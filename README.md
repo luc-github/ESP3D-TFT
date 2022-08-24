@@ -28,6 +28,18 @@ Everything, code from scratch or almost
 * Add Streaming Features
 * TBD... 
 
+## Chat
+
+Please use discord : [![discord](https://img.shields.io/discord/752822148795596940?color=blue&label=discord&logo=discord)](https://discord.gg/Z4ujTwE)
+
+## :question:Any question ?   
+Check [Wiki](https://github.com/luc-github/ESP3D/wiki/Install-Instructions) or Join the chat at [![Discord server](https://img.shields.io/discord/752822148795596940?color=blue&label=discord&logo=discord)](https://discord.gg/Z4ujTwE)   
+
+## :exclamation:Any issue/feedback ?    
+Check [Wiki](https://github.com/luc-github/ESP3D-TFT/wiki) and [FAQ](https://github.com/luc-github/ESP3D-TFT/discussions/categories/q-a) 
+If you still have issue: [submit ticket](https://github.com/luc-github/ESP3D-TFT/issues)    
+If it is not an issue join some discussion [here](https://github.com/luc-github/ESP3D-TFT/discussions)
+
 ## Sponsors 
 [<img width="200px" src="https://raw.githubusercontent.com/luc-github/ESP3D-WEBUI/2.1/images/sponsors-supporters/MKS/mksmakerbase.jpg" title="MKS Makerbase">](https://github.com/makerbase-mks)&nbsp;&nbsp;
 
