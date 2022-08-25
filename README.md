@@ -47,9 +47,9 @@ If it is not an issue join some discussion [here](https://github.com/luc-github/
 
 ## Become a sponsor or a supporter
  * A sponsor is a recurent donator    
-If your tier is `10 US$/month` or more, to thank you for your support, your logo / avatar will be added to the readme page with eventually with a link to your site.    
+   As my sponsorship is not displayed by github your logo / avatar will be added to the readme page with eventually with a link to your site.    
  * A supporter is per time donator 
- If your donation is over `120 US$` per year, to thank you for your support, your logo / avatar will be added to the readme page with eventually with a link to your site.  
+   To thank you for your support, your logo / avatar will be added to the readme page with eventually with a link to your site.  
 
  Every support is welcome, indeed helping users / developing new features need time and devices, donations contribute a lot to make things happen, thank you.
 
