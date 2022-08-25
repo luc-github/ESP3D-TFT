@@ -16,6 +16,7 @@ The reference boards I have bought :
 
 * ESP32 based + SDReader + 2.8'resistive screen (240x320) [model](https://www.aliexpress.com/item/3256804315935867.html)   
 * ESP32-S3 based + SDReader + PSRAM + 4.3' capacitive screen  (800x600) [model](https://www.aliexpress.com/item/1005003814428825.html)
+* ESP32-S3 based + SDReader + PSRAM + 3.5' capacitive screen (320x480) [model](https://www.aliexpress.com/item/1005004309826174.html)
 * [Rotrics TFT](https://rotrics.com/products/3-5-inch-touchscreen) ESP32 + SDReader + 3.5' Resistive screen (480x320) 
 * TBD...
 
