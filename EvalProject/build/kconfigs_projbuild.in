@@ -1,0 +1,6 @@
+source "C:/Users/luc/Documents/esp-idf/components/app_update/Kconfig.projbuild"
+source "C:/Users/luc/Documents/esp-idf/components/bootloader/Kconfig.projbuild"
+source "C:/Users/luc/Documents/esp-idf/components/esp_rom/Kconfig.projbuild"
+source "C:/Users/luc/Documents/esp-idf/components/esptool_py/Kconfig.projbuild"
+source "C:/Users/luc/Documents/esp-idf/components/partition_table/Kconfig.projbuild"
+source "C:/Users/luc/Documents/GitHub/ESP3D-TFT/EvalProject/main/Kconfig.projbuild"
