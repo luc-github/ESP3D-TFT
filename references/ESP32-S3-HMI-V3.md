@@ -24,6 +24,8 @@ https://github.com/W00ng/ESP32-S3-HMI-V3
 * Power switch
 * Power Supply: 5V / 1A
 * Dimension: 110 x 61 x 13.5mm   
+* Header 1 (10 pins): GND, 5V, EXT_IO2, EXT_IO1, 3.3V, RXD, TXD, GND, SCL, SDA
+* Header 2 (10 pins): GND, MOSI, CLK, MISO, CS, IO33, IO46, IO0, EXT_IO0
 
 ## Pinout 
 Pin | Usage 
