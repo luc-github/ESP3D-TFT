@@ -6,17 +6,16 @@ https://github.com/W00ng/ESP32-S3-HMI-V3
 * ESP32-S3 dual-core Xtensa 32-bit LX7 microprocessor, up to 240 MHz with 384KB ROM, 512KB SRAM. 2.4GHz WiFi and Bluetooth 5
 * PSRAM: 2MB     
 * FLASH: 8MB
-* Micro-SD card slot
-* 4.3-inch display with 800×480    
-* I2C capacitive touch panel
-* Audio amplifier   
+* Micro-SD card slot (SPI)
+* 4.3-inch display with 800×480 RM68120 (8080 parallel bus)  
+* I2C capacitive touch panel ft5x06 (i2C)
+* Audio amplifier RealNetworks (i2C)  
 * Built-in microphone   
 * Speaker
 * 1 USB-C OTG (DFU/CDC) port
 * 1 USB-C debug port
-* 3-axis accelerometer   
-* 3-axis gyroscope   
-* temperature and humidity sensors
+* 3-axis accelerometer /  3-axis gyroscope mpu6050 (i2C)
+* temperature and humidity sensors hdc1080 / htu21 (i2C)
 * I2C 
 * SPI   
 * GPIOs
