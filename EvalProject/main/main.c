@@ -15,11 +15,13 @@
 
 static const char *TAG = "main";
 
+extern void status_option(void);
 
 void app_main(void)
 {
     while (1) {
         ESP_LOGI(TAG, "Hello World");
+        status_option();
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
