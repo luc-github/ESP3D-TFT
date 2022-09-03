@@ -8,8 +8,8 @@ https://github.com/W00ng/ESP32-S3-HMI-V3
 * FLASH: 8MB
 * Micro-SD card slot (SPI)
 * 4.3-inch display with 800×480 RM68120 (8080 parallel bus)  
-* I2C capacitive touch panel ft5x06 (i2C)
-* Audio amplifier RealNetworks (i2C)  
+* I2C capacitive touch panel ft5x06 (i2C 0x38)
+* Audio amplifier RealNetworks (i2C 0x68)  
 * Built-in microphone   
 * Speaker
 * 1 USB-C OTG (DFU/CDC) port
