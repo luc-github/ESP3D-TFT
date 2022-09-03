@@ -9,13 +9,8 @@
 * Micro-SD card slot (SPI)
 * 3.5-inch display with 480×320 ST7796UI (8080 parallel bus)  RGB565
 * I2C capacitive touch panel ft5x06 (i2C 0x38)
-* Speaker
+* Audio (NS4168)
 * 1 USB-C OTG (DFU/CDC) port
-* 3-axis accelerometer /  3-axis gyroscope mpu6050 (i2C)
-* temperature and humidity sensors hdc1080 / htu21 (i2C)
-* I2C 
-* SPI   
-* GPIOs
 * Wakeup and reset buttons, 
 * Power switch
 * Power Supply: 5V / 1A
