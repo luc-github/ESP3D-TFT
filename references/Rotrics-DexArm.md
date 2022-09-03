@@ -7,12 +7,12 @@
 * PSRAM: ?     
 * FLASH: ?
 * Micro-SD card slot (SDIO)
-* 3.5-inch display with 480 x 320 ILI9488    
-* SPI capacitive touch panel XTP2048  
+* 3.5-inch display with 480 x 320 ILI9488 (SPI)   
+* SPI capacitive touch panel XTP2048 (SPI)    
 * Built-in microphone   
 * Speaker
 * 1 USB-C (Serial 1)
-* 1 debug port: GND, 5V, EN, GPIO 0, GPIO 2, GPIO 1(TX), GPIO 3 (RX)
+* 1 debug port: GND, 5V, EN, GPIO 0, GPIO 2, GPIO 1 (TX), GPIO 3 (RX)
 * Power Supply: 5V / 1A
 
 ## Pinout 
