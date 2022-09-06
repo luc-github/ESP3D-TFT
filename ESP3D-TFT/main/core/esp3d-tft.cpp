@@ -22,6 +22,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "version.h"
+#include <string>
 #define LOG_LEVEL_LOCAL ESP_LOG_VERBOSE
 #include "esp_log.h"
 #define LOG_TAG "MAIN"
@@ -40,8 +41,8 @@ Esp3DTFT::~Esp3DTFT()
 
 bool Esp3DTFT::begin()
 {
-    ESP_LOGI(LOG_TAG, "Starting Esp3DTFT " ESP3D_TFT_VERSION);
-
+    std::string target =  TFT_TARGET ;
+    ESP_LOGI(LOG_TAG, "Starting Esp3DTFT %s ", target.c_str());
     return true;
 }
 
