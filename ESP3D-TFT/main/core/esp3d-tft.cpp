@@ -27,8 +27,6 @@
 #include "esp_log.h"
 #define LOG_TAG "MAIN"
 
-
-
 Esp3DTFT::Esp3DTFT()
 {
 
