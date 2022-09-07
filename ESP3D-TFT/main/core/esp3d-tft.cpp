@@ -21,6 +21,7 @@
 #include "esp3d-tft.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "nvs_flash.h"
 #include "version.h"
 #include <string>
 #define LOG_LEVEL_LOCAL ESP_LOG_VERBOSE
@@ -41,7 +42,16 @@ bool Esp3DTFT::begin()
 {
     std::string target =  TFT_TARGET ;
     ESP_LOGI(LOG_TAG, "Starting Esp3DTFT %s ", target.c_str());
-    return true;
+    //do nvs init
+    ESP_LOGI(LOG_TAG, "Initialising NVS");
+    esp_err_t res = nvs_flash_init();
+    if (res == ESP_ERROR_NO_FREE_PAGES || res == ESP_ERROR_NVS_NEW_VERSION_FOUND) {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        res == nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(res);
+}
+return true;
 }
 
 void Esp3DTFT::handle()
