@@ -45,13 +45,12 @@ bool Esp3DTFT::begin()
     //do nvs init
     ESP_LOGI(LOG_TAG, "Initialising NVS");
     esp_err_t res = nvs_flash_init();
-    if (res == ESP_ERROR_NO_FREE_PAGES || res == ESP_ERROR_NVS_NEW_VERSION_FOUND) {
+    if (res == ESP_ERR_NVS_NO_FREE_PAGES || res == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         ESP_ERROR_CHECK(nvs_flash_erase());
-        res == nvs_flash_init();
+        res = nvs_flash_init();
     }
     ESP_ERROR_CHECK(res);
-}
-return true;
+    return true;
 }
 
 void Esp3DTFT::handle()
