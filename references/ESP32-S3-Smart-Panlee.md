@@ -15,9 +15,9 @@
 * Power switch
 * Power Supply: 5V / 1A
 * Dimension: 110 x 61 x 13.5mm   
-* 1 Debug interface : V5 - V3.3 - TX - RX - EN - GPIO 0 - GND / GPIO 14 
-* 1 Extended IO interface : V5 - GND - EXT_IO1- EXT_IO2- EXT_IO3- EXT_IO4- EXT_IO5- EXT_IO6
-* 1 RS485 interface : RS485-A - RS485-B - GND - V5
+* 1 Debug interface (7pins): V5 - V3.3 - TX - RX - EN - GPIO 0 - GND / GPIO 14 
+* 1 Extended IO interface (8pins): V5 - GND - EXT_IO1- EXT_IO2- EXT_IO3- EXT_IO4- EXT_IO5- EXT_IO6
+* 1 RS485 interface (4pins): RS485-A - RS485-B - GND - V5
 
 ## Pinout 
 Pin | Usage 

@@ -4,8 +4,8 @@
 
 ## Specs
 * ESP32
-* PSRAM: ?     
-* FLASH: ?
+* PSRAM: 8MB   
+* FLASH: 8MB
 * Micro-SD card slot (SDIO)
 * 3.5-inch display with 480 x 320 ILI9488 (SPI)   
 * SPI capacitive touch panel XTP2048 (SPI)    
