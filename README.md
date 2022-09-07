@@ -22,6 +22,16 @@ The reference boards I have bought :
 * [Rotrics TFT](https://rotrics.com/products/3-5-inch-touchscreen) ESP32 + SDReader + 3.5' Resistive screen (480x320) (Received)
 * TBD...
 
+## installation
+- Install the IDF vs code extension
+	- https://github.com/espressif/vscode-esp-idf-extension/blob/master/docs/tutorial/install.md
+- Configure the extension
+	- Select : View->Command palette 
+	- Type : configure esp
+- Open TFT-ESP3D project
+	- Go to file and select open folder where project is located
+- Edit CMakeLists.txt to select the correct target, be sure your Device target and port are properly set in espressif extension. (esp32 / esp32s3)
+
 ## Todo
 
 Everything, code from scratch or almost
