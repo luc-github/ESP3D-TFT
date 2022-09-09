@@ -1,5 +1,5 @@
 /*
-  esp3d-tft
+  esp3d-tft project
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 

@@ -27,6 +27,7 @@
 #define LOG_LEVEL_LOCAL ESP_LOG_VERBOSE
 #include "esp_log.h"
 #define LOG_TAG "MAIN"
+#include "lvgl.h"
 
 Esp3DTFT::Esp3DTFT()
 {
@@ -41,7 +42,8 @@ Esp3DTFT::~Esp3DTFT()
 bool Esp3DTFT::begin()
 {
     std::string target =  TFT_TARGET ;
-    ESP_LOGI(LOG_TAG, "Starting Esp3DTFT %s ", target.c_str());
+    ESP_LOGI(LOG_TAG, "Starting ESP3D-TFT on %s ", target.c_str());
+    ESP_LOGI(LOG_TAG, "Lvgl version is %s ", lv_version_info());
     //do nvs init
     ESP_LOGI(LOG_TAG, "Initialising NVS");
     esp_err_t res = nvs_flash_init();
