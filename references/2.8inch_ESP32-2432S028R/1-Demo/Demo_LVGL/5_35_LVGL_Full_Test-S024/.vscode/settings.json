@@ -1,0 +1,8 @@
+{
+    "idf.adapterTargetName": "esp32",
+    "idf.portWin": "COM3",
+    "idf.flashType": "UART",
+    "files.associations": {
+        "tp_spi.h": "c"
+    }
+}

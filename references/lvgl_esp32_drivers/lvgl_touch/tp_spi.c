@@ -14,7 +14,8 @@
 #include <string.h>
 
 #include "../lvgl_helpers.h"
-#include "../lvgl_spi_conf.h"
+#include "disp_def.h"
+#include "touch_def.h"
 
 /*********************
  *      DEFINES

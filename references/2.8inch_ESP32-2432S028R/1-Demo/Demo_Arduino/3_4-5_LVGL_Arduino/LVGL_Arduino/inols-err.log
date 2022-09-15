@@ -1,0 +1,60 @@
+
+
+
+
+
+
+
+Started logging.
+2022/07/27 18:02:30 logging to c:\Users\zhang'pei\Desktop\LVGL_Arduino\LVGL_Arduino\inols.log
+2022/07/27 18:02:30 Initial board configuration: {"ESP32 Dev Module" esp32:esp32:esp32}
+2022/07/27 18:02:30 Language server build path: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server130744847
+2022/07/27 18:02:30 Language server build sketch root: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server130744847\sketch
+2022/07/27 18:02:30 [92mIDE --> LS     CL: REQUEST initialize 0: [0m
+2022/07/27 18:02:30 IDE --> initialize 0 [93m locked[0m
+2022/07/27 18:02:30 IDE --> initialize 0 [93m unlocked[0m
+2022/07/27 18:02:30 INIT--- initializing workbench
+2022/07/27 18:02:30 INIT--- [93m locked[0m
+2022/07/27 18:02:30     --> initialize(file:///c%3A/Users/zhang%27pei/Desktop/LVGL_Arduino/LVGL_Arduino)
+2022/07/27 18:02:30 [91mIDE <-- LS     CL: ANSWER UNBOUND (0): [0m
+2022/07/27 18:02:30 running:  d:\arduino\Arduino IDE\resources\app\node_modules\arduino-ide-extension\build\arduino-cli.exe --config-file c:\Users\zhang'pei\.arduinoIDE\arduino-cli.yaml compile --fqbn esp32:esp32:esp32 --only-compilation-database --clean --source-override C:\Users\ZHANG'~1\AppData\Local\Temp\001035810 --build-path C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server130744847 --format json C:\Users\zhang'pei\Desktop\LVGL_Arduino\LVGL_Arduino
+2022/07/27 18:02:30 [92mIDE --> LS     CL: NOTIFICATION initialized: [0m
+2022/07/27 18:02:31 INIT--- initializing workbench (done)
+2022/07/27 18:02:31 INIT--- [93m unlocked[0m
+2022/07/27 18:02:31 IDE --> initialized notif1 [93m read-locked[0m
+2022/07/27 18:02:31 IDE --> initialized notif1 notification is not propagated to clangd
+2022/07/27 18:02:31 IDE --> initialized notif1 [93m read-unlocked[0m
+2022/07/27 18:02:31 [92mIDE --> LS     CL: NOTIFICATION textDocument/didOpen: [0m
+2022/07/27 18:02:31 IDE --> textDocument/didOpen notif2 [93m locked[0m
+2022/07/27 18:02:31 IDE --> textDocument/didOpen notif2 (throttled: waiting for clangd)
+2022/07/27 18:02:31 IDE --> textDocument/didOpen notif2 [93m unlocked (waiting clangd)[0m
+
+
+
+
+
+
+
+Started logging.
+2022/07/27 18:49:05 logging to c:\Users\zhang'pei\Desktop\LVGL_Arduino\LVGL_Arduino\inols.log
+2022/07/27 18:49:05 Initial board configuration: {"ESP32 Dev Module" esp32:esp32:esp32}
+2022/07/27 18:49:05 Language server build path: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server798265091
+2022/07/27 18:49:05 Language server build sketch root: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server798265091\sketch
+2022/07/27 18:49:05 [92mIDE --> LS     CL: REQUEST initialize 0: [0m
+2022/07/27 18:49:05 IDE --> initialize 0 [93m locked[0m
+2022/07/27 18:49:05 IDE --> initialize 0 [93m unlocked[0m
+2022/07/27 18:49:05 INIT--- initializing workbench
+2022/07/27 18:49:05 INIT--- [93m locked[0m
+2022/07/27 18:49:05     --> initialize(file:///c%3A/Users/zhang%27pei/Desktop/LVGL_Arduino/LVGL_Arduino)
+2022/07/27 18:49:05 [91mIDE <-- LS     CL: ANSWER UNBOUND (0): [0m
+2022/07/27 18:49:05 running:  d:\arduino\Arduino IDE\resources\app\node_modules\arduino-ide-extension\build\arduino-cli.exe --config-file c:\Users\zhang'pei\.arduinoIDE\arduino-cli.yaml compile --fqbn esp32:esp32:esp32 --only-compilation-database --clean --source-override C:\Users\ZHANG'~1\AppData\Local\Temp\016638086 --build-path C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server798265091 --format json C:\Users\zhang'pei\Desktop\LVGL_Arduino\LVGL_Arduino
+2022/07/27 18:49:05 [92mIDE --> LS     CL: NOTIFICATION initialized: [0m
+2022/07/27 18:49:07 INIT--- initializing workbench (done)
+2022/07/27 18:49:07 INIT--- [93m unlocked[0m
+2022/07/27 18:49:07 IDE --> initialized notif1 [93m read-locked[0m
+2022/07/27 18:49:07 IDE --> initialized notif1 notification is not propagated to clangd
+2022/07/27 18:49:07 IDE --> initialized notif1 [93m read-unlocked[0m
+2022/07/27 18:49:07 [92mIDE --> LS     CL: NOTIFICATION textDocument/didOpen: [0m
+2022/07/27 18:49:07 IDE --> textDocument/didOpen notif2 [93m locked[0m
+2022/07/27 18:49:07 IDE --> textDocument/didOpen notif2 (throttled: waiting for clangd)
+2022/07/27 18:49:07 IDE --> textDocument/didOpen notif2 [93m unlocked (waiting clangd)[0m

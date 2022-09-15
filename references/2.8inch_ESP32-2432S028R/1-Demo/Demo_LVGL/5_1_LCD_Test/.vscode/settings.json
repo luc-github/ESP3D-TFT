@@ -1,0 +1,16 @@
+{
+    "files.associations": {
+		"array": "c",
+		"vector": "c",
+		"xstring": "c",
+		"xutility": "c",
+		"random": "c",
+		"*.ipp": "c",
+		"ratio": "c"
+	},
+    "editor.insertSpaces": false,      //不检测到第一个是tab后面都用tab
+	"editor.detectIndentation": false,      //不检测到第一个是tab后面都用tab
+	"editor.renderControlCharacters": true, //显示制表符是→
+	"editor.renderWhitespace": "all",       //显示4个空格是....
+	"editor.tabSize": 4,                    //tab设置为4个空格
+}

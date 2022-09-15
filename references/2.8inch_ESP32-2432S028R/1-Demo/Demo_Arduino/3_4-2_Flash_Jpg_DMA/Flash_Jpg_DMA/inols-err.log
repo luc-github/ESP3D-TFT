@@ -1,0 +1,240 @@
+
+
+
+
+
+
+
+Started logging.
+2022/06/29 16:49:02 logging to c:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\3_4-2_Flash_Jpg_DMA\Flash_Jpg_DMA\inols.log
+2022/06/29 16:49:02 Initial board configuration: {"ESP32 Dev Module" esp32:esp32:esp32}
+2022/06/29 16:49:02 Language server build path: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server034902155
+2022/06/29 16:49:02 Language server build sketch root: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server034902155\sketch
+2022/06/29 16:49:02 [92mIDE --> LS     CL: REQUEST initialize 0: [0m
+2022/06/29 16:49:02 IDE --> initialize 0 [93m locked[0m
+2022/06/29 16:49:02 IDE --> initialize 0 [93m unlocked[0m
+2022/06/29 16:49:02 INIT--- initializing workbench
+2022/06/29 16:49:02 INIT--- [93m locked[0m
+2022/06/29 16:49:02     --> initialize(file:///c%3A/Users/zhang%27pei/Desktop/ESP32-2432S028%E4%BE%8B%E5%AD%90/arduino/Source%20code/3_4-2_Flash_Jpg_DMA/Flash_Jpg_DMA)
+2022/06/29 16:49:02 [91mIDE <-- LS     CL: ANSWER UNBOUND (0): [0m
+2022/06/29 16:49:02 running:  d:\arduino\Arduino IDE\resources\app\node_modules\arduino-ide-extension\build\arduino-cli.exe --config-file c:\Users\zhang'pei\.arduinoIDE\arduino-cli.yaml compile --fqbn esp32:esp32:esp32 --only-compilation-database --clean --source-override C:\Users\ZHANG'~1\AppData\Local\Temp\169843822 --build-path C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server034902155 --format json C:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\3_4-2_Flash_Jpg_DMA\Flash_Jpg_DMA
+2022/06/29 16:49:02 [92mIDE --> LS     CL: NOTIFICATION initialized: [0m
+2022/06/29 16:49:04 INIT--- initializing workbench (done)
+2022/06/29 16:49:04 INIT--- [93m unlocked[0m
+2022/06/29 16:49:04 IDE --> initialized notif1 [93m read-locked[0m
+2022/06/29 16:49:04 IDE --> initialized notif1 notification is not propagated to clangd
+2022/06/29 16:49:04 IDE --> initialized notif1 [93m read-unlocked[0m
+2022/06/29 16:49:04 [92mIDE --> LS     CL: NOTIFICATION textDocument/didOpen: [0m
+2022/06/29 16:49:04 IDE --> textDocument/didOpen notif2 [93m locked[0m
+2022/06/29 16:49:04 IDE --> textDocument/didOpen notif2 (throttled: waiting for clangd)
+2022/06/29 16:49:04 IDE --> textDocument/didOpen notif2 [93m unlocked (waiting clangd)[0m
+
+
+
+
+
+
+
+Started logging.
+2022/06/29 16:56:13 logging to c:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\3_4-2_Flash_Jpg_DMA\Flash_Jpg_DMA\inols.log
+2022/06/29 16:56:13 Initial board configuration: {"ESP32 Dev Module" esp32:esp32:esp32}
+2022/06/29 16:56:13 Language server build path: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server173079263
+2022/06/29 16:56:13 Language server build sketch root: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server173079263\sketch
+2022/06/29 16:56:13 [92mIDE --> LS     CL: REQUEST initialize 0: [0m
+2022/06/29 16:56:13 IDE --> initialize 0 [93m locked[0m
+2022/06/29 16:56:13 IDE --> initialize 0 [93m unlocked[0m
+2022/06/29 16:56:13 INIT--- initializing workbench
+2022/06/29 16:56:13 INIT--- [93m locked[0m
+2022/06/29 16:56:13     --> initialize(file:///c%3A/Users/zhang%27pei/Desktop/ESP32-2432S028%E4%BE%8B%E5%AD%90/arduino/Source%20code/3_4-2_Flash_Jpg_DMA/Flash_Jpg_DMA)
+2022/06/29 16:56:13 [91mIDE <-- LS     CL: ANSWER UNBOUND (0): [0m
+2022/06/29 16:56:13 running:  d:\arduino\Arduino IDE\resources\app\node_modules\arduino-ide-extension\build\arduino-cli.exe --config-file c:\Users\zhang'pei\.arduinoIDE\arduino-cli.yaml compile --fqbn esp32:esp32:esp32 --only-compilation-database --clean --source-override C:\Users\ZHANG'~1\AppData\Local\Temp\461370034 --build-path C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server173079263 --format json C:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\3_4-2_Flash_Jpg_DMA\Flash_Jpg_DMA
+2022/06/29 16:56:13 [92mIDE --> LS     CL: NOTIFICATION initialized: [0m
+2022/06/29 16:56:14 INIT--- initializing workbench (done)
+2022/06/29 16:56:14 INIT--- [93m unlocked[0m
+2022/06/29 16:56:14 IDE --> initialized notif1 [93m read-locked[0m
+2022/06/29 16:56:14 IDE --> initialized notif1 notification is not propagated to clangd
+2022/06/29 16:56:14 IDE --> initialized notif1 [93m read-unlocked[0m
+2022/06/29 16:56:14 [92mIDE --> LS     CL: NOTIFICATION textDocument/didOpen: [0m
+2022/06/29 16:56:14 IDE --> textDocument/didOpen notif2 [93m locked[0m
+2022/06/29 16:56:14 IDE --> textDocument/didOpen notif2 (throttled: waiting for clangd)
+2022/06/29 16:56:14 IDE --> textDocument/didOpen notif2 [93m unlocked (waiting clangd)[0m
+
+
+
+
+
+
+
+Started logging.
+2022/06/29 18:42:59 logging to c:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\3_4-2_Flash_Jpg_DMA\Flash_Jpg_DMA\inols.log
+2022/06/29 18:42:59 Initial board configuration: {"ESP32 Dev Module" esp32:esp32:esp32}
+2022/06/29 18:42:59 Language server build path: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server967062007
+2022/06/29 18:42:59 Language server build sketch root: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server967062007\sketch
+2022/06/29 18:42:59 [92mIDE --> LS     CL: REQUEST initialize 0: [0m
+2022/06/29 18:42:59 IDE --> initialize 0 [93m locked[0m
+2022/06/29 18:42:59 IDE --> initialize 0 [93m unlocked[0m
+2022/06/29 18:42:59 INIT--- initializing workbench
+2022/06/29 18:42:59 INIT--- [93m locked[0m
+2022/06/29 18:42:59 [91mIDE <-- LS     CL: ANSWER UNBOUND (0): [0m
+2022/06/29 18:42:59     --> initialize(file:///c%3A/Users/zhang%27pei/Desktop/ESP32-2432S028%E4%BE%8B%E5%AD%90/arduino/Source%20code/3_4-2_Flash_Jpg_DMA/Flash_Jpg_DMA)
+2022/06/29 18:42:59 running:  d:\arduino\Arduino IDE\resources\app\node_modules\arduino-ide-extension\build\arduino-cli.exe --config-file c:\Users\zhang'pei\.arduinoIDE\arduino-cli.yaml compile --fqbn esp32:esp32:esp32 --only-compilation-database --clean --source-override C:\Users\ZHANG'~1\AppData\Local\Temp\993139946 --build-path C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server967062007 --format json C:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\3_4-2_Flash_Jpg_DMA\Flash_Jpg_DMA
+2022/06/29 18:42:59 [92mIDE --> LS     CL: NOTIFICATION initialized: [0m
+2022/06/29 18:43:00 INIT--- initializing workbench (done)
+2022/06/29 18:43:00 INIT--- [93m unlocked[0m
+2022/06/29 18:43:00 IDE --> initialized notif1 [93m read-locked[0m
+2022/06/29 18:43:00 IDE --> initialized notif1 notification is not propagated to clangd
+2022/06/29 18:43:00 IDE --> initialized notif1 [93m read-unlocked[0m
+2022/06/29 18:43:00 [92mIDE --> LS     CL: NOTIFICATION textDocument/didOpen: [0m
+2022/06/29 18:43:00 IDE --> textDocument/didOpen notif2 [93m locked[0m
+2022/06/29 18:43:00 IDE --> textDocument/didOpen notif2 (throttled: waiting for clangd)
+2022/06/29 18:43:00 IDE --> textDocument/didOpen notif2 [93m unlocked (waiting clangd)[0m
+
+
+
+
+
+
+
+Started logging.
+2022/06/30 11:05:10 logging to c:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\3_4-2_Flash_Jpg_DMA\Flash_Jpg_DMA\inols.log
+2022/06/30 11:05:10 Initial board configuration: {"ESP32 Dev Module" esp32:esp32:esp32}
+2022/06/30 11:05:10 Language server build path: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server388329519
+2022/06/30 11:05:10 Language server build sketch root: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server388329519\sketch
+2022/06/30 11:05:10 [92mIDE --> LS     CL: REQUEST initialize 0: [0m
+2022/06/30 11:05:10 IDE --> initialize 0 [93m locked[0m
+2022/06/30 11:05:10 IDE --> initialize 0 [93m unlocked[0m
+2022/06/30 11:05:10 INIT--- initializing workbench
+2022/06/30 11:05:10 INIT--- [93m locked[0m
+2022/06/30 11:05:10 [91mIDE <-- LS     CL: ANSWER UNBOUND (0): [0m
+2022/06/30 11:05:10     --> initialize(file:///c%3A/Users/zhang%27pei/Desktop/ESP32-2432S028%E4%BE%8B%E5%AD%90/arduino/Source%20code/3_4-2_Flash_Jpg_DMA/Flash_Jpg_DMA)
+2022/06/30 11:05:10 running:  d:\arduino\Arduino IDE\resources\app\node_modules\arduino-ide-extension\build\arduino-cli.exe --config-file c:\Users\zhang'pei\.arduinoIDE\arduino-cli.yaml compile --fqbn esp32:esp32:esp32 --only-compilation-database --clean --source-override C:\Users\ZHANG'~1\AppData\Local\Temp\218404290 --build-path C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server388329519 --format json C:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\3_4-2_Flash_Jpg_DMA\Flash_Jpg_DMA
+2022/06/30 11:05:10 [92mIDE --> LS     CL: NOTIFICATION initialized: [0m
+2022/06/30 11:05:11 INIT--- initializing workbench (done)
+2022/06/30 11:05:11 INIT--- [93m unlocked[0m
+2022/06/30 11:05:11 IDE --> initialized notif1 [93m read-locked[0m
+2022/06/30 11:05:11 IDE --> initialized notif1 notification is not propagated to clangd
+2022/06/30 11:05:11 IDE --> initialized notif1 [93m read-unlocked[0m
+2022/06/30 11:05:11 [92mIDE --> LS     CL: NOTIFICATION textDocument/didOpen: [0m
+2022/06/30 11:05:11 IDE --> textDocument/didOpen notif2 [93m locked[0m
+2022/06/30 11:05:11 IDE --> textDocument/didOpen notif2 (throttled: waiting for clangd)
+2022/06/30 11:05:11 IDE --> textDocument/didOpen notif2 [93m unlocked (waiting clangd)[0m
+
+
+
+
+
+
+
+Started logging.
+2022/06/30 11:47:16 logging to c:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\3_4-2_Flash_Jpg_DMA\Flash_Jpg_DMA\inols.log
+2022/06/30 11:47:16 Initial board configuration: {"ESP32 Dev Module" esp32:esp32:esp32}
+2022/06/30 11:47:16 Language server build path: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server526236887
+2022/06/30 11:47:16 Language server build sketch root: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server526236887\sketch
+2022/06/30 11:47:16 [92mIDE --> LS     CL: REQUEST initialize 0: [0m
+2022/06/30 11:47:16 IDE --> initialize 0 [93m locked[0m
+2022/06/30 11:47:16 IDE --> initialize 0 [93m unlocked[0m
+2022/06/30 11:47:16 [91mIDE <-- LS     CL: ANSWER UNBOUND (0): [0m
+2022/06/30 11:47:16 INIT--- initializing workbench
+2022/06/30 11:47:16 INIT--- [93m locked[0m
+2022/06/30 11:47:16     --> initialize(file:///c%3A/Users/zhang%27pei/Desktop/ESP32-2432S028%E4%BE%8B%E5%AD%90/arduino/Source%20code/3_4-2_Flash_Jpg_DMA/Flash_Jpg_DMA)
+2022/06/30 11:47:16 running:  d:\arduino\Arduino IDE\resources\app\node_modules\arduino-ide-extension\build\arduino-cli.exe --config-file c:\Users\zhang'pei\.arduinoIDE\arduino-cli.yaml compile --fqbn esp32:esp32:esp32 --only-compilation-database --clean --source-override C:\Users\ZHANG'~1\AppData\Local\Temp\032056394 --build-path C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server526236887 --format json C:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\3_4-2_Flash_Jpg_DMA\Flash_Jpg_DMA
+2022/06/30 11:47:16 [92mIDE --> LS     CL: NOTIFICATION initialized: [0m
+2022/06/30 11:47:18 INIT--- initializing workbench (done)
+2022/06/30 11:47:18 INIT--- [93m unlocked[0m
+2022/06/30 11:47:18 IDE --> initialized notif1 [93m read-locked[0m
+2022/06/30 11:47:18 IDE --> initialized notif1 notification is not propagated to clangd
+2022/06/30 11:47:18 IDE --> initialized notif1 [93m read-unlocked[0m
+2022/06/30 11:47:18 [92mIDE --> LS     CL: NOTIFICATION textDocument/didOpen: [0m
+2022/06/30 11:47:18 IDE --> textDocument/didOpen notif2 [93m locked[0m
+2022/06/30 11:47:18 IDE --> textDocument/didOpen notif2 (throttled: waiting for clangd)
+2022/06/30 11:47:18 IDE --> textDocument/didOpen notif2 [93m unlocked (waiting clangd)[0m
+
+
+
+
+
+
+
+Started logging.
+2022/06/30 19:18:22 logging to c:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\3_4-2_Flash_Jpg_DMA\Flash_Jpg_DMA\inols.log
+2022/06/30 19:18:22 Initial board configuration: {"ESP32 Dev Module" esp32:esp32:esp32}
+2022/06/30 19:18:22 Language server build path: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server049740239
+2022/06/30 19:18:22 Language server build sketch root: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server049740239\sketch
+2022/06/30 19:18:22 [92mIDE --> LS     CL: REQUEST initialize 0: [0m
+2022/06/30 19:18:22 IDE --> initialize 0 [93m locked[0m
+2022/06/30 19:18:22 IDE --> initialize 0 [93m unlocked[0m
+2022/06/30 19:18:22 INIT--- initializing workbench
+2022/06/30 19:18:22 INIT--- [93m locked[0m
+2022/06/30 19:18:22     --> initialize(file:///c%3A/Users/zhang%27pei/Desktop/ESP32-2432S028%E4%BE%8B%E5%AD%90/arduino/Source%20code/3_4-2_Flash_Jpg_DMA/Flash_Jpg_DMA)
+2022/06/30 19:18:22 [91mIDE <-- LS     CL: ANSWER UNBOUND (0): [0m
+2022/06/30 19:18:22 running:  d:\arduino\Arduino IDE\resources\app\node_modules\arduino-ide-extension\build\arduino-cli.exe --config-file c:\Users\zhang'pei\.arduinoIDE\arduino-cli.yaml compile --fqbn esp32:esp32:esp32 --only-compilation-database --clean --source-override C:\Users\ZHANG'~1\AppData\Local\Temp\843695842 --build-path C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server049740239 --format json C:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\3_4-2_Flash_Jpg_DMA\Flash_Jpg_DMA
+2022/06/30 19:18:22 [92mIDE --> LS     CL: NOTIFICATION initialized: [0m
+2022/06/30 19:18:24 INIT--- initializing workbench (done)
+2022/06/30 19:18:24 INIT--- [93m unlocked[0m
+2022/06/30 19:18:24 IDE --> initialized notif1 [93m read-locked[0m
+2022/06/30 19:18:24 IDE --> initialized notif1 notification is not propagated to clangd
+2022/06/30 19:18:24 IDE --> initialized notif1 [93m read-unlocked[0m
+2022/06/30 19:18:24 [92mIDE --> LS     CL: NOTIFICATION textDocument/didOpen: [0m
+2022/06/30 19:18:24 IDE --> textDocument/didOpen notif2 [93m locked[0m
+2022/06/30 19:18:24 IDE --> textDocument/didOpen notif2 (throttled: waiting for clangd)
+2022/06/30 19:18:24 IDE --> textDocument/didOpen notif2 [93m unlocked (waiting clangd)[0m
+
+
+
+
+
+
+
+Started logging.
+2022/07/22 12:54:40 logging to e:\晶彩\资料下载\ESP32\2.8inch_ESP32-2432S028R\1-Demo\Demo_Arduino\3_4-2_Flash_Jpg_DMA\Flash_Jpg_DMA\inols.log
+2022/07/22 12:54:40 Initial board configuration: {"ESP32 Dev Module" esp32:esp32:esp32}
+2022/07/22 12:54:40 Language server build path: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server973070999
+2022/07/22 12:54:40 Language server build sketch root: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server973070999\sketch
+2022/07/22 12:54:40 [92mIDE --> LS     CL: REQUEST initialize 0: [0m
+2022/07/22 12:54:40 IDE --> initialize 0 [93m locked[0m
+2022/07/22 12:54:40 IDE --> initialize 0 [93m unlocked[0m
+2022/07/22 12:54:40 INIT--- initializing workbench
+2022/07/22 12:54:40 INIT--- [93m locked[0m
+2022/07/22 12:54:40     --> initialize(file:///e%3A/%E6%99%B6%E5%BD%A9/%E8%B5%84%E6%96%99%E4%B8%8B%E8%BD%BD/ESP32/2.8inch_ESP32-2432S028R/1-Demo/Demo_Arduino/3_4-2_Flash_Jpg_DMA/Flash_Jpg_DMA)
+2022/07/22 12:54:40 [91mIDE <-- LS     CL: ANSWER UNBOUND (0): [0m
+2022/07/22 12:54:40 running:  d:\arduino\Arduino IDE\resources\app\node_modules\arduino-ide-extension\build\arduino-cli.exe --config-file c:\Users\zhang'pei\.arduinoIDE\arduino-cli.yaml compile --fqbn esp32:esp32:esp32 --only-compilation-database --clean --source-override C:\Users\ZHANG'~1\AppData\Local\Temp\131716362 --build-path C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server973070999 --format json E:\晶彩\资料下载\ESP32\2.8inch_ESP32-2432S028R\1-Demo\Demo_Arduino\3_4-2_Flash_Jpg_DMA\Flash_Jpg_DMA
+2022/07/22 12:54:40 [92mIDE --> LS     CL: NOTIFICATION initialized: [0m
+2022/07/22 12:54:41 INIT--- initializing workbench (done)
+2022/07/22 12:54:41 INIT--- [93m unlocked[0m
+2022/07/22 12:54:41 IDE --> initialized notif1 [93m read-locked[0m
+2022/07/22 12:54:41 IDE --> initialized notif1 notification is not propagated to clangd
+2022/07/22 12:54:41 IDE --> initialized notif1 [93m read-unlocked[0m
+2022/07/22 12:54:41 [92mIDE --> LS     CL: NOTIFICATION textDocument/didOpen: [0m
+2022/07/22 12:54:41 IDE --> textDocument/didOpen notif2 [93m locked[0m
+2022/07/22 12:54:41 IDE --> textDocument/didOpen notif2 (throttled: waiting for clangd)
+2022/07/22 12:54:41 IDE --> textDocument/didOpen notif2 [93m unlocked (waiting clangd)[0m
+
+
+
+
+
+
+
+Started logging.
+2022/07/24 17:28:51 logging to e:\晶彩\资料下载\ESP32\2.8inch_ESP32-2432S028R\1-Demo\Demo_Arduino\3_4-2_Flash_Jpg_DMA\Flash_Jpg_DMA\inols.log
+2022/07/24 17:28:51 Initial board configuration: {"ESP32 Dev Module" esp32:esp32:esp32}
+2022/07/24 17:28:51 Language server build path: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server506393019
+2022/07/24 17:28:51 Language server build sketch root: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server506393019\sketch
+2022/07/24 17:28:51 [92mIDE --> LS     CL: REQUEST initialize 0: [0m
+2022/07/24 17:28:51 IDE --> initialize 0 [93m locked[0m
+2022/07/24 17:28:51 IDE --> initialize 0 [93m unlocked[0m
+2022/07/24 17:28:51 INIT--- initializing workbench
+2022/07/24 17:28:51 INIT--- [93m locked[0m
+2022/07/24 17:28:51     --> initialize(file:///e%3A/%E6%99%B6%E5%BD%A9/%E8%B5%84%E6%96%99%E4%B8%8B%E8%BD%BD/ESP32/2.8inch_ESP32-2432S028R/1-Demo/Demo_Arduino/3_4-2_Flash_Jpg_DMA/Flash_Jpg_DMA)
+2022/07/24 17:28:51 [91mIDE <-- LS     CL: ANSWER UNBOUND (0): [0m
+2022/07/24 17:28:51 running:  d:\arduino\Arduino IDE\resources\app\node_modules\arduino-ide-extension\build\arduino-cli.exe --config-file c:\Users\zhang'pei\.arduinoIDE\arduino-cli.yaml compile --fqbn esp32:esp32:esp32 --only-compilation-database --clean --source-override C:\Users\ZHANG'~1\AppData\Local\Temp\176646622 --build-path C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server506393019 --format json E:\晶彩\资料下载\ESP32\2.8inch_ESP32-2432S028R\1-Demo\Demo_Arduino\3_4-2_Flash_Jpg_DMA\Flash_Jpg_DMA
+2022/07/24 17:28:51 [92mIDE --> LS     CL: NOTIFICATION initialized: [0m
+2022/07/24 17:28:53 INIT--- initializing workbench (done)
+2022/07/24 17:28:53 INIT--- [93m unlocked[0m
+2022/07/24 17:28:53 IDE --> initialized notif1 [93m read-locked[0m
+2022/07/24 17:28:53 IDE --> initialized notif1 notification is not propagated to clangd
+2022/07/24 17:28:53 IDE --> initialized notif1 [93m read-unlocked[0m
+2022/07/24 17:28:53 [92mIDE --> LS     CL: NOTIFICATION textDocument/didOpen: [0m
+2022/07/24 17:28:53 IDE --> textDocument/didOpen notif2 [93m locked[0m
+2022/07/24 17:28:53 IDE --> textDocument/didOpen notif2 (throttled: waiting for clangd)
+2022/07/24 17:28:53 IDE --> textDocument/didOpen notif2 [93m unlocked (waiting clangd)[0m

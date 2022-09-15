@@ -1,0 +1,240 @@
+
+
+
+
+
+
+
+Started logging.
+2022/06/28 16:55:17 logging to c:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\3_4-1_TFT_Rainbow\3_4_TFT_Rainbow\inols.log
+2022/06/28 16:55:17 Initial board configuration: {"ESP32 Dev Module" esp32:esp32:esp32}
+2022/06/28 16:55:17 Language server build path: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server851497139
+2022/06/28 16:55:17 Language server build sketch root: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server851497139\sketch
+2022/06/28 16:55:17 [92mIDE --> LS     CL: REQUEST initialize 0: [0m
+2022/06/28 16:55:17 IDE --> initialize 0 [93m locked[0m
+2022/06/28 16:55:17 IDE --> initialize 0 [93m unlocked[0m
+2022/06/28 16:55:17 INIT--- initializing workbench
+2022/06/28 16:55:17 INIT--- [93m locked[0m
+2022/06/28 16:55:17     --> initialize(file:///c%3A/Users/zhang%27pei/Desktop/ESP32-2432S028%E4%BE%8B%E5%AD%90/arduino/Source%20code/3_4-1_TFT_Rainbow/3_4_TFT_Rainbow)
+2022/06/28 16:55:17 [91mIDE <-- LS     CL: ANSWER UNBOUND (0): [0m
+2022/06/28 16:55:17 running:  d:\arduino\Arduino IDE\resources\app\node_modules\arduino-ide-extension\build\arduino-cli.exe --config-file c:\Users\zhang'pei\.arduinoIDE\arduino-cli.yaml compile --fqbn esp32:esp32:esp32 --only-compilation-database --clean --source-override C:\Users\ZHANG'~1\AppData\Local\Temp\081518198 --build-path C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server851497139 --format json C:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\3_4-1_TFT_Rainbow\3_4_TFT_Rainbow
+2022/06/28 16:55:17 [92mIDE --> LS     CL: NOTIFICATION initialized: [0m
+2022/06/28 16:55:19 INIT--- initializing workbench (done)
+2022/06/28 16:55:19 INIT--- [93m unlocked[0m
+2022/06/28 16:55:19 IDE --> initialized notif1 [93m read-locked[0m
+2022/06/28 16:55:19 IDE --> initialized notif1 notification is not propagated to clangd
+2022/06/28 16:55:19 IDE --> initialized notif1 [93m read-unlocked[0m
+2022/06/28 16:55:19 [92mIDE --> LS     CL: NOTIFICATION textDocument/didOpen: [0m
+2022/06/28 16:55:19 IDE --> textDocument/didOpen notif2 [93m locked[0m
+2022/06/28 16:55:19 IDE --> textDocument/didOpen notif2 (throttled: waiting for clangd)
+2022/06/28 16:55:19 IDE --> textDocument/didOpen notif2 [93m unlocked (waiting clangd)[0m
+
+
+
+
+
+
+
+Started logging.
+2022/06/29 16:35:49 logging to c:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\3_4-1_TFT_Rainbow\3_4_TFT_Rainbow\inols.log
+2022/06/29 16:35:49 Initial board configuration: {"ESP32 Dev Module" esp32:esp32:esp32}
+2022/06/29 16:35:49 Language server build path: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server036952771
+2022/06/29 16:35:49 Language server build sketch root: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server036952771\sketch
+2022/06/29 16:35:49 [92mIDE --> LS     CL: REQUEST initialize 0: [0m
+2022/06/29 16:35:49 IDE --> initialize 0 [93m locked[0m
+2022/06/29 16:35:49 IDE --> initialize 0 [93m unlocked[0m
+2022/06/29 16:35:49 [91mIDE <-- LS     CL: ANSWER UNBOUND (0): [0m
+2022/06/29 16:35:49 INIT--- initializing workbench
+2022/06/29 16:35:49 INIT--- [93m locked[0m
+2022/06/29 16:35:49     --> initialize(file:///c%3A/Users/zhang%27pei/Desktop/ESP32-2432S028%E4%BE%8B%E5%AD%90/arduino/Source%20code/3_4-1_TFT_Rainbow/3_4_TFT_Rainbow)
+2022/06/29 16:35:49 running:  d:\arduino\Arduino IDE\resources\app\node_modules\arduino-ide-extension\build\arduino-cli.exe --config-file c:\Users\zhang'pei\.arduinoIDE\arduino-cli.yaml compile --fqbn esp32:esp32:esp32 --only-compilation-database --clean --source-override C:\Users\ZHANG'~1\AppData\Local\Temp\972440902 --build-path C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server036952771 --format json C:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\3_4-1_TFT_Rainbow\3_4_TFT_Rainbow
+2022/06/29 16:35:49 [92mIDE --> LS     CL: NOTIFICATION initialized: [0m
+2022/06/29 16:35:51 INIT--- initializing workbench (done)
+2022/06/29 16:35:51 INIT--- [93m unlocked[0m
+2022/06/29 16:35:51 IDE --> initialized notif1 [93m read-locked[0m
+2022/06/29 16:35:51 IDE --> initialized notif1 notification is not propagated to clangd
+2022/06/29 16:35:51 IDE --> initialized notif1 [93m read-unlocked[0m
+2022/06/29 16:35:51 [92mIDE --> LS     CL: NOTIFICATION textDocument/didOpen: [0m
+2022/06/29 16:35:51 IDE --> textDocument/didOpen notif2 [93m locked[0m
+2022/06/29 16:35:51 IDE --> textDocument/didOpen notif2 (throttled: waiting for clangd)
+2022/06/29 16:35:51 IDE --> textDocument/didOpen notif2 [93m unlocked (waiting clangd)[0m
+
+
+
+
+
+
+
+Started logging.
+2022/06/29 16:39:15 logging to c:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\3_4-1_TFT_Rainbow\3_4_TFT_Rainbow\inols.log
+2022/06/29 16:39:15 Initial board configuration: {"ESP32 Dev Module" esp32:esp32:esp32}
+2022/06/29 16:39:15 Language server build path: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server058258219
+2022/06/29 16:39:15 Language server build sketch root: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server058258219\sketch
+2022/06/29 16:39:15 [92mIDE --> LS     CL: REQUEST initialize 0: [0m
+2022/06/29 16:39:15 IDE --> initialize 0 [93m locked[0m
+2022/06/29 16:39:15 IDE --> initialize 0 [93m unlocked[0m
+2022/06/29 16:39:15 INIT--- initializing workbench
+2022/06/29 16:39:15 INIT--- [93m locked[0m
+2022/06/29 16:39:15     --> initialize(file:///c%3A/Users/zhang%27pei/Desktop/ESP32-2432S028%E4%BE%8B%E5%AD%90/arduino/Source%20code/3_4-1_TFT_Rainbow/3_4_TFT_Rainbow)
+2022/06/29 16:39:15 [91mIDE <-- LS     CL: ANSWER UNBOUND (0): [0m
+2022/06/29 16:39:15 running:  d:\arduino\Arduino IDE\resources\app\node_modules\arduino-ide-extension\build\arduino-cli.exe --config-file c:\Users\zhang'pei\.arduinoIDE\arduino-cli.yaml compile --fqbn esp32:esp32:esp32 --only-compilation-database --clean --source-override C:\Users\ZHANG'~1\AppData\Local\Temp\712810638 --build-path C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server058258219 --format json C:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\3_4-1_TFT_Rainbow\3_4_TFT_Rainbow
+2022/06/29 16:39:15 [92mIDE --> LS     CL: NOTIFICATION initialized: [0m
+2022/06/29 16:39:17 INIT--- initializing workbench (done)
+2022/06/29 16:39:17 INIT--- [93m unlocked[0m
+2022/06/29 16:39:17 IDE --> initialized notif1 [93m read-locked[0m
+2022/06/29 16:39:17 IDE --> initialized notif1 notification is not propagated to clangd
+2022/06/29 16:39:17 IDE --> initialized notif1 [93m read-unlocked[0m
+2022/06/29 16:39:17 [92mIDE --> LS     CL: NOTIFICATION textDocument/didOpen: [0m
+2022/06/29 16:39:17 IDE --> textDocument/didOpen notif2 [93m locked[0m
+2022/06/29 16:39:17 IDE --> textDocument/didOpen notif2 (throttled: waiting for clangd)
+2022/06/29 16:39:17 IDE --> textDocument/didOpen notif2 [93m unlocked (waiting clangd)[0m
+
+
+
+
+
+
+
+Started logging.
+2022/07/08 17:54:49 logging to e:\晶彩\开发资料\ESP32模块\ESP32-2432S028例子\arduino\Source code\3_4-1_TFT_Rainbow\3_4_TFT_Rainbow\inols.log
+2022/07/08 17:54:49 Initial board configuration: {"ESP32 Dev Module" esp32:esp32:esp32}
+2022/07/08 17:54:49 Language server build path: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server603017607
+2022/07/08 17:54:49 Language server build sketch root: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server603017607\sketch
+2022/07/08 17:54:49 [92mIDE --> LS     CL: REQUEST initialize 0: [0m
+2022/07/08 17:54:49 IDE --> initialize 0 [93m locked[0m
+2022/07/08 17:54:49 IDE --> initialize 0 [93m unlocked[0m
+2022/07/08 17:54:49 [91mIDE <-- LS     CL: ANSWER UNBOUND (0): [0m
+2022/07/08 17:54:49 INIT--- initializing workbench
+2022/07/08 17:54:49 INIT--- [93m locked[0m
+2022/07/08 17:54:49     --> initialize(file:///e%3A/%E6%99%B6%E5%BD%A9/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/ESP32%E6%A8%A1%E5%9D%97/ESP32-2432S028%E4%BE%8B%E5%AD%90/arduino/Source%20code/3_4-1_TFT_Rainbow/3_4_TFT_Rainbow)
+2022/07/08 17:54:49 running:  d:\arduino\Arduino IDE\resources\app\node_modules\arduino-ide-extension\build\arduino-cli.exe --config-file c:\Users\zhang'pei\.arduinoIDE\arduino-cli.yaml compile --fqbn esp32:esp32:esp32 --only-compilation-database --clean --source-override C:\Users\ZHANG'~1\AppData\Local\Temp\578654010 --build-path C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server603017607 --format json E:\晶彩\开发资料\ESP32模块\ESP32-2432S028例子\arduino\Source code\3_4-1_TFT_Rainbow\3_4_TFT_Rainbow
+2022/07/08 17:54:49 [92mIDE --> LS     CL: NOTIFICATION initialized: [0m
+2022/07/08 17:54:50 INIT--- initializing workbench (done)
+2022/07/08 17:54:50 INIT--- [93m unlocked[0m
+2022/07/08 17:54:50 IDE --> initialized notif1 [93m read-locked[0m
+2022/07/08 17:54:50 IDE --> initialized notif1 notification is not propagated to clangd
+2022/07/08 17:54:50 IDE --> initialized notif1 [93m read-unlocked[0m
+2022/07/08 17:54:50 [92mIDE --> LS     CL: NOTIFICATION textDocument/didOpen: [0m
+2022/07/08 17:54:50 IDE --> textDocument/didOpen notif2 [93m locked[0m
+2022/07/08 17:54:50 IDE --> textDocument/didOpen notif2 (throttled: waiting for clangd)
+2022/07/08 17:54:50 IDE --> textDocument/didOpen notif2 [93m unlocked (waiting clangd)[0m
+
+
+
+
+
+
+
+Started logging.
+2022/07/22 12:52:42 logging to e:\晶彩\资料下载\ESP32\2.8inch_ESP32-2432S028R\1-Demo\Demo_Arduino\3_4-1_TFT_Rainbow\3_4_TFT_Rainbow\inols.log
+2022/07/22 12:52:42 Initial board configuration: {"ESP32 Dev Module" esp32:esp32:esp32}
+2022/07/22 12:52:42 Language server build path: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server457685655
+2022/07/22 12:52:42 Language server build sketch root: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server457685655\sketch
+2022/07/22 12:52:42 [92mIDE --> LS     CL: REQUEST initialize 0: [0m
+2022/07/22 12:52:42 IDE --> initialize 0 [93m locked[0m
+2022/07/22 12:52:42 IDE --> initialize 0 [93m unlocked[0m
+2022/07/22 12:52:42 INIT--- initializing workbench
+2022/07/22 12:52:42 INIT--- [93m locked[0m
+2022/07/22 12:52:42     --> initialize(file:///e%3A/%E6%99%B6%E5%BD%A9/%E8%B5%84%E6%96%99%E4%B8%8B%E8%BD%BD/ESP32/2.8inch_ESP32-2432S028R/1-Demo/Demo_Arduino/3_4-1_TFT_Rainbow/3_4_TFT_Rainbow)
+2022/07/22 12:52:42 [91mIDE <-- LS     CL: ANSWER UNBOUND (0): [0m
+2022/07/22 12:52:42 running:  d:\arduino\Arduino IDE\resources\app\node_modules\arduino-ide-extension\build\arduino-cli.exe --config-file c:\Users\zhang'pei\.arduinoIDE\arduino-cli.yaml compile --fqbn esp32:esp32:esp32 --only-compilation-database --clean --source-override C:\Users\ZHANG'~1\AppData\Local\Temp\023265034 --build-path C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server457685655 --format json E:\晶彩\资料下载\ESP32\2.8inch_ESP32-2432S028R\1-Demo\Demo_Arduino\3_4-1_TFT_Rainbow\3_4_TFT_Rainbow
+2022/07/22 12:52:42 [92mIDE --> LS     CL: NOTIFICATION initialized: [0m
+2022/07/22 12:52:43 INIT--- initializing workbench (done)
+2022/07/22 12:52:43 INIT--- [93m unlocked[0m
+2022/07/22 12:52:43 IDE --> initialized notif1 [93m read-locked[0m
+2022/07/22 12:52:43 IDE --> initialized notif1 notification is not propagated to clangd
+2022/07/22 12:52:43 IDE --> initialized notif1 [93m read-unlocked[0m
+2022/07/22 12:52:43 [92mIDE --> LS     CL: NOTIFICATION textDocument/didOpen: [0m
+2022/07/22 12:52:43 IDE --> textDocument/didOpen notif2 [93m locked[0m
+2022/07/22 12:52:43 IDE --> textDocument/didOpen notif2 (throttled: waiting for clangd)
+2022/07/22 12:52:43 IDE --> textDocument/didOpen notif2 [93m unlocked (waiting clangd)[0m
+
+
+
+
+
+
+
+Started logging.
+2022/07/24 16:50:26 logging to e:\晶彩\资料下载\ESP32\2.8inch_ESP32-2432S028R\1-Demo\Demo_Arduino\3_4-1_TFT_Rainbow\3_4_TFT_Rainbow\inols.log
+2022/07/24 16:50:26 Initial board configuration: {"ESP32 Dev Module" esp32:esp32:esp32}
+2022/07/24 16:50:26 Language server build path: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server678977283
+2022/07/24 16:50:26 Language server build sketch root: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server678977283\sketch
+2022/07/24 16:50:26 [92mIDE --> LS     CL: REQUEST initialize 0: [0m
+2022/07/24 16:50:26 IDE --> initialize 0 [93m locked[0m
+2022/07/24 16:50:26 IDE --> initialize 0 [93m unlocked[0m
+2022/07/24 16:50:26 INIT--- initializing workbench
+2022/07/24 16:50:26 INIT--- [93m locked[0m
+2022/07/24 16:50:26 [91mIDE <-- LS     CL: ANSWER UNBOUND (0): [0m
+2022/07/24 16:50:26     --> initialize(file:///e%3A/%E6%99%B6%E5%BD%A9/%E8%B5%84%E6%96%99%E4%B8%8B%E8%BD%BD/ESP32/2.8inch_ESP32-2432S028R/1-Demo/Demo_Arduino/3_4-1_TFT_Rainbow/3_4_TFT_Rainbow)
+2022/07/24 16:50:26 running:  d:\arduino\Arduino IDE\resources\app\node_modules\arduino-ide-extension\build\arduino-cli.exe --config-file c:\Users\zhang'pei\.arduinoIDE\arduino-cli.yaml compile --fqbn esp32:esp32:esp32 --only-compilation-database --clean --source-override C:\Users\ZHANG'~1\AppData\Local\Temp\111088262 --build-path C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server678977283 --format json E:\晶彩\资料下载\ESP32\2.8inch_ESP32-2432S028R\1-Demo\Demo_Arduino\3_4-1_TFT_Rainbow\3_4_TFT_Rainbow
+2022/07/24 16:50:26 [92mIDE --> LS     CL: NOTIFICATION initialized: [0m
+2022/07/24 16:50:28 INIT--- initializing workbench (done)
+2022/07/24 16:50:28 INIT--- [93m unlocked[0m
+2022/07/24 16:50:28 IDE --> initialized notif1 [93m read-locked[0m
+2022/07/24 16:50:28 IDE --> initialized notif1 notification is not propagated to clangd
+2022/07/24 16:50:28 IDE --> initialized notif1 [93m read-unlocked[0m
+2022/07/24 16:50:28 [92mIDE --> LS     CL: NOTIFICATION textDocument/didOpen: [0m
+2022/07/24 16:50:28 IDE --> textDocument/didOpen notif2 [93m locked[0m
+2022/07/24 16:50:28 IDE --> textDocument/didOpen notif2 (throttled: waiting for clangd)
+2022/07/24 16:50:28 IDE --> textDocument/didOpen notif2 [93m unlocked (waiting clangd)[0m
+
+
+
+
+
+
+
+Started logging.
+2022/07/24 17:01:48 logging to e:\晶彩\资料下载\ESP32\2.8inch_ESP32-2432S028R\1-Demo\Demo_Arduino\3_4-1_TFT_Rainbow\3_4_TFT_Rainbow\inols.log
+2022/07/24 17:01:48 Initial board configuration: {"ESP32 Dev Module" esp32:esp32:esp32}
+2022/07/24 17:01:48 Language server build path: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server342218975
+2022/07/24 17:01:48 Language server build sketch root: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server342218975\sketch
+2022/07/24 17:01:48 [92mIDE --> LS     CL: REQUEST initialize 0: [0m
+2022/07/24 17:01:48 IDE --> initialize 0 [93m locked[0m
+2022/07/24 17:01:48 IDE --> initialize 0 [93m unlocked[0m
+2022/07/24 17:01:48 INIT--- initializing workbench
+2022/07/24 17:01:48 INIT--- [93m locked[0m
+2022/07/24 17:01:48     --> initialize(file:///e%3A/%E6%99%B6%E5%BD%A9/%E8%B5%84%E6%96%99%E4%B8%8B%E8%BD%BD/ESP32/2.8inch_ESP32-2432S028R/1-Demo/Demo_Arduino/3_4-1_TFT_Rainbow/3_4_TFT_Rainbow)
+2022/07/24 17:01:48 [91mIDE <-- LS     CL: ANSWER UNBOUND (0): [0m
+2022/07/24 17:01:48 running:  d:\arduino\Arduino IDE\resources\app\node_modules\arduino-ide-extension\build\arduino-cli.exe --config-file c:\Users\zhang'pei\.arduinoIDE\arduino-cli.yaml compile --fqbn esp32:esp32:esp32 --only-compilation-database --clean --source-override C:\Users\ZHANG'~1\AppData\Local\Temp\799733426 --build-path C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server342218975 --format json E:\晶彩\资料下载\ESP32\2.8inch_ESP32-2432S028R\1-Demo\Demo_Arduino\3_4-1_TFT_Rainbow\3_4_TFT_Rainbow
+2022/07/24 17:01:48 [92mIDE --> LS     CL: NOTIFICATION initialized: [0m
+2022/07/24 17:01:50 INIT--- initializing workbench (done)
+2022/07/24 17:01:50 INIT--- [93m unlocked[0m
+2022/07/24 17:01:50 IDE --> initialized notif1 [93m read-locked[0m
+2022/07/24 17:01:50 IDE --> initialized notif1 notification is not propagated to clangd
+2022/07/24 17:01:50 IDE --> initialized notif1 [93m read-unlocked[0m
+2022/07/24 17:01:50 [92mIDE --> LS     CL: NOTIFICATION textDocument/didOpen: [0m
+2022/07/24 17:01:50 IDE --> textDocument/didOpen notif2 [93m locked[0m
+2022/07/24 17:01:50 IDE --> textDocument/didOpen notif2 (throttled: waiting for clangd)
+2022/07/24 17:01:50 IDE --> textDocument/didOpen notif2 [93m unlocked (waiting clangd)[0m
+
+
+
+
+
+
+
+Started logging.
+2022/07/24 17:23:24 logging to e:\晶彩\资料下载\ESP32\2.8inch_ESP32-2432S028R\1-Demo\Demo_Arduino\3_4-1_TFT_Rainbow\3_4_TFT_Rainbow\inols.log
+2022/07/24 17:23:24 Initial board configuration: {"ESP32 Dev Module" esp32:esp32:esp32}
+2022/07/24 17:23:24 Language server build path: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server385263135
+2022/07/24 17:23:24 Language server build sketch root: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server385263135\sketch
+2022/07/24 17:23:24 [92mIDE --> LS     CL: REQUEST initialize 0: [0m
+2022/07/24 17:23:24 IDE --> initialize 0 [93m locked[0m
+2022/07/24 17:23:24 IDE --> initialize 0 [93m unlocked[0m
+2022/07/24 17:23:24 INIT--- initializing workbench
+2022/07/24 17:23:24 INIT--- [93m locked[0m
+2022/07/24 17:23:24     --> initialize(file:///e%3A/%E6%99%B6%E5%BD%A9/%E8%B5%84%E6%96%99%E4%B8%8B%E8%BD%BD/ESP32/2.8inch_ESP32-2432S028R/1-Demo/Demo_Arduino/3_4-1_TFT_Rainbow/3_4_TFT_Rainbow)
+2022/07/24 17:23:24 [91mIDE <-- LS     CL: ANSWER UNBOUND (0): [0m
+2022/07/24 17:23:24 running:  d:\arduino\Arduino IDE\resources\app\node_modules\arduino-ide-extension\build\arduino-cli.exe --config-file c:\Users\zhang'pei\.arduinoIDE\arduino-cli.yaml compile --fqbn esp32:esp32:esp32 --only-compilation-database --clean --source-override C:\Users\ZHANG'~1\AppData\Local\Temp\775258866 --build-path C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server385263135 --format json E:\晶彩\资料下载\ESP32\2.8inch_ESP32-2432S028R\1-Demo\Demo_Arduino\3_4-1_TFT_Rainbow\3_4_TFT_Rainbow
+2022/07/24 17:23:24 [92mIDE --> LS     CL: NOTIFICATION initialized: [0m
+2022/07/24 17:23:26 INIT--- initializing workbench (done)
+2022/07/24 17:23:26 INIT--- [93m unlocked[0m
+2022/07/24 17:23:26 IDE --> initialized notif1 [93m read-locked[0m
+2022/07/24 17:23:26 IDE --> initialized notif1 notification is not propagated to clangd
+2022/07/24 17:23:26 IDE --> initialized notif1 [93m read-unlocked[0m
+2022/07/24 17:23:26 [92mIDE --> LS     CL: NOTIFICATION textDocument/didOpen: [0m
+2022/07/24 17:23:26 IDE --> textDocument/didOpen notif2 [93m locked[0m
+2022/07/24 17:23:26 IDE --> textDocument/didOpen notif2 (throttled: waiting for clangd)
+2022/07/24 17:23:26 IDE --> textDocument/didOpen notif2 [93m unlocked (waiting clangd)[0m

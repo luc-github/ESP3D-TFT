@@ -1,0 +1,60 @@
+
+
+
+
+
+
+
+Started logging.
+2022/06/27 12:32:32 logging to c:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\4_5_WIFI_STA_TCP_Client\inols.log
+2022/06/27 12:32:32 Initial board configuration: {"ESP32 Dev Module" esp32:esp32:esp32}
+2022/06/27 12:32:32 Language server build path: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server682504075
+2022/06/27 12:32:32 Language server build sketch root: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server682504075\sketch
+2022/06/27 12:32:32 [92mIDE --> LS     CL: REQUEST initialize 0: [0m
+2022/06/27 12:32:32 IDE --> initialize 0 [93m locked[0m
+2022/06/27 12:32:32 IDE --> initialize 0 [93m unlocked[0m
+2022/06/27 12:32:32 INIT--- initializing workbench
+2022/06/27 12:32:32 INIT--- [93m locked[0m
+2022/06/27 12:32:32     --> initialize(file:///c%3A/Users/zhang%27pei/Desktop/ESP32-2432S028%E4%BE%8B%E5%AD%90/arduino/Source%20code/4_5_WIFI_STA_TCP_Client)
+2022/06/27 12:32:32 [91mIDE <-- LS     CL: ANSWER UNBOUND (0): [0m
+2022/06/27 12:32:32 running:  d:\arduino\Arduino IDE\resources\app\node_modules\arduino-ide-extension\build\arduino-cli.exe --config-file c:\Users\zhang'pei\.arduinoIDE\arduino-cli.yaml compile --fqbn esp32:esp32:esp32 --only-compilation-database --clean --source-override C:\Users\ZHANG'~1\AppData\Local\Temp\863781742 --build-path C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server682504075 --format json C:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\4_5_WIFI_STA_TCP_Client
+2022/06/27 12:32:32 [92mIDE --> LS     CL: NOTIFICATION initialized: [0m
+2022/06/27 12:32:33 INIT--- initializing workbench (done)
+2022/06/27 12:32:33 INIT--- [93m unlocked[0m
+2022/06/27 12:32:33 IDE --> initialized notif1 [93m read-locked[0m
+2022/06/27 12:32:33 IDE --> initialized notif1 notification is not propagated to clangd
+2022/06/27 12:32:33 IDE --> initialized notif1 [93m read-unlocked[0m
+2022/06/27 12:32:33 [92mIDE --> LS     CL: NOTIFICATION textDocument/didOpen: [0m
+2022/06/27 12:32:33 IDE --> textDocument/didOpen notif2 [93m locked[0m
+2022/06/27 12:32:33 IDE --> textDocument/didOpen notif2 (throttled: waiting for clangd)
+2022/06/27 12:32:33 IDE --> textDocument/didOpen notif2 [93m unlocked (waiting clangd)[0m
+
+
+
+
+
+
+
+Started logging.
+2022/06/27 12:35:25 logging to c:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\4_5_WIFI_STA_TCP_Client\inols.log
+2022/06/27 12:35:25 Initial board configuration: {"ESP32 Dev Module" esp32:esp32:esp32}
+2022/06/27 12:35:25 Language server build path: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server881786527
+2022/06/27 12:35:25 Language server build sketch root: C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server881786527\sketch
+2022/06/27 12:35:25 [92mIDE --> LS     CL: REQUEST initialize 0: [0m
+2022/06/27 12:35:25 IDE --> initialize 0 [93m locked[0m
+2022/06/27 12:35:25 IDE --> initialize 0 [93m unlocked[0m
+2022/06/27 12:35:25 INIT--- initializing workbench
+2022/06/27 12:35:25 INIT--- [93m locked[0m
+2022/06/27 12:35:25     --> initialize(file:///c%3A/Users/zhang%27pei/Desktop/ESP32-2432S028%E4%BE%8B%E5%AD%90/arduino/Source%20code/4_5_WIFI_STA_TCP_Client)
+2022/06/27 12:35:25 [91mIDE <-- LS     CL: ANSWER UNBOUND (0): [0m
+2022/06/27 12:35:25 running:  d:\arduino\Arduino IDE\resources\app\node_modules\arduino-ide-extension\build\arduino-cli.exe --config-file c:\Users\zhang'pei\.arduinoIDE\arduino-cli.yaml compile --fqbn esp32:esp32:esp32 --only-compilation-database --clean --source-override C:\Users\ZHANG'~1\AppData\Local\Temp\112525682 --build-path C:\Users\zhang'pei\AppData\Local\Temp\arduino-language-server881786527 --format json C:\Users\zhang'pei\Desktop\ESP32-2432S028例子\arduino\Source code\4_5_WIFI_STA_TCP_Client
+2022/06/27 12:35:25 [92mIDE --> LS     CL: NOTIFICATION initialized: [0m
+2022/06/27 12:35:27 INIT--- initializing workbench (done)
+2022/06/27 12:35:27 INIT--- [93m unlocked[0m
+2022/06/27 12:35:27 IDE --> initialized notif1 [93m read-locked[0m
+2022/06/27 12:35:27 IDE --> initialized notif1 notification is not propagated to clangd
+2022/06/27 12:35:27 IDE --> initialized notif1 [93m read-unlocked[0m
+2022/06/27 12:35:27 [92mIDE --> LS     CL: NOTIFICATION textDocument/didOpen: [0m
+2022/06/27 12:35:27 IDE --> textDocument/didOpen notif2 [93m locked[0m
+2022/06/27 12:35:27 IDE --> textDocument/didOpen notif2 (throttled: waiting for clangd)
+2022/06/27 12:35:27 IDE --> textDocument/didOpen notif2 [93m unlocked (waiting clangd)[0m
