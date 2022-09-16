@@ -32,7 +32,7 @@
 #include "lvgl.h"
 #include "lvgl_helpers.h"
 
-#define LV_TICK_PERIOD_MS 10
+#define LV_TICK_PERIOD_MS 1
 
 /**********************
  *  STATIC PROTOTYPES
@@ -48,39 +48,118 @@ static void lv_tick_task(void *arg)
     lv_tick_inc(LV_TICK_PERIOD_MS);
 }
 
-static void event_handler(lv_event_t * e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
+static lv_style_t style_btn;
+static lv_style_t style_btn_pressed;
+static lv_style_t style_btn_red;
+static lv_obj_t * labelSlider;
 
-    if(code == LV_EVENT_CLICKED) {
-        ESP_LOGI(LOG_TAG,"Clicked");
-    } else if(code == LV_EVENT_VALUE_CHANGED) {
-        ESP_LOGI(LOG_TAG, "Toggled");
-    }
+
+
+static void slider_event_cb(lv_event_t * e)
+{
+    lv_obj_t * slider = lv_event_get_target(e);
+
+    /*Refresh the text*/
+    lv_label_set_text_fmt(labelSlider, "%"LV_PRId32, lv_slider_get_value(slider));
+    lv_obj_align_to(labelSlider, slider, LV_ALIGN_OUT_TOP_MID, 0, -15);    /*Align top of the slider*/
+}
+
+static lv_color_t darken(const lv_color_filter_dsc_t * dsc, lv_color_t color, lv_opa_t opa)
+{
+    LV_UNUSED(dsc);
+    return lv_color_darken(color, opa);
+}
+
+static void style_init(void)
+{
+    /*Create a simple button style*/
+    lv_style_init(&style_btn);
+    lv_style_set_radius(&style_btn, 10);
+    lv_style_set_bg_opa(&style_btn, LV_OPA_COVER);
+    lv_style_set_bg_color(&style_btn, lv_palette_lighten(LV_PALETTE_GREY, 3));
+    lv_style_set_bg_grad_color(&style_btn, lv_palette_main(LV_PALETTE_GREY));
+    lv_style_set_bg_grad_dir(&style_btn, LV_GRAD_DIR_VER);
+
+    lv_style_set_border_color(&style_btn, lv_color_black());
+    lv_style_set_border_opa(&style_btn, LV_OPA_20);
+    lv_style_set_border_width(&style_btn, 2);
+
+    lv_style_set_text_color(&style_btn, lv_color_black());
+
+    /*Create a style for the pressed state.
+     *Use a color filter to simply modify all colors in this state*/
+    static lv_color_filter_dsc_t color_filter;
+    lv_color_filter_dsc_init(&color_filter, darken);
+    lv_style_init(&style_btn_pressed);
+    lv_style_set_color_filter_dsc(&style_btn_pressed, &color_filter);
+    lv_style_set_color_filter_opa(&style_btn_pressed, LV_OPA_20);
+
+    /*Create a red style. Change only some colors.*/
+    lv_style_init(&style_btn_red);
+    lv_style_set_bg_color(&style_btn_red, lv_palette_main(LV_PALETTE_RED));
+    lv_style_set_bg_grad_color(&style_btn_red, lv_palette_lighten(LV_PALETTE_RED, 3));
+
+
 }
 
 static void create_application(void)
 {
 
-    lv_obj_t * label;
+    /*Initialize the style*/
+    style_init();
 
-    lv_obj_t * btn1 = lv_btn_create(lv_scr_act());
-    lv_obj_add_event_cb(btn1, event_handler, LV_EVENT_ALL, NULL);
-    lv_obj_align(btn1, LV_ALIGN_CENTER, 0, -40);
+    /*Create a button and use the new styles*/
+    lv_obj_t * btn = lv_btn_create(lv_scr_act());
+    /* Remove the styles coming from the theme
+     * Note that size and position are also stored as style properties
+     * so lv_obj_remove_style_all will remove the set size and position too */
+    lv_obj_remove_style_all(btn);
+    lv_obj_set_pos(btn, 10, 10);
+    lv_obj_set_size(btn, 120, 50);
+    lv_obj_add_style(btn, &style_btn, 0);
+    lv_obj_add_style(btn, &style_btn_pressed, LV_STATE_PRESSED);
 
-    label = lv_label_create(btn1);
+    /*Add a label to the button*/
+    lv_obj_t * label = lv_label_create(btn);
     lv_label_set_text(label, "Button");
     lv_obj_center(label);
 
+    /*Create another button and use the red style too*/
     lv_obj_t * btn2 = lv_btn_create(lv_scr_act());
-    lv_obj_add_event_cb(btn2, event_handler, LV_EVENT_ALL, NULL);
-    lv_obj_align(btn2, LV_ALIGN_CENTER, 0, 40);
-    lv_obj_add_flag(btn2, LV_OBJ_FLAG_CHECKABLE);
-    lv_obj_set_height(btn2, LV_SIZE_CONTENT);
+    lv_obj_remove_style_all(btn2);                      /*Remove the styles coming from the theme*/
+    lv_obj_set_pos(btn2, 10, 80);
+    lv_obj_set_size(btn2, 120, 50);
+    lv_obj_add_style(btn2, &style_btn, 0);
+    lv_obj_add_style(btn2, &style_btn_red, 0);
+    lv_obj_add_style(btn2, &style_btn_pressed, LV_STATE_PRESSED);
+    lv_obj_set_style_radius(btn2, LV_RADIUS_CIRCLE, 0); /*Add a local style too*/
 
     label = lv_label_create(btn2);
-    lv_label_set_text(label, "Toggle");
+    lv_label_set_text(label, "Button 2");
     lv_obj_center(label);
+    lv_obj_align_to(btn2, btn, LV_ALIGN_LEFT_MID, 140,0);
+
+    lv_obj_t * slider = lv_slider_create(lv_scr_act());
+    lv_obj_set_width(slider, 200);                          /*Set the width*/
+
+    lv_obj_center(slider);
+    lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_VALUE_CHANGED, NULL);     /*Assign an event function*/
+
+    /*Create a label above the slider*/
+    labelSlider = lv_label_create(lv_scr_act());
+    lv_label_set_text(labelSlider, "0");
+    lv_obj_align_to(labelSlider, slider, LV_ALIGN_OUT_TOP_MID, 0, -15);    /*Align top of the slider*/
+
+    lv_obj_t * btnTheme;
+    lv_obj_t * labelTheme;
+
+    btnTheme = lv_btn_create(lv_scr_act());
+    labelTheme = lv_label_create(btnTheme);
+    lv_label_set_text(labelTheme, "Original theme");
+    lv_obj_center(labelTheme);
+
+    lv_obj_align_to(btnTheme, slider, LV_ALIGN_OUT_BOTTOM_MID, 0, 15);    /*Align top of the slider*/
+
 }
 
 /* Creates a semaphore to handle concurrent call to lvgl stuff

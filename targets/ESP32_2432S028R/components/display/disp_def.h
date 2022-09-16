@@ -15,7 +15,7 @@ extern "C" {
 #define ILI9341_DC        2 //GPIO 2
 #define ILI9341_USE_RST   1
 #define ILI9341_RST       4 // GPIO 4
-#define ILI9341_INVERT_COLORS 1
+#define ILI9341_INVERT_COLORS 0
 
 /*
 PORTRAIT				0
