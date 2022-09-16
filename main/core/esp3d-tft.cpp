@@ -60,7 +60,7 @@ static void slider_event_cb(lv_event_t * e)
     lv_obj_t * slider = lv_event_get_target(e);
 
     /*Refresh the text*/
-    lv_label_set_text_fmt(labelSlider, "%"LV_PRId32, lv_slider_get_value(slider));
+    lv_label_set_text_fmt(labelSlider, "%" LV_PRId32, lv_slider_get_value(slider));
     lv_obj_align_to(labelSlider, slider, LV_ALIGN_OUT_TOP_MID, 0, -15);    /*Align top of the slider*/
 }
 
@@ -212,7 +212,10 @@ static void guiTask(void *pvParameter)
     /* Create and start a periodic timer interrupt to call lv_tick_inc */
     const esp_timer_create_args_t periodic_timer_args = {
         .callback = &lv_tick_task,
-        .name = "periodic_gui"
+        .arg =nullptr,
+        .dispatch_method=ESP_TIMER_TASK,
+        .name = "periodic_gui",
+        .skip_unhandled_events=false
     };
     esp_timer_handle_t periodic_timer;
     ESP_ERROR_CHECK(esp_timer_create(&periodic_timer_args, &periodic_timer));
