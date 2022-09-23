@@ -18,8 +18,8 @@ extern "C" {
 #define XPT2046_Y_INV           0
 #define XPT2046_XY_SWAP		    0
 #define XPT2046_TOUCH_THRESHOLD 400 // Threshold for touch detection
-//#define XPT2046_TOUCH_IRQ       13 //GPIO 13 same as CS?
-//#define XPT2046_TOUCH_IRQ_PRESS 1
+#define XPT2046_TOUCH_IRQ       22 //GPIO 22 
+#define XPT2046_TOUCH_IRQ_PRESS 1
 #define XPT2046_TOUCH_PRESS     1
 
 #define TP_SPI_MOSI 32 //GPIO 32

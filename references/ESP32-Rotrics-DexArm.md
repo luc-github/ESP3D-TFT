@@ -6,7 +6,7 @@
 * ESP32
 * PSRAM: 8MB   
 * FLASH: 8MB
-* Micro-SD card slot (SDIO)
+* Micro-SD card slot (SDIO 1 bit)
 * 3.5-inch display with 480 x 320 ILI9488 (SPI)   
 * SPI capacitive touch panel XTP2048 (SPI)    
 * Built-in microphone   
@@ -20,9 +20,9 @@ Pin | Usage
 ----|-----
 GPIO 0 | GPIO 0  
 GPIO 1 | TX 0
-GPIO 2 | GPIO 2  
+GPIO 2 | GPIO 2  / SDIO DAT0
 GPIO 3 | RX 0
-GPIO 4 |  
+GPIO 4 | SDIO DAT1
 GPIO 5 |
 GPIO 6 | SPI FLASH
 GPIO 7 | SPI FLASH 
@@ -31,15 +31,15 @@ GPIO 9 | SPI FLASH
 GPIO 10 | SPI FLASH
 GPIO 11 | SPI FLASH
 GPIO 12 | TFT_BL
-GPIO 13 | TFT_TOUCH
-GPIO 14 | 
-GPIO 15 | 
+GPIO 13 | TFT_TOUCH_CS
+GPIO 14 | SDIO CLK
+GPIO 15 | SDIO CMD
 GPIO 16 | 
 GPIO 17 | 
 GPIO 18 | 
 GPIO 19 | TFT_CS
 GPIO 21 | TX 1
-GPIO 22 | 
+GPIO 22 | TFT_TOUCH_IRQ
 GPIO 23 |
 GPIO 25 |
 GPIO 26 |
