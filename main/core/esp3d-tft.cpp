@@ -31,6 +31,13 @@
 #define LOG_TAG "MAIN"
 #include "lvgl.h"
 #include "lvgl_helpers.h"
+#include "sdkconfig.h"
+
+#if defined(CONFIG_ESP32_SPIRAM_SUPPORT) || defined(CONFIG_ESP32S3_SPIRAM_SUPPORT)
+#define HAS_PSRAM 1
+#else
+#define HAS_PSRAM 0
+#endif //CONFIG_ESP32_SPIRAM_SUPPORT || CONFIG_ESP32S3_SPIRAM_SUPPORT
 
 #define LV_TICK_PERIOD_MS 1
 
@@ -177,11 +184,11 @@ static void guiTask(void *pvParameter)
 
     /* Initialize SPI bus used by the drivers */
     lvgl_driver_init();
-    lv_color_t* buf1 = (lv_color_t*)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
+    lv_color_t* buf1 = (lv_color_t*)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t), HAS_PSRAM ?MALLOC_CAP_SPIRAM: MALLOC_CAP_DMA);
     assert(buf1 != NULL);
 
     /* Use double buffered when not working with monochrome displays */
-    lv_color_t* buf2 = (lv_color_t*)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
+    lv_color_t* buf2 = (lv_color_t*)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t),  HAS_PSRAM ?MALLOC_CAP_SPIRAM: MALLOC_CAP_DMA);
     assert(buf2 != NULL);
 
 
