@@ -32,7 +32,7 @@ extern "C" {
 *      DEFINES
 *********************/
 
-#define HAS_PSRAM 0
+#define HAS_PSRAM 1
 
 /**********************
  * GLOBAL PROTOTYPES
