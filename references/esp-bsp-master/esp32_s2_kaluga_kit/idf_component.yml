@@ -1,0 +1,29 @@
+version: "2.0.1"
+description: Board Support Package for ESP32-S2-Kaluga kit
+url: https://github.com/espressif/esp-bsp/tree/master/esp32_s2_kaluga_kit
+
+targets:
+  - esp32s2
+
+dependencies:
+  idf: ">=5.0"
+
+  button:
+    version: "^2"
+    public: true
+
+  es8311:
+    version: "^1"
+    public: true
+
+  led_strip:
+    version: "^2"
+    public: true
+
+  lvgl/lvgl:
+    version: "^8"
+    public: true
+
+  esp32-camera:
+    version: "^2"
+    public: true

@@ -9,16 +9,13 @@ https://github.com/W00ng/ESP32-S3-HMI-V3
 * Micro-SD card slot (SPI)
 * 4.3-inch display with 800×480 RM68120 (8080 parallel bus)  
 * I2C capacitive touch panel ft5x06 (i2C 0x38)
-* Audio amplifier RealNetworks (i2C 0x68)  
+* Audio amplifier RealNetworks (i2C 0x68) Speaker
 * Built-in microphone   
-* Speaker
 * 1 USB-C OTG (DFU/CDC) port
 * 1 USB-C debug port
 * 3-axis accelerometer /  3-axis gyroscope mpu6050 (i2C)
 * temperature and humidity sensors hdc1080 / htu21 (i2C)
-* I2C 
-* SPI   
-* GPIOs
+* I2C / SPI / GPIOs
 * Wakeup and reset buttons, 
 * Power switch
 * Power Supply: 5V / 1A
@@ -67,30 +64,3 @@ GPIO 45 | ESP_I2S0_MCLK
 GPIO 46 | GPIO 46
 GPIO 47 | ESP_I2S0_DSDIN
 GPIO 48 | ESP_I2SS0_LRCK
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

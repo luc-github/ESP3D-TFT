@@ -2,8 +2,8 @@
 # Select the target
 # #######################################
 OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R 2.8inches" OFF)
-OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" ON)
-OPTION(ESP32_ROTRICS_DEXARM35 "TFT TARGET is ESP32 Rotrics DexArm 3.5inches" OFF)
+OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" OFF)
+OPTION(ESP32_ROTRICS_DEXARM35 "TFT TARGET is ESP32 Rotrics DexArm 3.5inches" ON)
 OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-USRC-4832 3.5inches" OFF)
 
 # #######################################
@@ -32,21 +32,22 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
 # For lvgl_conf to use simple path
 add_compile_options(-DLV_CONF_INCLUDE_SIMPLE=1)
+add_compile_options(-DLV_LVGL_H_INCLUDE_SIMPLE=1)
 
 if(ESP32_2432S028R)
-    add_compile_options("-I${CMAKE_SOURCE_DIR}/targets/ESP32_2432S028R/components/lvgl_conf")
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/targets/ESP32_2432S028R/components/bsp")
     set(EXTRA_COMPONENT_DIRS targets/ESP32_2432S028R/components)
     set(TFT_TARGET "ESP32_2432S028R")
 elseif(ESP32S3_HMI43V3)
-    add_compile_options("-I${CMAKE_SOURCE_DIR}/targets/ESP32S3_HMI43V3/components/lvgl_conf")
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/targets/ESP32S3_HMI43V3/components/bsp")
     set(EXTRA_COMPONENT_DIRS targets/ESP32S3_HMI43V3/components)
     set(TFT_TARGET "ESP32S3_HMI43V3")
 elseif(ESP32_ROTRICS_DEXARM35)
-    add_compile_options("-I${CMAKE_SOURCE_DIR}/targets/ESP32_ROTRICS_DEXARM35/components/lvgl_conf")
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/targets/ESP32_ROTRICS_DEXARM35/components/bsp")
     set(EXTRA_COMPONENT_DIRS targets/ESP32_ROTRICS_DEXARM35/components)
     set(TFT_TARGET "ESP32_ROTRICS_DEXARM35")
 elseif(ESP32S3_ZX3D50CE02S_USRC_4832)
-    add_compile_options("-I${CMAKE_SOURCE_DIR}/targets/ESP32S3_ZX3D50CE02S_USRC_4832/components/lvgl_conf")
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/targets/ESP32S3_ZX3D50CE02S_USRC_4832/components/bsp")
     set(EXTRA_COMPONENT_DIRS targets/ESP32S3_ZX3D50CE02S_USRC_4832/components)
     set(TFT_TARGET "ESP32S3_ZX3D50CE02S_USRC_4832")
 endif()
