@@ -7,10 +7,10 @@ extern "C" {
 
 #define TFT_DISPLAY_CONTROLLER "ILI9341"
 
-#define LV_HOR_RES_MAX 320
-#define LV_VER_RES_MAX 240
+#define DISP_HOR_RES_MAX 320
+#define DISP_VER_RES_MAX 240
 
-#define DISP_BUF_SIZE  (LV_HOR_RES_MAX * 40)
+#define DISP_BUF_SIZE  (DISP_HOR_RES_MAX * 40)
 
 #define ILI9341_DC        2 //GPIO 2
 #define ILI9341_USE_RST   1 //Flag

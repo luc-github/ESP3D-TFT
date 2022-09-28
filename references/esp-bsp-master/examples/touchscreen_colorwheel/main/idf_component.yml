@@ -1,8 +1,0 @@
-description: Display and Camera example on ESP-BOX
-targets:
-    - esp32s3
-dependencies:
-  idf: ">=4.4"
-  esp-box:
-    version: "*"
-    override_path: "../../../esp-box"

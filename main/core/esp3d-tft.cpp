@@ -34,7 +34,7 @@
 
 
 
-#define LV_TICK_PERIOD_MS 1
+#define LV_TICK_PERIOD_MS 10
 
 /**********************
  *  STATIC PROTOTYPES
@@ -230,7 +230,7 @@ bool Esp3DTFT::begin()
     }
     ESP_ERROR_CHECK(res);
     //Specitic board initialization
-    bsp_init();
+    ESP_ERROR_CHECK(bsp_init());
 
     //Ui creation
     xTaskCreatePinnedToCore(guiTask, "gui", 4096*2, NULL, 0, NULL, 1);

@@ -60,7 +60,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-void bsp_init(void)
+esp_err_t bsp_init(void)
 {
     //Driver initialization
     ESP_LOGI(LOG_TAG, "Display buffer size: %d", DISP_BUF_SIZE);
@@ -109,11 +109,11 @@ void bsp_init(void)
     //Lvgl setup
     ESP_LOGI(LOG_TAG, "Setup Lvgl");
     lv_color_t* buf1 = (lv_color_t*)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t), HAS_PSRAM ?MALLOC_CAP_SPIRAM: MALLOC_CAP_DMA);
-    assert(buf1 != NULL);
+    if (buf1 == NULL) return ESP_FAIL;
 
     /* Use double buffered when not working with monochrome displays */
     lv_color_t* buf2 = (lv_color_t*)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t),  HAS_PSRAM ?MALLOC_CAP_SPIRAM: MALLOC_CAP_DMA);
-    assert(buf2 != NULL);
+    if (buf2 == NULL) return ESP_FAIL;
 
 
     static lv_disp_draw_buf_t draw_buf;
@@ -127,8 +127,8 @@ void bsp_init(void)
     lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
     disp_drv.flush_cb = ili9488_flush;    /*Set your driver function*/
     disp_drv.draw_buf = &draw_buf;        /*Assign the buffer to the display*/
-    disp_drv.hor_res = LV_HOR_RES_MAX;   /*Set the horizontal resolution of the display*/
-    disp_drv.ver_res = LV_VER_RES_MAX;   /*Set the vertical resolution of the display*/
+    disp_drv.hor_res = DISP_HOR_RES_MAX;   /*Set the horizontal resolution of the display*/
+    disp_drv.ver_res = DISP_VER_RES_MAX;   /*Set the vertical resolution of the display*/
     lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
 
 
@@ -139,5 +139,7 @@ void bsp_init(void)
     indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*/
     indev_drv.read_cb = xpt2046_read;          /*Set your driver function*/
     lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
+
+    return ESP_OK;
 }
 

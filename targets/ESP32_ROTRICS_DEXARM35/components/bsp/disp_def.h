@@ -7,10 +7,10 @@ extern "C" {
 
 #define TFT_DISPLAY_CONTROLLER "ILI9488"
 
-#define LV_HOR_RES_MAX 480
-#define LV_VER_RES_MAX 320
+#define DISP_HOR_RES_MAX 480
+#define DISP_VER_RES_MAX 320
 
-#define DISP_BUF_SIZE  (LV_HOR_RES_MAX * 40)
+#define DISP_BUF_SIZE  (DISP_HOR_RES_MAX * 40)
 
 #define ILI9488_DC        27 //GPIO 27
 //#define ILI9488_USE_RST   0

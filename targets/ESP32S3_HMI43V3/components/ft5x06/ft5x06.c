@@ -1,0 +1,161 @@
+/**
+ * @file ft5x06.c
+ * @brief FT5x06 Capacitive Touch Panel Controller Driver
+ * @version 0.1
+ * @date 2021-01-13
+ *
+ * @copyright Copyright 2021 Espressif Systems (Shanghai) Co. Ltd.
+ *
+ *      Licensed under the Apache License, Version 2.0 (the "License");
+ *      you may not use this file except in compliance with the License.
+ *      You may obtain a copy of the License at
+ *
+ *               http://www.apache.org/licenses/LICENSE-2.0
+
+ *      Unless required by applicable law or agreed to in writing, software
+ *      distributed under the License is distributed on an "AS IS" BASIS,
+ *      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *      See the License for the specific language governing permissions and
+ *      limitations under the License.
+ */
+
+#include "ft5x06.h"
+#include "touch_def.h"
+#include "disp_def.h"
+#include "esp_log.h"
+#define LOG_TAG "FT5x06"
+
+/** @brief FT5x06 register map and function codes */
+
+#define FT5x06_DEVICE_MODE      (0x00)
+#define FT5x06_GESTURE_ID       (0x01)
+#define FT5x06_TOUCH_POINTS     (0x02)
+
+#define FT5x06_TOUCH1_EV_FLAG   (0x03)
+#define FT5x06_TOUCH1_XH        (0x03)
+#define FT5x06_TOUCH1_XL        (0x04)
+#define FT5x06_TOUCH1_YH        (0x05)
+#define FT5x06_TOUCH1_YL        (0x06)
+
+#define FT5x06_TOUCH2_EV_FLAG   (0x09)
+#define FT5x06_TOUCH2_XH        (0x09)
+#define FT5x06_TOUCH2_XL        (0x0A)
+#define FT5x06_TOUCH2_YH        (0x0B)
+#define FT5x06_TOUCH2_YL        (0x0C)
+
+#define FT5x06_TOUCH3_EV_FLAG   (0x0F)
+#define FT5x06_TOUCH3_XH        (0x0F)
+#define FT5x06_TOUCH3_XL        (0x10)
+#define FT5x06_TOUCH3_YH        (0x11)
+#define FT5x06_TOUCH3_YL        (0x12)
+
+#define FT5x06_TOUCH4_EV_FLAG   (0x15)
+#define FT5x06_TOUCH4_XH        (0x15)
+#define FT5x06_TOUCH4_XL        (0x16)
+#define FT5x06_TOUCH4_YH        (0x17)
+#define FT5x06_TOUCH4_YL        (0x18)
+
+#define FT5x06_TOUCH5_EV_FLAG   (0x1B)
+#define FT5x06_TOUCH5_XH        (0x1B)
+#define FT5x06_TOUCH5_XL        (0x1C)
+#define FT5x06_TOUCH5_YH        (0x1D)
+#define FT5x06_TOUCH5_YL        (0x1E)
+
+#define FT5x06_ID_G_THGROUP             (0x80)
+#define FT5x06_ID_G_THPEAK              (0x81)
+#define FT5x06_ID_G_THCAL               (0x82)
+#define FT5x06_ID_G_THWATER             (0x83)
+#define FT5x06_ID_G_THTEMP              (0x84)
+#define FT5x06_ID_G_THDIFF              (0x85)
+#define FT5x06_ID_G_CTRL                (0x86)
+#define FT5x06_ID_G_TIME_ENTER_MONITOR  (0x87)
+#define FT5x06_ID_G_PERIODACTIVE        (0x88)
+#define FT5x06_ID_G_PERIODMONITOR       (0x89)
+#define FT5x06_ID_G_AUTO_CLB_MODE       (0xA0)
+#define FT5x06_ID_G_LIB_VERSION_H       (0xA1)
+#define FT5x06_ID_G_LIB_VERSION_L       (0xA2)
+#define FT5x06_ID_G_CIPHER              (0xA3)
+#define FT5x06_ID_G_MODE                (0xA4)
+#define FT5x06_ID_G_PMODE               (0xA5)
+#define FT5x06_ID_G_FIRMID              (0xA6)
+#define FT5x06_ID_G_STATE               (0xA7)
+#define FT5x06_ID_G_FT5201ID            (0xA8)
+#define FT5x06_ID_G_ERR                 (0xA9)
+
+static i2c_bus_device_handle_t ft5x06_handle = NULL;
+
+esp_err_t ft5x06_init(i2c_bus_handle_t i2c_bus_handle)
+{
+    if (NULL != ft5x06_handle || i2c_bus_handle == NULL) {
+        return ESP_FAIL;
+    }
+
+    ft5x06_handle = i2c_bus_device_create(i2c_bus_handle, FT5x06_ADDR, FT5x06_CLK_SPEED);
+
+    if (NULL == ft5x06_handle) {
+        ESP_LOGE(LOG_TAG, "Failed create FX5X06 device");
+        return ESP_FAIL;
+    }
+
+    // Valid touching detect threshold
+    i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_THGROUP, 70);
+
+    // valid touching peak detect threshold
+    i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_THPEAK, 60);
+
+    // Touch focus threshold
+    i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_THCAL, 16);
+
+    // threshold when there is surface water
+    i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_THWATER, 60);
+
+    // threshold of temperature compensation
+    i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_THTEMP, 10);
+
+    // Touch difference threshold
+    i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_THDIFF, 20);
+
+    // Delay to enter 'Monitor' status (s)
+    i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_TIME_ENTER_MONITOR, 2);
+
+    // Period of 'Active' status (ms)
+    i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_PERIODACTIVE, 12);
+
+    // Timer to enter 'idle' when in 'Monitor' (ms)
+    esp_err_t ret = i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_PERIODMONITOR, 40);
+
+    if(ret == ESP_OK) {
+        ESP_LOGI(LOG_TAG, "ft5x06 init ok");
+    } else {
+        ESP_LOGI(LOG_TAG, "ft5x06 init fail");
+    }
+    return ret;
+}
+
+/*Will be called by the library to read the touchpad*/
+void ft5x06_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
+{
+    static lv_coord_t last_x = 0;
+    static lv_coord_t last_y = 0;
+    static uint8_t touch_points_num = 0;
+    static uint8_t dataArray[4];
+    i2c_bus_read_byte(ft5x06_handle,FT5x06_TOUCH_POINTS, &touch_points_num);
+    /*Save the pressed coordinates and the state*/
+    if(touch_points_num) {
+        data->state = LV_INDEV_STATE_PR;
+        i2c_bus_read_bytes(ft5x06_handle,FT5x06_TOUCH1_XH, 4, dataArray);
+#if DISP_DIRECTION_LANDSCAPE == 1  // landscape mode
+        last_y = DISP_VER_RES_MAX - ((dataArray[0] & 0x0f) << 8) - dataArray[1];
+        last_x = ((dataArray[2] & 0x0f) << 8) + dataArray[3];
+#else  // portrait mode
+        last_x = ((dataArray[0] & 0x0f) << 8) + dataArray[1];
+        last_y = ((dataArray[2] & 0x0f) << 8) + dataArray[3];
+#endif
+        ESP_LOGI(LOG_TAG, "X %d y %d", last_x, last_y);
+    } else {
+        data->state = LV_INDEV_STATE_REL;
+    }
+    /*Set the last pressed coordinates*/
+    data->point.x = last_x;
+    data->point.y = last_y;
+}

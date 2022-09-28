@@ -27,6 +27,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "esp_err.h"
 
 /*********************
 *      DEFINES
@@ -37,7 +38,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void bsp_init(void);
+esp_err_t bsp_init(void);
 
 #ifdef __cplusplus
 } /* extern "C" */

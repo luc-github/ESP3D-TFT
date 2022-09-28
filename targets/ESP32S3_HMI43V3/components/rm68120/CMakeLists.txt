@@ -1,6 +1,7 @@
 # Component directive
-set(SOURCES "i2c_bus.c")
+set(SOURCES "rm68120.c")
 set(INCLUDES .)
 idf_component_register(SRCS ${SOURCES}
     INCLUDE_DIRS ${INCLUDES}
+    REQUIRES lvgl esp_lcd
 )
