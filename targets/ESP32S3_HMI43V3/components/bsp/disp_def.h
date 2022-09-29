@@ -1,5 +1,5 @@
 //Pins for ESP32S3 HMI43V3
-//Display driver RM68120 I2C
+//Display driver RM68120 parallele 8080
 #pragma once
 #ifdef __cplusplus
 extern "C" {
@@ -19,7 +19,9 @@ extern "C" {
 
 #define DISP_BUF_SIZE  (DISP_HOR_RES_MAX * 40)
 
-#define DISP_BIT_WIDTH  (16)
+#define DISP_BITS_WIDTH         (16)
+#define DISP_CMD_BITS_WIDTH     (16)
+#define DISP_PARAM_BITS_WIDTH   (16)
 #define DISP_CLK_FREQ   (8000000)
 
 #define DISP_BL_PIN     (-1)

@@ -60,30 +60,3 @@ GPIO 45 | LCD_BL (High)
 GPIO 46 | LCD_D1  
 GPIO 47 | LCD_WR
 GPIO 48 | LCD_TE
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

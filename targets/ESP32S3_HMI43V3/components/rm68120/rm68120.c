@@ -133,7 +133,7 @@ esp_err_t rm68120_init(lv_disp_drv_t  * disp_drv){
             DISP_D08_PIN, DISP_D09_PIN, DISP_D10_PIN, DISP_D11_PIN,
             DISP_D12_PIN, DISP_D13_PIN, DISP_D14_PIN, DISP_D15_PIN,
         },
-        .bus_width = DISP_BIT_WIDTH,
+        .bus_width = DISP_BITS_WIDTH,
         .max_transfer_bytes = DISP_HOR_RES_MAX * 40 * sizeof(uint16_t)  
     };
     ESP_ERROR_CHECK(esp_lcd_new_i80_bus(&bus_config, &i80_bus));
@@ -154,8 +154,8 @@ esp_err_t rm68120_init(lv_disp_drv_t  * disp_drv){
         },
         .on_color_trans_done = rm68120_notify_flush_ready,        //Callback invoked when color data transfer has finished
         .user_ctx = disp_drv,                    //User private data, passed directly to on_color_trans_done’s user_ctx
-        .lcd_cmd_bits = 16,
-        .lcd_param_bits = 16,
+        .lcd_cmd_bits = DISP_CMD_BITS_WIDTH,
+        .lcd_param_bits = DISP_PARAM_BITS_WIDTH,
     };
     ESP_ERROR_CHECK(esp_lcd_new_panel_io_i80(i80_bus, &io_config, &io_handle));
 
