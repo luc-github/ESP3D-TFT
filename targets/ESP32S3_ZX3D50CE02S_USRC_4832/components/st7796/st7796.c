@@ -127,7 +127,7 @@ esp_err_t st7796_init(lv_disp_drv_t  * disp_drv){
     
     esp_lcd_panel_dev_config_t panel_config = {
         .reset_gpio_num = DISP_RST_PIN,
-        .color_space = ESP_LCD_COLOR_SPACE_RGB,
+        .color_space = ESP_LCD_COLOR_SPACE_BGR,
         .bits_per_pixel = 16,
     };
     ESP_ERROR_CHECK(esp_lcd_new_panel_st7796(io_handle, &panel_config, &panel_handle));
@@ -136,9 +136,9 @@ esp_err_t st7796_init(lv_disp_drv_t  * disp_drv){
     esp_lcd_panel_init(panel_handle);    // LCD init
 
     esp_lcd_panel_invert_color(panel_handle, true);
-    // the gap is LCD panel specific, even panels with the same driver IC, can have different gap value
-    esp_lcd_panel_set_gap(panel_handle, 0, 20);
-
+    #if DISP_DIRECTION_LANDSCAPE == 1  // landscape mode
+    panel_st7796_swap_xy(panel_handle,true);
+    #endif //DISP_DIRECTION_LANDSCAPE
     ESP_LOGI(TAG, "Turn on LCD backlight");
     gpio_set_level(DISP_BL_PIN, DISP_BL_ON);
 

@@ -25,7 +25,7 @@ extern "C" {
 #define DISP_CLK_FREQ   (2 *1000 * 1000) // could be 10 if no PSRAM memory 
 
 #define DISP_BL_PIN     (45) //GPIO 45
-#define DISP_CS_PIN     (-1) //GPIO 48
+#define DISP_CS_PIN     (48) //GPIO 48
 #define DISP_RST_PIN    (4) //GPIO 4 - same as touch
 #define DISP_RS_PIN     (0) //GPIO 0
 #define DISP_WR_PIN     (47) //GPIO 47
