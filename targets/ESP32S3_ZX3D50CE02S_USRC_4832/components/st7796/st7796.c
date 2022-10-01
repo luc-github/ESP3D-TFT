@@ -79,7 +79,7 @@ esp_err_t st7796_init(lv_disp_drv_t  * disp_drv){
         ESP_LOGE(TAG, "st7796 bus already initialized");
         return ESP_FAIL;
     }
-     ESP_LOGI(TAG, "Turn off LCD backlight");
+    ESP_LOGI(TAG, "Turn off LCD backlight");
     gpio_config_t bk_gpio_config = {
         .mode = GPIO_MODE_OUTPUT,
         .pin_bit_mask = 1ULL << DISP_BL_PIN
@@ -87,7 +87,7 @@ esp_err_t st7796_init(lv_disp_drv_t  * disp_drv){
     ESP_ERROR_CHECK(gpio_config(&bk_gpio_config));
     gpio_set_level(DISP_BL_PIN, DISP_BL_OFF);
 
-    ESP_LOGI(TAG, "init rm68120 bus");
+    ESP_LOGI(TAG, "init st7796 bus");
     esp_lcd_i80_bus_handle_t i80_bus = NULL;
     esp_lcd_i80_bus_config_t bus_config = {
         .dc_gpio_num = DISP_RS_PIN,

@@ -19,10 +19,15 @@
  *      limitations under the License.
  */
 
+#include "driver/gpio.h"
+#include "esp_log.h"
 #include "ft5x06.h"
 #include "touch_def.h"
 #include "disp_def.h"
-#include "esp_log.h"
+
+/*********************
+ *      DEFINES
+ *********************/
 #define LOG_TAG "FT5x06"
 
 /** @brief FT5x06 register map and function codes */
@@ -82,8 +87,31 @@
 #define FT5x06_ID_G_FT5201ID            (0xA8)
 #define FT5x06_ID_G_ERR                 (0xA9)
 
+/**********************
+ *      TYPEDEFS
+ **********************/
+typedef enum {
+    TOUCH_NOT_DETECTED = 0,
+    TOUCH_DETECTED = 1,
+} ft5x06_touch_detect_t;
+
+/**********************
+ *  STATIC PROTOTYPES
+ **********************/
+static ft5x06_touch_detect_t ft5x06_is_touch_detected();
+
+/**********************
+ *  STATIC VARIABLES
+ **********************/
 static i2c_bus_device_handle_t ft5x06_handle = NULL;
 
+/**********************
+ *      MACROS
+ **********************/
+
+/**********************
+ *   GLOBAL FUNCTIONS
+ **********************/
 esp_err_t ft5x06_init(i2c_bus_handle_t i2c_bus_handle)
 {
     if (NULL != ft5x06_handle || i2c_bus_handle == NULL) {
@@ -97,32 +125,45 @@ esp_err_t ft5x06_init(i2c_bus_handle_t i2c_bus_handle)
         return ESP_FAIL;
     }
 
+#if FT5x06_TOUCH_IRQ || FT5x06_TOUCH_IRQ_PRESS
+    gpio_config_t irq_config = {
+        .pin_bit_mask = BIT64(FT5x06_TOUCH_IRQ),
+        .mode = GPIO_MODE_INPUT,
+        .pull_up_en = GPIO_PULLUP_DISABLE,
+        .pull_down_en = GPIO_PULLDOWN_DISABLE,
+        .intr_type = GPIO_INTR_DISABLE,
+    };
+
+    esp_err_t result = gpio_config(&irq_config);
+    assert(result == ESP_OK);
+#endif
+
     // Valid touching detect threshold
-    i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_THGROUP, 70);
+    esp_err_t ret = i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_THGROUP, 70);
 
     // valid touching peak detect threshold
-    i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_THPEAK, 60);
+    ret |= i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_THPEAK, 60);
 
     // Touch focus threshold
-    i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_THCAL, 16);
+    ret |= i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_THCAL, 16);
 
     // threshold when there is surface water
-    i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_THWATER, 60);
+    ret |= i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_THWATER, 60);
 
     // threshold of temperature compensation
-    i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_THTEMP, 10);
+    ret |= i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_THTEMP, 10);
 
     // Touch difference threshold
-    i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_THDIFF, 20);
+    ret |= i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_THDIFF, 20);
 
     // Delay to enter 'Monitor' status (s)
-    i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_TIME_ENTER_MONITOR, 2);
+    ret |= i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_TIME_ENTER_MONITOR, 2);
 
     // Period of 'Active' status (ms)
-    i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_PERIODACTIVE, 12);
+    ret |= i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_PERIODACTIVE, 12);
 
     // Timer to enter 'idle' when in 'Monitor' (ms)
-    esp_err_t ret = i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_PERIODMONITOR, 40);
+    ret |= i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_PERIODMONITOR, 40);
 
     if(ret == ESP_OK) {
         ESP_LOGI(LOG_TAG, "ft5x06 init ok");
@@ -137,11 +178,9 @@ void ft5x06_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
 {
     static lv_coord_t last_x = 0;
     static lv_coord_t last_y = 0;
-    static uint8_t touch_points_num = 0;
     static uint8_t dataArray[4];
-    i2c_bus_read_byte(ft5x06_handle,FT5x06_TOUCH_POINTS, &touch_points_num);
-    /*Save the pressed coordinates and the state*/
-    if(touch_points_num) {
+
+    if(ft5x06_is_touch_detected() == TOUCH_DETECTED) {
         data->state = LV_INDEV_STATE_PR;
         i2c_bus_read_bytes(ft5x06_handle,FT5x06_TOUCH1_XH, 4, dataArray);
 #if DISP_DIRECTION_LANDSCAPE == 1  // landscape mode
@@ -151,6 +190,7 @@ void ft5x06_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
         last_x = ((dataArray[0] & 0x0f) << 8) + dataArray[1];
         last_y = ((dataArray[2] & 0x0f) << 8) + dataArray[3];
 #endif
+
         ESP_LOGI(LOG_TAG, "X %d y %d", last_x, last_y);
     } else {
         data->state = LV_INDEV_STATE_REL;
@@ -158,4 +198,32 @@ void ft5x06_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
     /*Set the last pressed coordinates*/
     data->point.x = last_x;
     data->point.y = last_y;
+}
+
+
+/**********************
+ *   Static FUNCTIONS
+ **********************/
+static ft5x06_touch_detect_t ft5x06_is_touch_detected()
+{
+    // check IRQ pin if we IRQ or IRQ and preessure
+#if FT5x06_TOUCH_IRQ && FT5x06_TOUCH_IRQ_PRESS
+    uint8_t irq = gpio_get_level(FT5x06_TOUCH_IRQ);
+
+    if (irq == 0) {
+
+        return TOUCH_NOT_DETECTED;
+    }
+#endif
+    // check pressure if we are pressure or IRQ and pressure
+#if  FT5x06_TOUCH_PRESS || FT5x06_TOUCH_IRQ_PRESS
+    uint8_t touch_points_num = 0;
+    i2c_bus_read_byte(ft5x06_handle,FT5x06_TOUCH_POINTS, &touch_points_num);
+    if (touch_points_num) {
+        return TOUCH_DETECTED;
+    } else {
+        return TOUCH_NOT_DETECTED;
+    }
+#endif
+    return TOUCH_NOT_DETECTED;
 }
