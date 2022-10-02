@@ -4,7 +4,7 @@
 OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R 2.8inches" OFF)
 OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" OFF)
 OPTION(ESP32_ROTRICS_DEXARM35 "TFT TARGET is ESP32 Rotrics DexArm 3.5inches" OFF)
-OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-USRC-4832 3.5inches" ON)
+OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-USRC-4832 3.5inches" OFF)
 
 # #######################################
 # Do not change anything above this line
@@ -25,7 +25,11 @@ elseif(ESP32S3_ZX3D50CE02S_USRC_4832)
     set(SDKCONFIG targets/ESP32S3_ZX3D50CE02S_USRC_4832/sdkconfig)
     set(EXTRA_COMPONENT_DIRS targets/ESP32S3_ZX3D50CE02S_USRC_4832/components)
 else()
-    message(FATAL_ERROR "No target defined, CMake will exit.")
+    message(FATAL_ERROR
+        "\n"
+        "No target defined, please define a target in CMakeLists.txt"
+        "\n"
+        "Now cmake will exit")
 endif()
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
