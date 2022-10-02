@@ -33,4 +33,4 @@ private:
     bool _started;
 };
 
-static Esp3DTFTNetwork esp3dTFTnetwork;
+extern Esp3DTFTNetwork esp3dTFTnetwork;

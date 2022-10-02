@@ -42,6 +42,7 @@
  **********************/
 static void streamTask(void *pvParameter);
 
+Esp3DTFTStream esp3dTFTstream;
 
 /* Creates a semaphore to handle concurrent call to task stuff
  * If you wish to call *any* class function from other threads/tasks

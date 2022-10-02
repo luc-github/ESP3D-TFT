@@ -42,6 +42,7 @@
  **********************/
 static void networkTask(void *pvParameter);
 
+Esp3DTFTNetwork esp3dTFTnetwork;
 
 /* Creates a semaphore to handle concurrent call to task stuff
  * If you wish to call *any* class function from other threads/tasks

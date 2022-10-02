@@ -33,4 +33,4 @@ private:
     bool _started;
 };
 
-static Esp3DTFTUi esp3dTFTui;
+extern Esp3DTFTUi esp3dTFTui;

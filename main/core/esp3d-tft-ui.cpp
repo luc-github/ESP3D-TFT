@@ -40,6 +40,9 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+Esp3DTFTUi esp3dTFTui;
+
 static void lv_tick_task(void *arg);
 static void guiTask(void *pvParameter);
 static void create_application(void);

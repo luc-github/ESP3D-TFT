@@ -33,4 +33,4 @@ private:
     bool _started;
 };
 
-static Esp3DTFTStream esp3dTFTstream;
+extern Esp3DTFTStream esp3dTFTstream;
