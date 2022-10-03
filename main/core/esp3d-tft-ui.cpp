@@ -25,7 +25,6 @@
 #include "freertos/semphr.h"
 #include "version.h"
 #include <string>
-#define LOG_LEVEL_LOCAL ESP_LOG_VERBOSE
 #include "esp_log.h"
 #include "lvgl.h"
 

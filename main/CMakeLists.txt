@@ -1,5 +1,5 @@
 # main application directives
-set(SOURCES main.cpp core/esp3d-tft.cpp core/esp3d-tft-ui.cpp core/esp3d-tft-stream.cpp core/esp3d-tft-network.cpp)
+set(SOURCES . core)
 set(INCLUDES . core/includes)
-idf_component_register(SRCS ${SOURCES}
+idf_component_register(SRC_DIRS ${SOURCES}
     INCLUDE_DIRS ${INCLUDES})

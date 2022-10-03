@@ -22,6 +22,7 @@
 #include "esp3d-tft-ui.h"
 #include "esp3d-tft-stream.h"
 #include "esp3d-tft-network.h"
+#include "esp3d-settings.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_freertos_hooks.h"
@@ -29,7 +30,6 @@
 #include "nvs_flash.h"
 #include "version.h"
 #include <string>
-#define LOG_LEVEL_LOCAL ESP_LOG_VERBOSE
 #include "esp_log.h"
 #define LOG_TAG "MAIN"
 #include "bsp.h"
@@ -75,6 +75,22 @@ bool Esp3DTFT::begin()
     if (success) {
         success = esp3dTFTstream.begin();
     }
+    if (esp3dTFTsettings.isValidSettingsNvs()) {
+        ESP_LOGI(LOG_TAG, "NVS is valid");
+        char result[50]= {0};
+        if (esp3dTFTsettings.readString(esp3d_version, result,50)) {
+            ESP_LOGI(LOG_TAG, "NVS Setting version is %s", result);
+        }
+    } else {
+        ESP_LOGI(LOG_TAG, "NVS is not valid, need resetting");
+        if (esp3dTFTsettings.reset()) {
+            ESP_LOGI(LOG_TAG, "Reset NVS done");
+        } else {
+            ESP_LOGI(LOG_TAG, "Reset NVS failed");
+        }
+    }
+
+
     return success;
 }
 
