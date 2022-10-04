@@ -22,6 +22,7 @@
 #include "nvs_flash.h"
 #include "nvs.h"
 #include "nvs_handle.hpp"
+#include "lwip/ip_addr.h"
 #include "esp_system.h"
 #include <cstring>
 #include <string>
@@ -185,7 +186,12 @@ uint32_t Esp3DSettings::readUint32(esp3d_setting_index_t index, bool * haserror)
                     return value;
                 }
                 if (err == ESP_ERR_NVS_NOT_FOUND) {
-                    value = (uint32_t)std::stoul(std::string(query->defaultval), NULL,0);
+                    if(query->type== esp3d_integer) {
+                        value = (uint32_t)std::stoul(std::string(query->defaultval), NULL,0);
+                    } else { // ip is stored as uin32t but default value is ip format string
+                        value = (uint32_t)std::stoul(StringtoIPUInt32(query->defaultval)), NULL,0);
+                    }
+
                     if (haserror) {
                         *haserror =false;
                     }
@@ -198,6 +204,11 @@ uint32_t Esp3DSettings::readUint32(esp3d_setting_index_t index, bool * haserror)
         *haserror =true;
     }
     return 0;
+}
+
+const char* Esp3DSettings::readIPString(esp3d_setting_index_t index, bool * haserror)
+{
+    return IPUInt32toString(readUint32(index,haserror));
 }
 
 const char* Esp3DSettings::readString(esp3d_setting_index_t index, char* out_str, size_t len, bool * haserror)
@@ -278,6 +289,12 @@ bool Esp3DSettings::writeUint32 (esp3d_setting_index_t index, const uint32_t val
     }
     return false;
 }
+
+bool Esp3DSettings::writeIPString (esp3d_setting_index_t index, const char * byte_buffer)
+{
+    return writeUint32 (index,StringtoIPUInt32(byte_buffer));
+}
+
 bool Esp3DSettings::writeString (esp3d_setting_index_t index, const char * byte_buffer )
 {
     const Esp3DSetting_t * query = getSettingPtr(index);
@@ -296,6 +313,26 @@ bool Esp3DSettings::writeString (esp3d_setting_index_t index, const char * byte_
         }
     }
     return false;
+}
+
+const char *Esp3DSettings::IPUInt32toString(uint32_t ip_int)
+{
+    ip_addr_t tmpip ;
+    tmpip.type = IPADDR_TYPE_V4;
+    //convert uint32_t to ip_addr_t
+    ip_addr_set_ip4_u32_val(tmpip, ip_int);
+    //convert ip_addr_t to_string
+    return ip4addr_ntoa(&tmpip.u_addr.ip4);
+}
+
+uint32_t Esp3DSettings::StringtoIPUInt32(const char *s)
+{
+    ip_addr_t tmpip ;
+    tmpip.type = IPADDR_TYPE_V4;
+    //convert string to ip_addr_t
+    ip4addr_aton(s, &tmpip.u_addr.ip4);
+    //convert ip_addr_t to uint32_t
+    return ip4_addr_get_u32(ip_2_ip4(&tmpip));
 }
 
 

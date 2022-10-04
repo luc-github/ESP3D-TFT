@@ -35,6 +35,19 @@ typedef enum  {
     esp3d_ip, //4 bytes
 } esp3d_setting_type_t;
 
+//to be implemented :
+//use regex could also be implemented
+//for options list may be use a map list int is value and string is display
+//std::map<int, std::string> options { {0, "No Network"}, {1, "AP"}, {2, "STA"},}
+
+std::map<std::string, int> m
+type struct {
+    int64_t max;
+    int64_t min;
+    bool canbeempty;
+    void * options;
+}  esp3d_setting_boundaries_t;
+
 typedef struct  {
     esp3d_setting_index_t index;
     esp3d_setting_type_t type;
@@ -50,14 +63,19 @@ public:
     bool isValidSettingsNvs();
     uint8_t readByte(esp3d_setting_index_t index, bool * haserror = NULL);
     uint32_t readUint32(esp3d_setting_index_t index, bool * haserror = NULL);
+    const char* readIPString(esp3d_setting_index_t index, bool * haserror);
     const char* readString(esp3d_setting_index_t index, char* out_str, size_t len, bool * haserror = NULL);
     bool writeByte (esp3d_setting_index_t index, const uint8_t value);
     bool writeUint32 (esp3d_setting_index_t index, const uint32_t value);
+    bool writeIPString (esp3d_setting_index_t index, const char * byte_buffer);
     bool writeString (esp3d_setting_index_t index, const char * byte_buffer);
     bool reset();
 
 private:
     const Esp3DSetting_t * getSettingPtr(esp3d_setting_index_t index);
+    const char *IPUInt32toString(uint32_t ip_int);
+    uint32_t StringtoIPUInt32(const char *s);
+
 };
 
 extern Esp3DSettings esp3dTFTsettings;
