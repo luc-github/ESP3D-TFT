@@ -1,5 +1,5 @@
 # main application directives
-set(SOURCES . core modules/network)
-set(INCLUDES . core/includes modules/network)
+set(SOURCES . core modules modules/filesystem modules/filesystem/sd)
+set(INCLUDES . core/includes modules)
 idf_component_register(SRC_DIRS ${SOURCES}
     INCLUDE_DIRS ${INCLUDES})
