@@ -219,7 +219,7 @@ static ft5x06_touch_detect_t ft5x06_is_touch_detected()
 #if  FT5x06_TOUCH_PRESS || FT5x06_TOUCH_IRQ_PRESS
     uint8_t touch_points_num = 0;
     i2c_bus_read_byte(ft5x06_handle,FT5x06_TOUCH_POINTS, &touch_points_num);
-    if (touch_points_num) {
+    if (!(touch_points_num==0 || touch_points_num==255)) {
         return TOUCH_DETECTED;
     } else {
         return TOUCH_NOT_DETECTED;
