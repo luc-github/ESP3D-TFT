@@ -40,8 +40,7 @@ typedef enum  {
 //for options list may be use a map list int is value and string is display
 //std::map<int, std::string> options { {0, "No Network"}, {1, "AP"}, {2, "STA"},}
 
-std::map<std::string, int> m
-type struct {
+typedef struct {
     int64_t max;
     int64_t min;
     bool canbeempty;

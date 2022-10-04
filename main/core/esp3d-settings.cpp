@@ -189,7 +189,7 @@ uint32_t Esp3DSettings::readUint32(esp3d_setting_index_t index, bool * haserror)
                     if(query->type== esp3d_integer) {
                         value = (uint32_t)std::stoul(std::string(query->defaultval), NULL,0);
                     } else { // ip is stored as uin32t but default value is ip format string
-                        value = (uint32_t)std::stoul(StringtoIPUInt32(query->defaultval)), NULL,0);
+                        value = StringtoIPUInt32(query->defaultval);
                     }
 
                     if (haserror) {
