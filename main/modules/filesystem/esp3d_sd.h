@@ -20,16 +20,44 @@
 
 #pragma once
 #include <stdio.h>
+#include "esp3d_fs_types.h"
 
-#define ESP_SD_FS_HEADER "/sd/"
+#define ESP3D_SD_FS_HEADER "/sd/"
+
+typedef enum {
+    ESP3D_SDCARD_IDLE,
+    ESP3D_SDCARD_NOT_PRESENT,
+    ESP3D_SDCARD_BUSY,
+    ESP3D_SDCARD__UNKNOWN,
+} esp3d_sd_states;
 
 class ESP_SD final
 {
 public:
     ESP_SD();
-    /*char * formatBytes (uint64_t bytes);*/
+    const char * formatBytes (uint64_t bytes);
     bool begin();
-    /*bool  accessFS(uint8_t FS = FS_SD);
+    bool mount();
+    void unmount();
+    bool isMounted()
+    {
+        return _mounted;
+    };
+    uint8_t getSPISpeedDivider()
+    {
+        return _spi_speed_divider;
+    }
+    void setSPISpeedDivider(uint8_t speeddivider)
+    {
+        _spi_speed_divider = speeddivider;
+    }
+    const char * getFileSystemName();
+    uint maxPathLength();
+    bool getSdInfo(uint64_t * totalBytes=NULL,
+                   uint64_t * usedBytes=NULL,
+                   uint64_t * freeBytes=NULL,
+                   bool refreshStats=false);
+    /**
     void  releaseFS(uint8_t FS = FS_SD);
     uint8_t getFSType(const char * path=nullptr);
     void handle();
@@ -37,11 +65,8 @@ public:
     uint8_t getState(bool refresh=false);
     uint8_t setState(uint8_t state);
     void refreshStats(bool force = false);
-    uint64_t totalBytes(bool refresh = false);
-    uint64_t usedBytes(bool refresh = false);
-    uint64_t freeBytes(bool refresh = false);
-    uint maxPathLength();
-    const char * FilesystemName();
+
+
     bool format(ESP3DOutput * output = nullptr);
     FILE open(const char* path, uint8_t mode = ESP_FILE_READ);
     bool exists(const char* path);
@@ -50,13 +75,9 @@ public:
     bool rmdir(const char *path);
     bool rename(const char *oldpath, const char *newpath);
     void closeAll();
-    uint8_t getSPISpeedDivider()
-    {
-        return _spi_speed_divider;
-    }
-    bool setSPISpeedDivider(uint8_t speeddivider);*/
+    */
 private:
-    FILE _currentFile;
+    bool _mounted;
     bool _started;
     uint8_t _state;
     uint8_t _spi_speed_divider;

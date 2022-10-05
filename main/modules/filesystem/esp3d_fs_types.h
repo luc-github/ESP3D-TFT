@@ -1,5 +1,5 @@
 /*
-  esp_sd.cpp - ESP3D SD support class
+  esp_fs_types.h - ESP3D SD support class
 
   Copyright (c) 2014 Luc Lebosse. All rights reserved.
 
@@ -18,7 +18,12 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "sd_def.h"
-#include "esp_sd.h"
+#pragma once
+#include <stdio.h>
 
-ESP_SD sd;
+typedef enum {
+    FS_ROOT,
+    FS_FLASH,
+    FS_SD,
+    FS_UNKNOWN,
+} esp3d_fs_types;

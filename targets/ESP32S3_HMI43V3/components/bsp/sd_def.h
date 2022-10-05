@@ -19,7 +19,9 @@ extern "C" {
 //#define ESP_SD_DETECT_PIN (-1) //GPIO -1
 //#define ESP_SD_DETECT_VALUE (0) //LOW
 #define MAX_TRANSFER_SZ (4000)
-#define ESP_SD_FREQ (40000)
+//(range 400kHz - 20MHz for SDSPI, less for other devices)
+//default is 20MHz
+#define ESP_SD_FREQ (20000)
 #define ESP_SD_SPI_DIV  (4)
 #define ESP_SD_FORMAT_IF_MOUNT_FAILED   (1)
 

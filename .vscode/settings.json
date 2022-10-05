@@ -7,7 +7,7 @@
     "idf.openOcdConfigs": [
         "board/esp32s3-bridge.cfg"
     ],
-    "idf.portWin": "COM3",
+    "idf.portWin": "COM9",
     "idf.pythonBinPathWin": "C:\\Users\\luc\\.espressif\\python_env\\idf4.4_py3.8_env\\Scripts\\python.exe",
     "idf.toolsPathWin": "C:\\Users\\luc\\.espressif",
     "idf.flashType": "UART",
