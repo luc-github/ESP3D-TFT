@@ -10,7 +10,7 @@ OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-U
 # Do not change anything above this line
 # #######################################
 cmake_minimum_required(VERSION 3.12.4)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 if(ESP32_2432S028R)
     set(SDKCONFIG targets/ESP32_2432S028R/sdkconfig)

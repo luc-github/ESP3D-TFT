@@ -23,12 +23,13 @@
 #include "esp3d_fs_types.h"
 
 #define ESP3D_SD_FS_HEADER "/sd/"
+#define MAX_SD_PATH 255
 
 typedef enum {
     ESP3D_SDCARD_IDLE,
     ESP3D_SDCARD_NOT_PRESENT,
     ESP3D_SDCARD_BUSY,
-    ESP3D_SDCARD__UNKNOWN,
+    ESP3D_SDCARD_UNKNOWN,
 } esp3d_sd_states;
 
 class ESP_SD final
@@ -57,16 +58,24 @@ public:
                    uint64_t * usedBytes=NULL,
                    uint64_t * freeBytes=NULL,
                    bool refreshStats=false);
+
+    esp3d_sd_states getState()
+    {
+        return _state;
+    };
+    esp3d_sd_states setState(esp3d_sd_states state)
+    {
+        _state=state;
+        return _state;
+    }
+    esp3d_fs_types getFSType(const char * path=nullptr);
+    bool  accessFS(esp3d_fs_types FS=FS_SD);
+    void  releaseFS(esp3d_fs_types FS=FS_SD);
+    const char * getFullPath(const char * path=nullptr);
     /**
-    void  releaseFS(uint8_t FS = FS_SD);
-    uint8_t getFSType(const char * path=nullptr);
     void handle();
     void end();
-    uint8_t getState(bool refresh=false);
-    uint8_t setState(uint8_t state);
     void refreshStats(bool force = false);
-
-
     bool format(ESP3DOutput * output = nullptr);
     FILE open(const char* path, uint8_t mode = ESP_FILE_READ);
     bool exists(const char* path);
@@ -79,7 +88,7 @@ public:
 private:
     bool _mounted;
     bool _started;
-    uint8_t _state;
+    esp3d_sd_states _state;
     uint8_t _spi_speed_divider;
     bool _sizechanged;
 };

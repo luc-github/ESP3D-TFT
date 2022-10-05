@@ -22,7 +22,10 @@
 
 #if defined(ESP_SD_IS_SPI) && ESP_SD_IS_SPI
 #include "filesystem/esp3d_sd.h"
+#include <string>
+#include <cstring>
 #include <string.h>
+#include "esp3d-string.h"
 #include <sys/unistd.h>
 #include <sys/stat.h>
 #include "esp_vfs.h"
@@ -169,5 +172,20 @@ bool ESP_SD::getSdInfo(uint64_t * totalBytes,
     //if total is 0 it is a failure
     return _totalBytes!=0;
 }
+
+const char * ESP_SD::getFullPath(const char * path)
+{
+    static std::string fullpath = mount_point;
+    std::string tpath = str_trim(path);
+    if (path && tpath.c_str()[0] != '/') {
+        fullpath += "/";
+    }
+    fullpath += tpath;
+    if (fullpath.c_str()[fullpath.size()-1]!='/') {
+        fullpath += "/";
+    }
+    return fullpath.c_str();
+}
+
 
 #endif//ESP_SD_IS_SPI 

@@ -34,10 +34,6 @@
 #define LOG_TAG "MAIN"
 #include "bsp.h"
 
-
-
-#define LV_TICK_PERIOD_MS 10
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
