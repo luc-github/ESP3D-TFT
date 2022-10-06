@@ -5,7 +5,8 @@
     "idf.customExtraVars": "{\"OPENOCD_SCRIPTS\":\"C:\\\\Users\\\\luc\\\\.espressif\\\\tools\\\\openocd-esp32\\\\v0.11.0-esp32-20220411/openocd-esp32/share/openocd/scripts\",\"IDF_CCACHE_ENABLE\":\"1\"}",
     "idf.espIdfPathWin": "c:\\Users\\luc\\Documents\\esp-idf",
     "idf.openOcdConfigs": [
-        "board/esp32s3-bridge.cfg"
+        "interface/ftdi/esp32_devkitj_v1.cfg",
+        "target/esp32s3.cfg"
     ],
     "idf.portWin": "COM9",
     "idf.pythonBinPathWin": "C:\\Users\\luc\\.espressif\\python_env\\idf4.4_py3.8_env\\Scripts\\python.exe",

@@ -38,14 +38,10 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 add_compile_options(-DLV_CONF_INCLUDE_SIMPLE=1)
 add_compile_options(-DLV_LVGL_H_INCLUDE_SIMPLE=1)
 
-# log level
-# NONE  = 0       /*!< No log output */
-# ERROR = 1       /*!< Critical errors, software module can not recover on its own */
-# WARN  = 2       /*!< Error conditions from which recovery measures have been taken */
-# INFO  = 3       /*!< Information messages which describe normal flow of events */
-# DEBUG = 4       /*!< Extra information which is not necessary for normal use (values, pointers, sizes, etc). */
-# VERBOSE= 5
-add_compile_options(-DLOG_LEVEL_LOCAL=5)
+# ESP3D-TFT specific log level
+# Enabled  = 1
+# Disabled = 0
+add_compile_options(-DESP3D_TFT_LOG=1)
 
 if(ESP32_2432S028R)
     add_compile_options("-I${CMAKE_SOURCE_DIR}/targets/ESP32_2432S028R/components/bsp")

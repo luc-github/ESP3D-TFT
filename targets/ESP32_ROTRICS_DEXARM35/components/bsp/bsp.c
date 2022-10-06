@@ -21,8 +21,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "esp_log.h"
-#define LOG_TAG "BSP"
+#include "esp3d_log.h"
 #include "lvgl.h"
 #include "bsp.h"
 #include "xpt2046.h"
@@ -62,17 +61,17 @@
 esp_err_t bsp_init(void)
 {
     //Driver initialization
-    ESP_LOGI(LOG_TAG, "Display buffer size: %d", DISP_BUF_SIZE);
+    esp3d_log("Display buffer size: %d", DISP_BUF_SIZE);
 
     /* Display controller initialization */
-    ESP_LOGI(LOG_TAG, "Initializing shared SPI master");
+    esp3d_log("Initializing shared SPI master");
 
     spi_driver_init(DISP_SPI_HOST,
                     TOUCH_SPI_MISO, DISP_SPI_MOSI, DISP_SPI_CLK,
                     DISP_SPI_BUS_MAX_TRANSFER_SZ, 1,
                     -1, -1);
     
-    ESP_LOGI(LOG_TAG, "Initializing display controller");                
+    esp3d_log("Initializing display controller");                
     disp_spi_add_device(DISP_SPI_HOST);
     tp_spi_add_device(TOUCH_SPI_HOST);
     ili9488_init();
@@ -97,7 +96,7 @@ esp_err_t bsp_init(void)
 #endif
 
     /* Touch controller initialization */
-    ESP_LOGI(LOG_TAG, "Initializing touch controller");
+    esp3d_log("Initializing touch controller");
     //SPI is shared between touch and display so no need to init againt SPI
     
     xpt2046_init();
@@ -106,7 +105,7 @@ esp_err_t bsp_init(void)
     lv_init();
 
     //Lvgl setup
-    ESP_LOGI(LOG_TAG, "Setup Lvgl");
+    esp3d_log("Setup Lvgl");
     lv_color_t* buf1 = (lv_color_t*)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t), HAS_PSRAM ?MALLOC_CAP_SPIRAM: MALLOC_CAP_DMA);
     if (buf1 == NULL) return ESP_FAIL;
 

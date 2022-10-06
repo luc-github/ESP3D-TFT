@@ -25,7 +25,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 
-#include "esp_log.h"
+#include "esp3d_log.h"
 #include "i2c_bus.h"
 
 #define I2C_ACK_CHECK_EN 0x1     /*!< I2C master will check ack from slave*/
@@ -50,36 +50,35 @@ typedef struct {
     i2c_bus_t *i2c_bus;    /*!<I2C bus*/
 } i2c_bus_device_t;
 
-static const char *TAG = "i2c_bus";
 static i2c_bus_t s_i2c_bus[I2C_NUM_MAX];
 
 #define I2C_BUS_CHECK(a, str, ret) if(!(a)) { \
-        ESP_LOGE(TAG,"%s:%d (%s):%s", __FILE__, __LINE__, __FUNCTION__, str); \
+        esp3d_log_e( str); \
         return (ret); \
     }
 
 #define I2C_BUS_CHECK_GOTO(a, str, lable) if(!(a)) { \
-        ESP_LOGE(TAG,"%s:%d (%s):%s", __FILE__, __LINE__, __FUNCTION__, str); \
+        esp3d_log_e(str); \
         goto lable; \
     }
 
 #define I2C_BUS_INIT_CHECK(is_init, ret) if(!is_init) { \
-        ESP_LOGE(TAG,"%s:%d (%s):i2c_bus has not inited", __FILE__, __LINE__, __FUNCTION__); \
+        esp3d_log_e("i2c_bus has not inited"); \
         return (ret); \
     }
 
 #define I2C_BUS_MUTEX_TAKE(mutex, ret) if (!xSemaphoreTake(mutex, I2C_BUS_MUTEX_TICKS_TO_WAIT)) { \
-        ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", I2C_BUS_MUTEX_TICKS_TO_WAIT); \
+        esp3d_log_e("i2c_bus take mutex timeout, max wait = %d ms", I2C_BUS_MUTEX_TICKS_TO_WAIT); \
         return (ret); \
     }
 
 #define I2C_BUS_MUTEX_TAKE_MAX_DELAY(mutex, ret) if (!xSemaphoreTake(mutex, portMAX_DELAY)) { \
-        ESP_LOGE(TAG, "i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
+        esp3d_log_e("i2c_bus take mutex timeout, max wait = %d ms", portMAX_DELAY); \
         return (ret); \
     }
 
 #define I2C_BUS_MUTEX_GIVE(mutex, ret) if (!xSemaphoreGive(mutex)) { \
-        ESP_LOGE(TAG, "i2c_bus give mutex failed"); \
+        esp3d_log_e( "i2c_bus give mutex failed"); \
         return (ret); \
     }
 
@@ -99,7 +98,7 @@ i2c_bus_handle_t i2c_bus_create(i2c_port_t port, const i2c_config_t *conf)
     if (s_i2c_bus[port].is_init) {
         /**if i2c_bus has been inited and configs not changed, return the handle directly**/
         if (i2c_config_compare(port, conf)) {
-            ESP_LOGW(TAG, "i2c%d has been inited, return handle directly, ref_counter=%d", port, s_i2c_bus[port].ref_counter);
+            esp3d_log_w("i2c%d has been inited, return handle directly, ref_counter=%d", port, s_i2c_bus[port].ref_counter);
             return (i2c_bus_handle_t)&s_i2c_bus[port];
         }
     } else {
@@ -124,7 +123,7 @@ esp_err_t i2c_bus_delete(i2c_bus_handle_t *p_bus)
 
     /** if ref_counter == 0, de-init the bus**/
     if ((i2c_bus->ref_counter) > 0) {
-        ESP_LOGW(TAG, "i2c%d is also handled by others ref_counter=%u, won't be de-inited", i2c_bus->i2c_port, i2c_bus->ref_counter);
+        esp3d_log_w("i2c%d is also handled by others ref_counter=%u, won't be de-inited", i2c_bus->i2c_port, i2c_bus->ref_counter);
         return ESP_OK;
     }
 
@@ -150,7 +149,7 @@ uint8_t i2c_bus_scan(i2c_bus_handle_t bus_handle, uint8_t *buf, uint8_t num)
         esp_err_t ret = i2c_master_cmd_begin(i2c_bus->i2c_port, cmd, I2C_BUS_TICKS_TO_WAIT);
 
         if (ret == ESP_OK) {
-            ESP_LOGI(TAG, "found i2c device address = 0x%02x", dev_address);
+            esp3d_log("found i2c device address = 0x%02x", dev_address);
             if (buf != NULL && device_count < num) {
                 *(buf + device_count) = dev_address;
             }
@@ -451,7 +450,7 @@ static esp_err_t i2c_driver_reinit(i2c_port_t port, const i2c_config_t *conf)
     if (s_i2c_bus[port].is_init) {
         i2c_driver_delete(port);
         s_i2c_bus[port].is_init = false;
-        ESP_LOGI(TAG, "i2c%d bus deinited", port);
+        esp3d_log("i2c%d bus deinited", port);
     }
 
     esp_err_t ret = i2c_param_config(port, conf);
@@ -459,7 +458,7 @@ static esp_err_t i2c_driver_reinit(i2c_port_t port, const i2c_config_t *conf)
     ret = i2c_driver_install(port, conf->mode, I2C_BUS_MASTER_BUF_LEN, I2C_BUS_MASTER_BUF_LEN, I2C_BUS_FLG_DEFAULT);
     I2C_BUS_CHECK(ret == ESP_OK, "i2c driver install failed", ret);
     s_i2c_bus[port].is_init = true;
-    ESP_LOGI(TAG, "i2c%d bus inited", port);
+    esp3d_log("i2c%d bus inited", port);
     return ESP_OK;
 }
 
@@ -469,7 +468,7 @@ static esp_err_t i2c_driver_deinit(i2c_port_t port)
     I2C_BUS_CHECK(s_i2c_bus[port].is_init == true, "i2c not inited", ESP_ERR_INVALID_STATE);
     i2c_driver_delete(port); //always return ESP_OK
     s_i2c_bus[port].is_init = false;
-    ESP_LOGI(TAG,"i2c%d bus deinited",port);
+    esp3d_log("i2c%d bus deinited",port);
     return ESP_OK;
 }
 

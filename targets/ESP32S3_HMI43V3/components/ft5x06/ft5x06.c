@@ -20,7 +20,7 @@
  */
 
 #include "driver/gpio.h"
-#include "esp_log.h"
+#include "esp3d_log.h"
 #include "ft5x06.h"
 #include "touch_def.h"
 #include "disp_def.h"
@@ -28,7 +28,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define LOG_TAG "FT5x06"
 
 /** @brief FT5x06 register map and function codes */
 
@@ -121,7 +120,7 @@ esp_err_t ft5x06_init(i2c_bus_handle_t i2c_bus_handle)
     ft5x06_handle = i2c_bus_device_create(i2c_bus_handle, FT5x06_ADDR, FT5x06_CLK_SPEED);
 
     if (NULL == ft5x06_handle) {
-        ESP_LOGE(LOG_TAG, "Failed create FX5X06 device");
+        esp3d_log_e("Failed create FX5X06 device");
         return ESP_FAIL;
     }
 
@@ -166,9 +165,9 @@ esp_err_t ft5x06_init(i2c_bus_handle_t i2c_bus_handle)
     ret |= i2c_bus_write_byte(ft5x06_handle, FT5x06_ID_G_PERIODMONITOR, 40);
 
     if(ret == ESP_OK) {
-        ESP_LOGI(LOG_TAG, "ft5x06 init ok");
+        esp3d_log( "ft5x06 init ok");
     } else {
-        ESP_LOGI(LOG_TAG, "ft5x06 init fail");
+        esp3d_log_e("ft5x06 init fail");
     }
     return ret;
 }
@@ -191,7 +190,7 @@ void ft5x06_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
         last_y = ((dataArray[2] & 0x0f) << 8) + dataArray[3];
 #endif
 
-        ESP_LOGI(LOG_TAG, "X %d y %d", last_x, last_y);
+        esp3d_log("X %d y %d", last_x, last_y);
     } else {
         data->state = LV_INDEV_STATE_REL;
     }

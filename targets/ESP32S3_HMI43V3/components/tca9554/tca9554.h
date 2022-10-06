@@ -24,9 +24,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "esp_log.h"
-
 #include "i2c_bus.h"
 #include "tca9554_def.h"
 

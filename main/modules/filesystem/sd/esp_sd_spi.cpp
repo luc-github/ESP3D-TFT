@@ -25,15 +25,13 @@
 #include <string>
 #include <cstring>
 #include <string.h>
-#include "esp3d-string.h"
+#include "esp3d_string.h"
 #include <sys/unistd.h>
 #include <sys/stat.h>
 #include "esp_vfs.h"
 #include "esp_vfs_fat.h"
 #include "sdmmc_cmd.h"
-#include "esp_log.h"
-
-#define LOG_TAG "SD_SPI"
+#include "esp3d_log.h"
 
 const char mount_point[] = "/sdcard";
 sdmmc_card_t *card;
@@ -42,7 +40,7 @@ sdmmc_host_t host = SDSPI_HOST_DEFAULT();
 void ESP_SD::unmount()
 {
     if (!_started ) {
-        ESP_LOGE(LOG_TAG, "SDCard not init.");
+        esp3d_log_e("SDCard not init.");
         return;
     }
     esp_vfs_fat_sdcard_unmount(mount_point, card);
@@ -52,7 +50,7 @@ void ESP_SD::unmount()
 bool ESP_SD::mount()
 {
     if (!_started) {
-        ESP_LOGE(LOG_TAG, "SDCard not init.");
+        esp3d_log_e("SDCard not init.");
         return false;
     }
     if (_mounted) {
@@ -71,18 +69,18 @@ bool ESP_SD::mount()
         .max_files = 5,
         .allocation_unit_size = 16 * 1024
     };
-    ESP_LOGI(LOG_TAG, "Mounting filesystem");
+    esp3d_log("Mounting filesystem");
     esp_err_t ret = esp_vfs_fat_sdspi_mount(mount_point, &host, &slot_config, &mount_config, &card);
 
     if (ret != ESP_OK) {
         if (ret == ESP_FAIL) {
-            ESP_LOGE(LOG_TAG, "Failed to mount filesystem.");
+            esp3d_log_e("Failed to mount filesystem.");
         } else {
-            ESP_LOGE(LOG_TAG, "Failed to initialize the card (%s). ", esp_err_to_name(ret));
+            esp3d_log_e("Failed to initialize the card (%s). ", esp_err_to_name(ret));
         }
         return false;
     }
-    ESP_LOGI(LOG_TAG, "Filesystem mounted");
+    esp3d_log_e("Filesystem mounted");
     _mounted = true;
     return _mounted;
 }
@@ -96,8 +94,8 @@ bool ESP_SD::begin()
 {
     _started =false;
     esp_err_t ret;
-    ESP_LOGI(LOG_TAG, "Initializing SD card");
-    ESP_LOGI(LOG_TAG, "Using SPI peripheral");
+    esp3d_log_e("Initializing SD card");
+    esp3d_log_e("Using SPI peripheral");
     spi_bus_config_t bus_cfg = {
         .mosi_io_num = (gpio_num_t)ESP_SD_MOSI_PIN,
         .miso_io_num = (gpio_num_t)ESP_SD_MISO_PIN,
@@ -114,7 +112,7 @@ bool ESP_SD::begin()
     };
     ret = spi_bus_initialize((spi_host_device_t)host.slot, &bus_cfg, SDSPI_DEFAULT_DMA);
     if (ret != ESP_OK) {
-        ESP_LOGE(LOG_TAG, "Failed to initialize bus.");
+        esp3d_log_e("Failed to initialize bus.");
         return false;
     }
     _started = true;
@@ -133,10 +131,10 @@ bool ESP_SD::getSdInfo(uint64_t * totalBytes,
     static uint64_t _totalBytes = 0;
     static uint64_t _usedBytes=0;
     static uint64_t _freeBytes=0;
-    ESP_LOGI(LOG_TAG, "Try to get total and free space");
+    esp3d_log("Try to get total and free space");
     //if not mounted reset values
     if (!_mounted) {
-        ESP_LOGE(LOG_TAG, "Failed to get total and free space because not mounted");
+        esp3d_log_e("Failed to get total and free space because not mounted");
         _totalBytes = 0;
         _usedBytes=0;
         _freeBytes=0;
@@ -153,7 +151,7 @@ bool ESP_SD::getSdInfo(uint64_t * totalBytes,
             _freeBytes = 1024 * (_freeBytes / 2);
             _usedBytes = _totalBytes-_freeBytes;
         } else {
-            ESP_LOGE(LOG_TAG, "Failed to get total and free space");
+            esp3d_log_e("Failed to get total and free space");
             _totalBytes = 0;
             _usedBytes=0;
             _freeBytes=0;

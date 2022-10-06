@@ -11,7 +11,7 @@
 #include "freertos/task.h"
 
 #include "driver/gpio.h"
-#include "esp_log.h"
+#include "esp3d_log.h"
 #include "esp_check.h"
 #include "disp_def.h"
 #include "st7796.h"
@@ -36,7 +36,6 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static const char *TAG = "ST7796";
 static bool st7796_notify_flush_ready(esp_lcd_panel_io_handle_t panel_io, esp_lcd_panel_io_event_data_t *edata, void *user_ctx);
 esp_err_t esp_lcd_new_panel_st7796(const esp_lcd_panel_io_handle_t io, const esp_lcd_panel_dev_config_t *panel_dev_config, esp_lcd_panel_handle_t *ret_panel);
 esp_lcd_panel_handle_t panel_handle = NULL;
@@ -76,10 +75,10 @@ void st7796_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t *
 esp_err_t st7796_init(lv_disp_drv_t  * disp_drv){
 
     if (panel_handle!= NULL) {
-        ESP_LOGE(TAG, "st7796 bus already initialized");
+        esp3d_log("st7796 bus already initialized");
         return ESP_FAIL;
     }
-    ESP_LOGI(TAG, "Turn off LCD backlight");
+    esp3d_log("Turn off LCD backlight");
     gpio_config_t bk_gpio_config = {
         .mode = GPIO_MODE_OUTPUT,
         .pin_bit_mask = 1ULL << DISP_BL_PIN
@@ -87,7 +86,7 @@ esp_err_t st7796_init(lv_disp_drv_t  * disp_drv){
     ESP_ERROR_CHECK(gpio_config(&bk_gpio_config));
     gpio_set_level(DISP_BL_PIN, DISP_BL_OFF);
 
-    ESP_LOGI(TAG, "init st7796 bus");
+    esp3d_log("init st7796 bus");
     esp_lcd_i80_bus_handle_t i80_bus = NULL;
     esp_lcd_i80_bus_config_t bus_config = {
         .dc_gpio_num = DISP_RS_PIN,
@@ -103,7 +102,7 @@ esp_err_t st7796_init(lv_disp_drv_t  * disp_drv){
     };
     ESP_ERROR_CHECK(esp_lcd_new_i80_bus(&bus_config, &i80_bus));
     if (i80_bus==NULL){
-        ESP_LOGE(TAG, "init lcd i80 display bus failed");
+        esp3d_log("init lcd i80 display bus failed");
     }
 
     esp_lcd_panel_io_handle_t io_handle = NULL;
@@ -139,7 +138,7 @@ esp_err_t st7796_init(lv_disp_drv_t  * disp_drv){
     #if DISP_DIRECTION_LANDSCAPE == 1  // landscape mode
     panel_st7796_swap_xy(panel_handle,true);
     #endif //DISP_DIRECTION_LANDSCAPE
-    ESP_LOGI(TAG, "Turn on LCD backlight");
+    esp3d_log("Turn on LCD backlight");
     gpio_set_level(DISP_BL_PIN, DISP_BL_ON);
 
     return ESP_OK;
@@ -154,16 +153,16 @@ esp_err_t esp_lcd_new_panel_st7796(const esp_lcd_panel_io_handle_t io, const esp
 {
     esp_err_t ret = ESP_OK;
     st7796_panel_t *st7796 = NULL;
-    ESP_GOTO_ON_FALSE(io && panel_dev_config && ret_panel, ESP_ERR_INVALID_ARG, err, TAG, "invalid argument");
+    ESP_GOTO_ON_FALSE(io && panel_dev_config && ret_panel, ESP_ERR_INVALID_ARG, err, "", "invalid argument");
     st7796 = calloc(1, sizeof(st7796_panel_t));
-    ESP_GOTO_ON_FALSE(st7796, ESP_ERR_NO_MEM, err, TAG, "no mem for st7796 panel");
+    ESP_GOTO_ON_FALSE(st7796, ESP_ERR_NO_MEM, err, "", "no mem for st7796 panel");
 
     if (panel_dev_config->reset_gpio_num >= 0) {
         gpio_config_t io_conf = {
             .mode = GPIO_MODE_OUTPUT,
             .pin_bit_mask = 1ULL << panel_dev_config->reset_gpio_num,
         };
-        ESP_GOTO_ON_ERROR(gpio_config(&io_conf), err, TAG, "configure GPIO for RST line failed");
+        ESP_GOTO_ON_ERROR(gpio_config(&io_conf), err, "", "configure GPIO for RST line failed");
     }
 
     switch (panel_dev_config->color_space) {
@@ -174,7 +173,7 @@ esp_err_t esp_lcd_new_panel_st7796(const esp_lcd_panel_io_handle_t io, const esp
         st7796->madctl_val |= LCD_CMD_BGR_BIT;
         break;
     default:
-        ESP_GOTO_ON_FALSE(false, ESP_ERR_NOT_SUPPORTED, err, TAG, "unsupported color space");
+        ESP_GOTO_ON_FALSE(false, ESP_ERR_NOT_SUPPORTED, err, "", "unsupported color space");
         break;
     }
 
@@ -186,7 +185,7 @@ esp_err_t esp_lcd_new_panel_st7796(const esp_lcd_panel_io_handle_t io, const esp
         st7796->colmod_cal = 0x66;
         break;
     default:
-        ESP_GOTO_ON_FALSE(false, ESP_ERR_NOT_SUPPORTED, err, TAG, "unsupported pixel width");
+        ESP_GOTO_ON_FALSE(false, ESP_ERR_NOT_SUPPORTED, err, "", "unsupported pixel width");
         break;
     }
 
@@ -204,7 +203,7 @@ esp_err_t esp_lcd_new_panel_st7796(const esp_lcd_panel_io_handle_t io, const esp
     st7796->base.swap_xy = panel_st7796_swap_xy;
     st7796->base.disp_off = panel_st7796_disp_off;
     *ret_panel = &(st7796->base);
-    ESP_LOGD(TAG, "new st7796 panel @%p", st7796);
+    esp3d_log("new st7796 panel @%p", st7796);
 
     return ESP_OK;
 
@@ -225,7 +224,7 @@ static esp_err_t panel_st7796_del(esp_lcd_panel_t *panel)
     if (st7796->reset_gpio_num >= 0) {
         gpio_reset_pin(st7796->reset_gpio_num);
     }
-    ESP_LOGD(TAG, "del st7796 panel @%p", st7796);
+    esp3d_log("del st7796 panel @%p", st7796);
     free(st7796);
     return ESP_OK;
 }

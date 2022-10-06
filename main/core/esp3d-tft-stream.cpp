@@ -25,7 +25,7 @@
 #include "freertos/semphr.h"
 #include "version.h"
 #include <string>
-#include "esp_log.h"
+#include "esp3d_log.h"
 
 
 
@@ -34,7 +34,6 @@
 #define STACKDEPTH  4096*2
 #define TASKPRIORITY 0
 #define TASKCORE 1
-#define LOG_TAG "tft-stream"
 
 /**********************
  *  STATIC PROTOTYPES
@@ -85,10 +84,10 @@ bool Esp3DTFTStream::begin()
     TaskHandle_t xHandle = NULL;
     BaseType_t  res =  xTaskCreatePinnedToCore(streamTask, "tftStream", STACKDEPTH, NULL, TASKPRIORITY, &xHandle, TASKCORE);
     if (res==pdPASS && xHandle) {
-        ESP_LOGI (LOG_TAG, "Created Stream Task");
+        esp3d_log ("Created Stream Task");
         return true;
     } else {
-        ESP_LOGE (LOG_TAG, "Stream Task creation failed");
+        esp3d_log_e ("Stream Task creation failed");
         return false;
     }
 

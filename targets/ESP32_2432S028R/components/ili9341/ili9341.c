@@ -9,14 +9,13 @@
 #include "ili9341.h"
 #include "disp_spi.h"
 #include "driver/gpio.h"
-#include "esp_log.h"
+#include "esp3d_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
 /*********************
  *      DEFINES
  *********************/
- #define TAG "ILI9341"
 
 /**********************
  *      TYPEDEFS
@@ -95,7 +94,7 @@ void ili9341_init(void)
 	vTaskDelay(100 / portTICK_RATE_MS);
 #endif
 
-	ESP_LOGI(TAG, "Initialization.");
+	esp3d_log("Initialization.");
 
 	//Send all the commands
 	uint16_t cmd = 0;
@@ -193,13 +192,13 @@ static void ili9341_set_orientation(uint8_t orientation)
         "PORTRAIT", "PORTRAIT_INVERTED", "LANDSCAPE", "LANDSCAPE_INVERTED"
     };
 
-    ESP_LOGI(TAG, "Display orientation: %s", orientation_str[orientation]);
+    esp3d_log("Display orientation: %s", orientation_str[orientation]);
 
 
     uint8_t data[] = {0x48, 0x88, 0x28, 0xE8};
 
 
-    ESP_LOGI(TAG, "0x36 command value: 0x%02X", data[orientation]);
+    esp3d_log("0x36 command value: 0x%02X", data[orientation]);
 
     ili9341_send_cmd(0x36);
     ili9341_send_data((void *) &data[orientation], 1);

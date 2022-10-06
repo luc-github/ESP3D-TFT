@@ -9,7 +9,7 @@
 #include "freertos/task.h"
 
 #include "driver/gpio.h"
-#include "esp_log.h"
+#include "esp3d_log.h"
 #include "esp_check.h"
 #include "disp_def.h"
 #include "rm68120.h"
@@ -82,7 +82,6 @@ typedef struct {
     uint8_t colmod_cal;     // Color Format: COLMOD register addr:3A00H
 } lcd_panel_t;
 
-static const char *TAG = "RM68120";
 static bool rm68120_notify_flush_ready(esp_lcd_panel_io_handle_t panel_io, esp_lcd_panel_io_event_data_t *edata, void *user_ctx);
 static esp_err_t panel_rm68120_del(esp_lcd_panel_t *panel);
 static esp_err_t panel_rm68120_reset(esp_lcd_panel_t *panel);
@@ -119,10 +118,10 @@ void rm68120_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t 
 esp_err_t rm68120_init(lv_disp_drv_t  * disp_drv){
 
     if (panel_handle!= NULL) {
-        ESP_LOGE(TAG, "rm68120 bus already initialized");
+        esp3d_log_e("rm68120 bus already initialized");
         return ESP_FAIL;
     }
-    ESP_LOGI(TAG, "init rm68120 bus");
+    esp3d_log("init rm68120 bus");
     esp_lcd_i80_bus_handle_t i80_bus = NULL;
     esp_lcd_i80_bus_config_t bus_config = {
         .dc_gpio_num = DISP_RS_PIN,
@@ -138,7 +137,7 @@ esp_err_t rm68120_init(lv_disp_drv_t  * disp_drv){
     };
     ESP_ERROR_CHECK(esp_lcd_new_i80_bus(&bus_config, &i80_bus));
     if (i80_bus==NULL){
-        ESP_LOGE(TAG, "init lcd i80 display bus failed");
+        esp3d_log_e("init lcd i80 display bus failed");
     }
 
     esp_lcd_panel_io_handle_t io_handle = NULL;
@@ -178,16 +177,16 @@ esp_err_t esp_lcd_new_panel_rm68120(const esp_lcd_panel_io_handle_t io, const es
 {
     esp_err_t ret = ESP_OK;
     lcd_panel_t *rm68120 = NULL;
-    ESP_GOTO_ON_FALSE(io && panel_dev_config && ret_panel, ESP_ERR_INVALID_ARG, err, TAG, "invalid argument");
+    ESP_GOTO_ON_FALSE(io && panel_dev_config && ret_panel, ESP_ERR_INVALID_ARG, err,"", "invalid argument");
     rm68120 = calloc(1, sizeof(lcd_panel_t));
-    ESP_GOTO_ON_FALSE(rm68120, ESP_ERR_NO_MEM, err, TAG, "no mem for rm68120 panel");
+    ESP_GOTO_ON_FALSE(rm68120, ESP_ERR_NO_MEM, err, "", "no mem for rm68120 panel");
 
     if (panel_dev_config->reset_gpio_num >= 0) {
         gpio_config_t io_conf = {
             .mode = GPIO_MODE_OUTPUT,
             .pin_bit_mask = 1ULL << panel_dev_config->reset_gpio_num,
         };
-        ESP_GOTO_ON_ERROR(gpio_config(&io_conf), err, TAG, "configure GPIO for RST line failed");
+        ESP_GOTO_ON_ERROR(gpio_config(&io_conf), err, "", "configure GPIO for RST line failed");
     }
 
     // scanning direction
@@ -206,7 +205,7 @@ esp_err_t esp_lcd_new_panel_rm68120(const esp_lcd_panel_io_handle_t io, const es
             rm68120->width = DISP_HOR_RES_MAX;
             rm68120->height = DISP_VER_RES_MAX;
             break;            
-        default: ESP_LOGE(TAG, "undefine, do not use!!!!");
+        default: esp3d_log_e("undefine, do not use!!!!");
             break;
     }
 
@@ -218,7 +217,7 @@ esp_err_t esp_lcd_new_panel_rm68120(const esp_lcd_panel_io_handle_t io, const es
         rm68120->madctl_val |= LCD_CMD_BGR_BIT;
         break;
     default:
-        ESP_GOTO_ON_FALSE(false, ESP_ERR_NOT_SUPPORTED, err, TAG, "unsupported color space");
+        ESP_GOTO_ON_FALSE(false, ESP_ERR_NOT_SUPPORTED, err, "", "unsupported color space");
         break;
     }
 
@@ -234,7 +233,7 @@ esp_err_t esp_lcd_new_panel_rm68120(const esp_lcd_panel_io_handle_t io, const es
         rm68120->colmod_cal = 0x77;
         break;
     default:
-        ESP_GOTO_ON_FALSE(false, ESP_ERR_NOT_SUPPORTED, err, TAG, "unsupported pixel width");
+        ESP_GOTO_ON_FALSE(false, ESP_ERR_NOT_SUPPORTED, err, "", "unsupported pixel width");
         break;
     }
 
@@ -254,7 +253,7 @@ esp_err_t esp_lcd_new_panel_rm68120(const esp_lcd_panel_io_handle_t io, const es
     rm68120->base.swap_xy = panel_rm68120_swap_xy;
     rm68120->base.disp_off = panel_rm68120_disp_off;
     *ret_panel = &(rm68120->base);
-    ESP_LOGD(TAG, "new rm68120 panel @%p", rm68120);
+    esp3d_log("new rm68120 panel @%p", rm68120);
 
     return ESP_OK;
 
@@ -275,7 +274,7 @@ static esp_err_t panel_rm68120_del(esp_lcd_panel_t *panel)
     if (rm68120->reset_gpio_num >= 0) {
         gpio_reset_pin(rm68120->reset_gpio_num);
     }
-    ESP_LOGD(TAG, "del rm68120 panel @%p", rm68120);
+    esp3d_log("del rm68120 panel @%p", rm68120);
     free(rm68120);
     return ESP_OK;
 }
@@ -322,8 +321,8 @@ static esp_err_t panel_rm68120_init(esp_lcd_panel_t *panel)
     esp_lcd_panel_io_tx_param(io, LCD_CMD_DISPON << 8, NULL, 0);
 
 
-ESP_LOGI(TAG, "LCD=%dx%d dir=%d xgap=%d ygap=%d", rm68120->width, rm68120->height, rm68120->dir, rm68120->x_gap, rm68120->y_gap);
-ESP_LOGI(TAG, "madctl=0x%02X colmod=0x%02X", rm68120->madctl_val, rm68120->colmod_cal);
+esp3d_log("LCD=%dx%d dir=%d xgap=%d ygap=%d", rm68120->width, rm68120->height, rm68120->dir, rm68120->x_gap, rm68120->y_gap);
+esp3d_log("madctl=0x%02X colmod=0x%02X", rm68120->madctl_val, rm68120->colmod_cal);
 
     return ESP_OK;
 }
@@ -367,7 +366,6 @@ static esp_err_t panel_rm68120_draw_bitmap(esp_lcd_panel_t *panel, int x_start, 
     }, 2);
     // transfer frame buffer
     size_t len = (x_end - x_start) * (y_end - y_start) * rm68120->bits_per_pixel / 8;
-    // ESP_LOGI(TAG, "transfer size = %d", len);
     esp_lcd_panel_io_tx_color(io, LCD_CMD_RAMWR << 8, color_data, len);
 
     return ESP_OK;

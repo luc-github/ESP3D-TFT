@@ -26,11 +26,10 @@
 #include "esp_system.h"
 #include <cstring>
 #include <string>
-#include "esp_log.h"
+#include "esp3d_log.h"
 
 
 #define STORAGE_NAME "ESP3D_TFT"
-#define LOG_TAG "ESP3D_SETTINGS"
 #define SETTING_VERSION "ESP3D_TFT-V3.0"
 #define SIZE_OF_SETTING_VERSION 25
 
@@ -47,31 +46,31 @@ bool Esp3DSettings::isValidSettingsNvs()
     char result[SIZE_OF_SETTING_VERSION+1]  = {0};
     if (esp3dTFTsettings.readString(esp3d_version, result,SIZE_OF_SETTING_VERSION+1)) {
         if (strcmp(SETTING_VERSION, result)!=0) {
-            ESP_LOGI(LOG_TAG, "Expected %s but got %s", SETTING_VERSION, result);
+            esp3d_log_e("Expected %s but got %s", SETTING_VERSION, result);
             return false;
         } else {
             return true;
         }
     } else {
-        ESP_LOGI(LOG_TAG, "Cannot read setting version");
+        esp3d_log_e("Cannot read setting version");
         return false;
     }
 }
 
 bool Esp3DSettings::reset()
 {
-    ESP_LOGI(LOG_TAG, "Resetting NVS");
+    esp3d_log("Resetting NVS");
     bool result = true;
     esp_err_t err;
     //clear all settings first
     nvs_handle_t handle_erase;
     err = nvs_open(STORAGE_NAME, NVS_READWRITE, &handle_erase);
     if (err != ESP_OK) {
-        ESP_LOGE(LOG_TAG, "Failing accessing NVS");
+        esp3d_log_e("Failing accessing NVS");
         return false;
     }
     if(nvs_erase_all(handle_erase)!= ESP_OK) {
-        ESP_LOGE(LOG_TAG, "Failing erasing NVS");
+        esp3d_log_e("Failing erasing NVS");
         return false;
     }
     nvs_close(handle_erase);
@@ -140,7 +139,7 @@ uint8_t Esp3DSettings::readByte(esp3d_setting_index_t index, bool * haserror)
             esp_err_t err;
             std::shared_ptr<nvs::NVSHandle> handle = nvs::open_nvs_handle(STORAGE_NAME, NVS_READWRITE, &err);
             if (err != ESP_OK) {
-                ESP_LOGE(LOG_TAG, "Failling accessing NVS");
+                esp3d_log_e("Failling accessing NVS");
             } else {
                 std::string key = "p_"+std::to_string((uint)query->index);
                 err =handle->get_item(key.c_str(), value);
@@ -175,7 +174,7 @@ uint32_t Esp3DSettings::readUint32(esp3d_setting_index_t index, bool * haserror)
             esp_err_t err;
             std::shared_ptr<nvs::NVSHandle> handle = nvs::open_nvs_handle(STORAGE_NAME, NVS_READONLY, &err);
             if (err != ESP_OK) {
-                ESP_LOGE(LOG_TAG, "Failling accessing NVS");
+                esp3d_log_e( "Failling accessing NVS");
             } else {
                 std::string key = "p_"+std::to_string((uint)query->index);
                 err = handle->get_item(key.c_str(), value);
@@ -220,7 +219,7 @@ const char* Esp3DSettings::readString(esp3d_setting_index_t index, char* out_str
             if (out_str && len >= (query->size +1)) {
                 std::shared_ptr<nvs::NVSHandle> handle = nvs::open_nvs_handle(STORAGE_NAME, NVS_READONLY, &err);
                 if (err != ESP_OK) {
-                    ESP_LOGE(LOG_TAG, "Failling accessing NVS");
+                    esp3d_log_e("Failling accessing NVS");
                 } else {
                     std::string key = "p_"+std::to_string((uint)query->index);
                     err = handle->get_string(key.c_str(), out_str, query->size);
@@ -237,7 +236,7 @@ const char* Esp3DSettings::readString(esp3d_setting_index_t index, char* out_str
                         }
                         return out_str;
                     }
-                    ESP_LOGI(LOG_TAG, "Read %s failed: %s", key.c_str(), esp_err_to_name(err) );
+                    esp3d_log_e("Read %s failed: %s", key.c_str(), esp_err_to_name(err) );
                 }
             }
         }
@@ -257,7 +256,7 @@ bool Esp3DSettings::writeByte (esp3d_setting_index_t index, const uint8_t value)
             esp_err_t err;
             std::shared_ptr<nvs::NVSHandle> handle = nvs::open_nvs_handle(STORAGE_NAME, NVS_READWRITE, &err);
             if (err != ESP_OK) {
-                ESP_LOGE(LOG_TAG, "Failling accessing NVS");
+                esp3d_log_e("Failling accessing NVS");
             } else {
                 std::string key = "p_"+std::to_string((uint)query->index);
                 if (handle->set_item(key.c_str(), value) == ESP_OK) {
@@ -278,7 +277,7 @@ bool Esp3DSettings::writeUint32 (esp3d_setting_index_t index, const uint32_t val
             esp_err_t err;
             std::shared_ptr<nvs::NVSHandle> handle = nvs::open_nvs_handle(STORAGE_NAME, NVS_READWRITE, &err);
             if (err != ESP_OK) {
-                ESP_LOGE(LOG_TAG, "Failling accessing NVS");
+                esp3d_log_e("Failling accessing NVS");
             } else {
                 std::string key = "p_"+std::to_string((uint)query->index);
                 if (handle->set_item(key.c_str(), value) == ESP_OK) {
@@ -303,7 +302,7 @@ bool Esp3DSettings::writeString (esp3d_setting_index_t index, const char * byte_
             esp_err_t err;
             std::shared_ptr<nvs::NVSHandle> handle = nvs::open_nvs_handle(STORAGE_NAME, NVS_READWRITE, &err);
             if (err != ESP_OK) {
-                ESP_LOGE(LOG_TAG, "Failling accessing NVS");
+                esp3d_log_e("Failling accessing NVS");
             } else {
                 std::string key = "p_"+std::to_string((uint)query->index);
                 if (handle->set_string(key.c_str(), byte_buffer) == ESP_OK) {

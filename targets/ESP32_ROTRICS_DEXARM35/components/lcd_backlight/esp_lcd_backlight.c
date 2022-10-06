@@ -9,7 +9,7 @@
 #include "esp_lcd_backlight.h"
 #include "driver/ledc.h"
 #include "driver/gpio.h"
-#include "esp_log.h"
+#include "esp3d_log.h"
 #include "soc/ledc_periph.h" // to invert LEDC output on IDF version < v4.3
 
 typedef struct {
@@ -17,7 +17,6 @@ typedef struct {
     int index;        // Either GPIO or LEDC channel
 } disp_backlight_t;
 
-static const char *TAG = "disp_backlight";
 
 disp_backlight_h disp_backlight_new(const disp_backlight_config_t *config)
 {
@@ -25,12 +24,12 @@ disp_backlight_h disp_backlight_new(const disp_backlight_config_t *config)
     if (config == NULL)
         return NULL;
     if (!GPIO_IS_VALID_OUTPUT_GPIO(config->gpio_num)) {
-        ESP_LOGW(TAG, "Invalid GPIO number");
+        esp3d_log_e("Invalid GPIO number");
         return NULL;
     }
     disp_backlight_t *bckl_dev = calloc(1, sizeof(disp_backlight_t));
     if (bckl_dev == NULL){
-        ESP_LOGW(TAG, "Not enough memory");
+        esp3d_log_e( "Not enough memory");
         return NULL;
     }
 
@@ -81,7 +80,7 @@ void disp_backlight_set(disp_backlight_h bckl, int brightness_percent)
         brightness_percent = 0;
 
     disp_backlight_t *bckl_dev = (disp_backlight_t *) bckl;
-    ESP_LOGI(TAG, "Setting LCD backlight: %d%%", brightness_percent);
+    esp3d_log("Setting LCD backlight: %d%%", brightness_percent);
 
     if (bckl_dev->pwm_control) {
         uint32_t duty_cycle = (1023 * brightness_percent) / 100; // LEDC resolution set to 10bits, thus: 100% = 1023

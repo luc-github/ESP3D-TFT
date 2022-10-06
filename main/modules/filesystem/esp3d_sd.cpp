@@ -22,9 +22,7 @@
 #include "esp3d_sd.h"
 #include <stdio.h>
 #include <string.h>
-#include "esp_log.h"
-
-#define LOG_TAG "SD_GLOBAL"
+#include "esp3d_log.h"
 
 ESP_SD sd;
 
@@ -47,10 +45,10 @@ bool  ESP_SD::accessFS(esp3d_fs_types FS)
     (void)FS;
     //if card is busy do not let another task access SD and so prevent a release
     if (_state == ESP3D_SDCARD_BUSY) {
-        ESP_LOGI(LOG_TAG, "SDCard Busy.");
+        esp3d_log( "SDCard Busy.");
         return false;
     }
-    ESP_LOGI(LOG_TAG,"Access SD");
+    esp3d_log("Access SD");
     return true;
 
 }
@@ -58,7 +56,7 @@ bool  ESP_SD::accessFS(esp3d_fs_types FS)
 void  ESP_SD::releaseFS(esp3d_fs_types FS)
 {
     (void)FS;
-    ESP_LOGI(LOG_TAG,"Release SD");
+    esp3d_log("Release SD");
     setState(ESP3D_SDCARD_IDLE);
 }
 

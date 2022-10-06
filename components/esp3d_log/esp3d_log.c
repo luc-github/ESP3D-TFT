@@ -1,5 +1,5 @@
 /*
-  esp3d-string helper functions
+  esp3d-tft log functions
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -17,7 +17,21 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#if defined(ESP3D_TFT_LOG) && ESP3D_TFT_LOG
+#include  "esp3d_log.h"
 
-#pragma once
-
-const char * str_trim(const char * str);
+const char * pathToFileName(const char * path)
+{
+    size_t i = 0;
+    size_t pos = 0;
+    char * p = (char *)path;
+    while(*p) {
+        i++;
+        if(*p == '/' || *p == '\\') {
+            pos = i;
+        }
+        p++;
+    }
+    return path+pos;
+}
+#endif //ESP3D_TFT_LOG

@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "esp_log.h"
+#include "esp3d_log.h"
 #include <stdint.h>
 #include <driver/spi_master.h>
 #include "spi_bus.h"
@@ -15,7 +15,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define TAG "SPI_BUS"
 #define SPI_HOST_MAX 3
 
 /**********************
@@ -58,11 +57,11 @@ bool spi_driver_init(int host,
         "SPI1_HOST", "SPI2_HOST", "SPI3_HOST"
     };
 
-    ESP_LOGI(TAG, "Configuring SPI host %s", spi_names[host]);
-    ESP_LOGI(TAG, "MISO pin: %d, MOSI pin: %d, SCLK pin: %d, IO2/WP pin: %d, IO3/HD pin: %d",
+    esp3d_log("Configuring SPI host %s", spi_names[host]);
+    esp3d_log("MISO pin: %d, MOSI pin: %d, SCLK pin: %d, IO2/WP pin: %d, IO3/HD pin: %d",
         miso_pin, mosi_pin, sclk_pin, quadwp_pin, quadhd_pin);
 
-    ESP_LOGI(TAG, "Max transfer size: %d (bytes)", max_transfer_sz);
+    esp3d_log("Max transfer size: %d (bytes)", max_transfer_sz);
 
     spi_bus_config_t buscfg = {
         .miso_io_num = miso_pin,
@@ -73,7 +72,7 @@ bool spi_driver_init(int host,
         .max_transfer_sz = max_transfer_sz
     };
 
-    ESP_LOGI(TAG, "Initializing SPI bus...");
+    esp3d_log("Initializing SPI bus...");
     #if defined (CONFIG_IDF_TARGET_ESP32C3)
     dma_channel = SPI_DMA_CH_AUTO;
     #endif

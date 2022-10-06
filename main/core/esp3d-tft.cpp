@@ -31,7 +31,7 @@
 #include "version.h"
 #include <string>
 #include "esp_log.h"
-#define LOG_TAG "MAIN"
+#include "esp3d_log.h"
 #include "bsp.h"
 
 /**********************
@@ -52,9 +52,9 @@ bool Esp3DTFT::begin()
 {
     //Generic board initialization
     std::string target =  TFT_TARGET ;
-    ESP_LOGI(LOG_TAG, "Starting ESP3D-TFT on %s ", target.c_str());
+    esp3d_log("Starting ESP3D-TFT on %s ", target.c_str());
     //do nvs init
-    ESP_LOGI(LOG_TAG, "Initialising NVS");
+    esp3d_log("Initialising NVS");
     esp_err_t res = nvs_flash_init();
     if (res == ESP_ERR_NVS_NO_FREE_PAGES || res == ESP_ERR_NVS_NEW_VERSION_FOUND) {
         ESP_ERROR_CHECK(nvs_flash_erase());
@@ -72,17 +72,17 @@ bool Esp3DTFT::begin()
         success = esp3dTFTstream.begin();
     }
     if (esp3dTFTsettings.isValidSettingsNvs()) {
-        ESP_LOGI(LOG_TAG, "NVS is valid");
+        esp3d_log("NVS is valid");
         char result[50]= {0};
         if (esp3dTFTsettings.readString(esp3d_version, result,50)) {
-            ESP_LOGI(LOG_TAG, "NVS Setting version is %s", result);
+            esp3d_log("NVS Setting version is %s", result);
         }
     } else {
-        ESP_LOGI(LOG_TAG, "NVS is not valid, need resetting");
+        esp3d_log_e("NVS is not valid, need resetting");
         if (esp3dTFTsettings.reset()) {
-            ESP_LOGI(LOG_TAG, "Reset NVS done");
+            esp3d_log("Reset NVS done");
         } else {
-            ESP_LOGI(LOG_TAG, "Reset NVS failed");
+            esp3d_log_e("Reset NVS failed");
         }
     }
 

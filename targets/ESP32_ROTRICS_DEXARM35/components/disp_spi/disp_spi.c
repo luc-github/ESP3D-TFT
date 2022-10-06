@@ -9,12 +9,8 @@
 #include "esp_system.h"
 #include "driver/gpio.h"
 #include "driver/spi_master.h"
-#include "esp_log.h"
-
-#define TAG "disp_spi"
-
+#include "esp3d_log.h"
 #include <string.h>
-
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 #include <freertos/task.h>
@@ -115,8 +111,8 @@ void disp_spi_add_device(spi_host_device_t host)
 
 void disp_spi_add_device_with_speed(spi_host_device_t host, int clock_speed_hz)
 {
-    ESP_LOGI(TAG, "Adding SPI device");
-    ESP_LOGI(TAG, "Clock speed: %dHz, mode: %d, CS pin: %d",
+    esp3d_log("Adding SPI device");
+    esp3d_log("Clock speed: %dHz, mode: %d, CS pin: %d",
         clock_speed_hz, DISP_SPI_MODE, DISP_SPI_CS);
 
     spi_device_interface_config_t devcfg={
@@ -153,7 +149,7 @@ void disp_spi_change_device_speed(int clock_speed_hz)
     if (clock_speed_hz <= 0) {
         clock_speed_hz = DISP_SPI_CLOCK_SPEED_HZ;
     }
-    ESP_LOGI(TAG, "Changing SPI device clock speed: %d", clock_speed_hz);
+    esp3d_log("Changing SPI device clock speed: %d", clock_speed_hz);
     disp_spi_remove_device();
     disp_spi_add_device_with_speed(spi_host, clock_speed_hz);
 }

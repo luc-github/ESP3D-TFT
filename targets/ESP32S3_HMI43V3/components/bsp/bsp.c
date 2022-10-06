@@ -21,8 +21,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "esp_log.h"
-#define LOG_TAG "BSP"
+#include "esp3d_log.h"
 #include "lvgl.h"
 #include "bsp.h"
 #include "disp_def.h"
@@ -76,37 +75,37 @@ esp_err_t bsp_init(void)
     static lv_disp_drv_t disp_drv;        /*Descriptor of a display driver*/
 
     //Drivers initialization
-    ESP_LOGI(LOG_TAG, "Display buffer size: %d", DISP_BUF_SIZE);
+    esp3d_log( "Display buffer size: %d", DISP_BUF_SIZE);
 
     /* i2c controller initialization */
-    ESP_LOGI(LOG_TAG, "Initializing i2C controller");
+    esp3d_log("Initializing i2C controller");
 
 
     if (NULL != i2c_bus_handle) {
-        ESP_LOGE(LOG_TAG, "I2C bus already initialized.");
+        esp3d_log_e("I2C bus already initialized.");
         return ESP_FAIL;
     }
 
 
     i2c_bus_handle = i2c_bus_create(I2C_PORT_NUMBER, &conf);
     if (i2c_bus_handle==NULL) {
-        ESP_LOGE(LOG_TAG, "I2C bus failed to be initialized.");
+        esp3d_log_e("I2C bus failed to be initialized.");
         return ESP_FAIL;
     }
 
 
     /* tca9554 controller initialization */
-    ESP_LOGI(LOG_TAG, "Initializing tca9554 controller");
+    esp3d_log("Initializing tca9554 controller");
     ESP_ERROR_CHECK(tca9554_init(i2c_bus_handle));
 
     /* Display controller initialization */
-    ESP_LOGI(LOG_TAG, "Initializing display controller");
+    esp3d_log("Initializing display controller");
     if (rm68120_init( &disp_drv) != ESP_OK) {
         return ESP_FAIL;
     }
 
     /* Touch controller initialization */
-    ESP_LOGI(LOG_TAG, "Initializing touch controller");
+    esp3d_log("Initializing touch controller");
     if (ft5x06_init(i2c_bus_handle) != ESP_OK) {
         return ESP_FAIL;
     }
@@ -115,7 +114,7 @@ esp_err_t bsp_init(void)
     lv_init();
 
     //Lvgl setup
-    ESP_LOGI(LOG_TAG, "Setup Lvgl");
+    esp3d_log("Setup Lvgl");
     lv_color_t* buf1 = (lv_color_t*)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t), HAS_PSRAM ?MALLOC_CAP_SPIRAM: MALLOC_CAP_DMA);
     if (buf1 == NULL) {
         return ESP_FAIL;

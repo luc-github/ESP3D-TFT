@@ -1,4 +1,4 @@
-//Pins definition for ESP32S3_HMI43V3
+//Pins definition for ESP32 ESP32S3_ZX3D50CE02S_USRC_4832
 //SD SPI
 #pragma once
 
@@ -7,14 +7,14 @@ extern "C" {
 #endif
 
 /**
- * @brief ESP32S3_HMI43V3 SD SPI GPIO definition
+ * @brief ESP32S3_ZX3D50CE02S_USRC_4832 SD SPI GPIO definition
  *
  */
 #define ESP_SD_IS_SPI   1
-#define ESP_SD_MOSI_PIN    (35) //GPIO 35
-#define ESP_SD_MISO_PIN    (37) //GPIO 37
-#define ESP_SD_CLK_PIN     (36) //GPIO 36
-#define ESP_SD_CS_PIN      (34) //GPIO 34
+#define ESP_SD_MOSI_PIN    (40) //GPIO 40
+#define ESP_SD_MISO_PIN    (38) //GPIO 38
+#define ESP_SD_CLK_PIN     (39) //GPIO 39
+#define ESP_SD_CS_PIN      (41) //GPIO 41
 
 //#define ESP_SD_DETECT_PIN (-1) //GPIO -1
 //#define ESP_SD_DETECT_VALUE (0) //LOW
