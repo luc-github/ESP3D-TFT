@@ -14,16 +14,22 @@ extern "C" {
 #define ESP_SD_IS_SDIO  1
 //TODO
 //DEFINE CMD DATA CLK PINS
-#define ESP_SD_MOSI_PIN    (40) //GPIO 40
+#define ESP_SDIO_CMD_PIN    (15) //GPIO 15
+#define ESP_SDIO_CLK_PIN    (14) //GPIO 14
+#define ESP_SDIO_D0_PIN     (2)  //GPIO 2
+#define ESP_SDIO_D1_PIN     (-1) //NC 
+#define ESP_SDIO_D2_PIN     (-1) //NC 
+#define ESP_SDIO_D3_PIN     (-1) //NC 
+
+#define ESP_SDIO_BIT_WIDTH 1 //can be 1 or 4
 
 
 //#define ESP_SD_DETECT_PIN (-1) //GPIO -1
 //#define ESP_SD_DETECT_VALUE (0) //LOW
-#define MAX_TRANSFER_SZ (4000)
-//(range 400kHz - 20MHz for SDSPI, less for other devices)
+
+//(range 400kHz - 40MHz for SDIO, less for other devices)
 //default is 20MHz
 #define ESP_SD_FREQ (20000)
-
 #define ESP_SD_FORMAT_IF_MOUNT_FAILED   (1)
 
 
