@@ -10,8 +10,8 @@ extern "C" {
 #endif
 
 #define TCA9554_CLK_SPEED               (400000)
-#define TCA9554_ADDR                    (0x24)
-#define TCA9554A_ADDR                   (0x3C)
+#define TCA9554A_ADDR                    (0x24)
+#define TCA9554_ADDR                     (0x3C)
 
 #define TCA9554_INPUT_PORT_REG          (0x00)
 #define TCA9554_OUTPUT_PORT_REG         (0x01)
