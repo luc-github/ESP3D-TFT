@@ -1,5 +1,5 @@
 /*
-  esp3d_string helper functions
+  esp3d_serial_client
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -20,11 +20,29 @@
 
 #pragma once
 #include <stdio.h>
+#include "esp3d_client.h"
+#include "esp3d_log.h"
+#include <pthread.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-const char * str_trim(const char * str);
+class Esp3DSerialClient : public Esp3DClient
+{
+public:
+    Esp3DSerialClient();
+    ~Esp3DSerialClient();
+    bool begin();
+    void handle();
+    void end();
+
+private:
+    pthread_mutex_t _tx_mutex;
+    pthread_mutex_t _rx_mutex;
+};
+
+extern Esp3DSerialClient serialClient;
 
 #ifdef __cplusplus
 } // extern "C"

@@ -19,6 +19,10 @@
 */
 
 #pragma once
+#include <stdio.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 class Esp3DTFTUi final
 {
@@ -34,3 +38,7 @@ private:
 };
 
 extern Esp3DTFTUi esp3dTFTui;
+
+#ifdef __cplusplus
+} // extern "C"
+#endif

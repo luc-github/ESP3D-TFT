@@ -19,6 +19,10 @@
 */
 
 #pragma once
+#include <stdio.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 class Esp3DTFTStream final
 {
@@ -34,3 +38,7 @@ private:
 };
 
 extern Esp3DTFTStream esp3dTFTstream;
+
+#ifdef __cplusplus
+} // extern "C"
+#endif

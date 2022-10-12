@@ -21,6 +21,9 @@
 
 #pragma once
 #include <stdio.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef enum  {
     esp3d_version,
@@ -78,3 +81,7 @@ private:
 };
 
 extern Esp3DSettings esp3dTFTsettings;
+
+#ifdef __cplusplus
+} // extern "C"
+#endif

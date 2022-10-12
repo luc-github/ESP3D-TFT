@@ -19,6 +19,10 @@
 */
 
 #pragma once
+#include <stdio.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 class Esp3DTFT final
 {
@@ -32,3 +36,7 @@ public:
 private:
     bool _started;
 };
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
