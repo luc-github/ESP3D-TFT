@@ -27,6 +27,7 @@ extern "C" {
 
 typedef enum  {
     esp3d_version,
+    esp3d_baud_rate,
     last_one
 } esp3d_setting_index_t;
 
@@ -54,6 +55,7 @@ typedef struct  {
     esp3d_setting_index_t index;
     esp3d_setting_type_t type;
     uint16_t size;
+    void * isValid;
     const char* defaultval;
 } Esp3DSetting_t;
 

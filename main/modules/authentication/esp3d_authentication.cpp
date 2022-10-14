@@ -1,6 +1,5 @@
 /*
-  esp3d_serial_client
-
+  esp3d_authentication class
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
   This code is free software; you can redistribute it and/or
@@ -18,34 +17,28 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#pragma once
+#include "esp3d_authentication.h"
 #include <stdio.h>
-#include "esp3d_client.h"
-#include "esp3d_log.h"
-#include <pthread.h>
+Esp3DAuthenticationService esp3dAuthenthicationService;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-class Esp3DSerialClient : public Esp3DClient
+Esp3DAuthenticationService::Esp3DAuthenticationService() {}
+Esp3DAuthenticationService::~Esp3DAuthenticationService() {}
+esp3d_authentication_level_t  Esp3DAuthenticationService::getAuthenticatedLevel(const  char * pwd )
 {
-public:
-    Esp3DSerialClient();
-    ~Esp3DSerialClient();
-    bool begin();
-    void handle();
-    void end();
-    bool isEndChar(uint8_t ch);
-    bool pushMsgToRxQueue(const uint8_t* msg, size_t size);
-private:
-    bool _started;
-    pthread_mutex_t _tx_mutex;
-    pthread_mutex_t _rx_mutex;
-};
-
-extern Esp3DSerialClient serialClient;
-
-#ifdef __cplusplus
-} // extern "C"
-#endif
+    return ESP3D_LEVEL_ADMIN;
+}
+bool Esp3DAuthenticationService::begin()
+{
+    return false;
+}
+void Esp3DAuthenticationService::handle() {}
+void Esp3DAuthenticationService::end() {}
+bool Esp3DAuthenticationService::isadmin (const char *pwd)
+{
+    return false;
+}
+bool Esp3DAuthenticationService::isuser (const char *pwd)
+{
+    return false;
+}
+void Esp3DAuthenticationService::update() {}

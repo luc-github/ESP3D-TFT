@@ -38,7 +38,7 @@ Esp3DSettings esp3dTFTsettings;
 //value of settings
 const Esp3DSetting_t Esp3DSettingsData [] = {
 
-    {esp3d_version, esp3d_string, SIZE_OF_SETTING_VERSION,"Invalid data"}
+    {esp3d_version, esp3d_string, SIZE_OF_SETTING_VERSION,nullptr,"Invalid data"}
 };
 
 bool Esp3DSettings::isValidSettingsNvs()

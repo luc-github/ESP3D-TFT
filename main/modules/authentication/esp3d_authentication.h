@@ -1,5 +1,5 @@
 /*
-  esp3d_serial_client
+  esp3d_authentication
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -20,31 +20,43 @@
 
 #pragma once
 #include <stdio.h>
-#include "esp3d_client.h"
+
 #include "esp3d_log.h"
-#include <pthread.h>
+#include <string>
+#define USER_PASSWORD_MAX_SIZE 20
+#define ADMIN_PASSWORD_MAX_SIZE 20
+const char ESP3D_ADMIN_LOGIN [] =      "admin";
+const char ESP3D_USER_LOGIN [] =       "user";
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-class Esp3DSerialClient : public Esp3DClient
+typedef enum {
+    ESP3D_LEVEL_GUEST,
+    ESP3D_LEVEL_USER,
+    ESP3D_LEVEL_ADMIN,
+} esp3d_authentication_level_t;
+
+class Esp3DAuthenticationService final
 {
 public:
-    Esp3DSerialClient();
-    ~Esp3DSerialClient();
+    Esp3DAuthenticationService();
+    ~Esp3DAuthenticationService();
+    esp3d_authentication_level_t  getAuthenticatedLevel(const  char * pwd = nullptr);
     bool begin();
     void handle();
     void end();
-    bool isEndChar(uint8_t ch);
-    bool pushMsgToRxQueue(const uint8_t* msg, size_t size);
+    bool isadmin (const char *pwd);
+    bool isuser (const char *pwd);
+    void update();
+
 private:
-    bool _started;
-    pthread_mutex_t _tx_mutex;
-    pthread_mutex_t _rx_mutex;
+    char _adminpwd[USER_PASSWORD_MAX_SIZE+1];
+    char _userpwd[USER_PASSWORD_MAX_SIZE+1];
 };
 
-extern Esp3DSerialClient serialClient;
+extern Esp3DAuthenticationService esp3dAuthenthicationService;
 
 #ifdef __cplusplus
 } // extern "C"

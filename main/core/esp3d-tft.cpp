@@ -64,13 +64,7 @@ bool Esp3DTFT::begin()
     //Specitic board initialization
     ESP_ERROR_CHECK(bsp_init());
 
-    bool success = esp3dTFTui.begin();
-    if (success) {
-        success = esp3dTFTnetwork.begin();
-    }
-    if (success) {
-        success = esp3dTFTstream.begin();
-    }
+
     if (esp3dTFTsettings.isValidSettingsNvs()) {
         esp3d_log("NVS is valid");
         char result[50]= {0};
@@ -86,7 +80,13 @@ bool Esp3DTFT::begin()
         }
     }
 
-
+    bool success = esp3dTFTui.begin();
+    if (success) {
+        success = esp3dTFTnetwork.begin();
+    }
+    if (success) {
+        success = esp3dTFTstream.begin();
+    }
     return success;
 }
 

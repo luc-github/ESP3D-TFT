@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <deque>
 #include <pthread.h>
+#include "authentication/esp3d_authentication.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,6 +44,7 @@ typedef struct {
     esp3d_clients_t origin;
     esp3d_clients_t target;
     bool esp3d_cmd;
+    esp3d_authentication_level_t authentication_level;
 } esp3d_msg_t;
 
 class Esp3DClient
@@ -80,8 +82,15 @@ public:
     };
     bool clearRxQueue();
     bool clearTxQueue();
+    size_t getRxMsgsCount()
+    {
+        return _rx_queue.size();
+    }
+    size_t getTxMsgsCount()
+    {
+        return _tx_queue.size();
+    }
 private:
-    bool _started;
     std::deque<esp3d_msg_t*> _rx_queue;
     std::deque<esp3d_msg_t*> _tx_queue;
     size_t _rx_size;

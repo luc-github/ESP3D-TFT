@@ -24,7 +24,6 @@
 
 Esp3DClient::Esp3DClient()
 {
-    _started = false;
     _rx_size=0;
     _tx_size=0;
     _rx_max_size=512;
@@ -73,7 +72,6 @@ bool Esp3DClient::clearTxQueue()
 }
 Esp3DClient::~Esp3DClient()
 {
-    _started = false;
     clearTxQueue();
     clearRxQueue();
 }

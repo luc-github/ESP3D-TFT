@@ -26,7 +26,7 @@
 #include "version.h"
 #include <string>
 #include "esp3d_log.h"
-
+#include "serial/esp3d_serial_client.h"
 
 
 
@@ -85,7 +85,7 @@ bool Esp3DTFTStream::begin()
     BaseType_t  res =  xTaskCreatePinnedToCore(streamTask, "tftStream", STACKDEPTH, NULL, TASKPRIORITY, &xHandle, TASKCORE);
     if (res==pdPASS && xHandle) {
         esp3d_log ("Created Stream Task");
-        return true;
+        return serialClient.begin();
     } else {
         esp3d_log_e ("Stream Task creation failed");
         return false;
@@ -95,7 +95,7 @@ bool Esp3DTFTStream::begin()
 
 void Esp3DTFTStream::handle()
 {
-
+    serialClient.handle();
 }
 
 bool Esp3DTFTStream::end()

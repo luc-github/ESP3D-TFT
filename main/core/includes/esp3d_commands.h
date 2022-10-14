@@ -1,5 +1,5 @@
 /*
-  esp3d_serial_client
+  esp3d_commands
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -19,32 +19,27 @@
 */
 
 #pragma once
+
 #include <stdio.h>
 #include "esp3d_client.h"
-#include "esp3d_log.h"
-#include <pthread.h>
+#include "authentication/esp3d_authentication.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-class Esp3DSerialClient : public Esp3DClient
+
+class Esp3DCommands
 {
 public:
-    Esp3DSerialClient();
-    ~Esp3DSerialClient();
-    bool begin();
-    void handle();
-    void end();
-    bool isEndChar(uint8_t ch);
-    bool pushMsgToRxQueue(const uint8_t* msg, size_t size);
+    Esp3DCommands();
+    ~Esp3DCommands();
+    bool is_esp_command(uint8_t * sbuf, size_t len);
 private:
-    bool _started;
-    pthread_mutex_t _tx_mutex;
-    pthread_mutex_t _rx_mutex;
+
 };
 
-extern Esp3DSerialClient serialClient;
+extern Esp3DCommands esp3dCommands;
 
 #ifdef __cplusplus
 } // extern "C"
