@@ -30,13 +30,6 @@ Esp3DSerialClient serialClient;
 
 #define RX_FLUSH_TIME_OUT 1500 * 1000 //microseconds timeout
 
-/*
-len = uart_write_bytes(ECHO_UART_PORT_NUM, command, sizeof(command));
-    if ( len == -1 ) {
-        goto end;
-    }
-*/
-
 //this task only collecting serial RX data and push thenmm to Rx Queue
 static void esp3d_serial_rx_task(void *pvParameter)
 {
