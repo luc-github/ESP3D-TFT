@@ -55,7 +55,6 @@ typedef struct  {
     esp3d_setting_index_t index;
     esp3d_setting_type_t type;
     uint16_t size;
-    void * isValid;
     const char* defaultval;
 } Esp3DSetting_t;
 
@@ -74,6 +73,12 @@ public:
     bool writeIPString (esp3d_setting_index_t index, const char * byte_buffer);
     bool writeString (esp3d_setting_index_t index, const char * byte_buffer);
     bool reset();
+    bool isValidStringSetting(const char* value, esp3d_setting_index_t settingElement);
+    bool isValidIntegerSetting(uint32_t value, esp3d_setting_index_t settingElement);
+    bool isValidByteSetting(uint8_t value, esp3d_setting_index_t settingElement);
+    uint32_t getDefaultIntegerSetting(esp3d_setting_index_t settingElement);
+    const char * getDefaultStringSetting(esp3d_setting_index_t settingElement);
+    uint8_t getDefaultByteSetting(esp3d_setting_index_t settingElement);
 
 private:
     const Esp3DSetting_t * getSettingPtr(esp3d_setting_index_t index);

@@ -27,6 +27,7 @@
 #include <cstring>
 #include <string>
 #include "esp3d_log.h"
+#include "serial_def.h"
 
 
 #define STORAGE_NAME "ESP3D_TFT"
@@ -35,11 +36,48 @@
 
 Esp3DSettings esp3dTFTsettings;
 
-//value of settings
-const Esp3DSetting_t Esp3DSettingsData [] = {
+const long SupportedBaudList[] = {9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000, 500000, 921600};
 
-    {esp3d_version, esp3d_string, SIZE_OF_SETTING_VERSION,nullptr,"Invalid data"}
+//value of settings, default value are all strings
+const Esp3DSetting_t Esp3DSettingsData [] = {
+    {esp3d_version, esp3d_string, SIZE_OF_SETTING_VERSION,"Invalid data"},
+    {esp3d_baud_rate,esp3d_integer,4, ESP3D_SERIAL_BAUDRATE}
 };
+
+bool  Esp3DSettings::isValidStringSetting(const char* value, esp3d_setting_index_t settingElement)
+{
+    switch(settingElement) {
+
+    default:
+        return false;
+    }
+    return false;
+}
+
+bool  Esp3DSettings::isValidIntegerSetting(uint32_t value, esp3d_setting_index_t settingElement)
+{
+    switch(settingElement) {
+    case esp3d_baud_rate:
+        for(uint8_t i=0; i< sizeof(SupportedBaudList); i++) {
+            if (SupportedBaudList[i]==value) {
+                return true;
+            }
+        }
+        break;
+    default:
+        return false;
+    }
+    return false;
+}
+bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t settingElement)
+{
+    switch(settingElement) {
+
+    default:
+        return false;
+    }
+    return false;
+}
 
 bool Esp3DSettings::isValidSettingsNvs()
 {
@@ -55,6 +93,31 @@ bool Esp3DSettings::isValidSettingsNvs()
         esp3d_log_e("Cannot read setting version");
         return false;
     }
+}
+
+uint32_t Esp3DSettings::getDefaultIntegerSetting(esp3d_setting_index_t settingElement)
+{
+    const Esp3DSetting_t * query = getSettingPtr(settingElement);
+    if (query) {
+        return (uint32_t)std::stoul(std::string(query->defaultval), NULL,0);
+    }
+    return 0;
+}
+const char * Esp3DSettings::getDefaultStringSetting(esp3d_setting_index_t settingElement)
+{
+    const Esp3DSetting_t * query = getSettingPtr(settingElement);
+    if (query) {
+        return query->defaultval;
+    }
+    return nullptr;
+}
+uint8_t Esp3DSettings::getDefaultByteSetting(esp3d_setting_index_t settingElement)
+{
+    const Esp3DSetting_t * query = getSettingPtr(settingElement);
+    if (query) {
+        return (uint8_t)std::stoul(std::string(query->defaultval), NULL,0);
+    }
+    return 0;
 }
 
 bool Esp3DSettings::reset()

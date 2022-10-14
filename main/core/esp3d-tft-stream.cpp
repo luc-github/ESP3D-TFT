@@ -85,12 +85,20 @@ bool Esp3DTFTStream::begin()
     BaseType_t  res =  xTaskCreatePinnedToCore(streamTask, "tftStream", STACKDEPTH, NULL, TASKPRIORITY, &xHandle, TASKCORE);
     if (res==pdPASS && xHandle) {
         esp3d_log ("Created Stream Task");
-        return serialClient.begin();
+        //to let buffer time to empty
+#if ESP3D_TFT_LOG
+        vTaskDelay(pdMS_TO_TICKS(100));
+#endif //ESP3D_TFT_LOG
+//now begin serialClient
+        if(serialClient.begin()) {
+            return true;
+        }
+
     } else {
         esp3d_log_e ("Stream Task creation failed");
-        return false;
-    }
 
+    }
+    return false;
 }
 
 void Esp3DTFTStream::handle()
