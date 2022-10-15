@@ -57,8 +57,9 @@ esp3d_msg_t * Esp3DClient::popTx()
 
 void Esp3DClient::deleteMsg(esp3d_msg_t * msg)
 {
-    delete msg->data;
-    delete msg;
+    free(msg->data);
+    free(msg);
+    msg = nullptr;
 }
 
 bool Esp3DClient::clearTxQueue()
@@ -122,3 +123,49 @@ bool Esp3DClient::addFrontTXData(esp3d_msg_t * msg)
     return res;
 }
 
+esp3d_msg_t * Esp3DClient::newMsg( esp3d_clients_t origin, esp3d_clients_t target, const uint8_t * data, size_t length)
+{
+    esp3d_msg_t * newMsgPtr =newMsg( origin,target);
+    if (newMsgPtr) {
+        if (!setDataContent (newMsgPtr, data, length)) {
+            deleteMsg(newMsgPtr);
+            newMsgPtr = nullptr;
+        }
+    }
+
+    return newMsgPtr;
+}
+
+esp3d_msg_t *Esp3DClient::newMsg( esp3d_clients_t origin, esp3d_clients_t target)
+{
+    esp3d_msg_t * newMsgPtr = (esp3d_msg_t*)malloc( sizeof(esp3d_msg_t));
+    if (newMsgPtr) {
+        newMsgPtr->data = nullptr;
+        newMsgPtr->origin = origin;
+        newMsgPtr->target = target;
+    }
+    return newMsgPtr;
+}
+
+bool Esp3DClient::setDataContent (esp3d_msg_t * msg, const uint8_t * data, size_t length)
+{
+    if (!msg ) {
+        esp3d_log_e("no valid msg container");
+        return false;
+    }
+    if (!data || length==0) {
+        esp3d_log_e("no data to set");
+        return false;
+    }
+    if (msg->data) {
+        free(msg->data);
+    }
+    msg->data=(uint8_t*)malloc( sizeof(uint8_t)*length);
+    if ( msg->data) {
+        memcpy(msg->data, data, length);
+        msg->size = length;
+        return true;
+    }
+    esp3d_log_e("Out of memory");
+    return false;
+}

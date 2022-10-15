@@ -18,9 +18,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <stdio.h>
-#include <string.h>
-#include <string>
+#include "esp3d_string.h"
+#include <algorithm>
 
 //Trim string function
 const char * str_trim(const char * str)
@@ -36,4 +35,9 @@ const char * str_trim(const char * str)
     } while (std::distance(start, end) > 0 && std::isspace(*end));
     s = std::string(start, end + 1);
     return s.c_str();
+}
+//Upper case string
+void  str_toUpperCase(std::string * str)
+{
+    std::transform(str->begin(), str->end(), str->begin(), ::toupper);
 }

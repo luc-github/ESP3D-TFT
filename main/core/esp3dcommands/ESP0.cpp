@@ -1,6 +1,5 @@
 /*
-  esp3d_string helper functions
-
+  esp3d_commands member
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
   This code is free software; you can redistribute it and/or
@@ -18,16 +17,18 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#pragma once
+#include "esp3d_commands.h"
+#include "esp3d_client.h"
 #include <stdio.h>
 #include <string>
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-const char * str_trim(const char * str);
-void  str_toUpperCase(std::string * str);
-
-#ifdef __cplusplus
-} // extern "C"
-#endif
+void Esp3DCommands::ESP0(int cmd_params_pos,esp3d_msg_t * msg)
+{
+    esp3d_clients_t target = msg->origin;
+    msg->target = target;
+    msg->origin = ESP3D_COMMAND;
+    if(!dispatch(msg,"Pray for help")) {
+        Esp3DClient::deleteMsg(msg);
+        return ;
+    }
+}

@@ -32,9 +32,11 @@ extern "C" {
 typedef enum {
     NO_CLIENT,
     SERIAL_CLIENT,
+    STREAM_CLIENT,
     TELNET_CLIENT,
     HTTP_CLIENT,
     WEBSOCKET_CLIENT,
+    ESP3D_COMMAND,
     ALL_CLIENTS
 } esp3d_clients_t;
 
@@ -43,7 +45,6 @@ typedef struct {
     size_t size;
     esp3d_clients_t origin;
     esp3d_clients_t target;
-    bool esp3d_cmd;
     esp3d_authentication_level_t authentication_level;
 } esp3d_msg_t;
 
@@ -70,7 +71,7 @@ public:
     bool addTXData(esp3d_msg_t * msg);
     esp3d_msg_t * popRx();
     esp3d_msg_t * popTx();
-    void deleteMsg(esp3d_msg_t * msg);
+    static void deleteMsg(esp3d_msg_t * msg);
     bool addFrontTXData(esp3d_msg_t * msg);
     void setRxMutex(pthread_mutex_t * mutex)
     {
@@ -90,6 +91,9 @@ public:
     {
         return _tx_queue.size();
     }
+    static esp3d_msg_t * newMsg( esp3d_clients_t origin, esp3d_clients_t target);
+    static esp3d_msg_t * newMsg( esp3d_clients_t origin, esp3d_clients_t target, const uint8_t * data, size_t length);
+    static bool setDataContent (esp3d_msg_t * msg, const uint8_t * data, size_t length);
 private:
     std::deque<esp3d_msg_t*> _rx_queue;
     std::deque<esp3d_msg_t*> _tx_queue;

@@ -35,6 +35,16 @@ public:
     Esp3DCommands();
     ~Esp3DCommands();
     bool is_esp_command(uint8_t * sbuf, size_t len);
+    void process(esp3d_msg_t * msg);
+    void execute_internal_command(int cmd, int cmd_params_pos,esp3d_msg_t * msg);
+    bool dispatch(esp3d_msg_t * msg);
+    bool dispatch(esp3d_msg_t * msg,uint8_t * sbuf, size_t len);
+    bool dispatch(esp3d_msg_t * msg,const char * sbuf);
+    void ESP0(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP420(int cmd_params_pos,esp3d_msg_t * msg);
+    const char * get_param (esp3d_msg_t * msg, uint start,const char* label);
+    const char * get_clean_param (esp3d_msg_t * msg, uint start);
+    bool hasTag (esp3d_msg_t * msg, uint start,const char* label);
 private:
 
 };

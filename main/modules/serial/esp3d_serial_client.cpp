@@ -26,6 +26,8 @@
 #include "esp3d_serial_client.h"
 #include "esp3d-settings.h"
 #include "esp3d_log.h"
+#include "esp3d_commands.h"
+
 Esp3DSerialClient serialClient;
 
 #define RX_FLUSH_TIME_OUT 1500 * 1000 //microseconds timeout
@@ -141,21 +143,21 @@ bool Esp3DSerialClient::pushMsgToRxQueue(const uint8_t* msg, size_t size)
 {
     esp3d_msg_t * newMsg = (esp3d_msg_t*)malloc( sizeof(esp3d_msg_t));
     if (newMsg) {
-        newMsg->data=(uint8_t*)malloc( sizeof(uint8_t)*size);
-        if ( newMsg->data) {
-            memcpy(newMsg->data, msg, size);
-            newMsg->size = size;
+        newMsg->data = nullptr;
+        if (Esp3DClient::setDataContent (newMsg,msg, size)) {
             newMsg->origin = SERIAL_CLIENT;
             newMsg->target = ALL_CLIENTS;
-            newMsg->esp3d_cmd = false;
             newMsg->authentication_level = ESP3D_LEVEL_GUEST;
             if (!addRXData(newMsg)) {
+                //delete message as cannot be added to the queue
+                Esp3DClient::deleteMsg(newMsg);
                 esp3d_log_e("Failed to add message to rx queue");
                 return false;
             }
         } else {
-            delete newMsg;
-            esp3d_log_e("Out of memory!");
+            //delete message as cannot be added partially filled to the queue
+            free( newMsg);
+            esp3d_log_e("Message creation failed");
             return false;
         }
     } else {
@@ -171,8 +173,7 @@ void Esp3DSerialClient::handle()
         if(getRxMsgsCount() > 0) {
             esp3d_msg_t * msg = popRx();
             if (msg) {
-                //for test purposes only
-                addTXData(msg);
+                esp3dCommands.process(msg);
             }
         }
         if(getTxMsgsCount() > 0) {
