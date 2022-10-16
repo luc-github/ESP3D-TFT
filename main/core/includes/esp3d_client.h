@@ -91,8 +91,10 @@ public:
     {
         return _tx_queue.size();
     }
-    static esp3d_msg_t * newMsg( esp3d_clients_t origin, esp3d_clients_t target);
-    static esp3d_msg_t * newMsg( esp3d_clients_t origin, esp3d_clients_t target, const uint8_t * data, size_t length);
+    static esp3d_msg_t * copyMsg( esp3d_msg_t * msg);
+    static esp3d_msg_t * newMsg();
+    static esp3d_msg_t * newMsg( esp3d_clients_t origin, esp3d_clients_t target, esp3d_authentication_level_t authentication_level=ESP3D_LEVEL_GUEST);
+    static esp3d_msg_t * newMsg( esp3d_clients_t origin, esp3d_clients_t target, const uint8_t * data, size_t length,esp3d_authentication_level_t authentication_level=ESP3D_LEVEL_GUEST);
     static bool setDataContent (esp3d_msg_t * msg, const uint8_t * data, size_t length);
 private:
     std::deque<esp3d_msg_t*> _rx_queue;

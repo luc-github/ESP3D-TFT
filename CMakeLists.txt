@@ -7,6 +7,12 @@ OPTION(ESP32_ROTRICS_DEXARM35 "TFT TARGET is ESP32 Rotrics DexArm 3.5inches" OFF
 OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-USRC-4832 3.5inches" OFF)
 
 # #######################################
+# Select the Options
+# #######################################
+OPTION(ESP3D_AUTHENTICATION "Authentication on all clients" OFF)
+OPTION(DISABLE_SERIAL_AUTHENTICATION "Disable Serial Authentication" OFF)
+
+# #######################################
 # Do not change anything above this line
 # #######################################
 cmake_minimum_required(VERSION 3.12.4)
@@ -42,6 +48,14 @@ add_compile_options(-DLV_LVGL_H_INCLUDE_SIMPLE=1)
 # Enabled  = 1
 # Disabled = 0
 add_compile_options(-DESP3D_TFT_LOG=1)
+
+if(ESP3D_AUTHENTICATION)
+    add_compile_options(-DESP3D_AUTHENTICATION_FEATURE=1)
+endif()
+
+if(DISABLE_SERIAL_AUTHENTICATION)
+    add_compile_options(-DESP3D_DISABLE_SERIAL_AUTHENTICATION_FEATURE=1)
+endif()
 
 if(ESP32_2432S028R)
     add_compile_options("-I${CMAKE_SOURCE_DIR}/targets/ESP32_2432S028R/components/bsp")

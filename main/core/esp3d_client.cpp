@@ -123,9 +123,29 @@ bool Esp3DClient::addFrontTXData(esp3d_msg_t * msg)
     return res;
 }
 
-esp3d_msg_t * Esp3DClient::newMsg( esp3d_clients_t origin, esp3d_clients_t target, const uint8_t * data, size_t length)
+esp3d_msg_t * Esp3DClient::newMsg()
 {
-    esp3d_msg_t * newMsgPtr =newMsg( origin,target);
+    esp3d_msg_t * newMsgPtr = (esp3d_msg_t*)malloc( sizeof(esp3d_msg_t));
+    if (newMsgPtr) {
+        newMsgPtr->data = nullptr;
+        newMsgPtr->origin = NO_CLIENT;
+        newMsgPtr->target = ALL_CLIENTS;
+        newMsgPtr->authentication_level = ESP3D_LEVEL_GUEST;
+    }
+    return newMsgPtr;
+}
+
+esp3d_msg_t * Esp3DClient::copyMsg( esp3d_msg_t * msg)
+{
+    if(msg) {
+        return newMsg(msg->origin, msg->target, msg->data, msg->size, msg->authentication_level);
+    }
+    return nullptr;
+}
+
+esp3d_msg_t * Esp3DClient::newMsg( esp3d_clients_t origin, esp3d_clients_t target, const uint8_t * data, size_t length,esp3d_authentication_level_t authentication_level)
+{
+    esp3d_msg_t * newMsgPtr =newMsg( origin,target, authentication_level);
     if (newMsgPtr) {
         if (!setDataContent (newMsgPtr, data, length)) {
             deleteMsg(newMsgPtr);
@@ -136,13 +156,15 @@ esp3d_msg_t * Esp3DClient::newMsg( esp3d_clients_t origin, esp3d_clients_t targe
     return newMsgPtr;
 }
 
-esp3d_msg_t *Esp3DClient::newMsg( esp3d_clients_t origin, esp3d_clients_t target)
+
+
+esp3d_msg_t *Esp3DClient::newMsg( esp3d_clients_t origin, esp3d_clients_t target,esp3d_authentication_level_t authentication_level)
 {
-    esp3d_msg_t * newMsgPtr = (esp3d_msg_t*)malloc( sizeof(esp3d_msg_t));
+    esp3d_msg_t * newMsgPtr = newMsg();
     if (newMsgPtr) {
-        newMsgPtr->data = nullptr;
         newMsgPtr->origin = origin;
         newMsgPtr->target = target;
+        newMsgPtr->authentication_level = authentication_level;
     }
     return newMsgPtr;
 }

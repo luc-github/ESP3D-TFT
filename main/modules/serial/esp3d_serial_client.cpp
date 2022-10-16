@@ -141,22 +141,22 @@ bool Esp3DSerialClient::begin()
 
 bool Esp3DSerialClient::pushMsgToRxQueue(const uint8_t* msg, size_t size)
 {
-    esp3d_msg_t * newMsg = (esp3d_msg_t*)malloc( sizeof(esp3d_msg_t));
-    if (newMsg) {
-        newMsg->data = nullptr;
-        if (Esp3DClient::setDataContent (newMsg,msg, size)) {
-            newMsg->origin = SERIAL_CLIENT;
-            newMsg->target = ALL_CLIENTS;
-            newMsg->authentication_level = ESP3D_LEVEL_GUEST;
-            if (!addRXData(newMsg)) {
+    esp3d_msg_t * newMsgPtr = newMsg();
+    if (newMsgPtr) {
+        if (Esp3DClient::setDataContent (newMsgPtr,msg, size)) {
+#if ESP3D_DISABLE_SERIAL_AUTHENTICATION_FEATURE
+            newMsgPtr->authentication_level=ESP3D_LEVEL_ADMIN;
+#endif // ESP3D_DISABLE_SERIAL_AUTHENTICATION 
+            newMsgPtr->origin = SERIAL_CLIENT;
+            if (!addRXData(newMsgPtr)) {
                 //delete message as cannot be added to the queue
-                Esp3DClient::deleteMsg(newMsg);
+                Esp3DClient::deleteMsg(newMsgPtr);
                 esp3d_log_e("Failed to add message to rx queue");
                 return false;
             }
         } else {
             //delete message as cannot be added partially filled to the queue
-            free( newMsg);
+            free( newMsgPtr);
             esp3d_log_e("Message creation failed");
             return false;
         }
