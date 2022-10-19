@@ -40,6 +40,7 @@ public:
     bool dispatch(esp3d_msg_t * msg);
     bool dispatch(esp3d_msg_t * msg,uint8_t * sbuf, size_t len);
     bool dispatch(esp3d_msg_t * msg,const char * sbuf);
+    bool dispatch(const char * sbuf,  esp3d_clients_t target, esp3d_clients_t origin = ESP3D_COMMAND, esp3d_authentication_level_t authentication_level=ESP3D_LEVEL_GUEST);
     void ESP0(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP420(int cmd_params_pos,esp3d_msg_t * msg);
     const char * get_param (esp3d_msg_t * msg, uint start,const char* label);

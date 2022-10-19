@@ -57,9 +57,11 @@ esp3d_msg_t * Esp3DClient::popTx()
 
 void Esp3DClient::deleteMsg(esp3d_msg_t * msg)
 {
-    free(msg->data);
-    free(msg);
-    msg = nullptr;
+    if (msg) {
+        free(msg->data);
+        free(msg);
+        msg = nullptr;
+    }
 }
 
 bool Esp3DClient::clearTxQueue()

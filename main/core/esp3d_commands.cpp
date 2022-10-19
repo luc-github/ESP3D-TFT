@@ -48,6 +48,9 @@ bool Esp3DCommands::is_esp_command(uint8_t * sbuf, size_t len)
 void Esp3DCommands::process(esp3d_msg_t * msg)
 {
     static bool lastIsESP3D = false;
+    if (!msg) {
+        return;
+    }
     if (is_esp_command(msg->data, msg->size)) {
         esp3d_log("Detected ESP command");
         lastIsESP3D = true;
@@ -84,6 +87,15 @@ void Esp3DCommands::process(esp3d_msg_t * msg)
     }
 }
 
+bool  Esp3DCommands::dispatch(const char * sbuf,  esp3d_clients_t target, esp3d_clients_t origin, esp3d_authentication_level_t authentication_level)
+{
+    esp3d_msg_t * newMsgPtr = Esp3DClient::newMsg( origin, target);
+    if (newMsgPtr) {
+        return dispatch(newMsgPtr,sbuf);
+    }
+    return false;
+}
+
 bool Esp3DCommands::dispatch(esp3d_msg_t * msg,const char * sbuf)
 {
     return dispatch(msg,(uint8_t *) sbuf, strlen(sbuf));
@@ -93,6 +105,7 @@ bool  Esp3DCommands::dispatch(esp3d_msg_t * msg,uint8_t * sbuf, size_t len)
 {
     if(!Esp3DClient::setDataContent (msg,sbuf, len)) {
         esp3d_log_e("Out of memory");
+        Esp3DClient::deleteMsg(msg);
         return false;
     }
     return dispatch(msg);
@@ -101,6 +114,9 @@ bool  Esp3DCommands::dispatch(esp3d_msg_t * msg,uint8_t * sbuf, size_t len)
 bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
 {
     bool sendOk = true;
+    if (!msg) {
+        return false;
+    }
     //currently only echo back no test done on success
     //TODO check add is successful
     switch (msg->target) {
@@ -130,6 +146,9 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
 
 bool Esp3DCommands::hasTag (esp3d_msg_t * msg, uint start,const char* label)
 {
+    if (!msg) {
+        return false;
+    }
     std::string lbl=label;
     uint lenLabel = strlen(label);
     lbl+="=";
@@ -178,6 +197,9 @@ bool Esp3DCommands::hasTag (esp3d_msg_t * msg, uint start,const char* label)
 
 const char *  Esp3DCommands::get_param (esp3d_msg_t * msg, uint start,const char* label)
 {
+    if (!msg) {
+        return "";
+    }
     int startPos = -1;
     uint lenLabel = strlen(label);
     static std::string value;
@@ -225,6 +247,9 @@ const char *  Esp3DCommands::get_param (esp3d_msg_t * msg, uint start,const char
 
 const char * Esp3DCommands::get_clean_param (esp3d_msg_t * msg, uint start)
 {
+    if (!msg) {
+        return "";
+    }
     static std::string value;
     bool prevCharIsEscaped = false;
     uint startp = start;
@@ -257,6 +282,9 @@ const char * Esp3DCommands::get_clean_param (esp3d_msg_t * msg, uint start)
 void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_msg_t * msg)
 {
     // execute commands
+    if (!msg) {
+        return;
+    }
     switch (cmd) {
     case 0:
         ESP0(cmd_params_pos, msg);
@@ -266,10 +294,16 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
         break;
     default:
         msg->target = msg->origin;
-        if(!dispatch(msg, "Invalid Command")) {
-            Esp3DClient::deleteMsg(msg);
-            esp3d_log_e("Out of memory");
+        if (hasTag(msg,cmd_params_pos,"json")) {
+            if(!dispatch(msg, "{\"cmd\":\"0\",\"status\":\"error\",\"data\":\"Invalid Command\"}")) {
+                esp3d_log_e("Out of memory");
+            }
+        } else {
+            if(!dispatch(msg, "Invalid Command\n")) {
+                esp3d_log_e("Out of memory");
+            }
         }
+
     }
 
 }
