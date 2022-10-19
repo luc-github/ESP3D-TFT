@@ -20,6 +20,7 @@
 #include "esp3d_commands.h"
 #include "esp3d_client.h"
 #include "serial/esp3d_serial_client.h"
+#include "authentication/esp3d_authentication.h"
 #include "esp3d_string.h"
 #include <stdio.h>
 #include <string>
@@ -87,6 +88,31 @@ void Esp3DCommands::process(esp3d_msg_t * msg)
     }
 }
 
+bool  Esp3DCommands::dispatchIdValue(bool json,const char *Id, const char * value, esp3d_clients_t target, bool isFirst)
+{
+    std::string tmpstr="";
+    if (json) {
+        if (!isFirst) {
+            tmpstr+=",";
+        }
+        tmpstr += "{\"id\":\"";
+    }
+    tmpstr +=Id;
+    if (json) {
+        tmpstr += "\",\"value\":\"";
+    } else {
+        tmpstr += ": ";
+    }
+    tmpstr +=value;
+    if (json) {
+        tmpstr += "\"}";
+    } else {
+        tmpstr +="\n";
+    }
+    return dispatch(tmpstr.c_str(), target);
+}
+
+
 bool  Esp3DCommands::dispatch(const char * sbuf,  esp3d_clients_t target, esp3d_clients_t origin, esp3d_authentication_level_t authentication_level)
 {
     esp3d_msg_t * newMsgPtr = Esp3DClient::newMsg( origin, target);
@@ -103,6 +129,9 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg,const char * sbuf)
 
 bool  Esp3DCommands::dispatch(esp3d_msg_t * msg,uint8_t * sbuf, size_t len)
 {
+    if (!msg) {
+        return false;
+    }
     if(!Esp3DClient::setDataContent (msg,sbuf, len)) {
         esp3d_log_e("Out of memory");
         Esp3DClient::deleteMsg(msg);
@@ -285,6 +314,18 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
     if (!msg) {
         return;
     }
+#if ESP3D_AUTHENTICATION_FEATURE
+    std::string pwd =  get_param (msg,cmd_params_pos,"pwd=");
+    if (!pwd.empty()) { //adjust authentication level according
+        msg->authentication_level=  esp3dAuthenthicationService.getAuthenticatedLevel(pwd.c_str());
+    }
+#if ESP3D_DISABLE_SERIAL_AUTHENTICATION_FEATURE
+    if (msg->origin ==SERIAL_CLIENT) {
+        msg->authentication_level=ESP3D_LEVEL_ADMIN;
+    }
+#endif //ESP3D_DISABLE_SERIAL_AUTHENTICATION_FEATURE
+#endif //ESP3D_AUTHENTICATION_FEATURE
+
     switch (cmd) {
     case 0:
         ESP0(cmd_params_pos, msg);

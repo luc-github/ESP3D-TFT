@@ -60,23 +60,3 @@ void  ESP_SD::releaseFS(esp3d_fs_types FS)
     setState(ESP3D_SDCARD_IDLE);
 }
 
-//helper to format size to readable string
-const char* ESP_SD::formatBytes (uint64_t bytes)
-{
-    static char buffer[32];
-    memset(buffer, 0, sizeof(buffer));
-    int res = 0;
-    if (bytes < 1024) {
-        res = snprintf(buffer, sizeof(buffer), "%d B", (int)bytes);
-    } else if (bytes < (1024 * 1024) ) {
-        res =  snprintf(buffer, sizeof(buffer), "%.2f KB", ((float)(bytes / 1024.0)));
-    } else if (bytes < (1024 * 1024 * 1024) ) {
-        res =  snprintf(buffer, sizeof(buffer), "%.2f MB", ((float)(bytes / 1024.0 / 1024.0)));
-    } else {
-        res =  snprintf(buffer, sizeof(buffer), "%.2f GB", ((float)(bytes / 1024.0 / 1024.0 / 1024.0)));
-    }
-    if (res < 0) {
-        strcpy(buffer, "? B");
-    }
-    return buffer;
-}

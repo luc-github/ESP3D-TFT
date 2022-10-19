@@ -25,20 +25,30 @@ Esp3DAuthenticationService::Esp3DAuthenticationService() {}
 Esp3DAuthenticationService::~Esp3DAuthenticationService() {}
 esp3d_authentication_level_t  Esp3DAuthenticationService::getAuthenticatedLevel(const  char * pwd )
 {
+    //TODO check if password is valid
     return ESP3D_LEVEL_ADMIN;
 }
 bool Esp3DAuthenticationService::begin()
 {
+    //TODO load password for admin and user for leter usage
     return false;
 }
-void Esp3DAuthenticationService::handle() {}
+void Esp3DAuthenticationService::handle()
+{
+    //TODO  clear time out session
+}
 void Esp3DAuthenticationService::end() {}
 bool Esp3DAuthenticationService::isadmin (const char *pwd)
 {
+    //TODO Compare with current admin password
     return false;
 }
 bool Esp3DAuthenticationService::isuser (const char *pwd)
 {
+    //TODO Compare with current user password
     return false;
 }
-void Esp3DAuthenticationService::update() {}
+void Esp3DAuthenticationService::update()
+{
+    //TODO update passwords from settings
+}

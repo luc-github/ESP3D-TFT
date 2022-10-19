@@ -37,6 +37,7 @@ public:
     bool is_esp_command(uint8_t * sbuf, size_t len);
     void process(esp3d_msg_t * msg);
     void execute_internal_command(int cmd, int cmd_params_pos,esp3d_msg_t * msg);
+    bool dispatchIdValue(bool json,const char *Id, const char * value, esp3d_clients_t target, bool isFirst = false);
     bool dispatch(esp3d_msg_t * msg);
     bool dispatch(esp3d_msg_t * msg,uint8_t * sbuf, size_t len);
     bool dispatch(esp3d_msg_t * msg,const char * sbuf);

@@ -36,6 +36,7 @@ typedef enum {
     ESP3D_LEVEL_GUEST,
     ESP3D_LEVEL_USER,
     ESP3D_LEVEL_ADMIN,
+    ESP3D_LEVEL_NOT_AUTHENTICATED,
 } esp3d_authentication_level_t;
 
 class Esp3DAuthenticationService final

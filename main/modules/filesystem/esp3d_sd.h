@@ -36,7 +36,6 @@ class ESP_SD final
 {
 public:
     ESP_SD();
-    const char * formatBytes (uint64_t bytes);
     bool begin();
     bool mount();
     void unmount();

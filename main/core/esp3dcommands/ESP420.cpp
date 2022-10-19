@@ -19,34 +19,99 @@
 
 #include "esp3d_commands.h"
 #include "esp3d_client.h"
+#include "esp3d_version.h"
+#include "esp3d_string.h"
 #include <stdio.h>
 #include <string>
+#include <cstring>
+#include "sdkconfig.h"
+#include "esp_system.h"
+#include "esp_heap_caps.h"
+#include "esp_spi_flash.h"
+#include "authentication/esp3d_authentication.h"
 
+//Get ESP current status
+//output is JSON or plain text according parameter
+//[ESP420]json=<no>
 void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
 {
     esp3d_clients_t target = msg->origin;
     msg->target = target;
     msg->origin = ESP3D_COMMAND;
-
-    std::string res = get_clean_param ( msg,cmd_params_pos);
-    esp3d_log("Clean *%s*",res.c_str());
-    res = get_param ( msg,cmd_params_pos,"json=");
-    esp3d_log("Got *%s*",res.c_str());
-    if ( hasTag (msg,cmd_params_pos,"json")) {
-        esp3d_log("Tag found");
-    } else {
-        esp3d_log("No tag found");
+    bool json = hasTag (msg,cmd_params_pos,"json");
+    std::string tmpstr;
+#if ESP3D_AUTHENTICATION_FEATURE
+    if (msg->authentication_level == ESP3D_LEVEL_GUEST) {
+        msg->authentication_level =ESP3D_LEVEL_NOT_AUTHENTICATED;
+        if (json) {
+            tmpstr = "{\"cmd\":\"420\",\"status\":\"error\",\"data\":\"Wrong authentication level\"}";
+        } else {
+            tmpstr = "Wrong authentication level\n";
+        }
+        if(!dispatch(msg,tmpstr.c_str())) {
+            esp3d_log_e("Error sending response to clients");
+        }
+        return;
     }
-    if(!dispatch(msg,"420")) {
-        Esp3DClient::deleteMsg(msg);
-        return ;
-    }
-    //now need new msg
-    esp3d_msg_t * newMsg = Esp3DClient::newMsg(ESP3D_COMMAND, target);
-    if (newMsg) {
-        if(!dispatch(newMsg,"another line")) {
-            Esp3DClient::deleteMsg(newMsg);
+#endif //ESP3D_AUTHENTICATION_FEATURE
+    if (json) {
+        tmpstr = "{\"cmd\":\"420\",\"status\":\"ok\",\"data\":[";
+        if(!dispatch(msg,tmpstr.c_str())) {
+            esp3d_log_e("Error sending response to clients");
             return;
+        }
+    } else {
+        Esp3DClient::deleteMsg(msg);
+    }
+
+
+
+    //ESP3D-TFT-VERSION
+    if (!dispatchIdValue(json,"FW Ver", ESP3D_TFT_VERSION, target, true)) {
+        return;
+    }
+
+    //FW Arch
+    if (!dispatchIdValue(json,"FW arch", CONFIG_IDF_TARGET, target)) {
+        return;
+    }
+
+    //SDK Version
+    if (!dispatchIdValue(json,"SDK", IDF_VER, target)) {
+        return;
+    }
+
+
+    //CPU Freq
+    tmpstr= std::to_string(ets_get_cpu_frequency()) + "MHz";
+    if (!dispatchIdValue(json,"CPU Freq",tmpstr.c_str(), target)) {
+        return;
+    }
+
+    //Flash size
+    tmpstr = formatBytes(spi_flash_get_chip_size());
+    if (!dispatchIdValue(json,"flash size",tmpstr.c_str(), target)) {
+        return;
+    }
+
+    //Free memory
+    tmpstr =formatBytes(esp_get_minimum_free_heap_size());
+    if (!dispatchIdValue(json,"free mem",tmpstr.c_str(), target)) {
+        return;
+    }
+#if CONFIG_SPIRAM
+    multi_heap_info_t info;
+    heap_caps_get_info(&info, MALLOC_CAP_SPIRAM);
+    tmpstr =formatBytes( info.total_free_bytes + info.total_allocated_bytes);
+    if (!dispatchIdValue(json,"Total psram mem",tmpstr.c_str(), target)) {
+        return;
+    }
+#endif //CONFIG_SPIRAM
+
+    //end of list
+    if (json) {
+        if(!dispatch("]}",target)) {
+            esp3d_log_e("Error sending answer to clients");
         }
     }
 

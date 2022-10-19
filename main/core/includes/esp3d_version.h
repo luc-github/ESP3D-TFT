@@ -1,5 +1,5 @@
 /*
-  esp3d_string helper functions
+  esp3d_version
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -20,14 +20,10 @@
 
 #pragma once
 #include <stdio.h>
-#include <string>
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-const char * str_trim(const char * str);
-void  str_toUpperCase(std::string * str);
-const char * formatBytes (uint64_t bytes);
+#define ESP3D_TFT_VERSION "1.0.0.a1"
 
 #ifdef __cplusplus
 } // extern "C"
