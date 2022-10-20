@@ -20,7 +20,7 @@
 
 #include "sd_def.h"
 
-#if defined(ESP_SD_IS_SDIO) && ESP_SD_IS_SDIO
+#if defined(ESP3D_SD_IS_SDIO) && ESP3D_SD_IS_SDIO
 #include "filesystem/esp3d_sd.h"
 #include <string>
 #include <cstring>
@@ -38,7 +38,7 @@ const char mount_point[] = "/sdcard";
 sdmmc_card_t *card;
 
 
-void ESP_SD::unmount()
+void ESP3D_SD::unmount()
 {
     if (!_started ) {
         esp3d_log_e("SDCard not init.");
@@ -48,7 +48,7 @@ void ESP_SD::unmount()
     _mounted = false;
 }
 
-bool ESP_SD::mount()
+bool ESP3D_SD::mount()
 {
     if (!_started) {
         esp3d_log_e("SDCard not init.");
@@ -59,21 +59,21 @@ bool ESP_SD::mount()
     }
     esp3d_log_e("Initializing SD card");
     sdmmc_host_t host = SDMMC_HOST_DEFAULT();
-    host.max_freq_khz = ESP_SD_FREQ;
+    host.max_freq_khz = ESP3D_SD_FREQ;
     sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
-    slot_config.width = ESP_SDIO_BIT_WIDTH;
-    slot_config.clk = (gpio_num_t)ESP_SDIO_CLK_PIN;
-    slot_config.cmd = (gpio_num_t)ESP_SDIO_CMD_PIN;
-    slot_config.d0 = (gpio_num_t)ESP_SDIO_D0_PIN;
-    slot_config.d1 = (gpio_num_t)ESP_SDIO_D1_PIN;
-    slot_config.d2 = (gpio_num_t)ESP_SDIO_D2_PIN;
-    slot_config.d3 = (gpio_num_t)ESP_SDIO_D3_PIN;
+    slot_config.width = ESP3D_SDIO_BIT_WIDTH;
+    slot_config.clk = (gpio_num_t)ESP3D_SDIO_CLK_PIN;
+    slot_config.cmd = (gpio_num_t)ESP3D_SDIO_CMD_PIN;
+    slot_config.d0 = (gpio_num_t)ESP3D_SDIO_D0_PIN;
+    slot_config.d1 = (gpio_num_t)ESP3D_SDIO_D1_PIN;
+    slot_config.d2 = (gpio_num_t)ESP3D_SDIO_D2_PIN;
+    slot_config.d3 = (gpio_num_t)ESP3D_SDIO_D3_PIN;
     slot_config.flags |= SDMMC_SLOT_FLAG_INTERNAL_PULLUP;
 
 
 
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {
-        .format_if_mount_failed = ESP_SD_FORMAT_IF_MOUNT_FAILED,
+        .format_if_mount_failed = ESP3D_SD_FORMAT_IF_MOUNT_FAILED,
         .max_files = 5,
         .allocation_unit_size = 16 * 1024
     };
@@ -94,25 +94,25 @@ bool ESP_SD::mount()
     return _mounted;
 }
 
-const char * ESP_SD::getFileSystemName()
+const char * ESP3D_SD::getFileSystemName()
 {
     return "SD native";
 }
 
-bool ESP_SD::begin()
+bool ESP3D_SD::begin()
 {
     _started = true;
     return true;
 }
 
-uint ESP_SD::maxPathLength()
+uint ESP3D_SD::maxPathLength()
 {
     return 255;
 }
 
-bool ESP_SD::getSdInfo(uint64_t * totalBytes,
-                       uint64_t *usedBytes,
-                       uint64_t *freeBytes, bool refreshStats)
+bool ESP3D_SD::getSpaceInfo(uint64_t * totalBytes,
+                            uint64_t *usedBytes,
+                            uint64_t *freeBytes, bool refreshStats)
 {
     static uint64_t _totalBytes = 0;
     static uint64_t _usedBytes=0;
@@ -157,7 +157,7 @@ bool ESP_SD::getSdInfo(uint64_t * totalBytes,
     return _totalBytes!=0;
 }
 
-const char * ESP_SD::getFullPath(const char * path)
+const char * ESP3D_SD::getFullPath(const char * path)
 {
     static std::string fullpath = mount_point;
     std::string tpath = str_trim(path);
@@ -172,4 +172,4 @@ const char * ESP_SD::getFullPath(const char * path)
 }
 
 
-#endif//ESP_SD_IS_SDIO
+#endif//ESP3D_SD_IS_SDIO

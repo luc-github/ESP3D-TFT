@@ -18,45 +18,36 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "sd_def.h"
-#include "esp3d_sd.h"
 #include <stdio.h>
 #include <string.h>
 #include "esp3d_log.h"
+#include "esp3d_flash.h"
 
-ESP3D_SD sd;
+ESP3D_FLASH flashFs;
 
-ESP3D_SD::ESP3D_SD()
+ESP3D_FLASH::ESP3D_FLASH()
 {
     _mounted = false;
     _started = false;
-    _spi_speed_divider = 1;
-    _state = ESP3D_SDCARD_UNKNOWN;
 }
 
-esp3d_fs_types ESP3D_SD::getFSType(const char * path)
+esp3d_fs_types ESP3D_FLASH::getFSType(const char * path)
 {
     (void)path;
-    return FS_SD;
+    return FS_FLASH;
 }
 
-bool  ESP3D_SD::accessFS(esp3d_fs_types FS)
+bool  ESP3D_FLASH::accessFS(esp3d_fs_types FS)
 {
     (void)FS;
-    //if card is busy do not let another task access SD and so prevent a release
-    if (_state == ESP3D_SDCARD_BUSY) {
-        esp3d_log( "SDCard Busy.");
-        return false;
-    }
     esp3d_log("Access SD");
     return true;
 
 }
 
-void  ESP3D_SD::releaseFS(esp3d_fs_types FS)
+void  ESP3D_FLASH::releaseFS(esp3d_fs_types FS)
 {
     (void)FS;
     esp3d_log("Release SD");
-    setState(ESP3D_SDCARD_IDLE);
 }
 

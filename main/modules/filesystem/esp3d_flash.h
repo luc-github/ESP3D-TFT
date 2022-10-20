@@ -22,20 +22,13 @@
 #include <stdio.h>
 #include "esp3d_fs_types.h"
 
-#define ESP3D_SD_FS_HEADER "/sd/"
-#define MAX_SD_PATH 255
+#define ESP3D_FLASH_FS_HEADER "/flash/"
+#define MAX_FLASH_PATH 255
 
-typedef enum {
-    ESP3D_SDCARD_IDLE,
-    ESP3D_SDCARD_NOT_PRESENT,
-    ESP3D_SDCARD_BUSY,
-    ESP3D_SDCARD_UNKNOWN,
-} esp3d_sd_states;
-
-class ESP3D_SD final
+class ESP3D_FLASH final
 {
 public:
-    ESP3D_SD();
+    ESP3D_FLASH();
     bool begin();
     bool mount();
     void unmount();
@@ -43,33 +36,15 @@ public:
     {
         return _mounted;
     };
-    uint8_t getSPISpeedDivider()
-    {
-        return _spi_speed_divider;
-    }
-    void setSPISpeedDivider(uint8_t speeddivider)
-    {
-        _spi_speed_divider = speeddivider;
-    }
     const char * getFileSystemName();
     uint maxPathLength();
-    bool getSpaceInfo(uint64_t * totalBytes=NULL,
-                      uint64_t * usedBytes=NULL,
-                      uint64_t * freeBytes=NULL,
+    bool getSpaceInfo(size_t * totalBytes=NULL,
+                      size_t * usedBytes=NULL,
+                      size_t * freeBytes=NULL,
                       bool refreshStats=false);
-
-    esp3d_sd_states getState()
-    {
-        return _state;
-    };
-    esp3d_sd_states setState(esp3d_sd_states state)
-    {
-        _state=state;
-        return _state;
-    }
     esp3d_fs_types getFSType(const char * path=nullptr);
-    bool  accessFS(esp3d_fs_types FS=FS_SD);
-    void  releaseFS(esp3d_fs_types FS=FS_SD);
+    bool  accessFS(esp3d_fs_types FS=FS_FLASH);
+    void  releaseFS(esp3d_fs_types FS=FS_FLASH);
     const char * getFullPath(const char * path=nullptr);
     /**
     void handle();
@@ -87,9 +62,6 @@ public:
 private:
     bool _mounted;
     bool _started;
-    esp3d_sd_states _state;
-    uint8_t _spi_speed_divider;
-    bool _sizechanged;
 };
 
-extern ESP3D_SD sd;
+extern ESP3D_FLASH flashFs;
