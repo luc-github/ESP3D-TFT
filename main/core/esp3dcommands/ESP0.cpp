@@ -25,12 +25,14 @@
 
 const char * help[]= {"[ESP] (id) - display this help",
                       "[ESP420]display ESP3D current status in plain/JSON",
-                      "[ESP444](state) - set ESP3D state (RESET/RESTART)"
+                      "[ESP444](state) - set ESP3D state (RESET/RESTART)",
+                      "[ESP900](state) - display/set serial state(ENABLE/DISABLE)"
                      };
 
 const uint cmdlist[]= {0,
                        420,
                        444,
+                       900,
                       };
 //ESP3D Help
 //[ESP0] or [ESP]<command>

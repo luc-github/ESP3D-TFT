@@ -43,6 +43,9 @@ static void esp3d_serial_rx_task(void *pvParameter)
     while (1) {
         /* Delay */
         vTaskDelay(pdMS_TO_TICKS(10));
+        if (!serialClient.started()) {
+            break;
+        }
         int len = uart_read_bytes(ESP3D_SERIAL_PORT, data, (ESP3D_SERIAL_RX_BUFFER_SIZE - 1), 10 / portTICK_PERIOD_MS);
         if (len) {
             //parse data
@@ -126,15 +129,16 @@ bool Esp3DSerialClient::begin()
     ESP_ERROR_CHECK(uart_set_pin(ESP3D_SERIAL_PORT, ESP3D_SERIAL_TX_PIN, ESP3D_SERIAL_RX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
 
     TaskHandle_t xHandle = NULL;
+    _started = true;
     BaseType_t  res =  xTaskCreatePinnedToCore(esp3d_serial_rx_task, "esp3d_serial_rx_tast", ESP3D_SERIAL_RX_TASK_SIZE, NULL, ESP3D_SERIAL_TASK_PRIORITY, &xHandle, ESP3D_SERIAL_TASK_CORE);
 
     if (res==pdPASS && xHandle) {
         esp3d_log ("Created Serial Task");
         esp3d_log("Serial client started");
-        _started = true;
         return true;
     } else {
         esp3d_log_e ("Serial Task creation failed");
+        _started = false;
         return false;
     }
 }
@@ -193,21 +197,32 @@ void Esp3DSerialClient::flush()
 {
     uint8_t loopCount = 10;
     while (loopCount && getTxMsgsCount() > 0) {
+        esp3d_log("flushing Tx messages");
         loopCount--;
         handle();
         uart_wait_tx_done(ESP3D_SERIAL_PORT, pdMS_TO_TICKS(500));
     }
-
-
 }
 
 void Esp3DSerialClient::end()
 {
-    _started = false;
-    if(pthread_mutex_destroy (&_tx_mutex) == 0) {
-        esp3d_log_w("Mutex destruction for tx failed");
-    }
-    if(pthread_mutex_destroy (&_rx_mutex) == 0) {
-        esp3d_log_w("Mutex destruction for rx failed");
+    if (_started) {
+        flush();
+        _started = false;
+        esp3d_log("Clearing queue Rx messages");
+        clearRxQueue();
+        esp3d_log("Clearing queue Tx messages");
+        clearTxQueue();
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        if(pthread_mutex_destroy (&_tx_mutex) != 0) {
+            esp3d_log_w("Mutex destruction for tx failed");
+        }
+        if(pthread_mutex_destroy (&_rx_mutex) != 0) {
+            esp3d_log_w("Mutex destruction for rx failed");
+        }
+        esp3d_log("Uninstalling Serial drivers");
+        if ( uart_is_driver_installed(ESP3D_SERIAL_PORT) && uart_driver_delete(ESP3D_SERIAL_PORT)!=ESP_OK ) {
+            esp3d_log_e("Error deleting serial driver");
+        }
     }
 }

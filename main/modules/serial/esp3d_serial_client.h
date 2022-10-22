@@ -39,6 +39,10 @@ public:
     bool isEndChar(uint8_t ch);
     bool pushMsgToRxQueue(const uint8_t* msg, size_t size);
     void flush();
+    bool started()
+    {
+        return _started;
+    }
 private:
     bool _started;
     pthread_mutex_t _tx_mutex;

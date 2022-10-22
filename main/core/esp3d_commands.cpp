@@ -168,15 +168,19 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
     //TODO check add is successful
     switch (msg->target) {
     case SERIAL_CLIENT:
-        if (!serialClient.addTXData(msg)) {
-            sendOk=false;
+        if (serialClient.started()) {
+            if (!serialClient.addTXData(msg)) {
+                sendOk=false;
+            }
         }
         break;
     case ALL_CLIENTS:
         //TODO: msg need to be duplicate for each target
         if (msg->origin!=SERIAL_CLIENT) {
-            if (!serialClient.addTXData(msg)) {
-                sendOk=false;
+            if (serialClient.started()) {
+                if (!serialClient.addTXData(msg)) {
+                    sendOk=false;
+                }
             }
         }
         break;
@@ -330,6 +334,11 @@ const char * Esp3DCommands::get_clean_param (esp3d_msg_t * msg, uint start)
     return value.c_str();
 }
 
+bool Esp3DCommands::has_param (esp3d_msg_t * msg, uint start)
+{
+    return strlen(get_clean_param (msg,start))!=0;
+}
+
 void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_msg_t * msg)
 {
     // execute commands
@@ -357,6 +366,9 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
         break;
     case 444:
         ESP444(cmd_params_pos, msg);
+        break;
+    case 900:
+        ESP900(cmd_params_pos, msg);
         break;
     default:
         msg->target = msg->origin;
