@@ -66,6 +66,7 @@ public:
     };
     virtual void handle() {};
     virtual void end() {};
+    virtual void flush() {};
     void setTxMaxSize(size_t max)
     {
         _tx_max_size=max;

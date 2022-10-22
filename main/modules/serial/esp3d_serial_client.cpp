@@ -188,6 +188,19 @@ void Esp3DSerialClient::handle()
         }
     }
 }
+
+void Esp3DSerialClient::flush()
+{
+    uint8_t loopCount = 10;
+    while (loopCount && getTxMsgsCount() > 0) {
+        loopCount--;
+        handle();
+        uart_wait_tx_done(ESP3D_SERIAL_PORT, pdMS_TO_TICKS(500));
+    }
+
+
+}
+
 void Esp3DSerialClient::end()
 {
     _started = false;

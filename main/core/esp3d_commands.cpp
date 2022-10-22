@@ -194,21 +194,26 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
 bool Esp3DCommands::hasTag (esp3d_msg_t * msg, uint start,const char* label)
 {
     if (!msg) {
+        esp3d_log("message for tag %s", label);
         return false;
     }
     std::string lbl=label;
+    esp3d_log("checking message for tag %s", label);
     uint lenLabel = strlen(label);
     lbl+="=";
     lbl = get_param (msg, start,lbl.c_str());
     if (lbl.length()!=0) {
+        esp3d_log("Label is used with parameter %s", lbl.c_str());
         //make result uppercase
         str_toUpperCase(&lbl);
         return (lbl=="YES" || lbl=="1" || lbl=="TRUE");
     }
     bool prevCharIsEscaped = false;
     bool prevCharIsspace= true;
+    esp3d_log("Checking  label as tag");
     for (uint i = start; i <msg->size; i++) {
         char c = char(msg->data[i]);
+        esp3d_log("%c", c);
         if (c== label[0] && prevCharIsspace) {
             uint p = 0;
             while (i<msg->size && p <lenLabel && c==label[p] ) {
@@ -216,15 +221,13 @@ bool Esp3DCommands::hasTag (esp3d_msg_t * msg, uint start,const char* label)
                 p++;
                 if(i<msg->size) {
                     c = char(msg->data[i]);
+                    esp3d_log("%c vs %c", c, char(msg->data[i]));
                 }
             }
             if (p == lenLabel) {
                 //end of params
-                if (i==msg->size) {
-                    return true;
-                }
-                //next char is space
-                if (std::isspace(c)) {
+                if (i==msg->size || std::isspace(c)) {
+                    esp3d_log("label %s found", label);
                     return true;
                 }
             }
@@ -239,6 +242,7 @@ bool Esp3DCommands::hasTag (esp3d_msg_t * msg, uint start,const char* label)
 
         }
     }
+    esp3d_log("label %s not found", label);
     return false;
 }
 
@@ -351,6 +355,9 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
     case 420:
         ESP420(cmd_params_pos, msg);
         break;
+    case 444:
+        ESP444(cmd_params_pos, msg);
+        break;
     default:
         msg->target = msg->origin;
         if (hasTag(msg,cmd_params_pos,"json")) {
@@ -362,7 +369,10 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
                 esp3d_log_e("Out of memory");
             }
         }
-
     }
+}
 
+void Esp3DCommands::flush()
+{
+    serialClient.flush();
 }
