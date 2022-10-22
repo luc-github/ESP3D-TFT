@@ -36,7 +36,8 @@
 
 Esp3DSettings esp3dTFTsettings;
 
-const long SupportedBaudList[] = {9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000, 500000, 921600};
+const uint32_t SupportedBaudList[] = {9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000, 500000, 921600};
+const uint8_t SupportedBaudListSize = sizeof(SupportedBaudList)/sizeof(uint32_t);
 
 //value of settings, default value are all strings
 const Esp3DSetting_t Esp3DSettingsData [] = {
@@ -58,7 +59,7 @@ bool  Esp3DSettings::isValidIntegerSetting(uint32_t value, esp3d_setting_index_t
 {
     switch(settingElement) {
     case esp3d_baud_rate:
-        for(uint8_t i=0; i< sizeof(SupportedBaudList); i++) {
+        for(uint8_t i=0; i<SupportedBaudListSize; i++) {
             if (SupportedBaudList[i]==value) {
                 return true;
             }
@@ -69,6 +70,7 @@ bool  Esp3DSettings::isValidIntegerSetting(uint32_t value, esp3d_setting_index_t
     }
     return false;
 }
+
 bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t settingElement)
 {
     switch(settingElement) {

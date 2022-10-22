@@ -48,6 +48,7 @@ public:
     void ESP420(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP444(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP900(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP901(int cmd_params_pos,esp3d_msg_t * msg);
     const char * get_param (esp3d_msg_t * msg, uint start,const char* label);
     const char * get_clean_param (esp3d_msg_t * msg, uint start);
     bool has_param (esp3d_msg_t * msg, uint start);
