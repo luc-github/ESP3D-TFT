@@ -133,14 +133,26 @@ esp3d_msg_t * Esp3DClient::newMsg()
         newMsgPtr->origin = NO_CLIENT;
         newMsgPtr->target = ALL_CLIENTS;
         newMsgPtr->authentication_level = ESP3D_LEVEL_GUEST;
+        newMsgPtr->requestId.id = esp_timer_get_time();
+    }
+    return newMsgPtr;
+}
+
+esp3d_msg_t * Esp3DClient::newMsg(esp3d_request_t requestId)
+{
+    esp3d_msg_t * newMsgPtr = newMsg();
+    if (newMsgPtr) {
+        newMsgPtr->origin = WEBUI_CLIENT;
+        newMsgPtr->requestId = requestId;
     }
     return newMsgPtr;
 }
 
 esp3d_msg_t * Esp3DClient::copyMsg( esp3d_msg_t * msg)
 {
+    esp3d_msg_t * newMsgPtr = newMsg(msg->origin, msg->target, msg->data, msg->size, msg->authentication_level);
     if(msg) {
-        return newMsg(msg->origin, msg->target, msg->data, msg->size, msg->authentication_level);
+        newMsgPtr->requestId = msg->requestId;
     }
     return nullptr;
 }

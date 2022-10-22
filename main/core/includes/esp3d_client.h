@@ -24,6 +24,7 @@
 #include <deque>
 #include <pthread.h>
 #include "authentication/esp3d_authentication.h"
+#include <esp_http_server.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,11 +35,16 @@ typedef enum {
     SERIAL_CLIENT,
     STREAM_CLIENT,
     TELNET_CLIENT,
-    HTTP_CLIENT,
+    WEBUI_CLIENT,
     WEBSOCKET_CLIENT,
     ESP3D_COMMAND,
     ALL_CLIENTS
 } esp3d_clients_t;
+
+typedef union {
+    uint id;
+    httpd_req_t *httpReq;
+} esp3d_request_t;
 
 typedef struct {
     uint8_t * data;
@@ -46,6 +52,7 @@ typedef struct {
     esp3d_clients_t origin;
     esp3d_clients_t target;
     esp3d_authentication_level_t authentication_level;
+    esp3d_request_t requestId;
 } esp3d_msg_t;
 
 class Esp3DClient
@@ -93,6 +100,7 @@ public:
     }
     static esp3d_msg_t * copyMsg( esp3d_msg_t * msg);
     static esp3d_msg_t * newMsg();
+    static esp3d_msg_t * newMsg(esp3d_request_t requestId);
     static esp3d_msg_t * newMsg( esp3d_clients_t origin, esp3d_clients_t target, esp3d_authentication_level_t authentication_level=ESP3D_LEVEL_GUEST);
     static esp3d_msg_t * newMsg( esp3d_clients_t origin, esp3d_clients_t target, const uint8_t * data, size_t length,esp3d_authentication_level_t authentication_level=ESP3D_LEVEL_GUEST);
     static bool setDataContent (esp3d_msg_t * msg, const uint8_t * data, size_t length);

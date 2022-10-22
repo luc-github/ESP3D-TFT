@@ -34,8 +34,8 @@ const uint cmdlist[]= {0,
 //[ESP0] or [ESP]<command>
 void Esp3DCommands::ESP0(int cmd_params_pos,esp3d_msg_t * msg)
 {
-    esp3d_clients_t /* `target` is the client that sent the command. */
-    target = msg->origin;
+    esp3d_clients_t target = msg->origin;
+    esp3d_request_t requestId = msg->requestId;
     msg->target = target;
     msg->origin = ESP3D_COMMAND;
     std::string tmpstr;
@@ -74,14 +74,14 @@ void Esp3DCommands::ESP0(int cmd_params_pos,esp3d_msg_t * msg)
                 tmpstr = help[i];
                 tmpstr+="\n";
             }
-            if(!dispatch(tmpstr.c_str(),target)) {
+            if(!dispatch(tmpstr.c_str(),target, requestId)) {
                 esp3d_log_e("Error sending answer to clients");
                 return ;
             }
         }
 
         if (json) {
-            if(!dispatch("]}",target)) {
+            if(!dispatch("]}",target, requestId)) {
                 esp3d_log_e("Error sending answer to clients");
                 return ;
             }

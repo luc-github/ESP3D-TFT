@@ -88,7 +88,24 @@ void Esp3DCommands::process(esp3d_msg_t * msg)
     }
 }
 
-bool  Esp3DCommands::dispatchIdValue(bool json,const char *Id, const char * value, esp3d_clients_t target, bool isFirst)
+bool Esp3DCommands::dispatchAuthenticationError(esp3d_msg_t * msg, uint cmdid, bool json)
+{
+    std::string tmpstr;
+    if (!msg) {
+        return false;
+    }
+    msg->authentication_level =ESP3D_LEVEL_NOT_AUTHENTICATED;
+    if (json) {
+        tmpstr = "{\"cmd\":\"";
+        tmpstr = std::to_string(cmdid);
+        tmpstr+= "\",\"status\":\"error\",\"data\":\"Wrong authentication level\"}";
+    } else {
+        tmpstr = "Wrong authentication level\n";
+    }
+    return dispatch(msg,tmpstr.c_str());
+}
+
+bool  Esp3DCommands::dispatchIdValue(bool json,const char *Id, const char * value, esp3d_clients_t target, esp3d_request_t requestId, bool isFirst)
 {
     std::string tmpstr="";
     if (json) {
@@ -109,14 +126,15 @@ bool  Esp3DCommands::dispatchIdValue(bool json,const char *Id, const char * valu
     } else {
         tmpstr +="\n";
     }
-    return dispatch(tmpstr.c_str(), target);
+    return dispatch(tmpstr.c_str(), target, requestId);
 }
 
 
-bool  Esp3DCommands::dispatch(const char * sbuf,  esp3d_clients_t target, esp3d_clients_t origin, esp3d_authentication_level_t authentication_level)
+bool  Esp3DCommands::dispatch(const char * sbuf,  esp3d_clients_t target, esp3d_request_t requestId, esp3d_clients_t origin, esp3d_authentication_level_t authentication_level)
 {
     esp3d_msg_t * newMsgPtr = Esp3DClient::newMsg( origin, target);
     if (newMsgPtr) {
+        newMsgPtr->requestId = requestId;
         return dispatch(newMsgPtr,sbuf);
     }
     return false;
