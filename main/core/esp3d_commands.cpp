@@ -509,6 +509,9 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
     case 400:
         ESP400(cmd_params_pos, msg);
         break;
+    case 401:
+        ESP401(cmd_params_pos, msg);
+        break;
     case 420:
         ESP420(cmd_params_pos, msg);
         break;

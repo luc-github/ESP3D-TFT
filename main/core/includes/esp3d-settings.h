@@ -40,6 +40,7 @@ typedef enum  {
     esp3d_float, //4 bytes
     esp3d_mask, //x bytes
     esp3d_bitsfield, //x bytes
+    esp3d_unknow
 } esp3d_setting_type_t;
 
 //to be implemented :
@@ -76,6 +77,7 @@ public:
     bool writeIPString (esp3d_setting_index_t index, const char * byte_buffer);
     bool writeString (esp3d_setting_index_t index, const char * byte_buffer);
     bool reset();
+    bool isValidIPStringSetting(const char* value, esp3d_setting_index_t settingElement);
     bool isValidStringSetting(const char* value, esp3d_setting_index_t settingElement);
     bool isValidIntegerSetting(uint32_t value, esp3d_setting_index_t settingElement);
     bool isValidByteSetting(uint8_t value, esp3d_setting_index_t settingElement);

@@ -25,6 +25,7 @@
 #include "lwip/ip_addr.h"
 #include "esp_system.h"
 #include <cstring>
+#include <regex>
 #include <string>
 #include "esp3d_log.h"
 #include "serial_def.h"
@@ -69,6 +70,18 @@ bool  Esp3DSettings::isValidIntegerSetting(uint32_t value, esp3d_setting_index_t
         return false;
     }
     return false;
+}
+
+bool Esp3DSettings::isValidIPStringSetting(const char* value, esp3d_setting_index_t settingElement)
+{
+    const Esp3DSetting_t * settingPtr= getSettingPtr(settingElement);
+    if (!settingPtr) {
+        return false;
+    }
+    if (settingPtr->type!=esp3d_ip) {
+        return false;
+    }
+    return std::regex_match (value, std::regex("^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$"));
 }
 
 bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t settingElement)
