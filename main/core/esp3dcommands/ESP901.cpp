@@ -36,7 +36,7 @@ void Esp3DCommands::ESP901(int cmd_params_pos,esp3d_msg_t * msg)
     bool json = hasTag (msg,cmd_params_pos,"json");
     std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
-    if (msg->authentication_level == ESP3D_LEVEL_ADMIN) {
+    if (msg->authentication_level != ESP3D_LEVEL_ADMIN) {
         msg->authentication_level =ESP3D_LEVEL_NOT_AUTHENTICATED;
         dispatchAuthenticationError(msg, 901,json);
         return;
