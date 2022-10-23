@@ -34,7 +34,6 @@ void Esp3DCommands::ESP400(int cmd_params_pos,esp3d_msg_t * msg)
     msg->origin = ESP3D_COMMAND;
 
     bool json = hasTag (msg,cmd_params_pos,"json");
-    esp3d_log("Size is %d", sizeof(BaudRateList));
     std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
     if (msg->authentication_level == ESP3D_LEVEL_GUEST) {
