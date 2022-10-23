@@ -23,14 +23,16 @@
 #include <string>
 #include <cstring>
 
-const char * help[]= {"[ESP] (id) - display this help",
-                      "[ESP420]display ESP3D current status in plain/JSON",
+const char * help[]= {"[ESP](id) - display this help",
+                      "[ESP400] - display ESP3D settings",
+                      "[ESP420] - display ESP3D current status",
                       "[ESP444](state) - set ESP3D state (RESET/RESTART)",
                       "[ESP900](state) - display/set serial state(ENABLE/DISABLE)",
                       "[ESP901](BAUD RATE) - display/set serial baud rate"
                      };
 
 const uint cmdlist[]= {0,
+                       400,
                        420,
                        444,
                        900,

@@ -18,9 +18,7 @@
 */
 
 #include "esp3d_commands.h"
-#include "esp3d_client.h"
 #include "serial/esp3d_serial_client.h"
-#include "authentication/esp3d_authentication.h"
 #include "esp3d_string.h"
 #include <stdio.h>
 #include <string>
@@ -86,6 +84,151 @@ void Esp3DCommands::process(esp3d_msg_t * msg)
         lastIsESP3D = false;
         dispatch(msg);
     }
+}
+
+
+bool Esp3DCommands::dispatchSetting(bool json,const char * filter, esp3d_setting_index_t index, const char* help, const char ** optionValues, const char ** optionLabels,  uint32_t maxsize, uint32_t minsize, uint32_t minsize2,uint8_t precision, const char * unit, bool needRestart,esp3d_clients_t target, esp3d_request_t requestId, bool isFirst)
+{
+    std::string tmpstr;
+    char out_str[255];
+    tmpstr.reserve(350); //to save time and avoid several memories allocation delay
+    const Esp3DSetting_t * elementSetting = esp3dTFTsettings.getSettingPtr(index);
+    if (!elementSetting) {
+        return false;
+    }
+    if (json) {
+        if (!isFirst) {
+            tmpstr+=",";
+        }
+        tmpstr += "{\"F\":\"";
+        tmpstr+=filter;
+        tmpstr += "\",\"T\":\"";
+        switch(elementSetting->type) {
+        case  esp3d_byte:
+            tmpstr+="B";
+            break;
+        case esp3d_integer:
+            tmpstr+="I";
+            break;
+        case esp3d_ip:
+            tmpstr+="A";
+            break;
+        case esp3d_float:
+            tmpstr+="B";
+            break;
+        case esp3d_mask :
+            tmpstr+="M";
+            break;
+        case esp3d_bitsfield:
+            tmpstr+="X";
+            break;
+        default:
+            tmpstr+="S";
+        }
+        tmpstr += "\",\"V\":\"";
+        switch(elementSetting->type) {
+        case  esp3d_byte:
+            tmpstr+= std::to_string(esp3dTFTsettings.readByte(index));
+            break;
+        case esp3d_integer:
+            tmpstr+=std::to_string(esp3dTFTsettings.readUint32(index));
+            break;
+        case esp3d_ip:
+            tmpstr+=esp3dTFTsettings.readIPString(index);
+            break;
+        case esp3d_float:
+            //TODO Add float support ?
+            tmpstr+="Not supported";
+            break;
+        case esp3d_mask:
+            //TODO Add Mask support ?
+            tmpstr+="Not supported";
+            break;
+        case esp3d_bitsfield:
+            //TODO Add bitfield support ?
+            tmpstr+="Not supported";
+            break;
+        default: //String
+            tmpstr+=esp3dTFTsettings.readString(index, out_str, elementSetting->size);
+        }
+        tmpstr += "\",\"H\":\"";
+        tmpstr += help;
+        tmpstr += "\"";
+        if (needRestart) {
+            tmpstr += ",\"R\":\"1\"";
+        }
+        if (optionValues && optionLabels) {
+            tmpstr += ",\"O\":[";
+            for (uint8_t i =0; i<maxsize; i++) {
+                if (i>0) {
+                    tmpstr += ",";
+                }
+                tmpstr += "{\"";
+                //be sure we have same size for both array to avoid overflow
+                tmpstr += optionLabels[i];
+                tmpstr += "\":\"";
+                tmpstr += optionValues[i];
+                tmpstr += "\"}";
+            }
+            tmpstr += "]";
+            if (unit) {
+                tmpstr += ",\"R\":\"";
+                tmpstr += unit;
+                tmpstr +="\"";
+            }
+            if (precision!=((uint8_t)-1)) {
+                tmpstr += ",\"E\":\"";
+                tmpstr += std::to_string(precision);
+                tmpstr +="\"";
+            }
+            if (maxsize!=(uint32_t)-1 && !optionValues) {
+                tmpstr += ",\"S\":\"";
+                tmpstr += std::to_string(maxsize);
+                tmpstr +="\"";
+            }
+            if (minsize!=(uint32_t)-1) {
+                tmpstr += ",\"M\":\"";
+                tmpstr += std::to_string(minsize);
+                tmpstr +="\"";
+            }
+            if (minsize2!=(uint32_t)-1) {
+                tmpstr += ",\"MS\":\"";
+                tmpstr += std::to_string(minsize2);
+                tmpstr +="\"";
+            }
+            tmpstr += "}";
+        }
+    } else {
+        tmpstr=help;
+        tmpstr+=": ";
+        switch(elementSetting->type) {
+        case  esp3d_byte:
+            tmpstr+= std::to_string(esp3dTFTsettings.readByte(index));
+            break;
+        case esp3d_integer:
+            tmpstr+=std::to_string(esp3dTFTsettings.readUint32(index));
+            break;
+        case esp3d_ip:
+            tmpstr+=esp3dTFTsettings.readIPString(index);
+            break;
+        case esp3d_float:
+            //TODO Add float support ?
+            tmpstr+="Not supported";
+            break;
+        case esp3d_mask:
+            //TODO Add Mask support ?
+            tmpstr+="Not supported";
+            break;
+        case esp3d_bitsfield:
+            //TODO Add bitfield support ?
+            tmpstr+="Not supported";
+            break;
+        default: //String
+            tmpstr+=esp3dTFTsettings.readString(index, out_str, elementSetting->size);
+        }
+        tmpstr+="\n";
+    }
+    return dispatch(tmpstr.c_str(), target, requestId);
 }
 
 bool Esp3DCommands::dispatchAuthenticationError(esp3d_msg_t * msg, uint cmdid, bool json)
@@ -360,6 +503,9 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
     switch (cmd) {
     case 0:
         ESP0(cmd_params_pos, msg);
+        break;
+    case 400:
+        ESP400(cmd_params_pos, msg);
         break;
     case 420:
         ESP420(cmd_params_pos, msg);

@@ -37,6 +37,9 @@ typedef enum  {
     esp3d_integer, //4 bytes
     esp3d_string, //string
     esp3d_ip, //4 bytes
+    esp3d_float, //4 bytes
+    esp3d_mask, //x bytes
+    esp3d_bitsfield, //x bytes
 } esp3d_setting_type_t;
 
 //to be implemented :
@@ -66,7 +69,7 @@ public:
     bool isValidSettingsNvs();
     uint8_t readByte(esp3d_setting_index_t index, bool * haserror = NULL);
     uint32_t readUint32(esp3d_setting_index_t index, bool * haserror = NULL);
-    const char* readIPString(esp3d_setting_index_t index, bool * haserror);
+    const char* readIPString(esp3d_setting_index_t index, bool * haserror = NULL);
     const char* readString(esp3d_setting_index_t index, char* out_str, size_t len, bool * haserror = NULL);
     bool writeByte (esp3d_setting_index_t index, const uint8_t value);
     bool writeUint32 (esp3d_setting_index_t index, const uint32_t value);
@@ -79,9 +82,8 @@ public:
     uint32_t getDefaultIntegerSetting(esp3d_setting_index_t settingElement);
     const char * getDefaultStringSetting(esp3d_setting_index_t settingElement);
     uint8_t getDefaultByteSetting(esp3d_setting_index_t settingElement);
-
-private:
     const Esp3DSetting_t * getSettingPtr(esp3d_setting_index_t index);
+private:
     const char *IPUInt32toString(uint32_t ip_int);
     uint32_t StringtoIPUInt32(const char *s);
 

@@ -1,9 +1,7 @@
-# ESP3D [ESP400] format
-
-Only sent in JSON format
+# ESP3D [ESP400] json
 
 ```
-{"Settings":[
+{"cmd":"400","status":"ok","data":[
 {"F":"network/network","P":"130","T":"S","V":"esp3d","H":"hostname","S":"32","M":"1"},
 {"F":"network/network","P":"0","T":"B","V":"1","H":"radio mode","O":[{"none":"0"},
 {"sta":"1"},
@@ -99,4 +97,6 @@ or
     -   R: need restart to be applied
 
 Note: if Type `M` and `X` use `O` entry to define the label / position, if `O` is `[]` then axis label are used according need `X`, `Y`, `Z`, `A`, `B`, `C`  
-Note2 : the 2.1 Flag type is no more used, several entries are used instead grouped by sub-section
+Note2 : the 2.1 Flag type is no more used, several entries are used instead grouped by sub-section    
+
+If no json the list is limited to a list of `<help>: <value>`  
