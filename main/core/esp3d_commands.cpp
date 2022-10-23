@@ -102,6 +102,8 @@ bool Esp3DCommands::dispatchSetting(bool json,const char * filter, esp3d_setting
         }
         tmpstr += "{\"F\":\"";
         tmpstr+=filter;
+        tmpstr += "\",\"P\":\"";
+        tmpstr+=std::to_string(index);
         tmpstr += "\",\"T\":\"";
         switch(elementSetting->type) {
         case  esp3d_byte:
