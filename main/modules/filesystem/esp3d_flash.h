@@ -49,8 +49,9 @@ public:
     /**
     void handle();
     void end();
-    void refreshStats(bool force = false);
-    bool format(ESP3DOutput * output = nullptr);
+    void refreshStats(bool force = false);*/
+    bool format();
+    /*
     FILE open(const char* path, uint8_t mode = ESP3D_FILE_READ);
     bool exists(const char* path);
     bool remove(const char *path);

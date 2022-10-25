@@ -30,6 +30,7 @@ const char * help[]= {"[ESP](id) - display this help",
                       "[ESP401]P=(position) T=(type) V=(value) - Set specific setting",
                       "[ESP420] - display ESP3D current status",
                       "[ESP444](state) - set ESP3D state (RESET/RESTART)",
+                      "[ESP710]FORMATFS - Format ESP Filesystem",
                       "[ESP900](state) - display/set serial state(ENABLE/DISABLE)",
                       "[ESP901](baud rate) - display/set serial baud rate"
                      };
@@ -41,6 +42,7 @@ const uint cmdlist[]= {0,
                        401,
                        420,
                        444,
+                       710,
                        900,
                        901
                       };

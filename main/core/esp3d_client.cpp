@@ -130,6 +130,7 @@ esp3d_msg_t * Esp3DClient::newMsg()
     esp3d_msg_t * newMsgPtr = (esp3d_msg_t*)malloc( sizeof(esp3d_msg_t));
     if (newMsgPtr) {
         newMsgPtr->data = nullptr;
+        newMsgPtr->size = 0;
         newMsgPtr->origin = NO_CLIENT;
         newMsgPtr->target = ALL_CLIENTS;
         newMsgPtr->authentication_level = ESP3D_LEVEL_GUEST;
@@ -144,6 +145,19 @@ esp3d_msg_t * Esp3DClient::newMsg(esp3d_request_t requestId)
     if (newMsgPtr) {
         newMsgPtr->origin = WEBUI_CLIENT;
         newMsgPtr->requestId = requestId;
+    }
+    return newMsgPtr;
+}
+
+esp3d_msg_t * Esp3DClient::copyMsgInfos( esp3d_msg_t * msg)
+{
+    esp3d_msg_t * newMsgPtr = newMsg();
+    if (newMsgPtr) {
+        newMsgPtr->origin = msg->origin;
+        newMsgPtr->target = msg->target;
+        newMsgPtr->authentication_level= msg->authentication_level;
+        newMsgPtr->requestId = msg->requestId;
+
     }
     return newMsgPtr;
 }

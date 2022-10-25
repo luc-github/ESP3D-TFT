@@ -89,7 +89,20 @@ const char * ESP3D_FLASH::getFileSystemName()
     return "LittleFS";
 }
 
-bool ESP3D_FLASH::begin()
+bool ESP3D_FLASH::format()
+{
+    if (_mounted) {
+        unmount();
+    }
+    bool isFormated = false;
+    if (ESP_OK==  esp_littlefs_format(PARTITION_LABEL)) {
+        isFormated = true;
+    }
+    mount();
+    return  (isFormated && _mounted);
+}
+
+bool ESP3D_FLASH::ESP3D_FLASH::begin()
 {
     _started = mount();
     return _started;
