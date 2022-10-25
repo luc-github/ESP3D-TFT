@@ -33,7 +33,7 @@
 #include "sdmmc_cmd.h"
 #include "esp3d_log.h"
 
-const char mount_point[] = "/sdcard";
+const char mount_point[] = "/sd";
 sdmmc_card_t *card;
 sdmmc_host_t host = SDSPI_HOST_DEFAULT();
 
@@ -41,9 +41,11 @@ void ESP3D_SD::unmount()
 {
     if (!_started ) {
         esp3d_log_e("SDCard not init.");
+        _state = ESP3D_SDCARD_UNKNOWN;
         return;
     }
     esp_vfs_fat_sdcard_unmount(mount_point, card);
+    _state = ESP3D_SDCARD_NOT_PRESENT;
     _mounted = false;
 }
 
@@ -51,6 +53,7 @@ bool ESP3D_SD::mount()
 {
     if (!_started) {
         esp3d_log_e("SDCard not init.");
+        _state = ESP3D_SDCARD_UNKNOWN;
         return false;
     }
     if (_mounted) {
@@ -73,6 +76,7 @@ bool ESP3D_SD::mount()
     esp_err_t ret = esp_vfs_fat_sdspi_mount(mount_point, &host, &slot_config, &mount_config, &card);
 
     if (ret != ESP_OK) {
+        _state = ESP3D_SDCARD_NOT_PRESENT;
         if (ret == ESP_FAIL) {
             esp3d_log_e("Failed to mount filesystem.");
         } else {
@@ -80,8 +84,9 @@ bool ESP3D_SD::mount()
         }
         return false;
     }
-    esp3d_log_e("Filesystem mounted");
+    esp3d_log("Filesystem mounted");
     _mounted = true;
+    _state = ESP3D_SDCARD_IDLE;
     return _mounted;
 }
 
@@ -94,8 +99,8 @@ bool ESP3D_SD::begin()
 {
     _started =false;
     esp_err_t ret;
-    esp3d_log_e("Initializing SD card");
-    esp3d_log_e("Using SPI peripheral");
+    esp3d_log("Initializing SD card");
+    esp3d_log("Using SPI peripheral");
     spi_bus_config_t bus_cfg = {
         .mosi_io_num = (gpio_num_t)ESP3D_SD_MOSI_PIN,
         .miso_io_num = (gpio_num_t)ESP3D_SD_MISO_PIN,

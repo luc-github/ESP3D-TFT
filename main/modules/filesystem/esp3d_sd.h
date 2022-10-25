@@ -58,10 +58,7 @@ public:
                       uint64_t * freeBytes=NULL,
                       bool refreshStats=false);
 
-    esp3d_sd_states getState()
-    {
-        return _state;
-    };
+    esp3d_sd_states getState();
     esp3d_sd_states setState(esp3d_sd_states state)
     {
         _state=state;

@@ -60,3 +60,12 @@ void  ESP3D_SD::releaseFS(esp3d_fs_types FS)
     setState(ESP3D_SDCARD_IDLE);
 }
 
+
+esp3d_sd_states ESP3D_SD::getState()
+{
+    if (_state==ESP3D_SDCARD_BUSY) {
+        return _state;
+    }
+    mount();
+    return _state;
+};

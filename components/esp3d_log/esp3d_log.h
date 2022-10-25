@@ -25,10 +25,22 @@ extern "C" {
 #include <stdio.h>
 #include <string.h>
 #include "esp_log.h"
+#if DISABLE_COLOR_LOG
+#define LOG_COLOR_NORMAL ""
+#define LOG_COLOR_ERROR ""
+#define LOG_COLOR_WARNING ""
+#define LOG_NO_COLOR ""
+#else
+#define LOG_COLOR_NORMAL "\e[0;36m"
+#define LOG_COLOR_ERROR "\e[0;31m"
+#define LOG_COLOR_WARNING "\e[1;33m"
+#define LOG_NO_COLOR "\e[0;37m\e[0m"
+#endif
+
 const char *   pathToFileName(const char * path);
-#define esp3d_log(format, ...) esp_log_write(ESP_LOG_NONE,"[ESP3D-TFT]","\e[0;36m[%s:%u] %s(): " format "\n" , pathToFileName(__FILE__), __LINE__, __FUNCTION__, ##__VA_ARGS__)
-#define esp3d_log_e(format, ...) esp_log_write(ESP_LOG_NONE,"[ESP3D-TFT]","\e[0;31m[%s:%u] %s(): " format "\n" , pathToFileName(__FILE__), __LINE__, __FUNCTION__, ##__VA_ARGS__)
-#define esp3d_log_w(format, ...) esp_log_write(ESP_LOG_NONE,"[ESP3D-TFT]","\e[1;33m[%s:%u] %s(): " format "\n" , pathToFileName(__FILE__), __LINE__, __FUNCTION__, ##__VA_ARGS__)
+#define esp3d_log(format, ...) esp_log_write(ESP_LOG_NONE,"[ESP3D-TFT]","%s[%s:%u] %s(): " format "%s\n" , LOG_COLOR_NORMAL,pathToFileName(__FILE__), __LINE__, __FUNCTION__, ##__VA_ARGS__,LOG_NO_COLOR)
+#define esp3d_log_e(format, ...) esp_log_write(ESP_LOG_NONE,"[ESP3D-TFT]","%s[%s:%u] %s(): " format "%s\n" , LOG_COLOR_ERROR, pathToFileName(__FILE__), __LINE__, __FUNCTION__, ##__VA_ARGS__,LOG_NO_COLOR)
+#define esp3d_log_w(format, ...) esp_log_write(ESP_LOG_NONE,"[ESP3D-TFT]","%s[%s:%u] %s(): " format "%s\n" , LOG_COLOR_WARNING, pathToFileName(__FILE__), __LINE__, __FUNCTION__, ##__VA_ARGS__,LOG_NO_COLOR)
 
 #else
 #define esp3d_log(format, ...)

@@ -24,6 +24,8 @@
 #include <cstring>
 
 const char * help[]= {"[ESP](id) - display this help",
+                      "[ESP200](RELEASE) (REFRESH)- display/set SD Card Status",
+                      "[ESP202]SPEED=(factor) - display / set  SD Card  SD card Speed divider factor (1 2 4 6 8 16 32)"
                       "[ESP400] - display ESP3D settings",
                       "[ESP401]P=(position) T=(type) V=(value) - Set specific setting",
                       "[ESP420] - display ESP3D current status",
@@ -33,6 +35,8 @@ const char * help[]= {"[ESP](id) - display this help",
                      };
 
 const uint cmdlist[]= {0,
+                       200,
+                       202,
                        400,
                        401,
                        420,

@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include "esp3d_fs_types.h"
 
-#define ESP3D_FLASH_FS_HEADER "/flash/"
+#define ESP3D_FLASH_FS_HEADER "/fs/"
 #define MAX_FLASH_PATH 255
 
 class ESP3D_FLASH final

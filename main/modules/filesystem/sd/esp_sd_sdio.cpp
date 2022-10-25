@@ -34,7 +34,7 @@
 #include "driver/sdmmc_host.h"
 #include "esp3d_log.h"
 
-const char mount_point[] = "/sdcard";
+const char mount_point[] = "/sd";
 sdmmc_card_t *card;
 
 
@@ -42,9 +42,11 @@ void ESP3D_SD::unmount()
 {
     if (!_started ) {
         esp3d_log_e("SDCard not init.");
+        _state = ESP3D_SDCARD_UNKNOWN;
         return;
     }
     esp_vfs_fat_sdcard_unmount(mount_point, card);
+    _state = ESP3D_SDCARD_NOT_PRESENT;
     _mounted = false;
 }
 
@@ -52,6 +54,7 @@ bool ESP3D_SD::mount()
 {
     if (!_started) {
         esp3d_log_e("SDCard not init.");
+        _state = ESP3D_SDCARD_UNKNOWN;
         return false;
     }
     if (_mounted) {
@@ -82,6 +85,7 @@ bool ESP3D_SD::mount()
 
 
     if (ret != ESP_OK) {
+        _state = ESP3D_SDCARD_NOT_PRESENT;
         if (ret == ESP_FAIL) {
             esp3d_log_e("Failed to mount filesystem.");
         } else {
@@ -89,8 +93,9 @@ bool ESP3D_SD::mount()
         }
         return false;
     }
-    esp3d_log_e("Filesystem mounted");
+    esp3d_log("Filesystem mounted");
     _mounted = true;
+    _state = ESP3D_SDCARD_IDLE;
     return _mounted;
 }
 

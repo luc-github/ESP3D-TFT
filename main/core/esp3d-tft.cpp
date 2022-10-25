@@ -34,6 +34,7 @@
 #include "esp3d_log.h"
 #include "bsp.h"
 #include "filesystem/esp3d_flash.h"
+#include "filesystem/esp3d_sd.h"
 
 /**********************
  *  STATIC PROTOTYPES
@@ -82,6 +83,7 @@ bool Esp3DTFT::begin()
     }
 
     bool successFs = flashFs.begin();
+    bool successSd = sd.begin();
     bool success =  esp3dTFTui.begin();
     if (success) {
         success = esp3dTFTstream.begin();
@@ -90,7 +92,7 @@ bool Esp3DTFT::begin()
         success = esp3dTFTnetwork.begin();
     }
 
-    return success && successFs;
+    return success && successFs && successSd;
 }
 
 void Esp3DTFT::handle()

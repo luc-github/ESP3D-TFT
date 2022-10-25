@@ -30,7 +30,7 @@
 #include "esp_littlefs.h"
 #include "esp3d_log.h"
 
-const char mount_point[] = "/flashFs";
+const char mount_point[] = "/fs";
 #define PARTITION_LABEL "flashfs"
 
 void ESP3D_FLASH::unmount()
