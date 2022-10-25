@@ -115,8 +115,8 @@ label can be: light/framesize/quality/contrast/brightness/saturation/gainceiling
 
     Note: Flash pins according chip cannot be used
 
-* Get/Set SD card Speed factor 1 2 4 6 8 16 32   
-    `[ESP202]SPEED=<value> json=<no> pwd=<user/admin password>`
+* Get/Set SD card speed divider factor 1 2 4 6 8 16 32   
+    `[ESP202]<div factor> json=<no> pwd=<user/admin password>`
 
 * Get Sensor Value / type/Set Sensor type   // Not used in ESP3D-TFT
     `[ESP210]<type=NONE/xxx> <interval=XXX in millisec> json=<no> pwd=<user/admin password>`

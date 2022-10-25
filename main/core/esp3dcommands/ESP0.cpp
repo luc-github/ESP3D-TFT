@@ -25,13 +25,13 @@
 
 const char * help[]= {"[ESP](id) - display this help",
                       "[ESP200](RELEASE) (REFRESH)- display/set SD Card Status",
-                      "[ESP202]SPEED=(factor) - display / set  SD Card  SD card Speed divider factor (1 2 4 6 8 16 32)"
+                      "[ESP202](factor) - display / set  SD Card  SD card Speed divider factor (1 2 4 6 8 16 32)",
                       "[ESP400] - display ESP3D settings",
                       "[ESP401]P=(position) T=(type) V=(value) - Set specific setting",
                       "[ESP420] - display ESP3D current status",
                       "[ESP444](state) - set ESP3D state (RESET/RESTART)",
                       "[ESP900](state) - display/set serial state(ENABLE/DISABLE)",
-                      "[ESP901](BAUD RATE) - display/set serial baud rate"
+                      "[ESP901](baud rate) - display/set serial baud rate"
                      };
 
 const uint cmdlist[]= {0,
@@ -54,9 +54,10 @@ void Esp3DCommands::ESP0(int cmd_params_pos,esp3d_msg_t * msg)
     msg->origin = ESP3D_COMMAND;
     std::string tmpstr;
     const uint cmdNb = sizeof(help)/sizeof(char*);
-    const uint cmdlistNb = sizeof(cmdlist)/sizeof(char*);
+    const uint cmdlistNb = sizeof(cmdlist)/sizeof(uint);
     bool json=hasTag(msg,cmd_params_pos,"json");
     if (cmdNb!=cmdlistNb) {
+        esp3d_log("Help corrupted: %d vs %d",cmdNb,cmdlistNb);
         if(!dispatch(msg,"Help corrupted")) {
             esp3d_log_e("Error sending command to clients");
         }

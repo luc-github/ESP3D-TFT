@@ -25,7 +25,7 @@
 #define COMMAND_ID 200
 
 //Get/Set SD card Speed factor 1 2 4 6 8 16 32
-//[ESP202]SPEED=<value> json=<no> pwd=<user/admin password>
+//[ESP202]<factor> json=<no> pwd=<user/admin password>
 void Esp3DCommands::ESP202(int cmd_params_pos,esp3d_msg_t * msg)
 {
     esp3d_clients_t target = msg->origin;
