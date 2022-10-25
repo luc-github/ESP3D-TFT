@@ -24,6 +24,7 @@
 #include "esp_system.h"
 #include "freertos/task.h"
 #include "authentication/esp3d_authentication.h"
+#define COMMAND_ID 444
 
 //Set ESP State
 //`cmd` can be  `RESTART` to restart board or `RESET` to reset all setting to  defaults values
@@ -39,10 +40,13 @@ void Esp3DCommands::ESP444(int cmd_params_pos,esp3d_msg_t * msg)
     std::string tmpstr;
     bool isRestart = hasTag (msg, cmd_params_pos,"RESTART");
     bool isReset = hasTag (msg, cmd_params_pos,"RESET");
+    bool hasError = false;
+    std::string error_msg ="Invalid parameters";
+    std::string ok_msg ="";
 #if ESP3D_AUTHENTICATION_FEATURE
     if (msg->authentication_level != ESP3D_LEVEL_ADMIN) {
         msg->authentication_level =ESP3D_LEVEL_NOT_AUTHENTICATED;
-        dispatchAuthenticationError(msg, 444,json);
+        dispatchAuthenticationError(msg, COMMAND_ID, json);
         return;
     }
 #endif //ESP3D_AUTHENTICATION_FEATURE
@@ -52,31 +56,17 @@ void Esp3DCommands::ESP444(int cmd_params_pos,esp3d_msg_t * msg)
     }
 
     if (!(isRestart||isReset)) {
-        if (json) {
-            tmpstr = "{\"cmd\":\"444\",\"status\":\"error\",\"data\":\"Invalid parameters\"}";
-        } else {
-            tmpstr = "Invalid parameters\n";
-        }
+        hasError= true;
     } else {
-        if (json) {
-            tmpstr = "{\"cmd\":\"444\",\"status\":\"ok\",\"data\":\"";
-            if (isReset) {
-                tmpstr += "Reset done,";
-            }
-            if (isRestart) {
-                tmpstr += "Now restarting...";
-            }
-            tmpstr +="\"}";
-        } else {
-            if (isReset) {
-                tmpstr = "Reset done\n";
-            }
-            if (isRestart) {
-                tmpstr += "Now restarting...\n";
-            }
+
+        if (isReset) {
+            ok_msg += "Reset done,";
+        }
+        if (isRestart) {
+            ok_msg += "Now restarting...";
         }
     }
-    if(!dispatch(msg,tmpstr.c_str())) {
+    if(!dispatchAnswer(msg,COMMAND_ID, json, hasError, hasError?error_msg.c_str():ok_msg.c_str())) {
         esp3d_log_e("Error sending response to clients");
         return;
     }

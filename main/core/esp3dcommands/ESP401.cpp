@@ -22,6 +22,8 @@
 #include "esp3d_string.h"
 #include "esp3d-settings.h"
 #include "authentication/esp3d_authentication.h"
+#include "filesystem/esp3d_sd.h"
+#define COMMAND_ID 401
 
 //Set EEPROM setting
 //[ESP401]P=<position> T=<type> V=<value> json=<no> pwd=<admin password>
@@ -41,7 +43,7 @@ void Esp3DCommands::ESP401(int cmd_params_pos,esp3d_msg_t * msg)
 #if ESP3D_AUTHENTICATION_FEATURE
     if (msg->authentication_level != ESP3D_LEVEL_ADMIN) {
         msg->authentication_level =ESP3D_LEVEL_NOT_AUTHENTICATED;
-        dispatchAuthenticationError(msg, 401,json);
+        dispatchAuthenticationError(msg, COMMAND_ID,json);
         return;
     }
 #endif //ESP3D_AUTHENTICATION_FEATURE
@@ -73,6 +75,9 @@ void Esp3DCommands::ESP401(int cmd_params_pos,esp3d_msg_t * msg)
                         } else {
                             //hot change setting if any
                             switch(index_setting) {
+                            case esp3d_spi_divider:
+                                sd.setSPISpeedDivider(value);
+                                break;
                             default:
                                 break;
                             }

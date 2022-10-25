@@ -32,6 +32,7 @@
 #include "esp_vfs_fat.h"
 #include "sdmmc_cmd.h"
 #include "esp3d_log.h"
+#include "esp3d-settings.h"
 
 const char mount_point[] = "/sd";
 sdmmc_card_t *card;
@@ -115,7 +116,8 @@ bool ESP3D_SD::begin()
         .flags = 0,
         .intr_flags = 0,
     };
-    ret = spi_bus_initialize((spi_host_device_t)host.slot, &bus_cfg, SDSPI_DEFAULT_DMA);
+    _spi_speed_divider =
+        ret = spi_bus_initialize((spi_host_device_t)host.slot, &bus_cfg, SDSPI_DEFAULT_DMA);
     if (ret != ESP_OK) {
         esp3d_log_e("Failed to initialize bus.");
         return false;

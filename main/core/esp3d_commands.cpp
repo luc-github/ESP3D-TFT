@@ -250,6 +250,29 @@ bool Esp3DCommands::dispatchAuthenticationError(esp3d_msg_t * msg, uint cmdid, b
     return dispatch(msg,tmpstr.c_str());
 }
 
+bool  Esp3DCommands::dispatchAnswer(esp3d_msg_t * msg, uint cmdid, bool json, bool hasError, const char* answerMsg)
+{
+    std::string tmpstr;
+    if (!msg) {
+        return false;
+    }
+    if (json) {
+        tmpstr = "{\"cmd\":\""+std::to_string(cmdid) + "\",\"status\":\"";
+        if (hasError) {
+            tmpstr +="error";
+        } else {
+            tmpstr +="ok";
+        }
+        tmpstr+="\",\"data\":\"";
+        tmpstr += answerMsg;
+        tmpstr += "\"}";
+    } else {
+        tmpstr=answerMsg;
+        tmpstr += "\n";
+    }
+    return dispatch(msg,tmpstr.c_str());
+}
+
 bool  Esp3DCommands::dispatchIdValue(bool json,const char *Id, const char * value, esp3d_clients_t target, esp3d_request_t requestId, bool isFirst)
 {
     std::string tmpstr="";
@@ -508,6 +531,9 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
         break;
     case 200:
         ESP200(cmd_params_pos, msg);
+        break;
+    case 202:
+        ESP202(cmd_params_pos, msg);
         break;
     case 400:
         ESP400(cmd_params_pos, msg);

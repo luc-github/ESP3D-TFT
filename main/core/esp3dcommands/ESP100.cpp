@@ -21,7 +21,7 @@
 #include "esp3d_client.h"
 #include "esp3d_string.h"
 #include "authentication/esp3d_authentication.h"
-
+#define COMMAND_ID 100
 //Set/Get STA SSID
 //output is JSON or plain text according parameter
 //[ESP100]<SSID> json=<no> pwd=<admin password for set/get & user password to get>
@@ -40,28 +40,13 @@ void Esp3DCommands::ESP100(int cmd_params_pos,esp3d_msg_t * msg)
 #if ESP3D_AUTHENTICATION_FEATURE
     if (msg->authentication_level == ESP3D_LEVEL_GUEST) {
         msg->authentication_level =ESP3D_LEVEL_NOT_AUTHENTICATED;
-        dispatchAuthenticationError(msg, 100,json);
+        dispatchAuthenticationError(msg, COMMAND_ID,json);
         return;
     }
 #endif //ESP3D_AUTHENTICATION_FEATURE
-    if (hasError) {
-        if (json) {
-            tmpstr = "{\"cmd\":\"100\",\"status\":\"error\",\"data\":\"";
-            tmpstr+=error_msg;
-            tmpstr += "\"}";
-        } else {
-            tmpstr = error_msg +"\n";
-        }
-    } else {
-        if (json) {
-            tmpstr = "{\"cmd\":\"100\",\"status\":\"ok\",\"data\":\"";
-            tmpstr += ok_msg;
-            tmpstr += "\"}";
-        } else {
-            tmpstr = ok_msg +"\n";
-        }
-    }
-    if(!dispatch(msg,tmpstr.c_str())) {
+    // TODO
+    //......
+    if(!dispatchAnswer(msg,COMMAND_ID,json, hasError, hasError?error_msg.c_str():ok_msg.c_str())) {
         esp3d_log_e("Error sending response to clients");
     }
 }

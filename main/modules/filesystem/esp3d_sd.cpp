@@ -30,7 +30,7 @@ ESP3D_SD::ESP3D_SD()
 {
     _mounted = false;
     _started = false;
-    _spi_speed_divider = 1;
+    _spi_speed_divider = 0;
     _state = ESP3D_SDCARD_UNKNOWN;
 }
 

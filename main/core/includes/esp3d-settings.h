@@ -28,6 +28,7 @@ extern "C" {
 typedef enum  {
     esp3d_version,
     esp3d_baud_rate,
+    esp3d_spi_divider,
     last_one
 } esp3d_setting_index_t;
 

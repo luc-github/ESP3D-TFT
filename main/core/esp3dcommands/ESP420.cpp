@@ -29,6 +29,7 @@
 #include "esp_heap_caps.h"
 #include "esp_spi_flash.h"
 #include "authentication/esp3d_authentication.h"
+#define COMMAND_ID 420
 
 //Get ESP current status
 //output is JSON or plain text according parameter
@@ -43,7 +44,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
     if (msg->authentication_level == ESP3D_LEVEL_GUEST) {
-        dispatchAuthenticationError(msg, 420,json);
+        dispatchAuthenticationError(msg, COMMAND_ID, json);
         return;
     }
 #endif //ESP3D_AUTHENTICATION_FEATURE

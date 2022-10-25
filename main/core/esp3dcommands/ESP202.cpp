@@ -20,13 +20,13 @@
 #include "esp3d_commands.h"
 #include "esp3d_client.h"
 #include "esp3d_string.h"
+#include "esp3d-settings.h"
 #include "authentication/esp3d_authentication.h"
-#include "serial/esp3d_serial_client.h"
-#define COMMAND_ID 900
+#define COMMAND_ID 200
 
-//Get state / Set Enable / Disable Serial Communication
-//[ESP900]<ENABLE/DISABLE> json=<no> pwd=<admin/user password>
-void Esp3DCommands::ESP900(int cmd_params_pos,esp3d_msg_t * msg)
+//Get/Set SD card Speed factor 1 2 4 6 8 16 32
+//[ESP202]SPEED=<value> json=<no> pwd=<user/admin password>
+void Esp3DCommands::ESP202(int cmd_params_pos,esp3d_msg_t * msg)
 {
     esp3d_clients_t target = msg->origin;
     esp3d_request_t requestId = msg->requestId;
@@ -37,37 +37,33 @@ void Esp3DCommands::ESP900(int cmd_params_pos,esp3d_msg_t * msg)
     std::string error_msg ="Invalid parameters";
     std::string ok_msg ="ok";
     bool json = hasTag (msg,cmd_params_pos,"json");
-    bool setEnable = hasTag (msg, cmd_params_pos,"ENABLE");
-    bool setDisable = hasTag (msg, cmd_params_pos,"DISABLE");
     std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
     if (msg->authentication_level == ESP3D_LEVEL_GUEST) {
         msg->authentication_level =ESP3D_LEVEL_NOT_AUTHENTICATED;
-        dispatchAuthenticationError(msg, COMMAND_ID,json);
+        dispatchAuthenticationError(msg, COMMAND_ID, json);
         return;
     }
 #endif //ESP3D_AUTHENTICATION_FEATURE
-    if (!(setEnable || setDisable) && !has_param(msg,cmd_params_pos)) { //get
-        hasError= true;
+    tmpstr = get_clean_param(msg,cmd_params_pos);
+    if (tmpstr.length()==0) {
+        ok_msg = std::to_string( esp3dTFTsettings.readByte(esp3d_spi_divider));
     } else {
-        if (setEnable) { //set
-            if (setEnable) {
-                if (!serialClient.started()) {
-                    if (!serialClient.begin()) {
-                        hasError = true;
-                        error_msg= "error processing command";
-                    }
-                }
+        uint8_t spidiv = atoi(tmpstr.c_str());
+        esp3d_log("got %s param for a value of %d, is valid %d", tmpstr.c_str(), spidiv, esp3dTFTsettings.isValidByteSetting(spidiv, esp3d_spi_divider));
+        if (esp3dTFTsettings.isValidByteSetting(spidiv, esp3d_spi_divider)) {
+            esp3d_log("Value %d is valid",spidiv);
+            if (!esp3dTFTsettings.writeByte (esp3d_spi_divider, spidiv)) {
+                hasError = true;
+                error_msg="Set value failed";
             }
+        } else {
+            hasError=true;
+            error_msg="Invalid parameter";
         }
     }
+
     if(!dispatchAnswer(msg,COMMAND_ID,json, hasError, hasError?error_msg.c_str():ok_msg.c_str())) {
         esp3d_log_e("Error sending response to clients");
-        return;
-    }
-    if (setDisable) {
-        if (serialClient.started()) {
-            serialClient.end();
-        }
     }
 }

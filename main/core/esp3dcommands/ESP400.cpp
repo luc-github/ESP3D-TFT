@@ -21,9 +21,10 @@
 #include "esp3d_client.h"
 #include "esp3d_string.h"
 #include "authentication/esp3d_authentication.h"
-
+#include "sd_def.h"
+#define COMMAND_ID 400
 const char * BaudRateList[] = {"9600", "19200", "38400", "57600", "74880", "115200", "230400", "250000", "500000", "921600"};
-
+const char *  SPIDivider[] = { "1", "2", "4", "6", "8", "16", "32"};
 //Get full ESP3D settings
 //[ESP400]<pwd=admin>
 void Esp3DCommands::ESP400(int cmd_params_pos,esp3d_msg_t * msg)
@@ -38,7 +39,7 @@ void Esp3DCommands::ESP400(int cmd_params_pos,esp3d_msg_t * msg)
 #if ESP3D_AUTHENTICATION_FEATURE
     if (msg->authentication_level == ESP3D_LEVEL_GUEST) {
         msg->authentication_level =ESP3D_LEVEL_NOT_AUTHENTICATED;
-        dispatchAuthenticationError(msg, 100,json);
+        dispatchAuthenticationError(msg, COMMAND_ID, json);
         return;
     }
 #endif //ESP3D_AUTHENTICATION_FEATURE
@@ -54,7 +55,11 @@ void Esp3DCommands::ESP400(int cmd_params_pos,esp3d_msg_t * msg)
     if (!dispatchSetting(json,"system/system",esp3d_baud_rate, "baud", BaudRateList, BaudRateList, sizeof(BaudRateList)/sizeof(char*), -1, -1,-1, nullptr, true,target,requestId,true)) {
         esp3d_log_e("Error sending response to clients");
     }
-
+#if defined(ESP3D_SD_IS_SPI) && ESP3D_SD_IS_SPI
+    if (!dispatchSetting(json,"device/sd",esp3d_spi_divider, "speedx", SPIDivider, SPIDivider,  sizeof(SPIDivider)/sizeof(char*), -1, -1,-1, nullptr, false,target,requestId,true)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+#endif
 
     if (json) {
         if(!dispatch("]}",target, requestId)) {

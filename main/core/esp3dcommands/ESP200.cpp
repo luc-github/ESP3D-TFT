@@ -23,6 +23,7 @@
 #include "authentication/esp3d_authentication.h"
 #include "filesystem/esp3d_sd.h"
 
+#define COMMAND_ID 200
 //Get SD Card Status
 //[ESP200]<RELEASE> <REFRESH> pwd=<user/admin password>
 void Esp3DCommands::ESP200(int cmd_params_pos,esp3d_msg_t * msg)
@@ -42,7 +43,7 @@ void Esp3DCommands::ESP200(int cmd_params_pos,esp3d_msg_t * msg)
 #if ESP3D_AUTHENTICATION_FEATURE
     if (msg->authentication_level == ESP3D_LEVEL_GUEST) {
         msg->authentication_level =ESP3D_LEVEL_NOT_AUTHENTICATED;
-        dispatchAuthenticationError(msg, 100,json);
+        dispatchAuthenticationError(msg, COMMAND_ID, json);
         return;
     }
 #endif //ESP3D_AUTHENTICATION_FEATURE
@@ -80,24 +81,7 @@ void Esp3DCommands::ESP200(int cmd_params_pos,esp3d_msg_t * msg)
         }
     }
 
-    if (hasError) {
-        if (json) {
-            tmpstr = "{\"cmd\":\"200\",\"status\":\"error\",\"data\":\"";
-            tmpstr+=error_msg;
-            tmpstr += "\"}";
-        } else {
-            tmpstr = error_msg +"\n";
-        }
-    } else {
-        if (json) {
-            tmpstr = "{\"cmd\":\"200\",\"status\":\"ok\",\"data\":\"";
-            tmpstr += ok_msg;
-            tmpstr += "\"}";
-        } else {
-            tmpstr = ok_msg + "\n";
-        }
-    }
-    if(!dispatch(msg,tmpstr.c_str())) {
+    if(!dispatchAnswer(msg,COMMAND_ID, json, hasError, hasError?error_msg.c_str():ok_msg.c_str())) {
         esp3d_log_e("Error sending response to clients");
     }
 }

@@ -38,6 +38,7 @@ public:
     bool is_esp_command(uint8_t * sbuf, size_t len);
     void process(esp3d_msg_t * msg);
     void execute_internal_command(int cmd, int cmd_params_pos,esp3d_msg_t * msg);
+    bool dispatchAnswer(esp3d_msg_t * msg, uint cmdid, bool json, bool hasError, const char* answerMsg);
     bool dispatchIdValue(bool json,const char *Id, const char * value, esp3d_clients_t target, esp3d_request_t requestId, bool isFirst = false);
     bool dispatchSetting(bool json,const char * filter, esp3d_setting_index_t index, const char* help, const char ** optionValues, const char ** optionLabels, uint32_t maxsize, uint32_t minsize, uint32_t minsize2,uint8_t precision, const char * unit,  bool needRestart,esp3d_clients_t target, esp3d_request_t requestId, bool isFirst = false);
     bool dispatch(esp3d_msg_t * msg);
@@ -48,6 +49,7 @@ public:
     void ESP0(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP100(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP200(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP202(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP400(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP401(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP420(int cmd_params_pos,esp3d_msg_t * msg);

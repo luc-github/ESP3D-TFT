@@ -32,7 +32,7 @@
 
 
 #define STORAGE_NAME "ESP3D_TFT"
-#define SETTING_VERSION "ESP3D_TFT-V3.0"
+#define SETTING_VERSION "ESP3D_TFT-V3.0.1"
 #define SIZE_OF_SETTING_VERSION 25
 
 Esp3DSettings esp3dTFTsettings;
@@ -40,14 +40,28 @@ Esp3DSettings esp3dTFTsettings;
 const uint32_t SupportedBaudList[] = {9600, 19200, 38400, 57600, 74880, 115200, 230400, 250000, 500000, 921600};
 const uint8_t SupportedBaudListSize = sizeof(SupportedBaudList)/sizeof(uint32_t);
 
+const uint8_t SupportedSPIDivider[] = { 1, 2, 4, 6, 8, 16, 32};
+const uint8_t SupportedSPIDividerSize = sizeof(SupportedSPIDivider)/sizeof(uint8_t);
+
 //value of settings, default value are all strings
 const Esp3DSetting_t Esp3DSettingsData [] = {
-    {esp3d_version, esp3d_string, SIZE_OF_SETTING_VERSION,"Invalid data"},
-    {esp3d_baud_rate,esp3d_integer,4, ESP3D_SERIAL_BAUDRATE}
+    {esp3d_version, esp3d_string, SIZE_OF_SETTING_VERSION,"Invalid data"}, //Version
+    {esp3d_baud_rate, esp3d_integer, 4, ESP3D_SERIAL_BAUDRATE},            //BaudRate
+    {esp3d_spi_divider, esp3d_byte, 1, "1"}                                //SPIdivider
 };
 
 bool  Esp3DSettings::isValidStringSetting(const char* value, esp3d_setting_index_t settingElement)
 {
+    const Esp3DSetting_t * settingPtr= getSettingPtr(settingElement);
+    if (!settingPtr) {
+        return false;
+    }
+    if (!(settingPtr->type==esp3d_string)) {
+        return false;
+    }
+    if (strlen(value)>settingPtr->size) {
+        return false;
+    }
     switch(settingElement) {
 
     default:
@@ -58,10 +72,40 @@ bool  Esp3DSettings::isValidStringSetting(const char* value, esp3d_setting_index
 
 bool  Esp3DSettings::isValidIntegerSetting(uint32_t value, esp3d_setting_index_t settingElement)
 {
+    const Esp3DSetting_t * settingPtr= getSettingPtr(settingElement);
+    if (!settingPtr) {
+        return false;
+    }
+    if (!(settingPtr->type==esp3d_integer || settingPtr->type==esp3d_ip)) {
+        return false;
+    }
     switch(settingElement) {
     case esp3d_baud_rate:
         for(uint8_t i=0; i<SupportedBaudListSize; i++) {
             if (SupportedBaudList[i]==value) {
+                return true;
+            }
+        }
+        break;
+    default:
+        return false;
+    }
+    return false;
+}
+
+bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t settingElement)
+{
+    const Esp3DSetting_t * settingPtr= getSettingPtr(settingElement);
+    if (!settingPtr) {
+        return false;
+    }
+    if (settingPtr->type!=esp3d_byte) {
+        return false;
+    }
+    switch(settingElement) {
+    case esp3d_spi_divider:
+        for(uint8_t i=0; i<SupportedSPIDividerSize; i++) {
+            if (SupportedSPIDivider[i]==value) {
                 return true;
             }
         }
@@ -82,16 +126,6 @@ bool Esp3DSettings::isValidIPStringSetting(const char* value, esp3d_setting_inde
         return false;
     }
     return std::regex_match (value, std::regex("^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$"));
-}
-
-bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t settingElement)
-{
-    switch(settingElement) {
-
-    default:
-        return false;
-    }
-    return false;
 }
 
 bool Esp3DSettings::isValidSettingsNvs()
