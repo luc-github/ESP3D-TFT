@@ -11,6 +11,7 @@ OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-U
 # #######################################
 OPTION(ESP3D_AUTHENTICATION "Authentication on all clients" OFF)
 OPTION(DISABLE_SERIAL_AUTHENTICATION "Disable Serial Authentication" OFF)
+OPTION(TIMESTAMP_ON_FILES "Time on files" ON)
 
 # #######################################
 # Do not change anything above this line
@@ -55,6 +56,10 @@ endif()
 
 if(DISABLE_SERIAL_AUTHENTICATION)
     add_compile_options(-DESP3D_DISABLE_SERIAL_AUTHENTICATION_FEATURE=1)
+endif()
+
+if(TIMESTAMP_ON_FILES)
+    add_compile_options(-DESP3D_TIMESTAMP_FEATURE=1)
 endif()
 
 if(ESP32_2432S028R)

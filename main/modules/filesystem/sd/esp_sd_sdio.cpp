@@ -34,7 +34,6 @@
 #include "driver/sdmmc_host.h"
 #include "esp3d_log.h"
 
-const char mount_point[] = "/sd";
 sdmmc_card_t *card;
 
 
@@ -45,7 +44,7 @@ void ESP3D_SD::unmount()
         _state = ESP3D_SDCARD_UNKNOWN;
         return;
     }
-    esp_vfs_fat_sdcard_unmount(mount_point, card);
+    esp_vfs_fat_sdcard_unmount(mount_point(), card);
     _state = ESP3D_SDCARD_NOT_PRESENT;
     _mounted = false;
 }
@@ -81,7 +80,7 @@ bool ESP3D_SD::mount()
         .allocation_unit_size = 16 * 1024
     };
     esp3d_log("Mounting filesystem");
-    esp_err_t ret = esp_vfs_fat_sdmmc_mount(mount_point, &host, &slot_config, &mount_config, &card);
+    esp_err_t ret = esp_vfs_fat_sdmmc_mount(mount_point(), &host, &slot_config, &mount_config, &card);
 
 
     if (ret != ESP_OK) {
@@ -164,7 +163,7 @@ bool ESP3D_SD::getSpaceInfo(uint64_t * totalBytes,
 
 const char * ESP3D_SD::getFullPath(const char * path)
 {
-    static std::string fullpath = mount_point;
+    static std::string fullpath = mount_point();
     std::string tpath = str_trim(path);
     if (path && tpath.c_str()[0] != '/') {
         fullpath += "/";
@@ -176,5 +175,21 @@ const char * ESP3D_SD::getFullPath(const char * path)
     return fullpath.c_str();
 }
 
+DIR * ESP3D_SD::opendir(const char * dirpath)
+{
+    std::string dir_path = mount_point();
+    if (strlen(dirpath)!=0) {
+        if (dirpath[0]!='/') {
+            dir_path+="/";
+        }
+        dir_path+=dirpath;
+    }
+    return ::opendir(dir_path.c_str());
+}
+
+int ESP3D_SD::closedir(DIR *dirp)
+{
+    return ::closedir(dirp);
+}
 
 #endif//ESP3D_SD_IS_SDIO

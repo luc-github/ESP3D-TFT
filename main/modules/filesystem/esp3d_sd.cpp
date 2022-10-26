@@ -21,7 +21,7 @@
 #include "sd_def.h"
 #include "esp3d_sd.h"
 #include <stdio.h>
-#include <string.h>
+#include "esp3d_string.h"
 #include "esp3d_log.h"
 
 ESP3D_SD sd;
@@ -44,11 +44,12 @@ bool  ESP3D_SD::accessFS(esp3d_fs_types FS)
 {
     (void)FS;
     //if card is busy do not let another task access SD and so prevent a release
-    if (_state == ESP3D_SDCARD_BUSY) {
-        esp3d_log( "SDCard Busy.");
+    if (getState() != ESP3D_SDCARD_IDLE ) {
+        esp3d_log( "SDCard not idle");
         return false;
     }
     esp3d_log("Access SD");
+    _state=ESP3D_SDCARD_BUSY;
     return true;
 
 }
@@ -69,3 +70,4 @@ esp3d_sd_states ESP3D_SD::getState()
     mount();
     return _state;
 };
+

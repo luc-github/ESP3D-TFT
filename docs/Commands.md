@@ -259,7 +259,7 @@ label can be: light/framesize/quality/contrast/brightness/saturation/gainceiling
 * Format ESP Filesystem   
     `[ESP710]FORMATFS json=<no> pwd=<admin password>`
  
-* Format SD Filesystem   
+* Format SD Filesystem   // Not used in ESP3D-TFT   
     `[ESP715]FORMATSD json=<no> pwd=<admin password>`
 
 * List ESP Filesystem   

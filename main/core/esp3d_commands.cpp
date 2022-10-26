@@ -254,6 +254,7 @@ bool  Esp3DCommands::dispatchAnswer(esp3d_msg_t * msg, uint cmdid, bool json, bo
 {
     std::string tmpstr;
     if (!msg) {
+        esp3d_log_e("no msg");
         return false;
     }
     if (json) {
@@ -305,6 +306,7 @@ bool  Esp3DCommands::dispatch(const char * sbuf,  esp3d_clients_t target, esp3d_
         newMsgPtr->requestId = requestId;
         return dispatch(newMsgPtr,sbuf);
     }
+    esp3d_log_e("no newMsgPtr");
     return false;
 }
 
@@ -316,6 +318,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg,const char * sbuf)
 bool  Esp3DCommands::dispatch(esp3d_msg_t * msg,uint8_t * sbuf, size_t len)
 {
     if (!msg) {
+        esp3d_log_e("no msg");
         return false;
     }
     if(!Esp3DClient::setDataContent (msg,sbuf, len)) {
@@ -330,6 +333,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
 {
     bool sendOk = true;
     if (!msg) {
+        esp3d_log_e("no msg");
         return false;
     }
     //currently only echo back no test done on success
@@ -338,7 +342,11 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
     case SERIAL_CLIENT:
         if (serialClient.started()) {
             if (!serialClient.addTXData(msg)) {
-                sendOk=false;
+                serialClient.flush();
+                if (!serialClient.addTXData(msg)) {
+                    esp3d_log_e("Cannot add msg to client queue");
+                    sendOk=false;
+                }
             }
         }
         break;
@@ -347,17 +355,19 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
         if (msg->origin!=SERIAL_CLIENT) {
             if (serialClient.started()) {
                 if (!serialClient.addTXData(msg)) {
+                    esp3d_log_e("Cannot add msg to client queue");
                     sendOk=false;
                 }
             }
         }
         break;
     default:
-        esp3d_log("No valid target specified %d", msg->target);
+        esp3d_log_e("No valid target specified %d", msg->target);
         sendOk = false;
     }
     //clear message
     if (!sendOk) {
+        esp3d_log_e("Send msg failed");
         Esp3DClient::deleteMsg(msg);
     }
     return sendOk;
@@ -366,7 +376,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
 bool Esp3DCommands::hasTag (esp3d_msg_t * msg, uint start,const char* label)
 {
     if (!msg) {
-        esp3d_log("message for tag %s", label);
+        esp3d_log_e("no msg for tag %s", label);
         return false;
     }
     std::string lbl=label;
@@ -549,6 +559,9 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
         break;
     case 710:
         ESP710(cmd_params_pos, msg);
+        break;
+    case 740:
+        ESP740(cmd_params_pos, msg);
         break;
     case 900:
         ESP900(cmd_params_pos, msg);

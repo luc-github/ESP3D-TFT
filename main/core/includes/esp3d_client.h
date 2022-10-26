@@ -99,8 +99,9 @@ public:
     {
         return _tx_queue.size();
     }
-    static esp3d_msg_t * copyMsg( esp3d_msg_t * msg);
-    static esp3d_msg_t * copyMsgInfos( esp3d_msg_t * msg);
+    static esp3d_msg_t * copyMsg( esp3d_msg_t  msg);
+    static esp3d_msg_t * copyMsgInfos( esp3d_msg_t msg);
+    static bool copyMsgInfos( esp3d_msg_t * newMsgPtr, esp3d_msg_t msg);
     static esp3d_msg_t * newMsg();
     static esp3d_msg_t * newMsg(esp3d_request_t requestId);
     static esp3d_msg_t * newMsg( esp3d_clients_t origin, esp3d_clients_t target, esp3d_authentication_level_t authentication_level=ESP3D_LEVEL_GUEST);

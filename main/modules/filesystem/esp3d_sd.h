@@ -21,6 +21,12 @@
 #pragma once
 #include <stdio.h>
 #include "esp3d_fs_types.h"
+#include <sys/unistd.h>
+#include <sys/stat.h>
+#include <dirent.h>
+#include "esp_vfs.h"
+#include "esp_vfs_fat.h"
+#include "ff.h"
 
 #define ESP3D_SD_FS_HEADER "/sd/"
 #define MAX_SD_PATH 255
@@ -68,11 +74,16 @@ public:
     bool  accessFS(esp3d_fs_types FS=FS_SD);
     void  releaseFS(esp3d_fs_types FS=FS_SD);
     const char * getFullPath(const char * path=nullptr);
+    const char* mount_point()
+    {
+        return "/sd";
+    }
+    DIR * opendir(const char * dirpath);
+    int closedir(DIR *dirp);
+    int stat(const char * filepath,  struct  stat * entry_stat);
     /**
     void handle();
     void end();
-    void refreshStats(bool force = false);
-    bool format(ESP3DOutput * output = nullptr);
     FILE open(const char* path, uint8_t mode = ESP3D_FILE_READ);
     bool exists(const char* path);
     bool remove(const char *path);
@@ -87,6 +98,7 @@ private:
     esp3d_sd_states _state;
     uint8_t _spi_speed_divider;
     bool _sizechanged;
+
 };
 
 extern ESP3D_SD sd;

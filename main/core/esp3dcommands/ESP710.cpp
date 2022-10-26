@@ -49,7 +49,7 @@ void Esp3DCommands::ESP710(int cmd_params_pos,esp3d_msg_t * msg)
     esp3d_msg_t * endMsg = nullptr;
     if (needFormat) {
         ok_msg = "Starting formating...";
-        endMsg = Esp3DClient::copyMsgInfos(msg);
+        endMsg = Esp3DClient::copyMsgInfos(*msg);
     } else {
         hasError = true;
     }

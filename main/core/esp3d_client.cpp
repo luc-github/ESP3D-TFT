@@ -26,8 +26,8 @@ Esp3DClient::Esp3DClient()
 {
     _rx_size=0;
     _tx_size=0;
-    _rx_max_size=512;
-    _tx_max_size=512;
+    _rx_max_size=1024;
+    _tx_max_size=1024;
     _rx_mutex =nullptr;
     _tx_mutex=nullptr;
 }
@@ -103,9 +103,13 @@ bool Esp3DClient::addTXData(esp3d_msg_t * msg)
                 _tx_queue.push_back (msg);
                 _tx_size+=msg->size;
                 res = true;
+            } else {
+                esp3d_log_e("Queue Size limit exceeded %d vs %d", msg->size + _tx_size, _tx_max_size);
             }
             pthread_mutex_unlock(_tx_mutex);
         }
+    } else {
+        esp3d_log_e("no mutex available");
     }
     return res;
 }
@@ -149,24 +153,32 @@ esp3d_msg_t * Esp3DClient::newMsg(esp3d_request_t requestId)
     return newMsgPtr;
 }
 
-esp3d_msg_t * Esp3DClient::copyMsgInfos( esp3d_msg_t * msg)
+bool Esp3DClient::copyMsgInfos( esp3d_msg_t * newMsgPtr, esp3d_msg_t msg)
+{
+    if (!newMsgPtr ) {
+        return false;
+    }
+    newMsgPtr->origin = msg.origin;
+    newMsgPtr->target = msg.target;
+    newMsgPtr->authentication_level= msg.authentication_level;
+    newMsgPtr->requestId = msg.requestId;
+    return true;
+}
+
+esp3d_msg_t * Esp3DClient::copyMsgInfos( esp3d_msg_t  msg)
 {
     esp3d_msg_t * newMsgPtr = newMsg();
     if (newMsgPtr) {
-        newMsgPtr->origin = msg->origin;
-        newMsgPtr->target = msg->target;
-        newMsgPtr->authentication_level= msg->authentication_level;
-        newMsgPtr->requestId = msg->requestId;
-
+        copyMsgInfos(newMsgPtr, msg);
     }
     return newMsgPtr;
 }
 
-esp3d_msg_t * Esp3DClient::copyMsg( esp3d_msg_t * msg)
+esp3d_msg_t * Esp3DClient::copyMsg( esp3d_msg_t  msg)
 {
-    esp3d_msg_t * newMsgPtr = newMsg(msg->origin, msg->target, msg->data, msg->size, msg->authentication_level);
-    if(msg) {
-        newMsgPtr->requestId = msg->requestId;
+    esp3d_msg_t * newMsgPtr = newMsg(msg.origin, msg.target, msg.data, msg.size, msg.authentication_level);
+    if(newMsgPtr) {
+        newMsgPtr->requestId = msg.requestId;
     }
     return nullptr;
 }
