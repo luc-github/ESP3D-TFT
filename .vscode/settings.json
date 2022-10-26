@@ -8,11 +8,13 @@
         "interface/ftdi/esp32_devkitj_v1.cfg",
         "target/esp32s3.cfg"
     ],
-    "idf.portWin": "COM9",
+    "idf.portWin": "COM4",
     "idf.pythonBinPathWin": "C:\\Users\\luc\\.espressif\\python_env\\idf4.4_py3.8_env\\Scripts\\python.exe",
     "idf.toolsPathWin": "C:\\Users\\luc\\.espressif",
     "idf.flashType": "UART",
     "files.associations": {
         "xpt2046.h": "c"
-    }
+    },
+    "editor.tabCompletion": "on",
+    "diffEditor.codeLens": true
 }

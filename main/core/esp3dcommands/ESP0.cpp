@@ -32,6 +32,7 @@ const char * help[]= {"[ESP](id) - display this help",
                       "[ESP444](state) - set ESP3D state (RESET/RESTART)",
                       "[ESP710]FORMATFS - Format ESP Filesystem",
                       "[ESP740](path)  - List SD Filesystem",
+                      "[ESP750](Action)=(path) - rmdir / remove / mkdir / exists / create on SD (path)",
                       "[ESP900](state) - display/set serial state(ENABLE/DISABLE)",
                       "[ESP901](baud rate) - display/set serial baud rate"
                      };
@@ -45,6 +46,7 @@ const uint cmdlist[]= {0,
                        444,
                        710,
                        740,
+                       750,
                        900,
                        901
                       };

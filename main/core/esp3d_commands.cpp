@@ -563,6 +563,9 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
     case 740:
         ESP740(cmd_params_pos, msg);
         break;
+    case 750:
+        ESP750(cmd_params_pos, msg);
+        break;
     case 900:
         ESP900(cmd_params_pos, msg);
         break;

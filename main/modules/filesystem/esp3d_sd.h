@@ -73,7 +73,6 @@ public:
     esp3d_fs_types getFSType(const char * path=nullptr);
     bool  accessFS(esp3d_fs_types FS=FS_SD);
     void  releaseFS(esp3d_fs_types FS=FS_SD);
-    const char * getFullPath(const char * path=nullptr);
     const char* mount_point()
     {
         return "/sd";
@@ -81,15 +80,20 @@ public:
     DIR * opendir(const char * dirpath);
     int closedir(DIR *dirp);
     int stat(const char * filepath,  struct  stat * entry_stat);
-    /**
-    void handle();
-    void end();
-    FILE open(const char* path, uint8_t mode = ESP3D_FILE_READ);
     bool exists(const char* path);
     bool remove(const char *path);
     bool mkdir(const char *path);
     bool rmdir(const char *path);
     bool rename(const char *oldpath, const char *newpath);
+    struct dirent * readdir(DIR *dir);
+    void rewinddir(DIR * dir);
+    FILE * open ( const char * filename, const char * mode );
+    void close(FILE * fd);
+    /**
+    void handle();
+    void end();
+    FILE open(const char* path, uint8_t mode = ESP3D_FILE_READ);
+
     void closeAll();
     */
 private:
@@ -97,8 +101,6 @@ private:
     bool _started;
     esp3d_sd_states _state;
     uint8_t _spi_speed_divider;
-    bool _sizechanged;
-
 };
 
 extern ESP3D_SD sd;

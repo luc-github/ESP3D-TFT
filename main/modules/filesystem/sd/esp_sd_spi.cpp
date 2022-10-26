@@ -177,20 +177,6 @@ bool ESP3D_SD::getSpaceInfo(uint64_t * totalBytes,
     return _totalBytes!=0;
 }
 
-const char * ESP3D_SD::getFullPath(const char * path)
-{
-    static std::string fullpath = mount_point();
-    std::string tpath = str_trim(path);
-    if (path && tpath.c_str()[0] != '/') {
-        fullpath += "/";
-    }
-    fullpath += tpath;
-    if (fullpath.c_str()[fullpath.size()-1]!='/') {
-        fullpath += "/";
-    }
-    return fullpath.c_str();
-}
-
 DIR * ESP3D_SD::opendir(const char * dirpath)
 {
     std::string dir_path = mount_point();
@@ -218,7 +204,104 @@ int ESP3D_SD::stat(const char * filepath,  struct  stat * entry_stat)
         }
         dir_path+=filepath;
     }
+    esp3d_log("Stat %s, %d", dir_path.c_str(), ::stat(dir_path.c_str(), entry_stat));
     return ::stat(dir_path.c_str(), entry_stat);
 }
+
+bool  ESP3D_SD::exists(const char* path)
+{
+    struct  stat  entry_stat;
+    if ( stat(path,  &entry_stat)==0) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool  ESP3D_SD::remove(const char *path)
+{
+    std::string file_path = mount_point();
+    if (strlen(path)!=0) {
+        if (path[0]!='/') {
+            file_path+="/";
+        }
+        file_path+=path;
+    }
+    return !::unlink(file_path.c_str());
+}
+
+bool  ESP3D_SD::mkdir(const char *path)
+{
+    std::string dir_path = mount_point();
+    if (strlen(path)!=0) {
+        if (path[0]!='/') {
+            dir_path+="/";
+        }
+        dir_path+=path;
+    }
+    return !::mkdir(dir_path.c_str(), 0777);
+}
+
+bool  ESP3D_SD::rmdir(const char *path)
+{
+    std::string dir_path = mount_point();
+    if (strlen(path)!=0) {
+        if (path[0]!='/') {
+            dir_path+="/";
+        }
+        dir_path+=path;
+    }
+    return !::rmdir(dir_path.c_str());
+}
+bool  ESP3D_SD::rename(const char *oldpath, const char *newpath)
+{
+    std::string old_path = mount_point();
+    std::string new_path = mount_point();
+    if (strlen(oldpath)!=0) {
+        if (oldpath[0]!='/') {
+            old_path+="/";
+        }
+        old_path+=oldpath;
+    }
+    if (strlen(newpath)!=0) {
+        if (newpath[0]!='/') {
+            new_path+="/";
+        }
+        new_path+=newpath;
+    }
+    struct stat st;
+    if (::stat(new_path.c_str(), &st) == 0) {
+        ::unlink(new_path.c_str());
+    }
+    return !::rename(old_path.c_str(),new_path.c_str());
+}
+
+FILE * ESP3D_SD::open ( const char * filename, const char * mode )
+{
+    std::string file_path = mount_point();
+    if (strlen(filename)!=0) {
+        if (filename[0]!='/') {
+            file_path+="/";
+        }
+        file_path+=filename;
+    }
+    return fopen(file_path.c_str(), mode);
+}
+
+struct dirent * ESP3D_SD::readdir(DIR *dir)
+{
+    return ::readdir(dir);
+}
+
+void ESP3D_SD::rewinddir(DIR * dir)
+{
+    ::rewinddir(dir);
+}
+
+void  ESP3D_SD::close(FILE * fd)
+{
+    fclose(fd);
+}
+
 
 #endif//ESP3D_SD_IS_SPI 

@@ -85,15 +85,8 @@ void Esp3DCommands::ESP740(int cmd_params_pos,esp3d_msg_t * msg)
                             &usedSpace,
                             &freeSpace,
                             true);
-            while ((entry = readdir(dir)) != NULL) {
-                esp3d_msg_t * newMsg = Esp3DClient::copyMsgInfos(msgInfo);
-
+            while ((entry = sd.readdir(dir)) != NULL) {
                 currentPath = tmpstr + entry->d_name;
-                if (sd.stat(currentPath.c_str(), &entry_stat) == -1) {
-                    esp3d_log_e("Failed to stat %s : %s", entry->d_type==DT_DIR?"DIR":"FILE", entry->d_name);
-                    continue;
-                }
-
                 if (entry->d_type==DT_DIR) {
                     nbDirs++;
                     if (json) {
@@ -111,7 +104,24 @@ void Esp3DCommands::ESP740(int cmd_params_pos,esp3d_msg_t * msg)
                         ok_msg += "]\n";
                     }
                 } else {
+                    continue;
+                }
+                esp3d_msg_t * newMsg = Esp3DClient::copyMsgInfos(msgInfo);
+                if(!dispatch( newMsg, ok_msg.c_str())) {
+                    esp3d_log_e("Error sending response to clients");
+                }
+            }
+            sd.rewinddir(dir);
+            while ((entry = sd.readdir(dir)) != NULL) {
+                currentPath = tmpstr + entry->d_name;
+                if (entry->d_type==DT_DIR) {
+                    continue;
+                } else {
                     nbFiles++;
+                    if (sd.stat(currentPath.c_str(), &entry_stat) == -1) {
+                        esp3d_log_e("Failed to stat %s : %s", entry->d_type==DT_DIR?"DIR":"FILE", entry->d_name);
+                        continue;
+                    }
 #if ESP3D_TIMESTAMP_FEATURE
                     char buff[20];
                     strftime(buff, sizeof (buff), "%Y-%m-%d %H:%M:%S", gmtime(&(entry_stat.st_mtim.tv_sec)));
@@ -150,12 +160,11 @@ void Esp3DCommands::ESP740(int cmd_params_pos,esp3d_msg_t * msg)
                         ok_msg += "\n";
                     }
                 }
+                esp3d_msg_t * newMsg = Esp3DClient::copyMsgInfos(msgInfo);
                 if(!dispatch( newMsg, ok_msg.c_str())) {
                     esp3d_log_e("Error sending response to clients");
                 }
-                esp3d_log("%s%s%s\t%ld",entry->d_type==DT_DIR?"[":"", entry->d_name,entry->d_type==DT_DIR?"]":"",entry_stat.st_size);
             }
-
             if (json) {
                 ok_msg ="], \"total\":\"";
                 ok_msg +=formatBytes (totalSpace);
