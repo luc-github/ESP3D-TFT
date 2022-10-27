@@ -29,6 +29,7 @@
 #include "esp_flash.h"
 #include "esp_littlefs.h"
 #include "esp3d_log.h"
+#include "sdkconfig.h"
 
 
 #define PARTITION_LABEL "flashfs"
@@ -110,7 +111,7 @@ bool ESP3D_FLASH::ESP3D_FLASH::begin()
 
 uint ESP3D_FLASH::maxPathLength()
 {
-    return 255;
+    return CONFIG_LITTLEFS_OBJ_NAME_LEN;
 }
 
 bool ESP3D_FLASH::getSpaceInfo(size_t * totalBytes,

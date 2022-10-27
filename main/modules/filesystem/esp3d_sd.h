@@ -26,7 +26,6 @@
 #include "esp_vfs.h"
 
 #define ESP3D_SD_FS_HEADER "/sd/"
-#define MAX_SD_PATH 255
 
 typedef enum {
     ESP3D_SDCARD_IDLE,

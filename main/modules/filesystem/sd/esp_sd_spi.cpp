@@ -32,6 +32,7 @@
 #include "sdmmc_cmd.h"
 #include "esp3d_log.h"
 #include "esp3d-settings.h"
+#include "sdkconfig.h"
 
 sdmmc_card_t *card;
 sdmmc_host_t host = SDSPI_HOST_DEFAULT();
@@ -126,7 +127,7 @@ bool ESP3D_SD::begin()
 
 uint ESP3D_SD::maxPathLength()
 {
-    return 255;
+    return CONFIG_FATFS_MAX_LFN;
 }
 
 bool ESP3D_SD::getSpaceInfo(uint64_t * totalBytes,

@@ -32,6 +32,7 @@
 #include "sdmmc_cmd.h"
 #include "driver/sdmmc_host.h"
 #include "esp3d_log.h"
+#include "sdkconfig.h"
 
 sdmmc_card_t *card;
 
@@ -110,7 +111,7 @@ bool ESP3D_SD::begin()
 
 uint ESP3D_SD::maxPathLength()
 {
-    return 255;
+    return CONFIG_FATFS_MAX_LFN;
 }
 
 bool ESP3D_SD::getSpaceInfo(uint64_t * totalBytes,
