@@ -35,6 +35,8 @@ const char * help[]= {"[ESP](id) - display this help",
                       "[ESP730](Action)=(path) - rmdir / remove / mkdir / exists / create on ESP3D FileSystem (path)",
                       "[ESP740](path) - List SD Filesystem",
                       "[ESP750](Action)=(path) - rmdir / remove / mkdir / exists / create on SD (path)",
+                      "[ESP780](path) - List Global Filesystem",
+                      "[ESP790](Action)=(path) - rmdir / remove / mkdir / exists / create on Global FileSystem (path)",
                       "[ESP900](state) - display/set serial state(ENABLE/DISABLE)",
                       "[ESP901](baud rate) - display/set serial baud rate"
                      };
@@ -51,6 +53,8 @@ const uint cmdlist[]= {0,
                        730,
                        740,
                        750,
+                       780,
+                       790,
                        900,
                        901
                       };

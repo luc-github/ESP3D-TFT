@@ -59,6 +59,8 @@ public:
     void ESP730(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP740(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP750(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP780(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP790(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP900(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP901(int cmd_params_pos,esp3d_msg_t * msg);
     const char * get_param (esp3d_msg_t * msg, uint start,const char* label);

@@ -113,7 +113,11 @@ void Esp3DCommands::ESP740(int cmd_params_pos,esp3d_msg_t * msg)
             }
             sd.rewinddir(dir);
             while ((entry = sd.readdir(dir)) != NULL) {
-                currentPath = tmpstr + entry->d_name;
+                currentPath = tmpstr;
+                if (tmpstr[tmpstr.length()-1]!='/') {
+                    currentPath+="/";
+                }
+                currentPath +=entry->d_name;
                 if (entry->d_type==DT_DIR) {
                     continue;
                 } else {

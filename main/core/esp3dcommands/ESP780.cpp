@@ -20,16 +20,17 @@
 #include "esp3d_commands.h"
 #include "esp3d_client.h"
 #include "esp3d_string.h"
+#include <string>
 #include <math.h>
 #if ESP3D_TIMESTAMP_FEATURE
 #include <time.h>
 #endif //ESP3D_TIMESTAMP_FEATURE
 #include "authentication/esp3d_authentication.h"
-#include "filesystem/esp3d_flash.h"
-#define COMMAND_ID 720
-//List ESP3D Filesystem
-///[ESP720]<Root> json=<no> pwd=<user/admin password>
-void Esp3DCommands::ESP720(int cmd_params_pos,esp3d_msg_t * msg)
+#include "filesystem/esp3d_globalfs.h"
+#define COMMAND_ID 780
+//List Global Filesystem
+///[ESP780]<Root> json=<no> pwd=<user/admin password>
+void Esp3DCommands::ESP780(int cmd_params_pos,esp3d_msg_t * msg)
 {
 
 
@@ -56,21 +57,20 @@ void Esp3DCommands::ESP720(int cmd_params_pos,esp3d_msg_t * msg)
     if (tmpstr.length()==0) {
         tmpstr="/";
     }
-    if (flashFs.accessFS()) {
-        DIR *dir = flashFs.opendir(tmpstr.c_str());
+    if (globalFs.accessFS(tmpstr.c_str())) {
+        DIR *dir = globalFs.opendir(tmpstr.c_str());
         std::string currentPath;
 
         if (dir) {
             struct dirent *entry;
             struct stat entry_stat;
-            esp3d_log("Dir struct %d %d", dir->dd_vfs_idx,dir->dd_rsv);
             if (json) {
-                ok_msg =   "{\"cmd\":\"720\",\"status\":\"ok\",\"data\":{\"path\":\"";
+                ok_msg =   "{\"cmd\":\"780\",\"status\":\"ok\",\"data\":{\"path\":\"";
                 ok_msg += tmpstr.c_str();
                 ok_msg +="\",\"files\":[";
 
             } else {
-                ok_msg = "Directory on Flash : ";
+                ok_msg = "Directory on Global Filesystem : ";
                 ok_msg += tmpstr.c_str();
                 ok_msg += "\n";
             }
@@ -79,19 +79,16 @@ void Esp3DCommands::ESP720(int cmd_params_pos,esp3d_msg_t * msg)
             }
             uint nbDirs = 0;
             uint nbFiles = 0;
-            size_t totalSpace = 0;
-            size_t usedSpace = 0;
-            size_t freeSpace=0;
-            flashFs.getSpaceInfo(&totalSpace,
-                                 &usedSpace,
-                                 &freeSpace,
-                                 true);
-            while ((entry = flashFs.readdir(dir)) != NULL) {
-                currentPath = tmpstr;
-                if (tmpstr[tmpstr.length()-1]!='/') {
-                    currentPath+="/";
-                }
-                currentPath +=entry->d_name;
+            uint64_t totalSpace = 0;
+            uint64_t usedSpace = 0;
+            uint64_t freeSpace=0;
+            globalFs.getSpaceInfo(&totalSpace,
+                                  &usedSpace,
+                                  &freeSpace,
+                                  tmpstr.c_str(),
+                                  true);
+            while ((entry = globalFs.readdir(dir)) != NULL) {
+                currentPath = tmpstr + entry->d_name;
                 if (entry->d_type==DT_DIR) {
                     nbDirs++;
                     if (json) {
@@ -116,14 +113,18 @@ void Esp3DCommands::ESP720(int cmd_params_pos,esp3d_msg_t * msg)
                     esp3d_log_e("Error sending response to clients");
                 }
             }
-            flashFs.rewinddir(dir);
-            while ((entry = flashFs.readdir(dir)) != NULL) {
-                currentPath = tmpstr + entry->d_name;
+            globalFs.rewinddir(dir);
+            while ((entry = globalFs.readdir(dir)) != NULL) {
+                currentPath = tmpstr;
+                if (tmpstr[tmpstr.length()-1]!='/') {
+                    currentPath+="/";
+                }
+                currentPath +=entry->d_name;
                 if (entry->d_type==DT_DIR) {
                     continue;
                 } else {
                     nbFiles++;
-                    if (flashFs.stat(currentPath.c_str(), &entry_stat) == -1) {
+                    if (globalFs.stat(currentPath.c_str(), &entry_stat) == -1) {
                         esp3d_log_e("Failed to stat %s : %s", entry->d_type==DT_DIR?"DIR":"FILE", entry->d_name);
                         continue;
                     }
@@ -203,7 +204,7 @@ void Esp3DCommands::ESP720(int cmd_params_pos,esp3d_msg_t * msg)
             if(!dispatch( newMsg, ok_msg.c_str())) {
                 esp3d_log_e("Error sending response to clients");
             }
-            flashFs.closedir(dir);
+            globalFs.closedir(dir);
         } else {
             hasError = true;
             error_msg = "Cannot open :";
@@ -213,16 +214,11 @@ void Esp3DCommands::ESP720(int cmd_params_pos,esp3d_msg_t * msg)
                 esp3d_log_e("Error sending response to clients");
             }
         }
-        flashFs.releaseFS();
+        globalFs.releaseFS(tmpstr.c_str());
 
     } else {
         hasError = true;
-        if (flashFs.isMounted()) {
-            error_msg = "Flash not available";
-        } else {
-            error_msg = "Flash partition not mounted";
-        }
-
+        error_msg = "Filesystem not available";
         esp3d_log_e("%s", error_msg.c_str());
         if(!dispatchAnswer(msg,COMMAND_ID,json, true,hasError?error_msg.c_str():ok_msg.c_str())) {
             {

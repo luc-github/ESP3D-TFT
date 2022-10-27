@@ -100,7 +100,7 @@ bool ESP3D_SD::mount()
 
 const char * ESP3D_SD::getFileSystemName()
 {
-    return "SD native";
+    return "SDFat native";
 }
 
 bool ESP3D_SD::begin()
