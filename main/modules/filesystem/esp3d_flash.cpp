@@ -41,7 +41,7 @@ bool  ESP3D_FLASH::accessFS(esp3d_fs_types FS)
 {
     (void)FS;
     esp3d_log("Access SD");
-    return true;
+    return _mounted;
 
 }
 

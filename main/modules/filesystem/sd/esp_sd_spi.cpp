@@ -27,9 +27,8 @@
 #include <string.h>
 #include "esp3d_string.h"
 #include <sys/unistd.h>
-#include <sys/stat.h>
-#include "esp_vfs.h"
 #include "esp_vfs_fat.h"
+#include "ff.h"
 #include "sdmmc_cmd.h"
 #include "esp3d_log.h"
 #include "esp3d-settings.h"

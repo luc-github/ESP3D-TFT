@@ -21,12 +21,9 @@
 #pragma once
 #include <stdio.h>
 #include "esp3d_fs_types.h"
-#include <sys/unistd.h>
 #include <sys/stat.h>
 #include <dirent.h>
 #include "esp_vfs.h"
-#include "esp_vfs_fat.h"
-#include "ff.h"
 
 #define ESP3D_SD_FS_HEADER "/sd/"
 #define MAX_SD_PATH 255
@@ -89,13 +86,6 @@ public:
     void rewinddir(DIR * dir);
     FILE * open ( const char * filename, const char * mode );
     void close(FILE * fd);
-    /**
-    void handle();
-    void end();
-    FILE open(const char* path, uint8_t mode = ESP3D_FILE_READ);
-
-    void closeAll();
-    */
 private:
     bool _mounted;
     bool _started;

@@ -21,6 +21,9 @@
 #pragma once
 #include <stdio.h>
 #include "esp3d_fs_types.h"
+#include <sys/stat.h>
+#include <dirent.h>
+#include "esp_vfs.h"
 
 #define ESP3D_FLASH_FS_HEADER "/fs/"
 #define MAX_FLASH_PATH 255
@@ -45,21 +48,23 @@ public:
     esp3d_fs_types getFSType(const char * path=nullptr);
     bool  accessFS(esp3d_fs_types FS=FS_FLASH);
     void  releaseFS(esp3d_fs_types FS=FS_FLASH);
-    const char * getFullPath(const char * path=nullptr);
-    /**
-    void handle();
-    void end();
-    void refreshStats(bool force = false);*/
     bool format();
-    /*
-    FILE open(const char* path, uint8_t mode = ESP3D_FILE_READ);
+    const char* mount_point()
+    {
+        return "/fs";
+    }
+    DIR * opendir(const char * dirpath);
+    int closedir(DIR *dirp);
+    int stat(const char * filepath,  struct  stat * entry_stat);
     bool exists(const char* path);
     bool remove(const char *path);
     bool mkdir(const char *path);
     bool rmdir(const char *path);
     bool rename(const char *oldpath, const char *newpath);
-    void closeAll();
-    */
+    struct dirent * readdir(DIR *dir);
+    void rewinddir(DIR * dir);
+    FILE * open ( const char * filename, const char * mode );
+    void close(FILE * fd);
 private:
     bool _mounted;
     bool _started;
