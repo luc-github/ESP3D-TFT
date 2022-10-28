@@ -25,10 +25,21 @@
 extern "C" {
 #endif
 
+#define SIZE_OF_SETTING_VERSION 25
+#define SIZE_OF_SETTING_SSID_ID 32
+#define SIZE_OF_SETTING_SSID_PWD 64
+#define SIZE_OF_SETTING_HOSTNAME 32
+#define HIDDEN_SETTING_VALUE "********"
+
 typedef enum  {
     esp3d_version,
     esp3d_baud_rate,
     esp3d_spi_divider,
+    esp3d_sta_ssid,
+    esp3d_sta_password,
+    esp3d_ap_ssid,
+    esp3d_ap_password,
+    esp3d_hostname,
     last_one
 } esp3d_setting_index_t;
 

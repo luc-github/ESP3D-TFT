@@ -33,7 +33,8 @@
 
 #define STORAGE_NAME "ESP3D_TFT"
 #define SETTING_VERSION "ESP3D_TFT-V3.0.1"
-#define SIZE_OF_SETTING_VERSION 25
+
+
 
 Esp3DSettings esp3dTFTsettings;
 
@@ -47,7 +48,12 @@ const uint8_t SupportedSPIDividerSize = sizeof(SupportedSPIDivider)/sizeof(uint8
 const Esp3DSetting_t Esp3DSettingsData [] = {
     {esp3d_version, esp3d_string, SIZE_OF_SETTING_VERSION,"Invalid data"}, //Version
     {esp3d_baud_rate, esp3d_integer, 4, ESP3D_SERIAL_BAUDRATE},            //BaudRate
-    {esp3d_spi_divider, esp3d_byte, 1, "1"}                                //SPIdivider
+    {esp3d_spi_divider, esp3d_byte, 1, "1"},                                //SPIdivider
+    {esp3d_sta_ssid, esp3d_string, SIZE_OF_SETTING_SSID_ID,""},
+    {esp3d_sta_password, esp3d_string, SIZE_OF_SETTING_SSID_PWD,""},
+    {esp3d_ap_ssid, esp3d_string, SIZE_OF_SETTING_SSID_ID,"esp3dtft"},
+    {esp3d_ap_password, esp3d_string, SIZE_OF_SETTING_SSID_PWD,"12345678"},
+    {esp3d_hostname, esp3d_string, SIZE_OF_SETTING_HOSTNAME,"esp3d-tft"}
 };
 
 bool  Esp3DSettings::isValidStringSetting(const char* value, esp3d_setting_index_t settingElement)
@@ -63,7 +69,15 @@ bool  Esp3DSettings::isValidStringSetting(const char* value, esp3d_setting_index
         return false;
     }
     switch(settingElement) {
-
+    case esp3d_ap_ssid:
+    case esp3d_sta_ssid:
+        return  std::regex_match (value, std::regex("^.{1,32}$")); //any string from 1 to 32
+    case esp3d_sta_password:
+    case esp3d_ap_password:
+        return  std::regex_match (value, std::regex("^$|^.{8,64}$"));    // 0  or 8 to size no other constraint
+    case esp3d_hostname:
+        esp3d_log("Checking hostname validity");
+        return  std::regex_match (value, std::regex("^[a-zA-Z0-9]{1}[a-zA-Z0-9\\-]{0,31}$"));//any string alphanumeric or '-' from 1 to 32
     default:
         return false;
     }
@@ -193,6 +207,7 @@ bool Esp3DSettings::reset()
     //may be use a vector of enum would solve also
     //fortunaly this is to reset all settings so it is ok for current situation and it avoid to create an array of enums
     for (size_t i = esp3d_version; i !=last_one; i++) {
+        esp3d_log("Reseting settings %d", i);
         esp3d_setting_index_t setting  =(esp3d_setting_index_t)i ;
         const Esp3DSetting_t * query = getSettingPtr(setting);
         if (query) {
@@ -210,12 +225,14 @@ bool Esp3DSettings::reset()
                 }
                 break;
             case esp3d_string:
+                esp3d_log("Reseting value to %s", query->defaultval);
                 if (setting==esp3d_version) {
                     if (!Esp3DSettings::writeString (setting, SETTING_VERSION)) {
                         result = false;
                     }
                 } else {
                     if (!Esp3DSettings::writeString (setting, query->defaultval)) {
+                        esp3d_log_e("Error writing %s to settings %d",query->defaultval, setting);
                         result = false;
                     }
                 }
@@ -328,7 +345,7 @@ const char* Esp3DSettings::readString(esp3d_setting_index_t index, char* out_str
     if (query) {
         if (query->type== esp3d_string) {
             esp_err_t err;
-            if (out_str && len >= (query->size +1)) {
+            if (out_str && len >= (query->size)) {
                 std::shared_ptr<nvs::NVSHandle> handle = nvs::open_nvs_handle(STORAGE_NAME, NVS_READONLY, &err);
                 if (err != ESP_OK) {
                     esp3d_log_e("Failling accessing NVS");
@@ -340,23 +357,37 @@ const char* Esp3DSettings::readString(esp3d_setting_index_t index, char* out_str
                             *haserror =false;
                         }
                         return out_str;
-                    }
-                    if (err == ESP_ERR_NVS_NOT_FOUND) {
-                        strcpy(out_str,query->defaultval);
-                        if (haserror) {
-                            *haserror =false;
+                    } else {
+                        esp3d_log_w("Got error %d %s", err, esp_err_to_name(err));
+                        if (err == ESP_ERR_NVS_NOT_FOUND) {
+                            esp3d_log_w("Not found value, use default %s", query->defaultval);
+                            strcpy(out_str,query->defaultval);
+                            if (haserror) {
+                                *haserror =false;
+                            }
+                            return out_str;
                         }
-                        return out_str;
                     }
                     esp3d_log_e("Read %s failed: %s", key.c_str(), esp_err_to_name(err) );
                 }
+            } else {
+                if (!out_str) {
+                    esp3d_log_e("Error no output buffer");
+                } else {
+                    esp3d_log_e("Error size are not correct got %d but should be %d", len, query->size);
+                }
             }
+        } else {
+            esp3d_log_e("Error setting is not a string");
         }
+    } else {
+        esp3d_log_e("Cannot find %d entry", index);
     }
     if (haserror) {
         *haserror =true;
     }
-    return NULL;
+    esp3d_log_e("Error reading setting value");
+    return "";
 }
 
 bool Esp3DSettings::writeByte (esp3d_setting_index_t index, const uint8_t value)
