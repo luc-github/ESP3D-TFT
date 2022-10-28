@@ -36,8 +36,8 @@ const char * RadioModeValues [] = { "0",
                                     "2"
                                   };
 
-const char * DhcpLabels [] = { "dhcp", "static"};
-const char * DhcpValues [] = { "1", "0"};
+const char * IpModeLabels [] = { "dhcp", "static"};
+const char * IpModeValues [] = { "0", "1"};
 
 const char * FallbackLabels [] = { "none", "ap"};
 const char * FallbackValues [] = { "1", "0"};
@@ -72,8 +72,18 @@ void Esp3DCommands::ESP400(int cmd_params_pos,esp3d_msg_t * msg)
     } else {
         Esp3DClient::deleteMsg(msg);
     }
-    //Baud rate (1first itrm)
+    //Baud rate (first item)
     if (!dispatchSetting(json,"system/system",esp3d_baud_rate, "baud", BaudRateList, BaudRateList, sizeof(BaudRateList)/sizeof(char*), -1, -1,-1, nullptr, true,target,requestId,true)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+
+    //Radio mode
+    if (!dispatchSetting(json,"network/network",esp3d_radio_mode, "radio mode", RadioModeValues, RadioModeLabels, sizeof(RadioModeValues)/sizeof(char*), -1, -1,-1, nullptr, true,target,requestId)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+
+    //Radio boot mode
+    if (!dispatchSetting(json,"network/network",esp3d_radio_mode, "radio_boot", YesNoValues, YesNoLabels, sizeof(YesNoValues)/sizeof(char*), -1, -1,-1, nullptr, true,target,requestId)) {
         esp3d_log_e("Error sending response to clients");
     }
 
@@ -92,6 +102,36 @@ void Esp3DCommands::ESP400(int cmd_params_pos,esp3d_msg_t * msg)
         esp3d_log_e("Error sending response to clients");
     }
 
+    //STA ip mode
+    if (!dispatchSetting(json,"network/sta",esp3d_sta_ip_mode, "ip mode", IpModeValues, IpModeLabels, sizeof(IpModeLabels)/sizeof(char*), -1, -1,-1, nullptr, true,target,requestId)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+
+    //STA fallback mode
+    if (!dispatchSetting(json,"network/sta",esp3d_fallback_mode, "sta fallback mode", FallbackValues, FallbackLabels, sizeof(FallbackValues)/sizeof(char*), -1, -1,-1, nullptr, true,target,requestId)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+
+    //STA static ip
+    if (!dispatchSetting(json,"network/sta",esp3d_sta_ip_static, "ip", nullptr, nullptr, -1, -1, -1,-1, nullptr, true,target,requestId)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+
+    //STA static mask
+    if (!dispatchSetting(json,"network/sta",esp3d_sta_mask_static, "msk", nullptr, nullptr, -1, -1, -1,-1, nullptr, true,target,requestId)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+
+    //STA static gateway
+    if (!dispatchSetting(json,"network/sta",esp3d_sta_gw_static, "gw", nullptr, nullptr, -1, -1, -1,-1, nullptr, true,target,requestId)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+
+    //STA static dns
+    if (!dispatchSetting(json,"network/sta",esp3d_sta_dns_static, "DNS", nullptr, nullptr, -1, -1, -1,-1, nullptr, true,target,requestId)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+
     //AP SSID
     if (!dispatchSetting(json,"network/ap",esp3d_ap_ssid, "SSID", nullptr, nullptr, SIZE_OF_SETTING_SSID_ID, 1, 1,-1, nullptr, true,target,requestId)) {
         esp3d_log_e("Error sending response to clients");
@@ -99,6 +139,16 @@ void Esp3DCommands::ESP400(int cmd_params_pos,esp3d_msg_t * msg)
 
     //AP Password
     if (!dispatchSetting(json,"network/ap",esp3d_ap_password, "pwd", nullptr, nullptr, SIZE_OF_SETTING_SSID_PWD, 8, 0,-1, nullptr, true,target,requestId)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+
+    //AP static ip
+    if (!dispatchSetting(json,"network/ap",esp3d_ap_ip_static, "ip", nullptr, nullptr, -1, -1, -1,-1, nullptr, true,target,requestId)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+
+    //AP Channel
+    if (!dispatchSetting(json,"network/ap",esp3d_ap_channel, "channel", ApChannelsList, ApChannelsList, sizeof(ApChannelsList)/sizeof(char*), -1, -1,-1, nullptr, true,target,requestId)) {
         esp3d_log_e("Error sending response to clients");
     }
 

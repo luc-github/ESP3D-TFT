@@ -30,11 +30,8 @@
 #include "esp3d_log.h"
 #include "serial_def.h"
 
-
 #define STORAGE_NAME "ESP3D_TFT"
 #define SETTING_VERSION "ESP3D_TFT-V3.0.1"
-
-
 
 Esp3DSettings esp3dTFTsettings;
 
@@ -48,12 +45,22 @@ const uint8_t SupportedSPIDividerSize = sizeof(SupportedSPIDivider)/sizeof(uint8
 const Esp3DSetting_t Esp3DSettingsData [] = {
     {esp3d_version, esp3d_string, SIZE_OF_SETTING_VERSION,"Invalid data"}, //Version
     {esp3d_baud_rate, esp3d_integer, 4, ESP3D_SERIAL_BAUDRATE},            //BaudRate
-    {esp3d_spi_divider, esp3d_byte, 1, "1"},                                //SPIdivider
+    {esp3d_spi_divider, esp3d_byte, 1, "1"},                               //SPIdivider
+    {esp3d_hostname, esp3d_string, SIZE_OF_SETTING_HOSTNAME,"esp3d-tft"},
+    {esp3d_radio_boot_mode, esp3d_byte, 1,"1"},
+    {esp3d_radio_mode, esp3d_byte, 1,"2"},
+    {esp3d_fallback_mode, esp3d_byte, 1,"2"},
     {esp3d_sta_ssid, esp3d_string, SIZE_OF_SETTING_SSID_ID,""},
     {esp3d_sta_password, esp3d_string, SIZE_OF_SETTING_SSID_PWD,""},
+    {esp3d_sta_ip_mode, esp3d_byte, 1,"0"},
+    {esp3d_sta_ip_static, esp3d_ip, 4,"192.168.1.100"},
+    {esp3d_sta_mask_static, esp3d_ip, 4,"255.255.255.0"},
+    {esp3d_sta_gw_static, esp3d_ip, 4,"192.168.1.1"},
+    {esp3d_sta_dns_static, esp3d_ip, 4,"192.168.1.1"},
     {esp3d_ap_ssid, esp3d_string, SIZE_OF_SETTING_SSID_ID,"esp3dtft"},
     {esp3d_ap_password, esp3d_string, SIZE_OF_SETTING_SSID_PWD,"12345678"},
-    {esp3d_hostname, esp3d_string, SIZE_OF_SETTING_HOSTNAME,"esp3d-tft"}
+    {esp3d_ap_ip_static, esp3d_ip, 4,"192.168.0.1"},
+    {esp3d_ap_channel, esp3d_byte, 1,"2"}
 };
 
 bool  Esp3DSettings::isValidStringSetting(const char* value, esp3d_setting_index_t settingElement)
@@ -207,27 +214,33 @@ bool Esp3DSettings::reset()
     //may be use a vector of enum would solve also
     //fortunaly this is to reset all settings so it is ok for current situation and it avoid to create an array of enums
     for (size_t i = esp3d_version; i !=last_one; i++) {
-        esp3d_log("Reseting settings %d", i);
         esp3d_setting_index_t setting  =(esp3d_setting_index_t)i ;
         const Esp3DSetting_t * query = getSettingPtr(setting);
         if (query) {
+            esp3d_log("Reseting %d value to %s",setting, query->defaultval);
             switch(query->type) {
             case  esp3d_byte:
                 if (!Esp3DSettings::writeByte (setting, (uint8_t)std::stoul(std::string(query->defaultval), NULL,0) )) {
-
+                    esp3d_log_e("Error writing %s to settings %d",query->defaultval, setting);
                     result = false;
                 }
                 break;
             case esp3d_ip:
+                if (!Esp3DSettings::writeIPString (setting, query->defaultval) ) {
+                    esp3d_log_e("Error writing %s to settings %d",query->defaultval, setting);
+                    result = false;
+                }
+                break;
             case esp3d_integer:
                 if (!Esp3DSettings::writeUint32 (setting, (uint32_t)std::stoul(std::string(query->defaultval), NULL,0) )) {
+                    esp3d_log_e("Error writing %s to settings %d",query->defaultval, setting);
                     result = false;
                 }
                 break;
             case esp3d_string:
-                esp3d_log("Reseting value to %s", query->defaultval);
                 if (setting==esp3d_version) {
                     if (!Esp3DSettings::writeString (setting, SETTING_VERSION)) {
+                        esp3d_log_e("Error writing %s to settings %d",query->defaultval, setting);
                         result = false;
                     }
                 } else {
@@ -240,9 +253,11 @@ bool Esp3DSettings::reset()
                 break;
             default:
                 result =false; //type is not handle
+                esp3d_log_e("Setting  %d , type %d is not handled ",setting, query->type);
             }
         } else {
             result =false; //setting invalid
+            esp3d_log_e("Setting  %d is unknown",setting);
         }
     }
     return result;
@@ -336,7 +351,10 @@ uint32_t Esp3DSettings::readUint32(esp3d_setting_index_t index, bool * haserror)
 
 const char* Esp3DSettings::readIPString(esp3d_setting_index_t index, bool * haserror)
 {
-    return IPUInt32toString(readUint32(index,haserror));
+    uint32_t ipInt = readUint32(index,haserror);
+    std::string ipStr = IPUInt32toString(ipInt);
+    esp3d_log("read setting %d : %d to %s",index, ipInt,ipStr.c_str());
+    return IPUInt32toString(ipInt);
 }
 
 const char* Esp3DSettings::readString(esp3d_setting_index_t index, char* out_str, size_t len, bool * haserror)
@@ -434,6 +452,10 @@ bool Esp3DSettings::writeUint32 (esp3d_setting_index_t index, const uint32_t val
 
 bool Esp3DSettings::writeIPString (esp3d_setting_index_t index, const char * byte_buffer)
 {
+    uint32_t ipInt = StringtoIPUInt32(byte_buffer);
+    std::string ipStr = IPUInt32toString(ipInt);
+    esp3d_log("write setting %d : %s to %d to %s",index,byte_buffer,ipInt,ipStr.c_str());
+
     return writeUint32 (index,StringtoIPUInt32(byte_buffer));
 }
 
@@ -470,11 +492,12 @@ const char *Esp3DSettings::IPUInt32toString(uint32_t ip_int)
 uint32_t Esp3DSettings::StringtoIPUInt32(const char *s)
 {
     ip_addr_t tmpip ;
+    esp3d_log( "convert %s", s);
     tmpip.type = IPADDR_TYPE_V4;
     //convert string to ip_addr_t
     ip4addr_aton(s, &tmpip.u_addr.ip4);
     //convert ip_addr_t to uint32_t
-    return ip4_addr_get_u32(ip_2_ip4(&tmpip));
+    return ip4_addr_get_u32(&tmpip.u_addr.ip4);
 }
 
 

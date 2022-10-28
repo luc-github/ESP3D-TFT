@@ -331,6 +331,8 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
                     esp3d_log_e("Cannot add msg to client queue");
                     sendOk=false;
                 }
+            } else {
+                serialClient.flush();
             }
         }
         break;
