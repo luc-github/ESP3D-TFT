@@ -31,7 +31,7 @@
 #include "ff.h"
 #include "sdmmc_cmd.h"
 #include "esp3d_log.h"
-#include "esp3d-settings.h"
+#include "esp3d_settings.h"
 #include "sdkconfig.h"
 
 sdmmc_card_t *card;

@@ -20,7 +20,7 @@
 #include "esp3d_commands.h"
 #include "esp3d_client.h"
 #include "esp3d_string.h"
-#include "esp3d-settings.h"
+#include "esp3d_settings.h"
 #include "esp_system.h"
 #include "freertos/task.h"
 #include "authentication/esp3d_authentication.h"

@@ -1,6 +1,6 @@
 
 /*
-  esp3d-settings.cpp -  settings esp3d functions class
+  esp3d_settings.cpp -  settings esp3d functions class
 
   Copyright (c) 2014 Luc Lebosse. All rights reserved.
 
@@ -18,7 +18,7 @@
   License along with This code; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include "esp3d-settings.h"
+#include "esp3d_settings.h"
 #include "nvs_flash.h"
 #include "nvs.h"
 #include "nvs_handle.hpp"
@@ -501,7 +501,7 @@ uint32_t Esp3DSettings::StringtoIPUInt32(const char *s)
 }
 
 
-const Esp3DSetting_t * Esp3DSettings::getSettingPtr(esp3d_setting_index_t index)
+const Esp3DSetting_t * Esp3DSettings::getSettingPtr(const esp3d_setting_index_t index)
 {
     for (uint16_t i = 0; i < sizeof(Esp3DSettingsData); i++) {
         if (Esp3DSettingsData[i].index == index ) {

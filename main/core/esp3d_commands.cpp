@@ -525,6 +525,45 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
     case 0:
         ESP0(cmd_params_pos, msg);
         break;
+    case 100:
+        ESP100(cmd_params_pos, msg);
+        break;
+    case 101:
+        ESP101(cmd_params_pos, msg);
+        break;
+    case 102:
+        ESP102(cmd_params_pos, msg);
+        break;
+    case 103:
+        ESP103(cmd_params_pos, msg);
+        break;
+    case 104:
+        ESP104(cmd_params_pos, msg);
+        break;
+    case 105:
+        ESP105(cmd_params_pos, msg);
+        break;
+    case 106:
+        ESP106(cmd_params_pos, msg);
+        break;
+    case 107:
+        ESP107(cmd_params_pos, msg);
+        break;
+    case 108:
+        ESP108(cmd_params_pos, msg);
+        break;
+    case 110:
+        ESP110(cmd_params_pos, msg);
+        break;
+    case 112:
+        ESP112(cmd_params_pos, msg);
+        break;
+    case 114:
+        ESP114(cmd_params_pos, msg);
+        break;
+    case 115:
+        ESP115(cmd_params_pos, msg);
+        break;
     case 200:
         ESP200(cmd_params_pos, msg);
         break;

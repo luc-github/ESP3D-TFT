@@ -24,7 +24,7 @@
 #include "driver/gpio.h"
 #include "serial_def.h"
 #include "esp3d_serial_client.h"
-#include "esp3d-settings.h"
+#include "esp3d_settings.h"
 #include "esp3d_log.h"
 #include "esp3d_commands.h"
 

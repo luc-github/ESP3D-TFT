@@ -1,6 +1,6 @@
 
 /*
-  esp3d-settings.h -  settings esp3d functions class
+  esp3d_settings.h -  settings esp3d functions class
 
   Copyright (c) 2014 Luc Lebosse. All rights reserved.
 
@@ -106,7 +106,7 @@ public:
     uint32_t getDefaultIntegerSetting(esp3d_setting_index_t settingElement);
     const char * getDefaultStringSetting(esp3d_setting_index_t settingElement);
     uint8_t getDefaultByteSetting(esp3d_setting_index_t settingElement);
-    const Esp3DSetting_t * getSettingPtr(esp3d_setting_index_t index);
+    const Esp3DSetting_t * getSettingPtr(const esp3d_setting_index_t index);
 private:
     const char *IPUInt32toString(uint32_t ip_int);
     uint32_t StringtoIPUInt32(const char *s);

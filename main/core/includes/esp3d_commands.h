@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include "esp3d_client.h"
 #include "authentication/esp3d_authentication.h"
-#include "esp3d-settings.h"
+#include "esp3d_settings.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,6 +48,18 @@ public:
     bool dispatchAuthenticationError(esp3d_msg_t * msg, uint cmdid, bool json);
     void ESP0(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP100(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP101(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP102(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP103(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP104(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP105(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP106(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP107(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP108(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP110(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP112(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP114(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP115(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP200(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP202(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP400(int cmd_params_pos,esp3d_msg_t * msg);

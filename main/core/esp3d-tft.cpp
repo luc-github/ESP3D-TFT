@@ -22,7 +22,7 @@
 #include "esp3d-tft-ui.h"
 #include "esp3d-tft-stream.h"
 #include "esp3d-tft-network.h"
-#include "esp3d-settings.h"
+#include "esp3d_settings.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_freertos_hooks.h"
