@@ -21,6 +21,7 @@
 #include "esp3d_client.h"
 #include "esp3d_string.h"
 #include "authentication/esp3d_authentication.h"
+#include "network/esp3d_network.h"
 #define COMMAND_ID 115
 //Get/Set immediate Network (WiFi/BT/Ethernet) state which can be ON, OFF
 //[ESP115]<state> json=<no> pwd=<admin password>
@@ -43,9 +44,28 @@ void Esp3DCommands::ESP115(int cmd_params_pos,esp3d_msg_t * msg)
         return;
     }
 #endif //ESP3D_AUTHENTICATION_FEATURE
-    // TODO
-    //......
-    if(!dispatchAnswer(msg,COMMAND_ID,json, hasError, hasError?error_msg.c_str():ok_msg.c_str())) {
+    tmpstr = get_clean_param(msg,cmd_params_pos);
+    if (tmpstr.length()==0) {
+        //TODO
+        hasError = true;
+        error_msg ="Not yet implemented";
+    } else {
+        if (tmpstr=="OFF") {
+            //TODO
+            hasError = true;
+            error_msg ="Not yet implemented";
+        } else if (tmpstr=="ON") {
+            //TODO
+            hasError = true;
+            error_msg ="Not yet implemented";
+        } else {
+            hasError = true;
+            error_msg ="Invalid parameter";
+        }
+
+    }
+
+    if(!dispatchAnswer(msg,COMMAND_ID, json, hasError, hasError?error_msg.c_str():ok_msg.c_str())) {
         esp3d_log_e("Error sending response to clients");
     }
 }

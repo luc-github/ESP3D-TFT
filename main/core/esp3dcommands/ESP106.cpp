@@ -24,7 +24,7 @@
 #include "esp3d_settings.h"
 #define COMMAND_ID 106
 //AP Password
-//[ESP106]<Password> json=no pwd=<admin password>
+//[ESP106]<Password> <NOPASSWORD> json=no pwd=<admin password>
 void Esp3DCommands::ESP106(int cmd_params_pos,esp3d_msg_t * msg)
 {
     esp3d_clients_t target = msg->origin;
@@ -35,7 +35,7 @@ void Esp3DCommands::ESP106(int cmd_params_pos,esp3d_msg_t * msg)
     bool hasError = false;
     std::string error_msg ="Invalid parameters";
     std::string ok_msg ="ok";
-    bool clearSetting = hasTag (msg,cmd_params_pos,"CLEAR");
+    bool clearSetting = hasTag (msg,cmd_params_pos,"NOPASSWORD");
     bool json = hasTag (msg,cmd_params_pos,"json");
     std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
@@ -51,7 +51,7 @@ void Esp3DCommands::ESP106(int cmd_params_pos,esp3d_msg_t * msg)
         error_msg="Password not displayable";
     } else {
         if (clearSetting) {
-            esp3d_log("CLEAR flag detected, set string to empty string");
+            esp3d_log("NOPASSWORD flag detected, set string to empty string");
             tmpstr="";
         }
         esp3d_log("got %s param for a value of %s, is valid %d", tmpstr.c_str(),tmpstr.c_str(), esp3dTFTsettings.isValidStringSetting(tmpstr.c_str(), esp3d_ap_password));

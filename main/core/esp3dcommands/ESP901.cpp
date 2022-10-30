@@ -66,5 +66,4 @@ void Esp3DCommands::ESP901(int cmd_params_pos,esp3d_msg_t * msg)
     if(!dispatchAnswer(msg,COMMAND_ID, json, hasError, hasError?error_msg.c_str():ok_msg.c_str())) {
         esp3d_log_e("Error sending response to clients");
     }
-
 }

@@ -29,6 +29,7 @@
 #include <string>
 #include "esp3d_log.h"
 #include "serial_def.h"
+#include "network/esp3d_network.h"
 
 #define STORAGE_NAME "ESP3D_TFT"
 #define SETTING_VERSION "ESP3D_TFT-V3.0.1"
@@ -41,6 +42,10 @@ const uint8_t SupportedBaudListSize = sizeof(SupportedBaudList)/sizeof(uint32_t)
 const uint8_t SupportedSPIDivider[] = { 1, 2, 4, 6, 8, 16, 32};
 const uint8_t SupportedSPIDividerSize = sizeof(SupportedSPIDivider)/sizeof(uint8_t);
 
+const uint8_t SupportedApChannels[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14};
+const uint8_t SupportedApChannelsSize = sizeof(SupportedApChannels)/sizeof(uint8_t);
+
+
 //value of settings, default value are all strings
 const Esp3DSetting_t Esp3DSettingsData [] = {
     {esp3d_version, esp3d_string, SIZE_OF_SETTING_VERSION,"Invalid data"}, //Version
@@ -48,8 +53,8 @@ const Esp3DSetting_t Esp3DSettingsData [] = {
     {esp3d_spi_divider, esp3d_byte, 1, "1"},                               //SPIdivider
     {esp3d_hostname, esp3d_string, SIZE_OF_SETTING_HOSTNAME,"esp3d-tft"},
     {esp3d_radio_boot_mode, esp3d_byte, 1,"1"},
-    {esp3d_radio_mode, esp3d_byte, 1,"2"},
-    {esp3d_fallback_mode, esp3d_byte, 1,"2"},
+    {esp3d_radio_mode, esp3d_byte, 1,"3"},
+    {esp3d_fallback_mode, esp3d_byte, 1,"3"},
     {esp3d_sta_ssid, esp3d_string, SIZE_OF_SETTING_SSID_ID,""},
     {esp3d_sta_password, esp3d_string, SIZE_OF_SETTING_SSID_PWD,""},
     {esp3d_sta_ip_mode, esp3d_byte, 1,"0"},
@@ -124,6 +129,32 @@ bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t set
         return false;
     }
     switch(settingElement) {
+    case esp3d_radio_boot_mode:
+        if(value==(uint8_t)esp3d_state_off || value==(uint8_t)esp3d_state_on) {
+            return true;
+        }
+    case esp3d_sta_ip_mode:
+        if(value==(uint8_t)esp3d_ip_mode_dhcp || value==(uint8_t)esp3d_ip_mode_static) {
+            return true;
+        }
+        break;
+    case esp3d_fallback_mode:
+        if(value==(uint8_t)esp3d_radio_off  || value==(uint8_t)esp3d_wifi_ap_config || value==(uint8_t)esp3d_bluetooth_serial) {
+            return true;
+        }
+        break;
+    case esp3d_radio_mode:
+        if (value==(uint8_t)esp3d_radio_off  || value==(uint8_t)esp3d_wifi_sta  || value==(uint8_t)esp3d_wifi_ap  || value==(uint8_t)esp3d_wifi_ap_config || value==(uint8_t)esp3d_bluetooth_serial) {
+            return true;
+        }
+        break;
+    case esp3d_ap_channel:
+        for(uint8_t i=0; i<SupportedApChannelsSize; i++) {
+            if (SupportedApChannels[i]==value) {
+                return true;
+            }
+        }
+        break;
     case esp3d_spi_divider:
         for(uint8_t i=0; i<SupportedSPIDividerSize; i++) {
             if (SupportedSPIDivider[i]==value) {

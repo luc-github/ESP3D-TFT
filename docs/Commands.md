@@ -20,7 +20,7 @@ The json format is {
     `[ESP100]<SSID> json=<no> pwd=<admin password for set/get & user password to get>`
 
 * Set STA Password   
-    `[ESP101]<Password> json=<no> pwd=<admin password>`
+    `[ESP101]<Password> <NOPASSWORD> json=<no> pwd=<admin password>`
 
 * Set/Get STA IP mode (DHCP/STATIC)   
     `[ESP102]<mode> json=<no> pwd=<admin password>`
@@ -35,7 +35,7 @@ The json format is {
     `[ESP105]<SSID> json=<no> pwd=<admin password>`
 
 * Change AP Password   
-    `[ESP106]<Password> json=<no> pwd=<admin password>`
+    `[ESP106]<Password> <NOPASSWORD> json=<no> pwd=<admin password>`
 
 * Set/Get AP IP   
     `[ESP107]<IP> json=<no> pwd=<admin password>`
@@ -43,7 +43,7 @@ The json format is {
 * Set/Get AP channel   
     `[ESP108]<channel> json=<no> pwd=<admin password>`
 
-* Set/Get radio state which can be WIFI-STA, WIFI-AP, BT, ETH-STA, ETH-AP, OFF  
+* Set/Get radio state which can be STA, AP, BT, CONFIG, OFF  
     `[ESP110]<state> json=<no> pwd=<admin password>`
 
 * Get current IP   

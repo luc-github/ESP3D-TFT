@@ -1,5 +1,5 @@
 /*
-  esp3d-tft-network
+  esp3d_network
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -25,32 +25,22 @@ extern "C" {
 #endif
 
 typedef enum {
-    esp3d_dhcp,
-    esp3d_static,
+    esp3d_ip_mode_dhcp=0,
+    esp3d_ip_mode_static=1,
 } esp3d_ip_mode_t;
 
 typedef enum {
-    esp3d_radio_off,
-    esp3d_wifi_sta,
-    esp3d_wifi_ap,
-    esp3d_wifi_ap_config,
-    esp3d_bluetooth_serial
+    esp3d_state_off=0,
+    esp3d_state_on=1,
+} esp3d_state_t;
+
+typedef enum {
+    esp3d_radio_off=0,
+    esp3d_wifi_sta=1,
+    esp3d_wifi_ap=2,
+    esp3d_wifi_ap_config=3,
+    esp3d_bluetooth_serial=4
 } esp3d_radio_mode_t;
-
-class Esp3DTFTNetwork final
-{
-public:
-    Esp3DTFTNetwork();
-    ~Esp3DTFTNetwork();
-    bool begin();
-    void handle();
-    bool end();
-
-private:
-    bool _started;
-};
-
-extern Esp3DTFTNetwork esp3dTFTnetwork;
 
 #ifdef __cplusplus
 } // extern "C"
