@@ -133,6 +133,7 @@ bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t set
         if(value==(uint8_t)esp3d_state_off || value==(uint8_t)esp3d_state_on) {
             return true;
         }
+        break;
     case esp3d_sta_ip_mode:
         if(value==(uint8_t)esp3d_ip_mode_dhcp || value==(uint8_t)esp3d_ip_mode_static) {
             return true;

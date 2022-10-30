@@ -135,6 +135,7 @@ bool Esp3DSerialClient::begin()
     if (res==pdPASS && xHandle) {
         esp3d_log ("Created Serial Task");
         esp3d_log("Serial client started");
+        flush();
         return true;
     } else {
         esp3d_log_e ("Serial Task creation failed");
