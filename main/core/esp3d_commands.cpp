@@ -237,20 +237,27 @@ bool Esp3DCommands::dispatchAuthenticationError(esp3d_msg_t * msg, uint cmdid, b
 bool  Esp3DCommands::dispatchAnswer(esp3d_msg_t * msg, uint cmdid, bool json, bool hasError, const char* answerMsg)
 {
     std::string tmpstr;
-    if (!msg) {
+    if (!msg || !answerMsg) {
         esp3d_log_e("no msg");
         return false;
     }
     if (json) {
         tmpstr = "{\"cmd\":\""+std::to_string(cmdid) + "\",\"status\":\"";
+
         if (hasError) {
             tmpstr +="error";
         } else {
             tmpstr +="ok";
         }
-        tmpstr+="\",\"data\":\"";
+        tmpstr+="\",\"data\":";
+        if (answerMsg[0]!='{') {
+            tmpstr +="\"";
+        }
         tmpstr += answerMsg;
-        tmpstr += "\"}";
+        if (answerMsg[0]!='{') {
+            tmpstr +="\"";
+        }
+        tmpstr += "}";
     } else {
         tmpstr=answerMsg;
         tmpstr += "\n";
