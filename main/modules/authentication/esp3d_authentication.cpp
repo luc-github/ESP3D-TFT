@@ -1,5 +1,5 @@
 /*
-  esp3d_authentication class
+  esp3d_authentication
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
   This code is free software; you can redistribute it and/or

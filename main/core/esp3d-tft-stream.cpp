@@ -80,7 +80,7 @@ Esp3DTFTStream::~Esp3DTFTStream()
 
 bool Esp3DTFTStream::begin()
 {
-    //Ui creation
+    //Task creation
     TaskHandle_t xHandle = NULL;
     BaseType_t  res =  xTaskCreatePinnedToCore(streamTask, "tftStream", STACKDEPTH, NULL, TASKPRIORITY, &xHandle, TASKCORE);
     if (res==pdPASS && xHandle) {

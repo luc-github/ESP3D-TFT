@@ -24,19 +24,6 @@
 extern "C" {
 #endif
 
-typedef enum {
-    esp3d_dhcp,
-    esp3d_static,
-} esp3d_ip_mode_t;
-
-typedef enum {
-    esp3d_radio_off,
-    esp3d_wifi_sta,
-    esp3d_wifi_ap,
-    esp3d_wifi_ap_config,
-    esp3d_bluetooth_serial
-} esp3d_radio_mode_t;
-
 class Esp3DTFTNetwork final
 {
 public:

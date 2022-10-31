@@ -42,6 +42,34 @@ typedef enum {
     esp3d_bluetooth_serial=4
 } esp3d_radio_mode_t;
 
+
+class Esp3DNetwork final
+{
+public:
+    Esp3DNetwork();
+    ~Esp3DNetwork();
+    bool begin();
+    void handle();
+    void end();
+    bool startStaMode();
+    bool startApMode();
+    bool startConfigMode();
+    bool startBtMode();
+    bool stopStaMode();
+    bool stopApMode();
+    bool stopConfigMode();
+    bool stopBtMode();
+    bool setMode (esp3d_radio_mode_t mode);
+    bool started()
+    {
+        return _started;
+    };
+private:
+    bool _started;
+    esp3d_radio_mode_t _current_radio_mode;
+};
+
+extern Esp3DNetwork esp3dNetworkService;
 #ifdef __cplusplus
 } // extern "C"
 #endif

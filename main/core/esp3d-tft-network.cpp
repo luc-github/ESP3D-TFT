@@ -23,9 +23,11 @@
 #include "freertos/task.h"
 #include "esp_freertos_hooks.h"
 #include "freertos/semphr.h"
-#include "version.h"
-#include <string>
+#include "esp_system.h"
+#include "esp_wifi.h"
+#include "esp_event.h"
 #include "esp3d_log.h"
+#include "network/esp3d_network.h"
 
 
 
@@ -33,7 +35,7 @@
 #define LV_TICK_PERIOD_MS 10
 #define STACKDEPTH  4096*2
 #define TASKPRIORITY 0
-#define TASKCORE 1
+#define TASKCORE 0
 
 /**********************
  *  STATIC PROTOTYPES
@@ -52,7 +54,11 @@ static void networkTask(void *pvParameter)
 
     (void) pvParameter;
     xNetworkSemaphore = xSemaphoreCreateMutex();
-
+    esp3d_log("Init Netif and network event loop");
+    ESP_ERROR_CHECK(esp_netif_init()); //desinit is not yet support so do it once
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
+    vTaskDelay(pdMS_TO_TICKS(100));
+    esp3dNetworkService.begin();
     while (1) {
         /* Delay */
         vTaskDelay(pdMS_TO_TICKS(10));
@@ -80,14 +86,17 @@ Esp3DTFTNetwork::~Esp3DTFTNetwork()
 
 bool Esp3DTFTNetwork::begin()
 {
+    esp3d_log("Free mem %d",esp_get_minimum_free_heap_size());
     //Ui creation
     TaskHandle_t xHandle = NULL;
     BaseType_t  res =  xTaskCreatePinnedToCore(networkTask, "tftNetwork", STACKDEPTH, NULL, TASKPRIORITY, &xHandle, TASKCORE);
     if (res==pdPASS && xHandle) {
         esp3d_log("Created Network Task");
+        esp3d_log("Free mem %d",esp_get_minimum_free_heap_size());
         return true;
     } else {
         esp3d_log_e ("Network Task creation failed");
+        esp3d_log("Free mem %d",esp_get_minimum_free_heap_size());
         return false;
     }
 
