@@ -20,6 +20,8 @@
 
 #pragma once
 #include <stdio.h>
+#include "esp_wifi.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -51,21 +53,28 @@ public:
     bool begin();
     void handle();
     void end();
+    bool startNoRadioMode();
     bool startStaMode();
-    bool startApMode();
+    bool startApMode(bool configMode=false);
     bool startConfigMode();
     bool startBtMode();
+    bool stopNoRadioMode();
     bool stopStaMode();
     bool stopApMode();
     bool stopConfigMode();
     bool stopBtMode();
     bool setMode (esp3d_radio_mode_t mode);
+    esp3d_radio_mode_t getMode()
+    {
+        return _current_radio_mode;
+    };
     bool started()
     {
         return _started;
     };
 private:
     bool _started;
+    esp_netif_t* _wifiApPtr;
     esp3d_radio_mode_t _current_radio_mode;
 };
 

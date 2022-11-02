@@ -388,7 +388,7 @@ bool Esp3DCommands::hasTag (esp3d_msg_t * msg, uint start,const char* label)
     esp3d_log("Checking  label as tag");
     for (uint i = start; i <msg->size; i++) {
         char c = char(msg->data[i]);
-        esp3d_log("%c", c);
+        //esp3d_log("%c", c);
         if (c== label[0] && prevCharIsspace) {
             uint p = 0;
             while (i<msg->size && p <lenLabel && c==label[p] ) {

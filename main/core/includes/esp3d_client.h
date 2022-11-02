@@ -38,6 +38,7 @@ typedef enum {
     WEBUI_CLIENT,
     WEBSOCKET_CLIENT,
     ESP3D_COMMAND,
+    ESP3D_SYSTEM,
     ALL_CLIENTS
 } esp3d_clients_t;
 

@@ -25,6 +25,7 @@
 #include "esp3d_string.h"
 #include "esp3d_settings.h"
 #include "lwip/ip_addr.h"
+#include "esp3d_commands.h"
 
 Esp3DNetwork esp3dNetworkService;
 
@@ -45,6 +46,7 @@ static void wifi_ap_event_handler(void* arg, esp_event_base_t event_base,
 Esp3DNetwork::Esp3DNetwork()
 {
     _current_radio_mode = esp3d_radio_off;
+    _wifiApPtr = nullptr;
 }
 
 Esp3DNetwork::~Esp3DNetwork() {}
@@ -82,15 +84,18 @@ void Esp3DNetwork::end()
 bool Esp3DNetwork::startStaMode()
 {
     esp3d_log("Init STA Mode");
-    _current_radio_mode = esp3d_wifi_ap;
+    _current_radio_mode = esp3d_wifi_sta;
     return false;
 }
 
-bool Esp3DNetwork::startApMode()
+bool Esp3DNetwork::startApMode(bool configMode)
 {
     static bool initDone   = false;
     char ssid_str[33]= {0};
     char ssid_pwd_str[32]= {0};
+    if (_wifiApPtr) {
+        stopApMode();
+    }
     esp3d_log("Init AP Mode");
     esp3d_log("Free mem %d",esp_get_minimum_free_heap_size());
     if (!initDone) {
@@ -129,16 +134,20 @@ bool Esp3DNetwork::startApMode()
     } else {
         wifi_config.ap.authmode =  WIFI_AUTH_WPA_WPA2_PSK;
     }
-    esp_netif_t* wifiAP = esp_netif_create_default_wifi_ap();
+    _wifiApPtr = esp_netif_create_default_wifi_ap();
+    if (!_wifiApPtr) {
+        esp3d_log_e("Create default wifi AP failed");
+        return false;
+    }
     esp3d_log("Setup IP and DHCP range");
     esp_netif_ip_info_t  ipInfo;
     ipInfo.ip.addr = ip_int;
-    ipInfo.gw.addr = ip_int; //0 IF NO GATEWAY
+    ipInfo.gw.addr = configMode?ip_int:0; //0 = no gateway address
     IP4_ADDR(&ipInfo.netmask, 255,255,255,0);
 
-    esp_netif_dhcps_stop(wifiAP);
-    esp_netif_set_ip_info(wifiAP, &ipInfo);
-    esp_netif_dhcps_start(wifiAP);
+    esp_netif_dhcps_stop(_wifiApPtr);
+    esp_netif_set_ip_info(_wifiApPtr, &ipInfo);
+    esp_netif_dhcps_start(_wifiApPtr);
 
     esp3d_log("set AP mode");
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
@@ -150,19 +159,52 @@ bool Esp3DNetwork::startApMode()
     esp3d_log("wifi_init_softap finished. SSID:%s password:%s channel:%d",
               ssid_str, ssid_pwd_str, channel);
     esp_netif_ip_info_t ip_info;
-    esp_netif_get_ip_info(wifiAP,&ip_info);
+    esp_netif_get_ip_info(_wifiApPtr,&ip_info);
     esp3d_log("AP IP: " IPSTR, IP2STR(&ip_info.ip));
     esp3d_log("AP GW: " IPSTR, IP2STR(&ip_info.gw));
     esp3d_log("AP NETMASK: " IPSTR, IP2STR(&ip_info.netmask));
+    std::string stmp = "Access Point ";
+    if(configMode) {
+        stmp += "(config mode) ";
+    }
+    stmp += ssid_str;
+    stmp += " started";
+    if (strlen(ssid_pwd_str) > 0) {
+        stmp+=" protected with ";
+    } else {
+        stmp+=" without ";
+    }
+    stmp+= "password (";
+    //tmpip.u_addr.ip4
+    stmp+= ip4addr_ntoa((const ip4_addr_t*)&ip_info.ip);
+    stmp+= ")\n";
 #endif //ESP3D_TFT_LOG
     _current_radio_mode = esp3d_wifi_ap;
+    esp3d_request_t requestId= {.id=0};
+    esp3dCommands. dispatch(stmp.c_str(),  ALL_CLIENTS,requestId, ESP3D_SYSTEM, ESP3D_LEVEL_ADMIN);
+    return true;
+}
+
+bool  Esp3DNetwork::startNoRadioMode()
+{
+    esp3d_log("Start No Radio Mode");
+    std::string stmp = "Radio is off\n";
+    _current_radio_mode = esp3d_radio_off;
+    esp3d_request_t requestId= {.id=0};
+    esp3dCommands. dispatch(stmp.c_str(),  ALL_CLIENTS,requestId, ESP3D_SYSTEM, ESP3D_LEVEL_ADMIN);
+    return true;
+}
+
+bool  Esp3DNetwork::stopNoRadioMode()
+{
+    esp3d_log("Stop No Radio Mode");
     return true;
 }
 
 bool Esp3DNetwork::startConfigMode()
 {
     esp3d_log("Init Config Mode");
-    bool res = startApMode();
+    bool res = startApMode(true);
     _current_radio_mode = esp3d_wifi_ap_config;
     return res;
 }
@@ -181,8 +223,26 @@ bool  Esp3DNetwork::stopStaMode()
 }
 bool  Esp3DNetwork::stopApMode()
 {
+    if (!(_current_radio_mode==esp3d_wifi_ap_config || _current_radio_mode==esp3d_wifi_ap)) {
+        return false;
+    }
     esp3d_log("Stop AP Mode");
-    return false;
+    if(esp_wifi_stop()!=ESP_OK) {
+        esp3d_log_e("Cannot stop wifi");
+        return false;
+    }
+    if (_wifiApPtr) {
+        esp3d_log("Stop DHCP");
+        esp_netif_dhcps_stop(_wifiApPtr);
+        esp3d_log("Destroy default wifi AP");
+        esp_netif_destroy_default_wifi(_wifiApPtr);
+        _wifiApPtr = nullptr;
+    } else {
+        esp3d_log_w("_wifiApPtr is null");
+    }
+
+    _current_radio_mode = esp3d_radio_off;
+    return true;
 }
 bool  Esp3DNetwork::stopConfigMode()
 {
@@ -198,8 +258,16 @@ bool  Esp3DNetwork::stopBtMode()
 
 bool Esp3DNetwork::setMode (esp3d_radio_mode_t mode)
 {
+    esp3d_log("Current mode is %d, and ask for %d", _current_radio_mode, mode);
+
+    if (mode == _current_radio_mode) {
+        esp3d_log("Current mode and new mode are identical so cancel");
+        return true;
+    }
+
     switch(_current_radio_mode) {
     case esp3d_radio_off:
+        stopNoRadioMode();
         break;
     case esp3d_wifi_sta:
         stopStaMode();
@@ -219,6 +287,7 @@ bool Esp3DNetwork::setMode (esp3d_radio_mode_t mode)
 
     switch(mode) {
     case esp3d_radio_off:
+        startNoRadioMode();
         break;
     case esp3d_wifi_sta:
         startStaMode();
