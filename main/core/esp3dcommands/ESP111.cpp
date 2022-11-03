@@ -22,10 +22,10 @@
 #include "esp3d_string.h"
 #include "authentication/esp3d_authentication.h"
 #include "network/esp3d_network.h"
-#define COMMAND_ID 115
-//Get/Set immediate Network (WiFi/BT/Ethernet) state which can be ON, OFF
-//[ESP115]<state> json=<no> pwd=<admin password>
-void Esp3DCommands::ESP115(int cmd_params_pos,esp3d_msg_t * msg)
+#define COMMAND_ID 111
+//Get current IP
+//[ESP111]<ALL> [json=no]
+void Esp3DCommands::ESP111(int cmd_params_pos,esp3d_msg_t * msg)
 {
     esp3d_clients_t target = msg->origin;
     esp3d_request_t requestId = msg->requestId;
@@ -36,6 +36,7 @@ void Esp3DCommands::ESP115(int cmd_params_pos,esp3d_msg_t * msg)
     std::string error_msg ="Invalid parameters";
     std::string ok_msg ="ok";
     bool json = hasTag (msg,cmd_params_pos,"json");
+    bool showAll = hasTag (msg,cmd_params_pos,"ALL");
     std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
     if (msg->authentication_level == ESP3D_LEVEL_GUEST) {
@@ -45,35 +46,49 @@ void Esp3DCommands::ESP115(int cmd_params_pos,esp3d_msg_t * msg)
     }
 #endif //ESP3D_AUTHENTICATION_FEATURE
     tmpstr = get_clean_param(msg,cmd_params_pos);
-    esp3d_radio_mode_t setting_radio_mode = (esp3d_radio_mode_t)esp3dTFTsettings.readByte(esp3d_radio_mode);
-    esp3d_radio_mode_t current_radio_mode = esp3dNetworkService.getMode();
-    if (tmpstr.length()==0) {
-        if (current_radio_mode==esp3d_radio_off) {
-            ok_msg = "OFF";
-        } else {
-            ok_msg= "ON";
-        }
+    if (tmpstr.length()!=0 && !showAll) {
+        hasError = true;
     } else {
-        if (tmpstr=="OFF") {
-            if (current_radio_mode!=esp3d_radio_off) {
-                if (!esp3dNetworkService.setMode(esp3d_radio_off)) {
-                    hasError = true;
-                    error_msg ="Fail to stop network";
-                }
-            }
-        } else if (tmpstr=="ON") {
-            if (current_radio_mode==esp3d_radio_off) {
-                if (!esp3dNetworkService.setMode(setting_radio_mode)) {
-                    hasError = true;
-                    error_msg ="Fail to start network";
-                }
-            }
+        esp3d_ip_info_t  ipInfo;
+        if (esp3dNetworkService.getLocalIp(&ipInfo)) {
+            ok_msg =  ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.ip_info.ip));
         } else {
             hasError = true;
-            error_msg ="Invalid parameter";
+            error_msg="Cannot get Ip";
+        }
+        if (showAll && !hasError) {
+            if (json) {
+                ok_msg = "{\"ip\":\"";
+            } else {
+                ok_msg = "IP: ";
+            }
+            ok_msg +=  ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.ip_info.ip));
+            if (json) {
+                ok_msg += "\",\"gw\":\"";
+            } else {
+                ok_msg += "\nGW: ";
+            }
+            ok_msg +=  ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.ip_info.gw));
+            if (json) {
+                ok_msg += "\",\"msk\":\"";
+            } else {
+                ok_msg += "\nMSK: ";
+            }
+            ok_msg +=  ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.ip_info.netmask));
+            if (json) {
+                ok_msg += "\",\"dns\":\"";
+            } else {
+                ok_msg += "\nDNS: ";
+            }
+            ok_msg +=  ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.dns_info.ip.u_addr.ip4));
+            if (json) {
+                ok_msg += "\"}";
+            } else {
+                ok_msg += "\n";
+            }
         }
     }
-    if(!dispatchAnswer(msg,COMMAND_ID, json, hasError, hasError?error_msg.c_str():ok_msg.c_str())) {
+    if(!dispatchAnswer(msg,COMMAND_ID,json, hasError, hasError?error_msg.c_str():ok_msg.c_str())) {
         esp3d_log_e("Error sending response to clients");
     }
 }

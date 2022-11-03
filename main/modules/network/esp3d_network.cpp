@@ -147,6 +147,7 @@ bool  Esp3DNetwork::getLocalIp(esp3d_ip_info_t * ipInfo)
     ipInfo->ip_info.gw.addr = 0;
     ipInfo->ip_info.netmask.addr = 0;
     ipInfo->dns_info.ip.u_addr.ip4.addr = 0;
+
     switch (_current_radio_mode) {
     case esp3d_wifi_sta:
         if (_wifiStaPtr) {
@@ -167,6 +168,9 @@ bool  Esp3DNetwork::getLocalIp(esp3d_ip_info_t * ipInfo)
             }
         }
         break;
+    case esp3d_bluetooth_serial:
+    case esp3d_radio_off:
+        return true;
     default:
         break;
     }
@@ -330,10 +334,8 @@ bool Esp3DNetwork::startStaMode()
                                            pdFALSE,
                                            portMAX_DELAY);
 
-// xEventGroupWaitBits() returns the bits before the call returned, hence we can test which event actually
-//happened.
-
-
+    // xEventGroupWaitBits() returns the bits before the call returned, hence we can test which event actually
+    //happened.
     if (bits & WIFI_CONNECTED_BIT) {
         esp3d_log("connected to ap SSID: %s, password: %s",
                   ssid_str, ssid_pwd_str);
@@ -356,8 +358,6 @@ bool Esp3DNetwork::startStaMode()
         stmp +=ssid_str;
         stmp += " failed\n";
     }
-
-
     esp3dCommands. dispatch(stmp.c_str(),  ALL_CLIENTS,requestId, ESP3D_SYSTEM, ESP3D_LEVEL_ADMIN);
     return connected;
 }

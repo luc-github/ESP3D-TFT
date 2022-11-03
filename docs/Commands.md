@@ -46,8 +46,8 @@ The json format is {
 * Set/Get radio state which can be STA, AP, BT, CONFIG, OFF  
     `[ESP110]<state> json=<no> pwd=<admin password>`
 
-* Get current IP   
-    `[ESP111]json=<no>`
+* Get current IP or IP/MSK/GW/DNS  
+    `[ESP111]<ALL> json=<no>`
 
 * Get/Set hostname   
     `[ESP112]<Hostname> json=<no> pwd=<admin password>`
