@@ -218,7 +218,7 @@ label can be: light/framesize/quality/contrast/brightness/saturation/gainceiling
 * Get/Set Check update at boot state which can be ON, OFF   
     `[ESP402]<state> json=<no> pwd=<admin password>`
 
-* Get available AP list (limited to 30)   
+* Get available AP list (limited to 15)   
     output is JSON or plain text according parameter   
     `[ESP410]json=<no> <pwd=admin/user>`
 
