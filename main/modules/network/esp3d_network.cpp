@@ -24,7 +24,6 @@
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_settings.h"
-#include "lwip/ip_addr.h"
 #include "esp3d_commands.h"
 
 Esp3DNetwork esp3dNetworkService;
@@ -34,7 +33,7 @@ Esp3DNetwork esp3dNetworkService;
  * - we failed to connect after the maximum amount of retries */
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT      BIT1
-
+#define MIN_RSSI           -78
 #define ESP3D_STA_MAXIMUM_RETRY 10
 
 static void wifi_ap_event_handler(void* arg, esp_event_base_t event_base,
@@ -219,6 +218,55 @@ void Esp3DNetwork::end()
     _started = false;
     _useStaticIp= false;
 }
+
+const char * Esp3DNetwork::getAPMac()
+{
+    return getMac(ESP_MAC_WIFI_SOFTAP);
+}
+const char * Esp3DNetwork::getSTAMac()
+{
+    return getMac(ESP_MAC_WIFI_STA);
+}
+const char * Esp3DNetwork::getBTMac()
+{
+    return getMac(ESP_MAC_BT);
+}
+
+const char * Esp3DNetwork::getMacAddress(uint8_t mac[6])
+{
+    static char mac_addr[18]= { 0 };
+    sprintf(mac_addr, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    return mac_addr;
+}
+
+const char * Esp3DNetwork::getMac(esp_mac_type_t type)
+{
+    uint8_t mac[6];
+    if (ESP_OK != esp_read_mac(mac, type)) {
+        memset(mac, 0, 6);
+    }
+    return getMacAddress(mac);
+}
+
+const char * Esp3DNetwork::getModeStr(esp3d_radio_mode_t mode)
+{
+    switch(mode) {
+    case esp3d_radio_off:
+        return "No Radio";
+    case esp3d_wifi_sta:
+        return "Client";
+    case esp3d_wifi_ap:
+        return "Access point";
+    case esp3d_wifi_ap_config:
+        return "Configuration";
+    case esp3d_bluetooth_serial:
+        return "Bluetooth";
+    default:
+        break;
+    }
+    return "Unknown";
+}
+
 bool Esp3DNetwork::startStaMode()
 {
     static bool initDone   = false;
@@ -360,6 +408,21 @@ bool Esp3DNetwork::startStaMode()
     }
     esp3dCommands. dispatch(stmp.c_str(),  ALL_CLIENTS,requestId, ESP3D_SYSTEM, ESP3D_LEVEL_ADMIN);
     return connected;
+}
+
+int32_t Esp3DNetwork::getSignal (int32_t RSSI, bool filter)
+{
+    if (RSSI < MIN_RSSI && filter) {
+        return 0;
+    }
+    if (RSSI <= -100 && !filter) {
+        return 0;
+    }
+    if (RSSI >= -50) {
+        return 100;
+    }
+    return (2 * (RSSI + 100) );
+
 }
 
 bool Esp3DNetwork::startApMode(bool configMode)

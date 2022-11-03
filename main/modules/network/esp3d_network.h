@@ -21,6 +21,7 @@
 #pragma once
 #include <stdio.h>
 #include "esp_wifi.h"
+#include "lwip/ip_addr.h"
 #include "freertos/event_groups.h"
 
 #ifdef __cplusplus
@@ -69,6 +70,12 @@ public:
     bool stopConfigMode();
     bool stopBtMode();
     bool setMode (esp3d_radio_mode_t mode);
+    const char * getAPMac();
+    const char * getSTAMac();
+    const char * getBTMac();
+    const char * getMacAddress(uint8_t mac[6]);
+    const char * getModeStr(esp3d_radio_mode_t mode);
+    int32_t getSignal (int32_t RSSI, bool filter=true);
     esp3d_radio_mode_t getMode()
     {
         return _current_radio_mode;
@@ -93,6 +100,7 @@ private:
     esp_netif_t * _wifiStaPtr;
     esp3d_radio_mode_t _current_radio_mode;
     EventGroupHandle_t _s_wifi_event_group;
+    const char * getMac(esp_mac_type_t type);
 };
 
 extern Esp3DNetwork esp3dNetworkService;

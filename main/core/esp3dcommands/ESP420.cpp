@@ -29,6 +29,8 @@
 #include "esp_heap_caps.h"
 #include "esp_spi_flash.h"
 #include "authentication/esp3d_authentication.h"
+#include "filesystem/esp3d_flash.h"
+#include "network/esp3d_network.h"
 #define COMMAND_ID 420
 
 //Get ESP current status
@@ -58,8 +60,13 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
         Esp3DClient::deleteMsg(msg);
     }
 
+//Screen
+    if (!dispatchIdValue(json,"Screen", TFT_TARGET, target, requestId, true)) {
+        return;
+    }
+
     //ESP3D-TFT-VERSION
-    if (!dispatchIdValue(json,"FW Ver", ESP3D_TFT_VERSION, target,requestId, true)) {
+    if (!dispatchIdValue(json,"FW Ver", ESP3D_TFT_VERSION, target,requestId)) {
         return;
     }
 
@@ -73,16 +80,9 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
         return;
     }
 
-
     //CPU Freq
     tmpstr= std::to_string(ets_get_cpu_frequency()) + "MHz";
     if (!dispatchIdValue(json,"CPU Freq",tmpstr.c_str(), target,requestId)) {
-        return;
-    }
-
-    //Flash size
-    tmpstr = formatBytes(spi_flash_get_chip_size());
-    if (!dispatchIdValue(json,"flash size",tmpstr.c_str(), target,requestId)) {
         return;
     }
 
@@ -91,6 +91,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     if (!dispatchIdValue(json,"free mem",tmpstr.c_str(), target,requestId)) {
         return;
     }
+
 #if CONFIG_SPIRAM
     multi_heap_info_t info;
     heap_caps_get_info(&info, MALLOC_CAP_SPIRAM);
@@ -99,6 +100,210 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
         return;
     }
 #endif //CONFIG_SPIRAM
+    //Flash size
+    tmpstr = formatBytes(spi_flash_get_chip_size());
+    if (!dispatchIdValue(json,"flash size",tmpstr.c_str(), target,requestId)) {
+        return;
+    }
+    //FileSystem
+    size_t totalBytes=0;
+    size_t usedBytes=0;
+    flashFs.getSpaceInfo(&totalBytes,&usedBytes);
+    tmpstr = formatBytes(usedBytes);
+    tmpstr+="/";
+    tmpstr = formatBytes(totalBytes);
+    if (!dispatchIdValue(json,"FS usage",tmpstr.c_str(), target,requestId)) {
+        return;
+    }
+
+    //wifi
+    if (esp3dNetworkService.getMode()==esp3d_radio_off || esp3dNetworkService.getMode()==esp3d_bluetooth_serial) {
+        tmpstr="OFF";
+    } else {
+        tmpstr="ON";
+    }
+    if (!dispatchIdValue(json,"wifi",tmpstr.c_str(), target,requestId)) {
+        return;
+    }
+
+    //hostname
+    const Esp3DSetting_t * settingPtr = esp3dTFTsettings.getSettingPtr(esp3d_hostname);
+    if (settingPtr) {
+        char out_str[(settingPtr->size)+1]= {0};
+        tmpstr = esp3dTFTsettings.readString(esp3d_hostname,out_str, settingPtr->size);
+    } else {
+        tmpstr="Error!!";
+    }
+    if (!dispatchIdValue(json,"hostname",tmpstr.c_str(), target,requestId)) {
+        return;
+    }
+    //sta
+    if (esp3dNetworkService.getMode()==esp3d_wifi_sta) {
+        tmpstr="ON";
+    } else {
+        tmpstr="OFF";
+    }
+    if (!dispatchIdValue(json,"sta",tmpstr.c_str(), target,requestId)) {
+        return;
+    }
+
+    //Sta MAC
+    tmpstr =esp3dNetworkService.getSTAMac();
+    if (!dispatchIdValue(json,"mac",tmpstr.c_str(), target,requestId)) {
+        return;
+    }
+
+    if (esp3dNetworkService.getMode()==esp3d_wifi_sta) {
+
+        wifi_ap_record_t ap;
+        esp_err_t res = esp_wifi_sta_get_ap_info(&ap);
+        if (res == ESP_OK) {
+            //ssid
+            tmpstr=(const char *)ap.ssid;
+            if (!dispatchIdValue(json,"SSID",tmpstr.c_str(), target,requestId)) {
+                return;
+            }
+            //%signal
+            int32_t signal = esp3dNetworkService.getSignal(ap.rssi,false);
+            tmpstr = std::to_string(signal);
+            tmpstr +="%";
+            if (!dispatchIdValue(json,"signal",tmpstr.c_str(), target,requestId)) {
+                return;
+            }
+            tmpstr = std::to_string(ap.primary);
+            if (!dispatchIdValue(json,"channel",tmpstr.c_str(), target,requestId)) {
+                return;
+            }
+        } else {
+            if (!dispatchIdValue(json,"status","not connected", target,requestId)) {
+                return;
+            }
+        }
+
+        if (esp3dNetworkService.useStaticIp()) {
+            tmpstr = "static";
+        } else {
+            tmpstr = "dhcp";
+        }
+        if (!dispatchIdValue(json,"ip mode",tmpstr.c_str(), target,requestId)) {
+            return;
+        }
+        esp3d_ip_info_t  ipInfo;
+        if (esp3dNetworkService.getLocalIp(&ipInfo)) {
+            tmpstr =  ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.ip_info.ip));
+            if (!dispatchIdValue(json,"ip",tmpstr.c_str(), target,requestId)) {
+                return;
+            }
+            tmpstr =  ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.ip_info.gw));
+            if (!dispatchIdValue(json,"gw",tmpstr.c_str(), target,requestId)) {
+                return;
+            }
+            tmpstr =  ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.ip_info.netmask));
+            if (!dispatchIdValue(json,"msk",tmpstr.c_str(), target,requestId)) {
+                return;
+            }
+            tmpstr =  ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.dns_info.ip.u_addr.ip4));
+            if (!dispatchIdValue(json,"DNS",tmpstr.c_str(), target,requestId)) {
+                return;
+            }
+        }
+    }
+    //ap
+    if (esp3dNetworkService.getMode()==esp3d_wifi_ap || esp3dNetworkService.getMode()==esp3d_wifi_ap_config) {
+        tmpstr="ON";
+    } else {
+        tmpstr="OFF";
+    }
+    if (!dispatchIdValue(json,"ap",tmpstr.c_str(), target,requestId)) {
+        return;
+    }
+    if (esp3dNetworkService.getMode()==esp3d_wifi_ap_config) {
+
+        if (!dispatchIdValue(json,"config","ON", target,requestId)) {
+            return;
+        }
+    }
+    //AP MAC
+    tmpstr =esp3dNetworkService.getAPMac();
+    if (!dispatchIdValue(json,"mac(AP)",tmpstr.c_str(), target,requestId)) {
+        return;
+    }
+    if (esp3dNetworkService.getMode()==esp3d_wifi_ap || esp3dNetworkService.getMode()==esp3d_wifi_ap_config) {
+        wifi_config_t wconfig;
+        esp_err_t res = esp_wifi_get_config(WIFI_IF_AP, &wconfig);
+        if (res == ESP_OK) {
+            //ssid
+            tmpstr=(const char *)wconfig.ap.ssid;
+            if (!dispatchIdValue(json,"SSID",tmpstr.c_str(), target,requestId)) {
+                return;
+            }
+
+            tmpstr = std::to_string(wconfig.ap.channel);
+            if (!dispatchIdValue(json,"channel",tmpstr.c_str(), target,requestId)) {
+                return;
+            }
+
+        }
+        esp3d_ip_info_t  ipInfo;
+        if (esp3dNetworkService.getLocalIp(&ipInfo)) {
+            tmpstr =  ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.ip_info.ip));
+            if (!dispatchIdValue(json,"ip",tmpstr.c_str(), target,requestId)) {
+                return;
+            }
+            tmpstr =  ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.ip_info.gw));
+            if (!dispatchIdValue(json,"gw",tmpstr.c_str(), target,requestId)) {
+                return;
+            }
+            tmpstr =  ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.ip_info.netmask));
+            if (!dispatchIdValue(json,"msk",tmpstr.c_str(), target,requestId)) {
+                return;
+            }
+            tmpstr =  ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.dns_info.ip.u_addr.ip4));
+            if (!dispatchIdValue(json,"DNS",tmpstr.c_str(), target,requestId)) {
+                return;
+            }
+        }
+        wifi_sta_list_t sta_list;
+        tcpip_adapter_sta_list_t tcpip_sta_list;
+        ESP_ERROR_CHECK( esp_wifi_ap_get_sta_list(&sta_list));
+        if (sta_list.num>0) {
+            ESP_ERROR_CHECK( tcpip_adapter_get_sta_list (&sta_list, &tcpip_sta_list));
+        }
+
+
+        tmpstr = std::to_string(sta_list.num);
+
+        if (!dispatchIdValue(json,"clients",tmpstr.c_str(), target,requestId)) {
+            return;
+        }
+        for(int i = 0; i < sta_list.num; i++) {
+            //Print the mac address of the connected station
+
+            tmpstr = ip4addr_ntoa((const ip4_addr_t*)&(tcpip_sta_list.sta[i].ip));
+            tmpstr +="(";
+            tmpstr += esp3dNetworkService.getMacAddress(sta_list.sta[i].mac);
+            tmpstr +=")";
+            std::string client = "client ";
+            client+=std::to_string(i+1);
+            if (!dispatchIdValue(json,client.c_str(),tmpstr.c_str(), target,requestId)) {
+                return;
+            }
+        }
+    }
+//bt
+    if (esp3dNetworkService.getMode()==esp3d_bluetooth_serial ) {
+        tmpstr="ON";
+    } else {
+        tmpstr="OFF";
+    }
+    if ( !dispatchIdValue(json,"bt",tmpstr.c_str(), target,requestId)) {
+        return;
+    }
+    //BT MAC
+    tmpstr =esp3dNetworkService.getBTMac();
+    if (!dispatchIdValue(json,"mac(BT)",tmpstr.c_str(), target,requestId)) {
+        return;
+    }
 
     //end of list
     if (json) {
