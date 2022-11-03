@@ -1,5 +1,5 @@
 //Pins definition for ESP32S3_HMI43V3
-//Serial
+//Touch driver FT5X06 I2C
 #pragma once
 
 #include "driver/uart.h"
