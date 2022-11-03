@@ -21,10 +21,16 @@
 #pragma once
 #include <stdio.h>
 #include "esp_wifi.h"
+#include "freertos/event_groups.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef struct {
+    esp_netif_ip_info_t ip_info;
+    esp_netif_dns_info_t dns_info;
+}  esp3d_ip_info_t;
 
 typedef enum {
     esp3d_ip_mode_dhcp=0,
@@ -43,7 +49,6 @@ typedef enum {
     esp3d_wifi_ap_config=3,
     esp3d_bluetooth_serial=4
 } esp3d_radio_mode_t;
-
 
 class Esp3DNetwork final
 {
@@ -72,10 +77,22 @@ public:
     {
         return _started;
     };
+    EventGroupHandle_t getEventGroup()
+    {
+        return _s_wifi_event_group;
+    };
+    bool useStaticIp()
+    {
+        return _useStaticIp;
+    };
+    bool getLocalIp(esp3d_ip_info_t * ipInfo);
 private:
     bool _started;
+    bool _useStaticIp;
     esp_netif_t* _wifiApPtr;
+    esp_netif_t * _wifiStaPtr;
     esp3d_radio_mode_t _current_radio_mode;
+    EventGroupHandle_t _s_wifi_event_group;
 };
 
 extern Esp3DNetwork esp3dNetworkService;
