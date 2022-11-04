@@ -187,11 +187,11 @@ static void ili9341_send_color(void * data, uint16_t length)
 static void ili9341_set_orientation(uint8_t orientation)
 {
     // ESP_ASSERT(orientation < 4);
-
+#if ESP3D_TFT_LOG
     const char *orientation_str[] = {
         "PORTRAIT", "PORTRAIT_INVERTED", "LANDSCAPE", "LANDSCAPE_INVERTED"
     };
-
+#endif //ESP3D_TFT_LOG
     esp3d_log("Display orientation: %s", orientation_str[orientation]);
 
 

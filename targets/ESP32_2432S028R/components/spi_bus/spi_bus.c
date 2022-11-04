@@ -53,10 +53,11 @@ bool spi_driver_init(int host,
     int dma_channel,
     int quadwp_pin, int quadhd_pin){
     assert((0 <= host) && (SPI_HOST_MAX > host));
+#if ESP3D_TFT_LOG
     const char *spi_names[] = {
         "SPI1_HOST", "SPI2_HOST", "SPI3_HOST"
     };
-
+#endif //ESP3D_TFT_LOG
     esp3d_log("Configuring SPI host %s", spi_names[host]);
     esp3d_log("MISO pin: %d, MOSI pin: %d, SCLK pin: %d, IO2/WP pin: %d, IO3/HD pin: %d",
         miso_pin, mosi_pin, sclk_pin, quadwp_pin, quadhd_pin);

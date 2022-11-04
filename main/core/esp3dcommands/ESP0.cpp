@@ -34,7 +34,7 @@ const char * help[]= {"[ESP](id) - display this help",
                       "[ESP107](IP) - display/set AP IP",
                       "[ESP108](Chanel) - display/set AP chanel",
                       "[ESP110](State) - display/set radio state which can be STA,AP, CONFIG, BT OFF",
-                      "[ESP111] - display current IP"
+                      "[ESP111] - display current IP",
                       "[ESP112](Hostname) - display/set Hostname",
                       "[ESP114](State) - display/set boot Radio state which can be ON, OFF",
                       "[ESP115](State) - display/set immediate Radio state which can be ON, OFF",

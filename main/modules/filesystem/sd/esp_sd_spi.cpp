@@ -100,7 +100,16 @@ bool ESP3D_SD::begin()
     _started =false;
     esp_err_t ret;
     esp3d_log("Initializing SD card");
-    esp3d_log("Using SPI peripheral");
+#if ESP3D_TFT_LOG
+    const char *spi_names[] = {
+        "SPI1_HOST", "SPI2_HOST", "SPI3_HOST"
+    };
+#endif //ESP3D_TFT_LOG
+    esp3d_log("Configuring SPI host %s", spi_names[host.slot]);
+    esp3d_log("MISO pin: %d, MOSI pin: %d, SCLK pin: %d, IO2/WP pin: %d, IO3/HD pin: %d",
+              ESP3D_SD_MISO_PIN, ESP3D_SD_MOSI_PIN, ESP3D_SD_CLK_PIN, -1, -1);
+
+    esp3d_log("Max transfer size: %d (bytes)", MAX_TRANSFER_SZ);
     spi_bus_config_t bus_cfg = {
         .mosi_io_num = (gpio_num_t)ESP3D_SD_MOSI_PIN,
         .miso_io_num = (gpio_num_t)ESP3D_SD_MISO_PIN,
@@ -115,10 +124,12 @@ bool ESP3D_SD::begin()
         .flags = 0,
         .intr_flags = 0,
     };
+
     _spi_speed_divider =  esp3dTFTsettings.readByte(esp3d_spi_divider);
     ret = spi_bus_initialize((spi_host_device_t)host.slot, &bus_cfg, SDSPI_DEFAULT_DMA);
     if (ret != ESP_OK) {
-        esp3d_log_e("Failed to initialize bus.");
+        esp3d_log_e("Failed to initialize bus. %s", esp_err_to_name(ret));
+
         return false;
     }
     _started = true;

@@ -12,8 +12,10 @@ extern "C" {
  */
 #define ESP3D_SD_IS_SPI   0
 #define ESP3D_SD_IS_SDIO  1
-//TODO
+#define SOC_SDMMC_USE_GPIO_MATRIX 0
+
 //DEFINE CMD DATA CLK PINS
+//Only for reference for ESP32 devices
 #define ESP3D_SDIO_CMD_PIN    (15) //GPIO 15
 #define ESP3D_SDIO_CLK_PIN    (14) //GPIO 14
 #define ESP3D_SDIO_D0_PIN     (2)  //GPIO 2

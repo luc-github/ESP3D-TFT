@@ -64,6 +64,7 @@ bool ESP3D_SD::mount()
     host.max_freq_khz = ESP3D_SD_FREQ;
     sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
     slot_config.width = ESP3D_SDIO_BIT_WIDTH;
+#if SOC_SDMMC_USE_GPIO_MATRIX
     slot_config.clk = (gpio_num_t)ESP3D_SDIO_CLK_PIN;
     slot_config.cmd = (gpio_num_t)ESP3D_SDIO_CMD_PIN;
     slot_config.d0 = (gpio_num_t)ESP3D_SDIO_D0_PIN;
@@ -71,7 +72,7 @@ bool ESP3D_SD::mount()
     slot_config.d2 = (gpio_num_t)ESP3D_SDIO_D2_PIN;
     slot_config.d3 = (gpio_num_t)ESP3D_SDIO_D3_PIN;
     slot_config.flags |= SDMMC_SLOT_FLAG_INTERNAL_PULLUP;
-
+#endif //SOC_SDMMC_USE_GPIO_MATRIX
 
 
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {

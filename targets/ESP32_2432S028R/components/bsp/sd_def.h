@@ -11,7 +11,7 @@ extern "C" {
  *
  */
 #define ESP3D_SD_IS_SPI   1
-#define ESP3D_SD_MOSI_PIN    (23) //GPIO 35
+#define ESP3D_SD_MOSI_PIN    (23) //GPIO 23
 #define ESP3D_SD_MISO_PIN    (19) //GPIO 19
 #define ESP3D_SD_CLK_PIN     (18) //GPIO 18
 #define ESP3D_SD_CS_PIN      (5) //GPIO 5

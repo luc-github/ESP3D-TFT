@@ -53,58 +53,58 @@ static void ili9488_send_color(void * data, uint16_t length);
 // From github.com/mvturnho/ILI9488-lvgl-ESP32-WROVER-B
 void ili9488_init(void)
 {
-	lcd_init_cmd_t ili_init_cmds[]={
-                {ILI9488_CMD_SLEEP_OUT, {0x00}, 0x80},
-		{ILI9488_CMD_POSITIVE_GAMMA_CORRECTION, {0x00, 0x03, 0x09, 0x08, 0x16, 0x0A, 0x3F, 0x78, 0x4C, 0x09, 0x0A, 0x08, 0x16, 0x1A, 0x0F}, 15},
-		{ILI9488_CMD_NEGATIVE_GAMMA_CORRECTION, {0x00, 0x16, 0x19, 0x03, 0x0F, 0x05, 0x32, 0x45, 0x46, 0x04, 0x0E, 0x0D, 0x35, 0x37, 0x0F}, 15},
-		{ILI9488_CMD_POWER_CONTROL_1, {0x17, 0x15}, 2},
-		{ILI9488_CMD_POWER_CONTROL_2, {0x41}, 1},
-		{ILI9488_CMD_VCOM_CONTROL_1, {0x00, 0x12, 0x80}, 3},
-		{ILI9488_CMD_MEMORY_ACCESS_CONTROL, {(0x20 | 0x08)}, 1},
-		{ILI9488_CMD_COLMOD_PIXEL_FORMAT_SET, {0x66}, 1},
-		{ILI9488_CMD_INTERFACE_MODE_CONTROL, {0x00}, 1},
-		{ILI9488_CMD_FRAME_RATE_CONTROL_NORMAL, {0xA0}, 1},
-		{ILI9488_CMD_DISPLAY_INVERSION_CONTROL, {0x02}, 1},
-		{ILI9488_CMD_DISPLAY_FUNCTION_CONTROL, {0x02, 0x02}, 2},
-		{ILI9488_CMD_SET_IMAGE_FUNCTION, {0x00}, 1},
-		{ILI9488_CMD_WRITE_CTRL_DISPLAY, {0x28}, 1},
-		{ILI9488_CMD_WRITE_DISPLAY_BRIGHTNESS, {0x7F}, 1},
-		{ILI9488_CMD_ADJUST_CONTROL_3, {0xA9, 0x51, 0x2C, 0x02}, 4},
-		{ILI9488_CMD_DISPLAY_ON, {0x00}, 0x80},
-		{0, {0}, 0xff},
-	};
+    lcd_init_cmd_t ili_init_cmds[]= {
+        {ILI9488_CMD_SLEEP_OUT, {0x00}, 0x80},
+        {ILI9488_CMD_POSITIVE_GAMMA_CORRECTION, {0x00, 0x03, 0x09, 0x08, 0x16, 0x0A, 0x3F, 0x78, 0x4C, 0x09, 0x0A, 0x08, 0x16, 0x1A, 0x0F}, 15},
+        {ILI9488_CMD_NEGATIVE_GAMMA_CORRECTION, {0x00, 0x16, 0x19, 0x03, 0x0F, 0x05, 0x32, 0x45, 0x46, 0x04, 0x0E, 0x0D, 0x35, 0x37, 0x0F}, 15},
+        {ILI9488_CMD_POWER_CONTROL_1, {0x17, 0x15}, 2},
+        {ILI9488_CMD_POWER_CONTROL_2, {0x41}, 1},
+        {ILI9488_CMD_VCOM_CONTROL_1, {0x00, 0x12, 0x80}, 3},
+        {ILI9488_CMD_MEMORY_ACCESS_CONTROL, {(0x20 | 0x08)}, 1},
+        {ILI9488_CMD_COLMOD_PIXEL_FORMAT_SET, {0x66}, 1},
+        {ILI9488_CMD_INTERFACE_MODE_CONTROL, {0x00}, 1},
+        {ILI9488_CMD_FRAME_RATE_CONTROL_NORMAL, {0xA0}, 1},
+        {ILI9488_CMD_DISPLAY_INVERSION_CONTROL, {0x02}, 1},
+        {ILI9488_CMD_DISPLAY_FUNCTION_CONTROL, {0x02, 0x02}, 2},
+        {ILI9488_CMD_SET_IMAGE_FUNCTION, {0x00}, 1},
+        {ILI9488_CMD_WRITE_CTRL_DISPLAY, {0x28}, 1},
+        {ILI9488_CMD_WRITE_DISPLAY_BRIGHTNESS, {0x7F}, 1},
+        {ILI9488_CMD_ADJUST_CONTROL_3, {0xA9, 0x51, 0x2C, 0x02}, 4},
+        {ILI9488_CMD_DISPLAY_ON, {0x00}, 0x80},
+        {0, {0}, 0xff},
+    };
 
-	//Initialize non-SPI GPIOs
+    //Initialize non-SPI GPIOs
     gpio_pad_select_gpio(ILI9488_DC);
-	gpio_set_direction(ILI9488_DC, GPIO_MODE_OUTPUT);
+    gpio_set_direction(ILI9488_DC, GPIO_MODE_OUTPUT);
 
 #if ILI9488_USE_RST
     gpio_pad_select_gpio(ILI9488_RST);
-	gpio_set_direction(ILI9488_RST, GPIO_MODE_OUTPUT);
+    gpio_set_direction(ILI9488_RST, GPIO_MODE_OUTPUT);
 
-	//Reset the display
-	gpio_set_level(ILI9488_RST, 0);
-	vTaskDelay(100 / portTICK_RATE_MS);
-	gpio_set_level(ILI9488_RST, 1);
-	vTaskDelay(100 / portTICK_RATE_MS);
+    //Reset the display
+    gpio_set_level(ILI9488_RST, 0);
+    vTaskDelay(100 / portTICK_RATE_MS);
+    gpio_set_level(ILI9488_RST, 1);
+    vTaskDelay(100 / portTICK_RATE_MS);
 #endif
 
-	esp3d_log("ILI9488 initialization.");
+    esp3d_log("ILI9488 initialization.");
 
-	// Exit sleep
-	ili9488_send_cmd(0x01);	/* Software reset */
-	vTaskDelay(100 / portTICK_RATE_MS);
+    // Exit sleep
+    ili9488_send_cmd(0x01);	/* Software reset */
+    vTaskDelay(100 / portTICK_RATE_MS);
 
-	//Send all the commands
-	uint16_t cmd = 0;
-	while (ili_init_cmds[cmd].databytes!=0xff) {
-		ili9488_send_cmd(ili_init_cmds[cmd].cmd);
-		ili9488_send_data(ili_init_cmds[cmd].data, ili_init_cmds[cmd].databytes&0x1F);
-		if (ili_init_cmds[cmd].databytes & 0x80) {
-			vTaskDelay(100 / portTICK_RATE_MS);
-		}
-		cmd++;
-	}
+    //Send all the commands
+    uint16_t cmd = 0;
+    while (ili_init_cmds[cmd].databytes!=0xff) {
+        ili9488_send_cmd(ili_init_cmds[cmd].cmd);
+        ili9488_send_data(ili_init_cmds[cmd].data, ili_init_cmds[cmd].databytes&0x1F);
+        if (ili_init_cmds[cmd].databytes & 0x80) {
+            vTaskDelay(100 / portTICK_RATE_MS);
+        }
+        cmd++;
+    }
 
     ili9488_set_orientation(ILI9488_DISPLAY_ORIENTATION);
 }
@@ -118,7 +118,9 @@ void ili9488_flush(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * col
     uint8_t *mybuf;
     do {
         mybuf = (uint8_t *) heap_caps_malloc(3 * size * sizeof(uint8_t), MALLOC_CAP_DMA);
-        if (mybuf == NULL)  esp3d_log_e("Could not allocate enough DMA memory!");
+        if (mybuf == NULL)  {
+            esp3d_log_e("Could not allocate enough DMA memory!");
+        }
     } while (mybuf == NULL);
 
     uint32_t LD = 0;
@@ -134,35 +136,35 @@ void ili9488_flush(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * col
         j++;
     }
 
-	/* Column addresses  */
-	uint8_t xb[] = {
-	    (uint8_t) (area->x1 >> 8) & 0xFF,
-	    (uint8_t) (area->x1) & 0xFF,
-	    (uint8_t) (area->x2 >> 8) & 0xFF,
-	    (uint8_t) (area->x2) & 0xFF,
-	};
+    /* Column addresses  */
+    uint8_t xb[] = {
+        (uint8_t) (area->x1 >> 8) & 0xFF,
+        (uint8_t) (area->x1) & 0xFF,
+        (uint8_t) (area->x2 >> 8) & 0xFF,
+        (uint8_t) (area->x2) & 0xFF,
+    };
 
-	/* Page addresses  */
-	uint8_t yb[] = {
-	    (uint8_t) (area->y1 >> 8) & 0xFF,
-	    (uint8_t) (area->y1) & 0xFF,
-	    (uint8_t) (area->y2 >> 8) & 0xFF,
-	    (uint8_t) (area->y2) & 0xFF,
-	};
+    /* Page addresses  */
+    uint8_t yb[] = {
+        (uint8_t) (area->y1 >> 8) & 0xFF,
+        (uint8_t) (area->y1) & 0xFF,
+        (uint8_t) (area->y2 >> 8) & 0xFF,
+        (uint8_t) (area->y2) & 0xFF,
+    };
 
-	/*Column addresses*/
-	ili9488_send_cmd(ILI9488_CMD_COLUMN_ADDRESS_SET);
-	ili9488_send_data(xb, 4);
+    /*Column addresses*/
+    ili9488_send_cmd(ILI9488_CMD_COLUMN_ADDRESS_SET);
+    ili9488_send_data(xb, 4);
 
-	/*Page addresses*/
-	ili9488_send_cmd(ILI9488_CMD_PAGE_ADDRESS_SET);
-	ili9488_send_data(yb, 4);
+    /*Page addresses*/
+    ili9488_send_cmd(ILI9488_CMD_PAGE_ADDRESS_SET);
+    ili9488_send_data(yb, 4);
 
-	/*Memory write*/
-	ili9488_send_cmd(ILI9488_CMD_MEMORY_WRITE);
+    /*Memory write*/
+    ili9488_send_cmd(ILI9488_CMD_MEMORY_WRITE);
 
-	ili9488_send_color((void *) mybuf, size * 3);
-	heap_caps_free(mybuf);
+    ili9488_send_color((void *) mybuf, size * 3);
+    heap_caps_free(mybuf);
 }
 
 /**********************
@@ -194,11 +196,11 @@ static void ili9488_send_color(void * data, uint16_t length)
 static void ili9488_set_orientation(uint8_t orientation)
 {
     // ESP_ASSERT(orientation < 4);
-
+#if ESP3D_TFT_LOG
     const char *orientation_str[] = {
         "PORTRAIT", "PORTRAIT_INVERTED", "LANDSCAPE", "LANDSCAPE_INVERTED"
     };
-
+#endif // ESP3D_TFT_LOG
     esp3d_log( "Display orientation: %s", orientation_str[orientation]);
 
 
