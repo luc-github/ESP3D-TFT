@@ -71,9 +71,9 @@ bool ESP3D_SD::mount()
     slot_config.d1 = (gpio_num_t)ESP3D_SDIO_D1_PIN;
     slot_config.d2 = (gpio_num_t)ESP3D_SDIO_D2_PIN;
     slot_config.d3 = (gpio_num_t)ESP3D_SDIO_D3_PIN;
-    slot_config.flags |= SDMMC_SLOT_FLAG_INTERNAL_PULLUP;
-#endif //SOC_SDMMC_USE_GPIO_MATRIX
 
+#endif //SOC_SDMMC_USE_GPIO_MATRIX
+    slot_config.flags |= SDMMC_SLOT_FLAG_INTERNAL_PULLUP;
 
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {
         .format_if_mount_failed = ESP3D_SD_FORMAT_IF_MOUNT_FAILED,
