@@ -23,7 +23,7 @@ extern "C" {
 //default is 20MHz
 #define ESP3D_SD_FREQ (20000)
 #define ESP3D_SD_SPI_DIV  (4)
-#define ESP3D_SD_FORMAT_IF_MOUNT_FAILED   (1)
+#define ESP3D_SD_FORMAT_IF_MOUNT_FAILED   (0)
 
 
 #ifdef __cplusplus

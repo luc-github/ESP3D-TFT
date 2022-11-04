@@ -23,16 +23,15 @@ extern "C" {
 #define ESP3D_SDIO_D2_PIN     (-1) //NC 
 #define ESP3D_SDIO_D3_PIN     (-1) //NC 
 
-#define ESP3D_SDIO_BIT_WIDTH 1 //can be 1 or 4
+#define ESP3D_SDIO_BIT_WIDTH 1
 
-
-//#define ESP3D_SD_DETECT_PIN (-1) //GPIO -1
+#define ESP3D_SD_DETECT_PIN (-1) //GPIO -1
 //#define ESP3D_SD_DETECT_VALUE (0) //LOW
 
 //(range 400kHz - 40MHz for SDIO, less for other devices)
 //default is 20MHz
 #define ESP3D_SD_FREQ (20000)
-#define ESP3D_SD_FORMAT_IF_MOUNT_FAILED   (1)
+#define ESP3D_SD_FORMAT_IF_MOUNT_FAILED   (0)
 
 
 #ifdef __cplusplus
