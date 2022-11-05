@@ -66,13 +66,15 @@ bool ESP3D_SD::mount()
     sdspi_device_config_t slot_config = SDSPI_DEVICE_CONFIG_DEFAULT();
     slot_config.gpio_cs = (gpio_num_t)ESP3D_SD_CS_PIN;
     slot_config.host_id = (spi_host_device_t)host.slot;
+    esp3d_log ("CS pin %d, host_id %d , Max Freq %d", slot_config.gpio_cs, slot_config.host_id, host.max_freq_khz);
     host.max_freq_khz = ESP3D_SD_FREQ / _spi_speed_divider;
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {
         .format_if_mount_failed = ESP3D_SD_FORMAT_IF_MOUNT_FAILED,
         .max_files = 5,
         .allocation_unit_size = 16 * 1024
     };
-    esp3d_log("Mounting filesystem");
+
+    esp3d_log("Mounting filesystem cd:%d, wp:%d",slot_config.gpio_cd, slot_config.gpio_wp );
     esp_err_t ret = esp_vfs_fat_sdspi_mount(mount_point(), &host, &slot_config, &mount_config, &card);
 
     if (ret != ESP_OK) {
@@ -105,6 +107,9 @@ bool ESP3D_SD::begin()
         "SPI1_HOST", "SPI2_HOST", "SPI3_HOST"
     };
 #endif //ESP3D_TFT_LOG
+#if defined(SD_SPI_HOST)
+    host.slot = SD_SPI_HOST;
+#endif //
     esp3d_log("Configuring SPI host %s", spi_names[host.slot]);
     esp3d_log("MISO pin: %d, MOSI pin: %d, SCLK pin: %d, IO2/WP pin: %d, IO3/HD pin: %d",
               ESP3D_SD_MISO_PIN, ESP3D_SD_MOSI_PIN, ESP3D_SD_CLK_PIN, -1, -1);
@@ -126,7 +131,7 @@ bool ESP3D_SD::begin()
     };
 
     _spi_speed_divider =  esp3dTFTsettings.readByte(esp3d_spi_divider);
-    ret = spi_bus_initialize((spi_host_device_t)host.slot, &bus_cfg, SDSPI_DEFAULT_DMA);
+    ret = spi_bus_initialize((spi_host_device_t)host.slot, &bus_cfg, SPI_DMA_CH_AUTO );
     if (ret != ESP_OK) {
         esp3d_log_e("Failed to initialize bus. %s", esp_err_to_name(ret));
 
@@ -215,7 +220,7 @@ int ESP3D_SD::stat(const char * filepath,  struct  stat * entry_stat)
         }
         dir_path+=filepath;
     }
-    esp3d_log("Stat %s, %d", dir_path.c_str(), ::stat(dir_path.c_str(), entry_stat));
+    // esp3d_log("Stat %s, %d", dir_path.c_str(), ::stat(dir_path.c_str(), entry_stat));
     return ::stat(dir_path.c_str(), entry_stat);
 }
 
