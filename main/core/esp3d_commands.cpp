@@ -373,7 +373,7 @@ bool Esp3DCommands::hasTag (esp3d_msg_t * msg, uint start,const char* label)
         return false;
     }
     std::string lbl=label;
-    esp3d_log("checking message for tag %s", label);
+    //esp3d_log("checking message for tag %s", label);
     uint lenLabel = strlen(label);
     lbl+="=";
     lbl = get_param (msg, start,lbl.c_str());
@@ -385,7 +385,7 @@ bool Esp3DCommands::hasTag (esp3d_msg_t * msg, uint start,const char* label)
     }
     bool prevCharIsEscaped = false;
     bool prevCharIsspace= true;
-    esp3d_log("Checking  label as tag");
+    //esp3d_log("Checking  label as tag");
     for (uint i = start; i <msg->size; i++) {
         char c = char(msg->data[i]);
         //esp3d_log("%c", c);
@@ -417,7 +417,7 @@ bool Esp3DCommands::hasTag (esp3d_msg_t * msg, uint start,const char* label)
 
         }
     }
-    esp3d_log("label %s not found", label);
+    //esp3d_log("label %s not found", label);
     return false;
 }
 

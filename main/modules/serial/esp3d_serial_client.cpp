@@ -198,7 +198,7 @@ void Esp3DSerialClient::flush()
 {
     uint8_t loopCount = 10;
     while (loopCount && getTxMsgsCount() > 0) {
-        esp3d_log("flushing Tx messages");
+        //esp3d_log("flushing Tx messages");
         loopCount--;
         handle();
         uart_wait_tx_done(ESP3D_SERIAL_PORT, pdMS_TO_TICKS(500));
