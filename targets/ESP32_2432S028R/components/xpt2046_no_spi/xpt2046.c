@@ -20,8 +20,6 @@
 
 #define CMD_X_READ  0b10010000  // NOTE: XPT2046 data sheet says this is actually Y
 #define CMD_Y_READ  0b11010000  // NOTE: XPT2046 data sheet says this is actually X
-#define CMD_Z1_READ 0b10110000
-#define CMD_Z2_READ 0b11000000
 
 #define XPT2046_SMP_SIZE 4
 
