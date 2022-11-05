@@ -27,7 +27,6 @@
 #include "xpt2046.h"
 #include "ili9341.h"
 #include "spi_bus.h"
-#include "touch_spi.h"
 #include "disp_spi.h"
 #include "esp_lcd_backlight.h"
 
@@ -73,7 +72,6 @@ esp_err_t bsp_init(void)
 
     esp3d_log("Initializing display controller");
     disp_spi_add_device(DISP_SPI_HOST);
-
     ili9341_init();
 #if (defined(DISP_BACKLIGHT_SWITCH) || defined(DISP_BACKLIGHT_PWM))
     const disp_backlight_config_t bckl_config = {
@@ -95,14 +93,7 @@ esp_err_t bsp_init(void)
     disp_backlight_set(bckl_handle, 100);
 #endif
     /* Touch controller initialization */
-    esp3d_log("Initializing SPI master for touch");
-    spi_driver_init(TOUCH_SPI_HOST,
-                    TOUCH_SPI_MISO, TOUCH_SPI_MOSI, TOUCH_SPI_CLK,
-                    0 /* Defaults to 4094 */, 2,
-                    -1, -1);
-                    
     esp3d_log( "Initializing touch controller");
-    tp_spi_add_device(TOUCH_SPI_HOST);
     xpt2046_init();
 
     //Lvgl initialization
@@ -132,8 +123,6 @@ esp_err_t bsp_init(void)
     disp_drv.hor_res = DISP_HOR_RES_MAX;   /*Set the horizontal resolution of the display*/
     disp_drv.ver_res = DISP_VER_RES_MAX;   /*Set the vertical resolution of the display*/
     lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
-
-
 
     /* Register an input device */
     static lv_indev_drv_t indev_drv;           /*Descriptor of a input device driver*/

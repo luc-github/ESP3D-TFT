@@ -22,7 +22,7 @@ extern "C" {
 //(range 400kHz - 20MHz for SDSPI, less for other devices)
 //default is 20MHz
 #define ESP3D_SD_FREQ (20000)
-#define ESP3D_SD_SPI_DIV  (4)
+
 #define ESP3D_SD_FORMAT_IF_MOUNT_FAILED   (0)
 
 
