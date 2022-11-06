@@ -12,7 +12,6 @@ extern "C" {
  */
 #define ESP3D_SD_IS_SPI   0
 #define ESP3D_SD_IS_SDIO  1
-#define SOC_SDMMC_USE_GPIO_MATRIX 0
 
 //DEFINE CMD DATA CLK PINS
 //Only for reference for ESP32 devices
@@ -30,8 +29,7 @@ extern "C" {
 
 //(range 400kHz - 40MHz for SDIO, less for other devices)
 //default is 20MHz
-#define ESP3D_SD_FREQ (20000)
-#define ESP3D_SD_FORMAT_IF_MOUNT_FAILED   (0)
+#define ESP3D_SD_FREQ (40000)
 
 
 #ifdef __cplusplus

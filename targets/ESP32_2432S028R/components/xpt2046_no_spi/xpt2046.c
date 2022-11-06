@@ -104,9 +104,9 @@ void xpt2046_read(lv_indev_drv_t * drv, lv_indev_data_t * data)
 {
     static int16_t last_x = 0;
     static int16_t last_y = 0;
-    bool valid = true;
-    int16_t x = 0;
-    int16_t y = 0;
+    bool valid = false;
+    int16_t x = last_x;
+    int16_t y = last_y;
     uint16_t ux = 0;
     uint16_t uy = 0;
 
@@ -124,7 +124,7 @@ void xpt2046_read(lv_indev_drv_t * drv, lv_indev_data_t * data)
             } else {
                 uy = 0;
             }
-			//I do not get what is that calculation 
+			//I do not get what is that calculation ....
 			//come from 
             ux = 20+(uint32_t)((uint32_t)ux * LV_HOR_RES) / (3870 - 350);//320   3870-350
             uy = (uint32_t)((uint32_t)uy * LV_VER_RES) / (3870 - 190);// 240  3870-190
@@ -134,21 +134,9 @@ void xpt2046_read(lv_indev_drv_t * drv, lv_indev_data_t * data)
             esp3d_log("x = %d, y = %d", x, y);
             last_x = x;
             last_y = x;
-        } else {
-            esp3d_log_e("XPT2046 Read Error");
-			//per my test issue happen when slidding finger
-			//so between 2 sampling it may out of range
-			//so not a real issue actually
-            x = last_x;
-            y = last_y;
-            valid = false;
-        }
-    } else {
-        x = last_x;
-        y = last_y;
-        valid = false;
-    }
-
+            valid = true;
+        } 
+    } 
     data->point.x = x;
     data->point.y = y;
     data->state = valid == false ? LV_INDEV_STATE_REL : LV_INDEV_STATE_PR;

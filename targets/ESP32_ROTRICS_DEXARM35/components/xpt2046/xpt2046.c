@@ -34,16 +34,12 @@ typedef enum {
  *  STATIC PROTOTYPES
  **********************/
 static void xpt2046_corr(int16_t * x, int16_t * y);
-static void xpt2046_avg(int16_t * x, int16_t * y);
 static int16_t xpt2046_cmd(uint8_t cmd);
 static xpt2046_touch_detect_t xpt2048_is_touch_detected();
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-int16_t avg_buf_x[XPT2046_AVG];
-int16_t avg_buf_y[XPT2046_AVG];
-uint8_t avg_last;
 
 /**********************
  *      MACROS
@@ -100,15 +96,11 @@ void xpt2046_read(lv_indev_drv_t * drv, lv_indev_data_t * data)
         esp3d_log("P_norm(%d,%d)", x, y);
         
         xpt2046_corr(&x, &y);
-        xpt2046_avg(&x, &y);
         last_x = x;
         last_y = y;
 
         esp3d_log("x = %d, y = %d", x, y);
     }
-    else
-    {
-        avg_last = 0;
     }
 
     data->point.x = x;
@@ -184,34 +176,5 @@ static void xpt2046_corr(int16_t * x, int16_t * y)
 #if XPT2046_Y_INV != 0
     (*y) =  LV_VER_RES - (*y);
 #endif
-
-
 }
 
-
-static void xpt2046_avg(int16_t * x, int16_t * y)
-{
-    /*Shift out the oldest data*/
-    uint8_t i;
-    for(i = XPT2046_AVG - 1; i > 0 ; i--) {
-        avg_buf_x[i] = avg_buf_x[i - 1];
-        avg_buf_y[i] = avg_buf_y[i - 1];
-    }
-
-    /*Insert the new point*/
-    avg_buf_x[0] = *x;
-    avg_buf_y[0] = *y;
-    if(avg_last < XPT2046_AVG) avg_last++;
-
-    /*Sum the x and y coordinates*/
-    int32_t x_sum = 0;
-    int32_t y_sum = 0;
-    for(i = 0; i < avg_last ; i++) {
-        x_sum += avg_buf_x[i];
-        y_sum += avg_buf_y[i];
-    }
-
-    /*Normalize the sums*/
-    (*x) = (int32_t)x_sum / avg_last;
-    (*y) = (int32_t)y_sum / avg_last;
-}

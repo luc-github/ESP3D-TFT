@@ -59,7 +59,7 @@ bool ESP3D_SD::mount()
     if (_mounted) {
         unmount();
     }
-    esp3d_log_e("Initializing SD card");
+    esp3d_log("Initializing SD card");
     sdmmc_host_t host = SDMMC_HOST_DEFAULT();
     host.max_freq_khz = ESP3D_SD_FREQ;
     sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
@@ -74,9 +74,9 @@ bool ESP3D_SD::mount()
 
 #endif //SOC_SDMMC_USE_GPIO_MATRIX
     slot_config.flags |= SDMMC_SLOT_FLAG_INTERNAL_PULLUP;
-
+    slot_config.cd = (gpio_num_t)ESP3D_SD_DETECT_PIN;
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {
-        .format_if_mount_failed = ESP3D_SD_FORMAT_IF_MOUNT_FAILED,
+        .format_if_mount_failed = false,
         .max_files = 5,
         .allocation_unit_size = 16 * 1024
     };
@@ -188,7 +188,7 @@ int ESP3D_SD::stat(const char * filepath,  struct  stat * entry_stat)
         }
         dir_path+=filepath;
     }
-    esp3d_log("Stat %s, %d", dir_path.c_str(), ::stat(dir_path.c_str(), entry_stat));
+    //esp3d_log("Stat %s, %d", dir_path.c_str(), ::stat(dir_path.c_str(), entry_stat));
     return ::stat(dir_path.c_str(), entry_stat);
 }
 

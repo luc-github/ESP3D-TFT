@@ -69,7 +69,7 @@ bool ESP3D_SD::mount()
     esp3d_log ("CS pin %d, host_id %d , Max Freq %d", slot_config.gpio_cs, slot_config.host_id, host.max_freq_khz);
     host.max_freq_khz = ESP3D_SD_FREQ / _spi_speed_divider;
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {
-        .format_if_mount_failed = ESP3D_SD_FORMAT_IF_MOUNT_FAILED,
+        .format_if_mount_failed = false,
         .max_files = 5,
         .allocation_unit_size = 16 * 1024
     };
