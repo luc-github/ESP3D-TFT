@@ -101,8 +101,6 @@ void xpt2046_read(lv_indev_drv_t * drv, lv_indev_data_t * data)
 
         esp3d_log("x = %d, y = %d", x, y);
     }
-    }
-
     data->point.x = x;
     data->point.y = y;
     data->state = valid == false ? LV_INDEV_STATE_REL : LV_INDEV_STATE_PR;
