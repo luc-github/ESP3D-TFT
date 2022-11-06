@@ -24,7 +24,7 @@ extern "C" {
 
 #define ESP3D_SDIO_BIT_WIDTH 1
 
-#define ESP3D_SD_DETECT_PIN (-1) //GPIO -1
+#define ESP3D_SD_DETECT_PIN (37) //GPIO -1
 //#define ESP3D_SD_DETECT_VALUE (0) //LOW
 
 //(range 400kHz - 40MHz for SDIO, less for other devices)
