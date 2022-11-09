@@ -45,9 +45,9 @@ void Esp3DCommands::ESP120(int cmd_params_pos,esp3d_msg_t * msg)
     }
 #endif //ESP3D_AUTHENTICATION_FEATURE
     tmpstr = get_clean_param(msg,cmd_params_pos);
-    esp3d_state_t setting_radio_mode = (esp3d_state_t)esp3dTFTsettings.readByte(esp3d_http_on);
+    esp3d_state_t setting_http_mode = (esp3d_state_t)esp3dTFTsettings.readByte(esp3d_http_on);
     if (tmpstr.length()==0) {
-        if (setting_radio_mode==esp3d_state_off) {
+        if (setting_http_mode==esp3d_state_off) {
             ok_msg = "OFF";
         } else {
             ok_msg= "ON";
