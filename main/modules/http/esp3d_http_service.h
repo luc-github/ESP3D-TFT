@@ -20,6 +20,7 @@
 
 #pragma once
 #include <stdio.h>
+#include <esp_http_server.h>
 
 
 #ifdef __cplusplus
@@ -43,6 +44,7 @@ public:
 
 private:
     bool _started;
+    httpd_handle_t _server;
 };
 
 extern Esp3DHttpService esp3dHttpService;

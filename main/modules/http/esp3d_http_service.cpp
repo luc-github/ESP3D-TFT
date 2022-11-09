@@ -31,6 +31,7 @@ Esp3DHttpService esp3dHttpService;
 Esp3DHttpService::Esp3DHttpService()
 {
     _started = false;
+    _server = nullptr;
 }
 
 Esp3DHttpService::~Esp3DHttpService() {}
@@ -38,7 +39,29 @@ Esp3DHttpService::~Esp3DHttpService() {}
 bool Esp3DHttpService::begin()
 {
     esp3d_log("Starting Http Service");
-    _started = true;
+
+    end();
+    //check if start
+    if (esp3d_state_on!= (esp3d_state_t)esp3dTFTsettings.readByte(esp3d_http_on)) {
+        esp3d_log("Http is not enabled");
+        //return true because no error but _started is false
+        return true;
+    }
+    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+    uint32_t  intValue = esp3dTFTsettings.readUint32(esp3d_http_port);
+    //HTTP port
+    config.server_port = intValue;
+    //Http server core
+    config.core_id = 0;
+    //start server
+    esp3d_log("Starting server on port: '%d'", config.server_port);
+    if (httpd_start(&_server, &config) == ESP_OK) {
+        // Set URI handlers
+        esp3d_log("Registering URI handlers");
+        //  httpd_register_uri_handler(server, &hello);
+
+        _started = true;
+    }
     return _started;
 }
 
@@ -46,9 +69,13 @@ void Esp3DHttpService::handle() {}
 
 void Esp3DHttpService::end()
 {
-    if (!_started) {
+    if (!_started && !_server) {
         return;
     }
     esp3d_log("Stop Http Service");
+    if (_server) {
+        httpd_stop(_server);
+    }
+    _server = nullptr;
     _started = false;
 }
