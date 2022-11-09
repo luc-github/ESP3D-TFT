@@ -65,7 +65,9 @@ const Esp3DSetting_t Esp3DSettingsData [] = {
     {esp3d_ap_ssid, esp3d_string, SIZE_OF_SETTING_SSID_ID,"esp3dtft"},
     {esp3d_ap_password, esp3d_string, SIZE_OF_SETTING_SSID_PWD,"12345678"},
     {esp3d_ap_ip_static, esp3d_ip, 4,"192.168.0.1"},
-    {esp3d_ap_channel, esp3d_byte, 1,"2"}
+    {esp3d_ap_channel, esp3d_byte, 1,"2"},
+    {esp3d_http_port, esp3d_integer, 4, "80"},
+    {esp3d_http_on, esp3d_byte, 1,"1"},
 };
 
 bool  Esp3DSettings::isValidStringSetting(const char* value, esp3d_setting_index_t settingElement)
@@ -113,6 +115,11 @@ bool  Esp3DSettings::isValidIntegerSetting(uint32_t value, esp3d_setting_index_t
             }
         }
         break;
+    case esp3d_http_port:
+        if (value>=1 && value<65535) {
+            return true;
+        }
+        break;
     default:
         return false;
     }
@@ -129,6 +136,7 @@ bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t set
         return false;
     }
     switch(settingElement) {
+    case esp3d_http_on:
     case esp3d_radio_boot_mode:
         if(value==(uint8_t)esp3d_state_off || value==(uint8_t)esp3d_state_on) {
             return true;
@@ -385,7 +393,7 @@ const char* Esp3DSettings::readIPString(esp3d_setting_index_t index, bool * hase
 {
     uint32_t ipInt = readUint32(index,haserror);
     std::string ipStr = IPUInt32toString(ipInt);
-    esp3d_log("read setting %d : %d to %s",index, ipInt,ipStr.c_str());
+    //esp3d_log("read setting %d : %d to %s",index, ipInt,ipStr.c_str());
     return IPUInt32toString(ipInt);
 }
 

@@ -47,6 +47,13 @@ typedef union {
     httpd_req_t *httpReq;
 } esp3d_request_t;
 
+typedef enum {
+    msg_head,
+    msg_core,
+    msg_tail,
+    msg_unique
+} esp3d_msg_type_t;
+
 typedef struct {
     uint8_t * data;
     size_t size;
@@ -54,6 +61,7 @@ typedef struct {
     esp3d_clients_t target;
     esp3d_authentication_level_t authentication_level;
     esp3d_request_t requestId;
+    esp3d_msg_type_t type;
 } esp3d_msg_t;
 
 class Esp3DClient

@@ -61,6 +61,8 @@ public:
     void ESP112(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP114(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP115(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP120(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP121(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP200(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP202(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP400(int cmd_params_pos,esp3d_msg_t * msg);

@@ -20,65 +20,50 @@
 #include "esp3d_commands.h"
 #include "esp3d_client.h"
 #include "esp3d_string.h"
-#include "esp3d_settings.h"
-#include "esp_system.h"
-#include "freertos/task.h"
 #include "authentication/esp3d_authentication.h"
-#define COMMAND_ID 444
-
-//Set ESP State
-//`cmd` can be  `RESTART` to restart board or `RESET` to reset all setting to  defaults values
-//[ESP444]<cmd> json=<no> <pwd=admin>`
-void Esp3DCommands::ESP444(int cmd_params_pos,esp3d_msg_t * msg)
+#include "network/esp3d_network.h"
+#define COMMAND_ID 120
+//Set HTTP port
+//[ESP121]<port> json=<no> pwd=<admin password>
+void Esp3DCommands::ESP120(int cmd_params_pos,esp3d_msg_t * msg)
 {
     esp3d_clients_t target = msg->origin;
     esp3d_request_t requestId = msg->requestId;
     (void)requestId;
     msg->target = target;
     msg->origin = ESP3D_COMMAND;
-    bool json = hasTag (msg,cmd_params_pos,"json");
-    std::string tmpstr;
-    bool isRestart = hasTag (msg, cmd_params_pos,"RESTART");
-    bool isReset = hasTag (msg, cmd_params_pos,"RESET");
     bool hasError = false;
     std::string error_msg ="Invalid parameters";
-    std::string ok_msg ="";
+    std::string ok_msg ="ok";
+    bool json = hasTag (msg,cmd_params_pos,"json");
+    std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
-    if (msg->authentication_level != ESP3D_LEVEL_ADMIN) {
+    if (msg->authentication_level == ESP3D_LEVEL_GUEST) {
         msg->authentication_level =ESP3D_LEVEL_NOT_AUTHENTICATED;
-        dispatchAuthenticationError(msg, COMMAND_ID, json);
+        dispatchAuthenticationError(msg, COMMAND_ID,json);
         return;
     }
 #endif //ESP3D_AUTHENTICATION_FEATURE
-    if (isReset) {
-        esp3dTFTsettings.reset();
-        esp3d_log("Resetting settings");
-    }
-
-    if (!(isRestart||isReset)) {
-        hasError= true;
-    } else {
-
-        if (isReset) {
-            ok_msg += "Reset done";
+    tmpstr = get_clean_param(msg,cmd_params_pos);
+    esp3d_state_t setting_radio_mode = (esp3d_state_t)esp3dTFTsettings.readByte(esp3d_http_on);
+    if (tmpstr.length()==0) {
+        if (setting_radio_mode==esp3d_state_off) {
+            ok_msg = "OFF";
+        } else {
+            ok_msg= "ON";
         }
-        if (isRestart) {
-            if (ok_msg.length()>0 ) {
-                ok_msg += ", ";
+    } else {
+        if (tmpstr=="OFF" || tmpstr=="ON") {
+            if (!esp3dTFTsettings.writeByte (esp3d_http_on, tmpstr=="OFF"?0:1)) {
+                hasError = true;
+                error_msg="Set value failed";
             }
-            ok_msg += "Now restarting...";
+        } else {
+            hasError = true;
+            error_msg ="Invalid parameter";
         }
     }
     if(!dispatchAnswer(msg,COMMAND_ID, json, hasError, hasError?error_msg.c_str():ok_msg.c_str())) {
         esp3d_log_e("Error sending response to clients");
-        return;
-    }
-    if (isRestart) {
-        flush();
-        vTaskDelay(pdMS_TO_TICKS(1000));
-        esp_restart();
-        while(1) {
-            vTaskDelay(pdMS_TO_TICKS(10));
-        }
     }
 }

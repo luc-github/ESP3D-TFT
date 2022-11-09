@@ -502,6 +502,10 @@ bool Esp3DNetwork::startApMode(bool configMode)
     } else {
         stmp = "Access Point setup failed\n";
     }
+#if ESP3D_TFT_LOG
+    //to avoid esp3d_log merge with dispatch message on serial output
+    vTaskDelay(pdMS_TO_TICKS(500));
+#endif // ESP3D_TFT_LOG
     esp3dCommands. dispatch(stmp.c_str(),  ALL_CLIENTS,requestId, ESP3D_SYSTEM, ESP3D_LEVEL_ADMIN);
     if (success) {
         esp3dNetworkServices.begin();

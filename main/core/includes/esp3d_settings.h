@@ -50,6 +50,8 @@ typedef enum  {
     esp3d_ap_ip_static,
     esp3d_ap_channel,
     esp3d_hostname,
+    esp3d_http_port,
+    esp3d_http_on,
     last_one
 } esp3d_setting_index_t;
 
