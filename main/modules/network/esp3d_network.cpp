@@ -76,9 +76,9 @@ static void  wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
                 xEventGroupSetBits(esp3dNetwork.getEventGroup(), WIFI_CONNECTED_BIT);
                 s_retry_num = 0;
             }
-            return;
+        } else {
+            esp3d_log_e("connect to the AP failed: %s", esp_err_to_name(res));
         }
-        esp3d_log_e("connect to the AP failed: %s", esp_err_to_name(res));
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
         if (s_retry_num < ESP3D_STA_MAXIMUM_RETRY) {
             esp3d_log( "retry to connect to the AP %d", s_retry_num);
@@ -260,6 +260,10 @@ bool Esp3DNetwork::startStaMode()
         stopStaMode();
     }
     esp3d_log("Init STA Mode");
+    esp3dTFTsettings.readString(esp3d_sta_ssid,ssid_str, 33);
+    if (strlen(ssid_str)==0) {
+        return false;
+    }
     _s_wifi_event_group = xEventGroupCreate();
     if (!_s_wifi_event_group) {
         esp3d_log("Cannot create event group");
@@ -351,6 +355,17 @@ bool Esp3DNetwork::startStaMode()
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config) );
     ESP_ERROR_CHECK(esp_wifi_start() );
 
+    //Set hostname
+    const Esp3DSetting_t * settingPtr = esp3dTFTsettings.getSettingPtr(esp3d_hostname);
+    if (settingPtr) {
+        char out_str[33]= {0};
+        std::string hostname = esp3dTFTsettings.readString(esp3d_hostname, out_str, settingPtr->size);
+        if (ESP_OK != esp_netif_set_hostname(_wifiStaPtr, hostname.c_str())) {
+            esp3d_log_e("Failed to set hostname");
+        }
+    } else {
+        esp3d_log_e("No hostname setting found");
+    }
     _current_radio_mode = esp3d_wifi_sta;
     /* Waiting until either the connection is established (WIFI_CONNECTED_BIT) or connection failed for the maximum
      * number of re-tries (WIFI_FAIL_BIT). The bits are set by event_handler() (see above) */
@@ -472,13 +487,26 @@ bool Esp3DNetwork::startApMode(bool configMode)
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_AP, &wifi_config));
     esp3d_log("Start wifi");
     ESP_ERROR_CHECK(esp_wifi_start());
+    //Set hostname
+    const Esp3DSetting_t * settingPtr = esp3dTFTsettings.getSettingPtr(esp3d_hostname);
+    if (settingPtr) {
+        char out_str[33]= {0};
+        std::string hostname = esp3dTFTsettings.readString(esp3d_hostname,out_str, settingPtr->size);
+        if (ESP_OK != esp_netif_set_hostname(_wifiApPtr,hostname.c_str())) {
+            esp3d_log_e("Failed to set hostname");
+        }
+    } else {
+        esp3d_log_e("No hostname setting found");
+    }
+
+
     esp_netif_ip_info_t ip_info;
     std::string stmp;
     esp3d_request_t requestId= {.id=0};
     _current_radio_mode = esp3d_wifi_ap;
     if (ESP_OK == esp_netif_get_ip_info(_wifiApPtr,&ip_info)) {
 #if ESP3D_TFT_LOG
-        esp3d_log("wifi_init_softap finished. SSID:%s password:%s channel:%d",
+        esp3d_log("wifi_init_softap done.\nSSID:%s\npassword:%s\nchannel:%d",
                   ssid_str, ssid_pwd_str, channel);
         esp3d_log("AP IP: " IPSTR, IP2STR(&ip_info.ip));
         esp3d_log("AP GW: " IPSTR, IP2STR(&ip_info.gw));
