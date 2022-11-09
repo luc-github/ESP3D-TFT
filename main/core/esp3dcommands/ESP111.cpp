@@ -50,7 +50,7 @@ void Esp3DCommands::ESP111(int cmd_params_pos,esp3d_msg_t * msg)
         hasError = true;
     } else {
         esp3d_ip_info_t  ipInfo;
-        if (esp3dNetworkService.getLocalIp(&ipInfo)) {
+        if (esp3dNetwork.getLocalIp(&ipInfo)) {
             ok_msg =  ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.ip_info.ip));
         } else {
             hasError = true;

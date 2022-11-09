@@ -117,7 +117,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     }
 
     //wifi
-    if (esp3dNetworkService.getMode()==esp3d_radio_off || esp3dNetworkService.getMode()==esp3d_bluetooth_serial) {
+    if (esp3dNetwork.getMode()==esp3d_radio_off || esp3dNetwork.getMode()==esp3d_bluetooth_serial) {
         tmpstr="OFF";
     } else {
         tmpstr="ON";
@@ -138,7 +138,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
         return;
     }
     //sta
-    if (esp3dNetworkService.getMode()==esp3d_wifi_sta) {
+    if (esp3dNetwork.getMode()==esp3d_wifi_sta) {
         tmpstr="ON";
     } else {
         tmpstr="OFF";
@@ -148,12 +148,12 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     }
 
     //Sta MAC
-    tmpstr =esp3dNetworkService.getSTAMac();
+    tmpstr =esp3dNetwork.getSTAMac();
     if (!dispatchIdValue(json,"mac",tmpstr.c_str(), target,requestId)) {
         return;
     }
 
-    if (esp3dNetworkService.getMode()==esp3d_wifi_sta) {
+    if (esp3dNetwork.getMode()==esp3d_wifi_sta) {
 
         wifi_ap_record_t ap;
         esp_err_t res = esp_wifi_sta_get_ap_info(&ap);
@@ -164,7 +164,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
                 return;
             }
             //%signal
-            int32_t signal = esp3dNetworkService.getSignal(ap.rssi,false);
+            int32_t signal = esp3dNetwork.getSignal(ap.rssi,false);
             tmpstr = std::to_string(signal);
             tmpstr +="%";
             if (!dispatchIdValue(json,"signal",tmpstr.c_str(), target,requestId)) {
@@ -180,7 +180,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
             }
         }
 
-        if (esp3dNetworkService.useStaticIp()) {
+        if (esp3dNetwork.useStaticIp()) {
             tmpstr = "static";
         } else {
             tmpstr = "dhcp";
@@ -189,7 +189,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
             return;
         }
         esp3d_ip_info_t  ipInfo;
-        if (esp3dNetworkService.getLocalIp(&ipInfo)) {
+        if (esp3dNetwork.getLocalIp(&ipInfo)) {
             tmpstr =  ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.ip_info.ip));
             if (!dispatchIdValue(json,"ip",tmpstr.c_str(), target,requestId)) {
                 return;
@@ -209,7 +209,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
         }
     }
     //ap
-    if (esp3dNetworkService.getMode()==esp3d_wifi_ap || esp3dNetworkService.getMode()==esp3d_wifi_ap_config) {
+    if (esp3dNetwork.getMode()==esp3d_wifi_ap || esp3dNetwork.getMode()==esp3d_wifi_ap_config) {
         tmpstr="ON";
     } else {
         tmpstr="OFF";
@@ -217,18 +217,18 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     if (!dispatchIdValue(json,"ap",tmpstr.c_str(), target,requestId)) {
         return;
     }
-    if (esp3dNetworkService.getMode()==esp3d_wifi_ap_config) {
+    if (esp3dNetwork.getMode()==esp3d_wifi_ap_config) {
 
         if (!dispatchIdValue(json,"config","ON", target,requestId)) {
             return;
         }
     }
     //AP MAC
-    tmpstr =esp3dNetworkService.getAPMac();
+    tmpstr =esp3dNetwork.getAPMac();
     if (!dispatchIdValue(json,"mac(AP)",tmpstr.c_str(), target,requestId)) {
         return;
     }
-    if (esp3dNetworkService.getMode()==esp3d_wifi_ap || esp3dNetworkService.getMode()==esp3d_wifi_ap_config) {
+    if (esp3dNetwork.getMode()==esp3d_wifi_ap || esp3dNetwork.getMode()==esp3d_wifi_ap_config) {
         wifi_config_t wconfig;
         esp_err_t res = esp_wifi_get_config(WIFI_IF_AP, &wconfig);
         if (res == ESP_OK) {
@@ -245,7 +245,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
 
         }
         esp3d_ip_info_t  ipInfo;
-        if (esp3dNetworkService.getLocalIp(&ipInfo)) {
+        if (esp3dNetwork.getLocalIp(&ipInfo)) {
             tmpstr =  ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.ip_info.ip));
             if (!dispatchIdValue(json,"ip",tmpstr.c_str(), target,requestId)) {
                 return;
@@ -281,7 +281,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
 
             tmpstr = ip4addr_ntoa((const ip4_addr_t*)&(tcpip_sta_list.sta[i].ip));
             tmpstr +="(";
-            tmpstr += esp3dNetworkService.getMacAddress(sta_list.sta[i].mac);
+            tmpstr += esp3dNetwork.getMacAddress(sta_list.sta[i].mac);
             tmpstr +=")";
             std::string client = "client ";
             client+=std::to_string(i+1);
@@ -291,7 +291,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
         }
     }
 //bt
-    if (esp3dNetworkService.getMode()==esp3d_bluetooth_serial ) {
+    if (esp3dNetwork.getMode()==esp3d_bluetooth_serial ) {
         tmpstr="ON";
     } else {
         tmpstr="OFF";
@@ -300,7 +300,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
         return;
     }
     //BT MAC
-    tmpstr =esp3dNetworkService.getBTMac();
+    tmpstr =esp3dNetwork.getBTMac();
     if (!dispatchIdValue(json,"mac(BT)",tmpstr.c_str(), target,requestId)) {
         return;
     }

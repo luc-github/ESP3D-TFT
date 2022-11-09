@@ -83,7 +83,7 @@ void Esp3DCommands::ESP110(int cmd_params_pos,esp3d_msg_t * msg)
                 hasError = true;
                 error_msg="Set value failed";
             } else {
-                esp3dNetworkService.setMode ((esp3d_radio_mode_t)byteValue);
+                esp3dNetwork.setMode ((esp3d_radio_mode_t)byteValue);
             }
         } else {
             hasError=true;

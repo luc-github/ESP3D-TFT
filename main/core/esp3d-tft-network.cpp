@@ -58,7 +58,7 @@ static void networkTask(void *pvParameter)
     ESP_ERROR_CHECK(esp_netif_init()); //desinit is not yet support so do it once
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     vTaskDelay(pdMS_TO_TICKS(100));
-    esp3dNetworkService.begin();
+    esp3dNetwork.begin();
     while (1) {
         /* Delay */
         vTaskDelay(pdMS_TO_TICKS(10));

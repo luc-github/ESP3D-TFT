@@ -103,7 +103,7 @@ private:
     const char * getMac(esp_mac_type_t type);
 };
 
-extern Esp3DNetwork esp3dNetworkService;
+extern Esp3DNetwork esp3dNetwork;
 #ifdef __cplusplus
 } // extern "C"
 #endif

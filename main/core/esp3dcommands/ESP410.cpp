@@ -52,7 +52,7 @@ void Esp3DCommands::ESP410(int cmd_params_pos,esp3d_msg_t * msg)
     }
 #endif //ESP3D_AUTHENTICATION_FEATURE
 
-    if (esp3dNetworkService.getMode() == esp3d_radio_off || esp3dNetworkService.getMode() == esp3d_bluetooth_serial) {
+    if (esp3dNetwork.getMode() == esp3d_radio_off || esp3dNetwork.getMode() == esp3d_bluetooth_serial) {
         tmpstr= "Network not enabled";
         dispatchAnswer(msg, COMMAND_ID, json,true,tmpstr.c_str());
         return;
@@ -70,7 +70,7 @@ void Esp3DCommands::ESP410(int cmd_params_pos,esp3d_msg_t * msg)
         return;
     }
 
-    if (esp3dNetworkService.getMode() !=esp3d_wifi_sta) {
+    if (esp3dNetwork.getMode() !=esp3d_wifi_sta) {
         ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
     }
     esp_err_t res = esp_wifi_scan_start(NULL, true);
@@ -88,7 +88,7 @@ void Esp3DCommands::ESP410(int cmd_params_pos,esp3d_msg_t * msg)
         for (int i = 0; (i < MAX_SCAN_LIST_SIZE) && (i < ap_count); i++) {
             esp3d_log ("%s %d %d", ap_info[i].ssid, ap_info[i].rssi, ap_info[i].authmode);
             tmpstr="";
-            int32_t signal = esp3dNetworkService.getSignal (ap_info[i].rssi, false);
+            int32_t signal = esp3dNetwork.getSignal (ap_info[i].rssi, false);
             if (signal !=0) {
                 if (json) {
                     if (real_count>0) {
@@ -130,7 +130,7 @@ void Esp3DCommands::ESP410(int cmd_params_pos,esp3d_msg_t * msg)
         // esp_wifi_clear_ap_list(void);
     }
 
-    if (esp3dNetworkService.getMode() !=esp3d_wifi_sta) {
+    if (esp3dNetwork.getMode() !=esp3d_wifi_sta) {
         ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
     }
     //end of list

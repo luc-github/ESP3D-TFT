@@ -25,8 +25,9 @@
 #include "esp3d_string.h"
 #include "esp3d_settings.h"
 #include "esp3d_commands.h"
+#include "esp3d_network_services.h"
 
-Esp3DNetwork esp3dNetworkService;
+Esp3DNetwork esp3dNetwork;
 
 /* The event group allows multiple bits for each event, but we only care about two events:
  * - we are connected to the AP with an IP
@@ -62,6 +63,8 @@ static void  wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
                                     int32_t event_id, void* event_data)
 {
     static uint s_retry_num = 0;
+    //IP_EVENT_STA_LOST_IP TODO:
+
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
         esp3d_log( "Try to connect to the AP");
         esp_err_t  res = esp_wifi_connect();
@@ -69,8 +72,8 @@ static void  wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
         case ESP_OK:
             esp3d_log( "Success connecting to the AP");
 
-            if (esp3dNetworkService.useStaticIp()) {
-                xEventGroupSetBits(esp3dNetworkService.getEventGroup(), WIFI_CONNECTED_BIT);
+            if (esp3dNetwork.useStaticIp()) {
+                xEventGroupSetBits(esp3dNetwork.getEventGroup(), WIFI_CONNECTED_BIT);
                 s_retry_num = 0;
             }
             return;
@@ -100,11 +103,14 @@ static void  wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
             switch (res) {
             case ESP_OK:
                 esp3d_log( "Success connecting to the AP");
-                if (esp3dNetworkService.useStaticIp()) {
+                if (esp3dNetwork.useStaticIp()) {
                     s_retry_num = 0;
-                    xEventGroupSetBits(esp3dNetworkService.getEventGroup(), WIFI_CONNECTED_BIT);
+                    xEventGroupSetBits(esp3dNetwork.getEventGroup(), WIFI_CONNECTED_BIT);
                 }
                 break;
+            //TODO: error
+            //Use esp_err_to_name() instead of switch
+            //do not use xEventGroupSetBits but esp3dNetworkServices or esp3dNetwork.ConnectionOk / esp3dNetwork.ConnectionFail
             case ESP_ERR_WIFI_NOT_INIT:
                 esp3d_log( "WiFi is not initialized by esp_wifi_init");
                 break;
@@ -122,7 +128,7 @@ static void  wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
                 break;
             }
         } else {
-            xEventGroupSetBits(esp3dNetworkService.getEventGroup(), WIFI_FAIL_BIT);
+            xEventGroupSetBits(esp3dNetwork.getEventGroup(), WIFI_FAIL_BIT);
         }
         esp3d_log_e("connect to the AP fail");
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
@@ -133,7 +139,7 @@ static void  wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
         //TODO: TBD
 #endif // ESP3D_TFT_LOG
         s_retry_num = 0;
-        xEventGroupSetBits(esp3dNetworkService.getEventGroup(), WIFI_CONNECTED_BIT);
+        xEventGroupSetBits(esp3dNetwork.getEventGroup(), WIFI_CONNECTED_BIT);
     }
 }
 
@@ -183,6 +189,7 @@ Esp3DNetwork::Esp3DNetwork()
     _wifiApPtr = nullptr;
     _s_wifi_event_group = nullptr;
     _useStaticIp = false;
+    _started = false;
 }
 
 Esp3DNetwork::~Esp3DNetwork() {}
@@ -269,7 +276,6 @@ const char * Esp3DNetwork::getModeStr(esp3d_radio_mode_t mode)
 
 bool Esp3DNetwork::startStaMode()
 {
-    static bool initDone   = false;
     bool connected = false;
     char ssid_str[33]= {0};
     char ssid_pwd_str[32]= {0};
@@ -288,19 +294,15 @@ bool Esp3DNetwork::startStaMode()
         return false;
     }
     esp3d_log("Free mem %d",esp_get_minimum_free_heap_size());
-    if (!initDone) {
-        esp3d_log("Create default sta service, once");
-        wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-        //init the wifi
-        ESP_ERROR_CHECK(esp_wifi_init(&cfg));
-        esp3d_log("Free mem %d",esp_get_minimum_free_heap_size());
-        if (esp_wifi_set_storage(WIFI_STORAGE_RAM) != ESP_OK) {
-            esp3d_log_e("Cannot disable persistence of wifi setting to flash");
-        }
-
-
-        initDone=true;
+    esp3d_log("Create default sta service");
+    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    //init the wifi
+    ESP_ERROR_CHECK(esp_wifi_init(&cfg));
+    esp3d_log("Free mem %d",esp_get_minimum_free_heap_size());
+    if (esp_wifi_set_storage(WIFI_STORAGE_RAM) != ESP_OK) {
+        esp3d_log_e("Cannot disable persistence of wifi setting to flash");
     }
+
     esp3d_log("Register wifi handler");
 
     ESP_ERROR_CHECK(esp_event_handler_instance_register(WIFI_EVENT,
@@ -309,7 +311,7 @@ bool Esp3DNetwork::startStaMode()
                     NULL,
                     NULL));
     ESP_ERROR_CHECK(esp_event_handler_instance_register(IP_EVENT,
-                    IP_EVENT_STA_GOT_IP,
+                    ESP_EVENT_ANY_ID,
                     &wifi_sta_event_handler,
                     NULL,
                     NULL));
@@ -427,7 +429,6 @@ int32_t Esp3DNetwork::getSignal (int32_t RSSI, bool filter)
 
 bool Esp3DNetwork::startApMode(bool configMode)
 {
-    static bool initDone   = false;
     bool success = false;
     char ssid_str[33]= {0};
     char ssid_pwd_str[32]= {0};
@@ -436,17 +437,16 @@ bool Esp3DNetwork::startApMode(bool configMode)
     }
     esp3d_log("Init AP Mode");
     esp3d_log("Free mem %d",esp_get_minimum_free_heap_size());
-    if (!initDone) {
-        esp3d_log("Create default ap service, once");
-        wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-        //init the wifi
-        ESP_ERROR_CHECK(esp_wifi_init(&cfg));
-        esp3d_log("Free mem %d",esp_get_minimum_free_heap_size());
-        if (esp_wifi_set_storage(WIFI_STORAGE_RAM) != ESP_OK) {
-            esp3d_log_e("Cannot disable persistence of wifi setting to flash");
-        }
-        initDone=true;
+
+    esp3d_log("Create default ap service");
+    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    //init the wifi
+    ESP_ERROR_CHECK(esp_wifi_init(&cfg));
+    esp3d_log("Free mem %d",esp_get_minimum_free_heap_size());
+    if (esp_wifi_set_storage(WIFI_STORAGE_RAM) != ESP_OK) {
+        esp3d_log_e("Cannot disable persistence of wifi setting to flash");
     }
+
     esp3d_log("Configure AP settings");
     //register can be done once also - so no need to unregister if changing to another mode
     esp3d_log("Register wifi handler");
@@ -564,11 +564,12 @@ bool  Esp3DNetwork::stopStaMode()
         return false;
     }
     esp3d_log("Stop STA Mode");
+    esp3dNetworkServices.end();
     ESP_ERROR_CHECK(esp_event_handler_unregister(WIFI_EVENT,
                     ESP_EVENT_ANY_ID,
                     &wifi_sta_event_handler));
     ESP_ERROR_CHECK(esp_event_handler_unregister(IP_EVENT,
-                    IP_EVENT_STA_GOT_IP,
+                    ESP_EVENT_ANY_ID,
                     &wifi_sta_event_handler));
     if (_s_wifi_event_group) {
         esp3d_log("Clear xEventGroupBits");
@@ -588,6 +589,8 @@ bool  Esp3DNetwork::stopStaMode()
     if (_wifiStaPtr) {
         esp3d_log("Stop DHCP Client");
         esp_netif_dhcpc_stop(_wifiStaPtr);
+        ESP_ERROR_CHECK(esp_wifi_deinit());
+        ESP_ERROR_CHECK(esp_wifi_clear_default_wifi_driver_and_handlers(_wifiStaPtr));
         esp_netif_destroy_default_wifi(_wifiStaPtr);
         _wifiStaPtr = nullptr;
     } else {
@@ -603,6 +606,8 @@ bool  Esp3DNetwork::stopApMode()
         return false;
     }
     esp3d_log("Stop AP Mode");
+
+    esp3dNetworkServices.end();
     ESP_ERROR_CHECK(esp_event_handler_unregister(WIFI_EVENT,
                     ESP_EVENT_ANY_ID,
                     &wifi_ap_event_handler));
@@ -614,6 +619,8 @@ bool  Esp3DNetwork::stopApMode()
         esp3d_log("Stop DHCP");
         esp_netif_dhcps_stop(_wifiApPtr);
         esp3d_log("Destroy default wifi AP");
+        ESP_ERROR_CHECK(esp_wifi_deinit());
+        ESP_ERROR_CHECK(esp_wifi_clear_default_wifi_driver_and_handlers(_wifiApPtr));
         esp_netif_destroy_default_wifi(_wifiApPtr);
         _wifiApPtr = nullptr;
     } else {
@@ -626,6 +633,8 @@ bool  Esp3DNetwork::stopApMode()
 bool  Esp3DNetwork::stopConfigMode()
 {
     esp3d_log("Stop Config Mode");
+
+    esp3dNetworkServices.end();
     bool res = stopApMode();
     return res;
 }
