@@ -20,8 +20,9 @@
 #include "esp3d_commands.h"
 #include "esp3d_client.h"
 #include "esp3d_string.h"
-#include "authentication/esp3d_authentication.h"
 #include "esp3d_settings.h"
+#include "authentication/esp3d_authentication.h"
+
 #define COMMAND_ID 106
 //AP Password
 //[ESP106]<Password> <NOPASSWORD> json=no pwd=<admin password>

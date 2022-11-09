@@ -1,5 +1,6 @@
 /*
-  esp3d_network
+  esp3d_http_service
+
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
   This code is free software; you can redistribute it and/or
@@ -17,39 +18,34 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "esp3d_network_services.h"
+#pragma once
 #include <stdio.h>
-#include "esp_wifi.h"
-#include "esp3d_log.h"
-#include "esp3d_string.h"
-#include "esp3d_settings.h"
-#include "esp3d_commands.h"
-#include "http/esp3d_http_service.h"
 
-Esp3DNetworkServices esp3dNetworkServices;
 
-Esp3DNetworkServices::Esp3DNetworkServices()
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+class Esp3DHttpService final
 {
-    _started = false;
-}
+public:
+    Esp3DHttpService();
+    ~Esp3DHttpService();
+    bool begin();
+    void handle();
+    void end();
 
-Esp3DNetworkServices::~Esp3DNetworkServices() {}
+    bool started()
+    {
+        return _started;
+    };
 
-bool Esp3DNetworkServices::begin()
-{
-    esp3d_log("Starting Services");
-    _started = esp3dHttpService.begin();
-    return _started;
-}
+private:
+    bool _started;
+};
 
-void Esp3DNetworkServices::handle() {}
-
-void Esp3DNetworkServices::end()
-{
-    if (!_started) {
-        return;
-    }
-    esp3d_log("Stop Services");
-    esp3dHttpService.end();
-    _started = false;
-}
+extern Esp3DHttpService esp3dHttpService;
+#ifdef __cplusplus
+} // extern "C"
+#endif

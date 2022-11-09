@@ -1,5 +1,5 @@
 /*
-  esp3d_network
+  esp3d_http_service
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
   This code is free software; you can redistribute it and/or
@@ -17,39 +17,38 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "esp3d_network_services.h"
+
+#include "esp3d_http_service.h"
 #include <stdio.h>
 #include "esp_wifi.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_settings.h"
 #include "esp3d_commands.h"
-#include "http/esp3d_http_service.h"
+#include "network/esp3d_network.h"
+Esp3DHttpService esp3dHttpService;
 
-Esp3DNetworkServices esp3dNetworkServices;
-
-Esp3DNetworkServices::Esp3DNetworkServices()
+Esp3DHttpService::Esp3DHttpService()
 {
     _started = false;
 }
 
-Esp3DNetworkServices::~Esp3DNetworkServices() {}
+Esp3DHttpService::~Esp3DHttpService() {}
 
-bool Esp3DNetworkServices::begin()
+bool Esp3DHttpService::begin()
 {
-    esp3d_log("Starting Services");
-    _started = esp3dHttpService.begin();
+    esp3d_log("Starting Http Service");
+    _started = true;
     return _started;
 }
 
-void Esp3DNetworkServices::handle() {}
+void Esp3DHttpService::handle() {}
 
-void Esp3DNetworkServices::end()
+void Esp3DHttpService::end()
 {
     if (!_started) {
         return;
     }
-    esp3d_log("Stop Services");
-    esp3dHttpService.end();
+    esp3d_log("Stop Http Service");
     _started = false;
 }
