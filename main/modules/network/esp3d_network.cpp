@@ -34,6 +34,8 @@ Esp3DNetwork esp3dNetwork;
  * - we failed to connect after the maximum amount of retries */
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT      BIT1
+#define WIFI_STA_LOST_IP   BIT2
+
 #define MIN_RSSI           -78
 #define ESP3D_STA_MAXIMUM_RETRY 10
 
@@ -68,69 +70,34 @@ static void  wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
         esp3d_log( "Try to connect to the AP");
         esp_err_t  res = esp_wifi_connect();
-        switch (res) {
-        case ESP_OK:
+        if (res == ESP_OK) {
             esp3d_log( "Success connecting to the AP");
-
             if (esp3dNetwork.useStaticIp()) {
                 xEventGroupSetBits(esp3dNetwork.getEventGroup(), WIFI_CONNECTED_BIT);
                 s_retry_num = 0;
             }
             return;
-            break;
-        case ESP_ERR_WIFI_NOT_INIT:
-            esp3d_log( "WiFi is not initialized by esp_wifi_init");
-            break;
-        case ESP_ERR_WIFI_NOT_STARTED:
-            esp3d_log( "WiFi is not started by esp_wifi_start");
-            break;
-        case ESP_ERR_WIFI_CONN:
-            esp3d_log( "WiFi internal error, station or soft-AP control block wrong");
-            break;
-        case ESP_ERR_WIFI_SSID:
-            esp3d_log( "SSID of AP which station connects is invalid");
-            break;
-        default:
-            esp3d_log( "Unknown error");
-            break;
         }
-        esp3d_log_e("connect to the AP fail");
+        esp3d_log_e("connect to the AP failed: %s", esp_err_to_name(res));
     } else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED) {
         if (s_retry_num < ESP3D_STA_MAXIMUM_RETRY) {
             esp3d_log( "retry to connect to the AP %d", s_retry_num);
             esp_err_t  res = esp_wifi_connect();
             s_retry_num++;
-            switch (res) {
-            case ESP_OK:
+            if (res == ESP_OK) {
                 esp3d_log( "Success connecting to the AP");
                 if (esp3dNetwork.useStaticIp()) {
                     s_retry_num = 0;
                     xEventGroupSetBits(esp3dNetwork.getEventGroup(), WIFI_CONNECTED_BIT);
                 }
-                break;
-            //TODO: error
-            //Use esp_err_to_name() instead of switch
-            //do not use xEventGroupSetBits but esp3dNetworkServices or esp3dNetwork.ConnectionOk / esp3dNetwork.ConnectionFail
-            case ESP_ERR_WIFI_NOT_INIT:
-                esp3d_log( "WiFi is not initialized by esp_wifi_init");
-                break;
-            case ESP_ERR_WIFI_NOT_STARTED:
-                esp3d_log( "WiFi is not started by esp_wifi_start");
-                break;
-            case ESP_ERR_WIFI_CONN:
-                esp3d_log( "WiFi internal error, station or soft-AP control block wrong");
-                break;
-            case ESP_ERR_WIFI_SSID:
-                esp3d_log( "SSID of AP which station connects is invalid");
-                break;
-            default:
-                esp3d_log( "Unknown error");
-                break;
+            } else {
+                esp3d_log_e("connect to the AP failed: %s", esp_err_to_name(res));
             }
         } else {
+            esp3d_log_e("retries to connect to the AP failed");
             xEventGroupSetBits(esp3dNetwork.getEventGroup(), WIFI_FAIL_BIT);
         }
-        esp3d_log_e("connect to the AP fail");
+
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
 #if ESP3D_TFT_LOG
         ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
@@ -140,6 +107,9 @@ static void  wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
 #endif // ESP3D_TFT_LOG
         s_retry_num = 0;
         xEventGroupSetBits(esp3dNetwork.getEventGroup(), WIFI_CONNECTED_BIT);
+    } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_LOST_IP) {
+        esp3d_log("Client IP was lost");
+        xEventGroupSetBits(esp3dNetwork.getEventGroup(), WIFI_STA_LOST_IP);
     }
 }
 
@@ -218,7 +188,14 @@ bool Esp3DNetwork::begin()
     return _started;
 }
 
-void Esp3DNetwork::handle() {}
+void Esp3DNetwork::handle()
+{
+    if (_current_radio_mode==esp3d_wifi_sta && ( xEventGroupGetBits(_s_wifi_event_group)& WIFI_STA_LOST_IP)) {
+        xEventGroupClearBits(_s_wifi_event_group, WIFI_STA_LOST_IP);
+        esp3d_log("Force restart wifi station");
+        setMode (esp3d_wifi_sta, true);
+    }
+}
 
 void Esp3DNetwork::end()
 {
@@ -374,7 +351,6 @@ bool Esp3DNetwork::startStaMode()
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config) );
     ESP_ERROR_CHECK(esp_wifi_start() );
 
-    esp3d_log("wifi_init_sta finished.");
     _current_radio_mode = esp3d_wifi_sta;
     /* Waiting until either the connection is established (WIFI_CONNECTED_BIT) or connection failed for the maximum
      * number of re-tries (WIFI_FAIL_BIT). The bits are set by event_handler() (see above) */
@@ -409,6 +385,9 @@ bool Esp3DNetwork::startStaMode()
         stmp += " failed\n";
     }
     esp3dCommands. dispatch(stmp.c_str(),  ALL_CLIENTS,requestId, ESP3D_SYSTEM, ESP3D_LEVEL_ADMIN);
+    if (connected) {
+        esp3dNetworkServices.begin();
+    }
     return connected;
 }
 
@@ -524,6 +503,9 @@ bool Esp3DNetwork::startApMode(bool configMode)
         stmp = "Access Point setup failed\n";
     }
     esp3dCommands. dispatch(stmp.c_str(),  ALL_CLIENTS,requestId, ESP3D_SYSTEM, ESP3D_LEVEL_ADMIN);
+    if (success) {
+        esp3dNetworkServices.begin();
+    }
     return success;
 }
 
@@ -575,6 +557,7 @@ bool  Esp3DNetwork::stopStaMode()
         esp3d_log("Clear xEventGroupBits");
         xEventGroupClearBits(_s_wifi_event_group, WIFI_CONNECTED_BIT);
         xEventGroupClearBits(_s_wifi_event_group, WIFI_FAIL_BIT);
+        xEventGroupClearBits(_s_wifi_event_group, WIFI_STA_LOST_IP);
         vEventGroupDelete(_s_wifi_event_group);
         _s_wifi_event_group = nullptr;
     }
@@ -644,11 +627,11 @@ bool  Esp3DNetwork::stopBtMode()
     return false;
 }
 
-bool Esp3DNetwork::setMode (esp3d_radio_mode_t mode)
+bool Esp3DNetwork::setMode (esp3d_radio_mode_t mode, bool restart)
 {
     esp3d_log("Current mode is %d, and ask for %d", _current_radio_mode, mode);
 
-    if (mode == _current_radio_mode) {
+    if (mode == _current_radio_mode && !restart) {
         esp3d_log("Current mode and new mode are identical so cancel");
         return true;
     }

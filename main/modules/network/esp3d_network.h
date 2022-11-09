@@ -69,7 +69,7 @@ public:
     bool stopApMode();
     bool stopConfigMode();
     bool stopBtMode();
-    bool setMode (esp3d_radio_mode_t mode);
+    bool setMode (esp3d_radio_mode_t mode, bool restart=false);
     const char * getAPMac();
     const char * getSTAMac();
     const char * getBTMac();
