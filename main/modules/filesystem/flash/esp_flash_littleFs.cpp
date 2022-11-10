@@ -121,7 +121,7 @@ bool ESP3D_FLASH::getSpaceInfo(size_t * totalBytes,
     static size_t _totalBytes = 0;
     static size_t _usedBytes=0;
     static size_t _freeBytes=0;
-    esp3d_log("Try to get total and free space");
+    //esp3d_log("Try to get total and free space");
     //if not mounted reset values
     if (!_mounted) {
         esp3d_log_e("Failed to get total and free space because not mounted");

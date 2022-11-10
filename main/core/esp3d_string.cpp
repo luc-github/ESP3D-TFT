@@ -63,3 +63,38 @@ const char* formatBytes (uint64_t bytes)
     }
     return buffer;
 }
+
+const char*  urlDecode(const char * text)
+{
+    static char * decoded=nullptr;
+    if (decoded) {
+        free(decoded);
+    }
+    char temp[] = "0x00";
+    unsigned int len = strlen(text);
+    unsigned int i = 0;
+    unsigned int p = 0;
+    decoded = (char*)malloc(len +1);
+    if (decoded) {
+        while (i < len) {
+            char decodedChar;
+            char encodedChar = text[i++];
+            if ((encodedChar == '%') && (i + 1 < len)) {
+                temp[2] = text[i++];
+                temp[3] = text[i++];
+                decodedChar = strtol(temp, NULL, 16);
+            } else {
+                if (encodedChar == '+') {
+                    decodedChar = ' ';
+                } else {
+                    decodedChar = encodedChar;    // normal ascii char
+                }
+            }
+            decoded[p++] = decodedChar;
+        }
+        decoded[p] = 0x0;
+        return decoded;
+    } else {
+        return nullptr;
+    }
+}

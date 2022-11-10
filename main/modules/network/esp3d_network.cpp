@@ -25,6 +25,7 @@
 #include "esp3d_string.h"
 #include "esp3d_settings.h"
 #include "esp3d_commands.h"
+#include "lwip/apps/netbiosns.h"
 #include "esp3d_network_services.h"
 
 Esp3DNetwork esp3dNetwork;
@@ -353,19 +354,23 @@ bool Esp3DNetwork::startStaMode()
     esp3dCommands. dispatch(stmp.c_str(),  ALL_CLIENTS,requestId, ESP3D_SYSTEM, ESP3D_LEVEL_ADMIN);
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA) );
     ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config) );
-    ESP_ERROR_CHECK(esp_wifi_start() );
+
 
     //Set hostname
     const Esp3DSetting_t * settingPtr = esp3dTFTsettings.getSettingPtr(esp3d_hostname);
+    std::string hostname;
     if (settingPtr) {
         char out_str[33]= {0};
-        std::string hostname = esp3dTFTsettings.readString(esp3d_hostname, out_str, settingPtr->size);
+        hostname = esp3dTFTsettings.readString(esp3d_hostname, out_str, settingPtr->size);
         if (ESP_OK != esp_netif_set_hostname(_wifiStaPtr, hostname.c_str())) {
             esp3d_log_e("Failed to set hostname");
         }
     } else {
         esp3d_log_e("No hostname setting found");
     }
+    netbiosns_init();
+    netbiosns_set_name(hostname.c_str());
+    ESP_ERROR_CHECK(esp_wifi_start() );
     _current_radio_mode = esp3d_wifi_sta;
     /* Waiting until either the connection is established (WIFI_CONNECTED_BIT) or connection failed for the maximum
      * number of re-tries (WIFI_FAIL_BIT). The bits are set by event_handler() (see above) */
