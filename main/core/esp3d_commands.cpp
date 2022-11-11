@@ -380,7 +380,7 @@ bool Esp3DCommands::hasTag (esp3d_msg_t * msg, uint start,const char* label)
     if (lbl.length()!=0) {
         esp3d_log("Label is used with parameter %s", lbl.c_str());
         //make result uppercase
-        str_toUpperCase(&lbl);
+        esp3d_strings::str_toUpperCase(&lbl);
         return (lbl=="YES" || lbl=="1" || lbl=="TRUE");
     }
     bool prevCharIsEscaped = false;

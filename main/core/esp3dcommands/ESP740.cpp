@@ -139,7 +139,7 @@ void Esp3DCommands::ESP740(int cmd_params_pos,esp3d_msg_t * msg)
                         ok_msg += "{\"name\":\"";
                         ok_msg += entry->d_name;
                         ok_msg += "\",\"size\":\"";
-                        ok_msg += formatBytes(entry_stat.st_size);
+                        ok_msg += esp3d_strings::formatBytes(entry_stat.st_size);
 #if ESP3D_TIMESTAMP_FEATURE
                         ok_msg += "\",\"time\":\"";
                         ok_msg += buff;
@@ -159,7 +159,7 @@ void Esp3DCommands::ESP740(int cmd_params_pos,esp3d_msg_t * msg)
                         ok_msg += buff;
                         ok_msg +="\t";
 #endif //ESP3D_TIMESTAMP_FEATURE
-                        ok_msg += formatBytes(entry_stat.st_size);
+                        ok_msg += esp3d_strings::formatBytes(entry_stat.st_size);
 
                         ok_msg += "\n";
                     }
@@ -171,9 +171,9 @@ void Esp3DCommands::ESP740(int cmd_params_pos,esp3d_msg_t * msg)
             }
             if (json) {
                 ok_msg ="], \"total\":\"";
-                ok_msg +=formatBytes (totalSpace);
+                ok_msg +=esp3d_strings::formatBytes (totalSpace);
                 ok_msg += "\",\"used\":\"";
-                ok_msg +=formatBytes (usedSpace);
+                ok_msg +=esp3d_strings::formatBytes (usedSpace);
                 ok_msg += "\",\"occupation\":\"";
                 if (totalSpace==0) {
                     totalSpace=1;
@@ -191,11 +191,11 @@ void Esp3DCommands::ESP740(int cmd_params_pos,esp3d_msg_t * msg)
                 ok_msg += ", Dirs :" ;
                 ok_msg +=std::to_string(nbDirs);
                 ok_msg +="\nTotal: ";
-                ok_msg +=formatBytes (totalSpace);
+                ok_msg +=esp3d_strings::formatBytes (totalSpace);
                 ok_msg +=", Used: ";
-                ok_msg +=formatBytes (usedSpace);
+                ok_msg +=esp3d_strings::formatBytes (usedSpace);
                 ok_msg +=", Available: ";
-                ok_msg +=formatBytes (freeSpace);
+                ok_msg +=esp3d_strings::formatBytes (freeSpace);
                 ok_msg +="\n";
             }
             esp3d_msg_t * newMsg = Esp3DClient::copyMsgInfos(msgInfo);

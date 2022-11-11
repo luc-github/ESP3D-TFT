@@ -41,6 +41,7 @@ public:
     {
         return _started;
     };
+    static esp_err_t root_get_handler(httpd_req_t *req);
 
 private:
     bool _started;

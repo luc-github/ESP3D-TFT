@@ -22,8 +22,9 @@
 #include <algorithm>
 #include <string.h>
 
+
 //Trim string function
-const char * str_trim(const char * str)
+const char * esp3d_strings::str_trim(const char * str)
 {
     static std::string s = str;
     auto start = s.begin();
@@ -38,13 +39,19 @@ const char * str_trim(const char * str)
     return s.c_str();
 }
 //Upper case string
-void  str_toUpperCase(std::string * str)
+void  esp3d_strings::str_toUpperCase(std::string * str)
 {
     std::transform(str->begin(), str->end(), str->begin(), ::toupper);
 }
 
+//Lower case string
+void  esp3d_strings::str_toLowerCase(std::string * str)
+{
+    std::transform(str->begin(), str->end(), str->begin(), ::tolower);
+}
+
 //helper to format size to readable string
-const char* formatBytes (uint64_t bytes)
+const char* esp3d_strings::formatBytes (uint64_t bytes)
 {
     static char buffer[32];
     memset(buffer, 0, sizeof(buffer));
@@ -64,7 +71,7 @@ const char* formatBytes (uint64_t bytes)
     return buffer;
 }
 
-const char*  urlDecode(const char * text)
+const char*  esp3d_strings::urlDecode(const char * text)
 {
     static char * decoded=nullptr;
     if (decoded) {
@@ -97,4 +104,45 @@ const char*  urlDecode(const char * text)
     } else {
         return nullptr;
     }
+}
+
+
+const char* esp3d_strings::getContentType (const char* filename)
+{
+    std::string file_name = filename;
+    esp3d_strings::str_toLowerCase(&file_name);
+    std::size_t found = file_name.find_last_of(".");
+    if (found) {
+        std::string extension = file_name.substr(found+1);
+        if (extension =="htm")  {
+            return "text/html";
+        } else if (extension =="html")  {
+            return "text/html";
+        } else if (extension =="css") {
+            return "text/css";
+        } else if (extension =="js") {
+            return "application/javascript";
+        } else if (extension =="png") {
+            return "image/png";
+        } else if (extension =="gif") {
+            return "image/gif";
+        } else if (extension =="jpeg") {
+            return "image/jpeg";
+        } else if (extension =="jpg") {
+            return "image/jpeg";
+        } else if (extension =="ico") {
+            return "image/x-icon";
+        } else if (extension =="xml") {
+            return "text/xml";
+        } else if (extension =="pdf") {
+            return "application/x-pdf";
+        } else if (extension =="zip") {
+            return "application/x-zip";
+        } else if (extension =="gz") {
+            return "application/x-gzip";
+        } else if (extension =="txt") {
+            return "text/plain";
+        }
+    }
+    return "application/octet-stream";
 }

@@ -25,11 +25,15 @@
 extern "C" {
 #endif
 
+namespace esp3d_strings
+{
 const char * str_trim(const char * str);
 void  str_toUpperCase(std::string * str);
+void  str_toLowerCase(std::string * str);
 const char * formatBytes (uint64_t bytes);
 const char*  urlDecode(const char * text);
-
+const char* getContentType (const char* filename);
+}
 #ifdef __cplusplus
 } // extern "C"
 #endif

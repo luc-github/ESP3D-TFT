@@ -87,7 +87,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     }
 
     //Free memory
-    tmpstr =formatBytes(esp_get_minimum_free_heap_size());
+    tmpstr =esp3d_strings::formatBytes(esp_get_minimum_free_heap_size());
     if (!dispatchIdValue(json,"free mem",tmpstr.c_str(), target,requestId)) {
         return;
     }
@@ -95,13 +95,13 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
 #if CONFIG_SPIRAM
     multi_heap_info_t info;
     heap_caps_get_info(&info, MALLOC_CAP_SPIRAM);
-    tmpstr =formatBytes( info.total_free_bytes + info.total_allocated_bytes);
+    tmpstr =esp3d_strings::formatBytes( info.total_free_bytes + info.total_allocated_bytes);
     if (!dispatchIdValue(json,"Total psram mem",tmpstr.c_str(), target, requestId)) {
         return;
     }
 #endif //CONFIG_SPIRAM
     //Flash size
-    tmpstr = formatBytes(spi_flash_get_chip_size());
+    tmpstr = esp3d_strings::formatBytes(spi_flash_get_chip_size());
     if (!dispatchIdValue(json,"flash size",tmpstr.c_str(), target,requestId)) {
         return;
     }
@@ -109,9 +109,9 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     size_t totalBytes=0;
     size_t usedBytes=0;
     flashFs.getSpaceInfo(&totalBytes,&usedBytes);
-    tmpstr = formatBytes(usedBytes);
+    tmpstr = esp3d_strings::formatBytes(usedBytes);
     tmpstr+="/";
-    tmpstr = formatBytes(totalBytes);
+    tmpstr = esp3d_strings::formatBytes(totalBytes);
     if (!dispatchIdValue(json,"FS usage",tmpstr.c_str(), target,requestId)) {
         return;
     }

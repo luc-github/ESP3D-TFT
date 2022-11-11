@@ -36,6 +36,34 @@ Esp3DHttpService::Esp3DHttpService()
 
 Esp3DHttpService::~Esp3DHttpService() {}
 
+esp_err_t http_404_error_handler(httpd_req_t *req, httpd_err_code_t err)
+{
+    /* if (strcmp("/hello", req->uri) == 0) {
+         httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "/hello URI is not available");
+         // Return ESP_OK to keep underlying socket open
+         return ESP_OK;
+     } else if (strcmp("/echo", req->uri) == 0) {
+         httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "/echo URI is not available");
+         // Return ESP_FAIL to close underlying socket
+         return ESP_FAIL;
+     }*/
+    /* For any other URI send 404 and close socket */
+    httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "404 - File not found");
+    return ESP_FAIL;
+}
+
+
+const httpd_uri_t root_handler_config = {
+    .uri       = "/",
+    .method    = HTTP_GET,
+    .handler   = (esp_err_t (*)(httpd_req_t*))(esp3dHttpService.root_get_handler),
+    .user_ctx  =  (void *)"Hello World!",
+    //.is_websocket = false,
+    //.handle_ws_control_frames = false,
+    // .supported_subprotocol = nullptr
+};
+
+
 bool Esp3DHttpService::begin()
 {
     esp3d_log("Starting Http Service");
@@ -58,8 +86,8 @@ bool Esp3DHttpService::begin()
     if (httpd_start(&_server, &config) == ESP_OK) {
         // Set URI handlers
         esp3d_log("Registering URI handlers");
-        //  httpd_register_uri_handler(server, &hello);
-
+        httpd_register_uri_handler(_server, &root_handler_config);
+        httpd_register_err_handler(_server, HTTPD_404_NOT_FOUND, http_404_error_handler);
         _started = true;
     }
     return _started;
@@ -74,6 +102,8 @@ void Esp3DHttpService::end()
     }
     esp3d_log("Stop Http Service");
     if (_server) {
+        httpd_unregister_uri(_server, "/");
+        httpd_register_err_handler(_server, HTTPD_404_NOT_FOUND, NULL);
         httpd_stop(_server);
     }
     _server = nullptr;
