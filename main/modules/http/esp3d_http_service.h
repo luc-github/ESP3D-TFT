@@ -42,7 +42,19 @@ public:
         return _started;
     };
     static esp_err_t root_get_handler(httpd_req_t *req);
-
+    static esp_err_t command_handler(httpd_req_t *req);
+    static esp_err_t config_handler(httpd_req_t *req);
+    static esp_err_t description_xml_handler(httpd_req_t *req);
+    static esp_err_t favicon_ico_handler(httpd_req_t *req);
+    static esp_err_t file_not_found_handler(httpd_req_t *req);
+    static esp_err_t login_handler(httpd_req_t *req);
+    static esp_err_t files_handler(httpd_req_t *req);
+    static esp_err_t upload_files_handler(httpd_req_t *req);
+    static esp_err_t sd_handler(httpd_req_t *req);
+    static esp_err_t sdfiles_handler(httpd_req_t *req);
+    static esp_err_t upload_sdfiles_handler(httpd_req_t *req);
+    static esp_err_t updatefw_handler(httpd_req_t *req);
+    static esp_err_t upload_updatefw_handler(httpd_req_t *req);
 private:
     bool _started;
     httpd_handle_t _server;
