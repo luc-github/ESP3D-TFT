@@ -31,7 +31,11 @@
 esp_err_t Esp3DHttpService::favicon_ico_handler(httpd_req_t *req)
 {
     esp3d_log("Uri: %s", req->uri);
-    //TODO: check if esp command and process it or dispatch it
-    httpd_resp_sendstr(req, "Response not yet available");
+    extern const unsigned char favicon_ico_start[] asm("_binary_favicon_ico_gz_start");
+    extern const unsigned char favicon_ico_end[]   asm("_binary_favicon_ico_gz_end");
+    const size_t favicon_ico_size = (favicon_ico_end - favicon_ico_start);
+    httpd_resp_set_type(req, "image/x-icon");
+    httpd_resp_set_hdr(req, "Content-Encoding", "gzip");
+    httpd_resp_send(req, (const char *)favicon_ico_start, favicon_ico_size);
     return ESP_OK;
 }

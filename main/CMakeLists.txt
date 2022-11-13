@@ -15,4 +15,4 @@ set(INCLUDES .
     modules)
 idf_component_register(SRC_DIRS ${SOURCES}
     INCLUDE_DIRS ${INCLUDES}
-    EMBED_FILES "embedded/favicon.ico" "embedded/index.html.gz")
+    EMBED_FILES "embedded/favicon.ico.gz" "embedded/index.html.gz")
