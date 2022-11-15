@@ -184,7 +184,7 @@ int ESP3D_FLASH::stat(const char * filepath,  struct  stat * entry_stat)
         }
         dir_path+=filepath;
     }
-    esp3d_log("Stat %s, %d", dir_path.c_str(), ::stat(dir_path.c_str(), entry_stat));
+    //esp3d_log("Stat %s, %d", dir_path.c_str(), ::stat(dir_path.c_str(), entry_stat));
     return ::stat(dir_path.c_str(), entry_stat);
 }
 

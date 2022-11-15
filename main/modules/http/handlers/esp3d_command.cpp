@@ -31,6 +31,22 @@
 esp_err_t Esp3DHttpService::command_handler(httpd_req_t *req)
 {
     esp3d_log("Uri: %s", req->uri);
+    char*  buf;
+    size_t buf_len;
+    buf_len = httpd_req_get_url_query_len(req) + 1;
+    if (buf_len > 1) {
+        buf = (char *)malloc(buf_len);
+        if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) {
+            char value[255]= {0};
+            esp3d_log("query string: %s", buf);
+            if (httpd_query_key_value(buf, "cmd", value, 254)==ESP_OK) {
+                esp3d_log("command is: %s", esp3d_strings::urlDecode(value));
+            } else {
+                esp3d_log_e("Invalid param");
+            }
+        }
+        free(buf);
+    }
     //TODO: check if esp command and process it or dispatch it
     httpd_resp_sendstr(req, "Response not yet available");
     return ESP_OK;

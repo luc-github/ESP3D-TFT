@@ -61,7 +61,6 @@ esp_err_t Esp3DHttpService::root_get_handler(httpd_req_t *req)
         httpd_resp_set_hdr(req, "Content-Encoding", "gzip");
         httpd_resp_send(req, (const char *)index_html_gz_start, index_html_gz_size);
     } else {
-
         esp3d_log_e("Invalid ressource");
         httpd_resp_sendstr(req, "Cannot load icon from webserver");
     }

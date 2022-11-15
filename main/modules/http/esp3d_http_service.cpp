@@ -87,6 +87,17 @@ bool Esp3DHttpService::begin()
             .supported_subprotocol = nullptr
         };
         httpd_register_uri_handler(_server, &root_handler_config);
+        //Command /command
+        const httpd_uri_t command_handler_config = {
+            .uri       = "/command",
+            .method    = HTTP_GET,
+            .handler   = (esp_err_t (*)(httpd_req_t*))(esp3dHttpService.command_handler),
+            .user_ctx  =  nullptr,
+            .is_websocket = false,
+            .handle_ws_control_frames = false,
+            .supported_subprotocol = nullptr
+        };
+        httpd_register_uri_handler(_server, &command_handler_config);
         //File not found
         httpd_register_err_handler(_server, HTTPD_404_NOT_FOUND, (httpd_err_handler_func_t )file_not_found_handler);
         _started = true;
@@ -104,6 +115,7 @@ void Esp3DHttpService::end()
     esp3d_log("Stop Http Service");
     if (_server) {
         httpd_unregister_uri(_server, "/favicon.ico");
+        httpd_unregister_uri(_server, "/command");
         httpd_unregister_uri(_server, "/");
         httpd_register_err_handler(_server, HTTPD_404_NOT_FOUND, NULL);
         httpd_stop(_server);
@@ -167,7 +179,7 @@ esp_err_t Esp3DHttpService::streamFile (const char * path,httpd_req_t *req )
                 esp3d_log("File exists");
                 res = ESP_OK;
             } else {
-                esp3d_log_e("File does not exists");
+                esp3d_log_e("File %s does not exists", filename.c_str());
                 res = ESP_ERR_NOT_FOUND;
             }
             if (res == ESP_OK) {
