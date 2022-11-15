@@ -38,6 +38,7 @@ public:
                       uint64_t * freeBytes=NULL,
                       const char *path=NULL,
                       bool refreshStats=false);
+    const char * mount_point(esp3d_fs_types fstype=FS_FLASH);
     esp3d_fs_types getFSType(const char * path=nullptr);
     bool  accessFS(const char* path);
     void  releaseFS(const char* path);

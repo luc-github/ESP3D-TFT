@@ -44,6 +44,21 @@ ESP3D_GLOBALFS::ESP3D_GLOBALFS()
     rewinddir(&_rootDir);
 }
 
+const char * ESP3D_GLOBALFS::mount_point(esp3d_fs_types fstype)
+{
+    switch(fstype) {
+    case FS_ROOT:
+        return "/";
+    case FS_SD:
+        return sd.mount_point();
+    case FS_FLASH:
+        return flashFs.mount_point();
+    default:
+        break;
+    }
+    return "/";
+}
+
 esp3d_fs_types ESP3D_GLOBALFS::getFSType(const char * path)
 {
     if (!path || strlen(path)==0) {

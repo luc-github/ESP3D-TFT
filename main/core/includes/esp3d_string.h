@@ -30,6 +30,8 @@ namespace esp3d_strings
 const char * str_trim(const char * str);
 void  str_toUpperCase(std::string * str);
 void  str_toLowerCase(std::string * str);
+bool endsWith(const char * str, const char end);
+bool startsWith(const char * str, const char startPart);
 const char * formatBytes (uint64_t bytes);
 const char*  urlDecode(const char * text);
 const char* getContentType (const char* filename);

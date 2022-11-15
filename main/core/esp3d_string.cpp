@@ -106,6 +106,41 @@ const char*  esp3d_strings::urlDecode(const char * text)
     }
 }
 
+bool endsWith(const char * str, const char * endpart)
+{
+    if (!str || !endpart) {
+        return false;
+    }
+    uint lenStr = strlen(str);
+    uint lenEnd = strlen(endpart);
+    if (lenEnd>lenStr) {
+        return false;
+    }
+    for(uint i=0; i < lenEnd; i++) {
+        if (str[lenStr-1-i]!= endpart[lenEnd-1-i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool startsWith(const char * str, const char * startPart)
+{
+    if (!str || !startPart) {
+        return false;
+    }
+    uint lenStr = strlen(str);
+    uint lenStart = strlen(startPart);
+    if (lenStart>lenStr) {
+        return false;
+    }
+    for(uint i=0; i < lenStart; i++) {
+        if (str[i]!= startPart[i]) {
+            return false;
+        }
+    }
+    return true;
+}
 
 const char* esp3d_strings::getContentType (const char* filename)
 {

@@ -31,11 +31,18 @@
 esp_err_t Esp3DHttpService::favicon_ico_handler(httpd_req_t *req)
 {
     esp3d_log("Uri: %s", req->uri);
-    extern const unsigned char favicon_ico_start[] asm("_binary_favicon_ico_gz_start");
-    extern const unsigned char favicon_ico_end[]   asm("_binary_favicon_ico_gz_end");
-    const size_t favicon_ico_size = (favicon_ico_end - favicon_ico_start);
-    httpd_resp_set_type(req, "image/x-icon");
-    httpd_resp_set_hdr(req, "Content-Encoding", "gzip");
-    httpd_resp_send(req, (const char *)favicon_ico_start, favicon_ico_size);
-    return ESP_OK;
+    esp_err_t err = esp3dHttpService.streamFile("/fs/favicon.ico", req);
+    if ( err == ESP_ERR_NOT_FOUND) {
+        extern const unsigned char favicon_ico_start[] asm("_binary_favicon_ico_gz_start");
+        extern const unsigned char favicon_ico_end[]   asm("_binary_favicon_ico_gz_end");
+        const size_t favicon_ico_size = (favicon_ico_end - favicon_ico_start);
+        httpd_resp_set_type(req, "image/x-icon");
+        httpd_resp_set_hdr(req, "Content-Encoding", "gzip");
+        err = httpd_resp_send(req, (const char *)favicon_ico_start, favicon_ico_size);
+    } else if (err != ESP_OK) {
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Failed to send file");
+        esp3d_log_e("Raise exception 500 INTERNAL SERVER ERROR");
+    }
+    //success or fail ?
+    return err== ESP_OK?ESP_OK:ESP_FAIL;
 }

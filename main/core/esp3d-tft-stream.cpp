@@ -27,11 +27,9 @@
 #include <string>
 #include "esp3d_log.h"
 #include "serial/esp3d_serial_client.h"
+#include "tasks_def.h"
 
-
-
-#define LV_TICK_PERIOD_MS 10
-#define STACKDEPTH  4096*2
+#define STACKDEPTH  STREAM_STACK_DEPTH
 #define TASKPRIORITY 0
 #define TASKCORE 1
 

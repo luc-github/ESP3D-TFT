@@ -19,6 +19,7 @@
 
 
 #include "esp3d_http_service.h"
+#include "tasks_def.h"
 #include <stdio.h>
 #include "esp_wifi.h"
 #include "esp3d_log.h"
@@ -26,6 +27,11 @@
 #include "esp3d_settings.h"
 #include "esp3d_commands.h"
 #include "network/esp3d_network.h"
+#include "filesystem/esp3d_globalfs.h"
+
+#define CHUNK_BUFFER_SIZE STREAM_CHUNK_SIZE
+char chunk[CHUNK_BUFFER_SIZE];
+
 Esp3DHttpService esp3dHttpService;
 
 Esp3DHttpService::Esp3DHttpService()
@@ -104,4 +110,101 @@ void Esp3DHttpService::end()
     }
     _server = nullptr;
     _started = false;
+}
+
+
+esp_err_t Esp3DHttpService::streamFile (const char * path,httpd_req_t *req )
+{
+    esp_err_t res = ESP_OK;
+    if (!_started|| !_server) {
+        esp3d_log_e("Stream server is not ready");
+        return ESP_ERR_INVALID_STATE;
+    }
+    std::string filename = "";
+    std::string filenameGz = "";
+    bool isGzip = false;
+    //check if filename is provided or need to extract from request string
+    if (path) {  // this one is already correct no need to decode it neither append mount point
+        filename = path;
+        filenameGz = filename+".gz";
+    } else { //extract file name from query and decode it
+        size_t buf_len = httpd_req_get_url_query_len(req) + 1;
+        char * buf = (char *)malloc(buf_len);
+        if (buf) {
+            res = httpd_req_get_url_query_str(req, buf, buf_len);
+            if (res != ESP_OK) {
+                esp3d_log_e("Cannot extract query string from uri: %s", esp_err_to_name(res));
+            } else {
+                //clear possible parameters
+                for (uint i = 0; i < buf_len; i++) {
+                    if (buf[i] == '?') {
+                        buf[i]=0x0;
+                        break;
+                    }
+                }
+                esp3d_fs_types fstype = globalFs.getFSType(buf);
+                //assume default file serving is flash
+                if (fstype==FS_UNKNOWN) {
+                    filename=globalFs.mount_point(FS_FLASH);
+                }
+                filename += esp3d_strings::urlDecode((const char *)buf);
+                filenameGz = filename+".gz";
+            }
+            free(buf );
+        } else {
+            esp3d_log_e("Memory allocation failed");
+            res= ESP_ERR_NO_MEM;
+        }
+    }
+    if (res== ESP_OK) {
+        esp3d_log("File name is %s", filename.c_str());
+        if (globalFs.accessFS(filename.c_str())) {
+            if (globalFs.exists(filenameGz.c_str())) {
+                esp3d_log("File exists and it is gzipped");
+                isGzip = true;
+                res = ESP_OK;
+            } else if (globalFs.exists(filename.c_str())) {
+                esp3d_log("File exists");
+                res = ESP_OK;
+            } else {
+                esp3d_log_e("File does not exists");
+                res = ESP_ERR_NOT_FOUND;
+            }
+            if (res == ESP_OK) {
+                FILE *fd = globalFs.open(filename.c_str(), "r");
+                if (fd) {
+                    //stream file
+                    std::string mimeType= esp3d_strings::getContentType( filename.c_str());
+
+                    httpd_resp_set_type(req, mimeType.c_str());
+                    if(isGzip) {
+                        httpd_resp_set_hdr(req, "Content-Encoding", "gzip");
+                    }
+                    size_t chunksize;
+                    do {
+                        chunksize = fread(chunk, 1, CHUNK_BUFFER_SIZE, fd);
+                        if (chunksize > 0) {
+                            if (httpd_resp_send_chunk(req, chunk, chunksize) != ESP_OK) {
+                                esp3d_log_e("File sending failed!");
+                                chunksize = 0;
+                                res = ESP_FAIL;
+                            }
+                        }
+                    } while (chunksize != 0);
+                    fclose(fd);
+                    httpd_resp_send_chunk(req, NULL, 0);
+                } else {
+                    res = ESP_ERR_NOT_FOUND;
+                    esp3d_log_e("Cannot access File");
+                }
+
+            }
+            globalFs.releaseFS(filename.c_str());
+        } else {
+            res = ESP_ERR_NOT_FOUND;
+            esp3d_log_e("Cannot access FS");
+        }
+    }
+
+    return res;
 }

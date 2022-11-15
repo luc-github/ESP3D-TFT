@@ -30,7 +30,7 @@
 
 esp_err_t Esp3DHttpService::file_not_found_handler(httpd_req_t *req, httpd_err_code_t err)
 {
-    esp3d_log("Uri: %s", req->uri);
+    esp3d_log("Uri: %s Error: %d", req->uri, (int)err);
     /* if (strcmp("/hello", req->uri) == 0) {
      httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "/hello URI is not available");
      // Return ESP_OK to keep underlying socket open

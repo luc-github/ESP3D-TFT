@@ -55,6 +55,7 @@ public:
     static esp_err_t upload_sdfiles_handler(httpd_req_t *req);
     static esp_err_t updatefw_handler(httpd_req_t *req);
     static esp_err_t upload_updatefw_handler(httpd_req_t *req);
+    esp_err_t streamFile (const char * path,httpd_req_t *req );
 private:
     bool _started;
     httpd_handle_t _server;
