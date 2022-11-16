@@ -21,6 +21,9 @@
 #include "esp3d_client.h"
 #include <string.h>
 #include <string>
+#if ESP3D_TFT_LOG
+int32_t msg_counting=0;
+#endif// ESP3D_TFT_LOG
 
 Esp3DClient::Esp3DClient()
 {
@@ -58,6 +61,7 @@ esp3d_msg_t * Esp3DClient::popTx()
 void Esp3DClient::deleteMsg(esp3d_msg_t * msg)
 {
     if (msg) {
+        esp3d_log("Deletion : Now we have %d msg", --msg_counting);
         free(msg->data);
         free(msg);
         msg = nullptr;
@@ -132,6 +136,7 @@ bool Esp3DClient::addFrontTXData(esp3d_msg_t * msg)
 esp3d_msg_t * Esp3DClient::newMsg()
 {
     esp3d_msg_t * newMsgPtr = (esp3d_msg_t*)malloc( sizeof(esp3d_msg_t));
+    esp3d_log("Creation : Now we have %d msg", ++msg_counting);
     if (newMsgPtr) {
         newMsgPtr->data = nullptr;
         newMsgPtr->size = 0;
@@ -139,6 +144,7 @@ esp3d_msg_t * Esp3DClient::newMsg()
         newMsgPtr->target = ALL_CLIENTS;
         newMsgPtr->authentication_level = ESP3D_LEVEL_GUEST;
         newMsgPtr->requestId.id = esp_timer_get_time();
+        newMsgPtr->type = msg_head;
     }
     return newMsgPtr;
 }
@@ -162,6 +168,7 @@ bool Esp3DClient::copyMsgInfos( esp3d_msg_t * newMsgPtr, esp3d_msg_t msg)
     newMsgPtr->target = msg.target;
     newMsgPtr->authentication_level= msg.authentication_level;
     newMsgPtr->requestId = msg.requestId;
+    newMsgPtr->type = msg.type;
     return true;
 }
 
@@ -179,6 +186,7 @@ esp3d_msg_t * Esp3DClient::copyMsg( esp3d_msg_t  msg)
     esp3d_msg_t * newMsgPtr = newMsg(msg.origin, msg.target, msg.data, msg.size, msg.authentication_level);
     if(newMsgPtr) {
         newMsgPtr->requestId = msg.requestId;
+        newMsgPtr->type = msg.type;
     }
     return nullptr;
 }
@@ -192,7 +200,6 @@ esp3d_msg_t * Esp3DClient::newMsg( esp3d_clients_t origin, esp3d_clients_t targe
             newMsgPtr = nullptr;
         }
     }
-
     return newMsgPtr;
 }
 

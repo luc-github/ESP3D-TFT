@@ -64,7 +64,7 @@ void Esp3DCommands::ESP410(int cmd_params_pos,esp3d_msg_t * msg)
     } else {
         tmpstr = "Start Scan\n";
     }
-
+    msg->type=msg_head;
     if(!dispatch(msg,tmpstr.c_str())) {
         esp3d_log_e("Error sending response to clients");
         return;
@@ -119,7 +119,7 @@ void Esp3DCommands::ESP410(int cmd_params_pos,esp3d_msg_t * msg)
                         tmpstr+="Open\n";
                     }
                 }
-                if(!dispatch(tmpstr.c_str(),target,requestId)) {
+                if(!dispatch(tmpstr.c_str(),target,requestId, msg_core)) {
                     esp3d_log_e("Error sending answer to clients");
                 }
             }
@@ -139,7 +139,7 @@ void Esp3DCommands::ESP410(int cmd_params_pos,esp3d_msg_t * msg)
     } else {
         tmpstr = "End Scan\n";
     }
-    if(!dispatch(tmpstr.c_str(),target,requestId)) {
+    if(!dispatch(tmpstr.c_str(),target,requestId, msg_tail)) {
         esp3d_log_e("Error sending answer to clients");
     }
 

@@ -70,12 +70,14 @@ void Esp3DCommands::ESP400(int cmd_params_pos,esp3d_msg_t * msg)
 #endif //ESP3D_AUTHENTICATION_FEATURE
     if (json) {
         tmpstr = "{\"cmd\":\"400\",\"status\":\"ok\",\"data\":[";
-        if(!dispatch(msg,tmpstr.c_str())) {
-            esp3d_log_e("Error sending response to clients");
-            return;
-        }
+
     } else {
-        Esp3DClient::deleteMsg(msg);
+        tmpstr = "Settings:\n";
+    }
+    msg->type = msg_head;
+    if(!dispatch(msg,tmpstr.c_str())) {
+        esp3d_log_e("Error sending response to clients");
+        return;
     }
     //Baud rate (first item)
     if (!dispatchSetting(json,"system/system",esp3d_baud_rate, "baud", BaudRateList, BaudRateList, sizeof(BaudRateList)/sizeof(char*), -1, -1,-1, nullptr, true,target,requestId,true)) {
@@ -176,7 +178,11 @@ void Esp3DCommands::ESP400(int cmd_params_pos,esp3d_msg_t * msg)
 #endif
 
     if (json) {
-        if(!dispatch("]}",target, requestId)) {
+        if(!dispatch("]}",target, requestId, msg_tail)) {
+            esp3d_log_e("Error sending response to clients");
+        }
+    } else {
+        if(!dispatch("ok\n",target, requestId, msg_tail)) {
             esp3d_log_e("Error sending response to clients");
         }
     }

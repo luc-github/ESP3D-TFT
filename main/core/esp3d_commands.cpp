@@ -215,7 +215,7 @@ bool Esp3DCommands::dispatchSetting(bool json,const char * filter, esp3d_setting
         tmpstr+=value;
         tmpstr+="\n";
     }
-    return dispatch(tmpstr.c_str(), target, requestId);
+    return dispatch(tmpstr.c_str(), target, requestId, msg_core);
 }
 
 bool Esp3DCommands::dispatchAuthenticationError(esp3d_msg_t * msg, uint cmdid, bool json)
@@ -225,6 +225,7 @@ bool Esp3DCommands::dispatchAuthenticationError(esp3d_msg_t * msg, uint cmdid, b
         return false;
     }
     msg->authentication_level =ESP3D_LEVEL_NOT_AUTHENTICATED;
+    //answer is one message, override for safety
     msg->type= msg_unique;
     if (json) {
         tmpstr = "{\"cmd\":\"";
@@ -243,6 +244,7 @@ bool  Esp3DCommands::dispatchAnswer(esp3d_msg_t * msg, uint cmdid, bool json, bo
         esp3d_log_e("no msg");
         return false;
     }
+    //answer is one message, override for safety
     msg->type= msg_unique;
     if (json) {
         tmpstr = "{\"cmd\":\""+std::to_string(cmdid) + "\",\"status\":\"";
@@ -289,15 +291,16 @@ bool  Esp3DCommands::dispatchIdValue(bool json,const char *Id, const char * valu
     } else {
         tmpstr +="\n";
     }
-    return dispatch(tmpstr.c_str(), target, requestId);
+    return dispatch(tmpstr.c_str(), target, requestId, msg_core);
 }
 
 
-bool  Esp3DCommands::dispatch(const char * sbuf,  esp3d_clients_t target, esp3d_request_t requestId, esp3d_clients_t origin, esp3d_authentication_level_t authentication_level)
+bool  Esp3DCommands::dispatch(const char * sbuf,  esp3d_clients_t target, esp3d_request_t requestId, esp3d_msg_type_t type, esp3d_clients_t origin, esp3d_authentication_level_t authentication_level)
 {
     esp3d_msg_t * newMsgPtr = Esp3DClient::newMsg( origin, target);
     if (newMsgPtr) {
         newMsgPtr->requestId = requestId;
+        newMsgPtr->type = type;
         return dispatch(newMsgPtr,sbuf);
     }
     esp3d_log_e("no newMsgPtr");
@@ -659,4 +662,24 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
 void Esp3DCommands::flush()
 {
     serialClient.flush();
+}
+
+bool isRealTimeCommand(char * cmd, size_t len)
+{
+    return false;
+}
+
+bool Esp3DCommands::formatCommand(char * cmd, size_t len)
+{
+    if (isRealTimeCommand(cmd, len)) {
+        //TODO
+        return true;
+    }
+    uint sizestr = strlen(cmd);
+    if (len > sizestr +2 ) {
+        cmd[sizestr]='\n';
+        cmd[sizestr+1]=0x0;
+        return true;
+    }
+    return false;
 }

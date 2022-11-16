@@ -64,7 +64,14 @@ esp_err_t Esp3DHttpService::command_handler(httpd_req_t *req)
         } else {
             httpd_resp_sendstr(req, "ESP3D says: command forwarded");
             requestId.id = 0;
-            esp3dCommands.dispatch(cmd, SERIAL_CLIENT, requestId, WEBUI_CLIENT, authentication_level);
+            //check format is correct
+            if (!esp3d_strings::endsWith(cmd, "\n")) {
+                if (!esp3dCommands.formatCommand(cmd,255)) {
+                    esp3d_log_e("Error command is too long");
+                    return ESP_FAIL;
+                }
+            }
+            esp3dCommands.dispatch(cmd, SERIAL_CLIENT, requestId,msg_unique, WEBUI_CLIENT, authentication_level);
             return ESP_OK;
         }
 
