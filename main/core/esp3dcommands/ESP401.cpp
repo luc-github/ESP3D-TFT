@@ -59,7 +59,7 @@ void Esp3DCommands::ESP401(int cmd_params_pos,esp3d_msg_t * msg)
     } else {
         //check parameters are correct
         esp3d_setting_index_t index_setting = (esp3d_setting_index_t) atoi(settingIndex.c_str ());
-        const Esp3DSetting_t * settingPtr= esp3dTFTsettings.getSettingPtr(index_setting);
+        const esp3d_setting_desc_t * settingPtr= esp3dTFTsettings.getSettingPtr(index_setting);
         if (!settingPtr) {
             hasError = true;
             error_msg= "Unknown setting";

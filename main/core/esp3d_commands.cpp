@@ -94,7 +94,7 @@ bool Esp3DCommands::dispatchSetting(bool json,const char * filter, esp3d_setting
     std::string value;
     char out_str[255];
     tmpstr.reserve(350); //to save time and avoid several memories allocation delay
-    const Esp3DSetting_t * elementSetting = esp3dTFTsettings.getSettingPtr(index);
+    const esp3d_setting_desc_t * elementSetting = esp3dTFTsettings.getSettingPtr(index);
     if (!elementSetting) {
         return false;
     }
@@ -268,6 +268,36 @@ bool  Esp3DCommands::dispatchAnswer(esp3d_msg_t * msg, uint cmdid, bool json, bo
         tmpstr += "\n";
     }
     return dispatch(msg,tmpstr.c_str());
+}
+
+bool  Esp3DCommands::dispatchKeyValue(bool json,const char *key, const char * value, esp3d_clients_t target, esp3d_request_t requestId, bool nested, bool isFirst)
+{
+    std::string tmpstr="";
+    if (json) {
+        if (!isFirst) {
+            tmpstr+=",";
+        }
+        if (nested) {
+            tmpstr += "{";
+        }
+        tmpstr += "\"";
+    }
+    tmpstr +=key;
+    if (json) {
+        tmpstr += "\":\"";
+    } else {
+        tmpstr += ": ";
+    }
+    tmpstr +=value;
+    if (json) {
+        tmpstr += "\"";
+        if (nested) {
+            tmpstr += "}";
+        }
+    } else {
+        tmpstr +="\n";
+    }
+    return dispatch(tmpstr.c_str(), target, requestId, msg_core);
 }
 
 bool  Esp3DCommands::dispatchIdValue(bool json,const char *Id, const char * value, esp3d_clients_t target, esp3d_request_t requestId, bool isFirst)
@@ -641,6 +671,9 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
         break;
     case 900:
         ESP900(cmd_params_pos, msg);
+        break;
+    case 800:
+        ESP800(cmd_params_pos, msg);
         break;
     case 901:
         ESP901(cmd_params_pos, msg);

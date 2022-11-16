@@ -52,9 +52,23 @@ typedef enum  {
     esp3d_hostname,
     esp3d_http_port,
     esp3d_http_on,
-    last_one
+    esp3d_setup,
+    esp3d_target_firmware,
+    last_esp3d_setting_index_t
 } esp3d_setting_index_t;
 
+typedef enum  {
+    esp3d_unknown           = 0,
+    esp3d_grbl              = 10,
+    esp3d_marlin            = 20,
+    esp3d_marlin_embedded   = 30,
+    esp3d_smoothieware      = 40,
+    esp3d_repetier          = 50,
+    esp3d_reprap            = 70,
+    esp3d_grblhal           = 80,
+    esp3d_hp_gl             = 90,
+    last_esp3d_target_firmware_index_t
+} esp3d_target_firmware_index_t;
 
 typedef enum  {
     esp3d_byte, //byte
@@ -67,24 +81,13 @@ typedef enum  {
     esp3d_unknow
 } esp3d_setting_type_t;
 
-//to be implemented :
-//use regex could also be implemented
-//for options list may be use a map list int is value and string is display
-//std::map<int, std::string> options { {0, "No Network"}, {1, "AP"}, {2, "STA"},}
-
-typedef struct {
-    int64_t max;
-    int64_t min;
-    bool canbeempty;
-    void * options;
-}  esp3d_setting_boundaries_t;
 
 typedef struct  {
     esp3d_setting_index_t index;
     esp3d_setting_type_t type;
     uint16_t size;
     const char* defaultval;
-} Esp3DSetting_t;
+} esp3d_setting_desc_t;
 
 class Esp3DSettings final
 {
@@ -108,7 +111,8 @@ public:
     uint32_t getDefaultIntegerSetting(esp3d_setting_index_t settingElement);
     const char * getDefaultStringSetting(esp3d_setting_index_t settingElement);
     uint8_t getDefaultByteSetting(esp3d_setting_index_t settingElement);
-    const Esp3DSetting_t * getSettingPtr(const esp3d_setting_index_t index);
+    const esp3d_setting_desc_t * getSettingPtr(const esp3d_setting_index_t index);
+    const char * GetFirmwareTargetShortName(esp3d_target_firmware_index_t index);
 private:
     const char *IPUInt32toString(uint32_t ip_int);
     uint32_t StringtoIPUInt32(const char *s);

@@ -48,7 +48,7 @@ void Esp3DCommands::ESP112(int cmd_params_pos,esp3d_msg_t * msg)
 #endif //ESP3D_AUTHENTICATION_FEATURE
     tmpstr = get_clean_param(msg,cmd_params_pos);
     if (tmpstr.length()==0) {
-        const Esp3DSetting_t * settingPtr = esp3dTFTsettings.getSettingPtr(esp3d_hostname);
+        const esp3d_setting_desc_t * settingPtr = esp3dTFTsettings.getSettingPtr(esp3d_hostname);
         if (settingPtr) {
             ok_msg = esp3dTFTsettings.readString(esp3d_hostname,out_str, settingPtr->size);
         } else {

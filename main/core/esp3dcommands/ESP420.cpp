@@ -128,7 +128,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     }
 
     //hostname
-    const Esp3DSetting_t * settingPtr = esp3dTFTsettings.getSettingPtr(esp3d_hostname);
+    const esp3d_setting_desc_t * settingPtr = esp3dTFTsettings.getSettingPtr(esp3d_hostname);
     if (settingPtr) {
         char out_str[(settingPtr->size)+1]= {0};
         tmpstr = esp3dTFTsettings.readString(esp3d_hostname,out_str, settingPtr->size);

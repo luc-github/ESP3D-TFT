@@ -40,6 +40,7 @@ public:
     void execute_internal_command(int cmd, int cmd_params_pos,esp3d_msg_t * msg);
     bool dispatchAnswer(esp3d_msg_t * msg, uint cmdid, bool json, bool hasError, const char* answerMsg);
     bool dispatchIdValue(bool json,const char *Id, const char * value, esp3d_clients_t target, esp3d_request_t requestId, bool isFirst = false);
+    bool dispatchKeyValue(bool json,const char *key, const char * value, esp3d_clients_t target, esp3d_request_t requestId, bool nested=false, bool isFirst=false);
     bool dispatchSetting(bool json,const char * filter, esp3d_setting_index_t index, const char* help, const char ** optionValues, const char ** optionLabels, uint32_t maxsize, uint32_t minsize, uint32_t minsize2,uint8_t precision, const char * unit,  bool needRestart,esp3d_clients_t target, esp3d_request_t requestId, bool isFirst = false);
     bool dispatch(esp3d_msg_t * msg);
     bool dispatch(esp3d_msg_t * msg,uint8_t * sbuf, size_t len);
@@ -78,6 +79,7 @@ public:
     void ESP750(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP780(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP790(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP800(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP900(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP901(int cmd_params_pos,esp3d_msg_t * msg);
     const char * get_param (esp3d_msg_t * msg, uint start,const char* label);

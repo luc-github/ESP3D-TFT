@@ -47,7 +47,7 @@ const uint8_t SupportedApChannelsSize = sizeof(SupportedApChannels)/sizeof(uint8
 
 
 //value of settings, default value are all strings
-const Esp3DSetting_t Esp3DSettingsData [] = {
+const esp3d_setting_desc_t Esp3DSettingsData [] = {
     {esp3d_version, esp3d_string, SIZE_OF_SETTING_VERSION,"Invalid data"}, //Version
     {esp3d_baud_rate, esp3d_integer, 4, ESP3D_SERIAL_BAUDRATE},            //BaudRate
     {esp3d_spi_divider, esp3d_byte, 1, "1"},                               //SPIdivider
@@ -68,11 +68,14 @@ const Esp3DSetting_t Esp3DSettingsData [] = {
     {esp3d_ap_channel, esp3d_byte, 1,"2"},
     {esp3d_http_port, esp3d_integer, 4, "80"},
     {esp3d_http_on, esp3d_byte, 1,"1"},
+    {esp3d_setup, esp3d_byte, 1,"0"},
+    {esp3d_target_firmware, esp3d_byte, 1,"0"},
+
 };
 
 bool  Esp3DSettings::isValidStringSetting(const char* value, esp3d_setting_index_t settingElement)
 {
-    const Esp3DSetting_t * settingPtr= getSettingPtr(settingElement);
+    const esp3d_setting_desc_t * settingPtr= getSettingPtr(settingElement);
     if (!settingPtr) {
         return false;
     }
@@ -100,7 +103,7 @@ bool  Esp3DSettings::isValidStringSetting(const char* value, esp3d_setting_index
 
 bool  Esp3DSettings::isValidIntegerSetting(uint32_t value, esp3d_setting_index_t settingElement)
 {
-    const Esp3DSetting_t * settingPtr= getSettingPtr(settingElement);
+    const esp3d_setting_desc_t * settingPtr= getSettingPtr(settingElement);
     if (!settingPtr) {
         return false;
     }
@@ -128,7 +131,7 @@ bool  Esp3DSettings::isValidIntegerSetting(uint32_t value, esp3d_setting_index_t
 
 bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t settingElement)
 {
-    const Esp3DSetting_t * settingPtr= getSettingPtr(settingElement);
+    const esp3d_setting_desc_t * settingPtr= getSettingPtr(settingElement);
     if (!settingPtr) {
         return false;
     }
@@ -136,6 +139,7 @@ bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t set
         return false;
     }
     switch(settingElement) {
+    case esp3d_setup:
     case esp3d_http_on:
     case esp3d_radio_boot_mode:
         if(value==(uint8_t)esp3d_state_off || value==(uint8_t)esp3d_state_on) {
@@ -171,15 +175,22 @@ bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t set
             }
         }
         break;
+    case esp3d_target_firmware:
+        for (size_t i = esp3d_unknown; i !=last_esp3d_target_firmware_index_t; i++) {
+            if ((esp3d_target_firmware_index_t)value == (esp3d_target_firmware_index_t)i) {
+                return true;
+            }
+        }
+        break;
     default:
-        return false;
+        break;
     }
     return false;
 }
 
 bool Esp3DSettings::isValidIPStringSetting(const char* value, esp3d_setting_index_t settingElement)
 {
-    const Esp3DSetting_t * settingPtr= getSettingPtr(settingElement);
+    const esp3d_setting_desc_t * settingPtr= getSettingPtr(settingElement);
     if (!settingPtr) {
         return false;
     }
@@ -207,7 +218,7 @@ bool Esp3DSettings::isValidSettingsNvs()
 
 uint32_t Esp3DSettings::getDefaultIntegerSetting(esp3d_setting_index_t settingElement)
 {
-    const Esp3DSetting_t * query = getSettingPtr(settingElement);
+    const esp3d_setting_desc_t * query = getSettingPtr(settingElement);
     if (query) {
         return (uint32_t)std::stoul(std::string(query->defaultval), NULL,0);
     }
@@ -215,7 +226,7 @@ uint32_t Esp3DSettings::getDefaultIntegerSetting(esp3d_setting_index_t settingEl
 }
 const char * Esp3DSettings::getDefaultStringSetting(esp3d_setting_index_t settingElement)
 {
-    const Esp3DSetting_t * query = getSettingPtr(settingElement);
+    const esp3d_setting_desc_t * query = getSettingPtr(settingElement);
     if (query) {
         return query->defaultval;
     }
@@ -223,11 +234,37 @@ const char * Esp3DSettings::getDefaultStringSetting(esp3d_setting_index_t settin
 }
 uint8_t Esp3DSettings::getDefaultByteSetting(esp3d_setting_index_t settingElement)
 {
-    const Esp3DSetting_t * query = getSettingPtr(settingElement);
+    const esp3d_setting_desc_t * query = getSettingPtr(settingElement);
     if (query) {
         return (uint8_t)std::stoul(std::string(query->defaultval), NULL,0);
     }
     return 0;
+}
+
+
+const char * Esp3DSettings::GetFirmwareTargetShortName(esp3d_target_firmware_index_t index)
+{
+    switch(index) {
+    case esp3d_grbl:
+        return "grbl";
+    case esp3d_marlin:
+        return "marlin";
+    case esp3d_marlin_embedded:
+        return "marlin";
+    case esp3d_smoothieware:
+        return "smoothieware";
+    case esp3d_repetier:
+        return "repetier";
+    case esp3d_reprap:
+        return "reprap";
+    case esp3d_grblhal:
+        return "grblhal";
+    case esp3d_hp_gl:
+        return "hp_gl";
+    default:
+        break;
+    }
+    return "unknown";
 }
 
 bool Esp3DSettings::reset()
@@ -253,9 +290,9 @@ bool Esp3DSettings::reset()
     //warning: iteration 1 invokes undefined behavior [-Waggressive-loop-optimizations]
     //may be use a vector of enum would solve also
     //fortunaly this is to reset all settings so it is ok for current situation and it avoid to create an array of enums
-    for (size_t i = esp3d_version; i !=last_one; i++) {
+    for (size_t i = esp3d_version; i !=last_esp3d_setting_index_t; i++) {
         esp3d_setting_index_t setting  =(esp3d_setting_index_t)i ;
-        const Esp3DSetting_t * query = getSettingPtr(setting);
+        const esp3d_setting_desc_t * query = getSettingPtr(setting);
         if (query) {
             esp3d_log("Reseting %d value to %s",setting, query->defaultval);
             switch(query->type) {
@@ -317,7 +354,7 @@ Esp3DSettings::~Esp3DSettings()
 uint8_t Esp3DSettings::readByte(esp3d_setting_index_t index, bool * haserror)
 {
     uint8_t value = 0;
-    const Esp3DSetting_t * query = getSettingPtr(index);
+    const esp3d_setting_desc_t * query = getSettingPtr(index);
     if (query) {
         if (query->type== esp3d_byte) {
             esp_err_t err;
@@ -352,7 +389,7 @@ uint8_t Esp3DSettings::readByte(esp3d_setting_index_t index, bool * haserror)
 uint32_t Esp3DSettings::readUint32(esp3d_setting_index_t index, bool * haserror)
 {
     uint32_t value = 0;
-    const Esp3DSetting_t * query = getSettingPtr(index);
+    const esp3d_setting_desc_t * query = getSettingPtr(index);
     if (query) {
         if (query->type== esp3d_integer || query->type== esp3d_ip) {
             esp_err_t err;
@@ -399,7 +436,7 @@ const char* Esp3DSettings::readIPString(esp3d_setting_index_t index, bool * hase
 
 const char* Esp3DSettings::readString(esp3d_setting_index_t index, char* out_str, size_t len, bool * haserror)
 {
-    const Esp3DSetting_t * query = getSettingPtr(index);
+    const esp3d_setting_desc_t * query = getSettingPtr(index);
     if (query) {
         if (query->type== esp3d_string) {
             esp_err_t err;
@@ -450,7 +487,7 @@ const char* Esp3DSettings::readString(esp3d_setting_index_t index, char* out_str
 
 bool Esp3DSettings::writeByte (esp3d_setting_index_t index, const uint8_t value)
 {
-    const Esp3DSetting_t * query = getSettingPtr(index);
+    const esp3d_setting_desc_t * query = getSettingPtr(index);
     if (query ) {
         if (query->type== esp3d_byte) {
 
@@ -471,7 +508,7 @@ bool Esp3DSettings::writeByte (esp3d_setting_index_t index, const uint8_t value)
 
 bool Esp3DSettings::writeUint32 (esp3d_setting_index_t index, const uint32_t value)
 {
-    const Esp3DSetting_t * query = getSettingPtr(index);
+    const esp3d_setting_desc_t * query = getSettingPtr(index);
     if (query ) {
         if (query->type== esp3d_integer || query->type== esp3d_ip) {
 
@@ -501,7 +538,7 @@ bool Esp3DSettings::writeIPString (esp3d_setting_index_t index, const char * byt
 
 bool Esp3DSettings::writeString (esp3d_setting_index_t index, const char * byte_buffer )
 {
-    const Esp3DSetting_t * query = getSettingPtr(index);
+    const esp3d_setting_desc_t * query = getSettingPtr(index);
     if (query ) {
         if (query->type== esp3d_string && strlen(byte_buffer)<= query->size) {
             esp_err_t err;
@@ -541,7 +578,7 @@ uint32_t Esp3DSettings::StringtoIPUInt32(const char *s)
 }
 
 
-const Esp3DSetting_t * Esp3DSettings::getSettingPtr(const esp3d_setting_index_t index)
+const esp3d_setting_desc_t * Esp3DSettings::getSettingPtr(const esp3d_setting_index_t index)
 {
     for (uint16_t i = 0; i < sizeof(Esp3DSettingsData); i++) {
         if (Esp3DSettingsData[i].index == index ) {
