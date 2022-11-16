@@ -26,12 +26,13 @@
 #include "esp3d_settings.h"
 #include "esp3d_commands.h"
 #include "network/esp3d_network.h"
+#include "filesystem/esp3d_flash.h"
 
 
 esp_err_t Esp3DHttpService::files_handler(httpd_req_t *req)
 {
     esp3d_log("Uri: %s", req->uri);
     //TODO: check if esp command and process it or dispatch it
-    httpd_resp_sendstr(req, "Response not yet available");
+    httpd_resp_sendstr(req, "{\"files\":[{\"name\":\"index.html.gz\",\"size\":\"85.33 KB\"},{\"name\":\"preferences.json\",\"size\":\"3.38 KB\"}],\"path\":\"/\",\"occupation\":\"2\",\"status\":\"ok\",\"total\":\"3.44 MB\",\"used\":\"100.00 KB\"}");
     return ESP_OK;
 }

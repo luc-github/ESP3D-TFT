@@ -98,6 +98,30 @@ bool Esp3DHttpService::begin()
             .supported_subprotocol = nullptr
         };
         httpd_register_uri_handler(_server, &command_handler_config);
+        //flash files /files
+        const httpd_uri_t files_handler_config = {
+            .uri       = "/files",
+            .method    = HTTP_GET,
+            .handler   = (esp_err_t (*)(httpd_req_t*))(esp3dHttpService.files_handler),
+            .user_ctx  =  nullptr,
+            .is_websocket = false,
+            .handle_ws_control_frames = false,
+            .supported_subprotocol = nullptr
+        };
+        httpd_register_uri_handler(_server, &files_handler_config);
+
+        //webui web socket /ws
+        const httpd_uri_t websocket_handler_config = {
+            .uri       = "/ws",
+            .method    = HTTP_GET,
+            .handler   = (esp_err_t (*)(httpd_req_t*))(esp3dHttpService.websocket_handler),
+            .user_ctx  =  nullptr,
+            .is_websocket = true,
+            .handle_ws_control_frames = false,
+            .supported_subprotocol = "webui-v3"
+        };
+        httpd_register_uri_handler(_server, &websocket_handler_config);
+
         //File not found
         httpd_register_err_handler(_server, HTTPD_404_NOT_FOUND, (httpd_err_handler_func_t )file_not_found_handler);
         _started = true;
