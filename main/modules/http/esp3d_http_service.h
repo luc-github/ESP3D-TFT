@@ -21,6 +21,7 @@
 #pragma once
 #include <stdio.h>
 #include <esp_http_server.h>
+#include "esp3d_client.h"
 
 
 #ifdef __cplusplus
@@ -36,7 +37,7 @@ public:
     bool begin();
     void handle();
     void end();
-
+    void process(esp3d_msg_t * msg);
     bool started()
     {
         return _started;

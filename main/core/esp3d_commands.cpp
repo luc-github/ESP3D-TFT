@@ -19,6 +19,7 @@
 
 #include "esp3d_commands.h"
 #include "serial/esp3d_serial_client.h"
+#include "http/esp3d_http_service.h"
 #include "esp3d_string.h"
 #include <stdio.h>
 #include <string>
@@ -224,6 +225,7 @@ bool Esp3DCommands::dispatchAuthenticationError(esp3d_msg_t * msg, uint cmdid, b
         return false;
     }
     msg->authentication_level =ESP3D_LEVEL_NOT_AUTHENTICATED;
+    msg->type= msg_unique;
     if (json) {
         tmpstr = "{\"cmd\":\"";
         tmpstr = std::to_string(cmdid);
@@ -241,6 +243,7 @@ bool  Esp3DCommands::dispatchAnswer(esp3d_msg_t * msg, uint cmdid, bool json, bo
         esp3d_log_e("no msg");
         return false;
     }
+    msg->type= msg_unique;
     if (json) {
         tmpstr = "{\"cmd\":\""+std::to_string(cmdid) + "\",\"status\":\"";
 
@@ -330,6 +333,11 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
     //currently only echo back no test done on success
     //TODO check add is successful
     switch (msg->target) {
+    case WEBUI_CLIENT:
+        if (esp3dHttpService.started()) {
+            esp3dHttpService.process(msg);
+        }
+        break;
     case SERIAL_CLIENT:
         if (serialClient.started()) {
             if (!serialClient.addTXData(msg)) {
@@ -488,8 +496,10 @@ const char * Esp3DCommands::get_clean_param (esp3d_msg_t * msg, uint start)
         if (c=='\\') {
             prevCharIsEscaped=true;
         }
-        if (std::isspace(c) && !prevCharIsEscaped ) {
-            if (value=="json" ||value.find("json=")==0 || value.find("pwd=")==0) {
+        if (std::isspace(c) && !prevCharIsEscaped) {
+            //esp3d_log("testing *%s*", value.c_str());
+            if (value=="json" || esp3d_strings::startsWith(value.c_str(),"json=") || esp3d_strings::startsWith(value.c_str(),"pwd=")) {
+
                 value.clear();
             } else {
                 return value.c_str();
@@ -501,6 +511,10 @@ const char * Esp3DCommands::get_clean_param (esp3d_msg_t * msg, uint start)
             }
             prevCharIsEscaped=false;
         }
+    }
+    //for empty value
+    if (value=="json" || esp3d_strings::startsWith(value.c_str(),"json=") || esp3d_strings::startsWith(value.c_str(),"pwd=")) {
+        value.clear();
     }
     return value.c_str();
 }

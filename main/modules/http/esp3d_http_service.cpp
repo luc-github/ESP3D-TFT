@@ -220,3 +220,19 @@ esp_err_t Esp3DHttpService::streamFile (const char * path,httpd_req_t *req )
 
     return res;
 }
+
+void Esp3DHttpService::process(esp3d_msg_t * msg)
+{
+    if (msg->requestId.httpReq) {
+        esp3d_log("Msg type : %d", msg->type);
+        if (httpd_resp_send_chunk(msg->requestId.httpReq, (const char *)msg->data, msg->size) != ESP_OK) {
+            httpd_resp_send_chunk(msg->requestId.httpReq, NULL, 0);
+            esp3d_log("Error sending data");
+        } else {
+            if (msg->type==  msg_tail || msg->type== msg_unique) {
+                httpd_resp_send_chunk(msg->requestId.httpReq, NULL, 0);
+            }
+        }
+    }
+    Esp3DClient::deleteMsg(msg);
+}

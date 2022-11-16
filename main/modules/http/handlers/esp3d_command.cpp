@@ -30,24 +30,46 @@
 
 esp_err_t Esp3DHttpService::command_handler(httpd_req_t *req)
 {
+    //TODO: check authentication level
+    esp3d_authentication_level_t authentication_level=ESP3D_LEVEL_GUEST;
     esp3d_log("Uri: %s", req->uri);
     char*  buf;
     size_t buf_len;
+    char cmd[255+1]= {0};
     buf_len = httpd_req_get_url_query_len(req) + 1;
     if (buf_len > 1) {
         buf = (char *)malloc(buf_len);
         if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) {
-            char value[255]= {0};
             esp3d_log("query string: %s", buf);
-            if (httpd_query_key_value(buf, "cmd", value, 254)==ESP_OK) {
-                esp3d_log("command is: %s", esp3d_strings::urlDecode(value));
+            if (httpd_query_key_value(buf, "cmd", cmd, 255)==ESP_OK) {
+                strcpy(cmd,esp3d_strings::urlDecode(cmd));
+                esp3d_log("command is: %s", cmd);
             } else {
                 esp3d_log_e("Invalid param");
             }
         }
         free(buf);
     }
-    //TODO: check if esp command and process it or dispatch it
-    httpd_resp_sendstr(req, "Response not yet available");
-    return ESP_OK;
+    if (strlen(cmd)>0) {
+        esp3d_request_t requestId;
+        if (esp3dCommands.is_esp_command((uint8_t*)cmd, strlen(cmd))) {
+            requestId.httpReq = req;
+            esp3d_msg_t * newMsgPtr = Esp3DClient::newMsg( WEBUI_CLIENT, ESP3D_COMMAND, (const uint8_t *) cmd,  strlen(cmd), authentication_level);
+            if (newMsgPtr) {
+                newMsgPtr->requestId.httpReq = req;
+                esp3dCommands.process(newMsgPtr);
+            } else {
+                httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Message creation failed");
+            }
+        } else {
+            httpd_resp_sendstr(req, "ESP3D says: command forwarded");
+            requestId.id = 0;
+            esp3dCommands.dispatch(cmd, SERIAL_CLIENT, requestId, WEBUI_CLIENT, authentication_level);
+            return ESP_OK;
+        }
+
+    } else {
+        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid request");
+    }
+    return ESP_FAIL;
 }

@@ -106,7 +106,7 @@ const char*  esp3d_strings::urlDecode(const char * text)
     }
 }
 
-bool endsWith(const char * str, const char * endpart)
+bool esp3d_strings::endsWith(const char * str, const char * endpart)
 {
     if (!str || !endpart) {
         return false;
@@ -124,7 +124,7 @@ bool endsWith(const char * str, const char * endpart)
     return true;
 }
 
-bool startsWith(const char * str, const char * startPart)
+bool esp3d_strings::startsWith(const char * str, const char * startPart)
 {
     if (!str || !startPart) {
         return false;
