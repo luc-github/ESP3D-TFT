@@ -640,12 +640,14 @@ function dispatchFileStatus(jsonresponse) {
           document
             .getElementById(eventslisteners[i].id)
             .addEventListener("click", function () {
+              var p = window.location.host +
+              currentPath +
+              "/" +
+              eventslisteners[i].target;
+              
               let url = new URL(
                 "http://" +
-                  window.location.host +
-                  currentPath +
-                  "/" +
-                  eventslisteners[i].target
+                  p.replace("//","/")
               );
               window.open(url, "_blank");
             });

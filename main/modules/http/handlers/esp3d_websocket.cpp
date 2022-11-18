@@ -71,6 +71,7 @@ esp_err_t Esp3DHttpService::websocket_handler(httpd_req_t *req)
         esp3d_log("Handshake done, the new connection was opened");
         return ESP_OK;
     }
+    return ESP_OK;
     httpd_ws_frame_t ws_pkt;
     uint8_t *buf = NULL;
     memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));

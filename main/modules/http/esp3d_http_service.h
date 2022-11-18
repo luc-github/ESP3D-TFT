@@ -58,9 +58,12 @@ public:
     static esp_err_t upload_updatefw_handler(httpd_req_t *req);
     static esp_err_t websocket_handler(httpd_req_t *req);
     esp_err_t streamFile (const char * path,httpd_req_t *req );
+    esp_err_t sendStringChunk (httpd_req_t *req, const char * str, bool autoClose = true );
+    esp_err_t sendBinaryChunk (httpd_req_t *req, const uint8_t * data, size_t len, bool autoClose = true );
 private:
     bool _started;
     httpd_handle_t _server;
+    const char * getBoundaryString (httpd_req_t *req);
 };
 
 extern Esp3DHttpService esp3dHttpService;

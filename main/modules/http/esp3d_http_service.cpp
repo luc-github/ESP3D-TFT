@@ -108,7 +108,19 @@ bool Esp3DHttpService::begin()
             .handle_ws_control_frames = false,
             .supported_subprotocol = nullptr
         };
+
         httpd_register_uri_handler(_server, &files_handler_config);
+        //flash files upload (POST data)
+        httpd_uri_t files_upload_handler_config = {
+            .uri       = "/files",   // Match all URIs of type /upload/path/to/file
+            .method    = HTTP_POST,
+            .handler   = upload_files_handler,
+            .user_ctx  =  nullptr,
+            .is_websocket = false,
+            .handle_ws_control_frames = false,
+            .supported_subprotocol = nullptr
+        };
+        httpd_register_uri_handler(_server, &files_upload_handler_config);
 
         //webui web socket /ws
         const httpd_uri_t websocket_handler_config = {
@@ -260,4 +272,68 @@ void Esp3DHttpService::process(esp3d_msg_t * msg)
         }
     }
     Esp3DClient::deleteMsg(msg);
+}
+
+
+esp_err_t Esp3DHttpService::sendStringChunk (httpd_req_t *req, const char * str, bool autoClose )
+{
+    if (!str || httpd_resp_send_chunk(req, str, strlen(str)) != ESP_OK) {
+        esp3d_log_e("String sending failed!");
+        if (autoClose) {
+            httpd_resp_send_chunk(req, NULL, 0);
+        }
+        return ESP_FAIL;
+    }
+    return ESP_OK;
+}
+
+esp_err_t Esp3DHttpService::sendBinaryChunk (httpd_req_t *req, const uint8_t * data, size_t len, bool autoClose )
+{
+    if (!data || httpd_resp_send_chunk(req, (const char *)data, len) != ESP_OK) {
+        esp3d_log_e("String sending failed!");
+        if (autoClose) {
+            httpd_resp_send_chunk(req, NULL, 0);
+        }
+        return ESP_FAIL;
+    }
+    return ESP_OK;
+}
+
+const char * Esp3DHttpService::getBoundaryString (httpd_req_t *req)
+{
+    static char * boundaryStr = nullptr;
+    if (boundaryStr) {
+        free(boundaryStr);
+    }
+    size_t contentTypeHeaderSize =  httpd_req_get_hdr_value_len(req, "Content-Type");
+    if (contentTypeHeaderSize) {
+        boundaryStr = (char*)calloc(contentTypeHeaderSize+1, sizeof(char));
+        if (boundaryStr) {
+            esp_err_t r = httpd_req_get_hdr_value_str(req, "Content-Type", boundaryStr, contentTypeHeaderSize+1);
+            if (ESP_OK==r) {
+                esp3d_log("Content-Type %s", boundaryStr);
+                if (esp3d_strings::startsWith(boundaryStr,"multipart/form-data")) {
+                    for(uint i=strlen("multipart/form-data"); i < contentTypeHeaderSize; i++) {
+                        if(esp3d_strings::startsWith(&boundaryStr[i],"boundary=")) {
+                            return &boundaryStr[i+strlen("boundary=")];
+                        }
+                    }
+                    free(boundaryStr);
+                    boundaryStr = nullptr;
+                    esp3d_log_e("Boundary not found");
+                } else {
+                    esp3d_log_e("Not multipart/form-data");
+                    free(boundaryStr);
+                    boundaryStr =nullptr;
+                }
+            } else {
+                esp3d_log_e("Invalid Content-Type %s", esp_err_to_name(r) );
+                free(boundaryStr);
+                boundaryStr =nullptr;
+            }
+        } else {
+            esp3d_log_e("Memory allocation failed");
+        }
+    }
+    return boundaryStr;
 }

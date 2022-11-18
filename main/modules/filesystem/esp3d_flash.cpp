@@ -40,7 +40,7 @@ esp3d_fs_types ESP3D_FLASH::getFSType(const char * path)
 bool  ESP3D_FLASH::accessFS(esp3d_fs_types FS)
 {
     (void)FS;
-    esp3d_log("Access SD");
+    esp3d_log("Access FS");
     return _mounted;
 
 }
@@ -48,6 +48,6 @@ bool  ESP3D_FLASH::accessFS(esp3d_fs_types FS)
 void  ESP3D_FLASH::releaseFS(esp3d_fs_types FS)
 {
     (void)FS;
-    esp3d_log("Release SD");
+    esp3d_log("Release FS");
 }
 

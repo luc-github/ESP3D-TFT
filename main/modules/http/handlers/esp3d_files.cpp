@@ -27,12 +27,176 @@
 #include "esp3d_commands.h"
 #include "network/esp3d_network.h"
 #include "filesystem/esp3d_flash.h"
+#include <math.h>
+#if ESP3D_TIMESTAMP_FEATURE
+#include <time.h>
+#endif //ESP3D_TIMESTAMP_FEATURE
+#include "authentication/esp3d_authentication.h"
 
 
 esp_err_t Esp3DHttpService::files_handler(httpd_req_t *req)
 {
     esp3d_log("Uri: %s", req->uri);
-    //TODO: check if esp command and process it or dispatch it
-    httpd_resp_sendstr(req, "{\"files\":[{\"name\":\"index.html.gz\",\"size\":\"85.33 KB\"},{\"name\":\"preferences.json\",\"size\":\"3.38 KB\"}],\"path\":\"/\",\"occupation\":\"2\",\"status\":\"ok\",\"total\":\"3.44 MB\",\"used\":\"100.00 KB\"}");
-    return ESP_OK;
+    char*  buf;
+    size_t buf_len;
+    char param[255+1]= {0};
+    std::string tmpstr;
+    std::string path = "/";
+    std::string action;
+    std::string filename;
+    std::string createPath;
+    std::string status = "ok";
+    std::string currentPath;
+    buf_len = httpd_req_get_url_query_len(req) + 1;
+    if (buf_len > 1) {
+        buf = (char *)malloc(buf_len);
+        if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) {
+            esp3d_log("query string: %s", buf);
+            if (httpd_query_key_value(buf, "path", param, 255)==ESP_OK) {
+                path = esp3d_strings::urlDecode(param);
+                esp3d_log("path is: %s", path.c_str());
+            }
+            if (httpd_query_key_value(buf, "action", param, 255)==ESP_OK) {
+                action =param;
+                esp3d_log("action is: %s", action.c_str());
+            }
+            if (httpd_query_key_value(buf, "filename", param, 255)==ESP_OK) {
+                filename = esp3d_strings::urlDecode(param);
+                esp3d_log("filename is: %s", filename.c_str());
+            }
+        }
+        free(buf);
+    }
+    if (flashFs.accessFS()) {
+        if (action.length()>0) {
+            if (filename.length()>0) {
+                //some sanity check
+                std::string currentPath = path;
+                if (path[path.length()-1]!='/') {
+                    currentPath+="/";
+                }
+                if (filename[0]=='/') {
+                    currentPath+=&(filename.c_str()[1]);
+                } else {
+                    currentPath+=filename;
+                }
+
+                if (action=="delete") {
+                    esp3d_log("Delete file: %s", currentPath.c_str());
+                    if (!flashFs.remove(currentPath.c_str())) {
+                        esp3d_log_e("Deletion failed");
+                        status="delee file failed";
+                    }
+                } else if (action=="deletedir") {
+                    esp3d_log("Delete dir: %s", currentPath.c_str());
+                    if (!flashFs.rmdir(currentPath.c_str())) {
+                        esp3d_log_e("Deletion failed");
+                        status="delete dir failed";
+                    }
+                } else if (action=="createdir") {
+
+                    esp3d_log("Create dir: %s", currentPath.c_str());
+                    if (!flashFs.mkdir(currentPath.c_str())) {
+                        esp3d_log_e("Creation failed");
+                        status="ceate dir failed";
+                    }
+                }
+            }
+        }
+        size_t totalSpace = 0;
+        size_t usedSpace = 0;
+        flashFs.getSpaceInfo(&totalSpace,
+                             &usedSpace,
+                             nullptr,
+                             true);
+        uint8_t occupation = 0;
+        if (totalSpace==0) {
+            status="Error getting space info";
+        } else {
+            occupation =round(100.0*usedSpace/totalSpace);
+            if (occupation==0 && usedSpace!=0) {
+                occupation=1;
+            }
+        }
+
+        //head of json
+        if (esp3dHttpService.sendStringChunk(req, "{\"files\":[")!=ESP_OK) {
+            flashFs.releaseFS();
+            return ESP_FAIL;
+        }
+        DIR *dir = flashFs.opendir(path.c_str());
+
+        if (dir) {
+            struct dirent *entry;
+            struct stat entry_stat;
+            uint nentries = 0;
+            while ((entry = flashFs.readdir(dir)) != NULL) {
+                currentPath = path;
+                tmpstr = "";
+                if(nentries>0) {
+                    tmpstr+= ",";
+                }
+                nentries++;
+                if (path[path.length()-1]!='/') {
+                    currentPath+="/";
+                }
+                currentPath +=entry->d_name;
+                if (entry->d_type==DT_DIR) {
+
+                    tmpstr += "{\"name\":\"";
+                    tmpstr += entry->d_name;
+                    tmpstr += "\",\"size\":\"-1\"}";
+
+                } else {
+#if ESP3D_TIMESTAMP_FEATURE
+                    char buff[20];
+                    strftime(buff, sizeof (buff), "%Y-%m-%d %H:%M:%S", gmtime(&(entry_stat.st_mtim.tv_sec)));
+#endif //ESP3D_TIMESTAMP_FEATURE
+                    if (flashFs.stat(currentPath.c_str(), &entry_stat) == -1) {
+                        esp3d_log_e("Failed to stat %s : %s", entry->d_type==DT_DIR?"DIR":"FILE", currentPath.c_str());
+                        continue;
+                    }
+                    tmpstr += "{\"name\":\"";
+                    tmpstr += entry->d_name;
+                    tmpstr += "\",\"size\":\"";
+                    tmpstr += esp3d_strings::formatBytes(entry_stat.st_size);
+#if ESP3D_TIMESTAMP_FEATURE
+                    tmpstr += "\",\"time\":\"";
+                    tmpstr += buff;
+#endif //ESP3D_TIMESTAMP_FEATURE
+                    tmpstr += "\"}";
+                }
+                if (esp3dHttpService.sendStringChunk(req, tmpstr.c_str())!=ESP_OK) {
+                    flashFs.releaseFS();
+                    return ESP_FAIL;
+                }
+            }
+        } else {
+            status="error cannot access ";
+            status+= path;
+        }
+
+        tmpstr = "],\"path\":\"";
+        tmpstr += path;
+        tmpstr += "\",\"occupation\":\"";
+        tmpstr += std::to_string(occupation);
+        tmpstr +="\",\"status\":\"";
+        tmpstr += status;
+        tmpstr +="\",\"total\":\"";
+        tmpstr +=esp3d_strings::formatBytes (totalSpace);
+        tmpstr +="\",\"used\":\"";
+        tmpstr +=esp3d_strings::formatBytes (usedSpace);
+        tmpstr +="\"}";
+        if (esp3dHttpService.sendStringChunk(req, tmpstr.c_str())!=ESP_OK) {
+            flashFs.releaseFS();
+            return ESP_FAIL;
+        }
+        //end of json
+        httpd_resp_send_chunk(req, NULL, 0);
+        flashFs.releaseFS();
+        return ESP_OK;
+    } else {
+        httpd_resp_sendstr(req, "{\"status\":\"error accessing filesystem\"}");
+        return ESP_FAIL;
+    }
 }
