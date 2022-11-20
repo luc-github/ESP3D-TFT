@@ -47,6 +47,10 @@ esp_err_t Esp3DHttpService::files_handler(httpd_req_t *req)
     std::string createPath;
     std::string status = "ok";
     std::string currentPath;
+    if (esp3dHttpService.hasArg(req,"path")) {
+        path = esp3dHttpService.getArg(req,"path");
+        esp3d_log("Path from post: %s", path.c_str());
+    }
     buf_len = httpd_req_get_url_query_len(req) + 1;
     if (buf_len > 1) {
         buf = (char *)malloc(buf_len);

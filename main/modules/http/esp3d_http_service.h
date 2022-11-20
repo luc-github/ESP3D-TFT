@@ -22,12 +22,35 @@
 #include <stdio.h>
 #include <esp_http_server.h>
 #include "esp3d_client.h"
-
+#include <list>
+#include <utility>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+//for file upload
+typedef enum {
+    upload_file_start,
+    upload_file_write,
+    upload_file_end,
+    upload_file_aborted,
+} esp3d_upload_state_t;
+
+//for complete upload (several files in upload)
+typedef enum {
+    upload_not_started,
+    upload_ongoing,
+    upload_error,
+    upload_success,
+} esp3d_upload_status_t;
+
+typedef struct {
+    esp_err_t (*writeFn)(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state,  FILE * fd, const char * filename, size_t filesize);
+    esp_err_t (*nextHandler)(httpd_req_t *req);
+    esp3d_upload_status_t status;
+    std::list<std::pair<std::string, std::string>> args;
+} post_upload_ctx_t;
 
 class Esp3DHttpService final
 {
@@ -50,20 +73,23 @@ public:
     static esp_err_t file_not_found_handler(httpd_req_t *req, httpd_err_code_t err);
     static esp_err_t login_handler(httpd_req_t *req);
     static esp_err_t files_handler(httpd_req_t *req);
-    static esp_err_t upload_files_handler(httpd_req_t *req);
     static esp_err_t sd_handler(httpd_req_t *req);
     static esp_err_t sdfiles_handler(httpd_req_t *req);
-    static esp_err_t upload_sdfiles_handler(httpd_req_t *req);
     static esp_err_t updatefw_handler(httpd_req_t *req);
-    static esp_err_t upload_updatefw_handler(httpd_req_t *req);
     static esp_err_t websocket_handler(httpd_req_t *req);
+    static esp_err_t post_multipart_handler(httpd_req_t *req);
+    static esp_err_t upload_to_flash_handler(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state,  FILE * fd, const char * filename, size_t filesize);
     esp_err_t streamFile (const char * path,httpd_req_t *req );
     esp_err_t sendStringChunk (httpd_req_t *req, const char * str, bool autoClose = true );
     esp_err_t sendBinaryChunk (httpd_req_t *req, const uint8_t * data, size_t len, bool autoClose = true );
+    bool hasArg(httpd_req_t *req,const char* argname );
+    const char * getArg(httpd_req_t *req, const char* argname);
 private:
     bool _started;
     httpd_handle_t _server;
     const char * getBoundaryString (httpd_req_t *req);
+    //it is based on : `only one post is supported at once`
+    static post_upload_ctx_t _post_files_upload_ctx;
 };
 
 extern Esp3DHttpService esp3dHttpService;

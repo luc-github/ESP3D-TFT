@@ -1,5 +1,5 @@
 /*
-  esp3d_http_service
+  esp3d_http_service : upload_to_flash_handler
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
   This code is free software; you can redistribute it and/or
@@ -19,19 +19,29 @@
 
 
 #include "http/esp3d_http_service.h"
-#include <stdio.h>
+#include <sys/param.h>
 #include "esp_wifi.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_settings.h"
 #include "esp3d_commands.h"
-#include "network/esp3d_network.h"
+#include "filesystem/esp3d_flash.h"
 
-
-esp_err_t Esp3DHttpService::upload_files_handler(httpd_req_t *req)
+esp_err_t Esp3DHttpService::upload_to_flash_handler(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state,  FILE * fd, const char * filename, size_t filesize)
 {
-    esp3d_log("Uri: %s", req->uri);
-    //TODO: check if esp command and process it or dispatch it
-    httpd_resp_sendstr(req, "Response not yet available");
+    switch(file_upload_state) {
+    case upload_file_start:
+        esp3d_log("Starting flash upload:%s", filename);
+        break;
+    case upload_file_write:
+        esp3d_log("Write :%d bytes", datasize);
+        break;
+    case upload_file_end:
+        esp3d_log("Ending upload");
+        break;
+    case upload_file_aborted:
+        esp3d_log("Error happened: cleanup");
+        break;
+    }
     return ESP_OK;
 }

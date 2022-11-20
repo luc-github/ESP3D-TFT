@@ -33,11 +33,47 @@
 char chunk[CHUNK_BUFFER_SIZE];
 
 Esp3DHttpService esp3dHttpService;
+post_upload_ctx_t Esp3DHttpService::_post_files_upload_ctx= {
+    .writeFn= (esp_err_t (*)(const uint8_t *, size_t,esp3d_upload_state_t,  FILE *, const char *, size_t ))(Esp3DHttpService::upload_to_flash_handler),
+    .nextHandler= (esp_err_t (*)(httpd_req_t*))(Esp3DHttpService::files_handler),
+    .status = upload_not_started,
+    .args = {}
+};
+
+bool Esp3DHttpService::hasArg(httpd_req_t *req, const char* argname)
+{
+    post_upload_ctx_t *post_upload_ctx = (post_upload_ctx_t *)req->user_ctx;
+    if (post_upload_ctx) {
+        for(auto itr=post_upload_ctx->args.begin(); itr!=post_upload_ctx->args.end(); itr++) {
+            if (strcmp(itr->first.c_str(), argname)==0) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+const char * Esp3DHttpService::getArg(httpd_req_t *req, const char* argname)
+{
+    post_upload_ctx_t *post_upload_ctx = (post_upload_ctx_t *)req->user_ctx;
+    if (post_upload_ctx) {
+        for(auto itr=post_upload_ctx->args.begin(); itr!=post_upload_ctx->args.end(); itr++) {
+            if (strcmp(itr->first.c_str(), argname)==0) {
+                return itr->second.c_str();
+            }
+        }
+    }
+    return "";
+}
 
 Esp3DHttpService::Esp3DHttpService()
 {
     _started = false;
     _server = nullptr;
+    /*_post_files_upload_ctx.writeFn = nullptr;
+    _post_files_upload_ctx.nextHandler = nullptr;
+    _post_files_upload_ctx.status = upload_not_started;*/
 }
 
 Esp3DHttpService::~Esp3DHttpService() {}
@@ -108,14 +144,14 @@ bool Esp3DHttpService::begin()
             .handle_ws_control_frames = false,
             .supported_subprotocol = nullptr
         };
-
         httpd_register_uri_handler(_server, &files_handler_config);
+
         //flash files upload (POST data)
         httpd_uri_t files_upload_handler_config = {
             .uri       = "/files",   // Match all URIs of type /upload/path/to/file
             .method    = HTTP_POST,
-            .handler   = upload_files_handler,
-            .user_ctx  =  nullptr,
+            .handler   = post_multipart_handler,
+            .user_ctx  =  &_post_files_upload_ctx,
             .is_websocket = false,
             .handle_ws_control_frames = false,
             .supported_subprotocol = nullptr
@@ -153,6 +189,8 @@ void Esp3DHttpService::end()
         httpd_unregister_uri(_server, "/favicon.ico");
         httpd_unregister_uri(_server, "/command");
         httpd_unregister_uri(_server, "/");
+        httpd_unregister_uri(_server, "/files");
+        httpd_unregister_uri(_server, "/ws");
         httpd_register_err_handler(_server, HTTPD_404_NOT_FOUND, NULL);
         httpd_stop(_server);
     }
