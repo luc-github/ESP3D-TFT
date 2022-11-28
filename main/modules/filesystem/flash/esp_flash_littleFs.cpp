@@ -207,7 +207,7 @@ bool  ESP3D_FLASH::remove(const char *path)
         }
         file_path+=path;
     }
-    return !::unlink(file_path.c_str());
+    return !unlink(file_path.c_str());
 }
 
 bool  ESP3D_FLASH::mkdir(const char *path)
@@ -281,4 +281,5 @@ void ESP3D_FLASH::rewinddir(DIR * dir)
 void  ESP3D_FLASH::close(FILE * fd)
 {
     fclose(fd);
+    fd=nullptr;
 }

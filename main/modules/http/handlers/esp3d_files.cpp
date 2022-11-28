@@ -89,7 +89,7 @@ esp_err_t Esp3DHttpService::files_handler(httpd_req_t *req)
                     esp3d_log("Delete file: %s", currentPath.c_str());
                     if (!flashFs.remove(currentPath.c_str())) {
                         esp3d_log_e("Deletion failed");
-                        status="delee file failed";
+                        status="delete file failed";
                     }
                 } else if (action=="deletedir") {
                     esp3d_log("Delete dir: %s", currentPath.c_str());
@@ -152,14 +152,14 @@ esp_err_t Esp3DHttpService::files_handler(httpd_req_t *req)
                     tmpstr += "\",\"size\":\"-1\"}";
 
                 } else {
-#if ESP3D_TIMESTAMP_FEATURE
-                    char buff[20];
-                    strftime(buff, sizeof (buff), "%Y-%m-%d %H:%M:%S", gmtime(&(entry_stat.st_mtim.tv_sec)));
-#endif //ESP3D_TIMESTAMP_FEATURE
                     if (flashFs.stat(currentPath.c_str(), &entry_stat) == -1) {
                         esp3d_log_e("Failed to stat %s : %s", entry->d_type==DT_DIR?"DIR":"FILE", currentPath.c_str());
                         continue;
                     }
+#if ESP3D_TIMESTAMP_FEATURE
+                    char buff[20];
+                    strftime(buff, sizeof (buff), "%Y-%m-%d %H:%M:%S", gmtime(&(entry_stat.st_mtim.tv_sec)));
+#endif //ESP3D_TIMESTAMP_FEATURE
                     tmpstr += "{\"name\":\"";
                     tmpstr += entry->d_name;
                     tmpstr += "\",\"size\":\"";

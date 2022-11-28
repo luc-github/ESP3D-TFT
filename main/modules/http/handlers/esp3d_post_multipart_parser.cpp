@@ -29,7 +29,7 @@
 
 //TODO fine tune these values and put them in tasks_def.h
 #define PACKET_SIZE 1024*1
-#define PACKET_WRITE_SIZE 1024*2
+#define PACKET_WRITE_SIZE 1024*1
 
 char packet[PACKET_SIZE];
 char packetWrite[PACKET_WRITE_SIZE];
@@ -46,6 +46,9 @@ typedef enum {
 esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
 {
     esp3d_log("Post Data %d on : %s", req->content_len, req->uri);
+#if ESP3D_TFT_BENCHMARK
+    uint64_t startBenchmark = esp_timer_get_time();
+#endif // ESP3D_TFT_BENCHMARK
 
     post_upload_ctx_t *post_upload_ctx = (post_upload_ctx_t *)req->user_ctx;
     if (!post_upload_ctx) {
@@ -80,7 +83,6 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
     int remaining = req->content_len;
     int received;
     int fileSize=-1;
-    FILE * fileDescriptor = nullptr;
     // processing the content
     if (boundaryPtr) {
         esp3d_parse_state_t parsing_state = parse_boundary;
@@ -88,7 +90,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
             if ((received = httpd_req_recv(req, packet, PACKET_SIZE)) <= 0) {
                 esp3d_log_e("Connection lost");
                 if (parsing_state==parse_data_file && post_upload_ctx->writeFn) {
-                    if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_aborted,  fileDescriptor, fileName.c_str(), fileSize)) {
+                    if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_aborted, fileName.c_str(), fileSize)) {
                         esp3d_log_e("Error writing file invalid");
                     }
                 }
@@ -101,7 +103,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
             if (received == HTTPD_SOCK_ERR_INVALID || received == HTTPD_SOCK_ERR_FAIL) {
                 esp3d_log_e("Error connection");
                 if (parsing_state==parse_data_file && post_upload_ctx->writeFn) {
-                    if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_aborted,  fileDescriptor, fileName.c_str(), fileSize)) {
+                    if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_aborted, fileName.c_str(), fileSize)) {
                         esp3d_log_e("Error writing file invalid");
                     }
                 }
@@ -288,7 +290,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                             esp3d_log("File size from post: %d", fileSize);
                         }
                         if (post_upload_ctx->writeFn) {
-                            if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_start,  fileDescriptor, fileName.c_str(), fileSize)) {
+                            if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_start,  fileName.c_str(), fileSize)) {
                                 esp3d_log_e("Error writing file invalid");
                                 return ESP_FAIL;
                             }
@@ -322,7 +324,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                                     indexPacketWrite++;
                                     if (indexPacketWrite==PACKET_WRITE_SIZE) {
                                         if (post_upload_ctx->writeFn) {
-                                            if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)packetWrite, indexPacketWrite, upload_file_write,  fileDescriptor, fileName.c_str(), fileSize)) {
+                                            if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)packetWrite, indexPacketWrite, upload_file_write, fileName.c_str(), fileSize)) {
                                                 esp3d_log_e("Error writing file invalid");
                                                 return ESP_FAIL;
                                             }
@@ -340,7 +342,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                     }
                     if (indexPacketWrite==PACKET_WRITE_SIZE || (uploadState == upload_file_end && indexPacketWrite>0)) {
                         if (post_upload_ctx->writeFn) {
-                            if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)packetWrite, indexPacketWrite, upload_file_write,  fileDescriptor, fileName.c_str(), fileSize)) {
+                            if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)packetWrite, indexPacketWrite, upload_file_write, fileName.c_str(), fileSize)) {
                                 esp3d_log_e("Error writing file invalid");
                                 return ESP_FAIL;
                             }
@@ -351,7 +353,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                     if (uploadState == upload_file_end) {
                         //send end of file
                         if (post_upload_ctx->writeFn) {
-                            if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_end,  fileDescriptor, fileName.c_str(), fileSize)) {
+                            if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_end, fileName.c_str(), fileSize)) {
                                 esp3d_log_e("Error writing file invalid");
                                 return ESP_FAIL;
                             }
@@ -377,6 +379,10 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
         // it is last boundary we assume the 4 last chars are `--\r\n`
         // at this stage if not the case it is not really an issue anymore
         esp3d_log("Now go to new request handle");
+#if ESP3D_TFT_BENCHMARK
+        float timesec= 1.0*((esp_timer_get_time()-startBenchmark)/1000000);
+        esp3d_report("duration %.2f seconds for %d bytes = %.2f KB/s", timesec, (size_t)(req->content_len), ((1.0*(size_t)(req->content_len))/ timesec)/1024);
+#endif // ESP3D_TFT_BENCHMARK
         return (post_upload_ctx->nextHandler(req));
     }
     esp3d_log_e("Error should not be there %d", remaining);

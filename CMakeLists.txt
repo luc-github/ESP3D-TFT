@@ -48,7 +48,9 @@ add_compile_options(-DLV_LVGL_H_INCLUDE_SIMPLE=1)
 # ESP3D-TFT specific log level
 # Enabled  = 1
 # Disabled = 0
-add_compile_options(-DESP3D_TFT_LOG=1)
+add_compile_options(-DESP3D_TFT_LOG=0)
+
+add_compile_options(-DESP3D_TFT_BENCHMARK=1)
 
 if(ESP3D_AUTHENTICATION)
     add_compile_options(-DESP3D_AUTHENTICATION_FEATURE=1)
