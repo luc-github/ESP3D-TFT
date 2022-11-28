@@ -29,23 +29,26 @@
 
 //TODO fine tune these values and put them in tasks_def.h
 #define PACKET_SIZE 1024*1
-#define PACKET_WRITE_SIZE 1024*2
+#define PACKET_WRITE_SIZE 1024*1
 
 char packet[PACKET_SIZE];
 char packetWrite[PACKET_WRITE_SIZE];
 
 typedef enum {
     parse_boundary,
-    parse_boundary_type,
     parse_content_disposition,
+    parse_content_type,
+    parse_content_separator,
     parse_data_form,
-    parse_data_file,
-    parse_file_content,
+    parse_data_file
 } esp3d_parse_state_t;
 
 esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
 {
     esp3d_log("Post Data %d on : %s", req->content_len, req->uri);
+#if ESP3D_TFT_BENCHMARK
+    uint64_t startBenchmark = esp_timer_get_time();
+#endif // ESP3D_TFT_BENCHMARK
 
     post_upload_ctx_t *post_upload_ctx = (post_upload_ctx_t *)req->user_ctx;
     if (!post_upload_ctx) {
@@ -63,42 +66,35 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
     }
     //be sure list is empty
     post_upload_ctx->args.clear();
-    uint8_t boundaryCursor = 0;
-    uint8_t boundaryEndCursor = 0;
-    bool contentTypePassed = false;
+    uint8_t boundaryCursor = 2;
+
     uint indexPacketWrite=0;
-    std::string boundaryString = "--";
+    std::string boundaryString = "\r\n--";
     std::string contentBuffer;
-    std::string nameFlag = " name=";
-    std::string filenameFlag = " filename=";
     char prevChar=0x0;
     std::string argName = "";
     std::string argValue = "";
-    std::string filenameValue = "";
+    std::string fileName = "";
+    esp3d_upload_state_t uploadState = upload_file_start;
     boundaryString += boundaryPtr;
-    bool dataFormStarted = false;
+    boundaryString += "\r\n";
     esp3d_log("Boundary is: %s", boundaryString.c_str());
+
     int remaining = req->content_len;
     int received;
     int fileSize=-1;
-    FILE * fileDescriptor = nullptr;
     // processing the content
     if (boundaryPtr) {
         esp3d_parse_state_t parsing_state = parse_boundary;
         while (remaining > 0) {
             if ((received = httpd_req_recv(req, packet, PACKET_SIZE)) <= 0) {
                 esp3d_log_e("Connection lost");
-                if (parsing_state==parse_file_content && post_upload_ctx->writeFn) {
-                    if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_aborted,  fileDescriptor, filenameValue.c_str(), fileSize)) {
+                if (parsing_state==parse_data_file && post_upload_ctx->writeFn) {
+                    if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_aborted, fileName.c_str(), fileSize)) {
                         esp3d_log_e("Error writing file invalid");
-
                     }
                 }
                 return ESP_FAIL;
-            }
-            if (!(received == HTTPD_SOCK_ERR_TIMEOUT || received == HTTPD_SOCK_ERR_INVALID || received == HTTPD_SOCK_ERR_FAIL)) {
-                // esp3d_log_e("Purge %d bytes", received);
-                remaining -= received;
             }
             if (received == HTTPD_SOCK_ERR_TIMEOUT) {
                 esp3d_log_e("Time out");
@@ -106,202 +102,267 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
             }
             if (received == HTTPD_SOCK_ERR_INVALID || received == HTTPD_SOCK_ERR_FAIL) {
                 esp3d_log_e("Error connection");
-                if (parsing_state==parse_file_content && post_upload_ctx->writeFn) {
-                    if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_aborted,  fileDescriptor, filenameValue.c_str(), fileSize)) {
+                if (parsing_state==parse_data_file && post_upload_ctx->writeFn) {
+                    if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_aborted, fileName.c_str(), fileSize)) {
                         esp3d_log_e("Error writing file invalid");
-
                     }
                 }
                 return ESP_FAIL;
             }
+            //decrease received bytes from remaining bytes amount
+            remaining -= received;
+            //Parsing the buffer
             for (uint pIndex = 0; pIndex < received; pIndex++) {
                 // parse buffer
                 switch (parsing_state) {
+                //--XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
                 case parse_boundary:
                     //esp3d_log("Parsing %d:  char %d:%c", pIndex, packet[pIndex], packet[pIndex]);
                     if (boundaryCursor < boundaryString.length()) {
                         if (boundaryString[boundaryCursor] == packet[pIndex]) {
                             boundaryCursor++;
+                            if (boundaryCursor == boundaryString.length()) {
+                                parsing_state = parse_content_disposition;
+                            }
                         } else {
-                            esp3d_log_e("Error parsing boundary");
-                            return ESP_FAIL;
+                            if (remaining >= 4) {
+                                esp3d_log_e("Error parsing boundary");
+                                return ESP_FAIL;
+                            } else {
+                                if (packet[pIndex]== '-' || packet[pIndex]== '\r' || packet[pIndex]== '\n') {
+                                    esp3d_log("End of boundary body");
+                                } else {
+                                    esp3d_log_e("Error parsing end boundary remaining: %d", remaining);
+                                    return ESP_FAIL;
+                                }
+
+                            }
                         }
                     } else {
-                        if (remaining == 4) {
-                            // it is last boundary we assume the 4 last chars are `--\r\n`
-                            // at this stage if not the case it is not really an issue anymore
-                            esp3d_log("Now go to new request handle");
-                            return (post_upload_ctx->nextHandler(req));
-                        }
-                        if (boundaryEndCursor == 0 && packet[pIndex] == '\r') {
-                            boundaryEndCursor++;
-                        } else if (boundaryEndCursor == 1 && packet[pIndex] == '\n') {
-                            boundaryEndCursor++;
-                            esp3d_log("Boundary found");
-                            parsing_state = parse_content_disposition;
-                            boundaryEndCursor = 0;
-                            boundaryCursor = 0;
-                        } else {
-                            esp3d_log_e("Error parsing end of boundary");
-                            return ESP_FAIL;
-                        }
+                        esp3d_log_e("Error parsing end of boundary");
+                        return ESP_FAIL;
                     }
                     break;
                 case parse_content_disposition:
                     //esp3d_log("Parsing %d:  char %d:%c", pIndex, packet[pIndex], packet[pIndex]);
-                    if (packet[pIndex] == '\n' && contentBuffer[contentBuffer.length() - 1] == '\r') {
-                        esp3d_log("Got %s", contentBuffer.c_str());
-                        uint startPos = 30; // strlen("Content-Disposition: form-data");
-                        //look for name
-                        int pos = contentBuffer.find(nameFlag, startPos);
-                        if (pos == std::string::npos) {
-                            esp3d_log_e("Error parsing name");
-                            return ESP_FAIL;
-                        }
-                        pos+=6;// name="
-                        int posEnd;
-                        bool endFound = false;
-                        // extract name
-                        for (posEnd = pos; posEnd < contentBuffer.length() || !endFound; posEnd++) {
-                            if (contentBuffer[posEnd] == ';' || contentBuffer[posEnd] == '\n' || contentBuffer[posEnd] == '\r') {
-                                endFound = true;
-                            } else {
-                                if (contentBuffer[posEnd] != '\"') {
-                                    argName += contentBuffer[posEnd];
-                                }
+                    if (packet[pIndex] == '\n') {
+                        if (prevChar == '\r') {
+                            esp3d_log("Got %s", contentBuffer.c_str());
+                            if (!esp3d_strings::startsWith(contentBuffer.c_str(),"Content-Disposition: form-data; ")) {
+                                esp3d_log_e("Error parsing content disposition,missing content-disposition header");
+                                return ESP_FAIL;
                             }
-                        }
-                        if (endFound) {
-                            esp3d_log("Got arg:%s", argName.c_str());
-                        } else {
-                            esp3d_log("Failed to parse name in %s", contentBuffer.c_str());
-                            return ESP_FAIL;
-                        }
+                            //check name parameter
+                            int startPos = esp3d_strings::find(contentBuffer.c_str(),"name=");
+                            if (startPos == -1) {
+                                esp3d_log_e("Error parsing content disposition,missing name parameter");
+                                return ESP_FAIL;
+                            }
+                            startPos+=6; //size of name="
+                            int endPos = esp3d_strings::find(contentBuffer.c_str(),"\"", startPos);
+                            if (endPos == -1) {
+                                esp3d_log_e("Error parsing content disposition,missing name parameter");
+                                return ESP_FAIL;
+                            }
+                            argName = contentBuffer.substr(startPos, endPos-startPos);
+                            esp3d_log("Got name=%s",argName.c_str());
 
-                        //look for filename
-                        endFound = false;
-                        pos = contentBuffer.find(filenameFlag, startPos);
-                        if (pos != std::string::npos) {
-                            pos+=10;// filename="
-                            // extract name
-                            for (posEnd = pos; posEnd < contentBuffer.length() || !endFound; posEnd++) {
-                                if (contentBuffer[posEnd] == ';' || contentBuffer[posEnd] == '\n' || contentBuffer[posEnd] == '\r') {
-                                    endFound = true;
-                                } else {
-                                    if (contentBuffer[posEnd] != '\"') {
-                                        filenameValue += contentBuffer[posEnd];
-                                    }
+                            //check fileName parameter
+                            startPos = esp3d_strings::find(contentBuffer.c_str(),"filename=");
+                            if (startPos != -1) {
+                                startPos+=10; //size of filename="
+                                int endPos = esp3d_strings::find(contentBuffer.c_str(),"\"", startPos);
+                                if (endPos == -1) {
+                                    esp3d_log_e("Error parsing content disposition,missing name parameter");
+                                    return ESP_FAIL;
                                 }
+                                fileName = contentBuffer.substr(startPos, endPos-startPos);
+                                esp3d_log("Got filename=%s",fileName.c_str());
                             }
-                            if (endFound) {
-                                esp3d_log("Got filename:%s", filenameValue.c_str());
-                            }
-                        }
-                        contentBuffer="";
-                        if (filenameValue.length() > 0) {
-                            esp3d_log("It is file %s", filenameValue.c_str());
-                            parsing_state = parse_data_file;
-                        } else if (argName.length()>0) {
-                            parsing_state = parse_data_form;
-                            esp3d_log("It is data form argname is  %s", argName.c_str());
+
+                            parsing_state = parse_content_type;
+                            contentBuffer = "";
                         } else {
-                            esp3d_log_e("Content-Disposition: form-data is invalid");
+                            esp3d_log_e("Error parsing content disposition, wrong end of line");
                             return ESP_FAIL;
                         }
-                    } else if (contentBuffer.length() < 512 && packet[pIndex] != '\n') {
-                        contentBuffer += packet[pIndex];
-                        //esp3d_log("Add %d, %s", packet[pIndex], contentBuffer.c_str());
                     } else {
-                        esp3d_log_e("Content-Disposition: form-data is invalid");
+                        if (contentBuffer.length()>300) {
+                            esp3d_log_e("Error parsing content disposition, wrong size");
+                            return ESP_FAIL;
+                        } else {
+                            contentBuffer+=packet[pIndex];
+                        }
+                    }
+                    break;
+                case parse_content_type:
+                    //esp3d_log("Parsing %d:  char %d:%c", pIndex, packet[pIndex], packet[pIndex]);
+                    if (packet[pIndex] == '\n') {
+                        if (prevChar == '\r') {
+                            esp3d_log("Got %s", contentBuffer.c_str());
+                            esp3d_log("size: %d", contentBuffer.length());
+                            if (contentBuffer.length()==0) {
+                                if (fileName.length()>0) {
+                                    parsing_state = parse_data_file;
+                                } else {
+                                    parsing_state = parse_data_form;
+                                    uploadState = upload_file_start;
+                                }
+                            } else {
+                                parsing_state = parse_content_separator;
+                            }
+                            contentBuffer="";
+                        } else {
+                            esp3d_log_e("Error parsing content disposition, wrong end of line");
+                            return ESP_FAIL;
+                        }
+                    } else {
+                        if (contentBuffer.length()<255 ) {
+                            if(packet[pIndex]!='\r') {
+                                contentBuffer+=packet[pIndex];
+                            }
+                        } else {
+                            esp3d_log_e("Error parsing content type, wrong size");
+                            return ESP_FAIL;
+                        }
+                    }
+
+                    break;
+                case parse_content_separator:
+                    //esp3d_log("Parsing %d:  char %d:%c", pIndex, packet[pIndex], packet[pIndex]);
+                    if (packet[pIndex] == '\n' || packet[pIndex] == '\r') {
+                        if (packet[pIndex] == '\n' && prevChar == '\r') {
+                            if (fileName.length()>0) {
+                                parsing_state = parse_data_file;
+                            } else {
+                                parsing_state = parse_data_form;
+                            }
+                        }
+                    } else {
+                        esp3d_log_e("Error parsing content disposition, wrong end of line");
                         return ESP_FAIL;
                     }
                     break;
                 case parse_data_form:
                     //esp3d_log("Parsing %d:  char %d:%c", pIndex, packet[pIndex], packet[pIndex]);
-                    //there few chance an arg is same a boundary so look for \r\n
-                    if (packet[pIndex] != '\n' && dataFormStarted) {
-                        if (packet[pIndex]!='\r') {
-                            argValue+=packet[pIndex];
-                        }
-                        // esp3d_log("Got char add to value %s", argValue.c_str());
-                    } else if (!dataFormStarted && packet[pIndex]=='\n') {
-                        if (prevChar=='\r') {
-                            esp3d_log("Content type passed, starting collect value string");
-                            dataFormStarted=true;
+                    if (packet[pIndex] == '\n') {
+                        if (prevChar == '\r') {
+                            esp3d_log("Got %s=%s", argName.c_str(), argValue.c_str());
+                            post_upload_ctx->args.push_back(std::make_pair(argName,argValue));
+                            argName="";
+                            argValue="";
+                            parsing_state = parse_boundary;
+                            boundaryCursor = 2;
                         } else {
-                            esp3d_log_e("Content-Disposition: form-data is invalid");
+                            esp3d_log_e("Error parsing data form, wrong end of line");
                             return ESP_FAIL;
                         }
-                    } else if (dataFormStarted && packet[pIndex]=='\n') {
-                        if (prevChar!='\r') {
-                            esp3d_log_e("Content-Disposition: form-data is invalid");
-                            return ESP_FAIL;
-                        }
-                        esp3d_log("Found arg value %s:%s", argName.c_str(),argValue.c_str());
-                        post_upload_ctx->args.push_back(std::make_pair(argName,argValue));
-                        dataFormStarted =false;
-                        argName="";
-                        argValue="";
-                        parsing_state = parse_boundary;
-                    } else if (packet[pIndex] != '\n' && !dataFormStarted)  {
-                        //ignore data
-                        //esp3d_log("ignore char: %c", packet[pIndex]);
                     } else {
-                        esp3d_log_e("Data from Content-Disposition section is invalid");
-                        return ESP_FAIL;
+                        if (argValue.length() < 255) {
+                            if(packet[pIndex] != '\r' && argValue.length() < 255) {
+                                argValue+=packet[pIndex] ;
+                            }
+                        } else {
+                            esp3d_log_e("Error parsing content type, wrong size");
+                            return ESP_FAIL;
+                        }
                     }
                     break;
                 case parse_data_file:
-                    if (packet[pIndex]== '\n') {
-                        if (prevChar=='\r') {
-                            //there is content type + \r\n then \r\n again
-                            //Note may be need to check
-                            if (contentTypePassed) {
-                                parsing_state = parse_file_content;
-                                contentTypePassed = false;
-                                //TODO:
-                                //Check if have filename size in args
-                                //if yes update filesize accordingly
-                                //TODO: if path and path not visible in filenameValue
-                                //re-generate filenameValue with path
-                                if (post_upload_ctx->writeFn) {
-                                    if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_start,  fileDescriptor, filenameValue.c_str(), fileSize)) {
-                                        esp3d_log_e("Error writing file invalid");
-                                        return ESP_FAIL;
-                                    }
+                    if (uploadState == upload_file_start) {
+                        //if path and path not visible in filenameValue
+                        //re-generate filenameValue with path
+                        if (esp3dHttpService.hasArg(req,"path")) {
+                            std::string path = esp3dHttpService.getArg(req,"path");
+                            esp3d_log("Path from post: %s", path.c_str());
+                            if (!esp3d_strings::startsWith(fileName.c_str(),path.c_str())) {
+                                if (path[path.length()-1] != '/') {
+                                    path+="/";
                                 }
-                                esp3d_log("Data from Content-Type section parsed");
-                            } else {
-                                esp3d_log("Content-Type section parsed: %s",contentBuffer.c_str());
-                                contentTypePassed=true;
-                                contentBuffer="";
+                                fileName=path + fileName;
                             }
-                        } else {
-                            esp3d_log_e("Data from Content-Type section is invalid");
-                            return ESP_FAIL;
+                        }
+                        //Check if have filename size in args
+                        //if yes update filesize accordingly
+                        std::string fileSizeArg=fileName+"S";
+                        if (esp3dHttpService.hasArg(req,fileSizeArg.c_str())) {
+                            fileSize = atoi(esp3dHttpService.getArg(req,fileSizeArg.c_str()));
+                            esp3d_log("File size from post: %d", fileSize);
+                        }
+                        if (post_upload_ctx->writeFn) {
+                            if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_start,  fileName.c_str(), fileSize)) {
+                                esp3d_log_e("Error writing file invalid");
+                                return ESP_FAIL;
+                            }
+                        }
+                        uploadState = upload_file_write;
+                        boundaryCursor=0;
+                    }
+
+                    if (packet[pIndex]==boundaryString[boundaryCursor]) {
+                        boundaryCursor++;
+                        //this is boundary string but not final one
+                        if (boundaryCursor==boundaryString.length()) {
+                            uploadState = upload_file_end;
+                            boundaryCursor= 0;
+                            parsing_state = parse_content_disposition;
                         }
                     } else {
-#if ESP3D_TFT_LOG
-                        if (!contentTypePassed && packet[pIndex]!= '\r') {
-                            contentBuffer+=packet[pIndex];
+                        if (boundaryCursor==0) {
+                            packetWrite[indexPacketWrite]=packet[pIndex];
+                            indexPacketWrite++;
+                        } else {
+                            if (packet[pIndex]=='-' && remaining<4) {
+                                uploadState = upload_file_end;
+                                parsing_state = parse_boundary;
+                            } else {
+                                //the data looks like begining of boundary but it is not finalized
+                                //so copy boundary part to write buffer
+                                //can be /r/n of the file content and any additional data identical to boundary start part
+                                for (uint c= 0; c<boundaryCursor; c++) {
+                                    packetWrite[indexPacketWrite]=boundaryString[c];
+                                    indexPacketWrite++;
+                                    if (indexPacketWrite==PACKET_WRITE_SIZE) {
+                                        if (post_upload_ctx->writeFn) {
+                                            if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)packetWrite, indexPacketWrite, upload_file_write, fileName.c_str(), fileSize)) {
+                                                esp3d_log_e("Error writing file invalid");
+                                                return ESP_FAIL;
+                                            }
+                                        }
+                                        indexPacketWrite=0;
+                                    }
+                                }
+                                //reprocess current char with new context
+                                boundaryCursor=0;
+                                pIndex--;
+                                continue;
+                            }
                         }
-#endif //ESP3D_TFT_LOG
+
                     }
-                    break;
-                case parse_file_content:
-                    //esp3d_log("Parsing %d:  char %d:%c", pIndex, packet[pIndex], packet[pIndex]);
-                    if (indexPacketWrite==PACKET_WRITE_SIZE) {
-                        //TODO: send to write function
+                    if (indexPacketWrite==PACKET_WRITE_SIZE || (uploadState == upload_file_end && indexPacketWrite>0)) {
                         if (post_upload_ctx->writeFn) {
-                            if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)packetWrite, indexPacketWrite, upload_file_write,  fileDescriptor, filenameValue.c_str(), fileSize)) {
+                            if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)packetWrite, indexPacketWrite, upload_file_write, fileName.c_str(), fileSize)) {
                                 esp3d_log_e("Error writing file invalid");
                                 return ESP_FAIL;
                             }
                         }
                         indexPacketWrite=0;
                     }
-                    packetWrite[indexPacketWrite]=packet[pIndex];
-                    indexPacketWrite++;
+
+                    if (uploadState == upload_file_end) {
+                        //send end of file
+                        if (post_upload_ctx->writeFn) {
+                            if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_end, fileName.c_str(), fileSize)) {
+                                esp3d_log_e("Error writing file invalid");
+                                return ESP_FAIL;
+                            }
+                        }
+                        uploadState = upload_file_start;
+                        fileName="";
+                        fileSize=-1;
+                    }
+
                     break;
                 default:
                     break;
@@ -318,6 +379,10 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
         // it is last boundary we assume the 4 last chars are `--\r\n`
         // at this stage if not the case it is not really an issue anymore
         esp3d_log("Now go to new request handle");
+#if ESP3D_TFT_BENCHMARK
+        float timesec= 1.0*((esp_timer_get_time()-startBenchmark)/1000000);
+        esp3d_report("duration %.2f seconds for %d bytes = %.2f KB/s", timesec, (size_t)(req->content_len), ((1.0*(size_t)(req->content_len))/ timesec)/1024);
+#endif // ESP3D_TFT_BENCHMARK
         return (post_upload_ctx->nextHandler(req));
     }
     esp3d_log_e("Error should not be there %d", remaining);

@@ -32,6 +32,7 @@ void  str_toUpperCase(std::string * str);
 void  str_toLowerCase(std::string * str);
 bool endsWith(const char * str, const char *  endpart);
 bool startsWith(const char * str, const char * startPart);
+int find(const char * str, const char *subStr, size_t start=0);
 const char * formatBytes (uint64_t bytes);
 const char*  urlDecode(const char * text);
 const char* getContentType (const char* filename);

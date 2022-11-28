@@ -46,7 +46,7 @@ typedef enum {
 } esp3d_upload_status_t;
 
 typedef struct {
-    esp_err_t (*writeFn)(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state,  FILE * fd, const char * filename, size_t filesize);
+    esp_err_t (*writeFn)(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state, const char * filename, size_t filesize);
     esp_err_t (*nextHandler)(httpd_req_t *req);
     esp3d_upload_status_t status;
     std::list<std::pair<std::string, std::string>> args;
@@ -78,7 +78,7 @@ public:
     static esp_err_t updatefw_handler(httpd_req_t *req);
     static esp_err_t websocket_handler(httpd_req_t *req);
     static esp_err_t post_multipart_handler(httpd_req_t *req);
-    static esp_err_t upload_to_flash_handler(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state,  FILE * fd, const char * filename, size_t filesize);
+    static esp_err_t upload_to_flash_handler(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state, const char * filename, size_t filesize);
     esp_err_t streamFile (const char * path,httpd_req_t *req );
     esp_err_t sendStringChunk (httpd_req_t *req, const char * str, bool autoClose = true );
     esp_err_t sendBinaryChunk (httpd_req_t *req, const uint8_t * data, size_t len, bool autoClose = true );

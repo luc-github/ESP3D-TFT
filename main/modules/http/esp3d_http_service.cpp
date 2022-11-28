@@ -34,7 +34,7 @@ char chunk[CHUNK_BUFFER_SIZE];
 
 Esp3DHttpService esp3dHttpService;
 post_upload_ctx_t Esp3DHttpService::_post_files_upload_ctx= {
-    .writeFn= (esp_err_t (*)(const uint8_t *, size_t,esp3d_upload_state_t,  FILE *, const char *, size_t ))(Esp3DHttpService::upload_to_flash_handler),
+    .writeFn= (esp_err_t (*)(const uint8_t *, size_t,esp3d_upload_state_t, const char *, size_t ))(Esp3DHttpService::upload_to_flash_handler),
     .nextHandler= (esp_err_t (*)(httpd_req_t*))(Esp3DHttpService::files_handler),
     .status = upload_not_started,
     .args = {}

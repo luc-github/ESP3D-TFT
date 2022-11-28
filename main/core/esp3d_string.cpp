@@ -181,3 +181,16 @@ const char* esp3d_strings::getContentType (const char* filename)
     }
     return "application/octet-stream";
 }
+
+int esp3d_strings::find(const char * str, const char *subStr, size_t start)
+{
+    if (!str ||!subStr ||start +strlen(subStr)>strlen(str)) {
+        return -1;
+    }
+    for (int i=start; i<strlen(str); i++) {
+        if (esp3d_strings::startsWith(&str[i], subStr)) {
+            return i;
+        }
+    }
+    return -1;
+}
