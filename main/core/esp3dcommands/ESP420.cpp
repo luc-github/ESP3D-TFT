@@ -144,13 +144,11 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     } else {
         tmpstr="OFF";
     }
-    if (!dispatchIdValue(json,"sta",tmpstr.c_str(), target,requestId)) {
-        return;
-    }
+    tmpstr+=" (";
+    tmpstr+=esp3dNetwork.getSTAMac();
+    tmpstr+=")";
 
-    //Sta MAC
-    tmpstr =esp3dNetwork.getSTAMac();
-    if (!dispatchIdValue(json,"mac",tmpstr.c_str(), target,requestId)) {
+    if (!dispatchIdValue(json,"sta",tmpstr.c_str(), target,requestId)) {
         return;
     }
 
@@ -215,6 +213,10 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     } else {
         tmpstr="OFF";
     }
+
+    tmpstr+=" (";
+    tmpstr+=esp3dNetwork.getAPMac();
+    tmpstr+=")";
     if (!dispatchIdValue(json,"ap",tmpstr.c_str(), target,requestId)) {
         return;
     }
@@ -223,11 +225,6 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
         if (!dispatchIdValue(json,"config","ON", target,requestId)) {
             return;
         }
-    }
-    //AP MAC
-    tmpstr =esp3dNetwork.getAPMac();
-    if (!dispatchIdValue(json,"mac(AP)",tmpstr.c_str(), target,requestId)) {
-        return;
     }
     if (esp3dNetwork.getMode()==esp3d_wifi_ap || esp3dNetwork.getMode()==esp3d_wifi_ap_config) {
         wifi_config_t wconfig;
@@ -297,15 +294,12 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     } else {
         tmpstr="OFF";
     }
+    tmpstr+=" (";
+    tmpstr+=esp3dNetwork.getBTMac();
+    tmpstr+=")";
     if ( !dispatchIdValue(json,"bt",tmpstr.c_str(), target,requestId)) {
         return;
     }
-    //BT MAC
-    tmpstr =esp3dNetwork.getBTMac();
-    if (!dispatchIdValue(json,"mac(BT)",tmpstr.c_str(), target,requestId)) {
-        return;
-    }
-
     //end of list
     if (json) {
         if(!dispatch("]}",target,requestId, msg_tail)) {
