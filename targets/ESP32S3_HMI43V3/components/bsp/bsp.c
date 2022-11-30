@@ -115,13 +115,13 @@ esp_err_t bsp_init(void)
 
     //Lvgl setup
     esp3d_log("Setup Lvgl");
-    lv_color_t* buf1 = (lv_color_t*)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t), HAS_PSRAM ?MALLOC_CAP_SPIRAM: MALLOC_CAP_DMA);
+    lv_color_t* buf1 = (lv_color_t*)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
     if (buf1 == NULL) {
         return ESP_FAIL;
     }
 
     /* Use double buffered when not working with monochrome displays */
-    lv_color_t* buf2 = (lv_color_t*)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t),  HAS_PSRAM ?MALLOC_CAP_SPIRAM: MALLOC_CAP_DMA);
+    lv_color_t* buf2 = (lv_color_t*)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t),  MALLOC_CAP_DMA);
     if (buf2 == NULL) {
         return ESP_FAIL;
     }

@@ -33,7 +33,6 @@ extern "C" {
 *      DEFINES
 *********************/
 
-#define HAS_PSRAM 0 // integrated as main ram allocation
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
