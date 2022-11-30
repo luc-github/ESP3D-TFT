@@ -106,6 +106,7 @@ bool ESP3D_FLASH::format()
 bool ESP3D_FLASH::ESP3D_FLASH::begin()
 {
     _started = mount();
+    getSpaceInfo();
     return _started;
 }
 
