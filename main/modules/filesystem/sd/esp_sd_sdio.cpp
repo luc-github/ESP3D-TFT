@@ -78,7 +78,11 @@ bool ESP3D_SD::mount()
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {
         .format_if_mount_failed = false,
         .max_files = 5,
-        .allocation_unit_size = 16 * 1024
+        .allocation_unit_size = 16 * 1024,
+         /** New IDF 5.0, Try to enable if you need to handle situations when SD cards
+        * are not unmounted properly before physical removal
+        * or you are experiencing issues with SD cards.*/
+        .disk_status_check_enable=false
     };
     esp3d_log("Mounting filesystem");
     esp_err_t ret = esp_vfs_fat_sdmmc_mount(mount_point(), &host, &slot_config, &mount_config, &card);

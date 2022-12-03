@@ -87,11 +87,11 @@ void xpt2046_init(void)
     assert(ret == ESP_OK);
 
     esp3d_log( "Pins configuration (Mosi)");
-    gpio_pad_select_gpio(TOUCH_SPI_MOSI);
+    esp_rom_gpio_pad_select_gpio(TOUCH_SPI_MOSI);
     gpio_set_direction(TOUCH_SPI_MOSI, GPIO_MODE_OUTPUT);
-    gpio_pad_select_gpio(TOUCH_SPI_CLK);
+    esp_rom_gpio_pad_select_gpio(TOUCH_SPI_CLK);
     gpio_set_direction(TOUCH_SPI_CLK, GPIO_MODE_OUTPUT);
-    gpio_pad_select_gpio(TOUCH_SPI_CS);
+    esp_rom_gpio_pad_select_gpio(TOUCH_SPI_CS);
     gpio_set_direction(TOUCH_SPI_CS, GPIO_MODE_OUTPUT);
     assert(ret == ESP_OK);
 }

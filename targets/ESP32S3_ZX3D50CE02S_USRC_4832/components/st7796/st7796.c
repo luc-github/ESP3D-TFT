@@ -89,6 +89,7 @@ esp_err_t st7796_init(lv_disp_drv_t  * disp_drv){
     esp3d_log("init st7796 bus");
     esp_lcd_i80_bus_handle_t i80_bus = NULL;
     esp_lcd_i80_bus_config_t bus_config = {
+        .clk_src = LCD_CLK_SRC_DEFAULT,
         .dc_gpio_num = DISP_RS_PIN,
         .wr_gpio_num = DISP_WR_PIN,
         .data_gpio_nums = {
@@ -96,9 +97,9 @@ esp_err_t st7796_init(lv_disp_drv_t  * disp_drv){
             DISP_D04_PIN, DISP_D05_PIN, DISP_D06_PIN, DISP_D07_PIN
         },
         .bus_width = DISP_BITS_WIDTH,
-        .max_transfer_bytes = DISP_HOR_RES_MAX * 40 * sizeof(uint16_t)  
-        //.psram_trans_align = 64 // could be 16 32 64
-        //.sram_trans_align = 4 // no idea of the alignment use sample one
+        .max_transfer_bytes = DISP_HOR_RES_MAX * 40 * sizeof(uint16_t),  
+        .psram_trans_align = 64, // could be 16 32 64
+        .sram_trans_align = 4 // no idea of the alignment use sample one
     };
     ESP_ERROR_CHECK(esp_lcd_new_i80_bus(&bus_config, &i80_bus));
     if (i80_bus==NULL){
@@ -201,7 +202,7 @@ esp_err_t esp_lcd_new_panel_st7796(const esp_lcd_panel_io_handle_t io, const esp
     st7796->base.set_gap = panel_st7796_set_gap;
     st7796->base.mirror = panel_st7796_mirror;
     st7796->base.swap_xy = panel_st7796_swap_xy;
-    st7796->base.disp_off = panel_st7796_disp_off;
+    st7796->base.disp_on_off = panel_st7796_disp_off;
     *ret_panel = &(st7796->base);
     esp3d_log("new st7796 panel @%p", st7796);
 

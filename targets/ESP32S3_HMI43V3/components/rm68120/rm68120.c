@@ -135,7 +135,7 @@ esp_err_t rm68120_init(lv_disp_drv_t  * disp_drv){
         },
         .bus_width = DISP_BITS_WIDTH,
         .max_transfer_bytes = DISP_HOR_RES_MAX * 40 * sizeof(uint16_t) ,
-         .psram_trans_align = 64,
+        .psram_trans_align = 64,
         .sram_trans_align = 4, 
     };
     esp3d_log("init lcd bus");
