@@ -197,6 +197,7 @@ esp_err_t Esp3DHttpService::files_handler(httpd_req_t *req)
         }
         //end of json
         httpd_resp_send_chunk(req, NULL, 0);
+        httpd_resp_send_chunk(req, NULL, 0);
         flashFs.releaseFS();
         return ESP_OK;
     } else {

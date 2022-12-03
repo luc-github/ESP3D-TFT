@@ -68,6 +68,11 @@ static bool style_refr = true;
  *   GLOBAL FUNCTIONS
  **********************/
 
+void lv_obj_remove_style_all(struct _lv_obj_t * obj)
+{
+    lv_obj_remove_style(obj, NULL, LV_PART_ANY | LV_STATE_ANY);
+}
+
 void _lv_obj_style_init(void)
 {
     _lv_ll_init(&LV_GC_ROOT(_lv_obj_style_trans_ll), sizeof(trans_t));

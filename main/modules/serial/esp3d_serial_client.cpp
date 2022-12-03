@@ -22,6 +22,7 @@
 #include "freertos/task.h"
 #include "driver/uart.h"
 #include "driver/gpio.h"
+#include "esp_timer.h"
 #include "serial_def.h"
 #include "esp3d_serial_client.h"
 #include "esp3d_settings.h"
@@ -109,7 +110,7 @@ bool Esp3DSerialClient::begin()
         esp3d_log_w("Invalid baudrate use default");
         baudrate =esp3dTFTsettings.getDefaultIntegerSetting(esp3d_baud_rate);
     }
-    esp3d_log("Use %d Serial Baud Rate", baudrate);
+    esp3d_log("Use %ld Serial Baud Rate", baudrate);
     uart_config_t uart_config = {
         .baud_rate = (int)baudrate,
         .data_bits = ESP3D_SERIAL_DATA_BITS,

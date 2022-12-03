@@ -21,6 +21,7 @@
 #include "esp3d_client.h"
 #include <string.h>
 #include <string>
+#include "esp_timer.h"
 #if ESP3D_TFT_LOG
 int32_t msg_counting=0;
 #endif// ESP3D_TFT_LOG
@@ -61,7 +62,7 @@ esp3d_msg_t * Esp3DClient::popTx()
 void Esp3DClient::deleteMsg(esp3d_msg_t * msg)
 {
     if (msg) {
-        esp3d_log("Deletion : Now we have %d msg", --msg_counting);
+        esp3d_log("Deletion : Now we have %ld msg", --msg_counting);
         free(msg->data);
         free(msg);
         msg = nullptr;
@@ -136,7 +137,7 @@ bool Esp3DClient::addFrontTXData(esp3d_msg_t * msg)
 esp3d_msg_t * Esp3DClient::newMsg()
 {
     esp3d_msg_t * newMsgPtr = (esp3d_msg_t*)malloc( sizeof(esp3d_msg_t));
-    esp3d_log("Creation : Now we have %d msg", ++msg_counting);
+    esp3d_log("Creation : Now we have %ld msg", ++msg_counting);
     if (newMsgPtr) {
         newMsgPtr->data = nullptr;
         newMsgPtr->size = 0;

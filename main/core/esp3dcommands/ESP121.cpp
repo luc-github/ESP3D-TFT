@@ -52,9 +52,9 @@ void Esp3DCommands::ESP121(int cmd_params_pos,esp3d_msg_t * msg)
         ok_msg=std::to_string(intValue);
     } else {
         intValue = atoi(tmpstr.c_str());
-        esp3d_log("got %s param for a value of %d, is valid %d", tmpstr.c_str(),intValue, esp3dTFTsettings.isValidIntegerSetting(intValue, esp3d_http_port));
+        esp3d_log("got %s param for a value of %ld, is valid %d", tmpstr.c_str(),intValue, esp3dTFTsettings.isValidIntegerSetting(intValue, esp3d_http_port));
         if (esp3dTFTsettings.isValidIntegerSetting(intValue, esp3d_http_port)) {
-            esp3d_log("Value %d is valid",intValue);
+            esp3d_log("Value %ld is valid",intValue);
             if (!esp3dTFTsettings.writeUint32 (esp3d_http_port, intValue)) {
                 hasError = true;
                 error_msg="Set value failed";

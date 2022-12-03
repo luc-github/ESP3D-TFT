@@ -6,6 +6,7 @@ set(SOURCES .
     modules/network
     modules/http
     modules/http/handlers
+    modules/websocket
     modules/filesystem
     modules/filesystem/sd
     modules/filesystem/flash

@@ -168,7 +168,7 @@ Esp3DNetwork::~Esp3DNetwork() {}
 bool Esp3DNetwork::begin()
 {
     static bool bootDone = false;
-    esp3d_log("Free mem %d",esp_get_minimum_free_heap_size());
+    esp3d_log("Free mem %ld",esp_get_minimum_free_heap_size());
     if (!bootDone) {
         bootDone = true;
         uint8_t bootMode = esp3dTFTsettings.readByte(esp3d_radio_boot_mode);
@@ -275,12 +275,12 @@ bool Esp3DNetwork::startStaMode()
         esp3d_log_e("Cannot create default wifi station");
         return false;
     }
-    esp3d_log("Free mem %d",esp_get_minimum_free_heap_size());
+    esp3d_log("Free mem %ld",esp_get_minimum_free_heap_size());
     esp3d_log("Create default sta service");
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     //init the wifi
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
-    esp3d_log("Free mem %d",esp_get_minimum_free_heap_size());
+    esp3d_log("Free mem %ld",esp_get_minimum_free_heap_size());
     if (esp_wifi_set_storage(WIFI_STORAGE_RAM) != ESP_OK) {
         esp3d_log_e("Cannot disable persistence of wifi setting to flash");
     }
@@ -435,13 +435,13 @@ bool Esp3DNetwork::startApMode(bool configMode)
         stopApMode();
     }
     esp3d_log("Init AP Mode");
-    esp3d_log("Free mem %d",esp_get_minimum_free_heap_size());
+    esp3d_log("Free mem %ld",esp_get_minimum_free_heap_size());
 
     esp3d_log("Create default ap service");
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     //init the wifi
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
-    esp3d_log("Free mem %d",esp_get_minimum_free_heap_size());
+    esp3d_log("Free mem %ld",esp_get_minimum_free_heap_size());
     if (esp_wifi_set_storage(WIFI_STORAGE_RAM) != ESP_OK) {
         esp3d_log_e("Cannot disable persistence of wifi setting to flash");
     }

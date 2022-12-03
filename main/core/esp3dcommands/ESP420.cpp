@@ -26,11 +26,16 @@
 #include <cstring>
 #include "sdkconfig.h"
 #include "esp_system.h"
+#include "rom/ets_sys.h"
 #include "esp_heap_caps.h"
-#include "esp_spi_flash.h"
+#include "spi_flash_mmap.h"
 #include "authentication/esp3d_authentication.h"
 #include "filesystem/esp3d_flash.h"
+#include "esp_chip_info.h"
+#include "esp_flash.h"
+#include "esp_wifi_ap_get_sta_list.h"
 #include "network/esp3d_network.h"
+#include "http/esp3d_http_service.h"
 #define COMMAND_ID 420
 
 //Get ESP current status
@@ -102,7 +107,13 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     }
 #endif //CONFIG_SPIRAM
     //Flash size
-    tmpstr = esp3d_strings::formatBytes(spi_flash_get_chip_size());
+    uint32_t flash_size;
+    if(esp_flash_get_size(NULL, &flash_size) != ESP_OK) {
+        printf("Get flash size failed");
+        return;
+    }
+
+    tmpstr = esp3d_strings::formatBytes(flash_size);
     if (!dispatchIdValue(json,"flash size",tmpstr.c_str(), target,requestId)) {
         return;
     }
@@ -262,10 +273,10 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
             }
         }
         wifi_sta_list_t sta_list;
-        tcpip_adapter_sta_list_t tcpip_sta_list;
+        wifi_sta_mac_ip_list_t tcpip_sta_list;
         ESP_ERROR_CHECK( esp_wifi_ap_get_sta_list(&sta_list));
         if (sta_list.num>0) {
-            ESP_ERROR_CHECK( tcpip_adapter_get_sta_list (&sta_list, &tcpip_sta_list));
+            ESP_ERROR_CHECK( esp_wifi_ap_get_sta_list_with_ip (&sta_list, &tcpip_sta_list));
         }
 
 
@@ -312,5 +323,5 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
             }
         }
     }
-
+    esp3dHttpService.listClients();
 }

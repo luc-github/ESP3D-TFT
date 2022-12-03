@@ -74,7 +74,8 @@ void Esp3DCommands::process(esp3d_msg_t * msg)
         //execute esp command
         execute_internal_command(cmdId, espcmdpos, msg);
     } else {
-        esp3d_log("Dispatch command");
+        esp3d_log("Dispatch command, len %d, char 0 is %d to %d", msg->size, msg->data[0], msg->target);
+
         //Work around to avoid to dispatch single \n or \r to everyone as it is part of previous ESP3D command
         if (msg->size == 1 && ((char(msg->data[0])=='\n') || (char(msg->data[0])=='\r'))&& lastIsESP3D) {
             lastIsESP3D = false;
@@ -393,6 +394,8 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
                     sendOk=false;
                 }
             }
+        } else { //message is not handled so need to be deleted
+            sendOk=false;
         }
         break;
     default:

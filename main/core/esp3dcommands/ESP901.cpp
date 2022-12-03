@@ -50,9 +50,9 @@ void Esp3DCommands::ESP901(int cmd_params_pos,esp3d_msg_t * msg)
         ok_msg=std::to_string(br);
     } else {
         uint32_t br = atoi(tmpstr.c_str());
-        esp3d_log("got %s param for a value of %d, is valid %d", tmpstr.c_str(),br, esp3dTFTsettings.isValidIntegerSetting(br, esp3d_baud_rate));
+        esp3d_log("got %s param for a value of %ld, is valid %d", tmpstr.c_str(),br, esp3dTFTsettings.isValidIntegerSetting(br, esp3d_baud_rate));
         if (esp3dTFTsettings.isValidIntegerSetting(br, esp3d_baud_rate)) {
-            esp3d_log("Value %d is valid",br);
+            esp3d_log("Value %ld is valid",br);
             if (!esp3dTFTsettings.writeUint32 (esp3d_baud_rate, br)) {
                 hasError = true;
                 error_msg="Set value failed";

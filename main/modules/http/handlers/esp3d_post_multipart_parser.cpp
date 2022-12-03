@@ -28,11 +28,8 @@
 
 
 //TODO fine tune these values and put them in tasks_def.h
-#define PACKET_SIZE 1024*1
-#define PACKET_WRITE_SIZE 1024*1
-
-char packet[PACKET_SIZE];
-char packetWrite[PACKET_WRITE_SIZE];
+#define PACKET_SIZE 1024*4
+#define PACKET_WRITE_SIZE 1024*4
 
 typedef enum {
     parse_boundary,
@@ -49,7 +46,8 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
 #if ESP3D_TFT_BENCHMARK
     uint64_t startBenchmark = esp_timer_get_time();
 #endif // ESP3D_TFT_BENCHMARK
-
+    static char * packet = nullptr;
+    static char * packetWrite = nullptr;
     post_upload_ctx_t *post_upload_ctx = (post_upload_ctx_t *)req->user_ctx;
     if (!post_upload_ctx) {
         esp3d_log_e("Context not found");
@@ -63,6 +61,20 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
     if (!boundaryPtr) {
         esp3d_log_e("No boundary found");
         return ESP_FAIL;
+    }
+    if (!packet) {
+        packet = (char*)malloc(PACKET_SIZE);
+        if (!packet) {
+            esp3d_log_e("Memory issue, allocation failed");
+            return ESP_FAIL;
+        }
+    }
+    if (!packetWrite) {
+        packetWrite = (char*)malloc(PACKET_SIZE);
+        if (!packetWrite) {
+            esp3d_log_e("Memory issue, allocation failed");
+            return ESP_FAIL;
+        }
     }
     //be sure list is empty
     post_upload_ctx->args.clear();
@@ -369,6 +381,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                 }
                 prevChar = packet[pIndex];
             }
+
         }
     } else {
         // not supported so close connection

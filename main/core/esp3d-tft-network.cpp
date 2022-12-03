@@ -84,17 +84,17 @@ Esp3DTFTNetwork::~Esp3DTFTNetwork()
 
 bool Esp3DTFTNetwork::begin()
 {
-    esp3d_log("Free mem %d",esp_get_minimum_free_heap_size());
+    esp3d_log("Free mem %ld",esp_get_minimum_free_heap_size());
     //Ui creation
     TaskHandle_t xHandle = NULL;
     BaseType_t  res =  xTaskCreatePinnedToCore(networkTask, "tftNetwork", STACKDEPTH, NULL, TASKPRIORITY, &xHandle, TASKCORE);
     if (res==pdPASS && xHandle) {
         esp3d_log("Created Network Task");
-        esp3d_log("Free mem %d",esp_get_minimum_free_heap_size());
+        esp3d_log("Free mem %ld",esp_get_minimum_free_heap_size());
         return true;
     } else {
         esp3d_log_e ("Network Task creation failed");
-        esp3d_log("Free mem %d",esp_get_minimum_free_heap_size());
+        esp3d_log("Free mem %ld",esp_get_minimum_free_heap_size());
         return false;
     }
 

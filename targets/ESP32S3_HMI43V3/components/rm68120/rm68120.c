@@ -124,6 +124,7 @@ esp_err_t rm68120_init(lv_disp_drv_t  * disp_drv){
     esp3d_log("init rm68120 bus");
     esp_lcd_i80_bus_handle_t i80_bus = NULL;
     esp_lcd_i80_bus_config_t bus_config = {
+        .clk_src = LCD_CLK_SRC_DEFAULT,
         .dc_gpio_num = DISP_RS_PIN,
         .wr_gpio_num = DISP_WR_PIN,
         .data_gpio_nums = {
@@ -133,8 +134,11 @@ esp_err_t rm68120_init(lv_disp_drv_t  * disp_drv){
             DISP_D12_PIN, DISP_D13_PIN, DISP_D14_PIN, DISP_D15_PIN,
         },
         .bus_width = DISP_BITS_WIDTH,
-        .max_transfer_bytes = DISP_HOR_RES_MAX * 40 * sizeof(uint16_t)  
+        .max_transfer_bytes = DISP_HOR_RES_MAX * 40 * sizeof(uint16_t) ,
+         .psram_trans_align = 64,
+        .sram_trans_align = 4, 
     };
+    esp3d_log("init lcd bus");
     ESP_ERROR_CHECK(esp_lcd_new_i80_bus(&bus_config, &i80_bus));
     if (i80_bus==NULL){
         esp3d_log_e("init lcd i80 display bus failed");
@@ -156,6 +160,7 @@ esp_err_t rm68120_init(lv_disp_drv_t  * disp_drv){
         .lcd_cmd_bits = DISP_CMD_BITS_WIDTH,
         .lcd_param_bits = DISP_PARAM_BITS_WIDTH,
     };
+    esp3d_log("init lcd panel");
     ESP_ERROR_CHECK(esp_lcd_new_panel_io_i80(i80_bus, &io_config, &io_handle));
 
     
@@ -164,6 +169,7 @@ esp_err_t rm68120_init(lv_disp_drv_t  * disp_drv){
         .color_space = ESP_LCD_COLOR_SPACE_RGB,
         .bits_per_pixel = 16,
     };
+    esp3d_log("init lcd panel rm68120");
     ESP_ERROR_CHECK(esp_lcd_new_panel_rm68120(io_handle, &panel_config, &panel_handle));
 
     esp_lcd_panel_reset(panel_handle);   // LCD Reset
@@ -251,7 +257,7 @@ esp_err_t esp_lcd_new_panel_rm68120(const esp_lcd_panel_io_handle_t io, const es
     rm68120->base.set_gap = panel_rm68120_set_gap;
     rm68120->base.mirror = panel_rm68120_mirror;
     rm68120->base.swap_xy = panel_rm68120_swap_xy;
-    rm68120->base.disp_off = panel_rm68120_disp_off;
+    rm68120->base.disp_on_off = panel_rm68120_disp_off;
     *ret_panel = &(rm68120->base);
     esp3d_log("new rm68120 panel @%p", rm68120);
 
@@ -870,11 +876,11 @@ static void rm68120_reg_config(esp_lcd_panel_t *panel)
 
     // //SLEEP OUT 
     // esp_lcd_panel_io_tx_param(io, 0x1100, NULL, 0);
-    // vTaskDelay(100 / portTICK_RATE_MS);
+    // vTaskDelay(100 / portTICK_PERIOD_MS);
 
     // //DISPLY ON
     // esp_lcd_panel_io_tx_param(io, 0x2900, NULL, 0);
-    // vTaskDelay(100 / portTICK_RATE_MS);
+    // vTaskDelay(100 / portTICK_PERIOD_MS);
 
     // esp_lcd_panel_io_tx_param(io, 0x3A00, (uint16_t[]) {0x55,}, 2);
     // esp_lcd_panel_io_tx_param(io, 0x3600, (uint16_t[]) {0xA3,}, 2);

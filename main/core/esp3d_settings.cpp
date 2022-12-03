@@ -531,7 +531,7 @@ bool Esp3DSettings::writeIPString (esp3d_setting_index_t index, const char * byt
 {
     uint32_t ipInt = StringtoIPUInt32(byte_buffer);
     std::string ipStr = IPUInt32toString(ipInt);
-    esp3d_log("write setting %d : %s to %d to %s",index,byte_buffer,ipInt,ipStr.c_str());
+    esp3d_log("write setting %d : %s to %ld to %s",index,byte_buffer,ipInt,ipStr.c_str());
 
     return writeUint32 (index,StringtoIPUInt32(byte_buffer));
 }

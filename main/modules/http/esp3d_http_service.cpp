@@ -28,6 +28,7 @@
 #include "esp3d_commands.h"
 #include "network/esp3d_network.h"
 #include "filesystem/esp3d_globalfs.h"
+#include "websocket/esp3d_ws_service.h"
 
 #define CHUNK_BUFFER_SIZE STREAM_CHUNK_SIZE
 char chunk[CHUNK_BUFFER_SIZE];
@@ -71,13 +72,23 @@ Esp3DHttpService::Esp3DHttpService()
 {
     _started = false;
     _server = nullptr;
-    /*_post_files_upload_ctx.writeFn = nullptr;
-    _post_files_upload_ctx.nextHandler = nullptr;
-    _post_files_upload_ctx.status = upload_not_started;*/
+    _post_files_upload_ctx.status = upload_not_started;
 }
 
 Esp3DHttpService::~Esp3DHttpService() {}
 
+esp_err_t Esp3DHttpService::open_fn(httpd_handle_t hd, int socketFd)
+{
+    esp3d_log("New client connection %d", socketFd);
+    return ESP_OK;
+}
+
+void Esp3DHttpService::close_fn(httpd_handle_t hd, int socketFd)
+{
+    esp3d_log("Client closing connection %d", socketFd);
+    esp3dWsWebUiService.onClose(socketFd);
+    close(socketFd );
+}
 
 bool Esp3DHttpService::begin()
 {
@@ -96,6 +107,16 @@ bool Esp3DHttpService::begin()
     config.server_port = intValue;
     //Http server core
     config.core_id = 0;
+    //stack size (default 4096)
+    config.stack_size = 1024*8;
+    //Nb of sockets
+    config.max_open_sockets = 5; //(3 internals +2)
+
+    config.open_fn = open_fn;
+    config.close_fn = close_fn;
+    //config.lru_purge_enable = true;
+
+
     //start server
     esp3d_log("Starting server on port: '%d'", config.server_port);
     if (httpd_start(&_server, &config) == ESP_OK) {
@@ -172,6 +193,9 @@ bool Esp3DHttpService::begin()
 
         //File not found
         httpd_register_err_handler(_server, HTTPD_404_NOT_FOUND, (httpd_err_handler_func_t )file_not_found_handler);
+
+        //websocket service
+        esp3dWsWebUiService.begin(_server);
         _started = true;
     }
     return _started;
@@ -186,6 +210,7 @@ void Esp3DHttpService::end()
     }
     esp3d_log("Stop Http Service");
     if (_server) {
+        esp3dWsWebUiService.end();
         httpd_unregister_uri(_server, "/favicon.ico");
         httpd_unregister_uri(_server, "/command");
         httpd_unregister_uri(_server, "/");
@@ -196,6 +221,7 @@ void Esp3DHttpService::end()
     }
     _server = nullptr;
     _started = false;
+    _post_files_upload_ctx.status = upload_not_started;
 }
 
 
@@ -374,4 +400,23 @@ const char * Esp3DHttpService::getBoundaryString (httpd_req_t *req)
         }
     }
     return boundaryStr;
+}
+
+void Esp3DHttpService::listClients()
+{
+    size_t clientCount=MAX_WS_CLIENTS;
+    int clientsList[MAX_WS_CLIENTS];
+    esp_err_t res = httpd_get_client_list(_server, &clientCount, clientsList);
+    if (res == ESP_OK) {
+        for (int i = 0; i < clientCount; i++) {
+            int fdi = clientsList[i];
+            if (httpd_ws_get_fd_info(_server, fdi)==HTTPD_WS_CLIENT_WEBSOCKET) {
+                esp3d_log("%d is WS", fdi);
+            } else if (httpd_ws_get_fd_info(_server, fdi)==HTTPD_WS_CLIENT_HTTP) {
+                esp3d_log("%d is HTTP", fdi);
+            } else {
+                esp3d_log("%d is invalid",fdi);
+            }
+        }
+    }
 }

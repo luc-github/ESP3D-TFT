@@ -35,6 +35,7 @@ esp_err_t Esp3DHttpService::upload_to_flash_handler(const uint8_t * data, size_t
         esp3d_log("Starting flash upload:%s", filename);
         if (FlashFD) {
             flashFs.close(FlashFD);
+            FlashFD = nullptr;
         }
         if (!flashFs.accessFS()) {
             esp3d_log_e("Error accessing flash filesystem");
@@ -66,6 +67,7 @@ esp_err_t Esp3DHttpService::upload_to_flash_handler(const uint8_t * data, size_t
     case upload_file_end:
         esp3d_log("Ending upload");
         flashFs.close(FlashFD);
+        FlashFD = nullptr;
         if (filesize!=(size_t)-1) {
             struct stat entry_stat;
             if (flashFs.stat(filename, &entry_stat) == -1 || entry_stat.st_size != filesize) {
@@ -84,6 +86,7 @@ esp_err_t Esp3DHttpService::upload_to_flash_handler(const uint8_t * data, size_t
     case upload_file_aborted:
         esp3d_log("Error happened: cleanup");
         flashFs.close(FlashFD);
+        FlashFD = nullptr;
         flashFs.remove(filename);
         flashFs.releaseFS();
         break;

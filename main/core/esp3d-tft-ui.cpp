@@ -23,6 +23,7 @@
 #include "freertos/task.h"
 #include "esp_freertos_hooks.h"
 #include "freertos/semphr.h"
+#include "esp_timer.h"
 #include "version.h"
 #include <string>
 #include "esp3d_log.h"

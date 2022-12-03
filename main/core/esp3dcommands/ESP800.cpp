@@ -27,7 +27,7 @@
 #include "sdkconfig.h"
 #include "esp_system.h"
 #include "esp_heap_caps.h"
-#include "esp_spi_flash.h"
+#include "spi_flash_mmap.h"
 #include "authentication/esp3d_authentication.h"
 #include "filesystem/esp3d_flash.h"
 #include "network/esp3d_network.h"

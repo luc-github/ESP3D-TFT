@@ -98,12 +98,14 @@ esp_err_t bsp_init(void)
     esp3d_log("Initializing tca9554 controller");
     ESP_ERROR_CHECK(tca9554_init(i2c_bus_handle));
 
+
     /* Display controller initialization */
     esp3d_log("Initializing display controller");
     if (rm68120_init( &disp_drv) != ESP_OK) {
         return ESP_FAIL;
     }
 
+    
     /* Touch controller initialization */
     esp3d_log("Initializing touch controller");
     if (ft5x06_init(i2c_bus_handle) != ESP_OK) {
