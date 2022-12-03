@@ -323,5 +323,4 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
             }
         }
     }
-    esp3dHttpService.listClients();
 }

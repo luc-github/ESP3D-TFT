@@ -85,7 +85,6 @@ public:
     static esp_err_t upload_to_flash_handler(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state, const char * filename, size_t filesize);
     static esp_err_t open_fn(httpd_handle_t hd, int socketFd);
     static void  close_fn(httpd_handle_t hd, int socketFd);
-    void listClients();
     esp_err_t streamFile (const char * path,httpd_req_t *req );
     esp_err_t sendStringChunk (httpd_req_t *req, const char * str, bool autoClose = true );
     esp_err_t sendBinaryChunk (httpd_req_t *req, const uint8_t * data, size_t len, bool autoClose = true );

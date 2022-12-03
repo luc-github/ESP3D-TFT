@@ -114,7 +114,7 @@ bool Esp3DHttpService::begin()
 
     config.open_fn = open_fn;
     config.close_fn = close_fn;
-    //config.lru_purge_enable = true;
+    config.lru_purge_enable = true;
 
 
     //start server
@@ -400,23 +400,4 @@ const char * Esp3DHttpService::getBoundaryString (httpd_req_t *req)
         }
     }
     return boundaryStr;
-}
-
-void Esp3DHttpService::listClients()
-{
-    size_t clientCount=MAX_WS_CLIENTS;
-    int clientsList[MAX_WS_CLIENTS];
-    esp_err_t res = httpd_get_client_list(_server, &clientCount, clientsList);
-    if (res == ESP_OK) {
-        for (int i = 0; i < clientCount; i++) {
-            int fdi = clientsList[i];
-            if (httpd_ws_get_fd_info(_server, fdi)==HTTPD_WS_CLIENT_WEBSOCKET) {
-                esp3d_log("%d is WS", fdi);
-            } else if (httpd_ws_get_fd_info(_server, fdi)==HTTPD_WS_CLIENT_HTTP) {
-                esp3d_log("%d is HTTP", fdi);
-            } else {
-                esp3d_log("%d is invalid",fdi);
-            }
-        }
-    }
 }
