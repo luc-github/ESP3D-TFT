@@ -41,6 +41,15 @@ post_upload_ctx_t Esp3DHttpService::_post_files_upload_ctx= {
     .args = {}
 };
 
+void Esp3DHttpService::pushError(esp3d_http_error_t errcode, const char * st)
+{
+    std::string errmsg = "ERROR:" + std::to_string(errcode);
+    errmsg+= ":";
+    errmsg+=st;
+    errmsg+= "\n";
+    esp3dWsWebUiService.BroadcastTxt((uint8_t*)errmsg.c_str(), strlen(errmsg.c_str()));
+}
+
 bool Esp3DHttpService::hasArg(httpd_req_t *req, const char* argname)
 {
     post_upload_ctx_t *post_upload_ctx = (post_upload_ctx_t *)req->user_ctx;

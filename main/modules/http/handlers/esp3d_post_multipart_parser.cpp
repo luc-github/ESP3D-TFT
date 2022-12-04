@@ -51,29 +51,34 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
     post_upload_ctx_t *post_upload_ctx = (post_upload_ctx_t *)req->user_ctx;
     if (!post_upload_ctx) {
         esp3d_log_e("Context not found");
-        return ESP_FAIL;
+        esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+        return httpd_resp_send_500(req);
     }
     if (!(post_upload_ctx->nextHandler)) {
         esp3d_log_e("Post handler not found");
-        return ESP_FAIL;
+        esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+        return httpd_resp_send_500(req);
     }
     const char *boundaryPtr = esp3dHttpService.getBoundaryString(req);
     if (!boundaryPtr) {
         esp3d_log_e("No boundary found");
-        return ESP_FAIL;
+        esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+        return httpd_resp_send_500(req);
     }
     if (!packet) {
         packet = (char*)malloc(PACKET_SIZE);
         if (!packet) {
             esp3d_log_e("Memory issue, allocation failed");
-            return ESP_FAIL;
+            esp3dHttpService.pushError(ESP3D_HTTP_MEMORY_ERROR,"Upload error");
+            return httpd_resp_send_500(req);
         }
     }
     if (!packetWrite) {
         packetWrite = (char*)malloc(PACKET_SIZE);
         if (!packetWrite) {
             esp3d_log_e("Memory issue, allocation failed");
-            return ESP_FAIL;
+            esp3dHttpService.pushError(ESP3D_HTTP_MEMORY_ERROR,"Upload error");
+            return httpd_resp_send_500(req);
         }
     }
     //be sure list is empty
@@ -92,7 +97,8 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
     boundaryString += "\r\n";
     esp3d_log("Boundary is: %s", boundaryString.c_str());
 
-    int remaining = req->content_len;
+    size_t remaining = req->content_len;
+
     int received;
     int fileSize=-1;
     // processing the content
@@ -106,7 +112,8 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                         esp3d_log_e("Error writing file invalid");
                     }
                 }
-                return ESP_FAIL;
+                esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+                return httpd_resp_send_500(req);
             }
             if (received == HTTPD_SOCK_ERR_TIMEOUT) {
                 esp3d_log_e("Time out");
@@ -119,7 +126,8 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                         esp3d_log_e("Error writing file invalid");
                     }
                 }
-                return ESP_FAIL;
+                esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+                return httpd_resp_send_500(req);
             }
             //decrease received bytes from remaining bytes amount
             remaining -= received;
@@ -139,20 +147,23 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                         } else {
                             if (remaining >= 4) {
                                 esp3d_log_e("Error parsing boundary");
-                                return ESP_FAIL;
+                                esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+                                return httpd_resp_send_500(req);
                             } else {
                                 if (packet[pIndex]== '-' || packet[pIndex]== '\r' || packet[pIndex]== '\n') {
                                     esp3d_log("End of boundary body");
                                 } else {
                                     esp3d_log_e("Error parsing end boundary remaining: %d", remaining);
-                                    return ESP_FAIL;
+                                    esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+                                    return httpd_resp_send_500(req);
                                 }
 
                             }
                         }
                     } else {
                         esp3d_log_e("Error parsing end of boundary");
-                        return ESP_FAIL;
+                        esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+                        return httpd_resp_send_500(req);
                     }
                     break;
                 case parse_content_disposition:
@@ -162,19 +173,22 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                             esp3d_log("Got %s", contentBuffer.c_str());
                             if (!esp3d_strings::startsWith(contentBuffer.c_str(),"Content-Disposition: form-data; ")) {
                                 esp3d_log_e("Error parsing content disposition,missing content-disposition header");
-                                return ESP_FAIL;
+                                esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+                                return httpd_resp_send_500(req);
                             }
                             //check name parameter
                             int startPos = esp3d_strings::find(contentBuffer.c_str(),"name=");
                             if (startPos == -1) {
                                 esp3d_log_e("Error parsing content disposition,missing name parameter");
-                                return ESP_FAIL;
+                                esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+                                return httpd_resp_send_500(req);
                             }
                             startPos+=6; //size of name="
                             int endPos = esp3d_strings::find(contentBuffer.c_str(),"\"", startPos);
                             if (endPos == -1) {
                                 esp3d_log_e("Error parsing content disposition,missing name parameter");
-                                return ESP_FAIL;
+                                esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+                                return httpd_resp_send_500(req);
                             }
                             argName = contentBuffer.substr(startPos, endPos-startPos);
                             esp3d_log("Got name=%s",argName.c_str());
@@ -186,7 +200,8 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                                 int endPos = esp3d_strings::find(contentBuffer.c_str(),"\"", startPos);
                                 if (endPos == -1) {
                                     esp3d_log_e("Error parsing content disposition,missing name parameter");
-                                    return ESP_FAIL;
+                                    esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+                                    return httpd_resp_send_500(req);
                                 }
                                 fileName = contentBuffer.substr(startPos, endPos-startPos);
                                 esp3d_log("Got filename=%s",fileName.c_str());
@@ -196,12 +211,14 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                             contentBuffer = "";
                         } else {
                             esp3d_log_e("Error parsing content disposition, wrong end of line");
-                            return ESP_FAIL;
+                            esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+                            return httpd_resp_send_500(req);
                         }
                     } else {
                         if (contentBuffer.length()>300) {
                             esp3d_log_e("Error parsing content disposition, wrong size");
-                            return ESP_FAIL;
+                            esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+                            return httpd_resp_send_500(req);
                         } else {
                             contentBuffer+=packet[pIndex];
                         }
@@ -226,7 +243,8 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                             contentBuffer="";
                         } else {
                             esp3d_log_e("Error parsing content disposition, wrong end of line");
-                            return ESP_FAIL;
+                            esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+                            return httpd_resp_send_500(req);
                         }
                     } else {
                         if (contentBuffer.length()<255 ) {
@@ -235,7 +253,8 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                             }
                         } else {
                             esp3d_log_e("Error parsing content type, wrong size");
-                            return ESP_FAIL;
+                            esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+                            return httpd_resp_send_500(req);
                         }
                     }
 
@@ -252,7 +271,8 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                         }
                     } else {
                         esp3d_log_e("Error parsing content disposition, wrong end of line");
-                        return ESP_FAIL;
+                        esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+                        return httpd_resp_send_500(req);
                     }
                     break;
                 case parse_data_form:
@@ -267,7 +287,8 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                             boundaryCursor = 2;
                         } else {
                             esp3d_log_e("Error parsing data form, wrong end of line");
-                            return ESP_FAIL;
+                            esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+                            return httpd_resp_send_500(req);
                         }
                     } else {
                         if (argValue.length() < 255) {
@@ -276,7 +297,8 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                             }
                         } else {
                             esp3d_log_e("Error parsing content type, wrong size");
-                            return ESP_FAIL;
+                            esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+                            return httpd_resp_send_500(req);
                         }
                     }
                     break;
@@ -304,7 +326,8 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                         if (post_upload_ctx->writeFn) {
                             if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_start,  fileName.c_str(), fileSize)) {
                                 esp3d_log_e("Error writing file invalid");
-                                return ESP_FAIL;
+                                uploadState = upload_file_aborted;
+                                return httpd_resp_send_500(req);
                             }
                         }
                         uploadState = upload_file_write;
@@ -338,7 +361,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                                         if (post_upload_ctx->writeFn) {
                                             if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)packetWrite, indexPacketWrite, upload_file_write, fileName.c_str(), fileSize)) {
                                                 esp3d_log_e("Error writing file invalid");
-                                                return ESP_FAIL;
+                                                return httpd_resp_send_500(req);
                                             }
                                         }
                                         indexPacketWrite=0;
@@ -356,7 +379,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                         if (post_upload_ctx->writeFn) {
                             if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)packetWrite, indexPacketWrite, upload_file_write, fileName.c_str(), fileSize)) {
                                 esp3d_log_e("Error writing file invalid");
-                                return ESP_FAIL;
+                                return httpd_resp_send_500(req);
                             }
                         }
                         indexPacketWrite=0;
@@ -367,7 +390,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                         if (post_upload_ctx->writeFn) {
                             if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_end, fileName.c_str(), fileSize)) {
                                 esp3d_log_e("Error writing file invalid");
-                                return ESP_FAIL;
+                                return httpd_resp_send_500(req);
                             }
                         }
                         uploadState = upload_file_start;
@@ -386,7 +409,8 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
     } else {
         // not supported so close connection
         esp3d_log_e("Error not supported");
-        return ESP_FAIL;
+        esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+        return httpd_resp_send_500(req);
     }
     if (remaining == 0) {
         // it is last boundary we assume the 4 last chars are `--\r\n`
@@ -399,5 +423,6 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
         return (post_upload_ctx->nextHandler(req));
     }
     esp3d_log_e("Error should not be there %d", remaining);
-    return ESP_FAIL;
+    esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+    return httpd_resp_send_500(req);
 }

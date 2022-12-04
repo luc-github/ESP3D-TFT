@@ -39,6 +39,7 @@ Esp3DWsService::Esp3DWsService()
 {
     _started = false;
     _server = nullptr;
+    _req = nullptr;
 }
 
 Esp3DWsService::~Esp3DWsService() {}
@@ -63,20 +64,21 @@ void Esp3DWsService::end()
     closeClients();
     _server = nullptr;
     _started = false;
+    _req = nullptr;
 }
 
 esp_err_t Esp3DWsService::onOpen(httpd_req_t *req)
 {
     int fd = httpd_req_to_sockfd(req);
+    _req = req;
     std::string tmpstr = "currentID:";
     tmpstr+=std::to_string(fd);
     tmpstr+="\n";
-    pushMsgTxt(fd,tmpstr.c_str());
+    pushMsgTxt(tmpstr.c_str());
     tmpstr = "activeID:";
     tmpstr+=std::to_string(fd);
     tmpstr+="\n";
     BroadcastTxt(tmpstr.c_str(), fd);
-    //enableOnly(fd);
     return ESP_OK;
 }
 esp_err_t Esp3DWsService::onMessage(httpd_req_t *req)
@@ -146,6 +148,40 @@ esp_err_t Esp3DWsService::process(httpd_req_t *req)
     return onMessage(req);
 }
 
+esp_err_t Esp3DWsService::pushMsgTxt(const char *msg)
+{
+    if (!_started || !_req) {
+        return ESP_FAIL;
+    }
+    httpd_ws_frame_t ws_pkt;
+    memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
+    ws_pkt.payload = (uint8_t*)msg;
+    ws_pkt.len = strlen(msg);
+    ws_pkt.type = HTTPD_WS_TYPE_TEXT;
+    esp_err_t res = httpd_ws_send_frame(_req, &ws_pkt);
+    if (res != ESP_OK) {
+        esp3d_log_e("httpd_ws_send_frame failed with %d", res);
+    }
+    return res;
+}
+
+esp_err_t Esp3DWsService::pushMsgBin(uint8_t *msg, size_t len)
+{
+    if (!_started || !_req) {
+        return ESP_FAIL;
+    }
+    httpd_ws_frame_t ws_pkt;
+    memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
+    ws_pkt.type = HTTPD_WS_TYPE_BINARY;
+    ws_pkt.payload = msg;
+    ws_pkt.len = len;
+    esp_err_t res = httpd_ws_send_frame(_req, &ws_pkt);
+    if (res != ESP_OK) {
+        esp3d_log_e("httpd_ws_send_frame failed with %d", res);
+    }
+    return res;
+}
+
 esp_err_t Esp3DWsService::pushMsgTxt(int fd, const char *msg)
 {
     return pushMsgTxt(fd, (uint8_t*)msg, strlen(msg));
@@ -161,8 +197,10 @@ esp_err_t Esp3DWsService::pushMsgTxt(int fd, uint8_t *msg, size_t len)
     ws_pkt.type = HTTPD_WS_TYPE_TEXT;
     ws_pkt.payload = msg;
     ws_pkt.len = len;
-    ws_pkt.type = HTTPD_WS_TYPE_TEXT;
     esp_err_t res = httpd_ws_send_frame_async(_server, fd, &ws_pkt);
+    if (res != ESP_OK) {
+        esp3d_log_e("httpd_ws_send_frame failed with %d", res);
+    }
     return res;
 }
 esp_err_t Esp3DWsService::pushMsgBin(int fd, uint8_t *msg, size_t len)
@@ -175,8 +213,10 @@ esp_err_t Esp3DWsService::pushMsgBin(int fd, uint8_t *msg, size_t len)
     ws_pkt.type = HTTPD_WS_TYPE_BINARY;
     ws_pkt.payload = msg;
     ws_pkt.len = len;
-    ws_pkt.type = HTTPD_WS_TYPE_BINARY;
     esp_err_t res = httpd_ws_send_frame_async(_server, fd, &ws_pkt);
+    if (res != ESP_OK) {
+        esp3d_log_e("httpd_ws_send_frame failed with %d", res);
+    }
     return res;
 }
 esp_err_t Esp3DWsService::BroadcastTxt(const char *msg, int ignore)

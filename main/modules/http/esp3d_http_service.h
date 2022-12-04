@@ -45,6 +45,27 @@ typedef enum {
     upload_success,
 } esp3d_upload_status_t;
 
+typedef enum {
+//Errors code
+    ESP3D_HTTP_NO_ERROR =0,
+    ESP3D_HTTP_ERROR_AUTHENTICATION,
+    ESP3D_HTTP_FILE_CREATION,
+    ESP3D_HTTP_FILE_WRITE,
+    ESP3D_HTTP_UPLOAD,
+    ESP3D_HTTP_NOT_ENOUGH_SPACE,
+    ESP3D_HTTP_UPLOAD_CANCELLED,
+    ESP3D_HTTP_FILE_CLOSE,
+    ESP3D_HTTP_NO_SD,
+    ESP3D_HTTP_MOUNT_SD,
+    ESP3D_HTTP_RESET_NUMBERING,
+    ESP3D_HTTP_BUFFER_OVERFLOW,
+    ESP3D_HTTP_START_UPLOAD,
+    ESP3D_HTTP_SIZE,
+    ESP3D_HTTP_UPDATE,
+    ESP3D_HTTP_MEMORY_ERROR,
+    ESP3D_HTTP_ACCESS_ERROR,
+} esp3d_http_error_t;
+
 typedef struct {
     esp_err_t (*writeFn)(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state, const char * filename, size_t filesize);
     esp_err_t (*nextHandler)(httpd_req_t *req);
@@ -69,6 +90,7 @@ public:
     {
         return _server;
     };
+    void pushError(esp3d_http_error_t errcode, const char * st);
     static esp_err_t root_get_handler(httpd_req_t *req);
     static esp_err_t command_handler(httpd_req_t *req);
     static esp_err_t config_handler(httpd_req_t *req);

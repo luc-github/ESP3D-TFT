@@ -39,6 +39,7 @@ esp_err_t Esp3DHttpService::upload_to_flash_handler(const uint8_t * data, size_t
         }
         if (!flashFs.accessFS()) {
             esp3d_log_e("Error accessing flash filesystem");
+            esp3dHttpService.pushError(ESP3D_HTTP_ACCESS_ERROR,"Error accessing flash filesystem");
             return ESP_FAIL;
         }
         if (filesize!=(size_t)-1) {
@@ -46,12 +47,14 @@ esp_err_t Esp3DHttpService::upload_to_flash_handler(const uint8_t * data, size_t
             flashFs.getSpaceInfo(nullptr,nullptr,&freespace);
             if (freespace<filesize) {
                 esp3d_log_e("Error not enough space on flash filesystem have %d and need %d",freespace,filesize);
+                esp3dHttpService.pushError(ESP3D_HTTP_NOT_ENOUGH_SPACE,"Error not enough space");
                 return ESP_FAIL;
             }
         }
         FlashFD = flashFs.open(filename,"w");
         if (!FlashFD) {
             esp3d_log_e("Error cannot create %s on flash filesystem",filename);
+            esp3dHttpService.pushError(ESP3D_HTTP_FILE_CREATION,"Error file creation failed");
             return ESP_FAIL;
         }
         break;
@@ -60,6 +63,7 @@ esp_err_t Esp3DHttpService::upload_to_flash_handler(const uint8_t * data, size_t
         if (datasize && FlashFD) {
             if (fwrite(data,datasize,1,FlashFD)!=1) {
                 esp3d_log_e("Error cannot writing data on flash filesystem ");
+                esp3dHttpService.pushError(ESP3D_HTTP_FILE_WRITE,"Error file write failed");
                 return ESP_FAIL;
             }
         }
@@ -78,6 +82,7 @@ esp_err_t Esp3DHttpService::upload_to_flash_handler(const uint8_t * data, size_t
                 }
                 flashFs.remove(filename);
                 flashFs.releaseFS();
+                esp3dHttpService.pushError(ESP3D_HTTP_SIZE,"Error file size does not match expected one");
                 return ESP_FAIL;
             }
         }

@@ -52,8 +52,10 @@ public:
     void enableOnly (int fd);
     esp_err_t add_client(int fd);
     esp_err_t remove_client(int fd);
+    esp_err_t pushMsgTxt(const char *msg);
     esp_err_t pushMsgTxt(int fd, const char *msg);
     esp_err_t pushMsgTxt(int fd, uint8_t *msg, size_t len);
+    esp_err_t pushMsgBin(uint8_t *msg, size_t len);
     esp_err_t pushMsgBin(int fd, uint8_t *msg, size_t len);
     esp_err_t BroadcastTxt(const char *msg, int ignore=-1);
     esp_err_t BroadcastTxt(uint8_t *msg, size_t len, int ignore=-1);
@@ -65,6 +67,7 @@ public:
 
 private:
     httpd_handle_t _server;
+    httpd_req_t *_req;
     bool _started;
 };
 
