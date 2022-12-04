@@ -374,7 +374,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
             esp3dHttpService.process(msg);
         } else {
             sendOk=false;
-            esp3d_log_e("esp3dHttpService not started for message size  %d", msg->size);
+            esp3d_log_w("esp3dHttpService not started for message size  %d", msg->size);
         }
         break;
     case WEBUI_WEBSOCKET_CLIENT:
@@ -382,7 +382,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
             esp3dWsWebUiService.process(msg);
         } else {
             sendOk=false;
-            esp3d_log_e("esp3dWsWebUiService not started for message size  %d", msg->size);
+            esp3d_log_w("esp3dWsWebUiService not started for message size  %d", msg->size);
         }
         break;
 
@@ -450,7 +450,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
     }
     //clear message
     if (!sendOk) {
-        esp3d_log_e("Send msg failed");
+        esp3d_log_w("Send msg failed");
         Esp3DClient::deleteMsg(msg);
     }
     return sendOk;
