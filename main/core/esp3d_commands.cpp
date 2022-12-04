@@ -437,7 +437,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
                 }
             }
         }
-        //Send pending if any or cancel message is no client handled it
+        //Send pending if any or cancel message is no client did handle it
         if (msg->target==ALL_CLIENTS) {
             sendOk = false;
         } else {

@@ -296,7 +296,9 @@ function processCmdJson(text) {
     json = JSON.parse(text);
     consoleContentUpdate(JSON.stringify(json, null, " ") + "\n");
   } catch (e) {
+    if (!text.startsWith("ESP3D says: command forwarded")) {
     consoleContentUpdate(text + "\n");
+    }
   }
 }
 
