@@ -20,6 +20,7 @@
 #include "esp3d_commands.h"
 #include "serial/esp3d_serial_client.h"
 #include "http/esp3d_http_service.h"
+#include "websocket/esp3d_ws_service.h"
 #include "esp3d_string.h"
 #include <stdio.h>
 #include <string>
@@ -360,6 +361,7 @@ bool  Esp3DCommands::dispatch(esp3d_msg_t * msg,uint8_t * sbuf, size_t len)
 bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
 {
     bool sendOk = true;
+    esp3d_log("Dispatch message origin %d to client %d , size %d",msg->origin,msg->target,msg->size);
     if (!msg) {
         esp3d_log_e("no msg");
         return false;
@@ -370,8 +372,20 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
     case WEBUI_CLIENT:
         if (esp3dHttpService.started()) {
             esp3dHttpService.process(msg);
+        } else {
+            sendOk=false;
+            esp3d_log_e("esp3dHttpService not started for message size  %d", msg->size);
         }
         break;
+    case WEBUI_WEBSOCKET_CLIENT:
+        if (esp3dWsWebUiService.started()) {
+            esp3dWsWebUiService.process(msg);
+        } else {
+            sendOk=false;
+            esp3d_log_e("esp3dWsWebUiService not started for message size  %d", msg->size);
+        }
+        break;
+
     case SERIAL_CLIENT:
         if (serialClient.started()) {
             if (!serialClient.addTXData(msg)) {
@@ -383,19 +397,51 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
             } else {
                 serialClient.flush();
             }
+        } else {
+            sendOk=false;
+            esp3d_log_e("serialClient not started for message size  %d", msg->size);
         }
         break;
+
     case ALL_CLIENTS:
-        //TODO: msg need to be duplicate for each target
+        //msg need to be duplicate for each target
+        //SERIAL_CLIENT
         if (msg->origin!=SERIAL_CLIENT) {
-            if (serialClient.started()) {
-                if (!serialClient.addTXData(msg)) {
-                    esp3d_log_e("Cannot add msg to client queue");
-                    sendOk=false;
+            if (msg->target==ALL_CLIENTS) {
+                //become the reference message
+                msg->target=SERIAL_CLIENT;
+            } else {
+                //duplicate message because current is  already pending
+                esp3d_msg_t * copy_msg = Esp3DSerialClient::copyMsg(*msg);
+                if (copy_msg) {
+                    copy_msg->target = SERIAL_CLIENT;
+                    dispatch(copy_msg);
+                } else {
+                    esp3d_log_e("Cannot duplicate message for Serial");
                 }
             }
-        } else { //message is not handled so need to be deleted
-            sendOk=false;
+        }
+        //WEBUI_WEBSOCKET_CLIENT
+        if (msg->origin!=WEBUI_WEBSOCKET_CLIENT) {
+            if (msg->target==ALL_CLIENTS) {
+                //become the reference message
+                msg->target=WEBUI_WEBSOCKET_CLIENT;
+            } else {
+                //duplicate message because current is  already pending
+                esp3d_msg_t * copy_msg = Esp3DSerialClient::copyMsg(*msg);
+                if (copy_msg) {
+                    copy_msg->target = WEBUI_WEBSOCKET_CLIENT;
+                    dispatch(copy_msg);
+                } else {
+                    esp3d_log_e("Cannot duplicate message for Websocket");
+                }
+            }
+        }
+        //Send pending if any or cancel message is no client handled it
+        if (msg->target==ALL_CLIENTS) {
+            sendOk = false;
+        } else {
+            return dispatch(msg);
         }
         break;
     default:

@@ -23,6 +23,7 @@
 #include <esp_http_server.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
+#include "esp3d_client.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,6 +43,7 @@ public:
     bool begin(httpd_handle_t serverHandle);
     void handle();
     void end();
+    void process(esp3d_msg_t * msg);
     esp_err_t process(httpd_req_t *req);
     esp_err_t onOpen(httpd_req_t *req);
     esp_err_t onMessage(httpd_req_t *req);
@@ -51,8 +53,10 @@ public:
     esp_err_t add_client(int fd);
     esp_err_t remove_client(int fd);
     esp_err_t pushMsgTxt(int fd, const char *msg);
+    esp_err_t pushMsgTxt(int fd, uint8_t *msg, size_t len);
     esp_err_t pushMsgBin(int fd, uint8_t *msg, size_t len);
     esp_err_t BroadcastTxt(const char *msg, int ignore=-1);
+    esp_err_t BroadcastTxt(uint8_t *msg, size_t len, int ignore=-1);
     esp_err_t BroadcastBin(uint8_t *msg, size_t len, int ignore=-1);
     bool started()
     {

@@ -62,7 +62,7 @@ esp3d_msg_t * Esp3DClient::popTx()
 void Esp3DClient::deleteMsg(esp3d_msg_t * msg)
 {
     if (msg) {
-        esp3d_log("Deletion : Now we have %ld msg", --msg_counting);
+        esp3d_log("Deletion origin: %d, Target: %d, size: %d  : Now we have %ld msg", msg->origin, msg->target, msg->size, --msg_counting);
         free(msg->data);
         free(msg);
         msg = nullptr;
@@ -137,8 +137,8 @@ bool Esp3DClient::addFrontTXData(esp3d_msg_t * msg)
 esp3d_msg_t * Esp3DClient::newMsg()
 {
     esp3d_msg_t * newMsgPtr = (esp3d_msg_t*)malloc( sizeof(esp3d_msg_t));
-    esp3d_log("Creation : Now we have %ld msg", ++msg_counting);
     if (newMsgPtr) {
+        esp3d_log("Creation : Now we have %ld msg", ++msg_counting);
         newMsgPtr->data = nullptr;
         newMsgPtr->size = 0;
         newMsgPtr->origin = NO_CLIENT;
@@ -189,7 +189,7 @@ esp3d_msg_t * Esp3DClient::copyMsg( esp3d_msg_t  msg)
         newMsgPtr->requestId = msg.requestId;
         newMsgPtr->type = msg.type;
     }
-    return nullptr;
+    return newMsgPtr;
 }
 
 esp3d_msg_t * Esp3DClient::newMsg( esp3d_clients_t origin, esp3d_clients_t target, const uint8_t * data, size_t length,esp3d_authentication_level_t authentication_level)

@@ -126,6 +126,13 @@ esp_err_t Esp3DWsService::onClose(int fd)
     return ESP_OK;
 }
 
+void Esp3DWsService::process(esp3d_msg_t * msg)
+{
+    //TODO : need to handle broadcast error ?
+    BroadcastBin(msg->data, msg->size);
+    Esp3DClient::deleteMsg(msg);
+}
+
 esp_err_t Esp3DWsService::process(httpd_req_t *req)
 {
     if (!_started) {
@@ -141,14 +148,19 @@ esp_err_t Esp3DWsService::process(httpd_req_t *req)
 
 esp_err_t Esp3DWsService::pushMsgTxt(int fd, const char *msg)
 {
+    return pushMsgTxt(fd, (uint8_t*)msg, strlen(msg));
+}
+
+esp_err_t Esp3DWsService::pushMsgTxt(int fd, uint8_t *msg, size_t len)
+{
     if (!_started) {
         return ESP_FAIL;
     }
     httpd_ws_frame_t ws_pkt;
     memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
     ws_pkt.type = HTTPD_WS_TYPE_TEXT;
-    ws_pkt.payload = (uint8_t*)msg;
-    ws_pkt.len = strlen(msg);
+    ws_pkt.payload = msg;
+    ws_pkt.len = len;
     ws_pkt.type = HTTPD_WS_TYPE_TEXT;
     esp_err_t res = httpd_ws_send_frame_async(_server, fd, &ws_pkt);
     return res;
@@ -169,6 +181,10 @@ esp_err_t Esp3DWsService::pushMsgBin(int fd, uint8_t *msg, size_t len)
 }
 esp_err_t Esp3DWsService::BroadcastTxt(const char *msg, int ignore)
 {
+    return  BroadcastTxt((uint8_t *)msg, strlen(msg), ignore);
+}
+esp_err_t Esp3DWsService::BroadcastTxt(uint8_t *msg, size_t len, int ignore)
+{
     if (!_started) {
         return ESP_FAIL;
     }
@@ -179,7 +195,7 @@ esp_err_t Esp3DWsService::BroadcastTxt(const char *msg, int ignore)
         for (int i = 0; i < clientCount; i++) {
             int fdi = clientsList[i];
             if (httpd_ws_get_fd_info(_server, fdi)==HTTPD_WS_CLIENT_WEBSOCKET && ignore!=fdi) {
-                pushMsgTxt(fdi, msg);
+                pushMsgTxt(fdi, msg, len);
             }
         }
     }
