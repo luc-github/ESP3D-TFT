@@ -128,6 +128,10 @@ bool Esp3DHttpService::begin()
     config.stack_size = 1024*8;
     //Nb of sockets
     config.max_open_sockets = 6; //(3 internals +3)
+    //handler
+    config.max_uri_handlers = 10; //currently use 9
+    //backlog_conn
+    config.backlog_conn       = 8,
 
     //config.open_fn = open_fn;
     //config.close_fn = close_fn;
