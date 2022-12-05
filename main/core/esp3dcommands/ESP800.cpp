@@ -179,6 +179,11 @@ void Esp3DCommands::ESP800(int cmd_params_pos,esp3d_msg_t * msg)
     if (!dispatchKeyValue(json,"HostPath", "/", target,requestId)) {
         return;
     }
+
+    //Screen
+    if (!dispatchKeyValue(json,"Screen", TFT_TARGET, target,requestId)) {
+        return;
+    }
     //TODO: update once setup ready
     //Time
     if (!dispatchKeyValue(json,"Time", "none", target,requestId)) {
