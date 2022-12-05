@@ -97,6 +97,7 @@ void Esp3DHttpService::close_fn(httpd_handle_t hd, int socketFd)
     esp3d_log("Client closing connection %d", socketFd);
     esp3dWsWebUiService.onClose(socketFd);
     close(socketFd );
+    httpd_sess_update_lru_counter(hd,socketFd);
 }
 
 bool Esp3DHttpService::begin()
@@ -119,10 +120,10 @@ bool Esp3DHttpService::begin()
     //stack size (default 4096)
     config.stack_size = 1024*8;
     //Nb of sockets
-    config.max_open_sockets = 5; //(3 internals +2)
+    config.max_open_sockets = 6; //(3 internals +3)
 
-    config.open_fn = open_fn;
-    config.close_fn = close_fn;
+    //config.open_fn = open_fn;
+    //config.close_fn = close_fn;
     config.lru_purge_enable = true;
 
 
@@ -292,7 +293,7 @@ esp_err_t Esp3DHttpService::streamFile (const char * path,httpd_req_t *req )
                 res = ESP_ERR_NOT_FOUND;
             }
             if (res == ESP_OK) {
-                FILE *fd = globalFs.open(filename.c_str(), "r");
+                FILE *fd = globalFs.open(isGzip?filenameGz.c_str():filename.c_str(), "r");
                 if (fd) {
                     //stream file
                     std::string mimeType= esp3d_strings::getContentType( filename.c_str());
@@ -316,7 +317,7 @@ esp_err_t Esp3DHttpService::streamFile (const char * path,httpd_req_t *req )
                     httpd_resp_send_chunk(req, NULL, 0);
                 } else {
                     res = ESP_ERR_NOT_FOUND;
-                    esp3d_log_e("Cannot access File");
+                    esp3d_log_e("Cannot access File %s", isGzip?filenameGz.c_str():filename.c_str());
                 }
 
             }

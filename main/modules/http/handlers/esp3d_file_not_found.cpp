@@ -19,30 +19,42 @@
 
 
 #include "http/esp3d_http_service.h"
-#include <stdio.h>
-#include "esp_wifi.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
-#include "esp3d_settings.h"
-#include "esp3d_commands.h"
-#include "network/esp3d_network.h"
+#include "filesystem/esp3d_sd.h"
+#include "filesystem/esp3d_flash.h"
 
 
 esp_err_t Esp3DHttpService::file_not_found_handler(httpd_req_t *req, httpd_err_code_t err)
 {
     esp3d_log("Uri: %s Error: %d", req->uri, (int)err);
-    /* if (strcmp("/hello", req->uri) == 0) {
-     httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "/hello URI is not available");
-     // Return ESP_OK to keep underlying socket open
-     return ESP_OK;
-    } else if (strcmp("/echo", req->uri) == 0) {
-     httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "/echo URI is not available");
-     // Return ESP_FAIL to close underlying socket
-     return ESP_FAIL;
-    }*/
-    /* For any other URI send 404 and close socket */
+    std::string uri = req->uri;
+    uri = uri.substr(0, uri.find_first_of("?"));
 
-    //TODO: handle custom 404 file
+    std::string path;
+    if (esp3d_strings::startsWith(req->uri,ESP3D_SD_FS_HEADER)) {
+        path = ESP3D_SD_FS_HEADER;
+    } else {
+        path =ESP3D_FLASH_FS_HEADER;
+    }
+    if (uri[0]=='/') {
+        path+=&uri[1];    //strip the "first/"
+    } else {
+        path+=uri;
+    }
+    esp3d_log("Path is %s", path.c_str());
+
+    /*try to stream file*/
+    if (ESP_OK == esp3dHttpService.streamFile(path.c_str(), req)) {
+        return ESP_OK;
+    }
+
+    /*Check custom 404.html*/
+    if (ESP_OK ==esp3dHttpService.streamFile("/fs/404.html", req)) {
+        return ESP_OK;
+    }
+
+    /* For any other URI send 404 and close socket */
     httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "404 - File not found");
     return ESP_FAIL;
 }

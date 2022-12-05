@@ -29,18 +29,20 @@ const char * YesNoLabels [] = { "yes", "no"};
 const char * YesNoValues [] = { "1", "0"};
 const char * RadioModeLabels [] = { "none",
                                     "sta",
-                                    "ap"
+                                    "ap",
+                                    "setup"
                                   };
 const char * RadioModeValues [] = { "0",
                                     "1",
-                                    "2"
+                                    "2",
+                                    "3"
                                   };
 
 const char * IpModeLabels [] = { "dhcp", "static"};
 const char * IpModeValues [] = { "0", "1"};
 
-const char * FallbackLabels [] = { "none", "ap"};
-const char * FallbackValues [] = { "1", "0"};
+const char * FallbackLabels [] = { "none", "setup"};
+const char * FallbackValues [] = { "0", "3"};
 
 const char * ApChannelsList [] = { "1", "2","3","4","5","6","7","8","9","10","11","12","13","14"};
 
