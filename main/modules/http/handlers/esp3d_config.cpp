@@ -19,19 +19,22 @@
 
 
 #include "http/esp3d_http_service.h"
-#include <stdio.h>
-#include "esp_wifi.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
-#include "esp3d_settings.h"
 #include "esp3d_commands.h"
-#include "network/esp3d_network.h"
-
+#include  "authentication/esp3d_authentication.h"
 
 esp_err_t Esp3DHttpService::config_handler(httpd_req_t *req)
 {
     esp3d_log("Uri: %s", req->uri);
-    //TODO: check if esp command and process it or dispatch it
-    httpd_resp_sendstr(req, "Response not yet available");
-    return ESP_OK;
+    esp3d_authentication_level_t  authentication_level = esp3dAuthenthicationService.getAuthenticatedLevel();
+    esp3d_msg_t * newMsgPtr = Esp3DClient::newMsg( WEBUI_CLIENT, ESP3D_COMMAND, (const uint8_t *) "[ESP420]addPreTag",  strlen("[ESP420]addPreTag"), authentication_level);
+    if (newMsgPtr) {
+        newMsgPtr->requestId.httpReq = req;
+        esp3dCommands.process(newMsgPtr);
+        return ESP_OK;
+    } else {
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Message creation failed");
+    }
+    return ESP_FAIL;
 }

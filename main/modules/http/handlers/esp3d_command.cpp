@@ -58,6 +58,7 @@ esp_err_t Esp3DHttpService::command_handler(httpd_req_t *req)
             if (newMsgPtr) {
                 newMsgPtr->requestId.httpReq = req;
                 esp3dCommands.process(newMsgPtr);
+                return ESP_OK;
             } else {
                 httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Message creation failed");
             }

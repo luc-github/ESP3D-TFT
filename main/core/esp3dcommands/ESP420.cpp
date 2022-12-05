@@ -48,6 +48,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     msg->target = target;
     msg->origin = ESP3D_COMMAND;
     bool json = hasTag (msg,cmd_params_pos,"json");
+    bool addPreTag = hasTag (msg,cmd_params_pos,"addPreTag");
     std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
     if (msg->authentication_level == ESP3D_LEVEL_GUEST) {
@@ -59,7 +60,11 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
         tmpstr = "{\"cmd\":\"420\",\"status\":\"ok\",\"data\":[";
 
     } else {
-        tmpstr = "Configuration:\n";
+        if (addPreTag) {
+            tmpstr="<pre>\n";
+        } else {
+            tmpstr = "Configuration:\n";
+        }
     }
     msg->type=msg_head;
     if(!dispatch(msg,tmpstr.c_str())) {
@@ -318,7 +323,12 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
         }
     } else {
         {
-            if(!dispatch("ok\n",target,requestId, msg_tail)) {
+            if (addPreTag) {
+                tmpstr="</pre>\n";
+            } else {
+                tmpstr = "ok\n";
+            }
+            if(!dispatch(tmpstr.c_str(),target,requestId, msg_tail)) {
                 esp3d_log_e("Error sending answer to clients");
             }
         }

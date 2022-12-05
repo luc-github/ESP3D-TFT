@@ -172,6 +172,19 @@ bool Esp3DHttpService::begin()
             .supported_subprotocol = nullptr
         };
         httpd_register_uri_handler(_server, &command_handler_config);
+
+        //config /config
+        const httpd_uri_t config_handler_config = {
+            .uri       = "/config",
+            .method    = HTTP_GET,
+            .handler   = (esp_err_t (*)(httpd_req_t*))(esp3dHttpService.config_handler),
+            .user_ctx  =  nullptr,
+            .is_websocket = false,
+            .handle_ws_control_frames = false,
+            .supported_subprotocol = nullptr
+        };
+        httpd_register_uri_handler(_server, &config_handler_config);
+
         //flash files /files
         const httpd_uri_t files_handler_config = {
             .uri       = "/files",
@@ -183,6 +196,18 @@ bool Esp3DHttpService::begin()
             .supported_subprotocol = nullptr
         };
         httpd_register_uri_handler(_server, &files_handler_config);
+
+        //flash files upload (POST data)
+        httpd_uri_t files_upload_handler_config = {
+            .uri       = "/files",   // Match all URIs of type /upload/path/to/file
+            .method    = HTTP_POST,
+            .handler   = post_multipart_handler,
+            .user_ctx  =  &_post_sdfiles_upload_ctx,
+            .is_websocket = false,
+            .handle_ws_control_frames = false,
+            .supported_subprotocol = nullptr
+        };
+        httpd_register_uri_handler(_server, &files_upload_handler_config);
 
         //sdfiles upload (POST data)
         httpd_uri_t sdfiles_upload_handler_config = {
@@ -207,18 +232,6 @@ bool Esp3DHttpService::begin()
             .supported_subprotocol = nullptr
         };
         httpd_register_uri_handler(_server, &sdfiles_handler_config);
-
-        //flash files upload (POST data)
-        httpd_uri_t files_upload_handler_config = {
-            .uri       = "/files",   // Match all URIs of type /upload/path/to/file
-            .method    = HTTP_POST,
-            .handler   = post_multipart_handler,
-            .user_ctx  =  &_post_sdfiles_upload_ctx,
-            .is_websocket = false,
-            .handle_ws_control_frames = false,
-            .supported_subprotocol = nullptr
-        };
-        httpd_register_uri_handler(_server, &files_upload_handler_config);
 
         //webui web socket /ws
         const httpd_uri_t websocket_handler_config = {
