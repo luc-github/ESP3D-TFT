@@ -1,5 +1,5 @@
 /*
-  esp3d_http_service : upload_to_flash_handler
+  esp3d_http_service : upload_to_sd_handler
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
   This code is free software; you can redistribute it and/or
@@ -25,35 +25,35 @@
 #include "esp3d_string.h"
 #include "esp3d_settings.h"
 #include "esp3d_commands.h"
-#include "filesystem/esp3d_flash.h"
+#include "filesystem/esp3d_sd.h"
 
-esp_err_t Esp3DHttpService::upload_to_flash_handler(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state, const char * filename, size_t filesize)
+esp_err_t Esp3DHttpService::upload_to_sd_handler(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state, const char * filename, size_t filesize)
 {
     static FILE * FileFD = nullptr;
     switch(file_upload_state) {
     case upload_file_start:
-        esp3d_log("Starting flash upload:%s", filename);
+        esp3d_log("Starting sd upload:%s", filename);
         if (FileFD) {
-            flashFs.close(FileFD);
+            sd.close(FileFD);
             FileFD = nullptr;
         }
-        if (!flashFs.accessFS()) {
-            esp3d_log_e("Error accessing flash filesystem");
-            esp3dHttpService.pushError(ESP3D_HTTP_ACCESS_ERROR,"Error accessing flash filesystem");
+        if (!sd.accessFS()) {
+            esp3d_log_e("Error accessing sd filesystem");
+            esp3dHttpService.pushError(ESP3D_HTTP_ACCESS_ERROR,"Error accessing sd filesystem");
             return ESP_FAIL;
         }
         if (filesize!=(size_t)-1) {
-            size_t freespace = 0;
-            flashFs.getSpaceInfo(nullptr,nullptr,&freespace);
+            uint64_t freespace = 0;
+            sd.getSpaceInfo(nullptr,nullptr,&freespace);
             if (freespace<filesize) {
-                esp3d_log_e("Error not enough space on flash filesystem have %d and need %d",freespace,filesize);
+                esp3d_log_e("Error not enough space on sd filesystem have %lld and need %d",freespace,filesize);
                 esp3dHttpService.pushError(ESP3D_HTTP_NOT_ENOUGH_SPACE,"Error not enough space");
                 return ESP_FAIL;
             }
         }
-        FileFD = flashFs.open(filename,"w");
+        FileFD = sd.open(filename,"w");
         if (!FileFD) {
-            esp3d_log_e("Error cannot create %s on flash filesystem",filename);
+            esp3d_log_e("Error cannot create %s on sd filesystem",filename);
             esp3dHttpService.pushError(ESP3D_HTTP_FILE_CREATION,"Error file creation failed");
             return ESP_FAIL;
         }
@@ -62,7 +62,7 @@ esp_err_t Esp3DHttpService::upload_to_flash_handler(const uint8_t * data, size_t
         esp3d_log("Write :%d bytes", datasize);
         if (datasize && FileFD) {
             if (fwrite(data,datasize,1,FileFD)!=1) {
-                esp3d_log_e("Error cannot writing data on flash filesystem ");
+                esp3d_log_e("Error cannot writing data on sd filesystem ");
                 esp3dHttpService.pushError(ESP3D_HTTP_FILE_WRITE,"Error file write failed");
                 return ESP_FAIL;
             }
@@ -70,30 +70,30 @@ esp_err_t Esp3DHttpService::upload_to_flash_handler(const uint8_t * data, size_t
         break;
     case upload_file_end:
         esp3d_log("Ending upload");
-        flashFs.close(FileFD);
+        sd.close(FileFD);
         FileFD = nullptr;
         if (filesize!=(size_t)-1) {
             struct stat entry_stat;
-            if (flashFs.stat(filename, &entry_stat) == -1 || entry_stat.st_size != filesize) {
+            if (sd.stat(filename, &entry_stat) == -1 || entry_stat.st_size != filesize) {
                 if (entry_stat.st_size != datasize) {
                     esp3d_log_e("Invalide size got %d expected %d ",(size_t)entry_stat.st_size, filesize);
                 } else {
                     esp3d_log_e("Failed to stat %s",filename);
                 }
-                flashFs.remove(filename);
-                flashFs.releaseFS();
+                sd.remove(filename);
+                sd.releaseFS();
                 esp3dHttpService.pushError(ESP3D_HTTP_SIZE,"Error file size does not match expected one");
                 return ESP_FAIL;
             }
         }
-        flashFs.releaseFS();
+        sd.releaseFS();
         break;
     case upload_file_aborted:
         esp3d_log("Error happened: cleanup");
-        flashFs.close(FileFD);
+        sd.close(FileFD);
         FileFD = nullptr;
-        flashFs.remove(filename);
-        flashFs.releaseFS();
+        sd.remove(filename);
+        sd.releaseFS();
         break;
     }
     return ESP_OK;

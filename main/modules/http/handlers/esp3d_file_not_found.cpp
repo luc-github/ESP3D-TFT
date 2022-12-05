@@ -33,15 +33,16 @@ esp_err_t Esp3DHttpService::file_not_found_handler(httpd_req_t *req, httpd_err_c
 
     std::string path;
     if (esp3d_strings::startsWith(req->uri,ESP3D_SD_FS_HEADER)) {
-        path = ESP3D_SD_FS_HEADER;
+        path = uri;
     } else {
         path =ESP3D_FLASH_FS_HEADER;
+        if (uri[0]=='/') {
+            path+=&uri[1];    //strip the "first/"
+        } else {
+            path+=uri;
+        }
     }
-    if (uri[0]=='/') {
-        path+=&uri[1];    //strip the "first/"
-    } else {
-        path+=uri;
-    }
+
     esp3d_log("Path is %s", path.c_str());
 
     /*try to stream file*/

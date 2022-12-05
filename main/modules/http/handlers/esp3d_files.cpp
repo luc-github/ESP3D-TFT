@@ -19,13 +19,8 @@
 
 
 #include "http/esp3d_http_service.h"
-#include <stdio.h>
-#include "esp_wifi.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
-#include "esp3d_settings.h"
-#include "esp3d_commands.h"
-#include "network/esp3d_network.h"
 #include "filesystem/esp3d_flash.h"
 #include <math.h>
 #if ESP3D_TIMESTAMP_FEATURE

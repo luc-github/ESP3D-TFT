@@ -99,12 +99,12 @@ public:
     static esp_err_t file_not_found_handler(httpd_req_t *req, httpd_err_code_t err);
     static esp_err_t login_handler(httpd_req_t *req);
     static esp_err_t files_handler(httpd_req_t *req);
-    static esp_err_t sd_handler(httpd_req_t *req);
     static esp_err_t sdfiles_handler(httpd_req_t *req);
     static esp_err_t updatefw_handler(httpd_req_t *req);
     static esp_err_t websocket_handler(httpd_req_t *req);
     static esp_err_t post_multipart_handler(httpd_req_t *req);
     static esp_err_t upload_to_flash_handler(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state, const char * filename, size_t filesize);
+    static esp_err_t upload_to_sd_handler(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state, const char * filename, size_t filesize);
     static esp_err_t open_fn(httpd_handle_t hd, int socketFd);
     static void  close_fn(httpd_handle_t hd, int socketFd);
     esp_err_t streamFile (const char * path,httpd_req_t *req );
@@ -118,6 +118,7 @@ private:
     const char * getBoundaryString (httpd_req_t *req);
     //it is based on : `only one post is supported at once`
     static post_upload_ctx_t _post_files_upload_ctx;
+    static post_upload_ctx_t _post_sdfiles_upload_ctx;
 };
 
 extern Esp3DHttpService esp3dHttpService;

@@ -41,6 +41,13 @@ post_upload_ctx_t Esp3DHttpService::_post_files_upload_ctx= {
     .args = {}
 };
 
+post_upload_ctx_t Esp3DHttpService::_post_sdfiles_upload_ctx= {
+    .writeFn= (esp_err_t (*)(const uint8_t *, size_t,esp3d_upload_state_t, const char *, size_t ))(Esp3DHttpService::upload_to_sd_handler),
+    .nextHandler= (esp_err_t (*)(httpd_req_t*))(Esp3DHttpService::sdfiles_handler),
+    .status = upload_not_started,
+    .args = {}
+};
+
 void Esp3DHttpService::pushError(esp3d_http_error_t errcode, const char * st)
 {
     std::string errmsg = "ERROR:" + std::to_string(errcode);
@@ -177,12 +184,36 @@ bool Esp3DHttpService::begin()
         };
         httpd_register_uri_handler(_server, &files_handler_config);
 
+        //sdfiles upload (POST data)
+        httpd_uri_t sdfiles_upload_handler_config = {
+            .uri       = "/sdfiles",   // Match all URIs of type /upload/path/to/file
+            .method    = HTTP_POST,
+            .handler   = post_multipart_handler,
+            .user_ctx  =  &_post_sdfiles_upload_ctx,
+            .is_websocket = false,
+            .handle_ws_control_frames = false,
+            .supported_subprotocol = nullptr
+        };
+        httpd_register_uri_handler(_server, &sdfiles_upload_handler_config);
+
+        //sd files /sdfiles
+        const httpd_uri_t sdfiles_handler_config = {
+            .uri       = "/sdfiles",
+            .method    = HTTP_GET,
+            .handler   = (esp_err_t (*)(httpd_req_t*))(esp3dHttpService.sdfiles_handler),
+            .user_ctx  =  nullptr,
+            .is_websocket = false,
+            .handle_ws_control_frames = false,
+            .supported_subprotocol = nullptr
+        };
+        httpd_register_uri_handler(_server, &sdfiles_handler_config);
+
         //flash files upload (POST data)
         httpd_uri_t files_upload_handler_config = {
             .uri       = "/files",   // Match all URIs of type /upload/path/to/file
             .method    = HTTP_POST,
             .handler   = post_multipart_handler,
-            .user_ctx  =  &_post_files_upload_ctx,
+            .user_ctx  =  &_post_sdfiles_upload_ctx,
             .is_websocket = false,
             .handle_ws_control_frames = false,
             .supported_subprotocol = nullptr
@@ -232,6 +263,7 @@ void Esp3DHttpService::end()
     _server = nullptr;
     _started = false;
     _post_files_upload_ctx.status = upload_not_started;
+    _post_sdfiles_upload_ctx.status = upload_not_started;
 }
 
 

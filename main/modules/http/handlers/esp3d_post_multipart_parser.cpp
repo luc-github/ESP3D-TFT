@@ -25,7 +25,9 @@
 #include "esp3d_settings.h"
 #include "esp3d_commands.h"
 #include "network/esp3d_network.h"
-
+#if ESP3D_TFT_BENCHMARK
+#include "esp_timer.h"
+#endif // ESP3D_TFT_BENCHMARK
 
 //TODO fine tune these values and put them in tasks_def.h
 #define PACKET_SIZE 1024*4
@@ -417,7 +419,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
         // at this stage if not the case it is not really an issue anymore
         esp3d_log("Now go to new request handle");
 #if ESP3D_TFT_BENCHMARK
-        float timesec= 1.0*((esp_timer_get_time()-startBenchmark)/1000000);
+        float timesec = (1.0*(esp_timer_get_time()-startBenchmark))/1000000;
         esp3d_report("duration %.2f seconds for %d bytes = %.2f KB/s", timesec, (size_t)(req->content_len), ((1.0*(size_t)(req->content_len))/ timesec)/1024);
 #endif // ESP3D_TFT_BENCHMARK
         return (post_upload_ctx->nextHandler(req));
