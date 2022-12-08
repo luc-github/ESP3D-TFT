@@ -53,17 +53,16 @@ typedef enum {
     ESP3D_HTTP_FILE_WRITE,
     ESP3D_HTTP_UPLOAD,
     ESP3D_HTTP_NOT_ENOUGH_SPACE,
-    ESP3D_HTTP_UPLOAD_CANCELLED,
+    ESP3D_HTTP_START_UPDATE,
     ESP3D_HTTP_FILE_CLOSE,
     ESP3D_HTTP_NO_SD,
     ESP3D_HTTP_MOUNT_SD,
-    ESP3D_HTTP_RESET_NUMBERING,
-    ESP3D_HTTP_BUFFER_OVERFLOW,
-    ESP3D_HTTP_START_UPLOAD,
-    ESP3D_HTTP_SIZE,
-    ESP3D_HTTP_UPDATE,
+    ESP3D_HTTP_RESET_NUMBERING, //not used
     ESP3D_HTTP_MEMORY_ERROR,
     ESP3D_HTTP_ACCESS_ERROR,
+    ESP3D_HTTP_SIZE,
+    ESP3D_HTTP_UPDATE,
+
 } esp3d_http_error_t;
 
 typedef struct {
@@ -105,6 +104,7 @@ public:
     static esp_err_t post_multipart_handler(httpd_req_t *req);
     static esp_err_t upload_to_flash_handler(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state, const char * filename, size_t filesize);
     static esp_err_t upload_to_sd_handler(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state, const char * filename, size_t filesize);
+    static esp_err_t upload_to_updatefw_handler(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state, const char * filename, size_t filesize);
     static esp_err_t open_fn(httpd_handle_t hd, int socketFd);
     static void  close_fn(httpd_handle_t hd, int socketFd);
     esp_err_t streamFile (const char * path,httpd_req_t *req );
@@ -119,6 +119,7 @@ private:
     //it is based on : `only one post is supported at once`
     static post_upload_ctx_t _post_files_upload_ctx;
     static post_upload_ctx_t _post_sdfiles_upload_ctx;
+    static post_upload_ctx_t _post_updatefw_upload_ctx;
 };
 
 extern Esp3DHttpService esp3dHttpService;

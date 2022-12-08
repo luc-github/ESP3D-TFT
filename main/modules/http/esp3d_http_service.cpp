@@ -34,6 +34,7 @@
 char chunk[CHUNK_BUFFER_SIZE];
 
 Esp3DHttpService esp3dHttpService;
+
 post_upload_ctx_t Esp3DHttpService::_post_files_upload_ctx= {
     .writeFn= (esp_err_t (*)(const uint8_t *, size_t,esp3d_upload_state_t, const char *, size_t ))(Esp3DHttpService::upload_to_flash_handler),
     .nextHandler= (esp_err_t (*)(httpd_req_t*))(Esp3DHttpService::files_handler),
@@ -44,6 +45,13 @@ post_upload_ctx_t Esp3DHttpService::_post_files_upload_ctx= {
 post_upload_ctx_t Esp3DHttpService::_post_sdfiles_upload_ctx= {
     .writeFn= (esp_err_t (*)(const uint8_t *, size_t,esp3d_upload_state_t, const char *, size_t ))(Esp3DHttpService::upload_to_sd_handler),
     .nextHandler= (esp_err_t (*)(httpd_req_t*))(Esp3DHttpService::sdfiles_handler),
+    .status = upload_not_started,
+    .args = {}
+};
+
+post_upload_ctx_t Esp3DHttpService::_post_updatefw_upload_ctx= {
+    .writeFn= (esp_err_t (*)(const uint8_t *, size_t,esp3d_upload_state_t, const char *, size_t ))(Esp3DHttpService::upload_to_updatefw_handler),
+    .nextHandler= (esp_err_t (*)(httpd_req_t*))(Esp3DHttpService::updatefw_handler),
     .status = upload_not_started,
     .args = {}
 };
@@ -129,7 +137,7 @@ bool Esp3DHttpService::begin()
     //Nb of sockets
     config.max_open_sockets = 6; //(3 internals +3)
     //handler
-    config.max_uri_handlers = 10; //currently use 9
+    config.max_uri_handlers = 10; //currently use 10
     //backlog_conn
     config.backlog_conn       = 8,
 
@@ -224,6 +232,18 @@ bool Esp3DHttpService::begin()
             .supported_subprotocol = nullptr
         };
         httpd_register_uri_handler(_server, &sdfiles_upload_handler_config);
+
+        //updatefw upload (POST data)
+        httpd_uri_t updatefw_upload_handler_config = {
+            .uri       = "/updatefw",   // Match all URIs of type /upload/path/to/file
+            .method    = HTTP_POST,
+            .handler   = post_multipart_handler,
+            .user_ctx  =  &_post_updatefw_upload_ctx,
+            .is_websocket = false,
+            .handle_ws_control_frames = false,
+            .supported_subprotocol = nullptr
+        };
+        httpd_register_uri_handler(_server, &updatefw_upload_handler_config);
 
         //sd files /sdfiles
         const httpd_uri_t sdfiles_handler_config = {
@@ -383,7 +403,7 @@ esp_err_t Esp3DHttpService::streamFile (const char * path,httpd_req_t *req )
 void Esp3DHttpService::process(esp3d_msg_t * msg)
 {
     if (msg->requestId.httpReq) {
-        esp3d_log("Msg type : %d", msg->type);
+        //esp3d_log("Msg type : %d", msg->type);
         if (httpd_resp_send_chunk(msg->requestId.httpReq, (const char *)msg->data, msg->size) != ESP_OK) {
             httpd_resp_send_chunk(msg->requestId.httpReq, NULL, 0);
             esp3d_log_e("Error sending data, closing chunk");
@@ -434,7 +454,7 @@ const char * Esp3DHttpService::getBoundaryString (httpd_req_t *req)
         if (boundaryStr) {
             esp_err_t r = httpd_req_get_hdr_value_str(req, "Content-Type", boundaryStr, contentTypeHeaderSize+1);
             if (ESP_OK==r) {
-                esp3d_log("Content-Type %s", boundaryStr);
+                //esp3d_log("Content-Type %s", boundaryStr);
                 if (esp3d_strings::startsWith(boundaryStr,"multipart/form-data")) {
                     for(uint i=strlen("multipart/form-data"); i < contentTypeHeaderSize; i++) {
                         if(esp3d_strings::startsWith(&boundaryStr[i],"boundary=")) {

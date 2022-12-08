@@ -36,6 +36,7 @@
 #include "esp_wifi_ap_get_sta_list.h"
 #include "network/esp3d_network.h"
 #include "http/esp3d_http_service.h"
+#include "update/esp3d_update_service.h"
 #define COMMAND_ID 420
 
 //Get ESP current status
@@ -122,6 +123,13 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     if (!dispatchIdValue(json,"flash size",tmpstr.c_str(), target,requestId)) {
         return;
     }
+
+    //Update max
+    tmpstr = esp3d_strings::formatBytes(esp3dUpdateService.maxUpdateSize());
+    if (!dispatchIdValue(json,"size for update",tmpstr.c_str(), target,requestId)) {
+        return;
+    }
+
     //FileSystem
     size_t totalBytes=0;
     size_t usedBytes=0;

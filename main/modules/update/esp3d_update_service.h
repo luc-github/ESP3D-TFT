@@ -1,5 +1,5 @@
 /*
-  esp3d_version
+  esp3d_update_service
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -20,11 +20,28 @@
 
 #pragma once
 #include <stdio.h>
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define ESP3D_TFT_VERSION "1.0.0.a2"
 
+
+class Esp3DUpdateService final
+{
+public:
+    Esp3DUpdateService();
+    ~Esp3DUpdateService();
+    bool begin();
+    void handle();
+    void end();
+    bool canUpdate();
+    size_t maxUpdateSize();
+private:
+
+};
+
+extern Esp3DUpdateService esp3dUpdateService;
 #ifdef __cplusplus
 } // extern "C"
 #endif

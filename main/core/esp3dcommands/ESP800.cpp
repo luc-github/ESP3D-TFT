@@ -31,6 +31,7 @@
 #include "authentication/esp3d_authentication.h"
 #include "filesystem/esp3d_flash.h"
 #include "network/esp3d_network.h"
+#include "update/esp3d_update_service.h"
 #define COMMAND_ID 800
 
 //get fw version firmare target and fw version
@@ -168,7 +169,7 @@ void Esp3DCommands::ESP800(int cmd_params_pos,esp3d_msg_t * msg)
         return;
     }
     //WebUpdate
-    if (!dispatchKeyValue(json,"WebUpdate", "Disabled", target,requestId)) {
+    if (!dispatchKeyValue(json,"WebUpdate", esp3dUpdateService.canUpdate()?"Enabled":"Disabled", target,requestId)) {
         return;
     }
     //FlashFileSystem

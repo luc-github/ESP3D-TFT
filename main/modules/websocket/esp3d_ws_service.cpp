@@ -92,7 +92,7 @@ esp_err_t Esp3DWsService::onMessage(httpd_req_t *req)
         esp3d_log_e("httpd_ws_recv_frame failed to get frame len with %d", ret);
         return ret;
     }
-    esp3d_log("frame len is %d", ws_pkt.len);
+    //esp3d_log("frame len is %d", ws_pkt.len);
     if (ws_pkt.len) {
         /* ws_pkt.len + 1 is for NULL termination as we are expecting a string */
         buf = ( uint8_t *)calloc(1, ws_pkt.len + 1);

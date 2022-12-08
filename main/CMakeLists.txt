@@ -10,6 +10,7 @@ set(SOURCES .
     modules/filesystem
     modules/filesystem/sd
     modules/filesystem/flash
+    modules/update
 )
 set(INCLUDES .
     core/includes

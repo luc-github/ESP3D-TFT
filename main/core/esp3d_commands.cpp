@@ -361,7 +361,7 @@ bool  Esp3DCommands::dispatch(esp3d_msg_t * msg,uint8_t * sbuf, size_t len)
 bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
 {
     bool sendOk = true;
-    esp3d_log("Dispatch message origin %d to client %d , size %d",msg->origin,msg->target,msg->size);
+    //esp3d_log("Dispatch message origin %d to client %d , size %d",msg->origin,msg->target,msg->size);
     if (!msg) {
         esp3d_log_e("no msg");
         return false;
@@ -468,7 +468,7 @@ bool Esp3DCommands::hasTag (esp3d_msg_t * msg, uint start,const char* label)
     lbl+="=";
     lbl = get_param (msg, start,lbl.c_str());
     if (lbl.length()!=0) {
-        esp3d_log("Label is used with parameter %s", lbl.c_str());
+        //esp3d_log("Label is used with parameter %s", lbl.c_str());
         //make result uppercase
         esp3d_strings::str_toUpperCase(&lbl);
         return (lbl=="YES" || lbl=="1" || lbl=="TRUE");

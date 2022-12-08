@@ -391,7 +391,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                         //send end of file
                         if (post_upload_ctx->writeFn) {
                             if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_end, fileName.c_str(), fileSize)) {
-                                esp3d_log_e("Error writing file invalid");
+                                esp3d_log_e("Error final file is invalid");
                                 return httpd_resp_send_500(req);
                             }
                         }

@@ -62,7 +62,7 @@ esp3d_msg_t * Esp3DClient::popTx()
 void Esp3DClient::deleteMsg(esp3d_msg_t * msg)
 {
     if (msg) {
-        esp3d_log("Deletion origin: %d, Target: %d, size: %d  : Now we have %ld msg", msg->origin, msg->target, msg->size, --msg_counting);
+        // esp3d_log("Deletion origin: %d, Target: %d, size: %d  : Now we have %ld msg", msg->origin, msg->target, msg->size, --msg_counting);
         free(msg->data);
         free(msg);
         msg = nullptr;
@@ -138,7 +138,7 @@ esp3d_msg_t * Esp3DClient::newMsg()
 {
     esp3d_msg_t * newMsgPtr = (esp3d_msg_t*)malloc( sizeof(esp3d_msg_t));
     if (newMsgPtr) {
-        esp3d_log("Creation : Now we have %ld msg", ++msg_counting);
+        // esp3d_log("Creation : Now we have %ld msg", ++msg_counting);
         newMsgPtr->data = nullptr;
         newMsgPtr->size = 0;
         newMsgPtr->origin = NO_CLIENT;

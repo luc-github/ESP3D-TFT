@@ -76,7 +76,7 @@ esp_err_t Esp3DHttpService::upload_to_sd_handler(const uint8_t * data, size_t da
             struct stat entry_stat;
             if (sd.stat(filename, &entry_stat) == -1 || entry_stat.st_size != filesize) {
                 if (entry_stat.st_size != datasize) {
-                    esp3d_log_e("Invalide size got %d expected %d ",(size_t)entry_stat.st_size, filesize);
+                    esp3d_log_e("Invalid size got %d expected %d ",(size_t)entry_stat.st_size, filesize);
                 } else {
                     esp3d_log_e("Failed to stat %s",filename);
                 }
