@@ -38,6 +38,8 @@ Esp3DHttpService esp3dHttpService;
 post_upload_ctx_t Esp3DHttpService::_post_files_upload_ctx= {
     .writeFn= (esp_err_t (*)(const uint8_t *, size_t,esp3d_upload_state_t, const char *, size_t ))(Esp3DHttpService::upload_to_flash_handler),
     .nextHandler= (esp_err_t (*)(httpd_req_t*))(Esp3DHttpService::files_handler),
+    .packetReadSize = 4* 1024, //This may need to be defined in tasks_def.h
+    .packetWriteSize= 4* 1024,  //This may need to be defined in tasks_def.h
     .status = upload_not_started,
     .args = {}
 };
@@ -45,6 +47,8 @@ post_upload_ctx_t Esp3DHttpService::_post_files_upload_ctx= {
 post_upload_ctx_t Esp3DHttpService::_post_sdfiles_upload_ctx= {
     .writeFn= (esp_err_t (*)(const uint8_t *, size_t,esp3d_upload_state_t, const char *, size_t ))(Esp3DHttpService::upload_to_sd_handler),
     .nextHandler= (esp_err_t (*)(httpd_req_t*))(Esp3DHttpService::sdfiles_handler),
+    .packetReadSize = 4* 1024,  //This may need to be defined in tasks_def.h
+    .packetWriteSize= 4* 1024, //This may need to be defined in tasks_def.h
     .status = upload_not_started,
     .args = {}
 };
@@ -52,6 +56,8 @@ post_upload_ctx_t Esp3DHttpService::_post_sdfiles_upload_ctx= {
 post_upload_ctx_t Esp3DHttpService::_post_updatefw_upload_ctx= {
     .writeFn= (esp_err_t (*)(const uint8_t *, size_t,esp3d_upload_state_t, const char *, size_t ))(Esp3DHttpService::upload_to_updatefw_handler),
     .nextHandler= (esp_err_t (*)(httpd_req_t*))(Esp3DHttpService::updatefw_handler),
+    .packetReadSize = 1024,  //This may need to be defined in tasks_def.h
+    .packetWriteSize= 1024,  //This may need to be defined in tasks_def.h
     .status = upload_not_started,
     .args = {}
 };
@@ -214,7 +220,7 @@ bool Esp3DHttpService::begin()
             .uri       = "/files",   // Match all URIs of type /upload/path/to/file
             .method    = HTTP_POST,
             .handler   = post_multipart_handler,
-            .user_ctx  =  &_post_sdfiles_upload_ctx,
+            .user_ctx  =  &_post_files_upload_ctx,
             .is_websocket = false,
             .handle_ws_control_frames = false,
             .supported_subprotocol = nullptr

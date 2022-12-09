@@ -47,7 +47,7 @@ esp_err_t Esp3DHttpService::upload_to_updatefw_handler(const uint8_t * data, siz
                 return ESP_FAIL;
             }
         }
-        err = esp_ota_begin(update_partition, filesize!=(size_t)-1?filesize:OTA_SIZE_UNKNOWN, &update_handle);
+        err = esp_ota_begin(update_partition, OTA_WITH_SEQUENTIAL_WRITES, &update_handle);
         if (err != ESP_OK) {
             esp3d_log_e("esp_ota_begin failed (%s)", esp_err_to_name(err));
             esp3dHttpService.pushError(ESP3D_HTTP_FILE_CREATION,"Error update begin failed");
@@ -77,7 +77,7 @@ esp_err_t Esp3DHttpService::upload_to_updatefw_handler(const uint8_t * data, siz
                 esp3dHttpService.pushError(ESP3D_HTTP_SIZE,tmperr.c_str());
                 return ESP_FAIL;
             } else {
-                esp3d_log_e("Final size is Ok");
+                esp3d_log("Final size is Ok");
             }
         }
         err = esp_ota_end(update_handle);

@@ -68,6 +68,8 @@ typedef enum {
 typedef struct {
     esp_err_t (*writeFn)(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state, const char * filename, size_t filesize);
     esp_err_t (*nextHandler)(httpd_req_t *req);
+    uint packetReadSize;
+    uint packetWriteSize;
     esp3d_upload_status_t status;
     std::list<std::pair<std::string, std::string>> args;
 } post_upload_ctx_t;

@@ -486,13 +486,13 @@ bool Esp3DCommands::hasTag (esp3d_msg_t * msg, uint start,const char* label)
                 p++;
                 if(i<msg->size) {
                     c = char(msg->data[i]);
-                    esp3d_log("%c vs %c", c, char(msg->data[i]));
+                    //esp3d_log("%c vs %c", c, char(msg->data[i]));
                 }
             }
             if (p == lenLabel) {
                 //end of params
                 if (i==msg->size || std::isspace(c)) {
-                    esp3d_log("label %s found", label);
+                    //esp3d_log("label %s found", label);
                     return true;
                 }
             }

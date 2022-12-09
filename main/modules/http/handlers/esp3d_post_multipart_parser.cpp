@@ -30,9 +30,6 @@
 #endif // ESP3D_TFT_BENCHMARK
 
 //TODO fine tune these values and put them in tasks_def.h
-#define PACKET_SIZE 1024*4
-#define PACKET_WRITE_SIZE 1024*4
-
 typedef enum {
     parse_boundary,
     parse_content_disposition,
@@ -56,8 +53,8 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
         esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
         return httpd_resp_send_500(req);
     }
-    if (!(post_upload_ctx->nextHandler)) {
-        esp3d_log_e("Post handler not found");
+    if (!(post_upload_ctx->nextHandler) ||!(post_upload_ctx->packetReadSize)||!(post_upload_ctx->packetWriteSize)) {
+        esp3d_log_e("Post parameter not found");
         esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
         return httpd_resp_send_500(req);
     }
@@ -67,22 +64,28 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
         esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
         return httpd_resp_send_500(req);
     }
+    if (packet) {
+        free(packet);
+        packet = nullptr;
+    }
+    packet = (char*)malloc(post_upload_ctx->packetReadSize);
     if (!packet) {
-        packet = (char*)malloc(PACKET_SIZE);
-        if (!packet) {
-            esp3d_log_e("Memory issue, allocation failed");
-            esp3dHttpService.pushError(ESP3D_HTTP_MEMORY_ERROR,"Upload error");
-            return httpd_resp_send_500(req);
-        }
+        esp3d_log_e("Memory issue, allocation failed");
+        esp3dHttpService.pushError(ESP3D_HTTP_MEMORY_ERROR,"Upload error");
+        return httpd_resp_send_500(req);
     }
+
+    if (packetWrite) {
+        free(packetWrite);
+        packetWrite = nullptr;
+    }
+    packetWrite = (char*)malloc(post_upload_ctx->packetWriteSize);
     if (!packetWrite) {
-        packetWrite = (char*)malloc(PACKET_SIZE);
-        if (!packetWrite) {
-            esp3d_log_e("Memory issue, allocation failed");
-            esp3dHttpService.pushError(ESP3D_HTTP_MEMORY_ERROR,"Upload error");
-            return httpd_resp_send_500(req);
-        }
+        esp3d_log_e("Memory issue, allocation failed");
+        esp3dHttpService.pushError(ESP3D_HTTP_MEMORY_ERROR,"Upload error");
+        return httpd_resp_send_500(req);
     }
+
     //be sure list is empty
     post_upload_ctx->args.clear();
     uint8_t boundaryCursor = 2;
@@ -107,7 +110,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
     if (boundaryPtr) {
         esp3d_parse_state_t parsing_state = parse_boundary;
         while (remaining > 0) {
-            if ((received = httpd_req_recv(req, packet, PACKET_SIZE)) <= 0) {
+            if ((received = httpd_req_recv(req, packet, post_upload_ctx->packetReadSize)) <= 0) {
                 esp3d_log_e("Connection lost");
                 if (parsing_state==parse_data_file && post_upload_ctx->writeFn) {
                     if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_aborted, fileName.c_str(), fileSize)) {
@@ -359,7 +362,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                                 for (uint c= 0; c<boundaryCursor; c++) {
                                     packetWrite[indexPacketWrite]=boundaryString[c];
                                     indexPacketWrite++;
-                                    if (indexPacketWrite==PACKET_WRITE_SIZE) {
+                                    if (indexPacketWrite==post_upload_ctx->packetWriteSize) {
                                         if (post_upload_ctx->writeFn) {
                                             if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)packetWrite, indexPacketWrite, upload_file_write, fileName.c_str(), fileSize)) {
                                                 esp3d_log_e("Error writing file invalid");
@@ -377,7 +380,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                         }
 
                     }
-                    if (indexPacketWrite==PACKET_WRITE_SIZE || (uploadState == upload_file_end && indexPacketWrite>0)) {
+                    if (indexPacketWrite==post_upload_ctx->packetWriteSize || (uploadState == upload_file_end && indexPacketWrite>0)) {
                         if (post_upload_ctx->writeFn) {
                             if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)packetWrite, indexPacketWrite, upload_file_write, fileName.c_str(), fileSize)) {
                                 esp3d_log_e("Error writing file invalid");
