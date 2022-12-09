@@ -70,6 +70,7 @@ const esp3d_setting_desc_t Esp3DSettingsData [] = {
     {esp3d_http_on, esp3d_byte, 1,"1"},
     {esp3d_setup, esp3d_byte, 1,"0"},
     {esp3d_target_firmware, esp3d_byte, 1,"0"},
+    {esp3d_check_update_on_sd, esp3d_byte, 1,"1"},
 
 };
 
@@ -139,6 +140,7 @@ bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t set
         return false;
     }
     switch(settingElement) {
+    case esp3d_check_update_on_sd:
     case esp3d_setup:
     case esp3d_http_on:
     case esp3d_radio_boot_mode:

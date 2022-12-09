@@ -54,6 +54,7 @@ typedef enum  {
     esp3d_http_on,
     esp3d_setup,
     esp3d_target_firmware,
+    esp3d_check_update_on_sd,
     last_esp3d_setting_index_t
 } esp3d_setting_index_t;
 

@@ -72,7 +72,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
         esp3d_log_e("Error sending response to clients");
         return;
     }
-//Screen
+    //Screen
     if (!dispatchIdValue(json,"Screen", TFT_TARGET, target, requestId, true)) {
         return;
     }
@@ -127,6 +127,17 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     //Update max
     tmpstr = esp3d_strings::formatBytes(esp3dUpdateService.maxUpdateSize());
     if (!dispatchIdValue(json,"size for update",tmpstr.c_str(), target,requestId)) {
+        return;
+    }
+
+    //SD updater
+    esp3d_state_t statesetting = (esp3d_state_t)esp3dTFTsettings.readByte(esp3d_check_update_on_sd);
+    if (statesetting == esp3d_state_off) {
+        tmpstr = "OFF";
+    } else {
+        tmpstr= "ON";
+    }
+    if (!dispatchIdValue(json,"SD updater",tmpstr.c_str(), target,requestId)) {
         return;
     }
 

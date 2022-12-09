@@ -178,6 +178,11 @@ void Esp3DCommands::ESP400(int cmd_params_pos,esp3d_msg_t * msg)
         esp3d_log_e("Error sending response to clients");
     }
 #endif
+    //SD updater
+    if (!dispatchSetting(json,"device/sd",esp3d_check_update_on_sd, "SD updater", YesNoValues, YesNoLabels, sizeof(YesNoValues)/sizeof(char*), -1, -1,-1, nullptr, false,target,requestId)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+
 
     if (json) {
         if(!dispatch("]}",target, requestId, msg_tail)) {
