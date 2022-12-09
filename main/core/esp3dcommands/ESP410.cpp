@@ -93,8 +93,8 @@ void Esp3DCommands::ESP410(int cmd_params_pos,esp3d_msg_t * msg)
                 if (json) {
                     if (real_count>0) {
                         tmpstr+=",";
-                        real_count++;
                     }
+                    real_count++;
                     tmpstr+="{\"SSID\":\"";
                 }
                 tmpstr += (char *)(ap_info[i].ssid);
