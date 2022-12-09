@@ -882,7 +882,7 @@ static void rm68120_reg_config(esp_lcd_panel_t *panel)
     // esp_lcd_panel_io_tx_param(io, 0x2900, NULL, 0);
     // vTaskDelay(100 / portTICK_PERIOD_MS);
 
-    // esp_lcd_panel_io_tx_param(io, 0x3A00, (uint16_t[]) {0x55,}, 2);
-    // esp_lcd_panel_io_tx_param(io, 0x3600, (uint16_t[]) {0xA3,}, 2);
+    esp_lcd_panel_io_tx_param(io, 0x3A00, (uint16_t[]) {0x55,}, 2); //COLMOD
+    esp_lcd_panel_io_tx_param(io, 0x3600, (uint16_t[]) {0xA3,}, 2); //Memory Data Access Control
 }
 
