@@ -59,7 +59,7 @@ esp_err_t Esp3DHttpService::upload_to_flash_handler(const uint8_t * data, size_t
         }
         break;
     case upload_file_write:
-        esp3d_log("Write :%d bytes", datasize);
+        //esp3d_log("Write :%d bytes", datasize);
         if (datasize && FileFD) {
             if (fwrite(data,datasize,1,FileFD)!=1) {
                 esp3d_log_e("Error cannot writing data on flash filesystem ");

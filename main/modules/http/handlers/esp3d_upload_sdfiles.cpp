@@ -59,7 +59,7 @@ esp_err_t Esp3DHttpService::upload_to_sd_handler(const uint8_t * data, size_t da
         }
         break;
     case upload_file_write:
-        esp3d_log("Write :%d bytes", datasize);
+        //esp3d_log("Write :%d bytes", datasize);
         if (datasize && FileFD) {
             if (fwrite(data,datasize,1,FileFD)!=1) {
                 esp3d_log_e("Error cannot writing data on sd filesystem ");
@@ -80,7 +80,7 @@ esp_err_t Esp3DHttpService::upload_to_sd_handler(const uint8_t * data, size_t da
                 } else {
                     esp3d_log_e("Failed to stat %s",filename);
                 }
-                sd.remove(filename);
+                //sd.remove(filename);
                 sd.releaseFS();
                 esp3dHttpService.pushError(ESP3D_HTTP_SIZE,"Error file size does not match expected one");
                 return ESP_FAIL;
@@ -92,7 +92,7 @@ esp_err_t Esp3DHttpService::upload_to_sd_handler(const uint8_t * data, size_t da
         esp3d_log("Error happened: cleanup");
         sd.close(FileFD);
         FileFD = nullptr;
-        sd.remove(filename);
+        //sd.remove(filename);
         sd.releaseFS();
         break;
     }

@@ -22,6 +22,7 @@
 #include "esp3d_string.h"
 #include "esp3d_settings.h"
 #include "esp_system.h"
+#include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "authentication/esp3d_authentication.h"
 #define COMMAND_ID 444

@@ -22,6 +22,8 @@
 
 #if defined(ESP3D_SD_IS_SPI) && ESP3D_SD_IS_SPI
 #include "filesystem/esp3d_sd.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include <string>
 #include <cstring>
 #include <string.h>
@@ -58,6 +60,7 @@ bool ESP3D_SD::mount()
     }
     if (_mounted) {
         unmount();
+        vTaskDelay(pdMS_TO_TICKS(500)); //try to work around the OOM issue, need time to free memory ?
     }
     //set SPI speed
 
@@ -85,10 +88,18 @@ bool ESP3D_SD::mount()
         _state = ESP3D_SDCARD_NOT_PRESENT;
         if (ret == ESP_FAIL) {
             esp3d_log_e("Failed to mount filesystem.");
+            return false;
         } else {
-            esp3d_log_e("Failed to initialize the card (%s). ", esp_err_to_name(ret));
+            esp3d_log_e("Failed to mount the card try 1 (%s). ", esp_err_to_name(ret));
+            vTaskDelay(pdMS_TO_TICKS(500)); //try to work around the OOM issue, need time to free memory ?
+            ret = esp_vfs_fat_sdspi_mount(mount_point(), &host, &slot_config, &mount_config, &card);
+            if (ret != ESP_OK) {
+
+                esp3d_log_e("Failed to mount the card try 2 (%s). ", esp_err_to_name(ret));
+                return false;
+            }
         }
-        return false;
+
     }
     esp3d_log("Filesystem mounted");
     _mounted = true;

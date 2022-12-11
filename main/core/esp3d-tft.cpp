@@ -35,6 +35,7 @@
 #include "bsp.h"
 #include "filesystem/esp3d_flash.h"
 #include "filesystem/esp3d_sd.h"
+#include "update/esp3d_update_service.h"
 
 /**********************
  *  STATIC PROTOTYPES
@@ -85,13 +86,15 @@ bool Esp3DTFT::begin()
     bool successFs = flashFs.begin();
     bool successSd = sd.begin();
     bool success =  esp3dTFTui.begin();
+    if (successSd) {
+        esp3dUpdateService.begin();
+    }
     if (success) {
         success = esp3dTFTstream.begin();
     }
     if (success) {
         success = esp3dTFTnetwork.begin();
     }
-
     return success && successFs && successSd;
 }
 

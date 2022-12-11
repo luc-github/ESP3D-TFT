@@ -22,6 +22,17 @@
 #include "esp3d_string.h"
 #include "esp3d_settings.h"
 #include "esp_ota_ops.h"
+#include "esp_system.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "filesystem/esp3d_sd.h"
+#include "network/esp3d_network.h"
+
+#define CONFIG_FILE "/esp3dcnf.ini"
+#define FW_FILE "/esp3dfw.bin"
+#define FW_FILE_OK "/esp3dfw.ok"
+#define FS_FILE "/esp3dfs.bin"
+#define CHUNK_BUFFER_SIZE 1024
 
 Esp3DUpdateService esp3dUpdateService;
 
@@ -69,8 +80,116 @@ size_t Esp3DUpdateService::maxUpdateSize()
 bool Esp3DUpdateService::begin()
 {
     esp3d_log("Starting Update Service");
-
+    bool restart =false;
+    esp3d_state_t setting_check_update = (esp3d_state_t)esp3dTFTsettings.readByte(esp3d_check_update_on_sd);
+    if (setting_check_update==esp3d_state_off || !canUpdate()) {
+        esp3d_log("Update Service disabled");
+        return true;
+    }
+    if (sd.accessFS()) {
+        if (sd.exists(FW_FILE)) {
+            restart= updateFW();
+            if (restart) {
+                if (!sd.rename(FW_FILE,FW_FILE_OK)) {
+                    esp3d_log_e("Failed to rename %s",FW_FILE);
+                    //to avoid dead loop
+                    restart = false;
+                }
+            }
+        } else {
+            esp3d_log("No Fw update on SD");
+        }
+        sd.releaseFS();
+    } else {
+        esp3d_log("SD unavailable for update");
+    }
+    if (restart) {
+        esp3d_log("Restarting  firmware");
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        esp_restart();
+        while(1) {
+            vTaskDelay(pdMS_TO_TICKS(10));
+        }
+    }
     return true;
+}
+
+bool Esp3DUpdateService::updateFW()
+{
+    bool isSuccess = true;
+    char chunk[CHUNK_BUFFER_SIZE];
+    esp_ota_handle_t update_handle = 0;
+    const esp_partition_t *update_partition = NULL;
+    esp3d_log("Updating firmware");
+    struct stat entry_stat;
+    size_t totalSize = 0;
+    if (sd.stat(FW_FILE, &entry_stat) == -1) {
+        esp3d_log_e("Failed to stat : %s", FW_FILE);
+        return false;
+    }
+    FILE* fwFd = sd.open(FW_FILE, "r");
+    if (!fwFd) {
+        esp3d_log_e("Failed to open on sd : %s", FW_FILE);
+        return false;
+    }
+    update_partition = esp_ota_get_next_update_partition(NULL);
+    if (!update_partition) {
+        esp3d_log_e("Error accessing flash filesystem");
+        isSuccess = false;
+    }
+    if (isSuccess) {
+        esp_err_t err = esp_ota_begin(update_partition, OTA_WITH_SEQUENTIAL_WRITES, &update_handle);
+        if (err != ESP_OK) {
+            esp3d_log_e("esp_ota_begin failed (%s)", esp_err_to_name(err));
+            isSuccess = false;
+        }
+    }
+    if (isSuccess) {
+        size_t chunksize ;
+        uint8_t progress =0;
+        do {
+            chunksize = fread(chunk, 1, CHUNK_BUFFER_SIZE, fwFd);
+            totalSize+=chunksize;
+            if (esp_ota_write( update_handle, (const void *)chunk, chunksize)!=ESP_OK) {
+                esp3d_log_e("Error cannot writing data on update partition");
+                isSuccess = false;
+            }
+#if ESP3D_TFT_LOG
+            if ( progress != 100*totalSize/entry_stat.st_size) {
+                progress = 100*totalSize/entry_stat.st_size;
+                esp3d_log("Update %d %% %d / %ld", progress, totalSize,entry_stat.st_size );
+            }
+#endif
+        } while (chunksize != 0 && isSuccess);
+    }
+    sd.close(fwFd);
+    if (isSuccess) {
+        //check size
+        if (totalSize!= entry_stat.st_size) {
+            esp3d_log_e("Failed to read firmware full data");
+            isSuccess = false;
+        }
+    }
+    if (isSuccess) {
+        esp_err_t err = esp_ota_end(update_handle);
+        if (err!=ESP_OK) {
+            esp3d_log_e("Error cannot end update(%s)", esp_err_to_name(err));
+            isSuccess = false;
+        }
+        update_handle = 0;
+    }
+    if (isSuccess) {
+        esp_err_t err = esp_ota_set_boot_partition(update_partition);
+        if (err!=ESP_OK) {
+            esp3d_log_e( "esp_ota_set_boot_partition failed (%s)!", esp_err_to_name(err));
+            isSuccess = false;
+        }
+    }
+    if (update_handle && !isSuccess) {
+        esp_ota_abort(update_handle);
+        update_handle = 0;
+    }
+    return isSuccess;
 }
 
 void Esp3DUpdateService::handle() {}

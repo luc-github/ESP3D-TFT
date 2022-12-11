@@ -10,7 +10,6 @@
 #include "driver/gpio.h"
 #include "esp3d_log.h"
 #include "esp_heap_caps.h"
-
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 

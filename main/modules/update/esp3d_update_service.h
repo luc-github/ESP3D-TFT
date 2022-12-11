@@ -35,6 +35,7 @@ public:
     bool begin();
     void handle();
     void end();
+    bool updateFW();
     bool canUpdate();
     size_t maxUpdateSize();
 private:

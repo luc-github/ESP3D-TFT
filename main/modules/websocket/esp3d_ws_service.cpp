@@ -21,8 +21,7 @@
 #include "esp3d_ws_service.h"
 #include "tasks_def.h"
 #include <esp_system.h>
-
-
+#include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_timer.h"
 #include <stdio.h>
