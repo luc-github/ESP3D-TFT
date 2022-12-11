@@ -30,6 +30,7 @@
 esp_err_t Esp3DHttpService::upload_to_sd_handler(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state, const char * filename, size_t filesize)
 {
     static FILE * FileFD = nullptr;
+    static bool isAccessed = false;
     switch(file_upload_state) {
     case upload_file_start:
         esp3d_log("Starting sd upload:%s", filename);
@@ -42,6 +43,7 @@ esp_err_t Esp3DHttpService::upload_to_sd_handler(const uint8_t * data, size_t da
             esp3dHttpService.pushError(ESP3D_HTTP_ACCESS_ERROR,"Error accessing sd filesystem");
             return ESP_FAIL;
         }
+        isAccessed = true;
         if (filesize!=(size_t)-1) {
             uint64_t freespace = 0;
             sd.getSpaceInfo(nullptr,nullptr,&freespace);
@@ -80,20 +82,26 @@ esp_err_t Esp3DHttpService::upload_to_sd_handler(const uint8_t * data, size_t da
                 } else {
                     esp3d_log_e("Failed to stat %s",filename);
                 }
-                //sd.remove(filename);
+                sd.remove(filename);
                 sd.releaseFS();
                 esp3dHttpService.pushError(ESP3D_HTTP_SIZE,"Error file size does not match expected one");
                 return ESP_FAIL;
             }
         }
+        isAccessed = false;
         sd.releaseFS();
         break;
     case upload_file_aborted:
         esp3d_log("Error happened: cleanup");
-        sd.close(FileFD);
+        if (FileFD) {
+            sd.close(FileFD);
+        }
         FileFD = nullptr;
-        //sd.remove(filename);
-        sd.releaseFS();
+        if (isAccessed) {
+            sd.remove(filename);
+            sd.releaseFS();
+        }
+        isAccessed = false;
         break;
     }
     return ESP_OK;

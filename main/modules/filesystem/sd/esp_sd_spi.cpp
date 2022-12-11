@@ -46,7 +46,10 @@ void ESP3D_SD::unmount()
         _state = ESP3D_SDCARD_UNKNOWN;
         return;
     }
-    esp_vfs_fat_sdcard_unmount(mount_point(), card);
+    esp_err_t err = esp_vfs_fat_sdcard_unmount(mount_point(), card);
+    if (ESP_OK!=err) {
+        esp3d_log_e("SDCard unmount failed:%s, it was previously : %s",  esp_err_to_name(err), _mounted?"mounted":"not mounted");
+    }
     _state = ESP3D_SDCARD_NOT_PRESENT;
     _mounted = false;
 }
@@ -60,7 +63,6 @@ bool ESP3D_SD::mount()
     }
     if (_mounted) {
         unmount();
-        vTaskDelay(pdMS_TO_TICKS(500)); //try to work around the OOM issue, need time to free memory ?
     }
     //set SPI speed
 
@@ -73,12 +75,12 @@ bool ESP3D_SD::mount()
     host.max_freq_khz = ESP3D_SD_FREQ / _spi_speed_divider;
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {
         .format_if_mount_failed = false,
-        .max_files = 5,
+        .max_files = 10,
         .allocation_unit_size = 16 * 1024,
         /** New IDF 5.0, Try to enable if you need to handle situations when SD cards
         * are not unmounted properly before physical removal
         * or you are experiencing issues with SD cards.*/
-        .disk_status_check_enable=false
+        .disk_status_check_enable=true
     };
 
     esp3d_log("Mounting filesystem cd:%d, wp:%d",slot_config.gpio_cd, slot_config.gpio_wp );
@@ -88,17 +90,10 @@ bool ESP3D_SD::mount()
         _state = ESP3D_SDCARD_NOT_PRESENT;
         if (ret == ESP_FAIL) {
             esp3d_log_e("Failed to mount filesystem.");
-            return false;
         } else {
-            esp3d_log_e("Failed to mount the card try 1 (%s). ", esp_err_to_name(ret));
-            vTaskDelay(pdMS_TO_TICKS(500)); //try to work around the OOM issue, need time to free memory ?
-            ret = esp_vfs_fat_sdspi_mount(mount_point(), &host, &slot_config, &mount_config, &card);
-            if (ret != ESP_OK) {
-
-                esp3d_log_e("Failed to mount the card try 2 (%s). ", esp_err_to_name(ret));
-                return false;
-            }
+            esp3d_log_e("Failed to mount the card  (%s). ", esp_err_to_name(ret));
         }
+        return false;
 
     }
     esp3d_log("Filesystem mounted");

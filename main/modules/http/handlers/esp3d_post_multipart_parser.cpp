@@ -41,7 +41,6 @@ typedef enum {
 
 esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
 {
-    size_t totalRead = 0;
     esp3d_log("Post Data %d on : %s", req->content_len, req->uri);
 #if ESP3D_TFT_BENCHMARK
     uint64_t startBenchmark = esp_timer_get_time();
@@ -57,7 +56,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
         hasError = true;
     }
     if (!hasError) {
-        if (!(post_upload_ctx->nextHandler) ||!(post_upload_ctx->packetReadSize)||!(post_upload_ctx->packetWriteSize)) {
+        if (!(post_upload_ctx->nextHandler) ||!(post_upload_ctx->packetReadSize)||!(post_upload_ctx->packetWriteSize) || !post_upload_ctx->writeFn) {
             esp3d_log_e("Post parameter not found");
             esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
             hasError = true;
@@ -105,8 +104,8 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
 
 
     size_t remaining = req->content_len;
-    size_t notProcessed = req->content_len;
-    int received;
+    int32_t notProcessed = req->content_len;
+    int32_t received;
     int fileSize=-1;
 // processing the content
     if (boundaryPtr && !hasError) {
@@ -114,11 +113,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
         while (remaining > 0 && !hasError) {
             if ((received = httpd_req_recv(req, packet, post_upload_ctx->packetReadSize)) <= 0) {
                 esp3d_log_e("Connection lost");
-                if (parsing_state==parse_data_file && post_upload_ctx->writeFn) {
-                    if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_aborted, fileName.c_str(), fileSize)) {
-                        esp3d_log_e("Error writing file invalid");
-                    }
-                }
+                uploadState = upload_file_aborted;
                 esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
                 hasError = true;
             }
@@ -128,19 +123,18 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
             }
             if (received == HTTPD_SOCK_ERR_INVALID || received == HTTPD_SOCK_ERR_FAIL) {
                 esp3d_log_e("Error connection");
-                if (parsing_state==parse_data_file && post_upload_ctx->writeFn) {
-                    if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_aborted, fileName.c_str(), fileSize)) {
-                        esp3d_log_e("Error writing file invalid");
-                    }
-                }
+                uploadState = upload_file_aborted;
                 esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
                 hasError = true;
             }
             //decrease received bytes from remaining bytes amount
             remaining -= received;
+            //esp3d_log("received %ld bytes now total left expected %d",received, remaining);
             //Parsing the buffer
             for (uint pIndex = 0; pIndex < received && !hasError; pIndex++) {
+                //esp3d_log("Processing %c %d", packet[pIndex],packet[pIndex]);
                 notProcessed--;
+                //esp3d_log("left %ld / %d", notProcessed, req->content_len);
                 // parse buffer
                 switch (parsing_state) {
                 //--XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -153,13 +147,13 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                                 parsing_state = parse_content_disposition;
                             }
                         } else {
-                            if (remaining >= 4) {
-                                esp3d_log_e("Error parsing boundary");
+                            if (notProcessed > 4) {
+                                esp3d_log_e("Error parsing boundary %ld, %c %d", notProcessed, packet[pIndex], packet[pIndex]);
                                 esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
                                 hasError = true;
                             } else {
                                 if (packet[pIndex]== '-' || packet[pIndex]== '\r' || packet[pIndex]== '\n') {
-                                    esp3d_log("End of boundary body");
+                                    //esp3d_log("End of boundary body");
                                 } else {
                                     esp3d_log_e("Error parsing end boundary remaining: %d", remaining);
                                     esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
@@ -311,9 +305,9 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                     }
                     break;
                 case parse_data_file:
-                    totalRead++;
+                    //esp3d_log("Parsing %d:  char %d:%c", pIndex, packet[pIndex], packet[pIndex]);
                     if (uploadState == upload_file_start) {
-                        esp3d_log_w("Upload Start");
+                        esp3d_log("File part Start");
                         //if path and path not visible in filenameValue
                         //re-generate filenameValue with path
                         if (esp3dHttpService.hasArg(req,"path")) {
@@ -345,6 +339,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                     }
 
                     if (packet[pIndex]==boundaryString[boundaryCursor]) {
+                        //esp3d_log("Boundary index %d found", boundaryCursor);
                         boundaryCursor++;
                         //this is boundary string but not final one
                         if (boundaryCursor==boundaryString.length()) {
@@ -354,16 +349,20 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                         }
                     } else {
                         if (boundaryCursor==0) {
+                            //esp3d_log("Look data %d %d", packet[pIndex], packet[pIndex]);
                             packetWrite[indexPacketWrite]=packet[pIndex];
                             indexPacketWrite++;
                         } else {
-                            if (packet[pIndex]=='-' && remaining<4) {
+                            //esp3d_log("it is not data %d %d and left %ld", packet[pIndex], packet[pIndex], notProcessed);
+                            if (packet[pIndex]=='-' && notProcessed<4) {
+                                esp3d_log("End of transfert found");
                                 uploadState = upload_file_end;
                                 parsing_state = parse_boundary;
                             } else {
                                 //the data looks like begining of boundary but it is not finalized
                                 //so copy boundary part to write buffer
                                 //can be /r/n of the file content and any additional data identical to boundary start part
+                                //esp3d_log("It is data but see as boundary so drop boundary part");
                                 for (uint c= 0; c<boundaryCursor && !hasError; c++) {
                                     packetWrite[indexPacketWrite]=boundaryString[c];
                                     indexPacketWrite++;
@@ -380,14 +379,14 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                                 //reprocess current char with new context
                                 boundaryCursor=0;
                                 pIndex--;
+                                notProcessed++;
+                                //esp3d_log("Revert notprocess to %ld", notProcessed);
                                 continue;
                             }
                         }
-
                     }
-
                     if (indexPacketWrite==post_upload_ctx->packetWriteSize || (uploadState == upload_file_end && indexPacketWrite>0)) {
-
+                        //esp3d_log("Write %d bytes", indexPacketWrite);
                         if (post_upload_ctx->writeFn) {
                             if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)packetWrite, indexPacketWrite, upload_file_write, fileName.c_str(), fileSize)) {
                                 esp3d_log_e("Error writing file invalid");
@@ -398,7 +397,6 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                     }
 
                     if (uploadState == upload_file_end) {
-                        esp3d_log_w("totalRead got %d", totalRead);
                         //send end of file
                         if (post_upload_ctx->writeFn) {
                             if (ESP_OK!=post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_end, fileName.c_str(), fileSize)) {
@@ -435,8 +433,8 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
         free(packetWrite);
         packetWrite = nullptr;
     }
-
-    if (remaining == 0 && !hasError) {
+    esp3d_log("Upload done : %s, bytes not processed :%ld ", hasError?"Error":"Success", notProcessed);
+    if (notProcessed <= 0 && !hasError) {
         // it is last boundary we assume the 4 last chars are `--\r\n`
         // at this stage if not the case it is not really an issue anymore
         esp3d_log("Now go to new request handle");
@@ -446,6 +444,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
 #endif // ESP3D_TFT_BENCHMARK
         return (post_upload_ctx->nextHandler(req));
     }
-
+    //send abort state to writefn
+    post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_aborted,  fileName.c_str(), fileSize);
     return httpd_resp_send_500(req);
 }

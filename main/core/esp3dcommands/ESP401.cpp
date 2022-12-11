@@ -35,6 +35,7 @@ void Esp3DCommands::ESP401(int cmd_params_pos,esp3d_msg_t * msg)
     (void)requestId;
     msg->target = target;
     msg->origin = ESP3D_COMMAND;
+    msg->type = msg_unique;
     bool json = hasTag (msg,cmd_params_pos,"json");
     std::string tmpstr;
     bool hasError = false;
