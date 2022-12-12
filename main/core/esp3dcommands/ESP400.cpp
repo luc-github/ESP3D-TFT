@@ -38,6 +38,24 @@ const char * RadioModeValues [] = { "0",
                                     "3"
                                   };
 
+const char * FirmwareLabels [] = { "Unknown",
+                                   "Grbl",
+                                   "Marlin",
+                                   "Smoothieware",
+                                   "Repetier",
+                                   "grblHAL",
+                                   "HP_GL"
+                                 };
+
+const char * FirmwareValues [] = { "0",
+                                   "10",
+                                   "20",
+                                   "40",
+                                   "50",
+                                   "80",
+                                   "90"
+                                 };
+
 const char * IpModeLabels [] = { "dhcp", "static"};
 const char * IpModeValues [] = { "0", "1"};
 
@@ -83,6 +101,11 @@ void Esp3DCommands::ESP400(int cmd_params_pos,esp3d_msg_t * msg)
     }
     //Baud rate (first item)
     if (!dispatchSetting(json,"system/system",esp3d_baud_rate, "baud", BaudRateList, BaudRateList, sizeof(BaudRateList)/sizeof(char*), -1, -1,-1, nullptr, true,target,requestId,true)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+
+    //Target Firmware
+    if (!dispatchSetting(json,"system/system",esp3d_target_firmware, "targetfw", FirmwareValues, FirmwareLabels, sizeof(FirmwareValues)/sizeof(char*), -1, -1,-1, nullptr, false,target,requestId)) {
         esp3d_log_e("Error sending response to clients");
     }
 

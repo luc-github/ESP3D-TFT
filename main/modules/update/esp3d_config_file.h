@@ -1,5 +1,5 @@
 /*
-  esp3d_version
+  esp3d_config_file
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -20,10 +20,37 @@
 
 #pragma once
 #include <stdio.h>
+#include <string>
+#include <functional>
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define ESP3D_TFT_VERSION "1.0.0.a3"
+
+typedef std::function<bool(const char*, const char*,const char*)> TProcessingFunction;
+
+class Esp3DConfigFile final
+{
+public:
+    Esp3DConfigFile(const char * path,  TProcessingFunction fn, const char * scrambledpath =nullptr,const char ** protectedkeys=nullptr);
+    ~Esp3DConfigFile();
+    char * trimSpaces(char * line, uint8_t maxsize=0);
+    bool isComment(char * line);
+    bool isSection(char * line);
+    bool isValue(char * line);
+    char * getSectionName(char * line);
+    char * getKeyName(char * line);
+    char * getValue(char * line);
+    bool processFile();
+    bool revokeFile();
+private:
+    bool isScrambleKey(const char *key, const char * str);
+    std::string _filename;
+    std::string _scrambledFilename;
+    const char ** _protectedkeys;
+    TProcessingFunction _pfunction;
+};
 
 #ifdef __cplusplus
 } // extern "C"

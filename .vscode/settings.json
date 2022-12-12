@@ -1,5 +1,5 @@
 {
-    "idf.portWin": "COM8",
+    "idf.portWin": "COM6",
     "idf.flashType": "UART",
     "idf.adapterTargetName": "esp32s3",
     "idf.openOcdConfigs": [
@@ -56,6 +56,16 @@
         "xmemory": "cpp",
         "xstddef": "cpp",
         "xtr1common": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "functional": "cpp",
+        "iomanip": "cpp",
+        "ios": "cpp",
+        "iostream": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "sstream": "cpp",
+        "strstream": "cpp",
+        "unordered_map": "cpp",
+        "xhash": "cpp"
     }
 }

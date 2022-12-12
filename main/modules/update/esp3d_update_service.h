@@ -20,6 +20,7 @@
 
 #pragma once
 #include <stdio.h>
+#include "esp3d_settings.h"
 
 
 #ifdef __cplusplus
@@ -36,10 +37,16 @@ public:
     void handle();
     void end();
     bool updateFW();
+    bool updateConfig();
     bool canUpdate();
     size_t maxUpdateSize();
+    static bool processingFileFunction (const char * section, const char * key, const char * value);
 private:
-
+    bool _canUpdate;
+    size_t _maxUpdateSize;
+    static bool processString(const char** keysval, const esp3d_setting_index_t * keypos, const size_t size, const char * key, const char * value, char & T, esp3d_setting_index_t & P );
+    static bool processInt(const char** keysval, const esp3d_setting_index_t * keypos, const size_t size, const char * key, const char * value, char & T, esp3d_setting_index_t & P,  uint32_t & v);
+    static bool processBool(const char** keysval, const esp3d_setting_index_t * keypos, const size_t size, const char * key, const char * value, char & T, esp3d_setting_index_t & P,  uint8_t & b);
 };
 
 extern Esp3DUpdateService esp3dUpdateService;
