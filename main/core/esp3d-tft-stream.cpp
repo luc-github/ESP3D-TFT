@@ -76,6 +76,15 @@ Esp3DTFTStream::~Esp3DTFTStream()
 
 }
 
+esp3d_target_firmware_index_t Esp3DTFTStream::getTargetFirmware(bool fromSettings)
+{
+    if (fromSettings) {
+        _target_firmware = (esp3d_target_firmware_index_t)esp3dTFTsettings.readByte(esp3d_target_firmware);
+    }
+
+    return _target_firmware;
+}
+
 bool Esp3DTFTStream::begin()
 {
     //Task creation
@@ -87,7 +96,8 @@ bool Esp3DTFTStream::begin()
 #if ESP3D_TFT_LOG
         vTaskDelay(pdMS_TO_TICKS(100));
 #endif //ESP3D_TFT_LOG
-//now begin serialClient
+        getTargetFirmware(true);
+        //now begin serialClient
         if(serialClient.begin()) {
             return true;
         }

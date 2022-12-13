@@ -123,7 +123,7 @@ bool Esp3DCommands::dispatchSetting(bool json,const char * filter, esp3d_setting
         value="Not supported";
         break;
     default: //String
-        if (index==esp3d_sta_password || index==esp3d_ap_password) { //hide passwords using  ********
+        if (index==esp3d_sta_password || index==esp3d_ap_password || index==esp3d_notification_token_1 || index==esp3d_notification_token_2 ) { //hide passwords using  ********
             value=HIDDEN_SETTING_VALUE;
         } else {
             value=esp3dTFTsettings.readString(index, out_str, elementSetting->size);
@@ -699,6 +699,9 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
         break;
     case 444:
         ESP444(cmd_params_pos, msg);
+        break;
+    case 610:
+        ESP610(cmd_params_pos, msg);
         break;
     case 710:
         ESP710(cmd_params_pos, msg);

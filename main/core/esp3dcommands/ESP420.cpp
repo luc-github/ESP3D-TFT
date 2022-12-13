@@ -37,6 +37,7 @@
 #include "network/esp3d_network.h"
 #include "http/esp3d_http_service.h"
 #include "update/esp3d_update_service.h"
+#include "notifications/esp3d_notifications_service.h"
 #define COMMAND_ID 420
 
 //Get ESP current status
@@ -78,7 +79,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     }
 
     //ESP3D-TFT-VERSION
-    if (!dispatchIdValue(json,"FW Ver", ESP3D_TFT_VERSION, target,requestId)) {
+    if (!dispatchIdValue(json,"FW ver", ESP3D_TFT_VERSION, target,requestId)) {
         return;
     }
 
@@ -323,7 +324,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
             }
         }
     }
-//bt
+    //bt
     if (esp3dNetwork.getMode()==esp3d_bluetooth_serial ) {
         tmpstr="ON";
     } else {
@@ -333,6 +334,19 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     tmpstr+=esp3dNetwork.getBTMac();
     tmpstr+=")";
     if ( !dispatchIdValue(json,"bt",tmpstr.c_str(), target,requestId)) {
+        return;
+    }
+
+    //Notifications
+    if (!esp3dNotificationsService.started() || esp3dNotificationsService.getType()==esp3d_no_notification) {
+        tmpstr="OFF";
+    } else {
+        tmpstr="ON (";
+        tmpstr+=esp3dNotificationsService.getTypeString();
+        tmpstr+=")";
+    }
+
+    if (!dispatchIdValue(json,"notification",tmpstr.c_str(), target,requestId)) {
         return;
     }
     //end of list

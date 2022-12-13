@@ -29,6 +29,9 @@ extern "C" {
 #define SIZE_OF_SETTING_SSID_ID 32
 #define SIZE_OF_SETTING_SSID_PWD 64
 #define SIZE_OF_SETTING_HOSTNAME 32
+#define SIZE_OF_SETTING_NOFIFICATION_T1 64
+#define SIZE_OF_SETTING_NOFIFICATION_T2 64
+#define SIZE_OF_SETTING_NOFIFICATION_TS 128
 #define HIDDEN_SETTING_VALUE "********"
 
 typedef enum  {
@@ -55,6 +58,11 @@ typedef enum  {
     esp3d_setup,
     esp3d_target_firmware,
     esp3d_check_update_on_sd,
+    esp3d_notification_type,
+    esp3d_auto_notification,
+    esp3d_notification_token_1,
+    esp3d_notification_token_2,
+    esp3d_notification_token_setting,
     last_esp3d_setting_index_t
 } esp3d_setting_index_t;
 
@@ -70,6 +78,8 @@ typedef enum  {
     esp3d_hp_gl             = 90,
     last_esp3d_target_firmware_index_t
 } esp3d_target_firmware_index_t;
+
+
 
 typedef enum  {
     esp3d_byte, //byte

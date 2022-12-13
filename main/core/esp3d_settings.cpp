@@ -30,6 +30,7 @@
 #include "esp3d_log.h"
 #include "serial_def.h"
 #include "network/esp3d_network.h"
+#include "notifications/esp3d_notifications_service.h"
 
 #define STORAGE_NAME "ESP3D_TFT"
 #define SETTING_VERSION "ESP3D_TFT-V3.0.1"
@@ -71,7 +72,11 @@ const esp3d_setting_desc_t Esp3DSettingsData [] = {
     {esp3d_setup, esp3d_byte, 1,"0"},
     {esp3d_target_firmware, esp3d_byte, 1,"0"},
     {esp3d_check_update_on_sd, esp3d_byte, 1,"1"},
-
+    {esp3d_notification_type, esp3d_byte, 1,"0"},
+    {esp3d_auto_notification, esp3d_byte, 1,"0"},
+    {esp3d_notification_token_1,esp3d_string, SIZE_OF_SETTING_NOFIFICATION_T1,""},
+    {esp3d_notification_token_2,esp3d_string, SIZE_OF_SETTING_NOFIFICATION_T2,""},
+    {esp3d_notification_token_setting,esp3d_string, SIZE_OF_SETTING_NOFIFICATION_TS,""},
 };
 
 bool  Esp3DSettings::isValidStringSetting(const char* value, esp3d_setting_index_t settingElement)
@@ -96,6 +101,12 @@ bool  Esp3DSettings::isValidStringSetting(const char* value, esp3d_setting_index
     case esp3d_hostname:
         esp3d_log("Checking hostname validity");
         return  std::regex_match (value, std::regex("^[a-zA-Z0-9]{1}[a-zA-Z0-9\\-]{0,31}$"));//any string alphanumeric or '-' from 1 to 32
+    case esp3d_notification_token_1:
+        return  std::regex_match (value, std::regex("^.{0,64}$")); //any string from 0 to 64
+    case esp3d_notification_token_2:
+        return  std::regex_match (value, std::regex("^.{0,64}$")); //any string from 0 to 64
+    case esp3d_notification_token_setting:
+        return  std::regex_match (value, std::regex("^.{0,128}$")); //any string from 0 to 128
     default:
         return false;
     }
@@ -144,7 +155,13 @@ bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t set
     case esp3d_setup:
     case esp3d_http_on:
     case esp3d_radio_boot_mode:
+    case esp3d_auto_notification:
         if(value==(uint8_t)esp3d_state_off || value==(uint8_t)esp3d_state_on) {
+            return true;
+        }
+        break;
+    case esp3d_notification_type:
+        if(value==(uint8_t)esp3d_no_notification || value==(uint8_t)esp3d_pushover_notification || value==(uint8_t)esp3d_email_notification || value==(uint8_t)esp3d_line_notification || value==(uint8_t)esp3d_telegram_notification || value==(uint8_t)esp3d_ifttt_notification) {
             return true;
         }
         break;

@@ -73,6 +73,7 @@ public:
     void ESP410(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP420(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP444(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP610(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP710(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP720(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP730(int cmd_params_pos,esp3d_msg_t * msg);

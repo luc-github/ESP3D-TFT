@@ -20,6 +20,7 @@
 
 #pragma once
 #include <stdio.h>
+#include "esp3d_settings.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -32,9 +33,11 @@ public:
     bool begin();
     void handle();
     bool end();
-
+    esp3d_target_firmware_index_t getTargetFirmware(bool fromSettings=false);
 private:
     bool _started;
+    esp3d_target_firmware_index_t _target_firmware;
+
 };
 
 extern Esp3DTFTStream esp3dTFTstream;

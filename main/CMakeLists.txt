@@ -11,6 +11,7 @@ set(SOURCES .
     modules/filesystem/sd
     modules/filesystem/flash
     modules/update
+    modules/notifications
 )
 set(INCLUDES .
     core/includes

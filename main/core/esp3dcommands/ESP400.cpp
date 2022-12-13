@@ -55,6 +55,21 @@ const char * FirmwareValues [] = { "0",
                                    "80",
                                    "90"
                                  };
+const char * NotificationsLabels [] = { "none",
+                                        "pushover",
+                                        "email",
+                                        "line",
+                                        "telegram",
+                                        "ifttt"
+                                      };
+
+const char * NotificationsValues [] = { "0",
+                                        "1",
+                                        "2",
+                                        "3",
+                                        "4",
+                                        "5"
+                                      };
 
 const char * IpModeLabels [] = { "dhcp", "static"};
 const char * IpModeValues [] = { "0", "1"};
@@ -194,6 +209,29 @@ void Esp3DCommands::ESP400(int cmd_params_pos,esp3d_msg_t * msg)
         esp3d_log_e("Error sending response to clients");
     }
 
+    //Notifications type
+    if (!dispatchSetting(json,"service/notification",esp3d_notification_type, "notification", NotificationsValues, NotificationsLabels,sizeof(NotificationsValues)/sizeof(char*), -1, -1,-1, nullptr, false,target,requestId)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+
+    //Auto notifications
+    if (!dispatchSetting(json,"service/notification",esp3d_auto_notification, "auto notif",YesNoValues, YesNoLabels, sizeof(YesNoValues)/sizeof(char*),-1,-1,-1, nullptr, false,target,requestId)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+
+    //Notification token 1
+    if (!dispatchSetting(json,"service/notification",esp3d_notification_token_1, "t1", nullptr, nullptr, SIZE_OF_SETTING_NOFIFICATION_T1, SIZE_OF_SETTING_NOFIFICATION_T1, 0,-1, nullptr, false,target,requestId)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+    //Notification token 2
+    if (!dispatchSetting(json,"service/notification",esp3d_notification_token_2, "t2", nullptr, nullptr, SIZE_OF_SETTING_NOFIFICATION_T2, SIZE_OF_SETTING_NOFIFICATION_T2, 0,-1, nullptr, false,target,requestId)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+
+    //Notification token setting
+    if (!dispatchSetting(json,"service/notification",esp3d_notification_token_setting, "ts", nullptr, nullptr, SIZE_OF_SETTING_NOFIFICATION_TS, SIZE_OF_SETTING_NOFIFICATION_TS, 0,-1, nullptr, false,target,requestId)) {
+        esp3d_log_e("Error sending response to clients");
+    }
 
 #if defined(ESP3D_SD_IS_SPI) && ESP3D_SD_IS_SPI
     //SPI Divider factor

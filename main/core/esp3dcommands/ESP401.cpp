@@ -23,6 +23,8 @@
 #include "esp3d_settings.h"
 #include "authentication/esp3d_authentication.h"
 #include "filesystem/esp3d_sd.h"
+#include "notifications/esp3d_notifications_service.h"
+#include "esp3d-tft-stream.h"
 #define COMMAND_ID 401
 
 //Set EEPROM setting
@@ -54,34 +56,28 @@ void Esp3DCommands::ESP401(int cmd_params_pos,esp3d_msg_t * msg)
     std::string settingValue = get_param (msg, cmd_params_pos,"V=");
     esp3d_log("Got P=%s T=%s V=%s",settingIndex.c_str(),settingType.c_str(),  settingValue.c_str());
     //basic sanity check - do we get all parameters
-    if (settingIndex.length()==0 || settingValue.length()==0 || settingType.length()!=1) {
-        esp3d_log("Got P=%d T=%d V=%d",settingIndex.length(),settingType.length(),  settingValue.length());
+    if (settingIndex.length()==0  || settingType.length()!=1) {
+        esp3d_log_e("Invalid parameter P or T");
         hasError = true;
     } else {
         //check parameters are correct
+        uint8_t valueb =0;
+        uint32_t value32=0;
         esp3d_setting_index_t index_setting = (esp3d_setting_index_t) atoi(settingIndex.c_str ());
         const esp3d_setting_desc_t * settingPtr= esp3dTFTsettings.getSettingPtr(index_setting);
         if (!settingPtr) {
             hasError = true;
             error_msg= "Unknown setting";
         } else {
+
             switch (settingType[0]) {
             case 'B':
                 if (settingPtr->type == esp3d_byte) {
-                    uint8_t value = (uint8_t)atoi(settingValue.c_str());
-                    if (esp3dTFTsettings.isValidByteSetting(value, index_setting)) {
-                        if (!esp3dTFTsettings.writeByte(index_setting, value)) {
+                    valueb = (uint8_t)atoi(settingValue.c_str());
+                    if (esp3dTFTsettings.isValidByteSetting(valueb, index_setting)) {
+                        if (!esp3dTFTsettings.writeByte(index_setting, valueb)) {
                             hasError = true;
                             error_msg= "Failed set value";
-                        } else {
-                            //hot change setting if any
-                            switch(index_setting) {
-                            case esp3d_spi_divider:
-                                sd.setSPISpeedDivider(value);
-                                break;
-                            default:
-                                break;
-                            }
                         }
                     } else {
                         hasError = true;
@@ -94,17 +90,11 @@ void Esp3DCommands::ESP401(int cmd_params_pos,esp3d_msg_t * msg)
                 break;
             case 'I':
                 if (settingPtr->type == esp3d_integer) {
-                    uint32_t value = (uint32_t)atoi(settingValue.c_str());
-                    if (esp3dTFTsettings.isValidIntegerSetting(value, index_setting)) {
-                        if (!esp3dTFTsettings.writeUint32(index_setting, value)) {
+                    value32 = (uint32_t)atoi(settingValue.c_str());
+                    if (esp3dTFTsettings.isValidIntegerSetting(value32, index_setting)) {
+                        if (!esp3dTFTsettings.writeUint32(index_setting, value32)) {
                             hasError = true;
                             error_msg= "Failed set value";
-                        } else {
-                            //hot change setting if any
-                            switch(index_setting) {
-                            default:
-                                break;
-                            }
                         }
                     } else {
                         hasError = true;
@@ -121,12 +111,6 @@ void Esp3DCommands::ESP401(int cmd_params_pos,esp3d_msg_t * msg)
                         if (!esp3dTFTsettings.writeString(index_setting, settingValue.c_str())) {
                             hasError = true;
                             error_msg= "Failed set value";
-                        } else {
-                            //hot change setting if any
-                            switch(index_setting) {
-                            default:
-                                break;
-                            }
                         }
                     } else {
                         hasError = true;
@@ -144,12 +128,6 @@ void Esp3DCommands::ESP401(int cmd_params_pos,esp3d_msg_t * msg)
                         if (!esp3dTFTsettings.writeIPString(index_setting, settingValue.c_str())) {
                             hasError = true;
                             error_msg= "Failed set value";
-                        } else {
-                            //hot change setting if any
-                            switch(index_setting) {
-                            default:
-                                break;
-                            }
                         }
                     } else {
                         hasError = true;
@@ -181,7 +159,28 @@ void Esp3DCommands::ESP401(int cmd_params_pos,esp3d_msg_t * msg)
                 break;
             }
         }
+        // hot changes
+        if (!hasError) {
+            switch(index_setting) {
+            case esp3d_spi_divider:
+                sd.setSPISpeedDivider(valueb);
+                break;
+            case esp3d_notification_type:
+            case esp3d_auto_notification:
+            case esp3d_notification_token_1:
+            case esp3d_notification_token_2:
+            case esp3d_notification_token_setting:
+                esp3dNotificationsService.begin();
+                break;
+            case esp3d_target_firmware:
+                esp3dTFTstream.getTargetFirmware(true);
+                break;
+            default:
+                break;
+            }
+        }
     }
+
     if (hasError) {
         if (json) {
             tmpstr = "{\"cmd\":\"401\",\"status\":\"error\",\"data\":{\"error\":\"";

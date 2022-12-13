@@ -25,6 +25,7 @@
 #include "esp3d_settings.h"
 #include "esp3d_commands.h"
 #include "http/esp3d_http_service.h"
+#include "notifications/esp3d_notifications_service.h"
 
 Esp3DNetworkServices esp3dNetworkServices;
 
@@ -38,7 +39,7 @@ Esp3DNetworkServices::~Esp3DNetworkServices() {}
 bool Esp3DNetworkServices::begin()
 {
     esp3d_log("Starting Services");
-    _started = esp3dHttpService.begin();
+    _started = esp3dHttpService.begin() && esp3dNotificationsService.begin();
     return _started;
 }
 

@@ -27,6 +27,7 @@
 #include "freertos/task.h"
 #include "filesystem/esp3d_sd.h"
 #include "network/esp3d_network.h"
+#include "notifications/esp3d_notifications_service.h"
 #include "esp3d_config_file.h"
 
 #define CONFIG_FILE "/esp3dcnf.ini"
@@ -92,9 +93,9 @@ const char * ServstringKeysVal[] = {
 //   "Time_server3",
 //  "ADMIN_PASSWORD",
 //  "USER_PASSWORD",
-//   "NOTIF_TOKEN1",
-//   "NOTIF_TOKEN2",
-//    "NOTIF_TOKEN_Settings"
+    "NOTIF_TOKEN1",
+    "NOTIF_TOKEN2",
+    "NOTIF_TOKEN_Settings"
 };
 
 const esp3d_setting_index_t ServstringKeysPos[] = {
@@ -103,9 +104,9 @@ const esp3d_setting_index_t ServstringKeysPos[] = {
 //   ESP_TIME_SERVER3,
 //   ESP_ADMIN_PWD,
 //   ESP_USER_PWD,
-//   ESP_NOTIFICATION_TOKEN1,
-//   ESP_NOTIFICATION_TOKEN2,
-//   ESP_NOTIFICATION_SETTINGS
+    esp3d_notification_token_1,
+    esp3d_notification_token_2,
+    esp3d_notification_token_setting
 } ;
 
 //Integer values
@@ -134,6 +135,7 @@ const esp3d_setting_index_t ServintKeysPos[] = {
 //Boolean values
 const char * ServboolKeysVal[] = {
     "HTTP_active",
+    "AUTONOTIFICATION",
     //"TELNET_active",
     //"WebSocket_active",
     //"WebDav_active",
@@ -146,6 +148,7 @@ const char * ServboolKeysVal[] = {
 
 const esp3d_setting_index_t ServboolKeysPos[] = {
     esp3d_http_on,
+    esp3d_auto_notification,
     //ESP_TELNET_ON,
     //ESP_WEBSOCKET_ON,
     //ESP_WEBDAV_ON,
@@ -556,28 +559,28 @@ bool Esp3DUpdateService::processingFileFunction (const char * section, const cha
             }
         }
         //Notification type None / PushOver / Line / Email / Telegram / IFTTT
-        /*  if (!done) {
-              if (strcasecmp("NOTIF_TYPE",key)==0) {
-                  T='B';
-                  P=ESP_NOTIFICATION_TYPE;
-                  done = true;
-                  if (strcasecmp("None",value)==0) {
-                      b=ESP_NO_NOTIFICATION;
-                  } else if (strcasecmp("PushOver",value)==0) {
-                      b=ESP_PUSHOVER_NOTIFICATION;
-                  } else if (strcasecmp("Line",value)==0) {
-                      b=ESP_LINE_NOTIFICATION;
-                  } else if (strcasecmp("Email",value)==0) {
-                      b=ESP_EMAIL_NOTIFICATION;
-                  } else if (strcasecmp("Telegram",value)==0) {
-                      b=ESP_TELEGRAM_NOTIFICATION;
-                  } else if (strcasecmp("IFTTT",value)==0) {
-                      b=ESP_IFTTT_NOTIFICATION;
-                  } else {
-                      P=-1;    //invalide value
-                  }
-              }
-          }*/
+        if (!done) {
+            if (strcasecmp("NOTIF_TYPE",key)==0) {
+                T='B';
+                P=esp3d_notification_type;
+                done = true;
+                if (strcasecmp("None",value)==0) {
+                    b=esp3d_no_notification;
+                } else if (strcasecmp("PushOver",value)==0) {
+                    b=esp3d_pushover_notification;
+                } else if (strcasecmp("Line",value)==0) {
+                    b=esp3d_line_notification;
+                } else if (strcasecmp("Email",value)==0) {
+                    b=esp3d_email_notification;
+                } else if (strcasecmp("Telegram",value)==0) {
+                    b=esp3d_telegram_notification;
+                } else if (strcasecmp("IFTTT",value)==0) {
+                    b=esp3d_ifttt_notification;
+                } else {
+                    P=last_esp3d_setting_index_t;    //invalid value
+                }
+            }
+        }
     } else if (strcasecmp("system",section)==0) {
         if (!done) {
             done = processInt(SysintKeysVal,SysintKeysPos,sizeof(SysintKeysVal)/sizeof(char*),  key, value, T, P, v);
