@@ -85,6 +85,9 @@ elseif(ESP32S3_ZX3D50CE02S_USRC_4832)
     set(TFT_TARGET "ESP32S3_ZX3D50CE02S_USRC_4832")
 endif()
 
+# Add entry point for customizations headers
+add_compile_options("-I${CMAKE_SOURCE_DIR}/customizations")
+
 add_compile_options(-DTFT_TARGET="${TFT_TARGET}")
 project(ESP3D-TFT
     VERSION 1.0

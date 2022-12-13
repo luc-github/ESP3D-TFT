@@ -39,6 +39,7 @@ Esp3DWsService::Esp3DWsService()
     _started = false;
     _server = nullptr;
     _req = nullptr;
+    _currentFd = -1;
 }
 
 Esp3DWsService::~Esp3DWsService() {}
@@ -64,20 +65,21 @@ void Esp3DWsService::end()
     _server = nullptr;
     _started = false;
     _req = nullptr;
+    _currentFd = -1;
 }
 
 esp_err_t Esp3DWsService::onOpen(httpd_req_t *req)
 {
-    int fd = httpd_req_to_sockfd(req);
+    _currentFd = httpd_req_to_sockfd(req);
     _req = req;
     std::string tmpstr = "currentID:";
-    tmpstr+=std::to_string(fd);
+    tmpstr+=std::to_string(_currentFd);
     tmpstr+="\n";
     pushMsgTxt(tmpstr.c_str());
     tmpstr = "activeID:";
-    tmpstr+=std::to_string(fd);
+    tmpstr+=std::to_string(_currentFd);
     tmpstr+="\n";
-    BroadcastTxt(tmpstr.c_str(), fd);
+    BroadcastTxt(tmpstr.c_str(), _currentFd);
     return ESP_OK;
 }
 esp_err_t Esp3DWsService::onMessage(httpd_req_t *req)
@@ -88,7 +90,7 @@ esp_err_t Esp3DWsService::onMessage(httpd_req_t *req)
     /* Set max_len = 0 to get the frame len */
     esp_err_t ret = httpd_ws_recv_frame(req, &ws_pkt, 0);
     if (ret != ESP_OK) {
-        esp3d_log_e("httpd_ws_recv_frame failed to get frame len with %d", ret);
+        esp3d_log_e("httpd_ws_recv_frame failed to get frame len with %s",  esp_err_to_name(ret));
         return ret;
     }
     //esp3d_log("frame len is %d", ws_pkt.len);
@@ -103,7 +105,7 @@ esp_err_t Esp3DWsService::onMessage(httpd_req_t *req)
         /* Set max_len = ws_pkt.len to get the frame payload */
         ret = httpd_ws_recv_frame(req, &ws_pkt, ws_pkt.len);
         if (ret != ESP_OK) {
-            esp3d_log_e("httpd_ws_recv_frame failed with %d", ret);
+            esp3d_log_e("httpd_ws_recv_frame failed with %s",  esp_err_to_name(ret));
             free(buf);
             return ret;
         }
@@ -123,7 +125,9 @@ esp_err_t Esp3DWsService::onMessage(httpd_req_t *req)
 esp_err_t Esp3DWsService::onClose(int fd)
 {
     esp3d_log("ID %d is now closed", fd);
-
+    if (fd ==_currentFd) {
+        _currentFd=-1;
+    }
     return ESP_OK;
 }
 
@@ -159,7 +163,7 @@ esp_err_t Esp3DWsService::pushMsgTxt(const char *msg)
     ws_pkt.type = HTTPD_WS_TYPE_TEXT;
     esp_err_t res = httpd_ws_send_frame(_req, &ws_pkt);
     if (res != ESP_OK) {
-        esp3d_log_e("httpd_ws_send_frame failed with %d", res);
+        esp3d_log_e("httpd_ws_send_frame failed with %s",  esp_err_to_name(res));
     }
     return res;
 }
@@ -176,9 +180,17 @@ esp_err_t Esp3DWsService::pushMsgBin(uint8_t *msg, size_t len)
     ws_pkt.len = len;
     esp_err_t res = httpd_ws_send_frame(_req, &ws_pkt);
     if (res != ESP_OK) {
-        esp3d_log_e("httpd_ws_send_frame failed with %d", res);
+        esp3d_log_e("httpd_ws_send_frame failed with %s",  esp_err_to_name(res));
     }
     return res;
+}
+
+esp_err_t Esp3DWsService::pushNotification(const char *msg)
+{
+    std::string tmp = "NOTIFICATION:";
+    tmp+=msg;
+    tmp+="\n";
+    return pushMsgTxt(_currentFd, tmp.c_str());
 }
 
 esp_err_t Esp3DWsService::pushMsgTxt(int fd, const char *msg)
@@ -188,7 +200,7 @@ esp_err_t Esp3DWsService::pushMsgTxt(int fd, const char *msg)
 
 esp_err_t Esp3DWsService::pushMsgTxt(int fd, uint8_t *msg, size_t len)
 {
-    if (!_started) {
+    if (!_started || fd==-1) {
         return ESP_FAIL;
     }
     httpd_ws_frame_t ws_pkt;
@@ -198,7 +210,7 @@ esp_err_t Esp3DWsService::pushMsgTxt(int fd, uint8_t *msg, size_t len)
     ws_pkt.len = len;
     esp_err_t res = httpd_ws_send_frame_async(_server, fd, &ws_pkt);
     if (res != ESP_OK) {
-        esp3d_log_e("httpd_ws_send_frame failed with %d", res);
+        esp3d_log_e("httpd_ws_send_frame failed with %s", esp_err_to_name(res));
     }
     return res;
 }
@@ -214,7 +226,7 @@ esp_err_t Esp3DWsService::pushMsgBin(int fd, uint8_t *msg, size_t len)
     ws_pkt.len = len;
     esp_err_t res = httpd_ws_send_frame_async(_server, fd, &ws_pkt);
     if (res != ESP_OK) {
-        esp3d_log_e("httpd_ws_send_frame failed with %d", res);
+        esp3d_log_e("httpd_ws_send_frame failed with %s",  esp_err_to_name(res));
     }
     return res;
 }

@@ -26,6 +26,7 @@
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "websocket/esp3d_ws_service.h"
 
 #define PUSHOVERTIMEOUT 5000
 #define PUSHOVERSERVER "api.pushover.net"
@@ -135,10 +136,6 @@ bool Esp3DNotificationsService::begin()
     }
     _started = res;
     return _started;
-
-
-
-
 }
 void Esp3DNotificationsService::handle() {}
 void Esp3DNotificationsService::end()
@@ -155,8 +152,12 @@ void Esp3DNotificationsService::end()
 }
 bool Esp3DNotificationsService::sendMSG(const char * title, const char * message)
 {
+    esp3dWsWebUiService.pushNotification(message);
+
+//TODO according notification type
     return true;
 }
+
 const char * Esp3DNotificationsService::getTypeString()
 {
     switch(_notificationType) {

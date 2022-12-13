@@ -190,6 +190,10 @@ void Esp3DCommands::ESP610(int cmd_params_pos,esp3d_msg_t * msg)
             hasError=true;
             error_msg="Invalid parameter";
         }
+        if (!hasError) {
+            //apply changes without restarting the board
+            esp3dNotificationsService.begin();
+        }
     }
     if(!dispatchAnswer(msg,COMMAND_ID, json, hasError, hasError?error_msg.c_str():ok_msg.c_str())) {
         esp3d_log_e("Error sending response to clients");

@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <string>
 #include "esp3d_settings.h"
-
+#include "notifications/customizations.h"
 
 #ifdef __cplusplus
 extern "C" {

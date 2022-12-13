@@ -50,6 +50,11 @@ public:
     esp_err_t onClose(int fd);
     void closeClients();
     void enableOnly (int fd);
+    int getCurrentFd()
+    {
+        return _currentFd;
+    }
+    esp_err_t pushNotification(const char *msg);
     esp_err_t add_client(int fd);
     esp_err_t remove_client(int fd);
     esp_err_t pushMsgTxt(const char *msg);
@@ -68,6 +73,7 @@ public:
 private:
     httpd_handle_t _server;
     httpd_req_t *_req;
+    int _currentFd;
     bool _started;
 };
 
