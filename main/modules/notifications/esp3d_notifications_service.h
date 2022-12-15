@@ -23,6 +23,7 @@
 #include <string>
 #include "esp3d_settings.h"
 #include "notifications/customizations.h"
+#include "esp_http_client.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,6 +48,11 @@ public:
     void handle();
     void end();
     bool sendMSG(const char * title, const char * message);
+    bool sendPushoverMSG(const char * title, const char * message);
+    bool sendEmailMSG(const char * title, const char * message);
+    bool sendLineMSG(const char * title, const char * message);
+    bool sendTelegramMSG(const char * title, const char * message);
+    bool sendIFTTTMSG(const char * title, const char * message);
     const char * getTypeString();
     esp3d_notification_type_t getType()
     {

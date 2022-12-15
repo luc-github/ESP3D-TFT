@@ -50,6 +50,9 @@ bool Esp3DWsService::begin(httpd_handle_t  serverHandle)
     end();
     _server = serverHandle;
     _started= true;
+    if (_started) {
+        esp3d_log("Ws Service Started");
+    }
     return _started;
 }
 
