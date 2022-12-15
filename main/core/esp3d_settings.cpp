@@ -91,22 +91,24 @@ bool  Esp3DSettings::isValidStringSetting(const char* value, esp3d_setting_index
     if (strlen(value)>settingPtr->size) {
         return false;
     }
+    //use strlen because it crash with regex if value is longer than 41 characters
+    size_t len = strlen(value);
     switch(settingElement) {
     case esp3d_ap_ssid:
     case esp3d_sta_ssid:
-        return  std::regex_match (value, std::regex("^.{1,32}$")); //any string from 1 to 32
+        return  (len>0 && len<=32); //any string from 1 to 32
     case esp3d_sta_password:
     case esp3d_ap_password:
-        return  std::regex_match (value, std::regex("^$|^.{8,64}$"));    // 0  or 8 to size no other constraint
+        return (len==0 || (len>=8 && len<=64)); //any string from 8 to 64 or 0
     case esp3d_hostname:
         esp3d_log("Checking hostname validity");
         return  std::regex_match (value, std::regex("^[a-zA-Z0-9]{1}[a-zA-Z0-9\\-]{0,31}$"));//any string alphanumeric or '-' from 1 to 32
     case esp3d_notification_token_1:
-        return  std::regex_match (value, std::regex("^.{0,64}$")); //any string from 0 to 64
+        return  len<=64; //any string from 0 to 64
     case esp3d_notification_token_2:
-        return  std::regex_match (value, std::regex("^.{0,64}$")); //any string from 0 to 64
+        return len<=64;  //any string from 0 to 64
     case esp3d_notification_token_setting:
-        return  std::regex_match (value, std::regex("^.{0,128}$")); //any string from 0 to 128
+        return  len<=128;  //any string from 0 to 128
     default:
         return false;
     }
@@ -474,7 +476,7 @@ const char* Esp3DSettings::readString(esp3d_setting_index_t index, char* out_str
                     } else {
                         esp3d_log_w("Got error %d %s", err, esp_err_to_name(err));
                         if (err == ESP_ERR_NVS_NOT_FOUND) {
-                            esp3d_log_w("Not found value, use default %s", query->defaultval);
+                            esp3d_log_w("Not found value for %s, use default %s", key.c_str(), query->defaultval);
                             strcpy(out_str,query->defaultval);
                             if (haserror) {
                                 *haserror =false;
@@ -557,6 +559,7 @@ bool Esp3DSettings::writeIPString (esp3d_setting_index_t index, const char * byt
 
 bool Esp3DSettings::writeString (esp3d_setting_index_t index, const char * byte_buffer )
 {
+    esp3d_log("write setting %d : (%d bytes) %s ",index,strlen(byte_buffer),byte_buffer);
     const esp3d_setting_desc_t * query = getSettingPtr(index);
     if (query ) {
         if (query->type== esp3d_string && strlen(byte_buffer)<= query->size) {
@@ -567,10 +570,17 @@ bool Esp3DSettings::writeString (esp3d_setting_index_t index, const char * byte_
             } else {
                 std::string key = "p_"+std::to_string((uint)query->index);
                 if (handle->set_string(key.c_str(), byte_buffer) == ESP_OK) {
+                    esp3d_log("Write success");
                     return (handle->commit()== ESP_OK);
+                } else {
+                    esp3d_log_e("Write failed");
                 }
             }
+        } else {
+            esp3d_log_e("Incorrect valued");
         }
+    } else {
+        esp3d_log_e("Unknow setting");
     }
     return false;
 }
