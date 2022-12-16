@@ -151,10 +151,10 @@ bool Esp3DHttpService::begin()
     //config.close_fn = close_fn;
     config.lru_purge_enable = true;
 
-
     //start server
     esp3d_log("Starting server on port: '%d'", config.server_port);
-    if (httpd_start(&_server, &config) == ESP_OK) {
+    esp_err_t err = httpd_start(&_server, &config);
+    if (err == ESP_OK) {
         // Set URI handlers
         esp3d_log("Registering URI handlers");
         //favicon.ico
@@ -281,6 +281,8 @@ bool Esp3DHttpService::begin()
         //websocket service
         esp3dWsWebUiService.begin(_server);
         _started = true;
+    } else {
+        esp3d_log_e("Web server start failed %s",esp_err_to_name(err)) ;
     }
     return _started;
 }
