@@ -30,6 +30,17 @@ extern "C" {
 #endif
 
 typedef enum  {
+    esp3d_notification_ok,
+    esp3d_notification_empty_msg,
+    esp3d_notification_invalid_msg,
+    esp3d_notification_invalid_data,
+    esp3d_notification_invalid_url,
+    esp3d_notification_invalid_token1,
+    esp3d_notification_invalid_token2,
+    esp3d_notification_error,
+} esp3d_notification_error_t;
+
+typedef enum  {
     esp3d_no_notification,
     esp3d_pushover_notification,
     esp3d_email_notification,
@@ -71,7 +82,10 @@ public:
         _autonotification = value;
     };
     bool sendAutoNotification(const char * msg);
-
+    esp3d_notification_error_t getLastError()
+    {
+        return _lastError;
+    }
 private:
     bool _started;
     bool _autonotification;
@@ -81,6 +95,7 @@ private:
     std::string _settings;
     std::string _serveraddress;
     std::string _port;
+    esp3d_notification_error_t _lastError;
     bool encodeBase64(const char *data, std::string *result);
     bool getEmailInformationsFromSettings();
 };

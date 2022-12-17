@@ -159,6 +159,7 @@ void Esp3DNotificationsService::end()
     _settings.clear();
     _serveraddress.clear();
     _port.clear();
+    _lastError=esp3d_notification_ok;
 }
 
 bool Esp3DNotificationsService::sendMSG(const char * title, const char * message)
@@ -169,7 +170,11 @@ bool Esp3DNotificationsService::sendMSG(const char * title, const char * message
         formated_message = esp3d_strings::str_replace(formated_message.c_str(), "%ESP_IP%", esp3dNetwork.getLocalIpString());
         formated_message = esp3d_strings::str_replace(formated_message.c_str(), "%ESP_NAME%", esp3dNetwork.getHostName());
     }
-
+    if (formated_message.length()==0) {
+        _lastError = esp3d_notification_empty_msg;
+        esp3d_log_e("Empty notification message");
+        return false;
+    }
     esp3dWsWebUiService.pushNotification(formated_message.c_str());
     if (_started) {
         switch(_notificationType) {
@@ -235,6 +240,7 @@ bool Esp3DNotificationsService::sendLineMSG(const char * title, const char * mes
 {
     if (_token1.length() == 0 ) {
         esp3d_log_e("Token is missing");
+        _lastError=esp3d_notification_invalid_token1;
         return false;
     }
     bool res = true;
@@ -247,6 +253,7 @@ bool Esp3DNotificationsService::sendLineMSG(const char * title, const char * mes
     esp_http_client_handle_t client = esp_http_client_init(&config);
     if (!client) {
         esp3d_log_e("Failed to create http client");
+        _lastError = esp3d_notification_error;
         return false;
     }
     esp3d_log("Client created");
@@ -269,12 +276,22 @@ bool Esp3DNotificationsService::sendLineMSG(const char * title, const char * mes
     esp_err_t err= esp_http_client_perform(client);
     if (err != ESP_OK) {
         esp3d_log_e("Failed to open HTTP connection: %s", esp_err_to_name(err));
+        _lastError = esp3d_notification_error;
         res = false;
     } else {
         uint code =esp_http_client_get_status_code(client);
         if ( code!= 200) {
             esp3d_log_e("Server response: %d", code);
+            if (code==401) {
+                _lastError = esp3d_notification_invalid_token1;
+            } else if (code==404) {
+                _lastError = esp3d_notification_invalid_url;
+            } else  {
+                _lastError = esp3d_notification_invalid_data;
+            }
             res = false;
+        } else {
+            _lastError = esp3d_notification_ok;
         }
     }
     esp_http_client_cleanup(client);
@@ -282,8 +299,14 @@ bool Esp3DNotificationsService::sendLineMSG(const char * title, const char * mes
 }
 bool Esp3DNotificationsService::sendTelegramMSG(const char * title, const char * message)
 {
+
     if (_token1.length() == 0 || _token2.length()==0) {
         esp3d_log_e("Some token is missing");
+        if (_token1.length() == 0) {
+            _lastError=esp3d_notification_invalid_token1;
+        } else {
+            _lastError=esp3d_notification_invalid_token2;
+        }
         return false;
     }
     bool res = true;
@@ -296,6 +319,7 @@ bool Esp3DNotificationsService::sendTelegramMSG(const char * title, const char *
     esp_http_client_handle_t client = esp_http_client_init(&config);
     if (!client) {
         esp3d_log_e("Failed to create http client");
+        _lastError = esp3d_notification_error;
         return false;
     }
     esp3d_log("Client created");
@@ -318,15 +342,26 @@ bool Esp3DNotificationsService::sendTelegramMSG(const char * title, const char *
     esp_http_client_set_post_field(client, post_data.c_str(), post_data.length());
     esp3d_log("Try to perform http client: %s", messageUrl.c_str());
     esp_err_t err= esp_http_client_perform(client);
-// esp_err_t err = esp_http_client_open(client, 0);
     if (err != ESP_OK) {
         esp3d_log_e("Failed to open HTTP connection: %s", esp_err_to_name(err));
+        _lastError = esp3d_notification_error;
         res = false;
     } else {
         uint code =esp_http_client_get_status_code(client);
         if ( code!= 200) {
             esp3d_log_e("Server response: %d", code);
+            if (code==401) {
+                _lastError=esp3d_notification_invalid_token1;
+            } else if (code==400) {
+                _lastError=esp3d_notification_invalid_token2;
+            } else if (code==404) {
+                _lastError=esp3d_notification_invalid_url;
+            } else {
+                _lastError =  esp3d_notification_invalid_data;
+            }
             res = false;
+        } else {
+            _lastError = esp3d_notification_ok;
         }
     }
     esp_http_client_cleanup(client);
