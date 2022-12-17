@@ -19,6 +19,7 @@
 */
 
 #pragma once
+/*Notification Title used according notification type*/
 #define ESP3D_NOTIFICATION_TITLE "Hi from ESP3D"
 /* Notification message when online
 * The message that will be sent when the ESP is online
