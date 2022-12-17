@@ -44,7 +44,7 @@ class Esp3DNotificationsService final
 public:
     Esp3DNotificationsService();
     ~Esp3DNotificationsService();
-    bool begin();
+    bool begin(bool sendAutoNotificationMsg =false);
     void handle();
     void end();
     bool sendMSG(const char * title, const char * message);

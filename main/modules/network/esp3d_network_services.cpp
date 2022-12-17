@@ -39,7 +39,7 @@ Esp3DNetworkServices::~Esp3DNetworkServices() {}
 bool Esp3DNetworkServices::begin()
 {
     esp3d_log("Starting Services");
-    _started = esp3dHttpService.begin() && esp3dNotificationsService.begin();
+    _started = esp3dHttpService.begin() && esp3dNotificationsService.begin(true);
     return _started;
 }
 

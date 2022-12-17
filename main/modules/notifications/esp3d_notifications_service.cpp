@@ -82,7 +82,8 @@ bool Esp3DNotificationsService::encodeBase64(const char *data, std::string *resu
 }
 
 Esp3DNotificationsService::~Esp3DNotificationsService() {}
-bool Esp3DNotificationsService::begin()
+
+bool Esp3DNotificationsService::begin(bool sendAutoNotificationMsg)
 {
     esp3d_log("Start notification service");
     bool res = true;
@@ -141,7 +142,9 @@ bool Esp3DNotificationsService::begin()
         _autonotification = esp3dTFTsettings.readByte(esp3d_auto_notification);
     }
     _started = res;
-    sendAutoNotification(ESP3D_NOTIFICATION_ONLINE);
+    if (sendAutoNotificationMsg) {
+        sendAutoNotification(ESP3D_NOTIFICATION_ONLINE);
+    }
     return _started;
 }
 void Esp3DNotificationsService::handle() {}
@@ -230,7 +233,52 @@ bool Esp3DNotificationsService::sendEmailMSG(const char * title, const char * me
 }
 bool Esp3DNotificationsService::sendLineMSG(const char * title, const char * message)
 {
-    return true;
+    if (_token1.length() == 0 ) {
+        esp3d_log_e("Token is missing");
+        return false;
+    }
+    bool res = true;
+    esp_http_client_config_t config;
+    memset(&config, 0, sizeof(esp_http_client_config_t));
+    config.url = _serveraddress.c_str();
+    config.port = atoi(_port.c_str());
+    config.crt_bundle_attach = esp_crt_bundle_attach,
+    config.transport_type = HTTP_TRANSPORT_OVER_SSL;
+    esp_http_client_handle_t client = esp_http_client_init(&config);
+    if (!client) {
+        esp3d_log_e("Failed to create http client");
+        return false;
+    }
+    esp3d_log("Client created");
+    std::string messageUrl= _serveraddress+":"+_port;
+    messageUrl+="/api/notify";
+    std::string headerToken = "Bearer " + _token1;
+    std::string post_data ="message=";
+    post_data+=message;
+
+    esp_http_client_set_header(client, "Host", "notify-api.line.me");
+    esp_http_client_set_header(client, "Connection", "close");
+    esp_http_client_set_header(client, "Content-Type", "application/x-www-form-urlencoded");
+    esp_http_client_set_header(client, "Cache-Control", "no-cache");
+    esp_http_client_set_header(client, "User-Agent", "ESP3D");
+    esp_http_client_set_header(client, "Authorization", headerToken.c_str());
+    esp_http_client_set_url(client,messageUrl.c_str());
+    esp_http_client_set_method(client, HTTP_METHOD_POST);
+    esp_http_client_set_post_field(client, post_data.c_str(), post_data.length());
+    esp3d_log("Try to perform http client: %s", messageUrl.c_str());
+    esp_err_t err= esp_http_client_perform(client);
+    if (err != ESP_OK) {
+        esp3d_log_e("Failed to open HTTP connection: %s", esp_err_to_name(err));
+        res = false;
+    } else {
+        uint code =esp_http_client_get_status_code(client);
+        if ( code!= 200) {
+            esp3d_log_e("Server response: %d", code);
+            res = false;
+        }
+    }
+    esp_http_client_cleanup(client);
+    return res;
 }
 bool Esp3DNotificationsService::sendTelegramMSG(const char * title, const char * message)
 {
@@ -264,7 +312,7 @@ bool Esp3DNotificationsService::sendTelegramMSG(const char * title, const char *
     esp_http_client_set_header(client, "Connection", "close");
     esp_http_client_set_header(client, "Content-Type", "application/x-www-form-urlencoded");
     esp_http_client_set_header(client, "Cache-Control", "no-cache");
-    esp_http_client_set_header(client, "  User-Agent", "ESP3D");
+    esp_http_client_set_header(client, "User-Agent", "ESP3D");
     esp_http_client_set_url(client,messageUrl.c_str());
     esp_http_client_set_method(client, HTTP_METHOD_POST);
     esp_http_client_set_post_field(client, post_data.c_str(), post_data.length());
