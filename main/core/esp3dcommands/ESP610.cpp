@@ -92,19 +92,7 @@ void Esp3DCommands::ESP610(int cmd_params_pos,esp3d_msg_t * msg)
         }
 
         ok_msg += esp3dTFTsettings.readByte(esp3d_auto_notification)==1?"YES":"NO";
-        if (json) {
-            ok_msg += "\",\"T1\":\"";
-        } else {
-            ok_msg +=", T1: ";
-        }
         char buffer[SIZE_OF_SETTING_NOFIFICATION_TS+1];
-        ok_msg += esp3dTFTsettings.readString(esp3d_notification_token_1, buffer, SIZE_OF_SETTING_NOFIFICATION_T1);
-        if (json) {
-            ok_msg += "\",\"T2\":\"";
-        } else {
-            ok_msg +=", T2: ";
-        }
-        ok_msg += esp3dTFTsettings.readString(esp3d_notification_token_2, buffer, SIZE_OF_SETTING_NOFIFICATION_T2);
         if (json) {
             ok_msg += "\",\"TS\":\"";
         } else {
