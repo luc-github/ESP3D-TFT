@@ -24,6 +24,7 @@
 #include <esp_mac.h>
 #include "lwip/ip_addr.h"
 #include "freertos/event_groups.h"
+#include <string>
 
 #ifdef __cplusplus
 extern "C" {
@@ -94,6 +95,11 @@ public:
         return _useStaticIp;
     };
     bool getLocalIp(esp3d_ip_info_t * ipInfo);
+    const char* getLocalIpString();
+    const char* getHostName()
+    {
+        return _hostname.c_str();
+    }
 private:
     bool _started;
     bool _useStaticIp;
@@ -101,6 +107,7 @@ private:
     esp_netif_t * _wifiStaPtr;
     esp3d_radio_mode_t _current_radio_mode;
     EventGroupHandle_t _s_wifi_event_group;
+    std::string _hostname;
     const char * getMac(esp_mac_type_t type);
 };
 

@@ -27,6 +27,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_timer.h"
+#include "network/esp3d_network.h"
 #include "websocket/esp3d_ws_service.h"
 #include "esp_tls.h"
 #include "esp_crt_bundle.h"
@@ -83,7 +84,7 @@ bool Esp3DNotificationsService::encodeBase64(const char *data, std::string *resu
 Esp3DNotificationsService::~Esp3DNotificationsService() {}
 bool Esp3DNotificationsService::begin()
 {
-    end();
+    esp3d_log("Start notification service");
     bool res = true;
     char buffer[SIZE_OF_SETTING_NOFIFICATION_T1];
     end();
@@ -134,11 +135,13 @@ bool Esp3DNotificationsService::begin()
     }
 
     if (!res) {
+        esp3d_log_e("Failed to start notification service");
         end();
     } else {
         _autonotification = esp3dTFTsettings.readByte(esp3d_auto_notification);
     }
     _started = res;
+    sendAutoNotification(ESP3D_NOTIFICATION_ONLINE);
     return _started;
 }
 void Esp3DNotificationsService::handle() {}
@@ -153,28 +156,34 @@ void Esp3DNotificationsService::end()
     _settings.clear();
     _serveraddress.clear();
     _port.clear();
-
 }
 
 bool Esp3DNotificationsService::sendMSG(const char * title, const char * message)
 {
-    esp3dWsWebUiService.pushNotification(message);
+    std::string formated_message = message;
+
+    if (formated_message.find('%')!= std::string::npos) {
+        formated_message = esp3d_strings::str_replace(formated_message.c_str(), "%ESP_IP%", esp3dNetwork.getLocalIpString());
+        formated_message = esp3d_strings::str_replace(formated_message.c_str(), "%ESP_NAME%", esp3dNetwork.getHostName());
+    }
+
+    esp3dWsWebUiService.pushNotification(formated_message.c_str());
     if (_started) {
         switch(_notificationType) {
         case esp3d_pushover_notification:
-            return sendPushoverMSG(title, message);
+            return sendPushoverMSG(title, formated_message.c_str());
             break;
         case esp3d_telegram_notification:
-            return sendTelegramMSG(title, message);
+            return sendTelegramMSG(title, formated_message.c_str());
             break;
         case esp3d_line_notification:
-            return sendLineMSG(title, message);
+            return sendLineMSG(title, formated_message.c_str());
             break;
         case esp3d_ifttt_notification:
-            return sendIFTTTMSG(title, message);
+            return sendIFTTTMSG(title, formated_message.c_str());
             break;
         case esp3d_email_notification:
-            return sendEmailMSG(title, message);
+            return sendEmailMSG(title, formated_message.c_str());
             break;
         default:
             break;
@@ -225,6 +234,10 @@ bool Esp3DNotificationsService::sendLineMSG(const char * title, const char * mes
 }
 bool Esp3DNotificationsService::sendTelegramMSG(const char * title, const char * message)
 {
+    if (_token1.length() == 0 || _token2.length()==0) {
+        esp3d_log_e("Some token is missing");
+        return false;
+    }
     bool res = true;
     esp_http_client_config_t config;
     memset(&config, 0, sizeof(esp_http_client_config_t));

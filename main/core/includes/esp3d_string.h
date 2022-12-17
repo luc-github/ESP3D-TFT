@@ -27,6 +27,11 @@ extern "C" {
 
 namespace esp3d_strings
 {
+//TODO:
+//some functions do internal change and others do copy of original string and modify it
+//need to review for consistency  or allows both copy and insite of string
+//TBD
+const char * str_replace(const char* currentstr, const char* oldsubstr, const char * newsubstr);
 const char * str_trim(const char * str);
 void  str_toUpperCase(std::string * str);
 void  str_toLowerCase(std::string * str);

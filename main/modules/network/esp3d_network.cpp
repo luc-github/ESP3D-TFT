@@ -114,6 +114,18 @@ static void  wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
     }
 }
 
+const char* Esp3DNetwork::getLocalIpString()
+{
+    static std::string tmpstr;
+    esp3d_ip_info_t  ipInfo;
+    if (esp3dNetwork.getLocalIp(&ipInfo)) {
+        tmpstr =  ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.ip_info.ip));
+    } else {
+        tmpstr = "0.0.0.0";
+    }
+    return tmpstr.c_str();
+}
+
 bool  Esp3DNetwork::getLocalIp(esp3d_ip_info_t * ipInfo)
 {
     if (!ipInfo) {
@@ -358,18 +370,17 @@ bool Esp3DNetwork::startStaMode()
 
     //Set hostname
     const esp3d_setting_desc_t * settingPtr = esp3dTFTsettings.getSettingPtr(esp3d_hostname);
-    std::string hostname;
     if (settingPtr) {
         char out_str[33]= {0};
-        hostname = esp3dTFTsettings.readString(esp3d_hostname, out_str, settingPtr->size);
-        if (ESP_OK != esp_netif_set_hostname(_wifiStaPtr, hostname.c_str())) {
+        _hostname = esp3dTFTsettings.readString(esp3d_hostname, out_str, settingPtr->size);
+        if (ESP_OK != esp_netif_set_hostname(_wifiStaPtr, _hostname.c_str())) {
             esp3d_log_e("Failed to set hostname");
         }
     } else {
         esp3d_log_e("No hostname setting found");
     }
     netbiosns_init();
-    netbiosns_set_name(hostname.c_str());
+    netbiosns_set_name(_hostname.c_str());
     ESP_ERROR_CHECK(esp_wifi_start() );
     _current_radio_mode = esp3d_wifi_sta;
     /* Waiting until either the connection is established (WIFI_CONNECTED_BIT) or connection failed for the maximum

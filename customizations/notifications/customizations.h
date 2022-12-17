@@ -20,3 +20,7 @@
 
 #pragma once
 #define ESP3D_NOTIFICATION_TITLE "Hi from ESP3D"
+/* Notification message when online
+* The message that will be sent when the ESP is online
+*/
+#define ESP3D_NOTIFICATION_ONLINE "Hi, %ESP_NAME% is now online at %ESP_IP%"

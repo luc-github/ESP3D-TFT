@@ -23,10 +23,27 @@
 #include <string.h>
 
 
+//Replace all occurrences of oldsubstr by newsubstr and return new string
+const char * esp3d_strings::str_replace(const char *  currentstr, const char * oldsubstr, const char * newsubstr)
+{
+    static std::string resstr;
+    resstr = currentstr;
+    std::string oldstr = oldsubstr;
+    std::string newstr = newsubstr;
+
+    size_t pos = 0;
+    while((pos = resstr.find(oldstr, pos)) != std::string::npos) {
+        resstr.replace(pos, oldstr.length(), newstr);
+        pos += newstr.length();
+    }
+    return resstr.c_str();
+}
+
 //Trim string function
 const char * esp3d_strings::str_trim(const char * str)
 {
-    static std::string s = str;
+    static std::string s;
+    s = str;
     auto start = s.begin();
     while (start != s.end() && std::isspace(*start)) {
         start++;
@@ -144,7 +161,8 @@ bool esp3d_strings::startsWith(const char * str, const char * startPart)
 
 const char* esp3d_strings::getContentType (const char* filename)
 {
-    std::string file_name = filename;
+    std::string file_name;
+    file_name= filename;
     esp3d_strings::str_toLowerCase(&file_name);
     std::size_t found = file_name.find_last_of(".");
     if (found) {
