@@ -25,3 +25,8 @@
 * The message that will be sent when the ESP is online
 */
 #define ESP3D_NOTIFICATION_ONLINE "Hi, %ESP_NAME% is now online at %ESP_IP%"
+
+/* Sender email to be used for sending notification email
+* if not defined it use the destination address provided in TS
+*/
+//#define ESP3D@mysmtp.com
