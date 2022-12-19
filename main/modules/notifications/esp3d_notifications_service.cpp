@@ -81,16 +81,10 @@ bool Esp3DNotificationsService::begin(bool sendAutoNotificationMsg)
         _token2 = esp3dTFTsettings.readString(esp3d_notification_token_2, buffer, SIZE_OF_SETTING_NOFIFICATION_T2);
         break;
     case esp3d_email_notification:
-        if ( encodeBase64(esp3dTFTsettings.readString(esp3d_notification_token_1, buffer, SIZE_OF_SETTING_NOFIFICATION_T1), &_token1)) {
-            if ( encodeBase64(esp3dTFTsettings.readString(esp3d_notification_token_2, buffer, SIZE_OF_SETTING_NOFIFICATION_T2), &_token2)) {
-                if(!getEmailInformationsFromSettings()) {
-                    res = false;
-                }
-            } else {
-                res=false;
-            }
-        } else {
-            res=false;
+        _token1 = esp3dTFTsettings.readString(esp3d_notification_token_1, buffer, SIZE_OF_SETTING_NOFIFICATION_T1);
+        _token2 = esp3dTFTsettings.readString(esp3d_notification_token_2, buffer, SIZE_OF_SETTING_NOFIFICATION_T2);
+        if(!getEmailInformationsFromSettings()) {
+            res = false;
         }
         break;
     default:
@@ -122,6 +116,7 @@ void Esp3DNotificationsService::end()
     _settings.clear();
     _serveraddress.clear();
     _port.clear();
+    _method.clear();
     _lastError=esp3d_notification_ok;
 }
 

@@ -24,6 +24,7 @@
 #include "esp3d_settings.h"
 #include "notifications/customizations.h"
 #include "esp_http_client.h"
+#include "mbedtls/net_sockets.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -86,6 +87,9 @@ public:
     {
         return _lastError;
     }
+    int perform_tls_handshake(mbedtls_ssl_context *ssl);
+    int write_ssl_and_get_response(mbedtls_ssl_context *ssl, unsigned char *buf, size_t len);
+    int write_tls_and_get_response(mbedtls_net_context *sock_fd, unsigned char *buf, size_t len);
 private:
     bool _started;
     bool _autonotification;
@@ -95,6 +99,7 @@ private:
     std::string _settings;
     std::string _serveraddress;
     std::string _port;
+    std::string _method;
     esp3d_notification_error_t _lastError;
     bool encodeBase64(const char *data, std::string *result);
     bool getEmailInformationsFromSettings();
