@@ -317,6 +317,7 @@ bool Esp3DNotificationsService::sendEmailMSG(const char * title, const char * me
         if ((ret = mbedtls_net_connect(&server_fd, _serveraddress.c_str(), _port.c_str(),
                                        MBEDTLS_NET_PROTO_TCP)) != 0) {
             esp3d_log_e("mbedtls_net_connect returned -0x%x", -ret);
+            _lastError = esp3d_notification_invalid_url;
             hasError = true;
         }
     }
@@ -416,6 +417,7 @@ bool Esp3DNotificationsService::sendEmailMSG(const char * title, const char * me
         ret = write_ssl_and_get_response(&ssl, (unsigned char *) buf, len);
         if (ret < 300 || ret > 399) {
             esp3d_log_e("Failed to get proper response");
+            _lastError = esp3d_notification_invalid_token1;
             hasError = true;
         }
     }
@@ -435,6 +437,7 @@ bool Esp3DNotificationsService::sendEmailMSG(const char * title, const char * me
         ret = write_ssl_and_get_response(&ssl, (unsigned char *) buf, len);
         if (ret < 200 || ret > 399) {
             esp3d_log_e("Failed to get proper response");
+            _lastError = esp3d_notification_invalid_token2;
             hasError = true;
         }
     }
@@ -487,6 +490,7 @@ bool Esp3DNotificationsService::sendEmailMSG(const char * title, const char * me
         if (ret < 200 || ret > 299) {
             esp3d_log_e("Failed to get proper response");
             hasError = true;
+            _lastError = esp3d_notification_invalid_data;
         }
     }
 
@@ -504,6 +508,11 @@ bool Esp3DNotificationsService::sendEmailMSG(const char * title, const char * me
     if (!hasError) {
         /* Close connection */
         mbedtls_ssl_close_notify(&ssl);
+        _lastError = esp3d_notification_ok;
+    } else {
+        if (_lastError == esp3d_notification_ok) {
+            _lastError = esp3d_notification_error;
+        }
     }
 
     mbedtls_net_free(&server_fd);

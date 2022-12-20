@@ -12,6 +12,7 @@ set(SOURCES .
     modules/filesystem/flash
     modules/update
     modules/notifications
+    modules/mDNS
 )
 set(INCLUDES .
     core/includes

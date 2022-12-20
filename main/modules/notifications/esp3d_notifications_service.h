@@ -101,7 +101,6 @@ private:
     std::string _port;
     std::string _method;
     esp3d_notification_error_t _lastError;
-    bool encodeBase64(const char *data, std::string *result);
     bool getEmailInformationsFromSettings();
 };
 

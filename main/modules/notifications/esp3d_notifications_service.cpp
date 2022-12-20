@@ -34,24 +34,6 @@ Esp3DNotificationsService::Esp3DNotificationsService()
     end();
 }
 
-bool Esp3DNotificationsService::encodeBase64(const char *data, std::string *result)
-{
-    bool res = false;
-    char *dataencoded = (char *)malloc(2*strlen(data)+1);
-    size_t finalLen = 0;
-    if (!dataencoded) {
-        esp3d_log_e("memory allocate failed");
-        return false;
-    }
-    if (mbedtls_base64_encode( (unsigned char*)dataencoded, 2*strlen(data), &finalLen,
-                               (const unsigned char*)data,strlen(data) )==0) {
-        res = true;
-    }
-    *result = dataencoded;
-    free(dataencoded);
-    return res;
-}
-
 Esp3DNotificationsService::~Esp3DNotificationsService() {}
 
 bool Esp3DNotificationsService::begin(bool sendAutoNotificationMsg)

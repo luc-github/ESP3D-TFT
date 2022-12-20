@@ -24,10 +24,6 @@
 #include <stdio.h>
 #include <string>
 #include <cstring>
-#include "sdkconfig.h"
-#include "esp_system.h"
-#include "esp_heap_caps.h"
-#include "spi_flash_mmap.h"
 #include "authentication/esp3d_authentication.h"
 #include "filesystem/esp3d_flash.h"
 #include "network/esp3d_network.h"
@@ -125,9 +121,7 @@ void Esp3DCommands::ESP410(int cmd_params_pos,esp3d_msg_t * msg)
             }
 
         }
-        //FixMe: esp_wifi_clear_ap_list(void);
-        //Not supported in 4.4.2 but seems present in newest versions
-        // esp_wifi_clear_ap_list(void);
+        esp_wifi_clear_ap_list();
     }
 
     if (esp3dNetwork.getMode() !=esp3d_wifi_sta) {
