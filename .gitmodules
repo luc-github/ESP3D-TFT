@@ -1,6 +1,6 @@
 [submodule "components/esp_littlefs"]
 	path = components/esp_littlefs
 	url = https://github.com/joltwallet/esp_littlefs.git
-[submodule "SSDP_IDF"]
-	path = SSDP_IDF
+[submodule "components/SSDP_IDF"]
+	path = components/SSDP_IDF
 	url = https://github.com/luc-github/SSDP_IDF.git
