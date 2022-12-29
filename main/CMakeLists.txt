@@ -13,6 +13,7 @@ set(SOURCES .
     modules/update
     modules/notifications
     modules/mDNS
+    modules/ssdp
 )
 set(INCLUDES .
     core/includes

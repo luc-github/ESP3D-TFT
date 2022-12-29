@@ -1,5 +1,6 @@
 /*
-  esp3d_http_service
+  esp3d-tft project
+
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
   This code is free software; you can redistribute it and/or
@@ -17,21 +18,30 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#pragma once
 
-#include "http/esp3d_http_service.h"
-#include <stdio.h>
-#include "esp_wifi.h"
-#include "esp3d_log.h"
-#include "esp3d_string.h"
-#include "esp3d_settings.h"
-#include "esp3d_commands.h"
-#include "ssdp/esp3d_ssdp.h"
+/* Model name
+* Modele name of device
+*/
+#define ESP3D_MODEL_NAME "ESP Board"
 
+/* Model number
+* Modele number of device
+*/
+#define ESP3D_MODEL_NUMBER "ESP3D 3.0"
 
-esp_err_t Esp3DHttpService::description_xml_handler(httpd_req_t *req)
-{
-    esp3d_log("Uri: %s", req->uri);
-    httpd_resp_set_type(req, "text/xml");
-    const char  * response = esp3d_ssdp_service.get_schema();
-    return httpd_resp_send(req, response, strlen(response));
-}
+/* Model url
+* Modele url of device
+*/
+#define ESP3D_MODEL_URL "https://www.espressif.com/en/products/devkits"
+
+/* Manufacturer name
+* Manufacturer name of device
+*/
+#define ESP3D_MANUFACTURER_NAME "Espressif Systems"
+
+/* Manufacturer url
+* Manufacturer url of device
+*/
+#define ESP3D_MANUFACTURER_URL "https://www.espressif.com"
+

@@ -1,5 +1,6 @@
 /*
-  esp3d_http_service
+  esp3d_ssdp
+
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
   This code is free software; you can redistribute it and/or
@@ -17,21 +18,32 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
-#include "http/esp3d_http_service.h"
+#pragma once
 #include <stdio.h>
-#include "esp_wifi.h"
-#include "esp3d_log.h"
-#include "esp3d_string.h"
-#include "esp3d_settings.h"
-#include "esp3d_commands.h"
-#include "ssdp/esp3d_ssdp.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-esp_err_t Esp3DHttpService::description_xml_handler(httpd_req_t *req)
+class Esp3Dssdp final
 {
-    esp3d_log("Uri: %s", req->uri);
-    httpd_resp_set_type(req, "text/xml");
-    const char  * response = esp3d_ssdp_service.get_schema();
-    return httpd_resp_send(req, response, strlen(response));
-}
+public:
+    Esp3Dssdp();
+    ~Esp3Dssdp();
+    bool begin();
+    void handle();
+    void end();
+    const char * get_schema();
+    bool started()
+    {
+        return _started;
+    };
+
+private:
+    bool _started;
+};
+
+extern Esp3Dssdp esp3d_ssdp_service;
+#ifdef __cplusplus
+} // extern "C"
+#endif

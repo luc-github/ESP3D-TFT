@@ -143,7 +143,7 @@ bool Esp3DHttpService::begin()
     //Nb of sockets
     config.max_open_sockets = 6; //(3 internals +3)
     //handler
-    config.max_uri_handlers = 10; //currently use 10
+    config.max_uri_handlers = 12; //currently use 10
     //backlog_conn
     config.backlog_conn       = 8,
 
@@ -168,6 +168,19 @@ bool Esp3DHttpService::begin()
             .supported_subprotocol = nullptr
         };
         httpd_register_uri_handler(_server, &favicon_handler_config);
+
+        //description.xml (ssdp)
+        const httpd_uri_t ssdp_handler_config = {
+            .uri       = "/description.xml",
+            .method    = HTTP_GET,
+            .handler   = (esp_err_t (*)(httpd_req_t*))(esp3dHttpService.description_xml_handler),
+            .user_ctx  =  nullptr,
+            .is_websocket = false,
+            .handle_ws_control_frames = false,
+            .supported_subprotocol = nullptr
+        };
+        httpd_register_uri_handler(_server, &ssdp_handler_config);
+
         //root /
         const httpd_uri_t root_handler_config = {
             .uri       = "/",
