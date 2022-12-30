@@ -22,18 +22,28 @@
 
 /* Model name
 * Modele name of device
+* if not define it will use the one defined in CMakelist.txt
 */
-#define ESP3D_MODEL_NAME "ESP Board"
+//#define ESP3D_MODEL_NAME "TFT-ESP32 Board"
 
 /* Model number
 * Modele number of device
+* if not define it will use the FW version
 */
-#define ESP3D_MODEL_NUMBER "ESP3D 3.0"
+//#define ESP3D_MODEL_NUMBER "ESP3D-TFT 3.0"
 
 /* Model url
 * Modele url of device
+* if not defined it will use the esp3d-tft github url
 */
-#define ESP3D_MODEL_URL "https://www.espressif.com/en/products/devkits"
+//#define ESP3D_MODEL_URL "https://www.espressif.com/en/products/devkits"
+
+
+/* Model description
+* Modele description of device
+* this is not used by window actually
+*/
+//#define ESP3D_MODEL_DESCRIPTION "ESP32 TFT"
 
 /* Manufacturer name
 * Manufacturer name of device

@@ -33,6 +33,8 @@ int64_t micros();
 
 int64_t seconds();
 
+uint64_t getEfuseMac();
+
 void wait(int64_t milliseconds);
 }
 #ifdef __cplusplus

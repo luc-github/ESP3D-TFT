@@ -20,8 +20,10 @@
 
 #include "esp3d_hal.h"
 #include "esp_timer.h"
+#include "esp3d_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "esp_mac.h"
 
 int64_t esp3d_hal::micros()
 {
@@ -41,4 +43,14 @@ int64_t esp3d_hal::seconds()
 void esp3d_hal::wait(int64_t milliseconds)
 {
     vTaskDelay(pdMS_TO_TICKS(milliseconds));
+}
+
+uint64_t esp3d_hal::getEfuseMac()
+{
+    uint64_t mac = 0;
+    esp_err_t err  = esp_efuse_mac_get_default((uint8_t *)&mac);
+    if (ESP_OK != err) {
+        esp3d_log_e("Not able to read MAC efuse");
+    }
+    return mac;
 }

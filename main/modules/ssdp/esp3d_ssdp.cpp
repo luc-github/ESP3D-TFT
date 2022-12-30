@@ -23,6 +23,8 @@
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_settings.h"
+#include "esp3d_hal.h"
+#include "esp3d_version.h"
 
 
 Esp3Dssdp esp3d_ssdp_service;
@@ -48,6 +50,51 @@ bool Esp3Dssdp::begin()
         end();
     }
     ssdp_config_t config = SDDP_DEFAULT_CONFIG();
+    //Customization
+    std::string efuseMacStr = std::to_string(esp3d_hal::getEfuseMac());
+    std::string friendlyNameStr = esp3dNetwork.getHostName();
+    //Friendly name
+    config.friendly_name = friendlyNameStr.c_str();
+    //Serial Number
+    config.serial_number = efuseMacStr.c_str();
+    //Http port
+    uint32_t portValue = esp3dTFTsettings.readUint32(esp3d_http_port);
+    config.port = portValue;
+    //User customization if any
+    //Modele name
+#if defined (ESP3D_MODEL_NAME)
+    config.model_name = ESP3D_MODEL_NAME;
+#else
+    config.model_name =TFT_TARGET;
+#endif
+    //Modele Number
+#if defined (ESP3D_MODEL_NUMBER)
+    config.model_number = ESP3D_MODEL_NUMBER;
+#else
+    config.model_number =ESP3D_TFT_VERSION;
+#endif
+    //Modele Url
+#if defined (ESP3D_MODEL_URL)
+    config.model_url = ESP3D_MODEL_URL;
+#else
+    config.model_url =ESP3D_TFT_FW_URL;
+#endif
+    //Modele description
+    //this one is optional because windows doesn't care about this field
+#if defined (ESP3D_MODEL_DESCRIPTION)
+    config.model_description = ESP3D_MODEL_URL;
+#endif
+    //Manufacturer Name
+#if defined (ESP3D_MANUFACTURER_NAME)
+    config.manufacturer_name = ESP3D_MANUFACTURER_NAME;
+#endif
+    //Manufacturer URL
+#if defined (ESP3D_MANUFACTURER_URL)
+    config.manufacturer_url = ESP3D_MANUFACTURER_URL;
+#endif
+    //Note: other fiels are left as default values
+    //because no need to let user to customize them here
+
     config.device_type = (char *)"rootdevice";
     esp_err_t err = ssdp_start(&config);
     if (err!= ESP_OK) {
