@@ -41,11 +41,6 @@ typedef enum {
 } esp3d_ip_mode_t;
 
 typedef enum {
-    esp3d_state_off=0,
-    esp3d_state_on=1,
-} esp3d_state_t;
-
-typedef enum {
     esp3d_radio_off=0,
     esp3d_wifi_sta=1,
     esp3d_wifi_ap=2,

@@ -63,6 +63,8 @@ typedef enum  {
     esp3d_notification_token_1,
     esp3d_notification_token_2,
     esp3d_notification_token_setting,
+    esp3d_socket_port,
+    esp3d_socket_on,
     last_esp3d_setting_index_t
 } esp3d_setting_index_t;
 
@@ -79,7 +81,10 @@ typedef enum  {
     last_esp3d_target_firmware_index_t
 } esp3d_target_firmware_index_t;
 
-
+typedef enum {
+    esp3d_state_off=0,
+    esp3d_state_on=1,
+} esp3d_state_t;
 
 typedef enum  {
     esp3d_byte, //byte

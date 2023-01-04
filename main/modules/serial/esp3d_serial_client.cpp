@@ -129,6 +129,7 @@ bool Esp3DSerialClient::begin()
     ESP_ERROR_CHECK(uart_param_config(ESP3D_SERIAL_PORT, &uart_config));
     ESP_ERROR_CHECK(uart_set_pin(ESP3D_SERIAL_PORT, ESP3D_SERIAL_TX_PIN, ESP3D_SERIAL_RX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
 
+    //Serial is never stopped so no need to kill the task from outside
     TaskHandle_t xHandle = NULL;
     _started = true;
     BaseType_t  res =  xTaskCreatePinnedToCore(esp3d_serial_rx_task, "esp3d_serial_rx_tast", ESP3D_SERIAL_RX_TASK_SIZE, NULL, ESP3D_SERIAL_TASK_PRIORITY, &xHandle, ESP3D_SERIAL_TASK_CORE);

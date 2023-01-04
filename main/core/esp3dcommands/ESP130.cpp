@@ -18,13 +18,14 @@
 */
 
 #include "esp3d_commands.h"
+#include "esp3d_client.h"
 #include "esp3d_string.h"
 #include "authentication/esp3d_authentication.h"
 #include "esp3d_settings.h"
-#define COMMAND_ID 402
-//Get/Set Check update at boot state which can be ON, OFF
-//[ESP402]<state> json=<no> pwd=<admin password>
-void Esp3DCommands::ESP402(int cmd_params_pos,esp3d_msg_t * msg)
+#define COMMAND_ID 130
+//Get/Set Socket state which can be ON, OFF
+//[ESP130]<state> json=<no> pwd=<admin password>
+void Esp3DCommands::ESP130(int cmd_params_pos,esp3d_msg_t * msg)
 {
     esp3d_clients_t target = msg->origin;
     esp3d_request_t requestId = msg->requestId;
@@ -44,16 +45,16 @@ void Esp3DCommands::ESP402(int cmd_params_pos,esp3d_msg_t * msg)
     }
 #endif //ESP3D_AUTHENTICATION_FEATURE
     tmpstr = get_clean_param(msg,cmd_params_pos);
+    esp3d_state_t setting_mode = (esp3d_state_t)esp3dTFTsettings.readByte(esp3d_socket_on);
     if (tmpstr.length()==0) {
-        esp3d_state_t setting_check_update = (esp3d_state_t)esp3dTFTsettings.readByte(esp3d_check_update_on_sd);
-        if (setting_check_update==esp3d_state_off) {
+        if (setting_mode==esp3d_state_off) {
             ok_msg = "OFF";
         } else {
             ok_msg= "ON";
         }
     } else {
         if (tmpstr=="OFF" || tmpstr=="ON") {
-            if (!esp3dTFTsettings.writeByte (esp3d_check_update_on_sd, tmpstr=="OFF"?0:1)) {
+            if (!esp3dTFTsettings.writeByte (esp3d_socket_on, tmpstr=="OFF"?0:1)) {
                 hasError = true;
                 error_msg="Set value failed";
             }

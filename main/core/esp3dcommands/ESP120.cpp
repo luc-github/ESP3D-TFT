@@ -21,10 +21,10 @@
 #include "esp3d_client.h"
 #include "esp3d_string.h"
 #include "authentication/esp3d_authentication.h"
-#include "network/esp3d_network.h"
+#include "esp3d_settings.h"
 #define COMMAND_ID 120
-//Set HTTP port
-//[ESP121]<port> json=<no> pwd=<admin password>
+//Get/Set HTTP state which can be ON, OFF
+//[ESP120]<state> json=<no> pwd=<admin password>
 void Esp3DCommands::ESP120(int cmd_params_pos,esp3d_msg_t * msg)
 {
     esp3d_clients_t target = msg->origin;

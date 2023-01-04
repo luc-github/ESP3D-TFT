@@ -112,7 +112,7 @@ const esp3d_setting_index_t ServstringKeysPos[] = {
 //Integer values
 const char * ServintKeysVal[] = {
     "HTTP_Port"
-//    "TELNET_Port",
+    "TELNET_Port",
 //    "SENSOR_INTERVAL",
 //    "WebSocket_Port",
 //    "WebDav_Port",
@@ -122,8 +122,8 @@ const char * ServintKeysVal[] = {
 };
 
 const esp3d_setting_index_t ServintKeysPos[] = {
-    esp3d_http_port
-//    ESP_TELNET_PORT,
+    esp3d_http_port,
+    esp3d_socket_port,
 //    ESP_SENSOR_INTERVAL,
 //    ESP_WEBSOCKET_PORT,
 //    ESP_WEBDAV_PORT,
@@ -136,7 +136,7 @@ const esp3d_setting_index_t ServintKeysPos[] = {
 const char * ServboolKeysVal[] = {
     "HTTP_active",
     "AUTONOTIFICATION",
-    //"TELNET_active",
+    "TELNET_active",
     //"WebSocket_active",
     //"WebDav_active",
     //"Time_DST",
@@ -149,7 +149,7 @@ const char * ServboolKeysVal[] = {
 const esp3d_setting_index_t ServboolKeysPos[] = {
     esp3d_http_on,
     esp3d_auto_notification,
-    //ESP_TELNET_ON,
+    esp3d_socket_on,
     //ESP_WEBSOCKET_ON,
     //ESP_WEBDAV_ON,
     //ESP_TIME_IS_DST,

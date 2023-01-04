@@ -21,6 +21,7 @@
 #include "esp3d_client.h"
 #include "esp3d_version.h"
 #include "esp3d_string.h"
+#include "esp3d_settings.h"
 #include <stdio.h>
 #include <string>
 #include <cstring>

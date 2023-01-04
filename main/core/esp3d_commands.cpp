@@ -676,6 +676,12 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
     case 121:
         ESP121(cmd_params_pos, msg);
         break;
+    case 130:
+        ESP130(cmd_params_pos, msg);
+        break;
+    case 131:
+        ESP131(cmd_params_pos, msg);
+        break;
     case 200:
         ESP200(cmd_params_pos, msg);
         break;

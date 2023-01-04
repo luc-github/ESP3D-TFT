@@ -12,6 +12,11 @@ extern "C" {
 
 #define STREAM_CHUNK_SIZE 1024
 
+#define ESP3D_SOCKET_RX_BUFFER_SIZE 1024
+#define ESP3D_SOCKET_TASK_SIZE 4096
+#define ESP3D_SOCKET_TASK_PRIORITY 5
+#define ESP3D_SOCKET_TASK_CORE 0
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

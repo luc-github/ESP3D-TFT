@@ -14,6 +14,7 @@ set(SOURCES .
     modules/notifications
     modules/mDNS
     modules/ssdp
+    modules/socket_server
 )
 set(INCLUDES .
     core/includes
