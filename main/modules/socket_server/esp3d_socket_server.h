@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "lwip/sockets.h"
 #include "esp3d_client.h"
 #include "esp3d_log.h"
 #include <pthread.h>
@@ -33,7 +34,7 @@ extern "C" {
 #define ESP3D_MAX_SOCKET_CLIENTS 2
 
 typedef struct {
-    int socketId,
+    int socketId;
     struct sockaddr_storage source_addr;
 } esp3d_socket_client_info_t;
 
@@ -52,13 +53,15 @@ public:
     {
         return _started;
     }
-    uint32_t port(){
+    uint32_t port()
+    {
         return _port;
     }
     bool startSocketServer();
     bool getClient();
     bool closeSocket(int socketId);
 private:
+    int getFreeClientSlot();
     esp3d_socket_client_info_t _clients[ESP3D_MAX_SOCKET_CLIENTS];
     int _listen_socket;
     bool _started;
