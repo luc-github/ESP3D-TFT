@@ -38,6 +38,9 @@
 #include "network/esp3d_network.h"
 #include "http/esp3d_http_service.h"
 #include "update/esp3d_update_service.h"
+#include "mDNS/esp3d_mdns.h"
+#include "ssdp/esp3d_ssdp.h"
+#include "socket_server/esp3d_socket_server.h"
 #include "notifications/esp3d_notifications_service.h"
 #define COMMAND_ID 420
 
@@ -335,6 +338,41 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     tmpstr+=esp3dNetwork.getBTMac();
     tmpstr+=")";
     if ( !dispatchIdValue(json,"bt",tmpstr.c_str(), target,requestId)) {
+        return;
+    }
+
+    //mdsn service
+    if (!esp3dmDNS.started() ) {
+        tmpstr="OFF";
+    } else {
+        tmpstr="ON";
+    }
+
+    if (!dispatchIdValue(json,"mDNS",tmpstr.c_str(), target,requestId)) {
+        return;
+    }
+
+    //ssdp service
+    if (!esp3d_ssdp_service.started() ) {
+        tmpstr="OFF";
+    } else {
+        tmpstr="ON";
+    }
+
+    if (!dispatchIdValue(json,"ssdp",tmpstr.c_str(), target,requestId)) {
+        return;
+    }
+
+    //socket server
+    if (!socketServer.started() ) {
+        tmpstr="OFF";
+    } else {
+        tmpstr="ON (";
+        tmpstr=std::to_string(socketServer.port());
+        tmpstr+="}";
+    }
+
+    if (!dispatchIdValue(json,"telnet",tmpstr.c_str(), target,requestId)) {
         return;
     }
 

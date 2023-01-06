@@ -210,12 +210,12 @@ void Esp3DCommands::ESP400(int cmd_params_pos,esp3d_msg_t * msg)
     }
 
     //Socket/Telnet
-    if (!dispatchSetting(json,"service/telnetd",esp3d_socket_on, "enable",YesNoValues, YesNoLabels, sizeof(YesNoValues)/sizeof(char*),-1,-1,-1, nullptr, true,target,requestId)) {
+    if (!dispatchSetting(json,"service/telnetp",esp3d_socket_on, "enable",YesNoValues, YesNoLabels, sizeof(YesNoValues)/sizeof(char*),-1,-1,-1, nullptr, true,target,requestId)) {
         esp3d_log_e("Error sending response to clients");
     }
 
     //Socket/Telnet port
-    if (!dispatchSetting(json,"service/telnetd",esp3d_socket_port, "port", nullptr, nullptr,MAX_PORT_NUMBER, MIN_PORT_NUMBER, -1,-1, nullptr, true,target,requestId)) {
+    if (!dispatchSetting(json,"service/telnetp",esp3d_socket_port, "port", nullptr, nullptr,MAX_PORT_NUMBER, MIN_PORT_NUMBER, -1,-1, nullptr, true,target,requestId)) {
         esp3d_log_e("Error sending response to clients");
     }
 
