@@ -30,6 +30,13 @@
 extern "C" {
 #endif
 
+#define ESP3D_MAX_SOCKET_CLIENTS 2
+
+typedef struct {
+    int socketId,
+    struct sockaddr_storage source_addr;
+} esp3d_socket_client_info_t;
+
 class ESP3DSocketServer : public Esp3DClient
 {
 public:
@@ -45,8 +52,17 @@ public:
     {
         return _started;
     }
+    uint32_t port(){
+        return _port;
+    }
+    bool startSocketServer();
+    bool getClient();
+    bool closeSocket(int socketId);
 private:
+    esp3d_socket_client_info_t _clients[ESP3D_MAX_SOCKET_CLIENTS];
+    int _listen_socket;
     bool _started;
+    uint32_t _port;
     pthread_mutex_t _tx_mutex;
     pthread_mutex_t _rx_mutex;
     TaskHandle_t _xHandle;
