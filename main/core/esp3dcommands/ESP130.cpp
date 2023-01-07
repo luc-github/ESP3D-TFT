@@ -21,6 +21,7 @@
 #include "esp3d_client.h"
 #include "esp3d_string.h"
 #include "authentication/esp3d_authentication.h"
+#include "socket_server/esp3d_socket_server.h"
 #include "esp3d_settings.h"
 #define COMMAND_ID 130
 //Get/Set Socket state which can be ON, OFF
@@ -36,6 +37,10 @@ void Esp3DCommands::ESP130(int cmd_params_pos,esp3d_msg_t * msg)
     std::string error_msg ="Invalid parameters";
     std::string ok_msg ="ok";
     bool json = hasTag (msg,cmd_params_pos,"json");
+    bool closeClients = hasTag (msg,cmd_params_pos,"CLOSE");
+    bool stateON = hasTag (msg,cmd_params_pos,"ON");
+    bool stateOFF = hasTag (msg,cmd_params_pos,"OFF");
+    bool has_param = false;
     std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
     if (msg->authentication_level == ESP3D_LEVEL_GUEST) {
@@ -53,12 +58,19 @@ void Esp3DCommands::ESP130(int cmd_params_pos,esp3d_msg_t * msg)
             ok_msg= "ON";
         }
     } else {
-        if (tmpstr=="OFF" || tmpstr=="ON") {
-            if (!esp3dTFTsettings.writeByte (esp3d_socket_on, tmpstr=="OFF"?0:1)) {
+
+        if (stateON ||stateOFF) {
+            if (!esp3dTFTsettings.writeByte (esp3d_socket_on,stateOFF?0:1)) {
                 hasError = true;
                 error_msg="Set value failed";
             }
-        } else {
+            has_param = true;
+        }
+        if (closeClients) {
+            has_param = true;
+            esp3dSocketServer.closeAllClients();
+        }
+        if (!has_param) {
             hasError = true;
             error_msg ="Invalid parameter";
         }

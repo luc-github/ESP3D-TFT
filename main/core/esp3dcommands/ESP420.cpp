@@ -368,15 +368,34 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
         tmpstr="OFF";
     } else {
         tmpstr="ON (";
-        tmpstr=std::to_string(esp3dSocketServer.port());
-        tmpstr+="}";
+        tmpstr+=std::to_string(esp3dSocketServer.port());
+        tmpstr+=")";
     }
 
     if (!dispatchIdValue(json,"telnet",tmpstr.c_str(), target,requestId)) {
         return;
     }
+    //Socket connected clients
+    tmpstr = std::to_string(esp3dSocketServer.clientsConnected());
 
-    //Notifications
+    if (!dispatchIdValue(json,"clients",tmpstr.c_str(), target,requestId)) {
+        return;
+    }
+    for(int i = 0; i < ESP3D_MAX_SOCKET_CLIENTS; i++) {
+        //Print the mac address of the connected station
+        if (esp3dSocketServer.getClientInfo(i)) {
+            char addr_str[16];
+            inet_ntoa_r(((struct sockaddr_in *)&(esp3dSocketServer.getClientInfo(i)->source_addr))->sin_addr, addr_str, sizeof(addr_str) - 1);
+            tmpstr = addr_str;
+            std::string client = "client ";
+            client+=std::to_string(i+1);
+            if (!dispatchIdValue(json,client.c_str(),tmpstr.c_str(), target,requestId)) {
+                return;
+            }
+        }
+    }
+
+//Notifications
     if (!esp3dNotificationsService.started() || esp3dNotificationsService.getType()==esp3d_no_notification) {
         tmpstr="OFF";
     } else {
@@ -388,7 +407,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     if (!dispatchIdValue(json,"notification",tmpstr.c_str(), target,requestId)) {
         return;
     }
-    //end of list
+//end of list
     if (json) {
         if(!dispatch("]}",target,requestId, msg_tail)) {
             esp3d_log_e("Error sending answer to clients");

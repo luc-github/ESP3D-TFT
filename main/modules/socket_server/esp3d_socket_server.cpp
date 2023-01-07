@@ -52,7 +52,9 @@ uint  ESP3DSocketServer::clientsConnected()
 esp3d_socket_client_info_t * ESP3DSocketServer::getClientInfo(uint index)
 {
     if (index<=ESP3D_MAX_SOCKET_CLIENTS) {
-        return &_clients[index];
+        if (_clients[index].socketId != -1) {
+            return &_clients[index];
+        }
     }
     return nullptr;
 }
