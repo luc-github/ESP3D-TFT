@@ -31,7 +31,7 @@
 extern "C" {
 #endif
 
-#define ESP3D_MAX_SOCKET_CLIENTS 2
+#define ESP3D_MAX_SOCKET_CLIENTS 1
 
 typedef struct {
     int socketId;
@@ -45,7 +45,7 @@ public:
     ~ESP3DSocketServer();
     bool begin();
     void handle();
-    void process();
+    void process(esp3d_msg_t * msg);
     void readSockets();
     void end();
     bool isEndChar(uint8_t ch);

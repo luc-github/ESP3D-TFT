@@ -24,7 +24,6 @@
 #include "esp3d_hal.h"
 #include "tasks_def.h"
 #include "esp3d_commands.h"
-
 #include "lwip/err.h"
 #include "lwip/sockets.h"
 #include "lwip/sys.h"
@@ -32,7 +31,7 @@
 
 ESP3DSocketServer esp3dSocketServer;
 
-#define RX_FLUSH_TIME_OUT 1500 * 1000 // microseconds timeout
+#define RX_FLUSH_TIME_OUT 1500  // millisecond timeout
 //Use sample code values for the moment
 #define KEEPALIVE_IDLE 5
 #define KEEPALIVE_INTERVAL 5
@@ -81,7 +80,6 @@ bool ESP3DSocketServer::startSocketServer()
     }
     esp3d_log("Socket marked as non blocking");
     //int opt = 1;
-    //setsockopt(_listen_socket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
     esp3d_log("Socket created");
 
@@ -102,19 +100,38 @@ bool ESP3DSocketServer::startSocketServer()
     return true;
 }
 
-void ESP3DSocketServer::process()
-{}
+void ESP3DSocketServer::process(esp3d_msg_t * msg)
+{
+    //add to TX queue that will be processed in task
+    if (!addTXData(msg)) {
+        // delete message as cannot be added to the queue
+        Esp3DClient::deleteMsg(msg);
+        esp3d_log_e("Failed to add message to tx queue");
+    }
+}
 
 void ESP3DSocketServer::readSockets()
 {
     int len;
+    static uint64_t startTimeout[ESP3D_MAX_SOCKET_CLIENTS];
+    static bool initArrays = false;
     if (!_started) {
         return;
     }
-    char rx_buffer[ESP3D_SOCKET_RX_BUFFER_SIZE]; // need * ESP3D_MAX_SOCKET_CLIENTS
+    static char buffer[ESP3D_MAX_SOCKET_CLIENTS][ESP3D_SOCKET_RX_BUFFER_SIZE+1];
+    static char data[ESP3D_SOCKET_RX_BUFFER_SIZE]; // need * ESP3D_MAX_SOCKET_CLIENTS
+    static size_t pos[ESP3D_MAX_SOCKET_CLIENTS];
+    if (!initArrays) {
+        initArrays = true;
+        for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
+            pos[s]=0;
+            startTimeout[s]=0;
+        }
+    }
+
     for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
         if (_clients[s].socketId != -1) {
-            len = recv(_clients[s].socketId, rx_buffer,ESP3D_SOCKET_RX_BUFFER_SIZE - 1, 0);
+            len = recv(_clients[s].socketId, data,ESP3D_SOCKET_RX_BUFFER_SIZE - 1, 0);
             if (len < 0) {
                 if (errno == EINPROGRESS || errno == EAGAIN || errno == EWOULDBLOCK) {
                     continue;   // Not an error
@@ -127,12 +144,41 @@ void ESP3DSocketServer::readSockets()
                 esp3d_log_e("Error occurred during receiving: errno %d on socket %d", errno, s );
                 closeSocket(_clients[s].socketId);
             } else {
-                rx_buffer[len] = 0; // Null-terminate whatever is received and treat it like a string
-                esp3d_log("Received %d bytes: %s", len, rx_buffer);
-                //push to msg array
+                data[len] = 0; // Null-terminate whatever is received and treat it like a string
+                esp3d_log("Received %d bytes: %s", len, data);
+                if (len) {
+                    //parse data
+                    startTimeout[s] = esp3d_hal::millis();
+                    for (size_t i = 0; i < len ; i++) {
+                        if (pos[s] <ESP3D_SOCKET_RX_BUFFER_SIZE) {
+                            buffer[s][pos[s]]= data[i];
+                            (pos[s])++;
+                            buffer[s][pos[s]]=0;
+                        }
+                        //if end of char or buffer is full
+                        if (isEndChar(data[i]) || pos[s]==ESP3D_SOCKET_RX_BUFFER_SIZE) {
+                            //create message and push
+                            if (!pushMsgToRxQueue((const uint8_t*)buffer[s], pos[s])) {
+                                //send error
+                                esp3d_log_e("Push Message to rx queue failed");
+                            }
+                            pos[s]=0;
+                        }
+                    }
+                }
             }
         }
     }
+    //if no data during a while then send them
+    for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++)
+        if (esp3d_hal::millis()-startTimeout[s]>(RX_FLUSH_TIME_OUT) && pos[s]>0) {
+            if (!pushMsgToRxQueue((const uint8_t*)buffer[s], pos[s])) {
+                //send error
+                esp3d_log_e("Push Message  %s of size %d to rx queue failed",buffer[s], pos[s]);
+            }
+            pos[s]=0;
+        }
+
 }
 
 // this task only collecting serial RX data and push thenmm to Rx Queue
@@ -148,46 +194,6 @@ static void esp3d_socket_rx_task(void *pvParameter)
             esp3dSocketServer.handle();
             vTaskDelay(pdMS_TO_TICKS(10));
         }
-        /*   (void) pvParameter;
-               uint8_t data[ESP3D_SOCKET_RX_BUFFER_SIZE];
-               uint8_t buffer[ESP3D_SOCKET_RX_BUFFER_SIZE];
-               size_t pos = 0;
-               uint64_t startTimeout=0; //microseconds
-               while (1) {
-                  // Delay
-                   vTaskDelay(pdMS_TO_TICKS(10));
-                   if (!serialClient.started()) {
-                       break;
-                   }
-                   int len = uart_read_bytes(ESP3D_SOCKET_PORT, data, (ESP3D_SOCKET_RX_BUFFER_SIZE - 1), 10 / portTICK_PERIOD_MS);
-                   if (len) {
-                       //parse data
-                       startTimeout = esp_timer_get_time();
-                       for (size_t i = 0; i < len ; i++) {
-                           if (pos <ESP3D_SOCKET_RX_BUFFER_SIZE) {
-                               buffer[pos]= data[i];
-                               pos++;
-                         }
-                           //if end of char or buffer is full
-                           if (serialClient.isEndChar(data[i]) || pos==ESP3D_SOCKET_RX_BUFFER_SIZE) {
-                               //create message and push
-                               if (!serialClient.pushMsgToRxQueue(buffer, pos)) {
-                                   //send error
-                                   esp3d_log_e("Push Message to rx queue failed");
-                              }
-                               pos=0;
-                       }
-                       }
-                 }
-                   //if no data during a while then send them
-                   if (esp_timer_get_time()-startTimeout>(RX_FLUSH_TIME_OUT) && pos>0) {
-                       if (!serialClient.pushMsgToRxQueue(data, pos)) {
-                           //send error
-                           esp3d_log_e("Push Message to rx queue failed");
-                   }
-                      pos= 0;
-               }
-               }*/
     } else {
         esp3d_log_e("Starting socket server failed");
     }
@@ -329,13 +335,16 @@ bool ESP3DSocketServer::begin()
 
 bool ESP3DSocketServer::pushMsgToRxQueue(const uint8_t *msg, size_t size)
 {
+    esp3d_log("Pushing `%s` %d", msg, size);
     esp3d_msg_t *newMsgPtr = newMsg();
     if (newMsgPtr) {
         if (Esp3DClient::setDataContent(newMsgPtr, msg, size)) {
 #if     ESP3D_DISABLE_SERIAL_AUTHENTICATION_FEATURE
             newMsgPtr->authentication_level = ESP3D_LEVEL_ADMIN;
 #endif // ESP3D_DISABLE_SERIAL_AUTHENTICATION
-            newMsgPtr->origin = TELNET_CLIENT ;
+            newMsgPtr->origin = TELNET_CLIENT;
+            newMsgPtr->target= SERIAL_CLIENT;
+            newMsgPtr->type = msg_unique;
             if (!addRXData(newMsgPtr)) {
                 // delete message as cannot be added to the queue
                 Esp3DClient::deleteMsg(newMsgPtr);
@@ -368,12 +377,11 @@ void ESP3DSocketServer::handle()
         if (getTxMsgsCount() > 0) {
             esp3d_msg_t *msg = popTx();
             if (msg) {
-                // TODO:
-                // send message
-                // size_t len = uart_write_bytes(ESP3D_SOCKET_PORT, msg->data, msg->size);
-                // if (len != msg->size) {
-                //     esp3d_log_e("Error writing message %s", msg->data);
-                // }
+                for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
+                    if (_clients[s].socketId != -1) {
+                        sendToSocket(_clients[s].socketId, (const char *)msg->data, msg->size);
+                    }
+                }
                 deleteMsg(msg);
             }
         }

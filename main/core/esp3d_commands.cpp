@@ -21,6 +21,7 @@
 #include "serial/esp3d_serial_client.h"
 #include "http/esp3d_http_service.h"
 #include "websocket/esp3d_ws_service.h"
+#include "socket_server/esp3d_socket_server.h"
 #include "esp3d_string.h"
 #include <stdio.h>
 #include <string>
@@ -75,7 +76,7 @@ void Esp3DCommands::process(esp3d_msg_t * msg)
         //execute esp command
         execute_internal_command(cmdId, espcmdpos, msg);
     } else {
-        esp3d_log("Dispatch command, len %d, char 0 is %d to %d", msg->size, msg->data[0], msg->target);
+        esp3d_log("Dispatch command, len %d, to %d", msg->size, msg->target);
 
         //Work around to avoid to dispatch single \n or \r to everyone as it is part of previous ESP3D command
         if (msg->size == 1 && ((char(msg->data[0])=='\n') || (char(msg->data[0])=='\r'))&& lastIsESP3D) {
@@ -361,7 +362,7 @@ bool  Esp3DCommands::dispatch(esp3d_msg_t * msg,uint8_t * sbuf, size_t len)
 bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
 {
     bool sendOk = true;
-    //esp3d_log("Dispatch message origin %d to client %d , size %d",msg->origin,msg->target,msg->size);
+    esp3d_log("Dispatch message origin %d to client %d , size: %d,  type: %d",msg->origin,msg->target,msg->size,msg->type);
     if (!msg) {
         esp3d_log_e("no msg");
         return false;
@@ -385,9 +386,18 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
             esp3d_log_w("esp3dWsWebUiService not started for message size  %d", msg->size);
         }
         break;
-
+    case TELNET_CLIENT:
+        if (esp3dSocketServer.started()) {
+            esp3dSocketServer.process(msg);
+        } else {
+            sendOk=false;
+            esp3d_log_w("esp3dSocketServer not started for message size  %d", msg->size);
+        }
+        break;
     case SERIAL_CLIENT:
+        esp3d_log("Serial client got message");
         if (serialClient.started()) {
+            esp3d_log("Add message to queue");
             if (!serialClient.addTXData(msg)) {
                 serialClient.flush();
                 if (!serialClient.addTXData(msg)) {
@@ -412,7 +422,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
                 msg->target=SERIAL_CLIENT;
             } else {
                 //duplicate message because current is  already pending
-                esp3d_msg_t * copy_msg = Esp3DSerialClient::copyMsg(*msg);
+                esp3d_msg_t * copy_msg = Esp3DClient::copyMsg(*msg);
                 if (copy_msg) {
                     copy_msg->target = SERIAL_CLIENT;
                     dispatch(copy_msg);
@@ -428,9 +438,25 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
                 msg->target=WEBUI_WEBSOCKET_CLIENT;
             } else {
                 //duplicate message because current is  already pending
-                esp3d_msg_t * copy_msg = Esp3DSerialClient::copyMsg(*msg);
+                esp3d_msg_t * copy_msg = Esp3DClient::copyMsg(*msg);
                 if (copy_msg) {
                     copy_msg->target = WEBUI_WEBSOCKET_CLIENT;
+                    dispatch(copy_msg);
+                } else {
+                    esp3d_log_e("Cannot duplicate message for Websocket");
+                }
+            }
+        }
+        //TELNET_CLIENT
+        if (msg->origin!=TELNET_CLIENT) {
+            if (msg->target==ALL_CLIENTS) {
+                //become the reference message
+                msg->target=TELNET_CLIENT;
+            } else {
+                //duplicate message because current is  already pending
+                esp3d_msg_t * copy_msg = Esp3DClient::copyMsg(*msg);
+                if (copy_msg) {
+                    copy_msg->target = TELNET_CLIENT;
                     dispatch(copy_msg);
                 } else {
                     esp3d_log_e("Cannot duplicate message for Websocket");

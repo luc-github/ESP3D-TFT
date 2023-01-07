@@ -351,7 +351,9 @@ bool Esp3DUpdateService::updateFW()
     }
     if (isSuccess) {
         size_t chunksize ;
+#if ESP3D_TFT_LOG
         uint8_t progress =0;
+#endif
         do {
             chunksize = fread(chunk, 1, CHUNK_BUFFER_SIZE, fwFd);
             totalSize+=chunksize;

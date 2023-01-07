@@ -69,7 +69,7 @@ static void esp3d_serial_rx_task(void *pvParameter)
         }
         //if no data during a while then send them
         if (esp_timer_get_time()-startTimeout>(RX_FLUSH_TIME_OUT) && pos>0) {
-            if (!serialClient.pushMsgToRxQueue(data, pos)) {
+            if (!serialClient.pushMsgToRxQueue(buffer, pos)) {
                 //send error
                 esp3d_log_e("Push Message to rx queue failed");
             }
