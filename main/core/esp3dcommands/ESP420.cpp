@@ -364,11 +364,11 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     }
 
     //socket server
-    if (!socketServer.started() ) {
+    if (!esp3dSocketServer.started() ) {
         tmpstr="OFF";
     } else {
         tmpstr="ON (";
-        tmpstr=std::to_string(socketServer.port());
+        tmpstr=std::to_string(esp3dSocketServer.port());
         tmpstr+="}";
     }
 

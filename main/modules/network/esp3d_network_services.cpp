@@ -28,6 +28,7 @@
 #include "notifications/esp3d_notifications_service.h"
 #include "mDNS/esp3d_mdns.h"
 #include "ssdp/esp3d_ssdp.h"
+#include "socket_server/esp3d_socket_server.h"
 
 Esp3DNetworkServices esp3dNetworkServices;
 
@@ -41,7 +42,7 @@ Esp3DNetworkServices::~Esp3DNetworkServices() {}
 bool Esp3DNetworkServices::begin()
 {
     esp3d_log("Starting Services");
-    _started = esp3dHttpService.begin() && esp3dNotificationsService.begin(true) && esp3dmDNS.begin() && esp3d_ssdp_service.begin();
+    _started = esp3dHttpService.begin() && esp3dNotificationsService.begin(true) && esp3dmDNS.begin() && esp3d_ssdp_service.begin() && esp3dSocketServer.begin();
     return _started;
 }
 
@@ -53,6 +54,7 @@ void Esp3DNetworkServices::end()
         return;
     }
     esp3d_log("Stop Services");
+    esp3dSocketServer.end();
     esp3dHttpService.end();
     esp3dmDNS.end();
     esp3d_ssdp_service.end();

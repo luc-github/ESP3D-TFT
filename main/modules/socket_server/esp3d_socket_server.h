@@ -45,6 +45,8 @@ public:
     ~ESP3DSocketServer();
     bool begin();
     void handle();
+    void process();
+    void readSockets();
     void end();
     bool isEndChar(uint8_t ch);
     bool pushMsgToRxQueue(const uint8_t* msg, size_t size);
@@ -59,8 +61,14 @@ public:
     }
     bool startSocketServer();
     bool getClient();
-    bool closeSocket(int socketId);
+    uint clientsConnected();
+    void closeAllClients();
+    esp3d_socket_client_info_t * getClientInfo(uint index);
+
 private:
+
+    bool sendToSocket(const int sock, const char * data, const size_t len);
+    bool closeSocket(int socketId);
     int getFreeClientSlot();
     esp3d_socket_client_info_t _clients[ESP3D_MAX_SOCKET_CLIENTS];
     int _listen_socket;
@@ -71,7 +79,7 @@ private:
     TaskHandle_t _xHandle;
 };
 
-extern ESP3DSocketServer socketServer;
+extern ESP3DSocketServer esp3dSocketServer;
 
 #ifdef __cplusplus
 } // extern "C"
