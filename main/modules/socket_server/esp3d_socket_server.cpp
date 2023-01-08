@@ -37,11 +37,14 @@ ESP3DSocketServer esp3dSocketServer;
 #define KEEPALIVE_INTERVAL 5
 #define KEEPALIVE_COUNT 1
 
+#define FREE_SOCKET_HANDLE -1
+#define SOCKET_ERROR -1
+
 uint  ESP3DSocketServer::clientsConnected()
 {
     uint count = 0;
     for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
-        if (_clients[s].socketId != -1) {
+        if (_clients[s].socketId != FREE_SOCKET_HANDLE) {
             count++;
         }
     }
@@ -51,7 +54,7 @@ uint  ESP3DSocketServer::clientsConnected()
 esp3d_socket_client_info_t * ESP3DSocketServer::getClientInfo(uint index)
 {
     if (index<=ESP3D_MAX_SOCKET_CLIENTS) {
-        if (_clients[index].socketId != -1) {
+        if (_clients[index].socketId !=FREE_SOCKET_HANDLE) {
             return &_clients[index];
         }
     }
@@ -73,7 +76,7 @@ bool ESP3DSocketServer::startSocketServer()
 
     // Marking the socket as non-blocking
     int flags = fcntl(_listen_socket, F_GETFL);
-    if (fcntl(_listen_socket, F_SETFL, flags | O_NONBLOCK) == -1) {
+    if (fcntl(_listen_socket, F_SETFL, flags | O_NONBLOCK) == SOCKET_ERROR) {
         esp3d_log_e("Unable to set socket non blocking: errno %d: %s", errno, strerror(errno));
         close(_listen_socket);
         return false;
@@ -115,23 +118,25 @@ void ESP3DSocketServer::readSockets()
     int len;
     static uint64_t startTimeout[ESP3D_MAX_SOCKET_CLIENTS];
     static bool initArrays = false;
-    if (!_started) {
+    if (!_started || !_data || !_buffer) {
         return;
     }
-    static char buffer[ESP3D_MAX_SOCKET_CLIENTS][ESP3D_SOCKET_RX_BUFFER_SIZE+1];
-    static char data[ESP3D_SOCKET_RX_BUFFER_SIZE]; // need * ESP3D_MAX_SOCKET_CLIENTS
     static size_t pos[ESP3D_MAX_SOCKET_CLIENTS];
     if (!initArrays) {
         initArrays = true;
         for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
             pos[s]=0;
             startTimeout[s]=0;
+            if (!_buffer[s]) {
+                esp3d_log_e("Missing buffer for socket %d", s);
+                return;
+            }
         }
     }
 
     for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
-        if (_clients[s].socketId != -1) {
-            len = recv(_clients[s].socketId, data,ESP3D_SOCKET_RX_BUFFER_SIZE - 1, 0);
+        if (_clients[s].socketId != FREE_SOCKET_HANDLE) {
+            len = recv(_clients[s].socketId, _data,ESP3D_SOCKET_RX_BUFFER_SIZE, 0);
             if (len < 0) {
                 if (errno == EINPROGRESS || errno == EAGAIN || errno == EWOULDBLOCK) {
                     continue;   // Not an error
@@ -144,21 +149,21 @@ void ESP3DSocketServer::readSockets()
                 esp3d_log_e("Error occurred during receiving: errno %d on socket %d", errno, s );
                 closeSocket(_clients[s].socketId);
             } else {
-                data[len] = 0; // Null-terminate whatever is received and treat it like a string
-                esp3d_log("Received %d bytes: %s", len, data);
+                _data[len] = 0; // Null-terminate whatever is received and treat it like a string
+                esp3d_log("Received %d bytes: %s", len, _data);
                 if (len) {
                     //parse data
                     startTimeout[s] = esp3d_hal::millis();
                     for (size_t i = 0; i < len ; i++) {
                         if (pos[s] <ESP3D_SOCKET_RX_BUFFER_SIZE) {
-                            buffer[s][pos[s]]= data[i];
+                            _buffer[s][pos[s]]= _data[i];
                             (pos[s])++;
-                            buffer[s][pos[s]]=0;
+                            _buffer[s][pos[s]]=0;
                         }
                         //if end of char or buffer is full
-                        if (isEndChar(data[i]) || pos[s]==ESP3D_SOCKET_RX_BUFFER_SIZE) {
+                        if (isEndChar(_data[i]) || pos[s]==ESP3D_SOCKET_RX_BUFFER_SIZE) {
                             //create message and push
-                            if (!pushMsgToRxQueue((const uint8_t*)buffer[s], pos[s])) {
+                            if (!pushMsgToRxQueue((const uint8_t*)_buffer[s], pos[s])) {
                                 //send error
                                 esp3d_log_e("Push Message to rx queue failed");
                             }
@@ -172,9 +177,9 @@ void ESP3DSocketServer::readSockets()
     //if no data during a while then send them
     for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++)
         if (esp3d_hal::millis()-startTimeout[s]>(RX_FLUSH_TIME_OUT) && pos[s]>0) {
-            if (!pushMsgToRxQueue((const uint8_t*)buffer[s], pos[s])) {
+            if (!pushMsgToRxQueue((const uint8_t*)_buffer[s], pos[s])) {
                 //send error
-                esp3d_log_e("Push Message  %s of size %d to rx queue failed",buffer[s], pos[s]);
+                esp3d_log_e("Push Message  %s of size %d to rx queue failed",_buffer[s], pos[s]);
             }
             pos[s]=0;
         }
@@ -225,7 +230,7 @@ bool ESP3DSocketServer::getClient()
         return false;
     }
     int freeIndex = getFreeClientSlot();
-    if (freeIndex < 0) {
+    if (freeIndex == SOCKET_ERROR) {
         esp3d_log_e("Unable to get free client slot");
         shutdown(sock, 0);
         close(sock);
@@ -236,7 +241,7 @@ bool ESP3DSocketServer::getClient()
     memcpy(&_clients[freeIndex].source_addr, &source_addr,  sizeof(source_addr));
     // Marking the socket as non-blocking
     int flags = fcntl(_clients[freeIndex].socketId, F_GETFL);
-    if (fcntl(_clients[freeIndex].socketId, F_SETFL, flags | O_NONBLOCK) == -1) {
+    if (fcntl(_clients[freeIndex].socketId, F_SETFL, flags | O_NONBLOCK) == SOCKET_ERROR) {
         esp3d_log_e("Unable to set socket non blocking: errno %d: %s", errno, strerror(errno));
         closeSocket(_clients[freeIndex].socketId);
         return false;
@@ -253,21 +258,21 @@ bool ESP3DSocketServer::getClient()
 int ESP3DSocketServer::getFreeClientSlot()
 {
     for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
-        if (_clients[s].socketId == -1) {
+        if (_clients[s].socketId == FREE_SOCKET_HANDLE) {
             return s;
         }
     }
-    return -1;
+    return SOCKET_ERROR;
 }
 
 bool ESP3DSocketServer::closeSocket(int socketId)
 {
-    if (socketId!=-1)
+    if (socketId!=FREE_SOCKET_HANDLE)
         for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
             if (_clients[s].socketId == socketId) {
                 shutdown(socketId, 0);
                 close(socketId);
-                _clients[s].socketId = -1;
+                _clients[s].socketId = FREE_SOCKET_HANDLE;
                 memset(&_clients[s].source_addr, 0, sizeof(struct sockaddr_storage));
                 return true;
             }
@@ -279,11 +284,13 @@ ESP3DSocketServer::ESP3DSocketServer()
 {
     _xHandle = NULL;
     _started = false;
-    _listen_socket = -1;
+    _listen_socket = FREE_SOCKET_HANDLE;
     memset(_clients, 0, sizeof(esp3d_socket_client_info_t) * ESP3D_MAX_SOCKET_CLIENTS);
     for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
-        _clients[s].socketId = -1;
+        _clients[s].socketId = FREE_SOCKET_HANDLE;
     }
+    _data = NULL;
+    _buffer = NULL;
 }
 ESP3DSocketServer::~ESP3DSocketServer()
 {
@@ -318,6 +325,28 @@ bool ESP3DSocketServer::begin()
 
     //Read port
     _port = esp3dTFTsettings.readUint32(esp3d_socket_port);
+
+    _data = (char *) malloc(ESP3D_SOCKET_RX_BUFFER_SIZE+1);
+    if (_data == NULL) {
+        esp3d_log_e("Memory allocation failed");
+        _started = false;
+        return false;
+    }
+    _buffer = (char **) malloc(ESP3D_MAX_SOCKET_CLIENTS*sizeof(char *));
+    if (_buffer == NULL) {
+        esp3d_log_e("Memory allocation failed");
+        _started = false;
+        return false;
+    }
+
+    for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
+        _buffer[s] = (char *) malloc(ESP3D_SOCKET_RX_BUFFER_SIZE+1);
+        if (_buffer[s] == NULL) {
+            esp3d_log_e("Memory allocation failed");
+            _started = false;
+            return false;
+        }
+    }
 
     BaseType_t res = xTaskCreatePinnedToCore(esp3d_socket_rx_task, "esp3d_socket_rx_task", ESP3D_SOCKET_TASK_SIZE, NULL, ESP3D_SOCKET_TASK_PRIORITY, &_xHandle, ESP3D_SOCKET_TASK_CORE);
 
@@ -378,7 +407,7 @@ void ESP3DSocketServer::handle()
             esp3d_msg_t *msg = popTx();
             if (msg) {
                 for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
-                    if (_clients[s].socketId != -1) {
+                    if (_clients[s].socketId != FREE_SOCKET_HANDLE) {
                         sendToSocket(_clients[s].socketId, (const char *)msg->data, msg->size);
                     }
                 }
@@ -422,7 +451,21 @@ void ESP3DSocketServer::end()
         vTaskDelete(_xHandle);
         _xHandle = NULL;
     }
-    _listen_socket = -1;
+    if (_data) {
+        free(_data);
+        _data = NULL;
+    }
+    if (_buffer) {
+        for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
+            if(_buffer[s]) {
+                free(_buffer[s]);
+                _buffer[s] = NULL;
+            }
+        }
+        free(_buffer);
+        _buffer = NULL;
+    }
+    _listen_socket = FREE_SOCKET_HANDLE;
     closeAllClients();
 }
 

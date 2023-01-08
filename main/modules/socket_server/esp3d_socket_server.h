@@ -77,6 +77,8 @@ private:
     pthread_mutex_t _tx_mutex;
     pthread_mutex_t _rx_mutex;
     TaskHandle_t _xHandle;
+    char ** _buffer;
+    char * _data;
 };
 
 extern ESP3DSocketServer esp3dSocketServer;
