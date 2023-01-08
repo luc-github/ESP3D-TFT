@@ -37,10 +37,28 @@ Esp3DSerialClient serialClient;
 static void esp3d_serial_rx_task(void *pvParameter)
 {
     (void) pvParameter;
-    uint8_t data[ESP3D_SERIAL_RX_BUFFER_SIZE];
-    uint8_t buffer[ESP3D_SERIAL_RX_BUFFER_SIZE];
+    static uint8_t * data = nullptr;
+    static uint8_t * buffer= nullptr;
     size_t pos = 0;
     uint64_t startTimeout=0; //microseconds
+    if (!data) {
+        data = (uint8_t *) malloc(ESP3D_SERIAL_RX_BUFFER_SIZE);
+        if (!data) {
+            esp3d_log_e("Failed to allocate memory for buffer");
+            serialClient.end();
+            vTaskDelete(NULL);
+            return ;
+        }
+    }
+    if (!buffer) {
+        buffer = (uint8_t *) malloc(ESP3D_SERIAL_RX_BUFFER_SIZE);
+        if (!buffer) {
+            esp3d_log_e("Failed to allocate memory for buffer");
+            serialClient.end();
+            vTaskDelete(NULL);
+            return ;
+        }
+    }
     while (1) {
         /* Delay */
         vTaskDelay(pdMS_TO_TICKS(10));
