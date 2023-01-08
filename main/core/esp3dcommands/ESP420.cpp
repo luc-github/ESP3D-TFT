@@ -321,7 +321,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
             tmpstr +="(";
             tmpstr += esp3dNetwork.getMacAddress(sta_list.sta[i].mac);
             tmpstr +=")";
-            std::string client = "client ";
+            std::string client = "# ";
             client+=std::to_string(i+1);
             if (!dispatchIdValue(json,client.c_str(),tmpstr.c_str(), target,requestId)) {
                 return;
@@ -387,7 +387,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
             char addr_str[16];
             inet_ntoa_r(((struct sockaddr_in *)&(esp3dSocketServer.getClientInfo(i)->source_addr))->sin_addr, addr_str, sizeof(addr_str) - 1);
             tmpstr = addr_str;
-            std::string client = "client ";
+            std::string client = "# ";
             client+=std::to_string(i+1);
             if (!dispatchIdValue(json,client.c_str(),tmpstr.c_str(), target,requestId)) {
                 return;
