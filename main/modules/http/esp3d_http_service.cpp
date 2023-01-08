@@ -105,9 +105,12 @@ Esp3DHttpService::Esp3DHttpService()
     _post_files_upload_ctx.status = upload_not_started;
 }
 
-Esp3DHttpService::~Esp3DHttpService() {}
+Esp3DHttpService::~Esp3DHttpService()
+{
+    end();
+}
 
-esp_err_t Esp3DHttpService::open_fn(httpd_handle_t hd, int socketFd)
+/*esp_err_t Esp3DHttpService::open_fn(httpd_handle_t hd, int socketFd)
 {
     esp3d_log("New client connection %d", socketFd);
     return ESP_OK;
@@ -119,7 +122,7 @@ void Esp3DHttpService::close_fn(httpd_handle_t hd, int socketFd)
     esp3dWsWebUiService.onClose(socketFd);
     close(socketFd );
     httpd_sess_update_lru_counter(hd,socketFd);
-}
+}*/
 
 bool Esp3DHttpService::begin()
 {
@@ -147,8 +150,6 @@ bool Esp3DHttpService::begin()
     //backlog_conn
     config.backlog_conn       = 8,
 
-    //config.open_fn = open_fn;
-    //config.close_fn = close_fn;
     config.lru_purge_enable = true;
 
     //start server

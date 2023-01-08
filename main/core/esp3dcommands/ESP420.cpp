@@ -41,6 +41,7 @@
 #include "mDNS/esp3d_mdns.h"
 #include "ssdp/esp3d_ssdp.h"
 #include "socket_server/esp3d_socket_server.h"
+#include "websocket/esp3d_ws_server.h"
 #include "notifications/esp3d_notifications_service.h"
 #define COMMAND_ID 420
 
@@ -377,23 +378,58 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     }
     //Socket connected clients
     tmpstr = std::to_string(esp3dSocketServer.clientsConnected());
-
-    if (!dispatchIdValue(json,"clients",tmpstr.c_str(), target,requestId)) {
-        return;
-    }
-    for(int i = 0; i < ESP3D_MAX_SOCKET_CLIENTS; i++) {
-        //Print the mac address of the connected station
-        if (esp3dSocketServer.getClientInfo(i)) {
-            char addr_str[16];
-            inet_ntoa_r(((struct sockaddr_in *)&(esp3dSocketServer.getClientInfo(i)->source_addr))->sin_addr, addr_str, sizeof(addr_str) - 1);
-            tmpstr = addr_str;
-            std::string client = "# ";
-            client+=std::to_string(i+1);
-            if (!dispatchIdValue(json,client.c_str(),tmpstr.c_str(), target,requestId)) {
-                return;
+    if (esp3dSocketServer.started() ) {
+        if (!dispatchIdValue(json,"clients",tmpstr.c_str(), target,requestId)) {
+            return;
+        }
+        for(int i = 0; i < ESP3D_MAX_SOCKET_CLIENTS; i++) {
+            //Print the mac address of the connected station
+            if (esp3dSocketServer.getClientInfo(i)) {
+                char addr_str[16];
+                inet_ntoa_r(((struct sockaddr_in *)&(esp3dSocketServer.getClientInfo(i)->source_addr))->sin_addr, addr_str, sizeof(addr_str) - 1);
+                tmpstr = addr_str;
+                std::string client = "# ";
+                client+=std::to_string(i+1);
+                if (!dispatchIdValue(json,client.c_str(),tmpstr.c_str(), target,requestId)) {
+                    return;
+                }
             }
         }
     }
+    //Web socket server
+    if (!esp3dWsServer.started() ) {
+        tmpstr="OFF";
+    } else {
+        tmpstr="ON (";
+        tmpstr+=std::to_string(esp3dWsServer.port());
+        tmpstr+=")";
+    }
+
+    if (!dispatchIdValue(json,"ws",tmpstr.c_str(), target,requestId)) {
+        return;
+    }
+    if (esp3dWsServer.started() ) {
+        //WebSocket connected clients
+        tmpstr = std::to_string(esp3dSocketServer.clientsConnected());
+
+        if (!dispatchIdValue(json,"clients",tmpstr.c_str(), target,requestId)) {
+            return;
+        }
+        for(    int i = 0; i < ESP3D_MAX_WS_CLIENTS; i++) {
+            //Print the mac address of the connected station
+            if (esp3dWsServer.getClientInfo(i)) {
+                char addr_str[16];
+                inet_ntoa_r(((struct sockaddr_in *)&(esp3dWsServer.getClientInfo(i)->source_addr))->sin_addr, addr_str, sizeof(addr_str) - 1);
+                tmpstr = addr_str;
+                std::string client = "# ";
+                client+=std::to_string(i+1);
+                if (!dispatchIdValue(json,client.c_str(),tmpstr.c_str(), target,requestId)) {
+                    return;
+                }
+            }
+        }
+    }
+
 
 //Notifications
     if (!esp3dNotificationsService.started() || esp3dNotificationsService.getType()==esp3d_no_notification) {

@@ -79,6 +79,8 @@ const esp3d_setting_desc_t Esp3DSettingsData [] = {
     {esp3d_notification_token_setting,esp3d_string, SIZE_OF_SETTING_NOFIFICATION_TS,""},
     {esp3d_socket_port, esp3d_integer, 4, "23"},
     {esp3d_socket_on, esp3d_byte, 1,"1"},
+    {esp3d_ws_port, esp3d_integer, 4, "8080"},
+    {esp3d_ws_on, esp3d_byte, 1,"1"},
 };
 
 bool  Esp3DSettings::isValidStringSetting(const char* value, esp3d_setting_index_t settingElement)
@@ -134,6 +136,7 @@ bool  Esp3DSettings::isValidIntegerSetting(uint32_t value, esp3d_setting_index_t
             }
         }
         break;
+    case esp3d_ws_port:
     case esp3d_socket_port:
     case esp3d_http_port:
         if (value>=1 && value<65535) {
@@ -159,6 +162,7 @@ bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t set
     case esp3d_check_update_on_sd:
     case esp3d_setup:
     case esp3d_socket_on:
+    case esp3d_ws_on:
     case esp3d_http_on:
     case esp3d_radio_boot_mode:
     case esp3d_auto_notification:

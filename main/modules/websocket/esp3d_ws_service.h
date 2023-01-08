@@ -55,8 +55,6 @@ public:
         return _currentFd;
     }
     esp_err_t pushNotification(const char *msg);
-    esp_err_t add_client(int fd);
-    esp_err_t remove_client(int fd);
     esp_err_t pushMsgTxt(const char *msg);
     esp_err_t pushMsgTxt(int fd, const char *msg);
     esp_err_t pushMsgTxt(int fd, uint8_t *msg, size_t len);
