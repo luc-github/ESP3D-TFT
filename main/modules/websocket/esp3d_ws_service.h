@@ -31,10 +31,6 @@ extern "C" {
 
 #define MAX_WS_CLIENTS 4
 
-
-typedef bool (*wss_check_client_alive_cb_t)(int fd);
-typedef bool (*wss_client_not_alive_cb_t)( int fd);
-
 class Esp3DWsService final
 {
 public:

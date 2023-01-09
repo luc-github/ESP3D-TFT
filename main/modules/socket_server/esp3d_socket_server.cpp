@@ -105,11 +105,12 @@ bool ESP3DSocketServer::startSocketServer()
 
 void ESP3DSocketServer::process(esp3d_msg_t * msg)
 {
-    //add to TX queue that will be processed in task
     if (!addTXData(msg)) {
-        // delete message as cannot be added to the queue
-        Esp3DClient::deleteMsg(msg);
-        esp3d_log_e("Failed to add message to tx queue");
+        flush();
+        if (!addTXData(msg)) {
+            esp3d_log_e("Cannot add msg to client queue");
+            deleteMsg(msg);
+        }
     }
 }
 
@@ -163,7 +164,7 @@ void ESP3DSocketServer::readSockets()
                         //if end of char or buffer is full
                         if (isEndChar(_data[i]) || pos[s]==ESP3D_SOCKET_RX_BUFFER_SIZE) {
                             //create message and push
-                            if (!pushMsgToRxQueue((const uint8_t*)_buffer[s], pos[s])) {
+                            if (!pushMsgToRxQueue(_clients[s].socketId,(const uint8_t*)_buffer[s], pos[s])) {
                                 //send error
                                 esp3d_log_e("Push Message to rx queue failed");
                             }
@@ -177,7 +178,7 @@ void ESP3DSocketServer::readSockets()
     //if no data during a while then send them
     for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++)
         if (esp3d_hal::millis()-startTimeout[s]>(RX_FLUSH_TIME_OUT) && pos[s]>0) {
-            if (!pushMsgToRxQueue((const uint8_t*)_buffer[s], pos[s])) {
+            if (!pushMsgToRxQueue(_clients[s].socketId,(const uint8_t*)_buffer[s], pos[s])) {
                 //send error
                 esp3d_log_e("Push Message  %s of size %d to rx queue failed",_buffer[s], pos[s]);
             }
@@ -362,7 +363,7 @@ bool ESP3DSocketServer::begin()
     }
 }
 
-bool ESP3DSocketServer::pushMsgToRxQueue(const uint8_t *msg, size_t size)
+bool ESP3DSocketServer::pushMsgToRxQueue(int socketId,const uint8_t *msg, size_t size)
 {
     esp3d_log("Pushing `%s` %d", msg, size);
     esp3d_msg_t *newMsgPtr = newMsg();
@@ -374,6 +375,7 @@ bool ESP3DSocketServer::pushMsgToRxQueue(const uint8_t *msg, size_t size)
             newMsgPtr->origin = TELNET_CLIENT;
             newMsgPtr->target= SERIAL_CLIENT;
             newMsgPtr->type = msg_unique;
+            newMsgPtr->requestId.id = socketId;
             if (!addRXData(newMsgPtr)) {
                 // delete message as cannot be added to the queue
                 Esp3DClient::deleteMsg(newMsgPtr);
@@ -408,7 +410,9 @@ void ESP3DSocketServer::handle()
             if (msg) {
                 for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
                     if (_clients[s].socketId != FREE_SOCKET_HANDLE) {
-                        sendToSocket(_clients[s].socketId, (const char *)msg->data, msg->size);
+                        if (msg->requestId.id==0 || msg->requestId.id== _clients[s].socketId) {
+                            sendToSocket(_clients[s].socketId, (const char *)msg->data, msg->size);
+                        }
                     }
                 }
                 deleteMsg(msg);

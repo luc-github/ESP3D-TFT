@@ -36,6 +36,7 @@ public:
     bool begin();
     void handle();
     void end();
+    void process(esp3d_msg_t * msg);
     bool isEndChar(uint8_t ch);
     bool pushMsgToRxQueue(const uint8_t* msg, size_t size);
     void flush();

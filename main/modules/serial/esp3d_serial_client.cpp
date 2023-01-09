@@ -104,6 +104,20 @@ Esp3DSerialClient::~Esp3DSerialClient()
     end();
 }
 
+void Esp3DSerialClient::process(esp3d_msg_t * msg)
+{
+    esp3d_log("Add message to queue");
+    if (!addTXData(msg)) {
+        flush();
+        if (!addTXData(msg)) {
+            esp3d_log_e("Cannot add msg to client queue");
+            deleteMsg(msg);
+        }
+    } else {
+        flush();
+    }
+}
+
 bool Esp3DSerialClient::isEndChar(uint8_t ch)
 {
     return ((char)ch=='\n' || (char)ch=='\r');

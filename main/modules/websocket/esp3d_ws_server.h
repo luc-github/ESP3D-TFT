@@ -57,12 +57,15 @@ public:
     {
         return _port;
     }
-
+    esp_err_t onOpen(httpd_req_t *req);
+    esp_err_t onMessage(httpd_req_t *req);
+    esp_err_t onClose(int fd);
+    static void close_fn(httpd_handle_t hd, int socketFd);
     bool getClient();
     uint clientsConnected();
     void closeAllClients();
     esp3d_ws_client_info_t * getClientInfo(uint index);
-
+    static esp_err_t websocket_handler(httpd_req_t *req);
 private:
     void readSockets();
     bool sendToSocket(const int sock, const char * data, const size_t len);

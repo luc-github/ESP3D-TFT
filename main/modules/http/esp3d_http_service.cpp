@@ -148,7 +148,7 @@ bool Esp3DHttpService::begin()
     //handler
     config.max_uri_handlers = 12; //currently use 10
     //backlog_conn
-    config.backlog_conn       = 8,
+    config.backlog_conn       = 8;
 
     config.lru_purge_enable = true;
 

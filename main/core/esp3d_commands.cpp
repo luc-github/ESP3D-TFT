@@ -397,16 +397,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
     case SERIAL_CLIENT:
         esp3d_log("Serial client got message");
         if (serialClient.started()) {
-            esp3d_log("Add message to queue");
-            if (!serialClient.addTXData(msg)) {
-                serialClient.flush();
-                if (!serialClient.addTXData(msg)) {
-                    esp3d_log_e("Cannot add msg to client queue");
-                    sendOk=false;
-                }
-            } else {
-                serialClient.flush();
-            }
+            serialClient.process(msg);
         } else {
             sendOk=false;
             esp3d_log_e("serialClient not started for message size  %d", msg->size);
@@ -449,6 +440,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
         }
         //TELNET_CLIENT
         if (msg->origin!=TELNET_CLIENT) {
+            msg->requestId.id = 0;
             if (msg->target==ALL_CLIENTS) {
                 //become the reference message
                 msg->target=TELNET_CLIENT;
