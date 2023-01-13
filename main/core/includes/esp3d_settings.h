@@ -65,7 +65,6 @@ typedef enum  {
     esp3d_notification_token_setting,
     esp3d_socket_port,
     esp3d_socket_on,
-    esp3d_ws_port,
     esp3d_ws_on,
     last_esp3d_setting_index_t
 } esp3d_setting_index_t;

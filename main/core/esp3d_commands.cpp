@@ -21,6 +21,7 @@
 #include "serial/esp3d_serial_client.h"
 #include "http/esp3d_http_service.h"
 #include "websocket/esp3d_ws_service.h"
+#include "websocket/esp3d_webui_service.h"
 #include "socket_server/esp3d_socket_server.h"
 #include "esp3d_string.h"
 #include <stdio.h>
@@ -386,6 +387,15 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
             esp3d_log_w("esp3dWsWebUiService not started for message size  %d", msg->size);
         }
         break;
+    case WEBSOCKET_CLIENT:
+        if (esp3dWsDataService.started()) {
+            esp3dWsDataService.process(msg);
+        } else {
+            sendOk=false;
+            esp3d_log_w("esp3dWsDataService not started for message size  %d", msg->size);
+        }
+        break;
+
     case TELNET_CLIENT:
         if (esp3dSocketServer.started()) {
             esp3dSocketServer.process(msg);
@@ -432,6 +442,23 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
                 esp3d_msg_t * copy_msg = Esp3DClient::copyMsg(*msg);
                 if (copy_msg) {
                     copy_msg->target = WEBUI_WEBSOCKET_CLIENT;
+                    dispatch(copy_msg);
+                } else {
+                    esp3d_log_e("Cannot duplicate message for Websocket");
+                }
+            }
+        }
+        //WEBSOCKET_CLIENT
+        if (msg->origin!=WEBSOCKET_CLIENT) {
+            msg->requestId.id = 0;
+            if (msg->target==ALL_CLIENTS) {
+                //become the reference message
+                msg->target=WEBSOCKET_CLIENT;
+            } else {
+                //duplicate message because current is  already pending
+                esp3d_msg_t * copy_msg = Esp3DClient::copyMsg(*msg);
+                if (copy_msg) {
+                    copy_msg->target = WEBSOCKET_CLIENT;
                     dispatch(copy_msg);
                 } else {
                     esp3d_log_e("Cannot duplicate message for Websocket");
@@ -699,6 +726,9 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
         break;
     case 131:
         ESP131(cmd_params_pos, msg);
+        break;
+    case 160:
+        ESP160(cmd_params_pos, msg);
         break;
     case 200:
         ESP200(cmd_params_pos, msg);

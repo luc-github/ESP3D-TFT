@@ -46,7 +46,10 @@ bool Esp3DNetworkServices::begin()
     return _started;
 }
 
-void Esp3DNetworkServices::handle() {}
+void Esp3DNetworkServices::handle()
+{
+
+}
 
 void Esp3DNetworkServices::end()
 {

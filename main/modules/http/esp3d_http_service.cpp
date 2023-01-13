@@ -29,6 +29,7 @@
 #include "network/esp3d_network.h"
 #include "filesystem/esp3d_globalfs.h"
 #include "websocket/esp3d_ws_service.h"
+#include "websocket/esp3d_webui_service.h"
 
 #define CHUNK_BUFFER_SIZE STREAM_CHUNK_SIZE
 char chunk[CHUNK_BUFFER_SIZE];
@@ -69,6 +70,18 @@ void Esp3DHttpService::pushError(esp3d_http_error_t errcode, const char * st)
     errmsg+=st;
     errmsg+= "\n";
     esp3dWsWebUiService.BroadcastTxt((uint8_t*)errmsg.c_str(), strlen(errmsg.c_str()));
+}
+
+void Esp3DHttpService::push (esp3d_http_socket_t socketType, int socketFd)
+{
+    _sockets_list.push_back(std::make_pair(socketType,socketFd));
+}
+
+void Esp3DHttpService::pop (esp3d_http_socket_t socketType, int socketFd)
+{
+    _sockets_list.remove_if([&](std::pair<esp3d_http_socket_t, int>& p) {
+        return p.first== socketType and p.second==socketFd;
+    });
 }
 
 bool Esp3DHttpService::hasArg(httpd_req_t *req, const char* argname)
@@ -114,15 +127,16 @@ Esp3DHttpService::~Esp3DHttpService()
 {
     esp3d_log("New client connection %d", socketFd);
     return ESP_OK;
-}
+}*/
 
 void Esp3DHttpService::close_fn(httpd_handle_t hd, int socketFd)
 {
     esp3d_log("Client closing connection %d", socketFd);
+    //each service should know if the socket is owned by  itself
     esp3dWsWebUiService.onClose(socketFd);
+    esp3dWsDataService.onClose(socketFd);
     close(socketFd );
-    httpd_sess_update_lru_counter(hd,socketFd);
-}*/
+}
 
 bool Esp3DHttpService::begin()
 {
@@ -149,7 +163,7 @@ bool Esp3DHttpService::begin()
     config.max_uri_handlers = 12; //currently use 10
     //backlog_conn
     config.backlog_conn       = 8;
-
+    config.close_fn = close_fn;
     config.lru_purge_enable = true;
 
     //start server
@@ -278,23 +292,47 @@ bool Esp3DHttpService::begin()
         httpd_register_uri_handler(_server, &sdfiles_handler_config);
 
         //webui web socket /ws
-        const httpd_uri_t websocket_handler_config = {
+        const httpd_uri_t websocket_webui_handler_config = {
             .uri       = "/ws",
             .method    = HTTP_GET,
-            .handler   = (esp_err_t (*)(httpd_req_t*))(esp3dHttpService.websocket_handler),
+            .handler   = (esp_err_t (*)(httpd_req_t*))(esp3dHttpService.websocket_webui_handler),
             .user_ctx  =  nullptr,
             .is_websocket = true,
             .handle_ws_control_frames = false,
             .supported_subprotocol = "webui-v3"
         };
-        httpd_register_uri_handler(_server, &websocket_handler_config);
+        httpd_register_uri_handler(_server, &websocket_webui_handler_config);
+
+        const httpd_uri_t websocket_data_handler_config = {
+            .uri       = "/wsdata",
+            .method    = HTTP_GET,
+            .handler   = (esp_err_t (*)(httpd_req_t*))(esp3dHttpService.websocket_data_handler),
+            .user_ctx  =  nullptr,
+            .is_websocket = true,
+            .handle_ws_control_frames = false,
+            .supported_subprotocol = "arduino"
+        };
+        httpd_register_uri_handler(_server, &websocket_data_handler_config);
 
         //File not found
         httpd_register_err_handler(_server, HTTPD_404_NOT_FOUND, (httpd_err_handler_func_t )file_not_found_handler);
 
         //websocket service
-        esp3dWsWebUiService.begin(_server);
-        _started = true;
+        esp3d_websocket_config_t wsConfig= {
+            .serverHandle=_server,
+            .max_clients = 1,
+            .type=ESP3D_WS_WEBUI_SOCKET
+        };
+        _started = esp3dWsWebUiService.begin(&wsConfig);
+        if (_started) {
+            if (esp3d_state_on!= (esp3d_state_t)esp3dTFTsettings.readByte(esp3d_ws_on)) {
+                esp3d_log("WS is not enabled");
+            } else {
+                wsConfig.max_clients = 2;
+                wsConfig.type= ESP3D_WS_DATA_SOCKET;
+                _started = esp3dWsDataService.begin(&wsConfig);
+            }
+        }
     } else {
         esp3d_log_e("Web server start failed %s",esp_err_to_name(err)) ;
     }
@@ -311,6 +349,7 @@ void Esp3DHttpService::end()
     esp3d_log("Stop Http Service");
     if (_server) {
         esp3dWsWebUiService.end();
+        esp3dWsDataService.end();
         httpd_unregister_uri(_server, "/favicon.ico");
         httpd_unregister_uri(_server, "/command");
         httpd_unregister_uri(_server, "/");
@@ -438,6 +477,7 @@ void Esp3DHttpService::process(esp3d_msg_t * msg)
     }
     Esp3DClient::deleteMsg(msg);
 }
+
 
 
 esp_err_t Esp3DHttpService::sendStringChunk (httpd_req_t *req, const char * str, bool autoClose )

@@ -114,7 +114,7 @@ const char * ServintKeysVal[] = {
     "HTTP_Port"
     "TELNET_Port",
 //    "SENSOR_INTERVAL",
-    "WebSocket_Port",
+//    "WebSocket_Port",
 //    "WebDav_Port",
 //    "FTP_Control_Port",
 //    "FTP_Active_Port ",
@@ -125,7 +125,7 @@ const esp3d_setting_index_t ServintKeysPos[] = {
     esp3d_http_port,
     esp3d_socket_port,
 //    ESP_SENSOR_INTERVAL,
-    esp3d_ws_port,
+//    esp3d_ws_port,
 //    ESP_WEBDAV_PORT,
 //    ESP_FTP_CTRL_PORT,
 //    ESP_FTP_DATA_ACTIVE_PORT,

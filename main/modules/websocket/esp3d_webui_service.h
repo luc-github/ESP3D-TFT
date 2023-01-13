@@ -1,5 +1,6 @@
 /*
-  esp3d_http_service
+  esp3d_ws_service
+
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
   This code is free software; you can redistribute it and/or
@@ -17,13 +18,25 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#pragma once
 
-#include "http/esp3d_http_service.h"
-#include "esp3d_log.h"
-#include "websocket/esp3d_ws_service.h"
+#include "esp3d_ws_service.h"
 
-esp_err_t Esp3DHttpService::websocket_data_handler(httpd_req_t *req)
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+class Esp3DWebUiService: public Esp3DWsService
 {
-    //Delegate to websocket data service
-    return esp3dWsDataService.http_handler(req);
-}
+public:
+    void process(esp3d_msg_t * msg);
+    esp_err_t pushNotification(const char *msg);
+    esp_err_t onOpen(httpd_req_t *req);
+    esp_err_t onMessage(httpd_req_t *req);
+};
+
+extern Esp3DWebUiService esp3dWsWebUiService;
+
+#ifdef __cplusplus
+} // extern "C"
+#endif

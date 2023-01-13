@@ -20,10 +20,11 @@
 
 #include "http/esp3d_http_service.h"
 #include "esp3d_log.h"
-#include "websocket/esp3d_ws_service.h"
+#include "websocket/esp3d_webui_service.h"
 
-esp_err_t Esp3DHttpService::websocket_data_handler(httpd_req_t *req)
+
+esp_err_t Esp3DHttpService::websocket_webui_handler(httpd_req_t *req)
 {
-    //Delegate to websocket data service
-    return esp3dWsDataService.http_handler(req);
+    //Delegate to websocket webui service
+    return esp3dWsWebUiService.http_handler(req);
 }

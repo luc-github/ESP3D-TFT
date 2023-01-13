@@ -21,7 +21,7 @@
 #include "esp3d_client.h"
 #include "esp3d_string.h"
 #include "authentication/esp3d_authentication.h"
-#include "websocket/esp3d_ws_server.h"
+#include "websocket/esp3d_ws_service.h"
 #include "esp3d_settings.h"
 #define COMMAND_ID 160
 //Get/Set WebSocket state which can be ON, OFF, CLOSE
@@ -68,7 +68,7 @@ void Esp3DCommands::ESP160(int cmd_params_pos,esp3d_msg_t * msg)
         }
         if (closeClients) {
             has_param = true;
-            esp3dWsServer.closeAllClients();
+            esp3dWsDataService.closeClients();
         }
         if (!has_param) {
             hasError = true;

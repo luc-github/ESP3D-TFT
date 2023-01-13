@@ -79,7 +79,7 @@ The json format is {
 * Get/Set WebSocket state which can be ON, OFF   
     `[ESP160]<state> json=<no> pwd=<admin password>`
 
-* Get/Set WebSocket port    
+* Get/Set WebSocket port    // Not used in ESP3D-TFT
     `[ESP161]<port> json=<no> pwd=<admin password>`
 
 * Get/Set Camera command value / list all values in JSON/plain  // Not used in ESP3D-TFT

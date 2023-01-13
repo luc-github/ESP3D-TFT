@@ -65,6 +65,16 @@ typedef enum {
 
 } esp3d_http_error_t;
 
+typedef enum {
+    ESP3D_UNKNOW_SOCKET,
+    ESP3D_HTTP_SOCKET,
+    ESP3D_WS_WEBUI_SOCKET,
+    ESP3D_WS_DATA_SOCKET,
+    ESP3D_WS_MAX_SOCKETS
+} esp3d_http_socket_t;
+
+
+
 typedef struct {
     esp_err_t (*writeFn)(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state, const char * filename, size_t filesize);
     esp_err_t (*nextHandler)(httpd_req_t *req);
@@ -102,17 +112,21 @@ public:
     static esp_err_t files_handler(httpd_req_t *req);
     static esp_err_t sdfiles_handler(httpd_req_t *req);
     static esp_err_t updatefw_handler(httpd_req_t *req);
-    static esp_err_t websocket_handler(httpd_req_t *req);
+    static esp_err_t websocket_webui_handler(httpd_req_t *req);
+    static esp_err_t websocket_data_handler(httpd_req_t *req);
     static esp_err_t post_multipart_handler(httpd_req_t *req);
     static esp_err_t upload_to_flash_handler(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state, const char * filename, size_t filesize);
     static esp_err_t upload_to_sd_handler(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state, const char * filename, size_t filesize);
     static esp_err_t upload_to_updatefw_handler(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state, const char * filename, size_t filesize);
     //static esp_err_t open_fn(httpd_handle_t hd, int socketFd);
-    //static void  close_fn(httpd_handle_t hd, int socketFd);
+    static void  close_fn(httpd_handle_t hd, int socketFd);
     esp_err_t streamFile (const char * path,httpd_req_t *req );
     esp_err_t sendStringChunk (httpd_req_t *req, const char * str, bool autoClose = true );
     esp_err_t sendBinaryChunk (httpd_req_t *req, const uint8_t * data, size_t len, bool autoClose = true );
     bool hasArg(httpd_req_t *req,const char* argname );
+    void push (esp3d_http_socket_t socketType, int socketFd);
+    void pop (esp3d_http_socket_t socketType, int socketFd);
+
     const char * getArg(httpd_req_t *req, const char* argname);
 private:
     bool _started;
@@ -122,6 +136,7 @@ private:
     static post_upload_ctx_t _post_files_upload_ctx;
     static post_upload_ctx_t _post_sdfiles_upload_ctx;
     static post_upload_ctx_t _post_updatefw_upload_ctx;
+    std::list<std::pair<esp3d_http_socket_t, int>> _sockets_list;
 };
 
 extern Esp3DHttpService esp3dHttpService;

@@ -31,60 +31,178 @@
 #include "esp3d_settings.h"
 #include "http/esp3d_http_service.h"
 
-Esp3DWsService esp3dWsWebUiService;
+Esp3DWsService esp3dWsDataService;
+
+#define NO_FREE_SOCKET_HANDLE -1
+#define FREE_SOCKET_HANDLE -1
+#define SOCKET_ERROR -1
+
+int Esp3DWsService::getFreeClientIndex()
+{
+    for (uint i = 0; i <_max_clients; i++) {
+        if (_clients[i].socketId== FREE_SOCKET_HANDLE) {
+            return i;
+        }
+    }
+    return NO_FREE_SOCKET_HANDLE;
+}
+
+uint  Esp3DWsService::clientsConnected()
+{
+    uint count = 0;
+    for (uint i = 0; i <_max_clients; i++) {
+        if (_clients[i].socketId!= FREE_SOCKET_HANDLE) {
+            count++;
+        }
+    }
+    return count;
+}
+
+esp3d_ws_client_info_t * Esp3DWsService::getClientInfo(uint index)
+{
+    if (index<=_max_clients) {
+        if (_clients[index].socketId !=FREE_SOCKET_HANDLE) {
+            return &_clients[index];
+        }
+    }
+    return nullptr;
+}
+
+void Esp3DWsService::closeClients()
+{
+    if (!_started || !_server) {
+        return ;
+    }
+    for (uint i = 0; i <_max_clients; i++) {
+        if (_clients[i].socketId!= FREE_SOCKET_HANDLE) {
+            httpd_sess_trigger_close(_server, _clients[i].socketId );
+            onClose(_clients[i].socketId); //in theory not necessary, but...
+        }
+    }
+}
+
+bool Esp3DWsService::addClient(int socketid)
+{
+    int freeIndex = getFreeClientIndex();
+    if (freeIndex== NO_FREE_SOCKET_HANDLE) {
+        esp3d_log_e("No free slot for new connection, rejects connection");
+        return false;
+
+    }
+    _clients[freeIndex].socketId = socketid;
+    _clients[freeIndex].bufPos = 0;
+    struct sockaddr_in saddr; // expecting an IPv4 address
+    memset(&saddr, 0, sizeof(saddr)); // Clear it to be sure
+    socklen_t saddr_len = sizeof(saddr);
+    if(getpeername(socketid, (struct sockaddr *)&saddr, &saddr_len) == 0) {
+        (( struct sockaddr_in *) (&_clients[freeIndex].source_addr))->sin_addr.s_addr = saddr.sin_addr.s_addr;
+    }
+
+    return true;
+}
+
 
 
 Esp3DWsService::Esp3DWsService()
 {
     _started = false;
     _server = nullptr;
-    _req = nullptr;
-    _currentFd = -1;
+    _max_clients = 0;
+    _clients = nullptr;
+    _type =ESP3D_UNKNOW_SOCKET;
+    _rx_buffer = nullptr;
 }
-
-Esp3DWsService::~Esp3DWsService() {}
-
-bool Esp3DWsService::begin(httpd_handle_t  serverHandle)
-{
-    esp3d_log("Starting Ws Service");
-    end();
-    _server = serverHandle;
-    _started= true;
-    if (_started) {
-        esp3d_log("Ws Service Started");
-    }
-    return _started;
-}
-
-void Esp3DWsService::handle() {}
 
 void Esp3DWsService::end()
 {
     if (!_started) {
         return;
     }
-    esp3d_log("Stop Ws Service");
+    esp3d_log("Stop Ws Service %d", _type);
     closeClients();
     _server = nullptr;
     _started = false;
-    _req = nullptr;
-    _currentFd = -1;
+    if (_clients) {
+        for (uint s = 0; s < _max_clients; s++) {
+            if(_clients[s].buffer) {
+                free(_clients[s].buffer);
+            }
+        }
+        free(_clients);
+        _clients = nullptr;
+
+    }
+    if (_rx_buffer) {
+        free(_rx_buffer);
+        _rx_buffer = nullptr;
+    }
+    _max_clients = 0;
+    _type = ESP3D_UNKNOW_SOCKET;
 }
+
+Esp3DWsService::~Esp3DWsService()
+{
+    end();
+}
+
+bool Esp3DWsService::begin(esp3d_websocket_config_t * config)
+{
+    esp3d_log("Starting Ws Service");
+    end();
+    _server = config->serverHandle;
+    _type = config->type;
+    if (_server == nullptr) {
+        esp3d_log_e("No valid server handle");
+        return false;
+    }
+    _max_clients = config->max_clients;
+    if (_max_clients == 0) {
+        esp3d_log_e("max_clients cannot be 0");
+        return false;
+    }
+    _rx_buffer = (uint8_t *) malloc(ESP3D_WS_RX_BUFFER_SIZE+1);
+    if (_rx_buffer == NULL) {
+        esp3d_log_e("Memory allocation failed");
+        _started = false;
+        return false;
+    }
+    _clients = (esp3d_ws_client_info_t *) malloc(_max_clients*sizeof(esp3d_ws_client_info_t));
+    if (_clients == NULL) {
+        esp3d_log_e("Memory allocation failed");
+        _started = false;
+        return false;
+    }
+
+    for (uint s = 0; s < _max_clients; s++) {
+        _clients[s].buffer = (char *) malloc(ESP3D_WS_RX_BUFFER_SIZE+1);
+        if (_clients[s].buffer == NULL) {
+            esp3d_log_e("Memory allocation failed");
+            _started = false;
+            return false;
+        }
+        _clients[s].bufPos = 0;
+        _clients[s].socketId = FREE_SOCKET_HANDLE;
+    }
+    _started= true;
+    if (_started) {
+        esp3d_log("Ws Service Started type:%d", _type);
+    }
+    return _started;
+}
+
+void Esp3DWsService::handle() {}
+
+
 
 esp_err_t Esp3DWsService::onOpen(httpd_req_t *req)
 {
-    _currentFd = httpd_req_to_sockfd(req);
-    _req = req;
-    std::string tmpstr = "currentID:";
-    tmpstr+=std::to_string(_currentFd);
-    tmpstr+="\n";
-    pushMsgTxt(tmpstr.c_str());
-    tmpstr = "activeID:";
-    tmpstr+=std::to_string(_currentFd);
-    tmpstr+="\n";
-    BroadcastTxt(tmpstr.c_str(), _currentFd);
+    int currentFd = httpd_req_to_sockfd(req);
+    if (!addClient(currentFd)) {
+        httpd_sess_trigger_close(_server, currentFd );
+    }
     return ESP_OK;
 }
+
 esp_err_t Esp3DWsService::onMessage(httpd_req_t *req)
 {
     httpd_ws_frame_t ws_pkt;
@@ -114,8 +232,10 @@ esp_err_t Esp3DWsService::onMessage(httpd_req_t *req)
         }
         if (ws_pkt.type ==HTTPD_WS_TYPE_TEXT) {
             esp3d_log("Got packet with message: %s", ws_pkt.payload);
+            //TODO process payload and dispatch message is \n \re
         } else  if(ws_pkt.type ==HTTPD_WS_TYPE_BINARY) {
             esp3d_log("Got packet with %d bytes", ws_pkt.len);
+            //TODO process payload / file upload ? =>TBD
         } else {
             esp3d_log_e("Unknown frame type %d", ws_pkt.type);
         }
@@ -125,23 +245,33 @@ esp_err_t Esp3DWsService::onMessage(httpd_req_t *req)
     free(buf);
     return ESP_OK;
 }
+
 esp_err_t Esp3DWsService::onClose(int fd)
 {
-    esp3d_log("ID %d is now closed", fd);
-    if (fd ==_currentFd) {
-        _currentFd=-1;
+    for (uint i = 0; i <_max_clients; i++) {
+        if (_clients[i].socketId== fd) {
+            _clients[i].bufPos=0;
+            _clients[i].socketId = FREE_SOCKET_HANDLE;
+            return ESP_OK;
+        }
     }
-    return ESP_OK;
+    return ESP_FAIL;
 }
 
 void Esp3DWsService::process(esp3d_msg_t * msg)
 {
-    //TODO : need to handle broadcast error ?
-    BroadcastBin(msg->data, msg->size);
+
+    esp3d_log("Processing message");
+    //Broadcast ?
+    if (msg->requestId.id == 0) {
+        BroadcastTxt(msg->data, msg->size);
+    } else {
+        pushMsgTxt(msg->requestId.id,msg->data, msg->size);
+    }
     Esp3DClient::deleteMsg(msg);
 }
 
-esp_err_t Esp3DWsService::process(httpd_req_t *req)
+esp_err_t Esp3DWsService::http_handler(httpd_req_t *req)
 {
     if (!_started) {
         return ESP_FAIL;
@@ -152,48 +282,6 @@ esp_err_t Esp3DWsService::process(httpd_req_t *req)
         return ESP_OK;
     }
     return onMessage(req);
-}
-
-esp_err_t Esp3DWsService::pushMsgTxt(const char *msg)
-{
-    if (!_started || !_req) {
-        return ESP_FAIL;
-    }
-    httpd_ws_frame_t ws_pkt;
-    memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
-    ws_pkt.payload = (uint8_t*)msg;
-    ws_pkt.len = strlen(msg);
-    ws_pkt.type = HTTPD_WS_TYPE_TEXT;
-    esp_err_t res = httpd_ws_send_frame(_req, &ws_pkt);
-    if (res != ESP_OK) {
-        esp3d_log_e("httpd_ws_send_frame failed with %s",  esp_err_to_name(res));
-    }
-    return res;
-}
-
-esp_err_t Esp3DWsService::pushMsgBin(uint8_t *msg, size_t len)
-{
-    if (!_started || !_req) {
-        return ESP_FAIL;
-    }
-    httpd_ws_frame_t ws_pkt;
-    memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
-    ws_pkt.type = HTTPD_WS_TYPE_BINARY;
-    ws_pkt.payload = msg;
-    ws_pkt.len = len;
-    esp_err_t res = httpd_ws_send_frame(_req, &ws_pkt);
-    if (res != ESP_OK) {
-        esp3d_log_e("httpd_ws_send_frame failed with %s",  esp_err_to_name(res));
-    }
-    return res;
-}
-
-esp_err_t Esp3DWsService::pushNotification(const char *msg)
-{
-    std::string tmp = "NOTIFICATION:";
-    tmp+=msg;
-    tmp+="\n";
-    return pushMsgTxt(_currentFd, tmp.c_str());
 }
 
 esp_err_t Esp3DWsService::pushMsgTxt(int fd, const char *msg)
@@ -217,6 +305,7 @@ esp_err_t Esp3DWsService::pushMsgTxt(int fd, uint8_t *msg, size_t len)
     }
     return res;
 }
+
 esp_err_t Esp3DWsService::pushMsgBin(int fd, uint8_t *msg, size_t len)
 {
     if (!_started) {
@@ -233,78 +322,36 @@ esp_err_t Esp3DWsService::pushMsgBin(int fd, uint8_t *msg, size_t len)
     }
     return res;
 }
+
 esp_err_t Esp3DWsService::BroadcastTxt(const char *msg, int ignore)
 {
     return  BroadcastTxt((uint8_t *)msg, strlen(msg), ignore);
 }
+
 esp_err_t Esp3DWsService::BroadcastTxt(uint8_t *msg, size_t len, int ignore)
 {
     if (!_started) {
         return ESP_FAIL;
     }
-    size_t clientCount=MAX_WS_CLIENTS;
-    int clientsList[MAX_WS_CLIENTS];
-    esp_err_t res = httpd_get_client_list(_server, &clientCount, clientsList);
-    if (res == ESP_OK) {
-        for (int i = 0; i < clientCount; i++) {
-            int fdi = clientsList[i];
-            if (httpd_ws_get_fd_info(_server, fdi)==HTTPD_WS_CLIENT_WEBSOCKET && ignore!=fdi) {
-                pushMsgTxt(fdi, msg, len);
-            }
+    for (uint i = 0; i <_max_clients; i++) {
+        if (_clients[i].socketId!= ignore) {
+            pushMsgTxt(_clients[i].socketId, msg, len);
         }
     }
-    return res;
+    return ESP_OK;
 }
+
 esp_err_t Esp3DWsService::BroadcastBin(uint8_t *msg, size_t len, int ignore)
 {
     if (!_started) {
         return ESP_FAIL;
     }
-    size_t clientCount=MAX_WS_CLIENTS;
-    int clientsList[MAX_WS_CLIENTS];
-    esp_err_t res = httpd_get_client_list(_server, &clientCount, clientsList);
-    if (res == ESP_OK) {
-        for (int i = 0; i < clientCount; i++) {
-            int fdi = clientsList[i];
-            if (httpd_ws_get_fd_info(_server, fdi)==HTTPD_WS_CLIENT_WEBSOCKET  && ignore!=fdi) {
-                pushMsgBin(fdi, msg, len);
-            }
+    for (uint i = 0; i <_max_clients; i++) {
+        if (_clients[i].socketId!= ignore) {
+            pushMsgBin(_clients[i].socketId, msg, len);
         }
     }
-    return res;
+    return ESP_OK;
 }
 
-void Esp3DWsService::closeClients()
-{
-    if (!_started) {
-        return ;
-    }
-    size_t clientCount=MAX_WS_CLIENTS;
-    int clientsList[MAX_WS_CLIENTS];
-    esp_err_t res = httpd_get_client_list(_server, &clientCount, clientsList);
-    if (res == ESP_OK) {
-        for (int i = 0; i < clientCount; i++) {
-            int fdi = clientsList[i];
-            if (httpd_ws_get_fd_info(_server, fdi)==HTTPD_WS_CLIENT_WEBSOCKET) {
-                httpd_sess_trigger_close(_server, fdi );
-            };
-        }
-    }
-}
-void Esp3DWsService::enableOnly (int fd)
-{
-    if (!_started) {
-        return ;
-    }
-    size_t clientCount=MAX_WS_CLIENTS;
-    int clientsList[MAX_WS_CLIENTS];
-    esp_err_t res = httpd_get_client_list(_server, &clientCount, clientsList);
-    if (res == ESP_OK) {
-        for (int i = 0; i < clientCount; i++) {
-            int fdi = clientsList[i];
-            if (httpd_ws_get_fd_info(_server, fdi)==HTTPD_WS_CLIENT_WEBSOCKET && fdi!=fd) {
-                httpd_sess_trigger_close(_server, fdi );
-            }
-        }
-    }
-}
+

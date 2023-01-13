@@ -21,40 +21,49 @@
 #pragma once
 #include <stdio.h>
 #include <esp_http_server.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/queue.h"
+#include "lwip/sockets.h"
 #include "esp3d_client.h"
+#include "http/esp3d_http_service.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define MAX_WS_CLIENTS 4
+typedef struct {
+    httpd_handle_t serverHandle;
+    uint max_clients;
+    esp3d_http_socket_t type;
+} esp3d_websocket_config_t;
 
-class Esp3DWsService final
+typedef struct {
+    int socketId;
+    struct sockaddr_storage source_addr;
+    char * buffer;
+    uint bufPos;
+} esp3d_ws_client_info_t;
+
+class Esp3DWsService
 {
 public:
     Esp3DWsService();
     ~Esp3DWsService();
-    bool begin(httpd_handle_t serverHandle);
+    bool begin(esp3d_websocket_config_t * config );
     void handle();
     void end();
-    void process(esp3d_msg_t * msg);
-    esp_err_t process(httpd_req_t *req);
-    esp_err_t onOpen(httpd_req_t *req);
-    esp_err_t onMessage(httpd_req_t *req);
-    esp_err_t onClose(int fd);
+    esp_err_t http_handler(httpd_req_t *req);
+    virtual void process(esp3d_msg_t * msg);
+    virtual esp_err_t onOpen(httpd_req_t *req);
+    virtual esp_err_t onMessage(httpd_req_t *req);
+    virtual esp_err_t onClose(int fd);
+
+    int getFreeClientIndex();
+    uint  clientsConnected();
+    esp3d_ws_client_info_t * getClientInfo(uint index);
+    bool addClient(int socketid);
     void closeClients();
-    void enableOnly (int fd);
-    int getCurrentFd()
-    {
-        return _currentFd;
-    }
-    esp_err_t pushNotification(const char *msg);
-    esp_err_t pushMsgTxt(const char *msg);
+
     esp_err_t pushMsgTxt(int fd, const char *msg);
     esp_err_t pushMsgTxt(int fd, uint8_t *msg, size_t len);
-    esp_err_t pushMsgBin(uint8_t *msg, size_t len);
     esp_err_t pushMsgBin(int fd, uint8_t *msg, size_t len);
     esp_err_t BroadcastTxt(const char *msg, int ignore=-1);
     esp_err_t BroadcastTxt(uint8_t *msg, size_t len, int ignore=-1);
@@ -62,16 +71,27 @@ public:
     bool started()
     {
         return _started;
-    };
+    }
+    uint maxClients()
+    {
+        return _max_clients;
+    }
+    esp3d_http_socket_t type()
+    {
+        return _type;
+    }
 
 private:
     httpd_handle_t _server;
-    httpd_req_t *_req;
-    int _currentFd;
     bool _started;
+    esp3d_ws_client_info_t * _clients;
+    uint _max_clients;
+    esp3d_http_socket_t _type;
+    uint8_t *_rx_buffer;
 };
 
-extern Esp3DWsService esp3dWsWebUiService;
+extern Esp3DWsService  esp3dWsDataService;
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

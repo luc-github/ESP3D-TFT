@@ -43,9 +43,11 @@ ESP3DSocketServer esp3dSocketServer;
 uint  ESP3DSocketServer::clientsConnected()
 {
     uint count = 0;
-    for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
-        if (_clients[s].socketId != FREE_SOCKET_HANDLE) {
-            count++;
+    if (_started) {
+        for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
+            if (_clients[s].socketId != FREE_SOCKET_HANDLE) {
+                count++;
+            }
         }
     }
     return count;
@@ -53,9 +55,11 @@ uint  ESP3DSocketServer::clientsConnected()
 
 esp3d_socket_client_info_t * ESP3DSocketServer::getClientInfo(uint index)
 {
-    if (index<=ESP3D_MAX_SOCKET_CLIENTS) {
-        if (_clients[index].socketId !=FREE_SOCKET_HANDLE) {
-            return &_clients[index];
+    if (_started) {
+        if (index<=ESP3D_MAX_SOCKET_CLIENTS) {
+            if (_clients[index].socketId !=FREE_SOCKET_HANDLE) {
+                return &_clients[index];
+            }
         }
     }
     return nullptr;

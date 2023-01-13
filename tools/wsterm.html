@@ -51,7 +51,7 @@
 					ws_source.close();
 				}
 				try {
-					ws_source = new WebSocket('ws://'+address+':' + port+'/ws',['webui-v3']);
+					ws_source = new WebSocket('ws://'+address+':' + port+'/wsdata',['arduino']);
 					ws_source.binaryType = "arraybuffer";
 					  ws_source.onopen = function(e){
 						document.getElementById('isconnected').innerHTML = "Connected";

@@ -23,7 +23,7 @@
 #include "esp3d_settings.h"
 #include "mbedtls/base64.h"
 #include "network/esp3d_network.h"
-#include "websocket/esp3d_ws_service.h"
+#include "websocket/esp3d_webui_service.h"
 
 
 
