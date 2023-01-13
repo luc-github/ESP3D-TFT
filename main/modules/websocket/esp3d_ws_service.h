@@ -55,13 +55,15 @@ public:
     virtual esp_err_t onOpen(httpd_req_t *req);
     virtual esp_err_t onMessage(httpd_req_t *req);
     virtual esp_err_t onClose(int fd);
+    virtual bool pushMsgToRxQueue(int socketId,const uint8_t *msg, size_t size);
 
+    bool isEndChar(uint8_t ch);
     int getFreeClientIndex();
     uint  clientsConnected();
     esp3d_ws_client_info_t * getClientInfo(uint index);
+    esp3d_ws_client_info_t * getClientInfoFromSocketId(int socketId);
     bool addClient(int socketid);
     void closeClients();
-
     esp_err_t pushMsgTxt(int fd, const char *msg);
     esp_err_t pushMsgTxt(int fd, uint8_t *msg, size_t len);
     esp_err_t pushMsgBin(int fd, uint8_t *msg, size_t len);
@@ -87,7 +89,6 @@ private:
     esp3d_ws_client_info_t * _clients;
     uint _max_clients;
     esp3d_http_socket_t _type;
-    uint8_t *_rx_buffer;
 };
 
 extern Esp3DWsService  esp3dWsDataService;

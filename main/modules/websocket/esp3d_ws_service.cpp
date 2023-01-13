@@ -30,6 +30,7 @@
 #include "esp3d_string.h"
 #include "esp3d_settings.h"
 #include "http/esp3d_http_service.h"
+#include "esp3d_commands.h"
 
 Esp3DWsService esp3dWsDataService;
 
@@ -46,7 +47,6 @@ int Esp3DWsService::getFreeClientIndex()
     }
     return NO_FREE_SOCKET_HANDLE;
 }
-
 uint  Esp3DWsService::clientsConnected()
 {
     uint count = 0;
@@ -58,9 +58,19 @@ uint  Esp3DWsService::clientsConnected()
     return count;
 }
 
+esp3d_ws_client_info_t * Esp3DWsService::getClientInfoFromSocketId(int socketId)
+{
+    for (uint index = 0; index <_max_clients; index++) {
+        if (_clients[index].socketId== socketId) {
+            return &_clients[index];;
+        }
+    }
+    return nullptr;
+}
+
 esp3d_ws_client_info_t * Esp3DWsService::getClientInfo(uint index)
 {
-    if (index<=_max_clients) {
+    if (index<_max_clients) {
         if (_clients[index].socketId !=FREE_SOCKET_HANDLE) {
             return &_clients[index];
         }
@@ -91,11 +101,17 @@ bool Esp3DWsService::addClient(int socketid)
     }
     _clients[freeIndex].socketId = socketid;
     _clients[freeIndex].bufPos = 0;
-    struct sockaddr_in saddr; // expecting an IPv4 address
-    memset(&saddr, 0, sizeof(saddr)); // Clear it to be sure
+    esp3d_log("Added connection %d, on slot %d", socketid, freeIndex);
+
+    struct sockaddr_in6 saddr;   // esp_http_server uses IPv6 addressing
     socklen_t saddr_len = sizeof(saddr);
-    if(getpeername(socketid, (struct sockaddr *)&saddr, &saddr_len) == 0) {
-        (( struct sockaddr_in *) (&_clients[freeIndex].source_addr))->sin_addr.s_addr = saddr.sin_addr.s_addr;
+    if(getpeername(socketid, (struct sockaddr *)&saddr, &saddr_len)>= 0) {
+        static char address_str[40];
+        inet_ntop(AF_INET, &saddr.sin6_addr.un.u32_addr[3], address_str, sizeof(address_str));
+        esp3d_log("client IP is %s", address_str);
+        (( struct sockaddr_in *) (&_clients[freeIndex].source_addr))->sin_addr.s_addr = saddr.sin6_addr.un.u32_addr[3];
+    } else {
+        esp3d_log_e("Failed to get address for new connection");
     }
 
     return true;
@@ -110,7 +126,6 @@ Esp3DWsService::Esp3DWsService()
     _max_clients = 0;
     _clients = nullptr;
     _type =ESP3D_UNKNOW_SOCKET;
-    _rx_buffer = nullptr;
 }
 
 void Esp3DWsService::end()
@@ -131,10 +146,6 @@ void Esp3DWsService::end()
         free(_clients);
         _clients = nullptr;
 
-    }
-    if (_rx_buffer) {
-        free(_rx_buffer);
-        _rx_buffer = nullptr;
     }
     _max_clients = 0;
     _type = ESP3D_UNKNOW_SOCKET;
@@ -158,12 +169,6 @@ bool Esp3DWsService::begin(esp3d_websocket_config_t * config)
     _max_clients = config->max_clients;
     if (_max_clients == 0) {
         esp3d_log_e("max_clients cannot be 0");
-        return false;
-    }
-    _rx_buffer = (uint8_t *) malloc(ESP3D_WS_RX_BUFFER_SIZE+1);
-    if (_rx_buffer == NULL) {
-        esp3d_log_e("Memory allocation failed");
-        _started = false;
         return false;
     }
     _clients = (esp3d_ws_client_info_t *) malloc(_max_clients*sizeof(esp3d_ws_client_info_t));
@@ -203,11 +208,23 @@ esp_err_t Esp3DWsService::onOpen(httpd_req_t *req)
     return ESP_OK;
 }
 
+bool Esp3DWsService::isEndChar(uint8_t ch)
+{
+    return ((char)ch == '\n' || (char)ch=='\r');
+}
+
 esp_err_t Esp3DWsService::onMessage(httpd_req_t *req)
 {
     httpd_ws_frame_t ws_pkt;
     uint8_t *buf = NULL;
     memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
+    int currentFd = httpd_req_to_sockfd(req);
+    esp3d_log("Message from %d", currentFd);
+    esp3d_ws_client_info_t * client = getClientInfoFromSocketId(currentFd);
+    if (client == NULL) {
+        esp3d_log_e("Unregistered client");
+        return ESP_FAIL;
+    }
     /* Set max_len = 0 to get the frame len */
     esp_err_t ret = httpd_ws_recv_frame(req, &ws_pkt, 0);
     if (ret != ESP_OK) {
@@ -231,8 +248,24 @@ esp_err_t Esp3DWsService::onMessage(httpd_req_t *req)
             return ret;
         }
         if (ws_pkt.type ==HTTPD_WS_TYPE_TEXT) {
-            esp3d_log("Got packet with message: %s", ws_pkt.payload);
+            buf[ws_pkt.len] = 0;
+            esp3d_log("Got packet with message: %s",buf);
             //TODO process payload and dispatch message is \n \re
+            for (uint i=0; i <ws_pkt.len; i++) {
+                if (client->bufPos <ESP3D_WS_RX_BUFFER_SIZE) {
+                    client->buffer[client->bufPos]= buf[i];
+                    (client->bufPos)++;
+                    client->buffer[client->bufPos]=0;
+                }
+                //if end of char or buffer is full
+                if (isEndChar(buf[i]) || client->bufPos==ESP3D_SOCKET_RX_BUFFER_SIZE) {
+                    if (!pushMsgToRxQueue(client->socketId,(const uint8_t*)client->buffer, client->bufPos)) {
+                        //send error
+                        esp3d_log_e("Push Message to rx queue failed");
+                    }
+                    client->bufPos=0;
+                }
+            }
         } else  if(ws_pkt.type ==HTTPD_WS_TYPE_BINARY) {
             esp3d_log("Got packet with %d bytes", ws_pkt.len);
             //TODO process payload / file upload ? =>TBD
@@ -245,6 +278,38 @@ esp_err_t Esp3DWsService::onMessage(httpd_req_t *req)
     free(buf);
     return ESP_OK;
 }
+
+bool Esp3DWsService::pushMsgToRxQueue(int socketId,const uint8_t *msg, size_t size)
+{
+    esp3d_log("Pushing `%s` %d", msg, size);
+    esp3d_msg_t *newMsgPtr = Esp3DClient::newMsg();
+    if (newMsgPtr) {
+        if (Esp3DClient::setDataContent(newMsgPtr, msg, size)) {
+#if     ESP3D_DISABLE_SERIAL_AUTHENTICATION_FEATURE
+            newMsgPtr->authentication_level = ESP3D_LEVEL_ADMIN;
+#endif // ESP3D_DISABLE_SERIAL_AUTHENTICATION
+            newMsgPtr->origin = WEBSOCKET_CLIENT;
+            newMsgPtr->target= SERIAL_CLIENT;
+            newMsgPtr->type = msg_unique;
+            newMsgPtr->requestId.id = socketId;
+            if (esp3dCommands.is_esp_command((uint8_t *)msg, size) ) {
+                newMsgPtr->target= ESP3D_COMMAND;
+            }
+            esp3dCommands.process(newMsgPtr);
+        } else {
+            // delete message as cannot be added partially filled to the queue
+            free(newMsgPtr);
+            esp3d_log_e("Message creation failed");
+            return false;
+        }
+    } else {
+        esp3d_log_e("Out of memory!");
+        return false;
+    }
+    return true;
+}
+
+
 
 esp_err_t Esp3DWsService::onClose(int fd)
 {
