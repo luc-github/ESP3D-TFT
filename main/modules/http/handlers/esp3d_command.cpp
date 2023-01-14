@@ -72,7 +72,7 @@ esp_err_t Esp3DHttpService::command_handler(httpd_req_t *req)
                     return ESP_FAIL;
                 }
             }
-            esp3dCommands.dispatch(cmd, SERIAL_CLIENT, requestId,msg_unique, WEBUI_CLIENT, authentication_level);
+            esp3dCommands.dispatch(cmd, OUTPUT_CLIENT, requestId,msg_unique, WEBUI_CLIENT, authentication_level);
             return ESP_OK;
         }
 

@@ -302,7 +302,7 @@ bool Esp3DWsService::pushMsgToRxQueue(int socketId,const uint8_t *msg, size_t si
             newMsgPtr->authentication_level = ESP3D_LEVEL_ADMIN;
 #endif // ESP3D_DISABLE_SERIAL_AUTHENTICATION
             newMsgPtr->origin = WEBSOCKET_CLIENT;
-            newMsgPtr->target= SERIAL_CLIENT;
+            newMsgPtr->target= OUTPUT_CLIENT;
             newMsgPtr->type = msg_unique;
             newMsgPtr->requestId.id = socketId;
             if (esp3dCommands.is_esp_command((uint8_t *)msg, size) ) {

@@ -377,7 +377,7 @@ bool ESP3DSocketServer::pushMsgToRxQueue(int socketId,const uint8_t *msg, size_t
             newMsgPtr->authentication_level = ESP3D_LEVEL_ADMIN;
 #endif // ESP3D_DISABLE_SERIAL_AUTHENTICATION
             newMsgPtr->origin = TELNET_CLIENT;
-            newMsgPtr->target= SERIAL_CLIENT;
+            newMsgPtr->target= OUTPUT_CLIENT;
             newMsgPtr->type = msg_unique;
             newMsgPtr->requestId.id = socketId;
             if (!addRXData(newMsgPtr)) {
