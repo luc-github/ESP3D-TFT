@@ -78,15 +78,27 @@ esp3d_ws_client_info_t * Esp3DWsService::getClientInfo(uint index)
     return nullptr;
 }
 
+bool Esp3DWsService::closeClient(int socketId)
+{
+    if (!_started || !_server) {
+        esp3d_log_e("Not started or not server");
+        return false;
+    }
+    httpd_sess_trigger_close(_server, socketId);
+    onClose(socketId);
+    return true;
+}
+
 void Esp3DWsService::closeClients()
 {
     if (!_started || !_server) {
+        esp3d_log_e("Not started or not server");
         return ;
     }
     for (uint i = 0; i <_max_clients; i++) {
         if (_clients[i].socketId!= FREE_SOCKET_HANDLE) {
-            httpd_sess_trigger_close(_server, _clients[i].socketId );
-            onClose(_clients[i].socketId); //in theory not necessary, but...
+            esp3d_log("Closing %d ", _clients[i].socketId);
+            closeClient( _clients[i].socketId);
         }
     }
 }
@@ -203,6 +215,7 @@ esp_err_t Esp3DWsService::onOpen(httpd_req_t *req)
 {
     int currentFd = httpd_req_to_sockfd(req);
     if (!addClient(currentFd)) {
+        esp3d_log_e("Failed to add client");
         httpd_sess_trigger_close(_server, currentFd );
     }
     return ESP_OK;
@@ -313,13 +326,16 @@ bool Esp3DWsService::pushMsgToRxQueue(int socketId,const uint8_t *msg, size_t si
 
 esp_err_t Esp3DWsService::onClose(int fd)
 {
+
     for (uint i = 0; i <_max_clients; i++) {
         if (_clients[i].socketId== fd) {
             _clients[i].bufPos=0;
             _clients[i].socketId = FREE_SOCKET_HANDLE;
+            esp3d_log("onClose %d succeed", fd);
             return ESP_OK;
         }
     }
+    esp3d_log_w("onClose %d failed", fd);
     return ESP_FAIL;
 }
 

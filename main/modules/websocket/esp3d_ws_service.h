@@ -64,6 +64,7 @@ public:
     esp3d_ws_client_info_t * getClientInfoFromSocketId(int socketId);
     bool addClient(int socketid);
     void closeClients();
+    bool closeClient(int socketId);
     esp_err_t pushMsgTxt(int fd, const char *msg);
     esp_err_t pushMsgTxt(int fd, uint8_t *msg, size_t len);
     esp_err_t pushMsgBin(int fd, uint8_t *msg, size_t len);

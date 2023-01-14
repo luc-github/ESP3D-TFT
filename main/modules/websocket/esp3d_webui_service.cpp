@@ -20,6 +20,7 @@
 #include "esp3d_webui_service.h"
 #include <stdio.h>
 #include "esp3d_log.h"
+#include "esp3d_hal.h"
 #include "esp3d_string.h"
 #include "http/esp3d_http_service.h"
 
@@ -28,20 +29,33 @@ Esp3DWebUiService esp3dWsWebUiService;
 esp_err_t Esp3DWebUiService::onOpen(httpd_req_t *req)
 {
     int currentFd = httpd_req_to_sockfd(req);
-    //send id to new comer because last come is last active
-    std::string tmpstr = "currentID:";
-    tmpstr+=std::to_string(currentFd);
-    tmpstr+="\n";
-    pushMsgTxt(currentFd, tmpstr.c_str());
-    //Inform all existing connections of new connection
-    tmpstr = "activeID:";
-    tmpstr+=std::to_string(currentFd);
-    tmpstr+="\n";
-    BroadcastTxt(tmpstr.c_str(), currentFd);
-    //close all existing connections
-    closeClients();
-    //set new connection as current client
+    std::string tmpstr;
+    esp3d_log("New connection %d", currentFd);
+    esp3d_log("Already connected: %d client", clientsConnected());
+    esp3d_ws_client_info_t *   client=  getClientInfo(maxClients()-1);
+    if (client) {
+        int currentSocketId = client->socketId;
+        if (currentSocketId!=-1) {
+            tmpstr = "activeID:";
+            tmpstr+=std::to_string(currentFd);
+            tmpstr+="\n";
+            esp3d_log("%s",tmpstr.c_str());
+            pushMsgTxt(currentSocketId,tmpstr.c_str());
+            esp3d_hal::wait(100);
+            closeClient(currentSocketId);
+        }
+    } else {
+        esp3d_log_e("No client info");
+    }
+//set new connection as current client
     addClient(currentFd);
+    //send id to new comer
+    tmpstr = "currentID:";
+    tmpstr+=std::to_string(currentFd);
+    tmpstr+="\n";
+    esp3d_log("%s",tmpstr.c_str());
+    pushMsgTxt(currentFd, tmpstr.c_str());
+
     return ESP_OK;
 }
 

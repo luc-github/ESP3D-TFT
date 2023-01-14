@@ -157,8 +157,8 @@ bool Esp3DHttpService::begin()
     config.core_id = 0;
     //stack size (default 4096)
     config.stack_size = 1024*8;
-    //Nb of sockets
-    config.max_open_sockets = 6; //(3 internals +3)
+    //Nb of sockets//need to match max LWIP socket in sdkconfig +3 internal
+    config.max_open_sockets = 8; //(3 (http) +2 (1+reject)webui +3 (2 + reject) webdata)
     //handler
     config.max_uri_handlers = 12; //currently use 10
     //backlog_conn
