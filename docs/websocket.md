@@ -96,7 +96,7 @@ with hexadecimal values:
  | - | - | - | - | - |
 
 the first byte of answer is the state
-|Code | Hexa | meaning|
+|Code | Hexa | Meaning|
 |-|-|-|
 |`B` | 0x42| busy|
 |`O` | 0x4F|idle/ok|
@@ -141,6 +141,7 @@ xx bytes : filename string
 |`R`|`S`|x|x|`D`|X|..|..|X|..|..|S1|S1|S1|S1|S2|S2|S2|S2|
 |-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|
 
+
 ### Start upload frame
 header is : 
 | `S` | `U` | 0 | 0 |   
@@ -163,6 +164,7 @@ if answer is :
 
 it means transfert can start
 
+
 ### Transfert upload frame
 header is :
 | `U` | `P` | x | x | ID | ID | ID | ID |..|..|  
@@ -174,6 +176,7 @@ XXXX bytes is data
 if packet is received the answer is 
 |`P`|`U`|0|5|`O`| ID | ID | ID | ID 
 |-|-|-|-|-|-|-|-|-|
+
 
 ### Start dowload frame
 header is :
@@ -197,6 +200,7 @@ if answer is :
 
 it means transfert can start
 
+
 ### Transfert download frame
 header is :
 | `D` | `P` | x | x | ID | ID | ID | ID |..|..|  
@@ -209,12 +213,18 @@ if packet is received the answer is
 |`P`|`D`|0|5|`O`| ID | ID | ID | ID 
 |-|-|-|-|-|-|-|-|-|
 
+
 ### Command frame
 header is :
 | `C` | `M` | 0 | 1 | X |
 | - | - | - | - |-|
 
-Command:
-|Code | Hexa | meaning|
+Commands:
+|Code | Hexa | Meaning|
 |-|-|-|
 |`A` | 0x41| abort|
+
+Abort command frame 
+
+| `C` | `M` | 0 | 1 | `A` |
+| - | - | - | - |-|
