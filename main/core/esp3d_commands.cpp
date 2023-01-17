@@ -18,17 +18,24 @@
 */
 
 #include "esp3d_commands.h"
+#include "esp3d_settings.h"
 #include "serial/esp3d_serial_client.h"
 #include "http/esp3d_http_service.h"
 #include "websocket/esp3d_ws_service.h"
 #include "websocket/esp3d_webui_service.h"
 #include "socket_server/esp3d_socket_server.h"
+#if ESP3D_USB_SERIAL_FEATURE
+#include "usb_serial/esp3d_usb_serial_client.h"
+#endif //#if ESP3D_USB_SERIAL_FEATURE
 #include "esp3d_string.h"
 #include <stdio.h>
 #include <string>
 Esp3DCommands esp3dCommands;
 
-Esp3DCommands::Esp3DCommands() {}
+Esp3DCommands::Esp3DCommands()
+{
+    _output_client = SERIAL_CLIENT;
+}
 Esp3DCommands::~Esp3DCommands() {}
 bool Esp3DCommands::is_esp_command(uint8_t * sbuf, size_t len)
 {
@@ -410,28 +417,62 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
             serialClient.process(msg);
         } else {
             sendOk=false;
-            esp3d_log_e("serialClient not started for message size  %d", msg->size);
+            esp3d_log_w("serialClient not started for message size  %d", msg->size);
         }
         break;
+#if ESP3D_USB_SERIAL_FEATURE
+    case USB_SERIAL_CLIENT:
+        esp3d_log("USB Serial client got message");
+        if (usbSerialClient.started()) {
+            esp3d_log("USB Serial process message");
+            usbSerialClient.process(msg);
+        } else {
+            sendOk=false;
+            esp3d_log_e("usbSerialClient not started for message size  %d", msg->size);
+        }
+        break;
+#endif//#if ESP3D_USB_SERIAL_FEATURE
 
     case ALL_CLIENTS:
         //msg need to be duplicate for each target
-        //SERIAL_CLIENT
-        if (msg->origin!=SERIAL_CLIENT) {
+        //Do not broadcast to printer output
+        //printer may receive unwhished messages
+        /* //SERIAL_CLIENT
+         if (msg->origin!=SERIAL_CLIENT) {
+             if (msg->target==ALL_CLIENTS) {
+                 //become the reference message
+                 msg->target=SERIAL_CLIENT;
+             } else {
+                 //duplicate message because current is  already pending
+                 esp3d_msg_t * copy_msg = Esp3DClient::copyMsg(*msg);
+                 if (copy_msg) {
+                     copy_msg->target = SERIAL_CLIENT;
+                     dispatch(copy_msg);
+                 } else {
+                     esp3d_log_e("Cannot duplicate message for Serial");
+                 }
+             }
+         }*/
+        /*
+        #if ESP3D_USB_SERIAL_FEATURE
+        //USB_SERIAL_CLIENT
+        if (msg->origin!=USB_SERIAL_CLIENT) {
             if (msg->target==ALL_CLIENTS) {
                 //become the reference message
-                msg->target=SERIAL_CLIENT;
+                msg->target=USB_SERIAL_CLIENT;
             } else {
                 //duplicate message because current is  already pending
                 esp3d_msg_t * copy_msg = Esp3DClient::copyMsg(*msg);
                 if (copy_msg) {
-                    copy_msg->target = SERIAL_CLIENT;
+                    copy_msg->target = USB_SERIAL_CLIENT;
                     dispatch(copy_msg);
                 } else {
-                    esp3d_log_e("Cannot duplicate message for Serial");
+                    esp3d_log_e("Cannot duplicate message for USB Serial");
                 }
             }
         }
+        #endif //#if ESP3D_USB_SERIAL_FEATURE*/
+
         //WEBUI_WEBSOCKET_CLIENT
         if (msg->origin!=WEBUI_WEBSOCKET_CLIENT) {
             if (msg->target==ALL_CLIENTS) {
@@ -793,6 +834,15 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
     case 901:
         ESP901(cmd_params_pos, msg);
         break;
+#if ESP3D_USB_SERIAL_FEATURE
+
+    case 902:
+        ESP902(cmd_params_pos, msg);
+        break;
+    case 950:
+        ESP950(cmd_params_pos, msg);
+        break;
+#endif //#if ESP3D_USB_SERIAL_FEATURE
     default:
         msg->target = msg->origin;
         if (hasTag(msg,cmd_params_pos,"json")) {
@@ -830,4 +880,28 @@ bool Esp3DCommands::formatCommand(char * cmd, size_t len)
         return true;
     }
     return false;
+}
+
+esp3d_clients_t Esp3DCommands::getOutputClient(bool fromSettings)
+{
+    if (fromSettings) {
+        _output_client = SERIAL_CLIENT;
+#if ESP3D_USB_SERIAL_FEATURE
+        uint8_t  value = esp3dTFTsettings.readByte(esp3d_output_client);
+        esp3d_log("Output client is %d", value);
+        switch((esp3d_clients_t)value) {
+        case SERIAL_CLIENT:
+            _output_client = SERIAL_CLIENT;
+            break;
+        case USB_SERIAL_CLIENT:
+            _output_client = USB_SERIAL_CLIENT;
+            break;
+        default:
+            _output_client = SERIAL_CLIENT;
+            break;
+        }
+#endif //#if ESP3D_USB_SERIAL_FEATURE
+    }
+    esp3d_log("Output client is %d", _output_client);
+    return _output_client;
 }

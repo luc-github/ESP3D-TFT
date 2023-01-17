@@ -63,7 +63,11 @@ const char * help[]= {"[ESP](id) - display this help",
                       "[ESP790](Action)=(path) - rmdir / remove / mkdir / exists / create on Global FileSystem (path)",
                       "[ESP800](time=YYYY-MM-DDTHH:mm:ss)(version= webui version)(setup=0/1) - display FW Informations /set time",
                       "[ESP900](state) - display/set serial state(ENABLE/DISABLE)",
-                      "[ESP901](baud rate) - display/set serial baud rate"
+                      "[ESP901](baud rate) - display/set serial baud rate",
+#if ESP3D_USB_SERIAL_FEATURE
+                      "[ESP902](baud rate) - display/set usb-serial baud rate",
+                      "[ESP950]<SERIAL/USB>  - display/set usb-serial client output",
+#endif //#if ESP3D_USB_SERIAL_FEATURE
                      };
 
 const uint cmdlist[]= {0,
@@ -106,7 +110,11 @@ const uint cmdlist[]= {0,
                        790,
                        800,
                        900,
-                       901
+                       901,
+#if ESP3D_USB_SERIAL_FEATURE
+                       902,
+                       950,
+#endif //#if ESP3D_USB_SERIAL_FEATURE
                       };
 //ESP3D Help
 //[ESP0] or [ESP]<command>

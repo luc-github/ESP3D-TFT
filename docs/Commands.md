@@ -222,6 +222,9 @@ label can be: light/framesize/quality/contrast/brightness/saturation/gainceiling
 * Get / Set Serial Baud Rate
     `[ESP901]<BAUD RATE> json=<no> pwd=<admin/user password>`
 
+* Get / Set USB-Serial Baud Rate
+    `[ESP902]<BAUD RATE> json=<no> pwd=<admin/user password>`
+
 * Get state / Set Enable / Disable buzzer   
     `[ESP910]<ENABLE/DISABLE> json=<no> pwd=<admin/user password>`
 
@@ -233,6 +236,9 @@ label can be: light/framesize/quality/contrast/brightness/saturation/gainceiling
 
 * Get / Set Serial Bridge Baud Rate // Not used in ESP3D-TFT
     `[ESP931]<BAUD RATE> json=<no> pwd=<admin/user password>`
+
+* Get / Set Serial Output // Only used in ESP3D-TFT with board having the feature
+    `[ESP950]<SERIAL/USB> json=<no> pwd=<admin/user password>`
 
 * Set quiet boot if strapping pin is High   
     `[ESP999]QUIETBOOT pwd=<admin/user password>`

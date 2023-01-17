@@ -37,3 +37,4 @@
 *.out
 *.app
 
+managed_components/

@@ -66,6 +66,8 @@ typedef enum  {
     esp3d_socket_port,
     esp3d_socket_on,
     esp3d_ws_on,
+    esp3d_usb_serial_baud_rate,
+    esp3d_output_client,
     last_esp3d_setting_index_t
 } esp3d_setting_index_t;
 

@@ -37,6 +37,14 @@ const char * RadioModeValues [] = { "0",
                                     "2",
                                     "3"
                                   };
+#if ESP3D_USB_SERIAL_FEATURE
+const char * OutputClientsLabels [] = { "serial",
+                                        "usb",
+                                      };
+const char * OutputClientsValues [] = { "1",
+                                        "2"
+                                      };
+#endif //ESP3D_USB_SERIAL_FEATURE
 
 const char * FirmwareLabels [] = { "Unknown",
                                    "Grbl",
@@ -114,10 +122,25 @@ void Esp3DCommands::ESP400(int cmd_params_pos,esp3d_msg_t * msg)
         esp3d_log_e("Error sending response to clients");
         return;
     }
+
+#if ESP3D_USB_SERIAL_FEATURE
+    //output client (first item)
+    if (!dispatchSetting(json,"system/system",esp3d_output_client, "output", OutputClientsValues, OutputClientsLabels, sizeof(OutputClientsValues)/sizeof(char*), -1, -1,-1, nullptr, true,target,requestId,true)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+    //Baud rate (first item)
+    if (!dispatchSetting(json,"system/system",esp3d_baud_rate, "baud", BaudRateList, BaudRateList, sizeof(BaudRateList)/sizeof(char*), -1, -1,-1, nullptr, true,target,requestId)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+    if (!dispatchSetting(json,"system/system",esp3d_usb_serial_baud_rate, "usb-serial baud", BaudRateList, BaudRateList, sizeof(BaudRateList)/sizeof(char*), -1, -1,-1, nullptr, true,target,requestId)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+#else
     //Baud rate (first item)
     if (!dispatchSetting(json,"system/system",esp3d_baud_rate, "baud", BaudRateList, BaudRateList, sizeof(BaudRateList)/sizeof(char*), -1, -1,-1, nullptr, true,target,requestId,true)) {
         esp3d_log_e("Error sending response to clients");
     }
+#endif //ESP3D_USB_SERIAL_FEATURE
 
     //Target Firmware
     if (!dispatchSetting(json,"system/system",esp3d_target_firmware, "targetfw", FirmwareValues, FirmwareLabels, sizeof(FirmwareValues)/sizeof(char*), -1, -1,-1, nullptr, false,target,requestId)) {

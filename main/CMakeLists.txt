@@ -15,6 +15,7 @@ set(SOURCES .
     modules/mDNS
     modules/ssdp
     modules/socket_server
+    modules/usb_serial
 )
 set(INCLUDES .
     core/includes

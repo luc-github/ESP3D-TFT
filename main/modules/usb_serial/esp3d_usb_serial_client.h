@@ -1,5 +1,5 @@
 /*
-  esp3d_serial_client
+  esp3d_usb_serial_client
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -22,17 +22,23 @@
 #include <stdio.h>
 #include "esp3d_client.h"
 #include "esp3d_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
 #include <pthread.h>
+#include "usb/cdc_acm_host.h"
+#include "usb/usb_host.h"
+#include "usb/vcp.hpp"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-class Esp3DSerialClient : public Esp3DClient
+class Esp3DUsbSerialClient : public Esp3DClient
 {
 public:
-    Esp3DSerialClient();
-    ~Esp3DSerialClient();
+    Esp3DUsbSerialClient();
+    ~Esp3DUsbSerialClient();
     bool begin();
     void handle();
     void end();
@@ -40,22 +46,49 @@ public:
     bool isEndChar(uint8_t ch);
     bool pushMsgToRxQueue(const uint8_t* msg, size_t size);
     void flush();
+    void connectDevice();
+    void handle_rx (uint8_t *data, size_t data_len);
     bool started()
     {
         return _started;
     }
-    void readSerial();
+    void setConnected(bool connected)
+    {
+        _connected = connected;
+        if (connected) {
+            xSemaphoreTake(_device_disconnected_sem, portMAX_DELAY);
+        } else {
+            xSemaphoreGive(_device_disconnected_sem);
+        }
+    }
+
+    bool isConnected()
+    {
+        return _connected;
+    }
+    void setBaudRate(uint32_t baudRate)
+    {
+        _baudrate = baudRate;
+    }
+    uint32_t getBaudRate()
+    {
+        return _baudrate;
+    }
 private:
     TaskHandle_t _xHandle;
+    size_t _rx_pos;
+    uint8_t * _rx_buffer;
+    uint32_t _baudrate;
+    bool _stopConnect;
     bool _started;
+    bool _connected;
     pthread_mutex_t _tx_mutex;
     pthread_mutex_t _rx_mutex;
-    uint8_t * _data;
-    uint8_t * _buffer;
-    size_t _bufferPos;
+    SemaphoreHandle_t _device_disconnected_sem;
+    std::unique_ptr<CdcAcmDevice> _vcp;
 };
 
-extern Esp3DSerialClient serialClient;
+extern Esp3DUsbSerialClient usbSerialClient;
 
 #ifdef __cplusplus
 } // extern "C"

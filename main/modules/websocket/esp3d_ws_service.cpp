@@ -85,7 +85,7 @@ bool Esp3DWsService::closeClient(int socketId)
         return false;
     }
     httpd_sess_trigger_close(_server, socketId);
-    onClose(socketId);
+    //onClose(socketId);
     return true;
 }
 
@@ -302,7 +302,7 @@ bool Esp3DWsService::pushMsgToRxQueue(int socketId,const uint8_t *msg, size_t si
             newMsgPtr->authentication_level = ESP3D_LEVEL_ADMIN;
 #endif // ESP3D_DISABLE_SERIAL_AUTHENTICATION
             newMsgPtr->origin = WEBSOCKET_CLIENT;
-            newMsgPtr->target= OUTPUT_CLIENT;
+            newMsgPtr->target= esp3dCommands.getOutputClient();
             newMsgPtr->type = msg_unique;
             newMsgPtr->requestId.id = socketId;
             if (esp3dCommands.is_esp_command((uint8_t *)msg, size) ) {
@@ -335,7 +335,7 @@ esp_err_t Esp3DWsService::onClose(int fd)
             return ESP_OK;
         }
     }
-    esp3d_log_w("onClose %d failed", fd);
+    //esp3d_log_w("onClose %d failed", fd);
     return ESP_FAIL;
 }
 

@@ -28,7 +28,11 @@
 #include <regex>
 #include <string>
 #include "esp3d_log.h"
+#include "esp3d_client.h"
 #include "serial_def.h"
+#if ESP3D_USB_SERIAL_FEATURE
+#include "usb_serial_def.h"
+#endif //ESP3D_USB_SERIAL_FEATURE
 #include "network/esp3d_network.h"
 #include "notifications/esp3d_notifications_service.h"
 
@@ -51,6 +55,10 @@ const uint8_t SupportedApChannelsSize = sizeof(SupportedApChannels)/sizeof(uint8
 const esp3d_setting_desc_t Esp3DSettingsData [] = {
     {esp3d_version, esp3d_string, SIZE_OF_SETTING_VERSION,"Invalid data"}, //Version
     {esp3d_baud_rate, esp3d_integer, 4, ESP3D_SERIAL_BAUDRATE},            //BaudRate
+#if ESP3D_USB_SERIAL_FEATURE
+    {esp3d_usb_serial_baud_rate, esp3d_integer, 4, ESP3D_USB_SERIAL_BAUDRATE}, //BaudRate
+    {esp3d_output_client, esp3d_byte, 1,"1"},
+#endif //ESP3D_USB_SERIAL_FEATURE
     {esp3d_spi_divider, esp3d_byte, 1, "1"},                               //SPIdivider
     {esp3d_hostname, esp3d_string, SIZE_OF_SETTING_HOSTNAME,"esp3d-tft"},
     {esp3d_radio_boot_mode, esp3d_byte, 1,"1"},
@@ -128,6 +136,12 @@ bool  Esp3DSettings::isValidIntegerSetting(uint32_t value, esp3d_setting_index_t
         return false;
     }
     switch(settingElement) {
+#if ESP3D_USB_SERIAL_FEATURE
+    case esp3d_output_client:
+        return  ((esp3d_clients_t)value == SERIAL_CLIENT || (esp3d_clients_t)value == USB_SERIAL_CLIENT);
+        break;
+    case esp3d_usb_serial_baud_rate:
+#endif //#if ESP3D_USB_SERIAL_FEATURE
     case esp3d_baud_rate:
         for(uint8_t i=0; i<SupportedBaudListSize; i++) {
             if (SupportedBaudList[i]==value) {

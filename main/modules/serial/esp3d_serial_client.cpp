@@ -22,7 +22,7 @@
 #include "freertos/task.h"
 #include "driver/uart.h"
 #include "driver/gpio.h"
-#include "esp_timer.h"
+#include "esp3d_hal.h"
 #include "serial_def.h"
 #include "esp3d_serial_client.h"
 #include "esp3d_settings.h"
@@ -31,74 +31,65 @@
 
 Esp3DSerialClient serialClient;
 
-#define RX_FLUSH_TIME_OUT 1500 * 1000 //microseconds timeout
+#define RX_FLUSH_TIME_OUT 1500  //milliseconds timeout
+
+void Esp3DSerialClient::readSerial()
+{
+    static uint64_t startTimeout=0; //milliseconds
+    int len = uart_read_bytes(ESP3D_SERIAL_PORT, _data, (ESP3D_SERIAL_RX_BUFFER_SIZE - 1), 10 / portTICK_PERIOD_MS);
+    if (len) {
+        //parse data
+        startTimeout = esp3d_hal::millis();
+        for (size_t i = 0; i < len ; i++) {
+            if (_bufferPos <ESP3D_SERIAL_RX_BUFFER_SIZE) {
+                _buffer[_bufferPos]= _data[i];
+                _bufferPos++;
+            }
+            //if end of char or buffer is full
+            if (serialClient.isEndChar(_data[i]) || _bufferPos==ESP3D_SERIAL_RX_BUFFER_SIZE) {
+                //create message and push
+                if (!serialClient.pushMsgToRxQueue(_buffer, _bufferPos)) {
+                    //send error
+                    esp3d_log_e("Push Message to rx queue failed");
+                }
+                _bufferPos=0;
+            }
+        }
+    }
+    //if no data during a while then send them
+    if (esp3d_hal::millis()-startTimeout>(RX_FLUSH_TIME_OUT) && _bufferPos>0) {
+        if (!serialClient.pushMsgToRxQueue(_buffer, _bufferPos)) {
+            //send error
+            esp3d_log_e("Push Message to rx queue failed");
+        }
+        _bufferPos=0;
+    }
+}
 
 //this task only collecting serial RX data and push thenmm to Rx Queue
 static void esp3d_serial_rx_task(void *pvParameter)
 {
     (void) pvParameter;
-    static uint8_t * data = nullptr;
-    static uint8_t * buffer= nullptr;
-    size_t pos = 0;
-    uint64_t startTimeout=0; //microseconds
-    if (!data) {
-        data = (uint8_t *) malloc(ESP3D_SERIAL_RX_BUFFER_SIZE);
-        if (!data) {
-            esp3d_log_e("Failed to allocate memory for buffer");
-            serialClient.end();
-            vTaskDelete(NULL);
-            return ;
-        }
-    }
-    if (!buffer) {
-        buffer = (uint8_t *) malloc(ESP3D_SERIAL_RX_BUFFER_SIZE);
-        if (!buffer) {
-            esp3d_log_e("Failed to allocate memory for buffer");
-            serialClient.end();
-            vTaskDelete(NULL);
-            return ;
-        }
-    }
     while (1) {
         /* Delay */
         vTaskDelay(pdMS_TO_TICKS(10));
         if (!serialClient.started()) {
             break;
         }
-        int len = uart_read_bytes(ESP3D_SERIAL_PORT, data, (ESP3D_SERIAL_RX_BUFFER_SIZE - 1), 10 / portTICK_PERIOD_MS);
-        if (len) {
-            //parse data
-            startTimeout = esp_timer_get_time();
-            for (size_t i = 0; i < len ; i++) {
-                if (pos <ESP3D_SERIAL_RX_BUFFER_SIZE) {
-                    buffer[pos]= data[i];
-                    pos++;
-                }
-                //if end of char or buffer is full
-                if (serialClient.isEndChar(data[i]) || pos==ESP3D_SERIAL_RX_BUFFER_SIZE) {
-                    //create message and push
-                    if (!serialClient.pushMsgToRxQueue(buffer, pos)) {
-                        //send error
-                        esp3d_log_e("Push Message to rx queue failed");
-                    }
-                    pos=0;
-                }
-            }
-        }
-        //if no data during a while then send them
-        if (esp_timer_get_time()-startTimeout>(RX_FLUSH_TIME_OUT) && pos>0) {
-            if (!serialClient.pushMsgToRxQueue(buffer, pos)) {
-                //send error
-                esp3d_log_e("Push Message to rx queue failed");
-            }
-            pos=0;
-        }
+        serialClient.readSerial();
     }
     /* A task should NEVER return */
     vTaskDelete(NULL);
 }
 
-Esp3DSerialClient::Esp3DSerialClient() {}
+Esp3DSerialClient::Esp3DSerialClient()
+{
+    _started = false;
+    _xHandle = NULL;
+    _data = NULL;
+    _buffer = NULL;
+    _bufferPos = 0 ;
+}
 Esp3DSerialClient::~Esp3DSerialClient()
 {
     end();
@@ -125,6 +116,19 @@ bool Esp3DSerialClient::isEndChar(uint8_t ch)
 bool Esp3DSerialClient::begin()
 {
     end();
+
+    _data = (uint8_t *) malloc(ESP3D_SERIAL_RX_BUFFER_SIZE);
+    if (!_data) {
+        esp3d_log_e("Failed to allocate memory for buffer");
+        return false;
+    }
+
+    _buffer = (uint8_t *) malloc(ESP3D_SERIAL_RX_BUFFER_SIZE);
+    if (!_buffer) {
+        esp3d_log_e("Failed to allocate memory for buffer");
+        return false;
+    }
+
     if(pthread_mutex_init (&_rx_mutex, NULL) != 0) {
         esp3d_log_e("Mutex creation for rx failed");
         return false;
@@ -162,11 +166,10 @@ bool Esp3DSerialClient::begin()
     ESP_ERROR_CHECK(uart_set_pin(ESP3D_SERIAL_PORT, ESP3D_SERIAL_TX_PIN, ESP3D_SERIAL_RX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
 
     //Serial is never stopped so no need to kill the task from outside
-    TaskHandle_t xHandle = NULL;
     _started = true;
-    BaseType_t  res =  xTaskCreatePinnedToCore(esp3d_serial_rx_task, "esp3d_serial_rx_tast", ESP3D_SERIAL_RX_TASK_SIZE, NULL, ESP3D_SERIAL_TASK_PRIORITY, &xHandle, ESP3D_SERIAL_TASK_CORE);
+    BaseType_t  res =  xTaskCreatePinnedToCore(esp3d_serial_rx_task, "esp3d_serial_rx_tast", ESP3D_SERIAL_RX_TASK_SIZE, NULL, ESP3D_SERIAL_TASK_PRIORITY, &_xHandle, ESP3D_SERIAL_TASK_CORE);
 
-    if (res==pdPASS && xHandle) {
+    if (res==pdPASS && _xHandle) {
         esp3d_log ("Created Serial Task");
         esp3d_log("Serial client started");
         flush();
@@ -259,5 +262,18 @@ void Esp3DSerialClient::end()
         if ( uart_is_driver_installed(ESP3D_SERIAL_PORT) && uart_driver_delete(ESP3D_SERIAL_PORT)!=ESP_OK ) {
             esp3d_log_e("Error deleting serial driver");
         }
+    }
+    if ( _xHandle) {
+        vTaskDelete(_xHandle);
+        _xHandle = NULL;
+    }
+    _bufferPos = 0;
+    if(_data) {
+        free(_data);
+        _data = NULL;
+    }
+    if (_buffer) {
+        free(_buffer);
+        _buffer = NULL;
     }
 }

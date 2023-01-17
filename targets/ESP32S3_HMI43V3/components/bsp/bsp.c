@@ -31,6 +31,7 @@
 #include "ft5x06.h"
 #include "rm68120.h"
 #include "tca9554.h"
+#include "usb_serial.h"
 
 static i2c_bus_handle_t i2c_bus_handle = NULL;
 
@@ -54,14 +55,14 @@ static i2c_bus_handle_t i2c_bus_handle = NULL;
 /**********************
  *  STATIC VARIABLES
  **********************/
-    static i2c_config_t conf = {
-        .mode = I2C_MODE_MASTER,
-        .scl_io_num = I2C_SCL_PIN,
-        .sda_io_num = I2C_SDA_PIN,
-        .scl_pullup_en = GPIO_PULLUP_ENABLE,
-        .sda_pullup_en = GPIO_PULLUP_ENABLE,
-        .master.clk_speed = I2C_CLK_SPEED
-    };
+static i2c_config_t conf = {
+    .mode = I2C_MODE_MASTER,
+    .scl_io_num = I2C_SCL_PIN,
+    .sda_io_num = I2C_SDA_PIN,
+    .scl_pullup_en = GPIO_PULLUP_ENABLE,
+    .sda_pullup_en = GPIO_PULLUP_ENABLE,
+    .master.clk_speed = I2C_CLK_SPEED
+};
 /**********************
  *      MACROS
  **********************/
@@ -98,6 +99,9 @@ esp_err_t bsp_init(void)
     esp3d_log("Initializing tca9554 controller");
     ESP_ERROR_CHECK(tca9554_init(i2c_bus_handle));
 
+    /*usb host initialization */
+    esp3d_log("Initializing usb-serial");
+    usb_serial_init();
 
     /* Display controller initialization */
     esp3d_log("Initializing display controller");
@@ -105,7 +109,7 @@ esp_err_t bsp_init(void)
         return ESP_FAIL;
     }
 
-    
+
     /* Touch controller initialization */
     esp3d_log("Initializing touch controller");
     if (ft5x06_init(i2c_bus_handle) != ESP_OK) {
@@ -136,7 +140,7 @@ esp_err_t bsp_init(void)
     /* Initialize the working buffer depending on the selected display.*/
     lv_disp_draw_buf_init(&draw_buf, buf1, buf2, size_in_px);
 
-   
+
     esp_lcd_panel_handle_t *  panel_handle = rm68120_panel_handle();
     lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
     disp_drv.flush_cb = rm68120_flush;    /*Set your driver function*/

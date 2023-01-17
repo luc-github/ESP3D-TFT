@@ -20,6 +20,7 @@
 #include "esp3d_update_service.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
+#include "esp3d_client.h"
 #include <cstdlib>
 #include "esp_ota_ops.h"
 #include "esp_system.h"
@@ -176,11 +177,13 @@ const esp3d_setting_index_t ServbyteKeysPos[] = {
 
 //System
 //Integer values
-const char * SysintKeysVal[] = {"Baud_rate"
+const char * SysintKeysVal[] = {"Baud_rate",
+                                "USB_Serial_Baud_rate"
                                 //"Boot_delay"
                                };
 
-const esp3d_setting_index_t SysintKeysPos[] = {esp3d_baud_rate
+const esp3d_setting_index_t SysintKeysPos[] = {esp3d_baud_rate,
+                                               esp3d_usb_serial_baud_rate
                                                //ESP_BOOT_DELAY
                                               };
 //Boolean values
@@ -611,6 +614,21 @@ bool Esp3DUpdateService::processingFileFunction (const char * section, const cha
                 } else if (strcasecmp("HP_GL",value)==0) {
                     b=esp3d_hp_gl;
                 } else {
+                    P=last_esp3d_setting_index_t;    //invalid value
+                }
+            }
+        }
+        //Output: SERIAL / USB
+        if (!done) {
+            if (strcasecmp("output",key)==0) {
+                T='B';
+                P=esp3d_output_client;
+                done = true;
+                if (strcasecmp("USB",value)==0) {
+                    b=USB_SERIAL_CLIENT;
+                } else if (strcasecmp("SERIAL",value)==0) {
+                    b=SERIAL_CLIENT;
+                }  else {
                     P=last_esp3d_setting_index_t;    //invalid value
                 }
             }

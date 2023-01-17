@@ -89,12 +89,22 @@ public:
     void ESP800(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP900(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP901(int cmd_params_pos,esp3d_msg_t * msg);
+#if ESP3D_USB_SERIAL_FEATURE
+    void ESP902(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP950(int cmd_params_pos,esp3d_msg_t * msg);
+#endif //#if ESP3D_USB_SERIAL_FEATURE
     const char * get_param (esp3d_msg_t * msg, uint start,const char* label);
     const char * get_clean_param (esp3d_msg_t * msg, uint start);
     bool has_param (esp3d_msg_t * msg, uint start);
     bool hasTag (esp3d_msg_t * msg, uint start,const char* label);
     void flush();
+    esp3d_clients_t getOutputClient(bool fromSettings=false);
+    void setOutputClient(esp3d_clients_t output_client)
+    {
+        _output_client = output_client;
+    }
 private:
+    esp3d_clients_t _output_client;
 
 };
 

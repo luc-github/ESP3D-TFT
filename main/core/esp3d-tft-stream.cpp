@@ -26,8 +26,12 @@
 #include "version.h"
 #include <string>
 #include "esp3d_log.h"
+#include "esp3d_commands.h"
 #include "serial/esp3d_serial_client.h"
 #include "tasks_def.h"
+#if ESP3D_USB_SERIAL_FEATURE
+#include "usb_serial/esp3d_usb_serial_client.h"
+#endif //ESP3D_USB_SERIAL_FEATURE
 
 #define STACKDEPTH  STREAM_STACK_DEPTH
 #define TASKPRIORITY 0
@@ -97,10 +101,20 @@ bool Esp3DTFTStream::begin()
         vTaskDelay(pdMS_TO_TICKS(100));
 #endif //ESP3D_TFT_LOG
         getTargetFirmware(true);
-        //now begin serialClient
-        if(serialClient.begin()) {
-            return true;
+
+        if (esp3dCommands.getOutputClient(true) == SERIAL_CLIENT) {
+            if(serialClient.begin()) {
+                return true;
+            }
         }
+#if ESP3D_USB_SERIAL_FEATURE
+        else if (esp3dCommands.getOutputClient() == USB_SERIAL_CLIENT) {
+            if(usbSerialClient.begin()) {
+                return true;
+            }
+        }
+#endif //ESP3D_USB_SERIAL_FEATURE
+
 
     } else {
         esp3d_log_e ("Stream Task creation failed");
@@ -112,9 +126,19 @@ bool Esp3DTFTStream::begin()
 void Esp3DTFTStream::handle()
 {
     serialClient.handle();
+#if ESP3D_USB_SERIAL_FEATURE
+    usbSerialClient.handle();
+#endif //ESP3D_USB_SERIAL_FEATURE
 }
 
 bool Esp3DTFTStream::end()
 {
+    //TODO
+    //this part is never called
+    // if called need to kill task also
+    serialClient.end();
+#if ESP3D_USB_SERIAL_FEATURE
+    usbSerialClient.end();
+#endif //#if ESP3D_USB_SERIAL_FEATURE
     return true;
 }
