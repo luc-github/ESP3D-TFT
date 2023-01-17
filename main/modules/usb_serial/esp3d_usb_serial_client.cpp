@@ -24,6 +24,7 @@
 #include "esp3d_settings.h"
 #include "esp3d_log.h"
 #include "esp3d_commands.h"
+#include "websocket/esp3d_webui_service.h"
 
 Esp3DUsbSerialClient usbSerialClient;
 
@@ -153,6 +154,19 @@ static void esp3d_usb_serial_connection_task(void *pvParameter)
     }
     /* A task should NEVER return */
     vTaskDelete(NULL);
+}
+
+void Esp3DUsbSerialClient::setConnected(bool connected)
+{
+    _connected = connected;
+
+    if (connected) {
+        esp3dWsWebUiService.pushNotification("Connected");
+        xSemaphoreTake(_device_disconnected_sem, portMAX_DELAY);
+    } else {
+        esp3dWsWebUiService.pushNotification("Disconnected");
+        xSemaphoreGive(_device_disconnected_sem);
+    }
 }
 
 Esp3DUsbSerialClient::Esp3DUsbSerialClient()

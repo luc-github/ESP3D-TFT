@@ -52,16 +52,7 @@ public:
     {
         return _started;
     }
-    void setConnected(bool connected)
-    {
-        _connected = connected;
-        if (connected) {
-            xSemaphoreTake(_device_disconnected_sem, portMAX_DELAY);
-        } else {
-            xSemaphoreGive(_device_disconnected_sem);
-        }
-    }
-
+    void setConnected(bool connected);
     bool isConnected()
     {
         return _connected;
