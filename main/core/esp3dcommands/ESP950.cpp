@@ -64,7 +64,8 @@ void Esp3DCommands::ESP950(int cmd_params_pos,esp3d_msg_t * msg)
             if (!esp3dTFTsettings.writeByte (esp3d_output_client,newoutput)) {
                 hasError = true;
                 error_msg="Set value failed";
-            } else {
+            } //hot change not yet supported
+            /*else {
 
                 if (esp3dCommands.getOutputClient() != newoutput) {
                     //hot change only if different
@@ -78,7 +79,7 @@ void Esp3DCommands::ESP950(int cmd_params_pos,esp3d_msg_t * msg)
                     //set new client output
                     esp3dCommands.setOutputClient(newoutput);
                 }
-            }
+            }*/
             has_param = true;
         }
         if (!has_param) {
