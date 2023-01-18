@@ -136,12 +136,6 @@ bool  Esp3DSettings::isValidIntegerSetting(uint32_t value, esp3d_setting_index_t
         return false;
     }
     switch(settingElement) {
-#if ESP3D_USB_SERIAL_FEATURE
-    case esp3d_output_client:
-        return  ((esp3d_clients_t)value == SERIAL_CLIENT || (esp3d_clients_t)value == USB_SERIAL_CLIENT);
-        break;
-    case esp3d_usb_serial_baud_rate:
-#endif //#if ESP3D_USB_SERIAL_FEATURE
     case esp3d_baud_rate:
         for(uint8_t i=0; i<SupportedBaudListSize; i++) {
             if (SupportedBaudList[i]==value) {
@@ -182,6 +176,12 @@ bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t set
             return true;
         }
         break;
+    #if ESP3D_USB_SERIAL_FEATURE
+    case esp3d_output_client:
+        return  ((esp3d_clients_t)value == SERIAL_CLIENT || (esp3d_clients_t)value == USB_SERIAL_CLIENT);
+        break;
+    case esp3d_usb_serial_baud_rate:
+    #endif //#if ESP3D_USB_SERIAL_FEATURE
     case esp3d_notification_type:
         if(value==(uint8_t)esp3d_no_notification || value==(uint8_t)esp3d_pushover_notification || value==(uint8_t)esp3d_email_notification || value==(uint8_t)esp3d_line_notification || value==(uint8_t)esp3d_telegram_notification || value==(uint8_t)esp3d_ifttt_notification) {
             return true;
