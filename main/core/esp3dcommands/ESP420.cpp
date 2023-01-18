@@ -22,6 +22,7 @@
 #include "esp3d_version.h"
 #include "esp3d_string.h"
 #include "esp3d_settings.h"
+#include "esp3d_commands.h"
 #include <stdio.h>
 #include <string>
 #include <cstring>
@@ -43,6 +44,9 @@
 #include "socket_server/esp3d_socket_server.h"
 #include "websocket/esp3d_ws_service.h"
 #include "notifications/esp3d_notifications_service.h"
+#if ESP3D_USB_SERIAL_FEATURE
+#include "usb_serial/esp3d_usb_serial_client.h"
+#endif //#if ESP3D_USB_SERIAL_FEATURE
 #define COMMAND_ID 420
 
 //Get ESP current status
@@ -157,6 +161,34 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     if (!dispatchIdValue(json,"FS usage",tmpstr.c_str(), target,requestId)) {
         return;
     }
+
+    if (esp3dCommands.getOutputClient()==SERIAL_CLIENT) {
+        if (!dispatchIdValue(json,"output","serial", target,requestId)) {
+            return;
+        }
+        //Serial BaudRate
+        uint32_t baud =esp3dTFTsettings.readUint32(esp3d_baud_rate);
+        tmpstr=std::to_string(baud);
+        if (!dispatchIdValue(json,"baud",tmpstr.c_str(), target,requestId)) {
+            return;
+        }
+    }
+#if ESP3D_USB_SERIAL_FEATURE
+    else  if (esp3dCommands.getOutputClient()==USB_SERIAL_CLIENT) {
+        if (!dispatchIdValue(json,"output","usb", target,requestId)) {
+            return;
+        }
+        uint32_t baud =esp3dTFTsettings.readUint32(esp3d_usb_serial_baud_rate);
+        tmpstr=std::to_string(baud);
+        if (!dispatchIdValue(json,"baud",tmpstr.c_str(), target,requestId)) {
+            return;
+        }
+        if (!dispatchIdValue(json,"clients",usbSerialClient.isConnected()?"1":"0", target,requestId)) {
+            return;
+        }
+    }
+#endif //#if ESP3D_USB_SERIAL
+
 
     //wifi
     if (esp3dNetwork.getMode()==esp3d_radio_off || esp3dNetwork.getMode()==esp3d_bluetooth_serial) {

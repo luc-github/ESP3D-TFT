@@ -60,13 +60,12 @@ esp_err_t usb_serial_deinit()
 {
     esp_err_t ret;
     if (usb_serial_xHandle) {
-        ret = usb_serial_delete_task()
+        ret = usb_serial_delete_task();
         if (ret !=ESP_OK) {
             esp3d_log_e("Failed to delete task for usb-host %s",esp_err_to_name(ret));
         }
         vTaskDelay(10);
     }
-
     ret = usb_host_device_free_all();
     if (ret !=ESP_OK) {
         esp3d_log_e("Failed to free all usb device %s",esp_err_to_name(ret));
