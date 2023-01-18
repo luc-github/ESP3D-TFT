@@ -38,8 +38,8 @@ const char * RadioModeValues [] = { "0",
                                     "3"
                                   };
 #if ESP3D_USB_SERIAL_FEATURE
-const char * OutputClientsLabels [] = { "serial",
-                                        "usb",
+const char * OutputClientsLabels [] = { "serial port",
+                                        "usb port",
                                       };
 const char * OutputClientsValues [] = { "1",
                                         "2"

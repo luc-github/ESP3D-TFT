@@ -163,7 +163,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     }
 
     if (esp3dCommands.getOutputClient()==SERIAL_CLIENT) {
-        if (!dispatchIdValue(json,"output","serial", target,requestId)) {
+        if (!dispatchIdValue(json,"output","serial port", target,requestId)) {
             return;
         }
         //Serial BaudRate
@@ -175,7 +175,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     }
 #if ESP3D_USB_SERIAL_FEATURE
     else  if (esp3dCommands.getOutputClient()==USB_SERIAL_CLIENT) {
-        if (!dispatchIdValue(json,"output","usb", target,requestId)) {
+        if (!dispatchIdValue(json,"output","usb port", target,requestId)) {
             return;
         }
         uint32_t baud =esp3dTFTsettings.readUint32(esp3d_usb_serial_baud_rate);
