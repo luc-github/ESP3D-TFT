@@ -70,6 +70,18 @@ static i2c_config_t conf = {
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+esp_err_t bsp_init_usb(void)
+{
+    /*usb host initialization */
+    esp3d_log("Initializing usb-serial");
+    return usb_serial_create_task();
+}
+
+esp_err_t bsp_deinit_usb(void)
+{
+    esp3d_log("Remove usb-serial");
+    return usb_serial_deinit();
+}
 
 esp_err_t bsp_init(void)
 {
@@ -93,15 +105,16 @@ esp_err_t bsp_init(void)
         esp3d_log_e("I2C bus failed to be initialized.");
         return ESP_FAIL;
     }
-
+//NOTE:
+//this location allows usb-host driver to be installed - later it will failed
+//Do not know why...
+    if ( usb_serial_init()!=ESP_OK) {
+        return ESP_FAIL;
+    }
 
     /* tca9554 controller initialization */
     esp3d_log("Initializing tca9554 controller");
     ESP_ERROR_CHECK(tca9554_init(i2c_bus_handle));
-
-    /*usb host initialization */
-    esp3d_log("Initializing usb-serial");
-    usb_serial_init();
 
     /* Display controller initialization */
     esp3d_log("Initializing display controller");

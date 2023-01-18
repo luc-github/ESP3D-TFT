@@ -18,10 +18,14 @@
 #include "usb/vcp.hpp"
 #include "usb/usb_host.h"
 #include "usb_serial_def.h"
+#include "hal/usb_phy_types.h"
+#include "esp_private/usb_phy.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+static usb_phy_handle_t phy_hdl = NULL;
+static TaskHandle_t usb_serial_xHandle = NULL;
 
 /**
  * @brief USB Host library handling task
@@ -52,22 +56,80 @@ void usb_lib_task(void *arg)
     }
 }
 
+esp_err_t usb_serial_deinit()
+{
+    esp_err_t ret;
+    if (usb_serial_xHandle) {
+        ret = usb_serial_delete_task()
+        if (ret !=ESP_OK) {
+            esp3d_log_e("Failed to delete task for usb-host %s",esp_err_to_name(ret));
+        }
+        vTaskDelay(10);
+    }
+
+    ret = usb_host_device_free_all();
+    if (ret !=ESP_OK) {
+        esp3d_log_e("Failed to free all usb device %s",esp_err_to_name(ret));
+    }
+    ret = usb_host_uninstall();
+    //this one failed with ESP_ERR_INVALID_STATE if USB is connected
+    if (ret!=ESP_OK) {
+        esp3d_log_e("Failed to unsinstall usb host %s",esp_err_to_name(usb_host_uninstall()));
+    }
+    //Deinitialize the internal USB PHY
+    ret = usb_del_phy(phy_hdl);
+    if ( ret!=ESP_OK) {
+        esp3d_log_e("Failed to delete PHY %s",esp_err_to_name(ret));
+    }
+    phy_hdl = NULL;
+    return ESP_OK;
+}
+
 esp_err_t usb_serial_init()
 {
+    usb_phy_config_t phy_config = {
+        .controller = USB_PHY_CTRL_OTG,
+        .target = USB_PHY_TARGET_INT,
+        .otg_mode = USB_OTG_MODE_HOST,
+        .otg_speed = USB_PHY_SPEED_UNDEFINED,   //In Host mode, the speed is determined by the connected device
+        .ext_io_conf = NULL,
+        .otg_io_conf = NULL,
+    };
+    if (ESP_OK!=usb_new_phy(&phy_config, &phy_hdl)) {
+        esp3d_log_e("Failed to init USB PHY");
+    }
+
     const usb_host_config_t host_config = {
-        .skip_phy_setup = false,
+        .skip_phy_setup = true,
         .intr_flags = ESP_INTR_FLAG_LEVEL1,
     };
     //Install USB Host driver. Should only be called once in entire application
     esp3d_log("Installing USB Host");
-    if (usb_host_install(&host_config)!=ESP_OK) {
-        esp3d_log_e("Failed to install USB Host");
+    esp_err_t err = usb_host_install(&host_config);
+    if (err!=ESP_OK) {
+        esp3d_log_e("Failed to install USB Host %s", esp_err_to_name(err));
         return ESP_FAIL;
     };
-    // Create a task that will handle USB library events
-    TaskHandle_t xHandle = NULL;
-    BaseType_t  res =  xTaskCreatePinnedToCore(usb_lib_task, "usb_lib", ESP3D_USB_SERIAL_TASK_SIZE, NULL, ESP3D_USB_SERIAL_TASK_PRIORITY, &xHandle, ESP3D_USB_SERIAL_TASK_CORE);
-    if (res==pdPASS && xHandle) {
+    return ESP_OK;
+}
+
+esp_err_t usb_serial_delete_task()
+{
+    esp_err_t err = cdc_acm_host_uninstall();
+    if (err!=ESP_OK) {
+        vTaskDelete(usb_serial_xHandle);
+        usb_serial_xHandle = NULL;
+        return ESP_OK;
+    }
+    return err;
+}
+
+esp_err_t usb_serial_create_task()
+{
+// Create a task that will handle USB library events
+
+    BaseType_t  res =  xTaskCreatePinnedToCore(usb_lib_task, "usb_lib", ESP3D_USB_SERIAL_TASK_SIZE, NULL, ESP3D_USB_SERIAL_TASK_PRIORITY, &usb_serial_xHandle, ESP3D_USB_SERIAL_TASK_CORE);
+    if (res==pdPASS && usb_serial_xHandle) {
         esp3d_log("Installing CDC-ACM driver");
         if (cdc_acm_host_install(NULL)==ESP_OK) {
             // Register VCP drivers to VCP service.

@@ -30,8 +30,8 @@
 #include "nvs_flash.h"
 #include "version.h"
 #include <string>
-#include "esp_log.h"
 #include "esp3d_log.h"
+#include "esp3d_commands.h"
 #include "bsp.h"
 #include "filesystem/esp3d_flash.h"
 #include "filesystem/esp3d_sd.h"
@@ -67,7 +67,6 @@ bool Esp3DTFT::begin()
     //Specitic board initialization
     ESP_ERROR_CHECK(bsp_init());
 
-
     if (esp3dTFTsettings.isValidSettingsNvs()) {
         esp3d_log("NVS is valid");
         char result[50]= {0};
@@ -82,7 +81,15 @@ bool Esp3DTFT::begin()
             esp3d_log_e("Reset NVS failed");
         }
     }
-
+#if ESP3D_USB_SERIAL_FEATURE
+    if (esp3dCommands.getOutputClient(true)==USB_SERIAL_CLIENT) {
+        bsp_init_usb();
+    } else {
+        if (bsp_deinit_usb()!=ESP_OK) {
+            esp3d_log_e("Failed to deinit usb");
+        }
+    }
+#endif //#if ESP3D_USB_SERIAL_FEATURE
     bool successFs = flashFs.begin();
     bool successSd = sd.begin();
     bool success =  esp3dTFTui.begin();

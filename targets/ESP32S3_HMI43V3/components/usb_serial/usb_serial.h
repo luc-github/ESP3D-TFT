@@ -31,7 +31,9 @@ extern "C" {
  **********************/
 
 esp_err_t usb_serial_init();
-
+esp_err_t usb_serial_deinit();
+esp_err_t usb_serial_create_task();
+esp_err_t usb_serial_delete_task();
 
 /**********************
  *      MACROS

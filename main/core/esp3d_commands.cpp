@@ -888,7 +888,6 @@ esp3d_clients_t Esp3DCommands::getOutputClient(bool fromSettings)
         _output_client = SERIAL_CLIENT;
 #if ESP3D_USB_SERIAL_FEATURE
         uint8_t  value = esp3dTFTsettings.readByte(esp3d_output_client);
-        esp3d_log("Output client is %d", value);
         switch((esp3d_clients_t)value) {
         case SERIAL_CLIENT:
             _output_client = SERIAL_CLIENT;
