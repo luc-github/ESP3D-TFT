@@ -38,6 +38,8 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 esp_err_t bsp_init(void);
+esp_err_t bsp_init_usb(void);
+esp_err_t bsp_deinit_usb(void);
 
 #ifdef __cplusplus
 } /* extern "C" */

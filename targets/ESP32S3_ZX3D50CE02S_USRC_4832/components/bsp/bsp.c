@@ -30,6 +30,7 @@
 #include "touch_def.h"
 #include "ft5x06.h"
 #include "st7796.h"
+#include "usb_serial.h"
 
 static i2c_bus_handle_t i2c_bus_handle = NULL;
 
@@ -53,14 +54,14 @@ static i2c_bus_handle_t i2c_bus_handle = NULL;
 /**********************
  *  STATIC VARIABLES
  **********************/
-    static i2c_config_t conf = {
-        .mode = I2C_MODE_MASTER,
-        .scl_io_num = I2C_SCL_PIN,
-        .sda_io_num = I2C_SDA_PIN,
-        .scl_pullup_en = GPIO_PULLUP_ENABLE,
-        .sda_pullup_en = GPIO_PULLUP_ENABLE,
-        .master.clk_speed = I2C_CLK_SPEED
-    };
+static i2c_config_t conf = {
+    .mode = I2C_MODE_MASTER,
+    .scl_io_num = I2C_SCL_PIN,
+    .sda_io_num = I2C_SDA_PIN,
+    .scl_pullup_en = GPIO_PULLUP_ENABLE,
+    .sda_pullup_en = GPIO_PULLUP_ENABLE,
+    .master.clk_speed = I2C_CLK_SPEED
+};
 /**********************
  *      MACROS
  **********************/
@@ -68,6 +69,19 @@ static i2c_bus_handle_t i2c_bus_handle = NULL;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
+esp_err_t bsp_init_usb(void)
+{
+    /*usb host initialization */
+    esp3d_log("Initializing usb-serial");
+    return usb_serial_create_task();
+}
+
+esp_err_t bsp_deinit_usb(void)
+{
+    esp3d_log("Remove usb-serial");
+    return usb_serial_deinit();
+}
 
 esp_err_t bsp_init(void)
 {
@@ -91,7 +105,12 @@ esp_err_t bsp_init(void)
         esp3d_log_e("I2C bus failed to be initialized.");
         return ESP_FAIL;
     }
-
+//NOTE:
+//this location allows usb-host driver to be installed - later it will failed
+//Do not know why...
+    if ( usb_serial_init()!=ESP_OK) {
+        return ESP_FAIL;
+    }
 
     /* Display controller initialization */
     esp3d_log("Initializing display controller");
@@ -129,7 +148,7 @@ esp_err_t bsp_init(void)
     /* Initialize the working buffer depending on the selected display.*/
     lv_disp_draw_buf_init(&draw_buf, buf1, buf2, size_in_px);
 
-   
+
     esp_lcd_panel_handle_t *  panel_handle = st7796_panel_handle();
     lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
     disp_drv.flush_cb = st7796_flush;    /*Set your driver function*/
