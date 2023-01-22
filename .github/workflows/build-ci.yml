@@ -17,4 +17,6 @@ jobs:
         esp_idf_version: v5.0
         target: esp32s3
         path: $PROJECT_PATH
-        command: idf.py -C $PROJECT_PATH build 
+    - name: List build
+        run: bash ./.github/ci/list.sh
+
