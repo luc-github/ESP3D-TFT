@@ -16,4 +16,5 @@ jobs:
       with:
         esp_idf_version: v5.0
         target: esp32s3
-        command: idf.py -C $GITHUB_WORKSPACE/$PROJECT_PATH build 
+        path: $PROJECT_PATH
+        command: idf.py -C $PROJECT_PATH build 
