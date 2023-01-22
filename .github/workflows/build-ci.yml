@@ -18,5 +18,5 @@ jobs:
         target: esp32s3
         path: $PROJECT_PATH
     - name: List build
-        run: bash ./.github/ci/list.sh
+      run: bash ./.github/ci/list.sh
 
