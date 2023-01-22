@@ -16,4 +16,4 @@ jobs:
       with:
         esp_idf_version: v5.0
         target: esp32s3
-        path: $GITHUB_WORKSPACE/$PROJECT_PATH
+        path: $GITHUB_WORKSPACE/
