@@ -29,6 +29,7 @@
 #include "mDNS/esp3d_mdns.h"
 #include "ssdp/esp3d_ssdp.h"
 #include "socket_server/esp3d_socket_server.h"
+#include "authentication/esp3d_authentication.h"
 
 Esp3DNetworkServices esp3dNetworkServices;
 
@@ -42,13 +43,13 @@ Esp3DNetworkServices::~Esp3DNetworkServices() {}
 bool Esp3DNetworkServices::begin()
 {
     esp3d_log("Starting Services");
-    _started = esp3dHttpService.begin() && esp3dNotificationsService.begin(true) && esp3dmDNS.begin() && esp3d_ssdp_service.begin() && esp3dSocketServer.begin();
+    _started = esp3dAuthenthicationService.begin() && esp3dHttpService.begin() && esp3dNotificationsService.begin(true) && esp3dmDNS.begin() && esp3d_ssdp_service.begin() && esp3dSocketServer.begin();
     return _started;
 }
 
 void Esp3DNetworkServices::handle()
 {
-
+    esp3dAuthenthicationService.handle();
 }
 
 void Esp3DNetworkServices::end()
@@ -57,6 +58,7 @@ void Esp3DNetworkServices::end()
         return;
     }
     esp3d_log("Stop Services");
+    esp3dAuthenthicationService.end();
     esp3dSocketServer.end();
     esp3dHttpService.end();
     esp3dmDNS.end();

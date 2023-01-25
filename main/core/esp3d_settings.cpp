@@ -35,6 +35,7 @@
 #endif //ESP3D_USB_SERIAL_FEATURE
 #include "network/esp3d_network.h"
 #include "notifications/esp3d_notifications_service.h"
+#include "authentication/esp3d_authentication.h"
 
 #define STORAGE_NAME "ESP3D_TFT"
 #define SETTING_VERSION "ESP3D_TFT-V3.0.1"
@@ -88,6 +89,11 @@ const esp3d_setting_desc_t Esp3DSettingsData [] = {
     {esp3d_socket_port, esp3d_integer, 4, "23"},
     {esp3d_socket_on, esp3d_byte, 1,"1"},
     {esp3d_ws_on, esp3d_byte, 1,"1"},
+#if ESP3D_AUTHENTICATION_FEATURE
+    {esp3d_admin_password, esp3d_string, SIZE_OF_LOCAL_PASSWORD,"admin"},
+    {esp3d_user_password, esp3d_string, SIZE_OF_LOCAL_PASSWORD,"user"},
+    {esp3d_session_timeout, esp3d_byte, 1,"3"},
+#endif //ESP3D_AUTHENTICATION_FEATURE
 };
 
 bool  Esp3DSettings::isValidStringSetting(const char* value, esp3d_setting_index_t settingElement)
@@ -107,19 +113,24 @@ bool  Esp3DSettings::isValidStringSetting(const char* value, esp3d_setting_index
     switch(settingElement) {
     case esp3d_ap_ssid:
     case esp3d_sta_ssid:
-        return  (len>0 && len<=32); //any string from 1 to 32
+        return  (len>0 && len<=SIZE_OF_SETTING_SSID_ID); //any string from 1 to 32
     case esp3d_sta_password:
     case esp3d_ap_password:
-        return (len==0 || (len>=8 && len<=64)); //any string from 8 to 64 or 0
+        return (len==0 || (len>=8 && len<=SIZE_OF_SETTING_SSID_PWD)); //any string from 8 to 64 or 0
     case esp3d_hostname:
         esp3d_log("Checking hostname validity");
         return  std::regex_match (value, std::regex("^[a-zA-Z0-9]{1}[a-zA-Z0-9\\-]{0,31}$"));//any string alphanumeric or '-' from 1 to 32
     case esp3d_notification_token_1:
-        return  len<=64; //any string from 0 to 64
+        return  len>=0 && len<=SIZE_OF_SETTING_NOFIFICATION_T1; //any string from 0 to 64
     case esp3d_notification_token_2:
-        return len<=64;  //any string from 0 to 64
+        return len>=0 && len<=SIZE_OF_SETTING_NOFIFICATION_T2;  //any string from 0 to 64
     case esp3d_notification_token_setting:
-        return  len<=128;  //any string from 0 to 128
+        return  len>=0 && len<=SIZE_OF_SETTING_NOFIFICATION_TS;  //any string from 0 to 128
+#if ESP3D_AUTHENTICATION_FEATURE
+    case esp3d_admin_password:
+    case esp3d_user_password:
+        return  len>=0 && len<=SIZE_OF_LOCAL_PASSWORD;  //any string from 0 to 20
+#endif //ESP3D_AUTHENTICATION_FEATURE
     default:
         return false;
     }
@@ -179,6 +190,11 @@ bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t set
             return true;
         }
         break;
+#if ESP3D_AUTHENTICATION_FEATURE
+    case esp3d_session_timeout:
+        return true; //0 ->255 minutes
+        break;
+#endif //ESP3D_AUTHENTICATION_FEATURE
 #if ESP3D_USB_SERIAL_FEATURE
     case esp3d_output_client:
         return  ((esp3d_clients_t)value == SERIAL_CLIENT || (esp3d_clients_t)value == USB_SERIAL_CLIENT);

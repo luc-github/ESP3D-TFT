@@ -132,7 +132,7 @@ bool Esp3DCommands::dispatchSetting(bool json,const char * filter, esp3d_setting
         value="Not supported";
         break;
     default: //String
-        if (index==esp3d_sta_password || index==esp3d_ap_password || index==esp3d_notification_token_1 || index==esp3d_notification_token_2 ) { //hide passwords using  ********
+        if (index==esp3d_sta_password || index==esp3d_ap_password || index==esp3d_notification_token_1 || index==esp3d_notification_token_2  || index==esp3d_admin_password|| index==esp3d_user_password) { //hide passwords using  ********
             value=HIDDEN_SETTING_VALUE;
         } else {
             value=esp3dTFTsettings.readString(index, out_str, elementSetting->size);
@@ -236,11 +236,14 @@ bool Esp3DCommands::dispatchAuthenticationError(esp3d_msg_t * msg, uint cmdid, b
         return false;
     }
     msg->authentication_level =ESP3D_LEVEL_NOT_AUTHENTICATED;
-    //answer is one message, override for safety
+    if (msg->target==WEBUI_CLIENT && msg->requestId.httpReq ) {
+        httpd_resp_set_status(msg->requestId.httpReq,"401 UNAUTHORIZED");
+    }
+//answer is one message, override for safety
     msg->type= msg_unique;
     if (json) {
         tmpstr = "{\"cmd\":\"";
-        tmpstr = std::to_string(cmdid);
+        tmpstr += std::to_string(cmdid);
         tmpstr+= "\",\"status\":\"error\",\"data\":\"Wrong authentication level\"}";
     } else {
         tmpstr = "Wrong authentication level\n";
@@ -798,6 +801,17 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
     case 450:
         ESP450(cmd_params_pos, msg);
         break;
+#if ESP3D_AUTHENTICATION_FEATURE
+    case 500:
+        ESP500(cmd_params_pos, msg);
+        break;
+    case 550:
+        ESP550(cmd_params_pos, msg);
+        break;
+    case 555:
+        ESP555(cmd_params_pos, msg);
+        break;
+#endif //ESP3D_AUTHENTICATION_FEATURE
     case 600:
         ESP600(cmd_params_pos, msg);
         break;

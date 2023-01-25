@@ -19,6 +19,7 @@
 
 #include "esp3d_authentication.h"
 #include <stdio.h>
+#include "esp3d_settings.h"
 Esp3DAuthenticationService esp3dAuthenthicationService;
 
 Esp3DAuthenticationService::Esp3DAuthenticationService() {}
@@ -30,23 +31,39 @@ esp3d_authentication_level_t  Esp3DAuthenticationService::getAuthenticatedLevel(
 }
 bool Esp3DAuthenticationService::begin()
 {
-    //TODO load password for admin and user for leter usage
-    return false;
+#if ESP3D_AUTHENTICATION_FEATURE
+    char tmpStr [SIZE_OF_LOCAL_PASSWORD+1];
+    _admin_pwd = esp3dTFTsettings.readString(esp3d_admin_password,tmpStr, SIZE_OF_LOCAL_PASSWORD);
+    _user_pwd = esp3dTFTsettings.readString(esp3d_user_password,tmpStr, SIZE_OF_LOCAL_PASSWORD);
+    _session_timeout = esp3dTFTsettings.readByte(esp3d_session_timeout);
+#endif //ESP3D_AUTHENTICATION_FEATURE
+    return true;
 }
 void Esp3DAuthenticationService::handle()
 {
     //TODO  clear time out session
 }
-void Esp3DAuthenticationService::end() {}
+void Esp3DAuthenticationService::end()
+{
+    _admin_pwd.clear();
+    _user_pwd.clear();
+
+}
 bool Esp3DAuthenticationService::isadmin (const char *pwd)
 {
-    //TODO Compare with current admin password
-    return false;
+#if ESP3D_AUTHENTICATION_FEATURE
+    return _admin_pwd==pwd;
+#else
+    return true;
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
 }
 bool Esp3DAuthenticationService::isuser (const char *pwd)
 {
-    //TODO Compare with current user password
-    return false;
+#if ESP3D_AUTHENTICATION_FEATURE
+    return _user_pwd==pwd;
+#else
+    return true;
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
 }
 void Esp3DAuthenticationService::update()
 {

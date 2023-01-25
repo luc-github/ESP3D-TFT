@@ -92,8 +92,10 @@ const char * ServstringKeysVal[] = {
 //  "Time_server1",
 //  "Time_server2",
 //   "Time_server3",
-//  "ADMIN_PASSWORD",
-//  "USER_PASSWORD",
+#if ESP3D_AUTHENTICATION_FEATURE
+    "ADMIN_PASSWORD",
+    "USER_PASSWORD",
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
     "NOTIF_TOKEN1",
     "NOTIF_TOKEN2",
     "NOTIF_TOKEN_Settings"
@@ -103,12 +105,14 @@ const esp3d_setting_index_t ServstringKeysPos[] = {
 //   ESP_TIME_SERVER1,
 //   ESP_TIME_SERVER2,
 //   ESP_TIME_SERVER3,
-//   ESP_ADMIN_PWD,
-//   ESP_USER_PWD,
+#if ESP3D_AUTHENTICATION_FEATURE
+    esp3d_admin_password,
+    esp3d_user_password,
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
     esp3d_notification_token_1,
     esp3d_notification_token_2,
     esp3d_notification_token_setting
-} ;
+};
 
 //Integer values
 const char * ServintKeysVal[] = {
@@ -163,14 +167,18 @@ const esp3d_setting_index_t ServboolKeysPos[] = {
 //Byte values
 const char * ServbyteKeysVal[] = {
     //"Time_zone",
-    //"Sesion_timeout",
+#if ESP3D_AUTHENTICATION_FEATURE
+    "Sesion_timeout",
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
     "SD_SPEED"
     //"Time_DST"
 } ;
 
 const esp3d_setting_index_t ServbyteKeysPos[] = {
     //ESP_TIMEZONE,
-    //ESP_SESSION_TIMEOUT,
+#if ESP3D_AUTHENTICATION_FEATURE
+    esp3d_session_timeout,
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
     esp3d_spi_divider
     //ESP_TIME_DST
 } ;
@@ -178,12 +186,16 @@ const esp3d_setting_index_t ServbyteKeysPos[] = {
 //System
 //Integer values
 const char * SysintKeysVal[] = {"Baud_rate",
+#if ESP3D_USB_SERIAL_FEATURE
                                 "USB_Serial_Baud_rate"
+#endif//#if ESP3D_USB_SERIAL_FEATURE
                                 //"Boot_delay"
                                };
 
 const esp3d_setting_index_t SysintKeysPos[] = {esp3d_baud_rate,
+#if ESP3D_USB_SERIAL_FEATURE
                                                esp3d_usb_serial_baud_rate
+#endif #if ESP3D_USB_SERIAL_FEATURE
                                                //ESP_BOOT_DELAY
                                               };
 //Boolean values

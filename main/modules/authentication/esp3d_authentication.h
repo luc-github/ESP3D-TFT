@@ -20,13 +20,8 @@
 
 #pragma once
 #include <stdio.h>
-
-#include "esp3d_log.h"
 #include <string>
-#define USER_PASSWORD_MAX_SIZE 20
-#define ADMIN_PASSWORD_MAX_SIZE 20
-const char ESP3D_ADMIN_LOGIN [] =      "admin";
-const char ESP3D_USER_LOGIN [] =       "user";
+#include "esp3d_log.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,10 +46,23 @@ public:
     bool isadmin (const char *pwd);
     bool isuser (const char *pwd);
     void update();
+    void setAdminPassword( const char *pwd)
+    {
+        _admin_pwd = pwd;
+    }
+    void setUserPassword( const char *pwd)
+    {
+        _user_pwd = pwd;
+    }
+    void setSessionTimeout(uint8_t timeout)
+    {
+        _session_timeout = timeout;
+    }
 
 private:
-    char _adminpwd[USER_PASSWORD_MAX_SIZE+1];
-    char _userpwd[USER_PASSWORD_MAX_SIZE+1];
+    std::string _admin_pwd;
+    std::string _user_pwd;
+    uint8_t _session_timeout;
 };
 
 extern Esp3DAuthenticationService esp3dAuthenthicationService;

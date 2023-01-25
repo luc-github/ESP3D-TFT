@@ -165,6 +165,17 @@ void Esp3DCommands::ESP401(int cmd_params_pos,esp3d_msg_t * msg)
             case esp3d_spi_divider:
                 sd.setSPISpeedDivider(valueb);
                 break;
+#if ESP3D_AUTHENTICATION_FEATURE
+            case esp3d_admin_password:
+                esp3dAuthenthicationService.setAdminPassword(settingValue.c_str());
+                break;
+            case esp3d_user_password:
+                esp3dAuthenthicationService.setUserPassword(settingValue.c_str());
+                break;
+            case esp3d_session_timeout:
+                esp3dAuthenthicationService.setSessionTimeout(valueb);
+                break;
+#endif //ESP3D_AUTHENTICATION_FEATURE
             case esp3d_notification_type:
             case esp3d_auto_notification:
             case esp3d_notification_token_1:

@@ -221,6 +221,22 @@ void Esp3DCommands::ESP400(int cmd_params_pos,esp3d_msg_t * msg)
     if (!dispatchSetting(json,"network/ap",esp3d_ap_channel, "channel", ApChannelsList, ApChannelsList, sizeof(ApChannelsList)/sizeof(char*), -1, -1,-1, nullptr, true,target,requestId)) {
         esp3d_log_e("Error sending response to clients");
     }
+#if ESP3D_AUTHENTICATION_FEATURE
+    //Session timeout
+    if (!dispatchSetting(json,"security/security",esp3d_session_timeout, "session timeout", nullptr, nullptr,255, 0, -1,-1, nullptr, false,target,requestId)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+
+    //Admin Password
+    if (!dispatchSetting(json,"security/security",esp3d_admin_password, "admin pwd", nullptr, nullptr, SIZE_OF_LOCAL_PASSWORD, 0, -1,-1, nullptr, false,target,requestId)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+
+    //User Password
+    if (!dispatchSetting(json,"security/security",esp3d_user_password, "user pwd", nullptr, nullptr, SIZE_OF_LOCAL_PASSWORD, 0, -1,-1, nullptr, false,target,requestId)) {
+        esp3d_log_e("Error sending response to clients");
+    }
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
 
     //Http service on
     if (!dispatchSetting(json,"service/http",esp3d_http_on, "enable",YesNoValues, YesNoLabels, sizeof(YesNoValues)/sizeof(char*),-1,-1,-1, nullptr, true,target,requestId)) {
