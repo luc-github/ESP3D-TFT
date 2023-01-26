@@ -121,15 +121,15 @@ bool  Esp3DSettings::isValidStringSetting(const char* value, esp3d_setting_index
         esp3d_log("Checking hostname validity");
         return  std::regex_match (value, std::regex("^[a-zA-Z0-9]{1}[a-zA-Z0-9\\-]{0,31}$"));//any string alphanumeric or '-' from 1 to 32
     case esp3d_notification_token_1:
-        return  len>=0 && len<=SIZE_OF_SETTING_NOFIFICATION_T1; //any string from 0 to 64
+        return len<=SIZE_OF_SETTING_NOFIFICATION_T1; //any string from 0 to 64
     case esp3d_notification_token_2:
-        return len>=0 && len<=SIZE_OF_SETTING_NOFIFICATION_T2;  //any string from 0 to 64
+        return len<=SIZE_OF_SETTING_NOFIFICATION_T2;  //any string from 0 to 64
     case esp3d_notification_token_setting:
-        return  len>=0 && len<=SIZE_OF_SETTING_NOFIFICATION_TS;  //any string from 0 to 128
+        return len<=SIZE_OF_SETTING_NOFIFICATION_TS;  //any string from 0 to 128
 #if ESP3D_AUTHENTICATION_FEATURE
     case esp3d_admin_password:
     case esp3d_user_password:
-        return  len>=0 && len<=SIZE_OF_LOCAL_PASSWORD;  //any string from 0 to 20
+        return len<=SIZE_OF_LOCAL_PASSWORD;  //any string from 0 to 20
 #endif //ESP3D_AUTHENTICATION_FEATURE
     default:
         return false;

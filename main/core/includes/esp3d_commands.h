@@ -79,6 +79,7 @@ public:
     void ESP450(int cmd_params_pos,esp3d_msg_t * msg);
 #if ESP3D_AUTHENTICATION_FEATURE
     void ESP500(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP510(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP550(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP555(int cmd_params_pos,esp3d_msg_t * msg);
 #endif //ESP3D_AUTHENTICATION_FEATURE

@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <esp_http_server.h>
 #include "esp3d_client.h"
+#include "esp3d_string.h"
 #include <list>
 #include <utility>
 

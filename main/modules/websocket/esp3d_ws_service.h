@@ -40,6 +40,9 @@ typedef struct {
     struct sockaddr_storage source_addr;
     char * buffer;
     uint bufPos;
+#if ESP3D_AUTHENTICATION_FEATURE
+    char sessionId[25];
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
 } esp3d_ws_client_info_t;
 
 class Esp3DWsService

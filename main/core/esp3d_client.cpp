@@ -22,6 +22,7 @@
 #include <string.h>
 #include <string>
 #include "esp_timer.h"
+#include "esp3d_log.h"
 #if ESP3D_TFT_LOG
 int32_t msg_counting=0;
 #endif// ESP3D_TFT_LOG

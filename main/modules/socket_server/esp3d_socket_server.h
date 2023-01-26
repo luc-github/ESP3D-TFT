@@ -36,6 +36,9 @@ extern "C" {
 typedef struct {
     int socketId;
     struct sockaddr_storage source_addr;
+#if ESP3D_AUTHENTICATION_FEATURE
+    char sessionId[25];
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
 } esp3d_socket_client_info_t;
 
 class ESP3DSocketServer : public Esp3DClient

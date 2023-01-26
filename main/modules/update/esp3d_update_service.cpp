@@ -195,7 +195,7 @@ const char * SysintKeysVal[] = {"Baud_rate",
 const esp3d_setting_index_t SysintKeysPos[] = {esp3d_baud_rate,
 #if ESP3D_USB_SERIAL_FEATURE
                                                esp3d_usb_serial_baud_rate
-#endif #if ESP3D_USB_SERIAL_FEATURE
+#endif //#if ESP3D_USB_SERIAL_FEATURE
                                                //ESP_BOOT_DELAY
                                               };
 //Boolean values

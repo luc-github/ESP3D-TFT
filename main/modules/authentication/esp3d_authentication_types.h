@@ -1,5 +1,5 @@
 /*
-  esp3d_authentication_records
+  esp3d_authentication
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -20,26 +20,18 @@
 
 #pragma once
 #include <stdio.h>
-#include "lwip/sockets.h"
-#include <string>
-#include "esp3d_client_types.h"
-#include "esp3d_authentication_types.h"
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if ESP3D_AUTHENTICATION_FEATURE
-typedef struct  {
-    esp3d_authentication_level_t level;
-    int socketId;
-    esp3d_clients_t client_type;
-    char sessionId[25];
-    int64_t last_time;
-} esp3d_authentication_record_t;
-#endif //ESP3D_AUTHENTICATION_FEATURE
-
-
+typedef enum {
+    ESP3D_LEVEL_GUEST,
+    ESP3D_LEVEL_USER,
+    ESP3D_LEVEL_ADMIN,
+    ESP3D_LEVEL_NOT_AUTHENTICATED,
+} esp3d_authentication_level_t;
 
 #ifdef __cplusplus
 } // extern "C"

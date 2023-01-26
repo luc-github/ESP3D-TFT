@@ -53,7 +53,8 @@ const char * help[]= {"[ESP](id) - display this help",
                       "[ESP444](state) - set ESP3D state (RESET/RESTART)",
                       "[ESP450]display ESP3D list on network",
 #if ESP3D_AUTHENTICATION_FEATURE
-                      "[ESP500](timeout) - display/set session timeout",
+                      "[ESP500] - set get connection status",
+                      "[ESP510](timeout) - display/set session timeout",
                       "[ESP550](password) - set admin password",
                       "[ESP555](password) - set user password",
 #endif //#if ESP3D_AUTHENTICATION_FEATURE
@@ -106,6 +107,7 @@ const uint cmdlist[]= {0,
                        444,
 #if ESP3D_AUTHENTICATION_FEATURE
                        500,
+                       510,
                        550,
                        555,
 #endif //#if ESP3D_AUTHENTICATION_FEATURE

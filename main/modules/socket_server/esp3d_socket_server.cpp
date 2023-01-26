@@ -373,8 +373,10 @@ bool ESP3DSocketServer::pushMsgToRxQueue(int socketId,const uint8_t *msg, size_t
     esp3d_msg_t *newMsgPtr = newMsg();
     if (newMsgPtr) {
         if (Esp3DClient::setDataContent(newMsgPtr, msg, size)) {
-#if     ESP3D_DISABLE_SERIAL_AUTHENTICATION_FEATURE
-            newMsgPtr->authentication_level = ESP3D_LEVEL_ADMIN;
+#if  ESP3D_AUTHENTICATION_FEATURE
+//Todo - check if authenticated
+//set  newMsgPtr->authentication_level = ESP3D_LEVEL_ADMIN;
+            esp3d_log("Authentication Level set to %d", newMsgPtr->authentication_level);
 #endif // ESP3D_DISABLE_SERIAL_AUTHENTICATION
             newMsgPtr->origin = TELNET_CLIENT;
             newMsgPtr->target= esp3dCommands.getOutputClient();

@@ -22,17 +22,14 @@
 #include <stdio.h>
 #include <string>
 #include "esp3d_log.h"
+#include "lwip/sockets.h"
+#include "esp3d_authentication_types.h"
+#include "esp3d_authentication_records.h"
+#include <list>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef enum {
-    ESP3D_LEVEL_GUEST,
-    ESP3D_LEVEL_USER,
-    ESP3D_LEVEL_ADMIN,
-    ESP3D_LEVEL_NOT_AUTHENTICATED,
-} esp3d_authentication_level_t;
 
 class Esp3DAuthenticationService final
 {
@@ -45,7 +42,8 @@ public:
     void end();
     bool isadmin (const char *pwd);
     bool isuser (const char *pwd);
-    void update();
+    void updateRecords();
+#if ESP3D_AUTHENTICATION_FEATURE
     void setAdminPassword( const char *pwd)
     {
         _admin_pwd = pwd;
@@ -58,11 +56,20 @@ public:
     {
         _session_timeout = timeout;
     }
-
+    bool createRecord (struct sockaddr_storage source_addr, int socketId, esp3d_authentication_level_t level, esp3d_clients_t client_type);
+    bool clearSession(const char * sessionId);
+    void clearAllSessions();
+    esp3d_authentication_record_t * getRecord(const char * sessionId);
+    const char* create_session_id(struct sockaddr_storage source_addr, int socketId);
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
 private:
+
+    bool _is_admin;
+    bool _is_user;
     std::string _admin_pwd;
     std::string _user_pwd;
     uint8_t _session_timeout;
+    std::list<esp3d_authentication_record_t> _sessions;
 };
 
 extern Esp3DAuthenticationService esp3dAuthenthicationService;

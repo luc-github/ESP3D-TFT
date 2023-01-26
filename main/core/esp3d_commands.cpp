@@ -805,6 +805,9 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
     case 500:
         ESP500(cmd_params_pos, msg);
         break;
+    case 510:
+        ESP510(cmd_params_pos, msg);
+        break;
     case 550:
         ESP550(cmd_params_pos, msg);
         break;

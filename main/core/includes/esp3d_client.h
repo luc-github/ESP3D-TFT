@@ -23,26 +23,14 @@
 #include <stdio.h>
 #include <deque>
 #include <pthread.h>
-#include "authentication/esp3d_authentication.h"
+#include "authentication/esp3d_authentication_types.h"
+#include "esp3d_client_types.h"
 #include <esp_http_server.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef enum {
-    NO_CLIENT=0,
-    SERIAL_CLIENT = 1,
-    USB_SERIAL_CLIENT = 2,
-    STREAM_CLIENT = 3,
-    TELNET_CLIENT,
-    WEBUI_CLIENT,
-    WEBUI_WEBSOCKET_CLIENT,
-    WEBSOCKET_CLIENT,
-    ESP3D_COMMAND,
-    ESP3D_SYSTEM,
-    ALL_CLIENTS
-} esp3d_clients_t;
 
 typedef union {
     uint id;
