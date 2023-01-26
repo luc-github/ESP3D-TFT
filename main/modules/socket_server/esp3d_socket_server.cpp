@@ -168,7 +168,7 @@ void ESP3DSocketServer::readSockets()
                         //if end of char or buffer is full
                         if (isEndChar(_data[i]) || pos[s]==ESP3D_SOCKET_RX_BUFFER_SIZE) {
                             //create message and push
-                            if (!pushMsgToRxQueue(_clients[s].socketId,(const uint8_t*)_buffer[s], pos[s])) {
+                            if (!pushMsgToRxQueue(s,(const uint8_t*)_buffer[s], pos[s])) {
                                 //send error
                                 esp3d_log_e("Push Message to rx queue failed");
                             }
@@ -182,7 +182,7 @@ void ESP3DSocketServer::readSockets()
     //if no data during a while then send them
     for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++)
         if (esp3d_hal::millis()-startTimeout[s]>(RX_FLUSH_TIME_OUT) && pos[s]>0) {
-            if (!pushMsgToRxQueue(_clients[s].socketId,(const uint8_t*)_buffer[s], pos[s])) {
+            if (!pushMsgToRxQueue(s,(const uint8_t*)_buffer[s], pos[s])) {
                 //send error
                 esp3d_log_e("Push Message  %s of size %d to rx queue failed",_buffer[s], pos[s]);
             }
@@ -241,6 +241,9 @@ bool ESP3DSocketServer::getClient()
         close(sock);
         return false;
     }
+#if ESP3D_AUTHENTICATION_FEATURE
+    memset(_clients[freeIndex].sessionId, 0, sizeof(_clients[freeIndex].sessionId));
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
     //copy informations of the client
     _clients[freeIndex].socketId = sock;
     memcpy(&_clients[freeIndex].source_addr, &source_addr,  sizeof(source_addr));
@@ -273,10 +276,14 @@ int ESP3DSocketServer::getFreeClientSlot()
 bool ESP3DSocketServer::closeSocket(int socketId)
 {
     if (socketId!=FREE_SOCKET_HANDLE)
+
         for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
             if (_clients[s].socketId == socketId) {
                 shutdown(socketId, 0);
                 close(socketId);
+#if ESP3D_AUTHENTICATION_FEATURE
+                esp3dAuthenthicationService.clearSession(_clients[s].sessionId);
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
                 _clients[s].socketId = FREE_SOCKET_HANDLE;
                 memset(&_clients[s].source_addr, 0, sizeof(struct sockaddr_storage));
                 return true;
@@ -367,21 +374,53 @@ bool ESP3DSocketServer::begin()
     }
 }
 
-bool ESP3DSocketServer::pushMsgToRxQueue(int socketId,const uint8_t *msg, size_t size)
+bool ESP3DSocketServer::pushMsgToRxQueue(uint index,const uint8_t *msg, size_t size)
 {
+    esp3d_socket_client_info_t * client = getClientInfo(index);
+    if (client == NULL) {
+        esp3d_log_e("No client");
+        return false;
+    }
+    esp3d_authentication_level_t  authentication_level = ESP3D_LEVEL_GUEST;
+#if  ESP3D_AUTHENTICATION_FEATURE
+    esp3d_log("Check authentication level");
+    if (strlen(client->sessionId) == 0) {
+        esp3d_log("No sessionId");
+        std::string str = esp3dCommands.get_param ((const char *) msg,size, 0,"pwd=");
+        authentication_level = esp3dAuthenthicationService.getAuthenticatedLevel(str.c_str());
+        esp3d_log("Authentication Level = %d", authentication_level);
+        //Todo:
+        //1 -  create  session id
+        //2 -  add session id to client info
+        //3 -  add session id to _sessions list
+        if (authentication_level == ESP3D_LEVEL_GUEST) {
+            esp3d_log("Authentication Level = GUEST, for %s", (const char *)msg);
+#define error_msg "Authentication error, rejected."
+            sendToSocket(client->socketId, error_msg, strlen(error_msg));
+            return false;
+        }
+    } else {
+        esp3d_log("SessionId is %s", client->sessionId);
+        esp3d_authentication_record_t * rec = esp3dAuthenthicationService.getRecord(client->sessionId);
+        if (rec!= NULL) {
+            authentication_level = rec->level;
+        } else {
+            esp3d_log_e("No client record for authentication level");
+            return false;
+        }
+    }
+#else
+    authentication_level = ESP3D_LEVEL_ADMIN;
+#endif // ESP3D_AUTHENTICATION_FEATURE  
     esp3d_log("Pushing `%s` %d", msg, size);
     esp3d_msg_t *newMsgPtr = newMsg();
     if (newMsgPtr) {
         if (Esp3DClient::setDataContent(newMsgPtr, msg, size)) {
-#if  ESP3D_AUTHENTICATION_FEATURE
-//Todo - check if authenticated
-//set  newMsgPtr->authentication_level = ESP3D_LEVEL_ADMIN;
-            esp3d_log("Authentication Level set to %d", newMsgPtr->authentication_level);
-#endif // ESP3D_DISABLE_SERIAL_AUTHENTICATION
             newMsgPtr->origin = TELNET_CLIENT;
+            newMsgPtr->authentication_level = authentication_level;
             newMsgPtr->target= esp3dCommands.getOutputClient();
             newMsgPtr->type = msg_unique;
-            newMsgPtr->requestId.id = socketId;
+            newMsgPtr->requestId.id = client->socketId;
             if (!addRXData(newMsgPtr)) {
                 // delete message as cannot be added to the queue
                 Esp3DClient::deleteMsg(newMsgPtr);

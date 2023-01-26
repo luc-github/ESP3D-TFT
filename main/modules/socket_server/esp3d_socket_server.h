@@ -52,7 +52,7 @@ public:
     void readSockets();
     void end();
     bool isEndChar(uint8_t ch);
-    bool pushMsgToRxQueue(int socketId, const uint8_t* msg, size_t size);
+    bool pushMsgToRxQueue(uint index, const uint8_t* msg, size_t size);
     void flush();
     bool started()
     {

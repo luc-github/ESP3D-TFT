@@ -27,8 +27,18 @@ Esp3DAuthenticationService::Esp3DAuthenticationService() {}
 Esp3DAuthenticationService::~Esp3DAuthenticationService() {}
 esp3d_authentication_level_t  Esp3DAuthenticationService::getAuthenticatedLevel(const  char * pwd )
 {
-    //TODO check if password is valid
+#if ESP3D_AUTHENTICATION_FEATURE
+    if (isadmin (pwd)) {
+        return ESP3D_LEVEL_ADMIN;
+    }
+    if (isuser (pwd)) {
+        return ESP3D_LEVEL_USER;
+    }
+    return ESP3D_LEVEL_GUEST;
+#else
     return ESP3D_LEVEL_ADMIN;
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
+
 }
 bool Esp3DAuthenticationService::begin()
 {

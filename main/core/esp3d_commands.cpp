@@ -605,6 +605,11 @@ const char *  Esp3DCommands::get_param (esp3d_msg_t * msg, uint start,const char
     if (!msg) {
         return "";
     }
+    return get_param ((const char *)msg->data,msg->size, start, label);
+}
+
+const char *  Esp3DCommands::get_param (const char * data,uint size, uint start,const char* label)
+{
     int startPos = -1;
     uint lenLabel = strlen(label);
     static std::string value;
@@ -612,18 +617,18 @@ const char *  Esp3DCommands::get_param (esp3d_msg_t * msg, uint start,const char
     bool prevCharIsspace= true;
     value.clear();
     uint startp = start;
-    while( char(msg->data[startp])==' ' && startp<msg->size) {
+    while( char(data[startp])==' ' && startp<size) {
         startp++;
     }
-    for (uint i = startp; i <msg->size; i++) {
-        char c = char(msg->data[i]);
+    for (uint i = startp; i <size; i++) {
+        char c = char(data[i]);
         if (c== label[0] && startPos == -1 && prevCharIsspace) {
             uint p = 0;
-            while (i<msg->size && p <lenLabel && c==label[p] ) {
+            while (i<size && p <lenLabel && c==label[p] ) {
                 i++;
                 p++;
-                if(i<msg->size) {
-                    c = char(msg->data[i]);
+                if(i<size) {
+                    c = char(data[i]);
                 }
             }
             if (p == lenLabel) {
@@ -633,7 +638,7 @@ const char *  Esp3DCommands::get_param (esp3d_msg_t * msg, uint start,const char
         if (std::isspace(c) && !prevCharIsEscaped) {
             prevCharIsspace=true;
         }
-        if (startPos>-1 && i<msg->size) {
+        if (startPos>-1 && i<size) {
             if (c=='\\') {
                 prevCharIsEscaped=true;
             }

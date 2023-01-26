@@ -100,6 +100,7 @@ public:
     void ESP950(int cmd_params_pos,esp3d_msg_t * msg);
 #endif //#if ESP3D_USB_SERIAL_FEATURE
     const char * get_param (esp3d_msg_t * msg, uint start,const char* label);
+    const char * get_param (const char * data,uint size, uint start,const char* label);
     const char * get_clean_param (esp3d_msg_t * msg, uint start);
     bool has_param (esp3d_msg_t * msg, uint start);
     bool hasTag (esp3d_msg_t * msg, uint start,const char* label);
