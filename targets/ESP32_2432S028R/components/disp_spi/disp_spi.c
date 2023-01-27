@@ -284,7 +284,7 @@ void disp_spi_release(void)
  *   STATIC FUNCTIONS
  **********************/
 
-static void IRAM_ATTR spi_ready(spi_transaction_t *trans)
+void spi_ready(spi_transaction_t *trans)
 {
     disp_spi_send_flag_t flags = (disp_spi_send_flag_t) trans->user;
 
