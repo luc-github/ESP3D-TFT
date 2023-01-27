@@ -27,7 +27,7 @@
 #include "authentication/esp3d_authentication.h"
 #include "network/esp3d_network.h"
 #include "esp_netif_ip_addr.h"
-#include "mDNS/esp3d_mDNS.h"
+#include "mDNS/esp3d_mdns.h"
 
 #define COMMAND_ID 450
 //Get available ESP3D list
