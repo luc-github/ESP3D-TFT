@@ -1,6 +1,8 @@
 <span align="left"><img src="https://github.com/luc-github/ESP3D-TFT/blob/main/logo/ESP3D.png" width="200px"/></span><span align="left">ESP3D-TFT Firmware for ESP32 based TFT  </span>    
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<img src="https://img.shields.io/liberapay/patrons/ESP3D.svg?logo=liberapay">](https://liberapay.com/ESP3D)
 
+[![Development Version](https://img.shields.io/badge/Dev-v1.0-yellow?style=plastic) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3D-TFT/main?style=plastic)](https://github.com/luc-github/ESP3D/tree/main) [![github-ci](https://github.com/luc-github/ESP3D-TFT/workflows/build-ci/badge.svg)](https://github.com/luc-github/ESP3D-TFT/actions/workflows/build-ci.yml) [![Development  Version](https://img.shields.io/badge/Dev-v3.0-yellow?style=plastic&label=WebUI)](https://github.com/luc-github/ESP3D-WEBUI/tree/3.0)
+
 ## Features
 A Serial TFT with all WiFi feature to control 3D Printer or CNC, using same feature as [ESP3D](https://github.com/luc-github/ESP3D/tree/3.0)     
 
