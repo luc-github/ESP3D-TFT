@@ -58,6 +58,7 @@ public:
     }
     bool createRecord (const char * sessionId, int socketId, esp3d_authentication_level_t level, esp3d_clients_t client_type);
     bool clearSession(const char * sessionId);
+    bool updateRecord(int socketId, esp3d_clients_t client_type, esp3d_authentication_level_t newlevel);
     void clearAllSessions();
     esp3d_authentication_record_t * getRecord(const char * sessionId);
     const char* create_session_id(struct sockaddr_storage source_addr, int socketId);

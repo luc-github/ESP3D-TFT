@@ -37,7 +37,6 @@ void Esp3DCommands::ESP555(int cmd_params_pos,esp3d_msg_t * msg)
     std::string ok_msg ="ok";
     bool json = hasTag (msg,cmd_params_pos,"json");
     std::string tmpstr;
-    char out_str[255]= {0};
 #if ESP3D_AUTHENTICATION_FEATURE
     if (msg->authentication_level == ESP3D_LEVEL_GUEST) {
         msg->authentication_level =ESP3D_LEVEL_NOT_AUTHENTICATED;
@@ -49,7 +48,7 @@ void Esp3DCommands::ESP555(int cmd_params_pos,esp3d_msg_t * msg)
     if (tmpstr.length()==0) {
         const esp3d_setting_desc_t * settingPtr = esp3dTFTsettings.getSettingPtr(esp3d_user_password);
         if (settingPtr) {
-            ok_msg = esp3dTFTsettings.readString(esp3d_user_password,out_str, settingPtr->size);
+            ok_msg = HIDDEN_SETTING_VALUE;
         } else {
             hasError = true;
             error_msg="This setting is unknown";

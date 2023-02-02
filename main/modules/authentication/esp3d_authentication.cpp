@@ -155,6 +155,18 @@ esp3d_authentication_record_t * Esp3DAuthenticationService::getRecord(const char
     return NULL;
 }
 
+bool Esp3DAuthenticationService::updateRecord(int socketId, esp3d_clients_t client_type, esp3d_authentication_level_t newlevel)
+{
+    for (auto session = _sessions.begin(); session!=
+            _sessions.end(); ++session) {
+        if (session->client_type == client_type && session->socketId == socketId) {
+            session->level = newlevel;
+            return true;
+        }
+    }
+    return false;
+}
+
 void Esp3DAuthenticationService::updateRecords()
 {
 

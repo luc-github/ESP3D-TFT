@@ -709,7 +709,14 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
 #if ESP3D_AUTHENTICATION_FEATURE
     std::string pwd =  get_param (msg,cmd_params_pos,"pwd=");
     if (!pwd.empty()) { //adjust authentication level according
-        msg->authentication_level=  esp3dAuthenthicationService.getAuthenticatedLevel(pwd.c_str());
+        esp3d_authentication_level_t lvl = esp3dAuthenthicationService.getAuthenticatedLevel(pwd.c_str());
+        if (msg->authentication_level!= lvl) {
+            esp3d_log("Authentication level change from %d to %d", msg->authentication_level, lvl );
+            msg->authentication_level = lvl;
+            if (!esp3dAuthenthicationService.updateRecord(msg->requestId.id, msg->origin, lvl)) {
+                esp3d_log_e("Did not found the corresponding session");
+            }
+        }
     }
 #if ESP3D_DISABLE_SERIAL_AUTHENTICATION_FEATURE
     if (msg->origin ==SERIAL_CLIENT) {
