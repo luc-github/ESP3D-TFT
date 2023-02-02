@@ -56,7 +56,7 @@ public:
     {
         _session_timeout = timeout;
     }
-    bool createRecord (struct sockaddr_storage source_addr, int socketId, esp3d_authentication_level_t level, esp3d_clients_t client_type);
+    bool createRecord (const char * sessionId, int socketId, esp3d_authentication_level_t level, esp3d_clients_t client_type);
     bool clearSession(const char * sessionId);
     void clearAllSessions();
     esp3d_authentication_record_t * getRecord(const char * sessionId);
@@ -66,10 +66,12 @@ private:
 
     bool _is_admin;
     bool _is_user;
+#if ESP3D_AUTHENTICATION_FEATURE
     std::string _admin_pwd;
     std::string _user_pwd;
     uint8_t _session_timeout;
     std::list<esp3d_authentication_record_t> _sessions;
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
 };
 
 extern Esp3DAuthenticationService esp3dAuthenthicationService;

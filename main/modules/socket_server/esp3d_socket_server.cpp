@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include "esp3d_socket_server.h"
 #include "esp3d_settings.h"
+#include "esp3d_version.h"
 #include "esp3d_log.h"
 #include "esp3d_hal.h"
 #include "tasks_def.h"
@@ -36,6 +37,13 @@ ESP3DSocketServer esp3dSocketServer;
 #define KEEPALIVE_IDLE 5
 #define KEEPALIVE_INTERVAL 5
 #define KEEPALIVE_COUNT 1
+#define ERROR_MSG "Authentication error, rejected."
+#if ESP3D_AUTHENTICATION_FEATURE
+#define WELCOME_MSG "Welcome to ESP3D-TFT V" ESP3D_TFT_VERSION ", please enter a command with credentials.\r\n"
+#else
+#define WELCOME_MSG "Welcome to ESP3D-TFT V" ESP3D_TFT_VERSION ".\r\n"
+#endif
+
 
 #define FREE_SOCKET_HANDLE -1
 #define SOCKET_ERROR -1
@@ -259,7 +267,7 @@ bool ESP3DSocketServer::getClient()
     inet_ntoa_r(((struct sockaddr_in *)&source_addr)->sin_addr, addr_str, sizeof(addr_str) - 1);
     esp3d_log("Socket accepted ip address: %s", addr_str);
 #endif
-
+    sendToSocket(sock, WELCOME_MSG, strlen(WELCOME_MSG));
     return true;
 }
 
@@ -389,18 +397,24 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index,const uint8_t *msg, size_t s
         std::string str = esp3dCommands.get_param ((const char *) msg,size, 0,"pwd=");
         authentication_level = esp3dAuthenthicationService.getAuthenticatedLevel(str.c_str());
         esp3d_log("Authentication Level = %d", authentication_level);
+        if (authentication_level == ESP3D_LEVEL_GUEST) {
+            esp3d_log("Authentication Level = GUEST, for %s", (const char *)msg);
+            sendToSocket(client->socketId, ERROR_MSG, strlen(ERROR_MSG));
+            return false;
+        }
         //Todo:
         //1 -  create  session id
         //2 -  add session id to client info
+        strcpy(client->sessionId, esp3dAuthenthicationService.create_session_id(client->source_addr, client->socketId));
         //3 -  add session id to _sessions list
-        if (authentication_level == ESP3D_LEVEL_GUEST) {
-            esp3d_log("Authentication Level = GUEST, for %s", (const char *)msg);
-#define error_msg "Authentication error, rejected."
-            sendToSocket(client->socketId, error_msg, strlen(error_msg));
+        if (!esp3dAuthenthicationService.createRecord (client->sessionId, client->socketId, authentication_level, TELNET_CLIENT)) {
+            esp3d_log("Authentication error, rejected.");
+            sendToSocket(client->socketId, ERROR_MSG, strlen(ERROR_MSG));
             return false;
         }
     } else {
         esp3d_log("SessionId is %s", client->sessionId);
+        //No need to check time out as session is deleted on close
         esp3d_authentication_record_t * rec = esp3dAuthenthicationService.getRecord(client->sessionId);
         if (rec!= NULL) {
             authentication_level = rec->level;
@@ -470,7 +484,7 @@ void ESP3DSocketServer::flush()
 {
     uint8_t loopCount = 10;
     while (loopCount && getTxMsgsCount() > 0) {
-        // esp3d_log("flushing Tx messages");
+        esp3d_log("flushing Tx messages");
         loopCount--;
         handle();
     }

@@ -56,9 +56,11 @@ void Esp3DAuthenticationService::handle()
 }
 void Esp3DAuthenticationService::end()
 {
+#if ESP3D_AUTHENTICATION_FEATURE
     _admin_pwd.clear();
     _user_pwd.clear();
     clearAllSessions();
+#endif// #if ESP3D_AUTHENTICATION_FEATURE
 
 }
 bool Esp3DAuthenticationService::isadmin (const char *pwd)
@@ -106,20 +108,34 @@ const char* Esp3DAuthenticationService::create_session_id(struct sockaddr_storag
     return sessionID;
 }
 
-bool Esp3DAuthenticationService::createRecord (struct sockaddr_storage source_addr, int socketId, esp3d_authentication_level_t level, esp3d_clients_t client_type)
+bool Esp3DAuthenticationService::createRecord (const char * sessionId, int socketId, esp3d_authentication_level_t level, esp3d_clients_t client_type)
 {
-    return false;
+    if (strlen(sessionId)==0) {
+        return false;
+    }
+    esp3d_authentication_record_t rec;
+    memset(&rec, 0, sizeof(rec));
+    rec.level = level;
+    rec.client_type = client_type;
+    rec.socketId = socketId;
+    strcpy(rec.sessionId,sessionId);
+    rec.last_time = esp3d_hal::millis();
+    _sessions.push_back(rec);
+    return true;
 }
 
 bool Esp3DAuthenticationService::clearSession(const char * sessionId)
 {
+    esp3d_log("Clear session %s", sessionId);
     for (auto session = _sessions.begin(); session !=
             _sessions.end(); ++session) {
         if (strcmp(session->sessionId,sessionId)== 0) {
             _sessions.erase(session);
+            esp3d_log("Clear session succeed");
             return true;
         }
     }
+    esp3d_log_w("Clear session failed");
     return false;
 }
 
@@ -141,9 +157,13 @@ esp3d_authentication_record_t * Esp3DAuthenticationService::getRecord(const char
 
 void Esp3DAuthenticationService::updateRecords()
 {
+
     for (auto session = _sessions.begin(); session !=
             _sessions.end(); ++session) {
-        esp3d_log("session %s", session->sessionId);
+        esp3d_log("session %s, type %d", session->sessionId, session->client_type);
+        //todo if type == webui check timestamp and last update
+        //if session timout=0 =>TBD
+        //other : TBD
     }
 }
 #endif //#if ESP3D_AUTHENTICATION_FEATURE
