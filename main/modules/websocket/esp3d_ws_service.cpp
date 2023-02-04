@@ -26,6 +26,7 @@
 #include "esp_timer.h"
 #include <stdio.h>
 #include "esp_wifi.h"
+#include "esp3d_version.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_settings.h"
@@ -33,6 +34,13 @@
 #include "esp3d_commands.h"
 
 Esp3DWsService esp3dWsDataService;
+
+#if ESP3D_AUTHENTICATION_FEATURE
+#define WELCOME_MSG "Welcome to ESP3D-TFT V" ESP3D_TFT_VERSION ", please enter a command with credentials.\n"
+#define ERROR_MSG "Authentication error, rejected.\n"
+#else
+#define WELCOME_MSG "Welcome to ESP3D-TFT V" ESP3D_TFT_VERSION ".\n"
+#endif
 
 #define NO_FREE_SOCKET_HANDLE -1
 #define FREE_SOCKET_HANDLE -1
@@ -125,7 +133,9 @@ bool Esp3DWsService::addClient(int socketid)
     } else {
         esp3d_log_e("Failed to get address for new connection");
     }
-
+#if ESP3D_AUTHENTICATION_FEATURE
+    memset(_clients[freeIndex].sessionId, 0, sizeof(_clients[freeIndex].sessionId));
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
     return true;
 }
 
@@ -218,6 +228,7 @@ esp_err_t Esp3DWsService::onOpen(httpd_req_t *req)
         esp3d_log_e("Failed to add client");
         httpd_sess_trigger_close(_server, currentFd );
     }
+    pushMsgTxt(currentFd, WELCOME_MSG);
     return ESP_OK;
 }
 
@@ -263,7 +274,7 @@ esp_err_t Esp3DWsService::onMessage(httpd_req_t *req)
         if (ws_pkt.type ==HTTPD_WS_TYPE_TEXT) {
             buf[ws_pkt.len] = 0;
             esp3d_log("Got packet with message: %s",buf);
-            //TODO process payload and dispatch message is \n \re
+            //process payload and dispatch message is \n \re
             for (uint i=0; i <ws_pkt.len; i++) {
                 if (client->bufPos <ESP3D_WS_RX_BUFFER_SIZE) {
                     client->buffer[client->bufPos]= buf[i];
@@ -295,12 +306,53 @@ esp_err_t Esp3DWsService::onMessage(httpd_req_t *req)
 bool Esp3DWsService::pushMsgToRxQueue(int socketId,const uint8_t *msg, size_t size)
 {
     esp3d_log("Pushing `%s` %d", msg, size);
+    esp3d_ws_client_info_t * client = getClientInfoFromSocketId(socketId);
+    if (client == NULL) {
+        esp3d_log_e("No client");
+        return false;
+    }
+    esp3d_authentication_level_t  authentication_level = ESP3D_LEVEL_GUEST;
+#if  ESP3D_AUTHENTICATION_FEATURE
+    esp3d_log("Check authentication level");
+    if (strlen(client->sessionId) == 0) {
+        esp3d_log("No sessionId");
+        std::string str = esp3dCommands.get_param ((const char *) msg,size, 0,"pwd=");
+        authentication_level = esp3dAuthenthicationService.getAuthenticatedLevel(str.c_str());
+        esp3d_log("Authentication Level = %d", authentication_level);
+        if (authentication_level == ESP3D_LEVEL_GUEST) {
+            esp3d_log("Authentication Level = GUEST, for %s", (const char *)msg);
+            pushMsgTxt(client->socketId, ERROR_MSG);
+            return false;
+        }
+        //1 -  create  session id
+        //2 -  add session id to client info
+        strcpy(client->sessionId, esp3dAuthenthicationService.create_session_id(client->source_addr, client->socketId));
+        //3 -  add session id to _sessions list
+        if (!esp3dAuthenthicationService.createRecord (client->sessionId, client->socketId, authentication_level, WEBSOCKET_CLIENT)) {
+            esp3d_log("Authentication error, rejected.");
+            pushMsgTxt(client->socketId, ERROR_MSG);
+            return false;
+        }
+    } else {
+        esp3d_log("SessionId is %s", client->sessionId);
+        //No need to check time out as session is deleted on close
+        esp3d_authentication_record_t * rec = esp3dAuthenthicationService.getRecord(client->sessionId);
+        if (rec!= NULL) {
+            authentication_level = rec->level;
+        } else {
+            esp3d_log_e("No client record for authentication level");
+            return false;
+        }
+    }
+#else
+    authentication_level = ESP3D_LEVEL_ADMIN;
+#endif // ESP3D_AUTHENTICATION_FEATURE 
+
+
     esp3d_msg_t *newMsgPtr = Esp3DClient::newMsg();
     if (newMsgPtr) {
         if (Esp3DClient::setDataContent(newMsgPtr, msg, size)) {
-#if     ESP3D_DISABLE_SERIAL_AUTHENTICATION_FEATURE
-            newMsgPtr->authentication_level = ESP3D_LEVEL_ADMIN;
-#endif // ESP3D_DISABLE_SERIAL_AUTHENTICATION
+            newMsgPtr->authentication_level = authentication_level;
             newMsgPtr->origin = WEBSOCKET_CLIENT;
             newMsgPtr->target= esp3dCommands.getOutputClient();
             newMsgPtr->type = msg_unique;
@@ -331,6 +383,9 @@ esp_err_t Esp3DWsService::onClose(int fd)
         if (_clients[i].socketId== fd) {
             _clients[i].bufPos=0;
             _clients[i].socketId = FREE_SOCKET_HANDLE;
+#if ESP3D_AUTHENTICATION_FEATURE
+            esp3dAuthenthicationService.clearSession(_clients[i].sessionId);
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
             esp3d_log("onClose %d succeed", fd);
             return ESP_OK;
         }

@@ -37,9 +37,10 @@ ESP3DSocketServer esp3dSocketServer;
 #define KEEPALIVE_IDLE 5
 #define KEEPALIVE_INTERVAL 5
 #define KEEPALIVE_COUNT 1
-#define ERROR_MSG "Authentication error, rejected."
+
 #if ESP3D_AUTHENTICATION_FEATURE
 #define WELCOME_MSG "Welcome to ESP3D-TFT V" ESP3D_TFT_VERSION ", please enter a command with credentials.\r\n"
+#define ERROR_MSG "Authentication error, rejected."
 #else
 #define WELCOME_MSG "Welcome to ESP3D-TFT V" ESP3D_TFT_VERSION ".\r\n"
 #endif
@@ -402,7 +403,6 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index,const uint8_t *msg, size_t s
             sendToSocket(client->socketId, ERROR_MSG, strlen(ERROR_MSG));
             return false;
         }
-        //Todo:
         //1 -  create  session id
         //2 -  add session id to client info
         strcpy(client->sessionId, esp3dAuthenthicationService.create_session_id(client->source_addr, client->socketId));
