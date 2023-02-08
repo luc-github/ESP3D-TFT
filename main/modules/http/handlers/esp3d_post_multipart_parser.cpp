@@ -56,7 +56,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
         hasError = true;
     }
     if (!hasError) {
-        if (!(post_upload_ctx->nextHandler) ||!(post_upload_ctx->packetReadSize)||!(post_upload_ctx->packetWriteSize) || !post_upload_ctx->writeFn) {
+        if (!(post_upload_ctx->nextHandler) ||!(post_upload_ctx->packetReadSize)) {
             esp3d_log_e("Post parameter not found");
             esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
             hasError = true;
@@ -77,7 +77,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                 hasError = true;
             }
         }
-        if (!hasError) {
+        if (!hasError && post_upload_ctx->writeFn && post_upload_ctx->packetWriteSize) {
             packetWrite = (char*)malloc(post_upload_ctx->packetWriteSize);
             if (!packetWrite) {
                 esp3d_log_e("Memory issue, allocation failed");
@@ -267,6 +267,11 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                         if (packet[pIndex] == '\n' && prevChar == '\r') {
                             if (fileName.length()>0) {
                                 parsing_state = parse_data_file;
+                                if (!packetWrite || !post_upload_ctx->writeFn) {
+                                    esp3d_log_e("This url does not allow upload");
+                                    esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,"Upload error");
+                                    hasError = true;
+                                }
                             } else {
                                 parsing_state = parse_data_form;
                             }
@@ -305,6 +310,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
                     }
                     break;
                 case parse_data_file:
+
                     //esp3d_log("Parsing %d:  char %d:%c", pIndex, packet[pIndex], packet[pIndex]);
                     if (uploadState == upload_file_start) {
                         esp3d_log("File part Start");
@@ -445,6 +451,8 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
         return (post_upload_ctx->nextHandler(req));
     }
     //send abort state to writefn
-    post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_aborted,  fileName.c_str(), fileSize);
+    if (post_upload_ctx->writeFn) {
+        post_upload_ctx->writeFn((const uint8_t *)nullptr, 0, upload_file_aborted,  fileName.c_str(), fileSize);
+    }
     return httpd_resp_send_500(req);
 }

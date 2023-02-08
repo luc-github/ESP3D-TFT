@@ -28,10 +28,10 @@ Esp3DAuthenticationService::~Esp3DAuthenticationService() {}
 esp3d_authentication_level_t  Esp3DAuthenticationService::getAuthenticatedLevel(const  char * pwd )
 {
 #if ESP3D_AUTHENTICATION_FEATURE
-    if (isadmin (pwd)) {
+    if (isAdmin (pwd)) {
         return ESP3D_LEVEL_ADMIN;
     }
-    if (isuser (pwd)) {
+    if (isUser (pwd)) {
         return ESP3D_LEVEL_USER;
     }
     return ESP3D_LEVEL_GUEST;
@@ -63,7 +63,7 @@ void Esp3DAuthenticationService::end()
 #endif// #if ESP3D_AUTHENTICATION_FEATURE
 
 }
-bool Esp3DAuthenticationService::isadmin (const char *pwd)
+bool Esp3DAuthenticationService::isAdmin (const char *pwd)
 {
 #if ESP3D_AUTHENTICATION_FEATURE
     return _admin_pwd==pwd;
@@ -71,7 +71,7 @@ bool Esp3DAuthenticationService::isadmin (const char *pwd)
     return true;
 #endif //#if ESP3D_AUTHENTICATION_FEATURE
 }
-bool Esp3DAuthenticationService::isuser (const char *pwd)
+bool Esp3DAuthenticationService::isUser (const char *pwd)
 {
 #if ESP3D_AUTHENTICATION_FEATURE
     return _user_pwd==pwd;

@@ -61,6 +61,7 @@ uint  Esp3DWsService::clientsConnected()
     for (uint i = 0; i <_max_clients; i++) {
         if (_clients[i].socketId!= FREE_SOCKET_HANDLE) {
             count++;
+            esp3d_log("%d socket:%d", count,_clients[i].socketId );
         }
     }
     return count;
@@ -93,7 +94,7 @@ bool Esp3DWsService::closeClient(int socketId)
         return false;
     }
     httpd_sess_trigger_close(_server, socketId);
-    //onClose(socketId);
+    onClose(socketId);
     return true;
 }
 
@@ -470,7 +471,8 @@ esp_err_t Esp3DWsService::BroadcastTxt(uint8_t *msg, size_t len, int ignore)
         return ESP_FAIL;
     }
     for (uint i = 0; i <_max_clients; i++) {
-        if (_clients[i].socketId!= ignore) {
+        if (!(_clients[i].socketId== ignore || _clients[i].socketId==-1)) {
+            esp3d_log("Broadcast to socket %d", _clients[i].socketId);
             pushMsgTxt(_clients[i].socketId, msg, len);
         }
     }
@@ -483,7 +485,9 @@ esp_err_t Esp3DWsService::BroadcastBin(uint8_t *msg, size_t len, int ignore)
         return ESP_FAIL;
     }
     for (uint i = 0; i <_max_clients; i++) {
-        if (_clients[i].socketId!= ignore) {
+
+        if (!(_clients[i].socketId== ignore || _clients[i].socketId==-1)) {
+            esp3d_log("Broadcast to socket %d", _clients[i].socketId);
             pushMsgBin(_clients[i].socketId, msg, len);
         }
     }

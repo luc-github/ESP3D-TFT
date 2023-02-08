@@ -26,12 +26,40 @@
 #include "esp3d_settings.h"
 #include "esp3d_commands.h"
 #include "network/esp3d_network.h"
+#include "authentication/esp3d_authentication_types.h"
 
 
 esp_err_t Esp3DHttpService::login_handler(httpd_req_t *req)
 {
     esp3d_log("Uri: %s", req->uri);
-    //TODO: check if esp command and process it or dispatch it
-    httpd_resp_sendstr(req, "Response not yet available");
+#if ESP3D_AUTHENTICATION_FEATURE
+    std::string tmpstr;
+    if (esp3dHttpService.hasArg(req,"DISCONNECT")) {
+        tmpstr = esp3dHttpService.getArg(req,"DISCONNECT");
+        esp3d_log("DISCONNECT: %s", tmpstr.c_str());
+        if (tmpstr=="YES") {
+            return not_authenticated_handler(req);
+        }
+    }
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
+    esp3d_authentication_level_t level =getAuthenticationLevel(req);
+    if (level==ESP3D_LEVEL_GUEST) {
+        //send 401
+        return not_authenticated_handler(req);
+    } else {
+        //send 200
+        std::string resp = "{\"status\":\"ok\",\"authentication_lvl\":\"";
+        if (level==ESP3D_LEVEL_ADMIN) {
+            resp += "admin";
+        } else if (level==ESP3D_LEVEL_USER) {
+            resp += "user";
+        } else {
+            resp += "guest";
+        }
+        resp +="\"}";
+        httpd_resp_set_hdr(req, "Cache-Control","no-cache");
+        httpd_resp_set_type(req, "application/json");
+        httpd_resp_sendstr(req, "Authenticated");
+    }
     return ESP_OK;
 }

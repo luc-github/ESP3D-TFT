@@ -31,21 +31,31 @@ esp_err_t Esp3DWebUiService::onOpen(httpd_req_t *req)
     int currentFd = httpd_req_to_sockfd(req);
     std::string tmpstr;
     esp3d_log("New connection %d", currentFd);
-    esp3d_log("Already connected: %d client", clientsConnected());
-    esp3d_ws_client_info_t *   client=  getClientInfo(maxClients()-1);
-    if (client) {
-        int currentSocketId = client->socketId;
-        if (currentSocketId!=-1) {
-            tmpstr = "activeID:";
-            tmpstr+=std::to_string(currentFd);
-            tmpstr+="\n";
-            esp3d_log("%s",tmpstr.c_str());
-            pushMsgTxt(currentSocketId,tmpstr.c_str());
-            esp3d_hal::wait(100);
-            closeClient(currentSocketId);
+    if (clientsConnected()==maxClients()) {
+        esp3d_log("Already connected: %d client", clientsConnected());
+        esp3d_ws_client_info_t *   client=  getClientInfo(maxClients()-1);
+        if (client) {
+
+            esp3d_log_w("Already connected: %d client with socket %d", clientsConnected(), client->socketId);
+            int currentSocketId = client->socketId;
+            if (currentSocketId!=-1) {
+                tmpstr = "activeID:";
+                tmpstr+=std::to_string(currentFd);
+                tmpstr+="\n";
+                esp3d_log("%s",tmpstr.c_str());
+                while (clientsConnected()==maxClients()) {
+                    esp3d_log("send %s to socket %d",tmpstr.c_str(), currentSocketId );
+                    pushMsgTxt(currentSocketId,tmpstr.c_str());
+                    esp3d_hal::wait(500);
+                    closeClient(currentSocketId);
+                    esp3d_hal::wait(100);
+                }
+            }
+        } else {
+            esp3d_log_e("No client info");
         }
     } else {
-        esp3d_log_e("No client info");
+        esp3d_log("No previous client connected");
     }
 //set new connection as current client
     addClient(currentFd);
@@ -104,7 +114,8 @@ esp_err_t Esp3DWebUiService::onMessage(httpd_req_t *req)
             return ret;
         }
         if (ws_pkt.type ==HTTPD_WS_TYPE_TEXT) {
-            esp3d_log("Got packet with message: %s", ws_pkt.payload);
+            int currentFd = httpd_req_to_sockfd(req);
+            esp3d_log("Got packet with message: %s on socket %d", ws_pkt.payload,currentFd);
             //TODO process payload and dispatch message is \n \re
         } else  if(ws_pkt.type ==HTTPD_WS_TYPE_BINARY) {
             esp3d_log("Got packet with %d bytes", ws_pkt.len);

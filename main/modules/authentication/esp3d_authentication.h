@@ -40,10 +40,18 @@ public:
     bool begin();
     void handle();
     void end();
-    bool isadmin (const char *pwd);
-    bool isuser (const char *pwd);
+    bool isAdmin (const char *pwd);
+    bool isUser (const char *pwd);
     void updateRecords();
 #if ESP3D_AUTHENTICATION_FEATURE
+    const char * getAdminPassword()
+    {
+        return _admin_pwd.c_str();
+    }
+    const char * getUserPassword()
+    {
+        return _user_pwd.c_str();
+    }
     void setAdminPassword( const char *pwd)
     {
         _admin_pwd = pwd;
@@ -52,9 +60,14 @@ public:
     {
         _user_pwd = pwd;
     }
-    void setSessionTimeout(uint8_t timeout)
+    void setSessionTimeout(uint8_t timeout) //minutes
     {
         _session_timeout = timeout;
+    }
+    uint64_t getSessionTimeout() //milliseconds
+
+    {
+        return 60 * 1000 * _session_timeout;
     }
     bool createRecord (const char * sessionId, int socketId, esp3d_authentication_level_t level, esp3d_clients_t client_type);
     bool clearSession(const char * sessionId);
@@ -65,8 +78,6 @@ public:
 #endif //#if ESP3D_AUTHENTICATION_FEATURE
 private:
 
-    bool _is_admin;
-    bool _is_user;
 #if ESP3D_AUTHENTICATION_FEATURE
     std::string _admin_pwd;
     std::string _user_pwd;

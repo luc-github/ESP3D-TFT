@@ -21,11 +21,13 @@
 #include "esp3d_http_service.h"
 #include "tasks_def.h"
 #include <stdio.h>
+#include "esp_tls_crypto.h"
 #include "esp_wifi.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_settings.h"
 #include "esp3d_commands.h"
+#include "esp3d_hal.h"
 #include "network/esp3d_network.h"
 #include "filesystem/esp3d_globalfs.h"
 #include "websocket/esp3d_ws_service.h"
@@ -62,6 +64,16 @@ post_upload_ctx_t Esp3DHttpService::_post_updatefw_upload_ctx= {
     .status = upload_not_started,
     .args = {}
 };
+
+post_upload_ctx_t Esp3DHttpService::_post_login_ctx= {
+    .writeFn= NULL,
+    .nextHandler= (esp_err_t (*)(httpd_req_t*))(Esp3DHttpService::login_handler),
+    .packetReadSize = 512,  //This may need to be defined in tasks_def.h
+    .packetWriteSize= 0,  //This may need to be defined in tasks_def.h
+    .status = upload_not_started,
+    .args = {}
+};
+
 
 void Esp3DHttpService::pushError(esp3d_http_error_t errcode, const char * st)
 {
@@ -243,6 +255,18 @@ bool Esp3DHttpService::begin()
         };
         httpd_register_uri_handler(_server, &files_handler_config);
 
+        //login
+        const httpd_uri_t login_handler_config = {
+            .uri       = "/login",
+            .method    = HTTP_POST,
+            .handler   = post_multipart_handler,
+            .user_ctx  =  &_post_login_ctx,
+            .is_websocket = false,
+            .handle_ws_control_frames = false,
+            .supported_subprotocol = nullptr
+        };
+        httpd_register_uri_handler(_server, &login_handler_config);
+
         //flash files upload (POST data)
         httpd_uri_t files_upload_handler_config = {
             .uri       = "/files",   // Match all URIs of type /upload/path/to/file
@@ -363,8 +387,259 @@ void Esp3DHttpService::end()
     _post_files_upload_ctx.status = upload_not_started;
     _post_sdfiles_upload_ctx.status = upload_not_started;
 }
+#if ESP3D_AUTHENTICATION_FEATURE
+char *Esp3DHttpService::generate_http_auth_basic_digest(const char *username, const char *password)
+{
+    int out;
+    char *user_info = NULL;
+    char *digest = NULL;
+    size_t n = 0;
+    asprintf(&user_info, "%s:%s", username, password);
+    if (!user_info) {
+        esp3d_log_e("No enough memory for user information");
+        return NULL;
+    }
+    esp_crypto_base64_encode(NULL, 0, &n, (const unsigned char *)user_info, strlen(user_info));
 
+    /* 6: The length of the "Basic " string
+     * n: Number of bytes for a base64 encode format
+     * 1: Number of bytes for a reserved which be used to fill zero
+    */
+    digest = (char *)calloc(1, 6 + n + 1);
+    if (digest) {
+        strcpy(digest, "Basic ");
+        esp_crypto_base64_encode((unsigned char *)digest + 6, n, (size_t *)&out, (const unsigned char *)user_info, strlen(user_info));
+    }
+    free(user_info);
+    return digest;
+}
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
 
+esp3d_authentication_level_t Esp3DHttpService::getAuthenticationLevel(httpd_req_t *req)
+{
+    esp3d_authentication_level_t authentication_level = ESP3D_LEVEL_GUEST;
+    esp3d_log_w("Checking URI: %s, Authentication level is %d",req->uri,authentication_level);
+    if ( req->sess_ctx) {
+        esp3d_log_w("Context cookie: %s",(char *)req->sess_ctx);
+    }
+#if ESP3D_AUTHENTICATION_FEATURE
+    //get socket
+    int socketId =  httpd_req_to_sockfd(req);
+    std::string sessionID="";
+    struct sockaddr_in6 saddr;   // esp_http_server uses IPv6 addressing
+    socklen_t saddr_len = sizeof(saddr);
+    //get ip
+    if(getpeername(socketId, (struct sockaddr *)&saddr, &saddr_len)>= 0) {
+        static char address_str[40];
+        inet_ntop(AF_INET, &saddr.sin6_addr.un.u32_addr[3], address_str, sizeof(address_str));
+        esp3d_log("client IP is %s", address_str);
+        // (( struct sockaddr_in *) (&_clients[freeIndex].source_addr))->sin_addr.s_addr = saddr.sin6_addr.un.u32_addr[3];
+    } else {
+        esp3d_log_e("Failed to get address for new connection");
+    }
+    //  1 - check post parameter SUBMIT + USER + PASSWORD
+    post_upload_ctx_t *post_upload_ctx = (post_upload_ctx_t *)req->user_ctx;
+    char *buf = NULL;
+    size_t buf_len = 0;
+    if (post_upload_ctx) {
+        esp3d_log("Check post parameters: SUBMIT + USER + PASSWORD");
+        if (esp3dHttpService.hasArg(req,"SUBMIT") && esp3dHttpService.hasArg(req,"USER") && esp3dHttpService.hasArg(req,"PASSWORD")) {
+            std::string tmpstr = esp3dHttpService.getArg(req,"SUBMIT");
+            if (tmpstr == "YES") {
+                tmpstr = esp3dHttpService.getArg(req,"USER");
+                if (tmpstr == "user") {
+                    if (esp3dAuthenthicationService.isUser(esp3dHttpService.getArg(req,"PASSWORD"))) {
+                        esp3d_log("Post user authentication is user");
+                        authentication_level = ESP3D_LEVEL_USER;
+                    }
+                } else if (tmpstr == "admin") {
+                    if (esp3dAuthenthicationService.isAdmin(esp3dHttpService.getArg(req,"PASSWORD"))) {
+                        esp3d_log("Post user authentication is admin");
+                        authentication_level = ESP3D_LEVEL_ADMIN;
+                    }
+                }
+            }
+        }
+    }
+    //if authentication_level is still ESP3D_LEVEL_GUEST
+    //2 - check Autorization
+    if (authentication_level == ESP3D_LEVEL_GUEST) {
+        buf = NULL;
+        buf_len = 0;
+        buf_len = httpd_req_get_hdr_value_len(req, "Authorization") + 1;
+        if (buf_len > 1) {
+            esp3d_log("Check Basic authentication based on Autorization");
+            buf = (char *)calloc(1, buf_len);
+            if (buf) {
+                if (httpd_req_get_hdr_value_str(req, "Authorization", buf, buf_len) == ESP_OK) {
+                    esp3d_log("Found header => Authorization: %s", buf);
+                    char *auth_credentials = generate_http_auth_basic_digest("admin",esp3dAuthenthicationService.getAdminPassword());
+                    if (auth_credentials) {
+                        if (strncmp(auth_credentials, buf, buf_len)==0) {
+                            esp3d_log("Authorizaton user authentication is admin");
+                            authentication_level = ESP3D_LEVEL_ADMIN;
+                        } else {
+                            free(auth_credentials);
+                            auth_credentials = generate_http_auth_basic_digest("user",esp3dAuthenthicationService.getUserPassword());
+                            if (auth_credentials) {
+                                if (strncmp(auth_credentials, buf, buf_len)==0) {
+                                    esp3d_log("Authorizaton user authentication is user");
+                                    authentication_level = ESP3D_LEVEL_USER;
+                                }
+                            } else {
+                                esp3d_log_e("Failed to generate user auth credentials");
+                            }
+                        }
+                        if (auth_credentials) {
+                            free(auth_credentials);
+                        }
+                    } else {
+                        esp3d_log_e("Failed to generate admin auth credentials");
+                    }
+                } else {
+                    esp3d_log_e("No enough memory for basic authorization");
+                }
+                if (buf) {
+                    free(buf);
+                    buf = NULL;
+                }
+                buf_len = 0;
+            } else {
+                esp3d_log("No auth value received");
+            }
+        } else {
+            esp3d_log("No auth value received");
+        }
+    }
+    //Check if have sessionID in Cookie header
+    char cookie_str[128];
+    size_t cookie_len = 127;
+    esp_err_t res= httpd_req_get_cookie_val(req, "ESPSESSIONID", cookie_str, &cookie_len);
+    esp3d_log("Has header Cookie size %d", cookie_len);
+    if (res == ESP_OK) {
+        sessionID = cookie_str;
+        esp3d_log("Cookie Session ID: %s size: %d", sessionID.c_str(),sessionID.length());
+        if (sessionID.length()!=24) {
+            esp3d_log("Session ID is not valid");
+            sessionID.clear();
+        }
+    } else {
+        esp3d_log_w("Failed to get sessionID, err %s", esp_err_to_name(res));
+        sessionID.clear();
+    }
+    esp3d_log("Authentication level is %d", authentication_level);
+//if authentication_level is not ESP3D_LEVEL_GUEST
+//Create / update Session ID and cookie
+    if (authentication_level != ESP3D_LEVEL_GUEST) {
+        esp3d_log("Authentication level is %d", authentication_level);
+        //Authentication level is not ESP3D_LEVEL_GUEST
+        //check if session ID is already set
+        if (sessionID.length()!=0) {
+            //Update Session ID
+            esp3d_log("Found Session ID: %s",sessionID.c_str());
+            esp3d_authentication_record_t * rec  =  esp3dAuthenthicationService.getRecord(sessionID.c_str());
+            if (rec) {
+                //we have a record for this session ID so update it
+                //update timeout
+                //update level
+                esp3d_log("Record created for level %d",authentication_level);
+                rec->level = authentication_level;
+                rec->last_time = esp3d_hal::millis();
+            } else {
+                //We have no record for this session ID so create one
+                if ( esp3dAuthenthicationService.createRecord (sessionID.c_str(), socketId, authentication_level, WEBUI_CLIENT)) {
+                    esp3d_log("Record created for level %d",authentication_level);
+                } else {
+                    esp3d_log_e("Failed to create session id");
+                    //TBD:
+                    //Should  we reset authencation level to guest?
+                }
+            }
+        } else {
+            //create new session ID
+            struct sockaddr_storage source_addr;
+            ((struct sockaddr_in *)&source_addr)->sin_addr.s_addr=saddr.sin6_addr.un.u32_addr[3];
+            sessionID = esp3dAuthenthicationService.create_session_id(source_addr, socketId);
+            esp3d_log("Create Session ID: %s",sessionID.c_str());
+            //update record list
+            if ( esp3dAuthenthicationService.createRecord (sessionID.c_str(), socketId, authentication_level, WEBUI_CLIENT)) {
+                esp3d_log("Record created for level %d",authentication_level);
+                //Add Cookie to session ID
+
+                std::string cookie = "ESPSESSIONID=" + sessionID;
+                if (! req->sess_ctx) {
+                    esp3d_log("Add context cookie to session");
+                    req->sess_ctx = malloc(sizeof(char)*cookie.length()+1);
+                } else {
+                    esp3d_log_e("Memory error adding cookie to session");
+                }
+                if (req->sess_ctx) {
+                    strcpy((char *)req->sess_ctx, cookie.c_str());
+                }
+                esp3d_log_e("add set cookie header: %s", (char*)req->sess_ctx );
+                if (ESP_OK!=httpd_resp_set_hdr(req, "Set-Cookie",(char*)req->sess_ctx )) {
+                    esp3d_log_e("Failed to set cookie header");
+                }
+            } else {
+                esp3d_log_e("Failed to create session id");
+                //TBD:
+                //Should  we reset authencation level to guest?
+            }
+        }
+    } else {
+        //Authentication level still is ESP3D_LEVEL_GUEST
+        esp3d_log("Authentication level still is ESP3D_LEVEL_GUEST");
+        if (sessionID.length()!=0) {
+            // we have a session ID
+            //check if time out is set
+            esp3d_log("Got Session ID: %s",sessionID.c_str());
+            esp3d_authentication_record_t * rec  =  esp3dAuthenthicationService.getRecord(sessionID.c_str());
+            if (rec) {
+                if (esp3dAuthenthicationService.getSessionTimeout() !=0) { //no session limit
+                    if (esp3d_hal::millis() - rec->last_time < esp3dAuthenthicationService.getSessionTimeout()) {
+                        esp3d_log("Update Session timeout");
+                        rec->last_time=esp3d_hal::millis();
+                        esp3d_log("Authentication level now %d", rec->level);
+                        authentication_level =rec->level;
+
+                    } else { // session  reached limit
+                        esp3d_log_w("Session is now outdated %lld vs %lld",esp3d_hal::millis() - rec->last_time, esp3dAuthenthicationService.getSessionTimeout());
+                        authentication_level = ESP3D_LEVEL_GUEST;
+                        //Update cookie to 0
+                        esp3d_log_e("add set cookie header: %s", "ESPSESSIONID=0");
+                        if (ESP_OK!=httpd_resp_set_hdr(req, "Set-Cookie", "ESPSESSIONID=0")) {
+                            esp3d_log_e("Failed to set cookie header");
+                        }
+
+                        //delete session
+                        if (!esp3dAuthenthicationService.clearSession(sessionID.c_str())) {
+                            esp3d_log_e("Failed to clear session");
+                        }
+                    }
+                } else {
+                    //in case setting change
+                    rec->last_time=esp3d_hal::millis();
+                    esp3d_log("Session has no timeout");
+                }
+            } else {
+                //No record found
+                esp3d_log_e("No record found for session id %s",sessionID.c_str());
+                //
+                //Update cookie to 0
+                esp3d_log_e("add set cookie header: %s", "ESPSESSIONID=0");
+                if (ESP_OK!=httpd_resp_set_hdr(req, "Set-Cookie", "ESPSESSIONID=0")) {
+                    esp3d_log_e("Failed to set cookie header");
+                }
+
+            }
+        }
+    }
+    esp3d_log_w("URI: %s, Authentication level is %d",req->uri,authentication_level);
+    return authentication_level;
+#else
+    return ESP3D_LEVEL_ADMIN;
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
+}
 esp_err_t Esp3DHttpService::streamFile (const char * path,httpd_req_t *req )
 {
     esp_err_t res = ESP_OK;

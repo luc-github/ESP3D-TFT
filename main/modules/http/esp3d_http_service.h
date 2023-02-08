@@ -25,6 +25,7 @@
 #include "esp3d_string.h"
 #include <list>
 #include <utility>
+#include "authentication/esp3d_authentication_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -74,7 +75,7 @@ typedef enum {
     ESP3D_WS_MAX_SOCKETS
 } esp3d_http_socket_t;
 
-
+#define HTTPD_401      "401 UNAUTHORIZED"           /*!< HTTP Response 401 */
 
 typedef struct {
     esp_err_t (*writeFn)(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state, const char * filename, size_t filesize);
@@ -103,6 +104,11 @@ public:
         return _server;
     };
     void pushError(esp3d_http_error_t errcode, const char * st);
+#if ESP3D_AUTHENTICATION_FEATURE
+    static esp_err_t not_authenticated_handler(httpd_req_t *req);
+    static char *generate_http_auth_basic_digest(const char *username, const char *password);
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
+    static esp3d_authentication_level_t getAuthenticationLevel(httpd_req_t *req);
     static esp_err_t root_get_handler(httpd_req_t *req);
     static esp_err_t command_handler(httpd_req_t *req);
     static esp_err_t config_handler(httpd_req_t *req);
@@ -137,6 +143,7 @@ private:
     static post_upload_ctx_t _post_files_upload_ctx;
     static post_upload_ctx_t _post_sdfiles_upload_ctx;
     static post_upload_ctx_t _post_updatefw_upload_ctx;
+    static post_upload_ctx_t _post_login_ctx;
     std::list<std::pair<esp3d_http_socket_t, int>> _sockets_list;
 };
 
