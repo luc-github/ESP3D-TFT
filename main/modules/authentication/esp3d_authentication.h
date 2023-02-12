@@ -71,10 +71,13 @@ public:
     }
     bool createRecord (const char * sessionId, int socketId, esp3d_authentication_level_t level, esp3d_clients_t client_type);
     bool clearSession(const char * sessionId);
+    void clearSessions(esp3d_clients_t client_type);
     bool updateRecord(int socketId, esp3d_clients_t client_type, esp3d_authentication_level_t newlevel);
     void clearAllSessions();
     esp3d_authentication_record_t * getRecord(const char * sessionId);
+    esp3d_authentication_record_t * getRecord(int socketId, esp3d_clients_t client_type);
     const char* create_session_id(struct sockaddr_storage source_addr, int socketId);
+    uint8_t activeSessionsCount( esp3d_clients_t type);
 #endif //#if ESP3D_AUTHENTICATION_FEATURE
 private:
 

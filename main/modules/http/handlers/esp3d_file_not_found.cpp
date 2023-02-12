@@ -27,6 +27,13 @@
 
 esp_err_t Esp3DHttpService::file_not_found_handler(httpd_req_t *req, httpd_err_code_t err)
 {
+#if ESP3D_AUTHENTICATION_FEATURE
+    esp3d_authentication_level_t authentication_level =getAuthenticationLevel(req);
+    if (authentication_level==ESP3D_LEVEL_GUEST) {
+        //send 401
+        return not_authenticated_handler(req);
+    }
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
     esp3d_log("Uri: %s Error: %d", req->uri, (int)err);
     std::string uri = req->uri;
     uri = uri.substr(0, uri.find_first_of("?"));

@@ -42,6 +42,17 @@ typedef enum {
 esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req)
 {
     esp3d_log("Post Data %d on : %s", req->content_len, req->uri);
+
+#if ESP3D_AUTHENTICATION_FEATURE
+    if (strncasecmp(req->uri,"/login",6)!=0) {
+        esp3d_log("Not a login request: %s",req->uri);
+        esp3d_authentication_level_t authentication_level =getAuthenticationLevel(req);
+        if (authentication_level==ESP3D_LEVEL_GUEST) {
+            //send 401
+            return not_authenticated_handler(req);
+        }
+    }
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
 #if ESP3D_TFT_BENCHMARK
     uint64_t startBenchmark = esp_timer_get_time();
 #endif // ESP3D_TFT_BENCHMARK

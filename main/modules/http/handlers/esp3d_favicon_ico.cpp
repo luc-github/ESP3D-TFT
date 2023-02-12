@@ -24,6 +24,7 @@
 
 esp_err_t Esp3DHttpService::favicon_ico_handler(httpd_req_t *req)
 {
+    //No authentication for this URL
     esp3d_log("Uri: %s", req->uri);
     esp_err_t err = esp3dHttpService.streamFile("/fs/favicon.ico", req);
     if ( err == ESP_ERR_NOT_FOUND) {

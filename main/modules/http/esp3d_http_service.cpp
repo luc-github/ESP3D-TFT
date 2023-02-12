@@ -150,6 +150,14 @@ void Esp3DHttpService::close_fn(httpd_handle_t hd, int socketFd)
     close(socketFd );
 }
 
+void Esp3DHttpService::onClose(int socketFd)
+{
+#if ESP3D_AUTHENTICATION_FEATURE
+    esp3d_log_w("Closing client connection %d and all WEBUI_CLIENT", socketFd);
+    esp3dAuthenthicationService.clearSessions(WEBUI_CLIENT);
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
+}
+
 bool Esp3DHttpService::begin()
 {
     esp3d_log("Starting Http Service");
@@ -446,6 +454,7 @@ esp3d_authentication_level_t Esp3DHttpService::getAuthenticationLevel(httpd_req_
         if (esp3dHttpService.hasArg(req,"SUBMIT") && esp3dHttpService.hasArg(req,"USER") && esp3dHttpService.hasArg(req,"PASSWORD")) {
             std::string tmpstr = esp3dHttpService.getArg(req,"SUBMIT");
             if (tmpstr == "YES") {
+                esp3dHttpService.onClose(socketId);
                 tmpstr = esp3dHttpService.getArg(req,"USER");
                 if (tmpstr == "user") {
                     if (esp3dAuthenthicationService.isUser(esp3dHttpService.getArg(req,"PASSWORD"))) {
@@ -473,6 +482,7 @@ esp3d_authentication_level_t Esp3DHttpService::getAuthenticationLevel(httpd_req_
             if (buf) {
                 if (httpd_req_get_hdr_value_str(req, "Authorization", buf, buf_len) == ESP_OK) {
                     esp3d_log("Found header => Authorization: %s", buf);
+                    esp3dHttpService.onClose(socketId);
                     char *auth_credentials = generate_http_auth_basic_digest("admin",esp3dAuthenthicationService.getAdminPassword());
                     if (auth_credentials) {
                         if (strncmp(auth_credentials, buf, buf_len)==0) {
@@ -624,7 +634,6 @@ esp3d_authentication_level_t Esp3DHttpService::getAuthenticationLevel(httpd_req_
             } else {
                 //No record found
                 esp3d_log_e("No record found for session id %s",sessionID.c_str());
-                //
                 //Update cookie to 0
                 esp3d_log_e("add set cookie header: %s", "ESPSESSIONID=0");
                 if (ESP_OK!=httpd_resp_set_hdr(req, "Set-Cookie", "ESPSESSIONID=0")) {

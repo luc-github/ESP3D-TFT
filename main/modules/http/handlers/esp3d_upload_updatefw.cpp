@@ -25,10 +25,10 @@
 
 esp_err_t Esp3DHttpService::upload_to_updatefw_handler(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state, const char * filename, size_t filesize)
 {
+    //No need Authentication as already handled in multipart_parser
     static esp_ota_handle_t update_handle = 0;
     static const esp_partition_t *update_partition = NULL;
     static size_t update_size = 0;
-
     esp_err_t err;
     switch(file_upload_state) {
     case upload_file_start:

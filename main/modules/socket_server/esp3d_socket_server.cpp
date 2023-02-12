@@ -288,11 +288,11 @@ bool ESP3DSocketServer::closeSocket(int socketId)
 
         for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
             if (_clients[s].socketId == socketId) {
-                shutdown(socketId, 0);
-                close(socketId);
 #if ESP3D_AUTHENTICATION_FEATURE
                 esp3dAuthenthicationService.clearSession(_clients[s].sessionId);
 #endif //#if ESP3D_AUTHENTICATION_FEATURE
+                shutdown(socketId, 0);
+                close(socketId);
                 _clients[s].socketId = FREE_SOCKET_HANDLE;
                 memset(&_clients[s].source_addr, 0, sizeof(struct sockaddr_storage));
                 return true;

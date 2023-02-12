@@ -382,11 +382,11 @@ esp_err_t Esp3DWsService::onClose(int fd)
 
     for (uint i = 0; i <_max_clients; i++) {
         if (_clients[i].socketId== fd) {
-            _clients[i].bufPos=0;
-            _clients[i].socketId = FREE_SOCKET_HANDLE;
 #if ESP3D_AUTHENTICATION_FEATURE
             esp3dAuthenthicationService.clearSession(_clients[i].sessionId);
 #endif //#if ESP3D_AUTHENTICATION_FEATURE
+            _clients[i].bufPos=0;
+            _clients[i].socketId = FREE_SOCKET_HANDLE;
             esp3d_log("onClose %d succeed", fd);
             return ESP_OK;
         }

@@ -32,6 +32,12 @@ esp_err_t Esp3DHttpService::command_handler(httpd_req_t *req)
 {
     //TODO: check authentication level
     esp3d_authentication_level_t authentication_level= getAuthenticationLevel(req);
+#if ESP3D_AUTHENTICATION_FEATURE
+    if (authentication_level==ESP3D_LEVEL_GUEST) {
+        //send 401
+        return not_authenticated_handler(req);
+    }
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
     esp3d_log("Uri: %s", req->uri);
     char*  buf;
     size_t buf_len;

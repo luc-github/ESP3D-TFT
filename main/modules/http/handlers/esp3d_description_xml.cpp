@@ -30,6 +30,7 @@
 
 esp_err_t Esp3DHttpService::description_xml_handler(httpd_req_t *req)
 {
+    //No authentication for this URL
     esp3d_log("Uri: %s", req->uri);
     httpd_resp_set_type(req, "text/xml");
     const char  * response = esp3d_ssdp_service.get_schema();

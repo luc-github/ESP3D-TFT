@@ -28,8 +28,9 @@
 #define HTTPD_401_RESPONSE "{\"status\":\"disconnected\",\"authentication_lvl\":\"guest\"}"
 esp_err_t Esp3DHttpService::not_authenticated_handler(httpd_req_t *req)
 {
-    esp3d_log("Uri: %s", req->uri);
-    std::string tmpstr;
+    int socketId = httpd_req_to_sockfd(req);
+    esp3d_log("Uri: %s, socket: %d", req->uri,socketId );
+    esp3dHttpService.onClose(socketId);
     httpd_resp_set_hdr(req, "Set-Cookie", "ESPSESSIONID=0");
     httpd_resp_set_hdr(req, "Cache-Control","no-cache");
     httpd_resp_set_type(req, "application/json");

@@ -27,7 +27,13 @@
 esp_err_t Esp3DHttpService::config_handler(httpd_req_t *req)
 {
     esp3d_log("Uri: %s", req->uri);
-    esp3d_authentication_level_t  authentication_level = esp3dAuthenthicationService.getAuthenticatedLevel();
+    esp3d_authentication_level_t authentication_level =getAuthenticationLevel(req);
+#if ESP3D_AUTHENTICATION_FEATURE
+    if (authentication_level==ESP3D_LEVEL_GUEST) {
+        //send 401
+        return not_authenticated_handler(req);
+    }
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
     esp3d_msg_t * newMsgPtr = Esp3DClient::newMsg( WEBUI_CLIENT, ESP3D_COMMAND, (const uint8_t *) "[ESP420]addPreTag",  strlen("[ESP420]addPreTag"), authentication_level);
     if (newMsgPtr) {
         newMsgPtr->requestId.httpReq = req;

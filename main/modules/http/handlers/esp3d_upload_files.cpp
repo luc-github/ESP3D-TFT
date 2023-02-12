@@ -29,6 +29,7 @@
 
 esp_err_t Esp3DHttpService::upload_to_flash_handler(const uint8_t * data, size_t datasize,esp3d_upload_state_t file_upload_state, const char * filename, size_t filesize)
 {
+    //No need Authentication as already handled in multipart_parser
     static FILE * FileFD = nullptr;
     switch(file_upload_state) {
     case upload_file_start:

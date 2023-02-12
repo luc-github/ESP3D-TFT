@@ -41,25 +41,27 @@ esp_err_t Esp3DHttpService::login_handler(httpd_req_t *req)
             return not_authenticated_handler(req);
         }
     }
-#endif //#if ESP3D_AUTHENTICATION_FEATURE
+#endif //#if ESP3D_AUTHENTICATION_FEATURE 
     esp3d_authentication_level_t level =getAuthenticationLevel(req);
+#if ESP3D_AUTHENTICATION_FEATURE
     if (level==ESP3D_LEVEL_GUEST) {
         //send 401
         return not_authenticated_handler(req);
-    } else {
-        //send 200
-        std::string resp = "{\"status\":\"ok\",\"authentication_lvl\":\"";
-        if (level==ESP3D_LEVEL_ADMIN) {
-            resp += "admin";
-        } else if (level==ESP3D_LEVEL_USER) {
-            resp += "user";
-        } else {
-            resp += "guest";
-        }
-        resp +="\"}";
-        httpd_resp_set_hdr(req, "Cache-Control","no-cache");
-        httpd_resp_set_type(req, "application/json");
-        httpd_resp_sendstr(req, "Authenticated");
     }
+#endif //#if ESP3D_AUTHENTICATION_FEATURE
+    //send 200
+    std::string resp = "{\"status\":\"ok\",\"authentication_lvl\":\"";
+    if (level==ESP3D_LEVEL_ADMIN) {
+        resp += "admin";
+    } else if (level==ESP3D_LEVEL_USER) {
+        resp += "user";
+    } else {
+        resp += "guest";
+    }
+    resp +="\"}";
+    httpd_resp_set_hdr(req, "Cache-Control","no-cache");
+    httpd_resp_set_type(req, "application/json");
+    httpd_resp_sendstr(req, "Authenticated");
+
     return ESP_OK;
 }

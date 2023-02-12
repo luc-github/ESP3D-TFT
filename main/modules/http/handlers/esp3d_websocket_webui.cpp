@@ -25,6 +25,7 @@
 
 esp_err_t Esp3DHttpService::websocket_webui_handler(httpd_req_t *req)
 {
+    //No need authentication as handled by service itself
     //Delegate to websocket webui service
     return esp3dWsWebUiService.http_handler(req);
 }
