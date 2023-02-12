@@ -44,6 +44,15 @@ esp_err_t Esp3DHttpService::command_handler(httpd_req_t *req)
             if (httpd_query_key_value(buf, "cmd", cmd, 255)==ESP_OK) {
                 strcpy(cmd,esp3d_strings::urlDecode(cmd));
                 esp3d_log("command is: %s", cmd);
+            } else if (httpd_query_key_value(buf, "PING", cmd, 255)==ESP_OK) {
+                if (strcmp(cmd, "PING")==0) {
+                    esp3d_log("command is a PING");
+                    //we do not care the value a command was sent and reset is already done
+                    free(buf);
+                    //Just do nothing
+                    return ESP_OK;
+                }
+
             } else {
                 esp3d_log_e("Invalid param");
             }

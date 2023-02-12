@@ -23,6 +23,7 @@
 #include "esp3d_hal.h"
 #include "esp3d_string.h"
 #include "http/esp3d_http_service.h"
+#include "authentication/esp3d_authentication.h"
 
 Esp3DWebUiService esp3dWsWebUiService;
 
@@ -114,9 +115,35 @@ esp_err_t Esp3DWebUiService::onMessage(httpd_req_t *req)
             return ret;
         }
         if (ws_pkt.type ==HTTPD_WS_TYPE_TEXT) {
+#if ESP3D_AUTHENTICATION_FEATURE
             int currentFd = httpd_req_to_sockfd(req);
             esp3d_log("Got packet with message: %s on socket %d", ws_pkt.payload,currentFd);
-            //TODO process payload and dispatch message is \n \re
+            if (esp3d_strings::startsWith((const char *)buf, "PING:")) {
+                esp3d_log("Got PING on sessionID %s", (const char *)&buf[5] );
+                esp3d_authentication_record_t *rec =  esp3dAuthenthicationService.getRecord((const char *)&buf[5]);
+                std::string tmpStr = "PING:";
+                uint64_t session = esp3dAuthenthicationService.getSessionTimeout();
+                if (rec!= NULL) {
+
+                    int64_t last = rec->last_time;
+
+                    uint64_t now = esp3d_hal::millis();
+                    int64_t diff = now - last;
+                    if (diff > session) {
+                        tmpStr+="0";
+                    } else {
+                        tmpStr+=std::to_string(session-diff);
+                    }
+                } else {
+                    tmpStr+="0";
+                }
+                tmpStr+=":";
+                tmpStr+=std::to_string(session);
+                esp3d_log("Pushing %s", tmpStr.c_str());
+                pushMsgTxt(currentFd, tmpStr.c_str());
+            }
+
+#endif //ESP3D_AUTHENTICATION_FEATURE
         } else  if(ws_pkt.type ==HTTPD_WS_TYPE_BINARY) {
             esp3d_log("Got packet with %d bytes", ws_pkt.len);
             //TODO process payload / file upload ? =>TBD

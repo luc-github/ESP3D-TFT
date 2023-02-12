@@ -96,6 +96,7 @@ this handler is for MKS boards using MKS communication protocol if enabled, it h
 this handler is for all commands the parameter is `cmd=...`
 if it is an `[ESPXXX]` command the answer is the `[ESPXXX]` response
 if it is not an `[ESPXXX]` command the answer is `ESP3D says: command forwarded` and can be ignored
+if authentication is enabled the parameter `PING=Yes` will reset the session timout
 
 ### /login 
 this handler is for authentication function if enabled
