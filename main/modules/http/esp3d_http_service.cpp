@@ -425,8 +425,11 @@ char *Esp3DHttpService::generate_http_auth_basic_digest(const char *username, co
 
 esp3d_authentication_level_t Esp3DHttpService::getAuthenticationLevel(httpd_req_t *req)
 {
+#if ESP3D_AUTHENTICATION_FEATURE
     esp3d_authentication_level_t authentication_level = ESP3D_LEVEL_GUEST;
     esp3d_log_w("Checking URI: %s, Authentication level is %d",req->uri,authentication_level);
+#endif // ESP3D_AUTHENTICATION_FEATURE
+
     if ( req->sess_ctx) {
         esp3d_log_w("Context cookie: %s",(char *)req->sess_ctx);
     }

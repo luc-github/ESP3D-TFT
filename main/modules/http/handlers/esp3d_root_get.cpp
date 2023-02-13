@@ -26,8 +26,11 @@
 esp_err_t Esp3DHttpService::root_get_handler(httpd_req_t *req)
 {
     //not blocking
+#if ESP3D_AUTHENTICATION_FEATURE
     esp3d_authentication_level_t level = getAuthenticationLevel(req);
     esp3d_log("Uri: %s, %d", req->uri,level );
+#endif  //ESP3D_AUTHENTICATION_FEATURE
+
     bool forcefallback = false;
     size_t buf_len = httpd_req_get_url_query_len(req);
     if (buf_len > 0) {
