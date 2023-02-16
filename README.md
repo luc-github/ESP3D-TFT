@@ -1,4 +1,7 @@
 <span align="left"><img src="https://github.com/luc-github/ESP3D-TFT/blob/main/logo/ESP3D.png" width="200px"/></span><span align="left">ESP3D-TFT Firmware for ESP32 based TFT  </span>    
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<img src="https://img.shields.io/liberapay/patrons/ESP3D.svg?logo=liberapay">](https://liberapay.com/ESP3D)
 
 [![Development Version](https://img.shields.io/badge/Dev-v1.0-yellow?style=plastic) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3D-TFT/main?style=plastic)](https://github.com/luc-github/ESP3D-TFT/tree/main) [![github-ci](https://github.com/luc-github/ESP3D-TFT/workflows/build-ci/badge.svg)](https://github.com/luc-github/ESP3D-TFT/actions/workflows/build-ci.yml) [![Development  Version](https://img.shields.io/badge/Dev-v3.0-yellow?style=plastic&label=WebUI&logo=Preact)](https://github.com/luc-github/ESP3D-WEBUI/tree/3.0) [![IDF 5.1](https://img.shields.io/badge/IDF-v5.1-blue?style=plastic&label=IDF&logo=espressif)](https://github.com/espressif/esp-idf)
@@ -100,3 +103,25 @@ If it is not an issue join some discussion [here](https://github.com/luc-github/
 * liberapay <a href="https://liberapay.com/ESP3D/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a> 
 * Paypal [<img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG_global.gif" border="0" alt="PayPal – The safer, easier way to pay online.">](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=FQL59C749A78L)
 * ko-fi [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/G2G0C0QT7)   
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/3DSmitty"><img src="https://avatars.githubusercontent.com/u/51137582?v=4?s=100" width="100px;" alt="3DSmitty"/><br /><sub><b>3DSmitty</b></sub></a><br /><a href="https://github.com/luc-github/ESP3D-TFT/commits?author=3DSmitty" title="Documentation">📖</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
