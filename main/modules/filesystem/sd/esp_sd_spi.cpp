@@ -137,6 +137,7 @@ bool ESP3D_SD::begin()
         .data7_io_num = -1,
         .max_transfer_sz = MAX_TRANSFER_SZ,
         .flags = 0,
+        .isr_cpu_id = INTR_CPU_ID_AUTO,
         .intr_flags = 0,
     };
 
