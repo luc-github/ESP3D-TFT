@@ -167,7 +167,7 @@ bool Esp3DSerialClient::begin()
 
     //Serial is never stopped so no need to kill the task from outside
     _started = true;
-    BaseType_t  res =  xTaskCreatePinnedToCore(esp3d_serial_rx_task, "esp3d_serial_rx_tast", ESP3D_SERIAL_RX_TASK_SIZE, NULL, ESP3D_SERIAL_TASK_PRIORITY, &_xHandle, ESP3D_SERIAL_TASK_CORE);
+    BaseType_t  res =  xTaskCreatePinnedToCore(esp3d_serial_rx_task, "esp3d_serial_rx_task", ESP3D_SERIAL_RX_TASK_SIZE, NULL, ESP3D_SERIAL_TASK_PRIORITY, &_xHandle, ESP3D_SERIAL_TASK_CORE);
 
     if (res==pdPASS && _xHandle) {
         esp3d_log ("Created Serial Task");
