@@ -16,6 +16,7 @@ set(SOURCES .
     modules/ssdp
     modules/socket_server
     modules/usb_serial
+    modules/gcode_host
 )
 set(INCLUDES .
     core/includes
