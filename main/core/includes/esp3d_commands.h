@@ -85,6 +85,8 @@ public:
 #endif //ESP3D_AUTHENTICATION_FEATURE
     void ESP600(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP610(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP700(int cmd_params_pos,esp3d_msg_t * msg);
+    void ESP701(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP710(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP720(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP730(int cmd_params_pos,esp3d_msg_t * msg);

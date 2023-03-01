@@ -55,6 +55,8 @@ static void esp3d_gcode_host_task(void *pvParameter)
 
 bool Esp3DGCodeHostService::processScript(const char * script, esp3d_authentication_level_t auth_type )
 {
+    esp3d_log("Processing script: %s,  with authentication level=%d", script,auth_type );
+
     return false;
 }
 bool Esp3DGCodeHostService::abort()
@@ -93,6 +95,29 @@ bool  Esp3DGCodeHostService::readNextCommand()
 {
     return false;
 }
+
+esp3d_gcode_host_state_t Esp3DGCodeHostService::getStatus()
+{
+    return ESP3D_HOST_NO_STREAM;
+}
+
+esp3d_gcode_host_error_t Esp3DGCodeHostService::getErrorNum()
+{
+    return ESP3D_NO_ERROR_STREAM;
+}
+
+esp3d_script_t * Esp3DGCodeHostService::getCurrentScript()
+{
+    //get first not command
+    for (auto script = _scripts.begin(); script !=
+            _scripts.end(); ++script) {
+        if (script->type!=ESP3D_TYPE_SINGLE_COMMAND) {
+            return &(*script);
+        }
+    }
+    return nullptr;
+}
+
 bool Esp3DGCodeHostService::endStream()
 {
     return false;

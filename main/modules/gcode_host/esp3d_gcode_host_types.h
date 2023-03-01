@@ -47,7 +47,8 @@ typedef enum {
     ESP3D_HOST_STOP,
     ESP3D_HOST_ERROR,
     ESP3D_HOST_ABORT,
-    ESP3D_HOST_WAIT
+    ESP3D_HOST_WAIT,
+    ESP3D_HOST_NEXT_STATE
 } esp3d_gcode_host_state_t;
 
 typedef enum {
@@ -68,6 +69,7 @@ typedef enum {
 } esp3d_gcode_host_error_t;
 
 typedef enum {
+    ESP3D_TYPE_SINGLE_COMMAND,
     ESP3D_TYPE_SCRIPT_STREAM,
     ESP3D_TYPE_FS_STREAM,
     ESP3D_TYPE_SD_STREAM,

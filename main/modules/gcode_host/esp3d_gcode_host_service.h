@@ -38,12 +38,14 @@ typedef struct {
     std::string current_command;
     esp3d_gcode_host_script_type_t type;
     esp3d_gcode_host_state_t state;
+    esp3d_gcode_host_state_t next_state;
     esp3d_gcode_host_wait_t wait_state;
     esp3d_gcode_host_error_t error;
     esp3d_authentication_level_t auth_type;
     uint64_t total;
     uint64_t progress;
     uint64_t timestamp;
+    FILE * fileScript;
 } esp3d_script_t;
 
 
@@ -66,6 +68,9 @@ public:
     bool abort();
     bool pause();
     bool resume();
+    esp3d_gcode_host_state_t getStatus();
+    esp3d_gcode_host_error_t getErrorNum();
+    esp3d_script_t * getCurrentScript();
 private:
     bool isAck(const char *cmd );
     bool isCommand();
