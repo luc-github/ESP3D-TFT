@@ -127,7 +127,7 @@ esp_err_t usb_serial_create_task()
 {
 // Create a task that will handle USB library events
 
-    BaseType_t  res =  xTaskCreatePinnedToCore(usb_lib_task, "usb_lib", ESP3D_USB_SERIAL_TASK_SIZE, NULL, ESP3D_USB_SERIAL_TASK_PRIORITY, &usb_serial_xHandle, ESP3D_USB_SERIAL_TASK_CORE);
+    BaseType_t  res =  xTaskCreatePinnedToCore(usb_lib_task, "usb_lib", ESP3D_USB_LIB_TASK_SIZE, NULL, ESP3D_USB_LIB_TASK_PRIORITY, &usb_serial_xHandle, ESP3D_USB_LIB_TASK_CORE);
     if (res==pdPASS && usb_serial_xHandle) {
         esp3d_log("Installing CDC-ACM driver");
         if (cdc_acm_host_install(NULL)==ESP_OK) {
