@@ -33,10 +33,6 @@ Esp3DGCodeHostService gcodeHostService;
 #define ESP3D_GCODE_HOST_TASK_PRIORITY 5
 #define ESP3D_GCODE_HOST_TASK_CORE 1
 
-
-
-
-
 //main task
 static void esp3d_gcode_host_task(void *pvParameter)
 {

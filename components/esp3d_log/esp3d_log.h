@@ -21,6 +21,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#define esp3d_log_error(format, ...)  esp3d_log_e(format, ...)
+#define esp3d_log_warning(format, ...)  esp3d_log_w(format, ...)
+
 #if ESP3D_TFT_LOG || ESP3D_TFT_BENCHMARK
 #include <stdio.h>
 #include <string.h>

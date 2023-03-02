@@ -51,7 +51,7 @@ void Esp3DCommands::ESP700(int cmd_params_pos,esp3d_msg_t * msg)
         error_msg="Missing parameter";
         esp3d_log_e("Error missing");
     } else {
-        if (gcodeHostService.getStatus()==ESP3D_NO_ERROR_STREAM) {
+        if (gcodeHostService.getStatus()==ESP3D_HOST_NO_STREAM) {
             if (!gcodeHostService.processScript(tmpstr.c_str(), msg->authentication_level )) {
                 hasError = false;
                 error_msg ="Invalid parameters";
