@@ -45,7 +45,9 @@
 #if ESP3D_SSDP_FEATURE
 #include "ssdp/esp3d_ssdp.h"
 #endif //ESP3D_SSDP_FEATURE
+#if ESP3D_TELNET_FEATURE
 #include "socket_server/esp3d_socket_server.h"
+#endif //ESP3D_TELNET_FEATURE
 #include "websocket/esp3d_ws_service.h"
 #include "notifications/esp3d_notifications_service.h"
 #if ESP3D_USB_SERIAL_FEATURE
@@ -403,7 +405,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
         return;
     }
 #endif //ESP3D_SSDP_FEATURE
-
+#if ESP3D_TELNET_FEATURE
     //socket server
     if (!esp3dSocketServer.started() ) {
         tmpstr="OFF";
@@ -436,6 +438,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
             }
         }
     }
+#endif //ESP3D_TELNET_FEATURE
     //Web socket server
     if (!esp3dWsDataService.started() ) {
         tmpstr="OFF";

@@ -23,7 +23,9 @@
 #include "http/esp3d_http_service.h"
 #include "websocket/esp3d_ws_service.h"
 #include "websocket/esp3d_webui_service.h"
+#if ESP3D_TELNET_FEATURE
 #include "socket_server/esp3d_socket_server.h"
+#endif //ESP3D_TELNET_FEATURE
 #if ESP3D_USB_SERIAL_FEATURE
 #include "usb_serial/esp3d_usb_serial_client.h"
 #endif //#if ESP3D_USB_SERIAL_FEATURE
@@ -405,7 +407,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
             esp3d_log_w("esp3dWsDataService not started for message size  %d", msg->size);
         }
         break;
-
+#if ESP3D_TELNET_FEATURE
     case TELNET_CLIENT:
         if (esp3dSocketServer.started()) {
             esp3dSocketServer.process(msg);
@@ -414,6 +416,8 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
             esp3d_log_w("esp3dSocketServer not started for message size  %d", msg->size);
         }
         break;
+#endif //ESP3D_TELNET_FEATURE
+
     case SERIAL_CLIENT:
         esp3d_log("Serial client got message");
         if (serialClient.started()) {
@@ -509,6 +513,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
                 }
             }
         }
+#if ESP3D_TELNET_FEATURE
         //TELNET_CLIENT
         if (msg->origin!=TELNET_CLIENT) {
             msg->requestId.id = 0;
@@ -526,6 +531,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
                 }
             }
         }
+#endif //ESP3D_TELNET_FEATURE
         //Send pending if any or cancel message is no client did handle it
         if (msg->target==ALL_CLIENTS) {
             sendOk = false;
@@ -777,12 +783,14 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
     case 121:
         ESP121(cmd_params_pos, msg);
         break;
+#if ESP3D_TELNET_FEATURE
     case 130:
         ESP130(cmd_params_pos, msg);
         break;
     case 131:
         ESP131(cmd_params_pos, msg);
         break;
+#endif //ESP3D_TELNET_FEATURE
     case 160:
         ESP160(cmd_params_pos, msg);
         break;

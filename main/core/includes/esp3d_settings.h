@@ -64,8 +64,10 @@ typedef enum  {
     esp3d_notification_token_1,
     esp3d_notification_token_2,
     esp3d_notification_token_setting,
+#if ESP3D_TELNET_FEATURE
     esp3d_socket_port,
     esp3d_socket_on,
+#endif //ESP3D_TELNET_FEATURE
     esp3d_ws_on,
     esp3d_usb_serial_baud_rate,
     esp3d_output_client,

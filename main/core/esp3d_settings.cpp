@@ -86,8 +86,10 @@ const esp3d_setting_desc_t Esp3DSettingsData [] = {
     {esp3d_notification_token_1,esp3d_string, SIZE_OF_SETTING_NOFIFICATION_T1,""},
     {esp3d_notification_token_2,esp3d_string, SIZE_OF_SETTING_NOFIFICATION_T2,""},
     {esp3d_notification_token_setting,esp3d_string, SIZE_OF_SETTING_NOFIFICATION_TS,""},
+#if ESP3D_TELNET_FEATURE
     {esp3d_socket_port, esp3d_integer, 4, "23"},
     {esp3d_socket_on, esp3d_byte, 1,"1"},
+#endif //ESP3D_TELNET_FEATURE
     {esp3d_ws_on, esp3d_byte, 1,"1"},
 #if ESP3D_AUTHENTICATION_FEATURE
     {esp3d_admin_password, esp3d_string, SIZE_OF_LOCAL_PASSWORD,"admin"},
@@ -157,7 +159,10 @@ bool  Esp3DSettings::isValidIntegerSetting(uint32_t value, esp3d_setting_index_t
             }
         }
         break;
+#if ESP3D_TELNET_FEATURE
     case esp3d_socket_port:
+#endif //ESP3D_TELNET_FEATURE
+
     case esp3d_http_port:
         if (value>=1 && value<65535) {
             return true;
@@ -181,7 +186,10 @@ bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t set
     switch(settingElement) {
     case esp3d_check_update_on_sd:
     case esp3d_setup:
+#if ESP3D_TELNET_FEATURE
     case esp3d_socket_on:
+#endif //ESP3D_TELNET_FEATURE
+
     case esp3d_ws_on:
     case esp3d_http_on:
     case esp3d_radio_boot_mode:

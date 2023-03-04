@@ -40,8 +40,10 @@ const char * help[]= {"[ESP](id) - display this help",
                       "[ESP115](State) - display/set immediate Radio state which can be ON, OFF",
                       "[ESP120](State) - display/set HTTP state which can be ON, OFF",
                       "[ESP121](Port) - display/set HTTP port",
+#if ESP3D_TELNET_FEATURE
                       "[ESP130](State) - display/set Telnet state which can be ON, OFF, CLOSE",
                       "[ESP131](Port) - display/set Telnet port ",
+#endif //ESP3D_TELNET_FEATURE
                       "[ESP160](State) - display/set WebSocket state which can be ON, OFF, CLOSE",
                       "[ESP200](RELEASE) (REFRESH)- display/set SD Card Status",
                       "[ESP202](factor) - display / set  SD Card  SD card Speed divider factor (1 2 4 6 8 16 32)",
@@ -97,8 +99,10 @@ const uint cmdlist[]= {0,
                        115,
                        120,
                        121,
+#if ESP3D_TELNET_FEATURE
                        130,
                        131,
+#endif //ESP3D_TELNET_FEATURE
                        160,
                        200,
                        202,

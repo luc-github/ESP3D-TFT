@@ -30,7 +30,9 @@
 #if ESP3D_SSDP_FEATURE
 #include "ssdp/esp3d_ssdp.h"
 #endif //ESP3D_SSDP_FEATURE
+#if ESP3D_TELNET_FEATURE
 #include "socket_server/esp3d_socket_server.h"
+#endif //ESP3D_TELNET_FEATURE
 #include "authentication/esp3d_authentication.h"
 
 Esp3DNetworkServices esp3dNetworkServices;
@@ -52,7 +54,9 @@ bool Esp3DNetworkServices::begin()
 #if ESP3D_SSDP_FEATURE
     _started = _started && esp3d_ssdp_service.begin();
 #endif //ESP3D_SSDP_FEATURE
+#if ESP3D_TELNET_FEATURE
     _started = _started && esp3dSocketServer.begin();
+#endif //ESP3D_TELNET_FEATURE
     return _started;
 }
 
@@ -68,7 +72,9 @@ void Esp3DNetworkServices::end()
     }
     esp3d_log("Stop Services");
     esp3dAuthenthicationService.end();
+#if ESP3D_TELNET_FEATURE
     esp3dSocketServer.end();
+#endif //ESP3D_TELNET_FEATURE
     esp3dHttpService.end();
 #if ESP3D_MDNS_FEATURE
     esp3dmDNS.end();
