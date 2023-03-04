@@ -22,15 +22,15 @@
  *      INCLUDES
  *********************/
 #include "esp3d_log.h"
-#include "lvgl.h"
 #include "bsp.h"
+#if ESP3D_DISPLAY_FEATURE
+#include "lvgl.h"
 #include "xpt2046.h"
 #include "ili9341.h"
-#include "spi_bus.h"
 #include "disp_spi.h"
 #include "esp_lcd_backlight.h"
-
-
+#endif //ESP3D_DISPLAY_FEATURE
+#include "spi_bus.h"
 
 /*********************
  *      DEFINES
@@ -59,6 +59,7 @@
 
 esp_err_t bsp_init(void)
 {
+#if ESP3D_DISPLAY_FEATURE
     //Driver initialization
     esp3d_log("Display buffer size: %d", DISP_BUF_SIZE);
 
@@ -102,11 +103,15 @@ esp_err_t bsp_init(void)
     //Lvgl setup
     esp3d_log("Setup Lvgl");
     lv_color_t* buf1 = (lv_color_t*)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t), HAS_PSRAM ?MALLOC_CAP_SPIRAM: MALLOC_CAP_DMA);
-    if (buf1 == NULL) return ESP_FAIL;
+    if (buf1 == NULL) {
+        return ESP_FAIL;
+    }
 
     /* Use double buffered when not working with monochrome displays */
     lv_color_t* buf2 = (lv_color_t*)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t),  HAS_PSRAM ?MALLOC_CAP_SPIRAM: MALLOC_CAP_DMA);
-    if (buf2 == NULL) return ESP_FAIL;
+    if (buf2 == NULL) {
+        return ESP_FAIL;
+    }
 
 
     static lv_disp_draw_buf_t draw_buf;
@@ -130,7 +135,7 @@ esp_err_t bsp_init(void)
     indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*/
     indev_drv.read_cb = xpt2046_read;          /*Set your driver function*/
     lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
-
+#endif //ESP3D_DISPLAY_FEATURE
     return ESP_OK;
 }
 

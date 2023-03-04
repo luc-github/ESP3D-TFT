@@ -19,7 +19,10 @@
 */
 
 #include "esp3d-tft.h"
+#if ESP3D_DISPLAY_FEATURE
 #include "esp3d-tft-ui.h"
+#endif // ESP3D_DISPLAY_FEATURE
+
 #include "esp3d-tft-stream.h"
 #include "esp3d-tft-network.h"
 #include "esp3d_settings.h"
@@ -92,7 +95,10 @@ bool Esp3DTFT::begin()
 #endif //#if ESP3D_USB_SERIAL_FEATURE
     bool successFs = flashFs.begin();
     bool successSd = sd.begin();
-    bool success =  esp3dTFTui.begin();
+    bool success =  true;
+#if ESP3D_DISPLAY_FEATURE
+    esp3dTFTui.begin();
+#endif //ESP3D_DISPLAY_FEATURE
     if (successSd) {
         esp3dUpdateService.begin();
     }
