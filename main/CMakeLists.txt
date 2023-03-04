@@ -1,4 +1,5 @@
 # main application directives
+
 set(SOURCES .
     core core/esp3dcommands
     modules/authentication
@@ -13,11 +14,17 @@ set(SOURCES .
     modules/update
     modules/notifications
     modules/mDNS
-    modules/ssdp
     modules/socket_server
     modules/usb_serial
     modules/gcode_host
 )
+
+if(SSDP_SERVICE)
+    list(APPEND SOURCES "modules/ssdp")
+endif()
+
+unset(SSDP_SERVICE CACHE)
+
 set(INCLUDES .
     core/includes
     modules)

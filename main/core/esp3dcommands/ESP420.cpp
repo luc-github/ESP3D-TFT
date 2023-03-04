@@ -40,7 +40,9 @@
 #include "http/esp3d_http_service.h"
 #include "update/esp3d_update_service.h"
 #include "mDNS/esp3d_mdns.h"
+#if ESP3D_SSDP_FEATURE
 #include "ssdp/esp3d_ssdp.h"
+#endif //ESP3D_SSDP_FEATURE
 #include "socket_server/esp3d_socket_server.h"
 #include "websocket/esp3d_ws_service.h"
 #include "notifications/esp3d_notifications_service.h"
@@ -384,7 +386,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     if (!dispatchIdValue(json,"mDNS",tmpstr.c_str(), target,requestId)) {
         return;
     }
-
+#if ESP3D_SSDP_FEATURE
     //ssdp service
     if (!esp3d_ssdp_service.started() ) {
         tmpstr="OFF";
@@ -395,6 +397,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     if (!dispatchIdValue(json,"ssdp",tmpstr.c_str(), target,requestId)) {
         return;
     }
+#endif //ESP3D_SSDP_FEATURE
 
     //socket server
     if (!esp3dSocketServer.started() ) {

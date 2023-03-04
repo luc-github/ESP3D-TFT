@@ -1,8 +1,8 @@
 # #######################################
 # Select the target
 # #######################################
-OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R 2.8inches" OFF)
-OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" ON)
+OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R 2.8inches" ON)
+OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" OFF)
 OPTION(ESP32_ROTRICS_DEXARM35 "TFT TARGET is ESP32 Rotrics DexArm 3.5inches" OFF)
 OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-SRC-4832 3.5inches" OFF)
 
@@ -12,6 +12,18 @@ OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-S
 OPTION(ESP3D_AUTHENTICATION "Authentication on all clients" OFF)
 OPTION(DISABLE_SERIAL_AUTHENTICATION "Disable Serial Authentication" ON)
 OPTION(TIMESTAMP_ON_FILES "Time on files" ON)
+OPTION(SSDP_SERVICE "SSDP service" OFF)
+OPTION(MDNS_SERVICE "MDNS service" ON)
+OPTION(WIFI_SERVICE "WiFi service" ON)
+OPTION(BT_SERVICE "Bluetooth service" ON)
+OPTION(WEB_SERVICES "Web Services http/websocket" ON)
+OPTION(TELNET_SERVICE "Telnet service" ON)
+OPTION(WS_SERVICE "WebSocket data service" ON)
+OPTION(TFT_UI_SERVICE "TFT UI service" ON)
+OPTION(SD_CARD_SERVICE "SD card service" ON)
+OPTION(NOTIFICATIONS_SERVICE "Notifications service" ON)
+OPTION(UPDATE_SERVICE "Update service" ON)
+OPTION(GCODE_HOST_SERVICE "GCode Streaming service" ON)
 
 # #######################################
 # Do not change anything above this line
@@ -65,6 +77,54 @@ endif()
 
 if(TIMESTAMP_ON_FILES)
     add_compile_options(-DESP3D_TIMESTAMP_FEATURE=1)
+endif()
+
+if(SSDP_SERVICE)
+    add_compile_options(-DESP3D_SSDP_FEATURE=1)
+endif()
+
+if(MDNS_SERVICE)
+    add_compile_options(-DESP3D_MDNS_FEATURE=1)
+endif()
+
+if(WIFI_SERVICE)
+    add_compile_options(-DESP3D_WIFI_FEATURE=1)
+endif()
+
+if(BT_SERVICE)
+    add_compile_options(-DESP3D_BLUETTOTH_FEATURE=1)
+endif()
+
+if(WEB_SERVICES)
+    add_compile_options(-DESP3D_HTTP_FEATURE=1)
+endif()
+
+if(TELNET_SERVICE)
+    add_compile_options(-DESP3D_TELNET_FEATURE=1)
+endif()
+
+if(WS_SERVICE)
+    add_compile_options(-DESP3D_WS_SERVICE_FEATURE=1)
+endif()
+
+if(TFT_UI_SERVICE)
+    add_compile_options(-DESP3D_DISPLAY_FEATURE=1)
+endif()
+
+if(SD_CARD_SERVICE)
+    add_compile_options(-DESP3D_SD_CARD_FEATURE=1)
+endif()
+
+if(NOTIFICATIONS_SERVICE)
+    add_compile_options(-DESP3D_NOTIFICATIONS_FEATURE=1)
+endif()
+
+if(UPDATE_SERVICE)
+    add_compile_options(-DESP3D_UPDATE_FEATURE=1)
+endif()
+
+if(GCODE_HOST_SERVICE)
+    add_compile_options(-DESP3D_GCODE_HOST_FEATURE=1)
 endif()
 
 if(ESP32_2432S028R)

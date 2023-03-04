@@ -203,7 +203,7 @@ bool Esp3DHttpService::begin()
             .supported_subprotocol = nullptr
         };
         httpd_register_uri_handler(_server, &favicon_handler_config);
-
+#if ESP3D_SSDP_FEATURE
         //description.xml (ssdp)
         const httpd_uri_t ssdp_handler_config = {
             .uri       = "/description.xml",
@@ -215,6 +215,7 @@ bool Esp3DHttpService::begin()
             .supported_subprotocol = nullptr
         };
         httpd_register_uri_handler(_server, &ssdp_handler_config);
+#endif //ESP3D_SSDP_FEATURE
 
         //root /
         const httpd_uri_t root_handler_config = {
