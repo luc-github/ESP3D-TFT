@@ -134,7 +134,15 @@ bool Esp3DCommands::dispatchSetting(bool json,const char * filter, esp3d_setting
         value="Not supported";
         break;
     default: //String
-        if (index==esp3d_sta_password || index==esp3d_ap_password || index==esp3d_notification_token_1 || index==esp3d_notification_token_2  || index==esp3d_admin_password|| index==esp3d_user_password) { //hide passwords using  ********
+        if (index==esp3d_sta_password ||
+                index==esp3d_ap_password ||
+#if ESP3D_NOTIFICATIONS_FEATURE
+                index==esp3d_notification_token_1 ||
+                index==esp3d_notification_token_2  ||
+#endif //ESP3D_NOTIFICATIONS_FEATURE
+
+                index==esp3d_admin_password||
+                index==esp3d_user_password) { //hide passwords using  ********
             value=HIDDEN_SETTING_VALUE;
         } else {
             value=esp3dTFTsettings.readString(index, out_str, elementSetting->size);
@@ -838,12 +846,15 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
         ESP555(cmd_params_pos, msg);
         break;
 #endif //ESP3D_AUTHENTICATION_FEATURE
+#if ESP3D_NOTIFICATIONS_FEATURE
     case 600:
         ESP600(cmd_params_pos, msg);
         break;
     case 610:
         ESP610(cmd_params_pos, msg);
         break;
+#endif //ESP3D_NOTIFICATIONS_FEATURE
+
     case 700:
         ESP700(cmd_params_pos, msg);
         break;

@@ -96,9 +96,11 @@ const char * ServstringKeysVal[] = {
     "ADMIN_PASSWORD",
     "USER_PASSWORD",
 #endif //#if ESP3D_AUTHENTICATION_FEATURE
+#if ESP3D_NOTIFICATIONS_FEATURE
     "NOTIF_TOKEN1",
     "NOTIF_TOKEN2",
     "NOTIF_TOKEN_Settings"
+#endif //ESP3D_NOTIFICATIONS_FEATURE
 };
 
 const esp3d_setting_index_t ServstringKeysPos[] = {
@@ -109,15 +111,20 @@ const esp3d_setting_index_t ServstringKeysPos[] = {
     esp3d_admin_password,
     esp3d_user_password,
 #endif //#if ESP3D_AUTHENTICATION_FEATURE
+#if ESP3D_NOTIFICATIONS_FEATURE
     esp3d_notification_token_1,
     esp3d_notification_token_2,
     esp3d_notification_token_setting
+#endif //ESP3D_NOTIFICATIONS_FEATURE
 };
 
 //Integer values
 const char * ServintKeysVal[] = {
     "HTTP_Port"
+#if ESP3D_TELNET_FEATURE
     "TELNET_Port",
+#endif //ESP3D_TELNET_FEATURE
+
 //    "SENSOR_INTERVAL",
 //    "WebSocket_Port",
 //    "WebDav_Port",
@@ -143,8 +150,12 @@ const esp3d_setting_index_t ServintKeysPos[] = {
 //Boolean values
 const char * ServboolKeysVal[] = {
     "HTTP_active",
+#if ESP3D_NOTIFICATIONS_FEATURE
     "AUTONOTIFICATION",
+#endif //ESP3D_NOTIFICATIONS_FEATURE
+#if ESP3D_TELNET_FEATURE
     "TELNET_active",
+#endif //ESP3D_TELNET_FEATURE
     "WebSocket_active",
     //"WebDav_active",
     //"Time_DST",
@@ -156,7 +167,9 @@ const char * ServboolKeysVal[] = {
 
 const esp3d_setting_index_t ServboolKeysPos[] = {
     esp3d_http_on,
+#if ESP3D_NOTIFICATIONS_FEATURE
     esp3d_auto_notification,
+#endif //ESP3D_NOTIFICATIONS_FEATURE
 #if ESP3D_TELNET_FEATURE
     esp3d_socket_on,
 #endif //ESP3D_TELNET_FEATURE
@@ -583,6 +596,7 @@ bool Esp3DUpdateService::processingFileFunction (const char * section, const cha
         }
         //Notification type None / PushOver / Line / Email / Telegram / IFTTT
         if (!done) {
+#if ESP3D_NOTIFICATIONS_FEATURE
             if (strcasecmp("NOTIF_TYPE",key)==0) {
                 T='B';
                 P=esp3d_notification_type;
@@ -603,6 +617,7 @@ bool Esp3DUpdateService::processingFileFunction (const char * section, const cha
                     P=last_esp3d_setting_index_t;    //invalid value
                 }
             }
+#endif //ESP3D_NOTIFICATIONS_FEATURE
         }
     } else if (strcasecmp("system",section)==0) {
         if (!done) {

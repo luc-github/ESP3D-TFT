@@ -49,7 +49,9 @@
 #include "socket_server/esp3d_socket_server.h"
 #endif //ESP3D_TELNET_FEATURE
 #include "websocket/esp3d_ws_service.h"
+#if ESP3D_NOTIFICATIONS_FEATURE
 #include "notifications/esp3d_notifications_service.h"
+#endif //ESP3D_NOTIFICATIONS_FEATURE
 #if ESP3D_USB_SERIAL_FEATURE
 #include "usb_serial/esp3d_usb_serial_client.h"
 #endif //#if ESP3D_USB_SERIAL_FEATURE
@@ -472,7 +474,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
         }
     }
 
-
+#if ESP3D_NOTIFICATIONS_FEATURE
 //Notifications
     if (!esp3dNotificationsService.started() || esp3dNotificationsService.getType()==esp3d_no_notification) {
         tmpstr="OFF";
@@ -485,6 +487,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     if (!dispatchIdValue(json,"notification",tmpstr.c_str(), target,requestId)) {
         return;
     }
+#endif //ESP3D_NOTIFICATIONS_FEATURE
 //end of list
     if (json) {
         if(!dispatch("]}",target,requestId, msg_tail)) {

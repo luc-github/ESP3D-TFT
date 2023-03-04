@@ -34,7 +34,10 @@
 #include "usb_serial_def.h"
 #endif //ESP3D_USB_SERIAL_FEATURE
 #include "network/esp3d_network.h"
+#if ESP3D_NOTIFICATIONS_FEATURE
 #include "notifications/esp3d_notifications_service.h"
+#endif //ESP3D_NOTIFICATIONS_FEATURE
+
 #include "authentication/esp3d_authentication.h"
 
 #define STORAGE_NAME "ESP3D_TFT"
@@ -81,11 +84,13 @@ const esp3d_setting_desc_t Esp3DSettingsData [] = {
     {esp3d_setup, esp3d_byte, 1,"0"},
     {esp3d_target_firmware, esp3d_byte, 1,"0"},
     {esp3d_check_update_on_sd, esp3d_byte, 1,"1"},
+#if ESP3D_NOTIFICATIONS_FEATURE
     {esp3d_notification_type, esp3d_byte, 1,"0"},
     {esp3d_auto_notification, esp3d_byte, 1,"0"},
     {esp3d_notification_token_1,esp3d_string, SIZE_OF_SETTING_NOFIFICATION_T1,""},
     {esp3d_notification_token_2,esp3d_string, SIZE_OF_SETTING_NOFIFICATION_T2,""},
     {esp3d_notification_token_setting,esp3d_string, SIZE_OF_SETTING_NOFIFICATION_TS,""},
+#endif //ESP3D_NOTIFICATIONS_FEATURE
 #if ESP3D_TELNET_FEATURE
     {esp3d_socket_port, esp3d_integer, 4, "23"},
     {esp3d_socket_on, esp3d_byte, 1,"1"},
@@ -122,12 +127,14 @@ bool  Esp3DSettings::isValidStringSetting(const char* value, esp3d_setting_index
     case esp3d_hostname:
         esp3d_log("Checking hostname validity");
         return  std::regex_match (value, std::regex("^[a-zA-Z0-9]{1}[a-zA-Z0-9\\-]{0,31}$"));//any string alphanumeric or '-' from 1 to 32
+#if ESP3D_NOTIFICATIONS_FEATURE
     case esp3d_notification_token_1:
         return len<=SIZE_OF_SETTING_NOFIFICATION_T1; //any string from 0 to 64
     case esp3d_notification_token_2:
         return len<=SIZE_OF_SETTING_NOFIFICATION_T2;  //any string from 0 to 64
     case esp3d_notification_token_setting:
         return len<=SIZE_OF_SETTING_NOFIFICATION_TS;  //any string from 0 to 128
+#endif //ESP3D_NOTIFICATIONS_FEATURE
 #if ESP3D_AUTHENTICATION_FEATURE
     case esp3d_admin_password:
     case esp3d_user_password:
@@ -193,7 +200,9 @@ bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t set
     case esp3d_ws_on:
     case esp3d_http_on:
     case esp3d_radio_boot_mode:
+#if ESP3D_NOTIFICATIONS_FEATURE
     case esp3d_auto_notification:
+#endif //ESP3D_NOTIFICATIONS_FEATURE
         if(value==(uint8_t)esp3d_state_off || value==(uint8_t)esp3d_state_on) {
             return true;
         }
@@ -208,11 +217,14 @@ bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t set
         return  ((esp3d_clients_t)value == SERIAL_CLIENT || (esp3d_clients_t)value == USB_SERIAL_CLIENT);
         break;
 #endif //#if ESP3D_USB_SERIAL_FEATURE
+#if ESP3D_NOTIFICATIONS_FEATURE
     case esp3d_notification_type:
         if(value==(uint8_t)esp3d_no_notification || value==(uint8_t)esp3d_pushover_notification || value==(uint8_t)esp3d_email_notification || value==(uint8_t)esp3d_line_notification || value==(uint8_t)esp3d_telegram_notification || value==(uint8_t)esp3d_ifttt_notification) {
             return true;
         }
         break;
+#endif //ESP3D_NOTIFICATIONS_FEATURE
+
     case esp3d_sta_ip_mode:
         if(value==(uint8_t)esp3d_ip_mode_dhcp || value==(uint8_t)esp3d_ip_mode_static) {
             return true;

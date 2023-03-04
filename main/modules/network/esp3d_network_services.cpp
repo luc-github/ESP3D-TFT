@@ -25,8 +25,12 @@
 #include "esp3d_settings.h"
 #include "esp3d_commands.h"
 #include "http/esp3d_http_service.h"
+#if ESP3D_NOTIFICATIONS_FEATURE
 #include "notifications/esp3d_notifications_service.h"
+#endif //ESP3D_NOTIFICATIONS_FEATURE
+#if ESP3D_MDNS_FEATURE
 #include "mDNS/esp3d_mdns.h"
+#endif //ESP3D_MDNS_FEATURE
 #if ESP3D_SSDP_FEATURE
 #include "ssdp/esp3d_ssdp.h"
 #endif //ESP3D_SSDP_FEATURE
@@ -47,7 +51,11 @@ Esp3DNetworkServices::~Esp3DNetworkServices() {}
 bool Esp3DNetworkServices::begin()
 {
     esp3d_log("Starting Services");
-    _started = esp3dAuthenthicationService.begin() && esp3dHttpService.begin() && esp3dNotificationsService.begin(true);
+    _started = esp3dAuthenthicationService.begin() && esp3dHttpService.begin();
+#if ESP3D_NOTIFICATIONS_FEATURE
+    _started = _started && esp3dNotificationsService.begin(true);
+#endif //ESP3D_NOTIFICATIONS_FEATURE
+
 #if ESP3D_MDNS_FEATURE
     _started = _started && esp3dmDNS.begin();
 #endif //ESP3D_MDNS_FEATURE
@@ -83,6 +91,9 @@ void Esp3DNetworkServices::end()
 #if ESP3D_SSDP_FEATURE
     esp3d_ssdp_service.end();
 #endif //ESP3D_SSDP_FEATURE
+#if ESP3D_NOTIFICATIONS_FEATURE
     esp3dNotificationsService.end();
+#endif //ESP3D_NOTIFICATIONS_FEATURE
+
     _started = false;
 }

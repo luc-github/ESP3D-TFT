@@ -86,8 +86,10 @@ public:
     void ESP550(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP555(int cmd_params_pos,esp3d_msg_t * msg);
 #endif //ESP3D_AUTHENTICATION_FEATURE
+#if ESP3D_NOTIFICATIONS_FEATURE
     void ESP600(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP610(int cmd_params_pos,esp3d_msg_t * msg);
+#endif //ESP3D_NOTIFICATIONS_FEATURE
     void ESP700(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP701(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP710(int cmd_params_pos,esp3d_msg_t * msg);

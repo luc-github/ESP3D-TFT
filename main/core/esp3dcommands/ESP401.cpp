@@ -176,6 +176,7 @@ void Esp3DCommands::ESP401(int cmd_params_pos,esp3d_msg_t * msg)
                 esp3dAuthenthicationService.setSessionTimeout(valueb);
                 break;
 #endif //ESP3D_AUTHENTICATION_FEATURE
+#if ESP3D_NOTIFICATIONS_FEATURE
             case esp3d_notification_type:
             case esp3d_auto_notification:
             case esp3d_notification_token_1:
@@ -183,6 +184,8 @@ void Esp3DCommands::ESP401(int cmd_params_pos,esp3d_msg_t * msg)
             case esp3d_notification_token_setting:
                 esp3dNotificationsService.begin();
                 break;
+#endif //ESP3D_NOTIFICATIONS_FEATURE
+
             case esp3d_target_firmware:
                 esp3dTFTstream.getTargetFirmware(true);
                 break;
