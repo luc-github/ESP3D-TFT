@@ -45,7 +45,10 @@ Esp3DNetworkServices::~Esp3DNetworkServices() {}
 bool Esp3DNetworkServices::begin()
 {
     esp3d_log("Starting Services");
-    _started = esp3dAuthenthicationService.begin() && esp3dHttpService.begin() && esp3dNotificationsService.begin(true) && esp3dmDNS.begin();
+    _started = esp3dAuthenthicationService.begin() && esp3dHttpService.begin() && esp3dNotificationsService.begin(true);
+#if ESP3D_MDNS_FEATURE
+    _started = _started && esp3dmDNS.begin();
+#endif //ESP3D_MDNS_FEATURE
 #if ESP3D_SSDP_FEATURE
     _started = _started && esp3d_ssdp_service.begin();
 #endif //ESP3D_SSDP_FEATURE
@@ -67,7 +70,10 @@ void Esp3DNetworkServices::end()
     esp3dAuthenthicationService.end();
     esp3dSocketServer.end();
     esp3dHttpService.end();
+#if ESP3D_MDNS_FEATURE
     esp3dmDNS.end();
+#endif //ESP3D_MDNS_FEATURE
+
 #if ESP3D_SSDP_FEATURE
     esp3d_ssdp_service.end();
 #endif //ESP3D_SSDP_FEATURE

@@ -810,9 +810,12 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
     case 444:
         ESP444(cmd_params_pos, msg);
         break;
+#if ESP3D_MDNS_FEATURE
     case 450:
         ESP450(cmd_params_pos, msg);
         break;
+#endif //ESP3D_MDNS_FEATURE
+
 #if ESP3D_AUTHENTICATION_FEATURE
     case 500:
         ESP500(cmd_params_pos, msg);

@@ -76,7 +76,10 @@ public:
     void ESP410(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP420(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP444(int cmd_params_pos,esp3d_msg_t * msg);
+#if ESP3D_MDNS_FEATURE
     void ESP450(int cmd_params_pos,esp3d_msg_t * msg);
+#endif // ESP3D_MDNS_FEATURE
+
 #if ESP3D_AUTHENTICATION_FEATURE
     void ESP500(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP510(int cmd_params_pos,esp3d_msg_t * msg);

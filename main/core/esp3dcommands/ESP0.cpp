@@ -51,7 +51,9 @@ const char * help[]= {"[ESP](id) - display this help",
                       "[ESP410] - display available AP list",
                       "[ESP420] - display ESP3D current status",
                       "[ESP444](state) - set ESP3D state (RESET/RESTART)",
+#if ESP3D_MDNS_FEATURE
                       "[ESP450]display ESP3D list on network",
+#endif //#if ESP3D_MDNS_FEATURE
 #if ESP3D_AUTHENTICATION_FEATURE
                       "[ESP500] - set get connection status",
                       "[ESP510](timeout) - display/set session timeout",
@@ -105,7 +107,9 @@ const uint cmdlist[]= {0,
                        402,
                        410,
                        420,
+#if ESP3D_MDNS_FEATURE
                        450,
+#endif //ESP3D_MDNS_FEATURE
                        444,
 #if ESP3D_AUTHENTICATION_FEATURE
                        500,
