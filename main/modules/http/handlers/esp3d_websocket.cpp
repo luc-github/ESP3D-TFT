@@ -17,7 +17,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
+#if ESP3D_WS_SERVICE_FEATURE
 #include "http/esp3d_http_service.h"
 #include "esp3d_log.h"
 #include "websocket/esp3d_ws_service.h"
@@ -28,3 +28,4 @@ esp_err_t Esp3DHttpService::websocket_data_handler(httpd_req_t *req)
     //Delegate to websocket data service
     return esp3dWsDataService.http_handler(req);
 }
+#endif //ESP3D_WS_SERVICE_FEATURE

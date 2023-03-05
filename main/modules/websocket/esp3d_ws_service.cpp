@@ -33,7 +33,9 @@
 #include "http/esp3d_http_service.h"
 #include "esp3d_commands.h"
 
+#if ESP3D_WS_SERVICE_FEATURE
 Esp3DWsService esp3dWsDataService;
+#endif//ESP3D_WS_SERVICE_FEATURE
 
 #if ESP3D_AUTHENTICATION_FEATURE
 #define WELCOME_MSG "Welcome to ESP3D-TFT V" ESP3D_TFT_VERSION ", please enter a command with credentials.\n"

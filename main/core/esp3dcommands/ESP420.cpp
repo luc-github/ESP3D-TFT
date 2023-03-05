@@ -147,7 +147,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     if (!dispatchIdValue(json,"size for update",tmpstr.c_str(), target,requestId)) {
         return;
     }
-
+#if ESP3D_SD_CARD_FEATURE
     //SD updater
     esp3d_state_t statesetting = (esp3d_state_t)esp3dTFTsettings.readByte(esp3d_check_update_on_sd);
     if (statesetting == esp3d_state_off) {
@@ -158,6 +158,8 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     if (!dispatchIdValue(json,"SD updater",tmpstr.c_str(), target,requestId)) {
         return;
     }
+#endif //ESP3D_SD_CARD_FEATURE
+
 #else
     if (!dispatchIdValue(json,"FW Update","OFF", target,requestId)) {
         return;
@@ -446,6 +448,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
         }
     }
 #endif //ESP3D_TELNET_FEATURE
+#if ESP3D_WS_SERVICE_FEATURE
     //Web socket server
     if (!esp3dWsDataService.started() ) {
         tmpstr="OFF";
@@ -478,6 +481,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
             }
         }
     }
+#endif //ESP3D_WS_SERVICE_FEATURE
 
 #if ESP3D_NOTIFICATIONS_FEATURE
 //Notifications

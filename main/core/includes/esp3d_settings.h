@@ -36,7 +36,8 @@ extern "C" {
 #endif //ESP3D_NOTIFICATIONS_FEATURE
 #define SIZE_OF_LOCAL_PASSWORD 20
 #define HIDDEN_SETTING_VALUE "********"
-
+// do not change the order of the enum
+//using #if to keep consistency if user update feature
 typedef enum  {
     esp3d_version,
     esp3d_baud_rate,
@@ -61,18 +62,13 @@ typedef enum  {
     esp3d_setup,
     esp3d_target_firmware,
     esp3d_check_update_on_sd,
-#if ESP3D_NOTIFICATIONS_FEATURE
     esp3d_notification_type,
     esp3d_auto_notification,
     esp3d_notification_token_1,
     esp3d_notification_token_2,
     esp3d_notification_token_setting,
-#endif //ESP3D_NOTIFICATIONS_FEATURE
-
-#if ESP3D_TELNET_FEATURE
     esp3d_socket_port,
     esp3d_socket_on,
-#endif //ESP3D_TELNET_FEATURE
     esp3d_ws_on,
     esp3d_usb_serial_baud_rate,
     esp3d_output_client,

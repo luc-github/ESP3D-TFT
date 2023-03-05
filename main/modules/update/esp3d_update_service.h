@@ -36,7 +36,9 @@ public:
     bool begin();
     void handle();
     void end();
+#if ESP3D_SD_CARD_FEATURE
     bool updateFW();
+#endif // ESP3D_SD_CARD_FEATURE
     bool updateConfig();
     bool canUpdate();
     size_t maxUpdateSize();

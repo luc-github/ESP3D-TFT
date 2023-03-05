@@ -22,7 +22,9 @@
 #include "esp3d_string.h"
 #include "esp3d_settings.h"
 #include "authentication/esp3d_authentication.h"
+#if ESP3D_SD_CARD_FEATURE
 #include "filesystem/esp3d_sd.h"
+#endif // ESP3D_SD_CARD_FEATURE
 #include "notifications/esp3d_notifications_service.h"
 #include "esp3d-tft-stream.h"
 #define COMMAND_ID 401
@@ -162,9 +164,13 @@ void Esp3DCommands::ESP401(int cmd_params_pos,esp3d_msg_t * msg)
         // hot changes
         if (!hasError) {
             switch(index_setting) {
+#if ESP3D_SD_CARD_FEATURE
+#if ESP3D_SD_FEATURE_IS_SPI
             case esp3d_spi_divider:
                 sd.setSPISpeedDivider(valueb);
                 break;
+#endif // ESP3D_SD_FEATURE_IS_SPI
+#endif // ESP3D_SD_CARD_FEATURE
 #if ESP3D_AUTHENTICATION_FEATURE
             case esp3d_admin_password:
                 esp3dAuthenthicationService.setAdminPassword(settingValue.c_str());

@@ -291,17 +291,20 @@ void Esp3DCommands::ESP400(int cmd_params_pos,esp3d_msg_t * msg)
     }
 #endif //ESP3D_NOTIFICATIONS_FEATURE
 
-#if defined(ESP3D_SD_IS_SPI) && ESP3D_SD_IS_SPI
+#if ESP3D_SD_CARD_FEATURE
+#if ESP3D_SD_FEATURE_IS_SPI
     //SPI Divider factor
     if (!dispatchSetting(json,"device/sd",esp3d_spi_divider, "speedx", SPIDivider, SPIDivider,  sizeof(SPIDivider)/sizeof(char*), -1, -1,-1, nullptr, false,target,requestId)) {
         esp3d_log_e("Error sending response to clients");
     }
-#endif
+#endif //ESP3D_SD_FEATURE_IS_SPI
+#if ESP3D_UPDATE_FEATURE
     //SD updater
     if (!dispatchSetting(json,"device/sd",esp3d_check_update_on_sd, "SD updater", YesNoValues, YesNoLabels, sizeof(YesNoValues)/sizeof(char*), -1, -1,-1, nullptr, false,target,requestId)) {
         esp3d_log_e("Error sending response to clients");
     }
-
+#endif //ESP3D_UPDATE_FEATURE
+#endif//ESP3D_SD_CARD_FEATURE
 
     if (json) {
         if(!dispatch("]}",target, requestId, msg_tail)) {

@@ -46,7 +46,7 @@ post_upload_ctx_t Esp3DHttpService::_post_files_upload_ctx= {
     .status = upload_not_started,
     .args = {}
 };
-
+#if ESP3D_SD_CARD_FEATURE
 post_upload_ctx_t Esp3DHttpService::_post_sdfiles_upload_ctx= {
     .writeFn= (esp_err_t (*)(const uint8_t *, size_t,esp3d_upload_state_t, const char *, size_t ))(Esp3DHttpService::upload_to_sd_handler),
     .nextHandler= (esp_err_t (*)(httpd_req_t*))(Esp3DHttpService::sdfiles_handler),
@@ -55,7 +55,8 @@ post_upload_ctx_t Esp3DHttpService::_post_sdfiles_upload_ctx= {
     .status = upload_not_started,
     .args = {}
 };
-
+#endif //ESP3D_SD_CARD_FEATURE
+#if ESP3D_UPDATE_FEATURE
 post_upload_ctx_t Esp3DHttpService::_post_updatefw_upload_ctx= {
     .writeFn= (esp_err_t (*)(const uint8_t *, size_t,esp3d_upload_state_t, const char *, size_t ))(Esp3DHttpService::upload_to_updatefw_handler),
     .nextHandler= (esp_err_t (*)(httpd_req_t*))(Esp3DHttpService::updatefw_handler),
@@ -64,6 +65,7 @@ post_upload_ctx_t Esp3DHttpService::_post_updatefw_upload_ctx= {
     .status = upload_not_started,
     .args = {}
 };
+#endif //ESP3D_UPDATE_FEATURE
 
 post_upload_ctx_t Esp3DHttpService::_post_login_ctx= {
     .writeFn= NULL,
@@ -128,6 +130,13 @@ Esp3DHttpService::Esp3DHttpService()
     _started = false;
     _server = nullptr;
     _post_files_upload_ctx.status = upload_not_started;
+#if ESP3D_SD_CARD_FEATURE
+    _post_sdfiles_upload_ctx.status = upload_not_started;
+#endif //ESP3D_SD_CARD_FEATURE
+#if ESP3D_UPDATE_FEATURE
+    _post_updatefw_upload_ctx.status = upload_not_started;
+#endif //ESP3D_UPDATE_FEATURE
+
 }
 
 Esp3DHttpService::~Esp3DHttpService()
@@ -146,7 +155,10 @@ void Esp3DHttpService::close_fn(httpd_handle_t hd, int socketFd)
     esp3d_log("Client closing connection %d", socketFd);
     //each service should know if the socket is owned by  itself
     esp3dWsWebUiService.onClose(socketFd);
+#if ESP3D_WS_SERVICE_FEATURE
     esp3dWsDataService.onClose(socketFd);
+#endif //ESP3D_WS_SERVICE_FEATURE
+
     close(socketFd );
 }
 
@@ -287,7 +299,7 @@ bool Esp3DHttpService::begin()
             .supported_subprotocol = nullptr
         };
         httpd_register_uri_handler(_server, &files_upload_handler_config);
-
+#if ESP3D_SD_CARD_FEATURE
         //sdfiles upload (POST data)
         httpd_uri_t sdfiles_upload_handler_config = {
             .uri       = "/sdfiles",   // Match all URIs of type /upload/path/to/file
@@ -299,19 +311,6 @@ bool Esp3DHttpService::begin()
             .supported_subprotocol = nullptr
         };
         httpd_register_uri_handler(_server, &sdfiles_upload_handler_config);
-
-        //updatefw upload (POST data)
-        httpd_uri_t updatefw_upload_handler_config = {
-            .uri       = "/updatefw",   // Match all URIs of type /upload/path/to/file
-            .method    = HTTP_POST,
-            .handler   = post_multipart_handler,
-            .user_ctx  =  &_post_updatefw_upload_ctx,
-            .is_websocket = false,
-            .handle_ws_control_frames = false,
-            .supported_subprotocol = nullptr
-        };
-        httpd_register_uri_handler(_server, &updatefw_upload_handler_config);
-
         //sd files /sdfiles
         const httpd_uri_t sdfiles_handler_config = {
             .uri       = "/sdfiles",
@@ -323,6 +322,21 @@ bool Esp3DHttpService::begin()
             .supported_subprotocol = nullptr
         };
         httpd_register_uri_handler(_server, &sdfiles_handler_config);
+#endif // ESP3D_SD_CARD_FEATURE
+
+#if ESP3D_UPDATE_FEATURE
+        //updatefw upload (POST data)
+        httpd_uri_t updatefw_upload_handler_config = {
+            .uri       = "/updatefw",   // Match all URIs of type /upload/path/to/file
+            .method    = HTTP_POST,
+            .handler   = post_multipart_handler,
+            .user_ctx  =  &_post_updatefw_upload_ctx,
+            .is_websocket = false,
+            .handle_ws_control_frames = false,
+            .supported_subprotocol = nullptr
+        };
+        httpd_register_uri_handler(_server, &updatefw_upload_handler_config);
+#endif //ESP3D_UPDATE_FEATURE
 
         //webui web socket /ws
         const httpd_uri_t websocket_webui_handler_config = {
@@ -335,7 +349,7 @@ bool Esp3DHttpService::begin()
             .supported_subprotocol = "webui-v3"
         };
         httpd_register_uri_handler(_server, &websocket_webui_handler_config);
-
+#if ESP3D_WS_SERVICE_FEATURE
         const httpd_uri_t websocket_data_handler_config = {
             .uri       = "/wsdata",
             .method    = HTTP_GET,
@@ -346,6 +360,7 @@ bool Esp3DHttpService::begin()
             .supported_subprotocol = "arduino"
         };
         httpd_register_uri_handler(_server, &websocket_data_handler_config);
+#endif //ESP3D_WS_SERVICE_FEATURE
 
         //File not found
         httpd_register_err_handler(_server, HTTPD_404_NOT_FOUND, (httpd_err_handler_func_t )file_not_found_handler);
@@ -357,6 +372,7 @@ bool Esp3DHttpService::begin()
             .type=ESP3D_WS_WEBUI_SOCKET
         };
         _started = esp3dWsWebUiService.begin(&wsConfig);
+#if ESP3D_WS_SERVICE_FEATURE
         if (_started) {
             if (esp3d_state_on!= (esp3d_state_t)esp3dTFTsettings.readByte(esp3d_ws_on)) {
                 esp3d_log("WS is not enabled");
@@ -366,6 +382,7 @@ bool Esp3DHttpService::begin()
                 _started = esp3dWsDataService.begin(&wsConfig);
             }
         }
+#endif //ESP3D_WS_SERVICE_FEATURE
     } else {
         esp3d_log_e("Web server start failed %s",esp_err_to_name(err)) ;
     }
@@ -382,19 +399,36 @@ void Esp3DHttpService::end()
     esp3d_log("Stop Http Service");
     if (_server) {
         esp3dWsWebUiService.end();
+#if ESP3D_WS_SERVICE_FEATURE
         esp3dWsDataService.end();
+        httpd_unregister_uri(_server, "/wsdata");
+#endif //ESP3D_WS_SERVICE_FEATURE
         httpd_unregister_uri(_server, "/favicon.ico");
         httpd_unregister_uri(_server, "/command");
         httpd_unregister_uri(_server, "/");
         httpd_unregister_uri(_server, "/files");
+        httpd_unregister_uri(_server, "/config");
         httpd_unregister_uri(_server, "/ws");
+#if ESP3D_UPDATE_FEATURE
+        httpd_unregister_uri(_server, "/updatefw");
+#endif //ESP3D_UPDATE_FEATURE
+#if ESP3D_SD_CARD_FEATURE
+        httpd_unregister_uri(_server, "/sdfiles");
+#endif //ESP3D_SD_CARD_FEATURE
+        httpd_unregister_uri(_server, "/login");
         httpd_register_err_handler(_server, HTTPD_404_NOT_FOUND, NULL);
         httpd_stop(_server);
     }
     _server = nullptr;
     _started = false;
     _post_files_upload_ctx.status = upload_not_started;
+#if ESP3D_SD_CARD_FEATURE
     _post_sdfiles_upload_ctx.status = upload_not_started;
+#endif //ESP3D_SD_CARD_FEATURE
+#if ESP3D_UPDATE_FEATURE
+    _post_updatefw_upload_ctx.status = upload_not_started;
+#endif //ESP3D_UPDATE_FEATURE
+
 }
 #if ESP3D_AUTHENTICATION_FEATURE
 char *Esp3DHttpService::generate_http_auth_basic_digest(const char *username, const char *password)

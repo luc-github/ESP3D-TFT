@@ -20,7 +20,9 @@
 #include "esp3d_config_file.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
+#if ESP3D_SD_CARD_FEATURE
 #include "filesystem/esp3d_sd.h"
+#endif //ESP3D_SD_CARD_FEATURE
 
 #define LINE_MAX_SIZE       255
 #define SECTION_MAX_SIZE    10
@@ -41,6 +43,7 @@ Esp3DConfigFile::Esp3DConfigFile(const char * path,  TProcessingFunction fn, con
 
 bool Esp3DConfigFile::processFile()
 {
+#if ESP3D_SD_CARD_FEATURE
     bool res = true;
     if (!_filename.length()) {
         esp3d_log_e("No filename provided");
@@ -96,6 +99,7 @@ bool Esp3DConfigFile::processFile()
         sd.close(rFile);
         return res;
     }
+#endif //ESP3D_SD_CARD_FEATURE
     esp3d_log_e("Cannot open ini file");
     return false;
 }
@@ -209,7 +213,7 @@ bool Esp3DConfigFile::revokeFile()
         esp3d_log_e("No scrambled filename provided");
         return false;
     }
-
+#if ESP3D_SD_CARD_FEATURE
     //if CONFIG_FILE_OK already exists,  rename it to CONFIG_FILE_OKXX
     if (sd.exists(_scrambledFilename.c_str())) {
         std::string filename = _scrambledFilename;
@@ -286,8 +290,9 @@ bool Esp3DConfigFile::revokeFile()
         }
         return true;
     }
-    esp3d_log_e("Cannot open / create revoked file");
     sd.close(wFile);
     sd.close(rFile);
+#endif // ESP3D_SD_CARD_FEATURE
+    esp3d_log_e("Cannot open / create revoked file");
     return false;
 }

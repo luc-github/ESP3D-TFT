@@ -407,6 +407,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
             esp3d_log_w("esp3dWsWebUiService not started for message size  %d", msg->size);
         }
         break;
+#if ESP3D_WS_SERVICE_FEATURE
     case WEBSOCKET_CLIENT:
         if (esp3dWsDataService.started()) {
             esp3dWsDataService.process(msg);
@@ -415,6 +416,8 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
             esp3d_log_w("esp3dWsDataService not started for message size  %d", msg->size);
         }
         break;
+#endif //ESP3D_WS_SERVICE_FEATURE
+
 #if ESP3D_TELNET_FEATURE
     case TELNET_CLIENT:
         if (esp3dSocketServer.started()) {
@@ -504,6 +507,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
                 }
             }
         }
+#if ESP3D_WS_SERVICE_FEATURE
         //WEBSOCKET_CLIENT
         if (msg->origin!=WEBSOCKET_CLIENT) {
             msg->requestId.id = 0;
@@ -521,6 +525,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
                 }
             }
         }
+#endif //ESP3D_WS_SERVICE_FEATURE
 #if ESP3D_TELNET_FEATURE
         //TELNET_CLIENT
         if (msg->origin!=TELNET_CLIENT) {
@@ -799,24 +804,35 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
         ESP131(cmd_params_pos, msg);
         break;
 #endif //ESP3D_TELNET_FEATURE
+#if ESP3D_WS_SERVICE_FEATURE
     case 160:
         ESP160(cmd_params_pos, msg);
         break;
+#endif //ESP3D_WS_SERVICE_FEATURE
+#if ESP3D_SD_CARD_FEATURE
     case 200:
         ESP200(cmd_params_pos, msg);
         break;
+#if ESP3D_SD_FEATURE_IS_SPI
     case 202:
         ESP202(cmd_params_pos, msg);
         break;
+#endif //ESP3D_SD_FEATURE_IS_SPI
+#endif //ESP3D_SD_CARD_FEATURE
+
     case 400:
         ESP400(cmd_params_pos, msg);
         break;
     case 401:
         ESP401(cmd_params_pos, msg);
         break;
+#if ESP3D_SD_CARD_FEATURE
+#if ESP3D_UPDATE_FEATURE
     case 402:
         ESP402(cmd_params_pos, msg);
         break;
+#endif //ESP3D_UPDATE_FEATURE 
+#endif //ESP3D_SD_CARD_FEATURE
     case 410:
         ESP410(cmd_params_pos, msg);
         break;
@@ -870,12 +886,14 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
     case 730:
         ESP730(cmd_params_pos, msg);
         break;
+#if ESP3D_SD_CARD_FEATURE
     case 740:
         ESP740(cmd_params_pos, msg);
         break;
     case 750:
         ESP750(cmd_params_pos, msg);
         break;
+#endif //ESP3D_SD_CARD_FEATURE
     case 780:
         ESP780(cmd_params_pos, msg);
         break;

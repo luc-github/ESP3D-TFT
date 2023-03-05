@@ -17,7 +17,7 @@
   License along with This code; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
+#if ESP3D_SD_CARD_FEATURE
 #include "sd_def.h"
 #include "esp3d_sd.h"
 #include <stdio.h>
@@ -71,3 +71,4 @@ esp3d_sd_states ESP3D_SD::getState()
     return _state;
 };
 
+#endif // ESP3D_SD_CARD_FEATURE

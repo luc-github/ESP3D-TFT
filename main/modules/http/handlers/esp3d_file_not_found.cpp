@@ -21,7 +21,9 @@
 #include "http/esp3d_http_service.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
+#if ESP3D_SD_CARD_FEATURE
 #include "filesystem/esp3d_sd.h"
+#endif //ESP3D_SD_CARD_FEATURE
 #include "filesystem/esp3d_flash.h"
 
 
@@ -39,9 +41,13 @@ esp_err_t Esp3DHttpService::file_not_found_handler(httpd_req_t *req, httpd_err_c
     uri = uri.substr(0, uri.find_first_of("?"));
 
     std::string path;
+#if    ESP3D_SD_CARD_FEATURE
     if (esp3d_strings::startsWith(req->uri,ESP3D_SD_FS_HEADER)) {
         path = uri;
-    } else {
+    } else
+#endif //ESP3D_SD_CARD_FEATURE
+
+    {
         path =ESP3D_FLASH_FS_HEADER;
         if (uri[0]=='/') {
             path+=&uri[1];    //strip the "first/"

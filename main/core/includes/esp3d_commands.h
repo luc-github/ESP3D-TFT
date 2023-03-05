@@ -67,12 +67,22 @@ public:
     void ESP121(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP130(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP131(int cmd_params_pos,esp3d_msg_t * msg);
+#if ESP3D_WS_SERVICE_FEATURE
     void ESP160(int cmd_params_pos,esp3d_msg_t * msg);
+#endif // ESP3D_WS_SERVICE_FEATURE
+#if ESP3D_SD_CARD_FEATURE
     void ESP200(int cmd_params_pos,esp3d_msg_t * msg);
+#if ESP3D_SD_FEATURE_IS_SPI
     void ESP202(int cmd_params_pos,esp3d_msg_t * msg);
+#endif // ESP3D_SD_FEATURE_IS_SPI
+#endif // ESP3D_SD_CARD_FEATURE
     void ESP400(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP401(int cmd_params_pos,esp3d_msg_t * msg);
+#if ESP3D_SD_CARD_FEATURE
+#if ESP3D_UPDATE_FEATURE
     void ESP402(int cmd_params_pos,esp3d_msg_t * msg);
+#endif // ESP3D_UPDATE_FEATURE
+#endif // ESP3D_SD_CARD_FEATURE
     void ESP410(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP420(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP444(int cmd_params_pos,esp3d_msg_t * msg);
@@ -95,8 +105,10 @@ public:
     void ESP710(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP720(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP730(int cmd_params_pos,esp3d_msg_t * msg);
+#if ESP3D_SD_CARD_FEATURE
     void ESP740(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP750(int cmd_params_pos,esp3d_msg_t * msg);
+#endif //ESP3D_SD_CARD_FEATURE
     void ESP780(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP790(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP800(int cmd_params_pos,esp3d_msg_t * msg);

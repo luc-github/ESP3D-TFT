@@ -16,7 +16,7 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
+#if ESP3D_SD_CARD_FEATURE
 #include "esp3d_commands.h"
 #include "esp3d_client.h"
 #include "esp3d_string.h"
@@ -233,3 +233,5 @@ void Esp3DCommands::ESP740(int cmd_params_pos,esp3d_msg_t * msg)
         }
     }
 }
+
+#endif //ESP3D_SD_CARD_FEATURE   

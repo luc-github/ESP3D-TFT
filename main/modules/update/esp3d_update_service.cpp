@@ -26,9 +26,15 @@
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#if ESP3D_SD_CARD_FEATURE
 #include "filesystem/esp3d_sd.h"
+#endif //ESP3D_SD_CARD_FEATURE
+
 #include "network/esp3d_network.h"
+#if ESP3D_NOTIFICATIONS_FEATURE
 #include "notifications/esp3d_notifications_service.h"
+#endif //ESP3D_NOTIFICATIONS_FEATURE
+
 #include "esp3d_config_file.h"
 
 #define CONFIG_FILE "/esp3dcnf.ini"
@@ -156,10 +162,15 @@ const char * ServboolKeysVal[] = {
 #if ESP3D_TELNET_FEATURE
     "TELNET_active",
 #endif //ESP3D_TELNET_FEATURE
+#if ESP3D_WS_SERVICE_FEATURE
     "WebSocket_active",
+#endif //ESP3D_WS_SERVICE_FEATURE
     //"WebDav_active",
     //"Time_DST",
+#if ESP3D_SD_CARD_FEATURE
     "CHECK_FOR_UPDATE",
+#endif//ESP3D_SD_CARD_FEATURE
+
     //"Active_buzzer",
     //"Active_Internet_time",
     "Radio_enabled"
@@ -173,11 +184,14 @@ const esp3d_setting_index_t ServboolKeysPos[] = {
 #if ESP3D_TELNET_FEATURE
     esp3d_socket_on,
 #endif //ESP3D_TELNET_FEATURE
-
+#if ESP3D_WS_SERVICE_FEATURE
     esp3d_ws_on,
+#endif //ESP3D_WS_SERVICE_FEATURE
     //ESP_WEBDAV_ON,
     //ESP_TIME_IS_DST,
+#if ESP3D_SD_CARD_FEATURE
     esp3d_check_update_on_sd,
+#endif  //ESP3D_SD_CARD_FEATURE
     //ESP_BUZZER,
     //ESP_INTERNET_TIME,
     esp3d_radio_boot_mode
@@ -189,7 +203,12 @@ const char * ServbyteKeysVal[] = {
 #if ESP3D_AUTHENTICATION_FEATURE
     "Sesion_timeout",
 #endif //#if ESP3D_AUTHENTICATION_FEATURE
+#if ESP3D_SD_CARD_FEATURE
+#if ESP3D_SD_FEATURE_IS_SPI
     "SD_SPEED"
+#endif//ESP3D_SD_FEATURE_IS_SPI
+#endif //ESP3D_SD_CARD_FEATURE
+
     //"Time_DST"
 } ;
 
@@ -198,7 +217,12 @@ const esp3d_setting_index_t ServbyteKeysPos[] = {
 #if ESP3D_AUTHENTICATION_FEATURE
     esp3d_session_timeout,
 #endif //#if ESP3D_AUTHENTICATION_FEATURE
+#if ESP3D_SD_CARD_FEATURE
+#if ESP3D_SD_FEATURE_IS_SPI
     esp3d_spi_divider
+#endif //ESP3D_SD_FEATURE_IS_SPI
+#endif //ESP3D_SD_CARD_FEATURE
+
     //ESP_TIME_DST
 } ;
 
@@ -282,11 +306,16 @@ bool Esp3DUpdateService::begin()
 {
     esp3d_log("Starting Update Service");
     bool restart =false;
-    esp3d_state_t setting_check_update = (esp3d_state_t)esp3dTFTsettings.readByte(esp3d_check_update_on_sd);
+    esp3d_state_t setting_check_update = esp3d_state_off;
+#if ESP3D_SD_CARD_FEATURE
+    setting_check_update = (esp3d_state_t)esp3dTFTsettings.readByte(esp3d_check_update_on_sd);
+#endif //ESP3D_SD_CARD_FEATURE
+
     if (setting_check_update==esp3d_state_off || !canUpdate()) {
         esp3d_log("Update Service disabled");
         return true;
     }
+#if ESP3D_SD_CARD_FEATURE
     if (sd.accessFS()) {
         if (sd.exists(FW_FILE)) {
             restart= updateFW();
@@ -324,6 +353,7 @@ bool Esp3DUpdateService::begin()
     } else {
         esp3d_log("SD unavailable for update");
     }
+#endif //ESP3D_SD_CARD_FEATURE
     if (restart) {
         esp3d_log("Restarting  firmware");
         vTaskDelay(pdMS_TO_TICKS(1000));
@@ -352,7 +382,7 @@ bool Esp3DUpdateService::updateConfig()
     }
     return res;
 }
-
+#if ESP3D_SD_CARD_FEATURE
 bool Esp3DUpdateService::updateFW()
 {
     bool isSuccess = true;
@@ -432,7 +462,7 @@ bool Esp3DUpdateService::updateFW()
     }
     return isSuccess;
 }
-
+#endif//ESP3D_SD_CARD_FEATURE
 void Esp3DUpdateService::handle() {}
 
 void Esp3DUpdateService::end()

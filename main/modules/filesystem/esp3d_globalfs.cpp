@@ -26,16 +26,31 @@
 #include "esp3d_log.h"
 #include "esp3d_globalfs.h"
 #include "esp3d_flash.h"
+#if ESP3D_SD_CARD_FEATURE
 #include "esp3d_sd.h"
+#endif //ESP3D_SD_CARD_FEATURE
+
 
 ESP3D_GLOBALFS globalFs;
 #define GLOBAL_ROOT_DIR_ID 8888
 #define GLOBAL_FLASH_DIR_ID 1111
+#if ESP3D_SD_CARD_FEATURE
 #define GLOBAL_SD_DIR_ID 2222
+#endif //ESP3D_SD_CARD_FEATURE
 
-const char * rootDirsHeaders[]= {ESP3D_FLASH_FS_HEADER,ESP3D_SD_FS_HEADER};
+const char * rootDirsHeaders[]= {
+    ESP3D_FLASH_FS_HEADER
+#if ESP3D_SD_CARD_FEATURE
+    ,ESP3D_SD_FS_HEADER
+#endif //ESP3D_SD_CARD_FEATURE
+};
 uint8_t rootDirsHeadersSize = sizeof(rootDirsHeaders)/sizeof(char*);
-const uint rootDirsFSType[]= {FS_FLASH,FS_SD};
+const uint rootDirsFSType[]= {
+    FS_FLASH
+#if ESP3D_SD_CARD_FEATURE
+    ,FS_SD
+#endif //ESP3D_SD_CARD_FEATURE
+};
 
 ESP3D_GLOBALFS::ESP3D_GLOBALFS()
 {
@@ -49,8 +64,10 @@ const char * ESP3D_GLOBALFS::mount_point(esp3d_fs_types fstype)
     switch(fstype) {
     case FS_ROOT:
         return "/";
+#if ESP3D_SD_CARD_FEATURE
     case FS_SD:
         return sd.mount_point();
+#endif // ESP3D_SD_CARD_FEATURE
     case FS_FLASH:
         return flashFs.mount_point();
     default:
@@ -99,8 +116,10 @@ bool  ESP3D_GLOBALFS::accessFS(const char * path)
     case FS_ROOT:
         return true;
         break;
+#if ESP3D_SD_CARD_FEATURE
     case FS_SD:
         return sd.accessFS();
+#endif //ESP3D_SD_CARD_FEATURE
     case FS_FLASH:
         return flashFs.accessFS();
     default:
@@ -115,9 +134,11 @@ void  ESP3D_GLOBALFS::releaseFS(const char * path)
     switch(fstype) {
     case FS_ROOT:
         break;
+#if ESP3D_SD_CARD_FEATURE
     case FS_SD:
         sd.releaseFS();
         break;
+#endif //ESP3D_SD_CARD_FEATURE
     case FS_FLASH:
         flashFs.releaseFS();
         break;
@@ -138,8 +159,10 @@ const char * ESP3D_GLOBALFS::getFileSystemName(char * path)
     case FS_ROOT:
         return "Global";
         break;
+#if ESP3D_SD_CARD_FEATURE
     case FS_SD:
         return sd.getFileSystemName();
+#endif //ESP3D_SD_CARD_FEATURE
     case FS_FLASH:
         return flashFs.getFileSystemName();
     default:
@@ -152,8 +175,10 @@ uint ESP3D_GLOBALFS::maxPathLength(esp3d_fs_types fstype)
     switch(fstype) {
     case FS_ROOT:
         return 0;
+#if ESP3D_SD_CARD_FEATURE
     case FS_SD:
         return sd.maxPathLength();
+#endif //ESP3D_SD_CARD_FEATURE
     case FS_FLASH:
         return flashFs.maxPathLength();
     default:
@@ -172,11 +197,13 @@ bool ESP3D_GLOBALFS::getSpaceInfo(uint64_t * totalBytes,
     case FS_ROOT:
         return false;
         break;
+#if ESP3D_SD_CARD_FEATURE
     case FS_SD:
         return sd.getSpaceInfo(totalBytes,
                                usedBytes,
                                freeBytes,
                                refreshStats);
+#endif //ESP3D_SD_CARD_FEATURE
     case FS_FLASH: {
         size_t total_Bytes;
         size_t used_Bytes;
@@ -221,6 +248,7 @@ DIR * ESP3D_GLOBALFS::opendir(const char * dirpath)
         rewinddir(&_rootDir);
         return &_rootDir;
         break;
+#if ESP3D_SD_CARD_FEATURE
     case FS_SD: {
         DIR * dirfd = sd.opendir(&dirpath[strlen(ESP3D_SD_FS_HEADER)-1]);
         if (dirfd) {
@@ -228,6 +256,7 @@ DIR * ESP3D_GLOBALFS::opendir(const char * dirpath)
             return dirfd;
         }
     }
+#endif //ESP3D_SD_CARD_FEATURE
     break;
     case FS_FLASH: {
         DIR * dirfd = flashFs.opendir(&dirpath[strlen(ESP3D_FLASH_FS_HEADER)-1]);
@@ -248,8 +277,10 @@ int ESP3D_GLOBALFS::closedir(DIR *dirp)
         switch(dirp->dd_rsv) {
         case GLOBAL_ROOT_DIR_ID:
             return 0;
+#if ESP3D_SD_CARD_FEATURE
         case GLOBAL_SD_DIR_ID:
             return sd.closedir(dirp);
+#endif //ESP3D_SD_CARD_FEATURE
         case GLOBAL_FLASH_DIR_ID:
             return flashFs.closedir(dirp);
         default:
@@ -265,9 +296,11 @@ int ESP3D_GLOBALFS::stat(const char * filepath,  struct  stat * entry_stat)
     switch(fstype) {
     case FS_ROOT:
         return -1;
+#if ESP3D_SD_CARD_FEATURE
     case FS_SD:
         esp3d_log("Is SD %s", filepath);
         return sd.stat(&filepath[strlen(ESP3D_SD_FS_HEADER)-1],entry_stat);
+#endif //ESP3D_SD_CARD_FEATURE
     case FS_FLASH:
         return flashFs.stat(&filepath[strlen(ESP3D_FLASH_FS_HEADER)-1],entry_stat);
     default:
@@ -285,8 +318,10 @@ bool ESP3D_GLOBALFS::exists(const char* path)
             return true;
         }
         break;
+#if ESP3D_SD_CARD_FEATURE
     case FS_SD:
         return sd.exists(&path[strlen(ESP3D_SD_FS_HEADER)-1]);
+#endif //ESP3D_SD_CARD_FEATURE
     case FS_FLASH:
         return flashFs.exists(&path[strlen(ESP3D_FLASH_FS_HEADER)-1]);
     default:
@@ -301,8 +336,10 @@ bool ESP3D_GLOBALFS::remove(const char *path)
     switch(fstype) {
     case FS_ROOT:
         break;
+#if ESP3D_SD_CARD_FEATURE
     case FS_SD:
         return sd.remove(&path[strlen(ESP3D_SD_FS_HEADER)-1]);
+#endif //ESP3D_SD_CARD_FEATURE
     case FS_FLASH:
         return flashFs.remove(&path[strlen(ESP3D_FLASH_FS_HEADER)-1]);
     default:
@@ -317,8 +354,10 @@ bool ESP3D_GLOBALFS::mkdir(const char *dirpath)
     switch(fstype) {
     case FS_ROOT:
         break;
+#if ESP3D_SD_CARD_FEATURE
     case FS_SD:
         return sd.mkdir(&dirpath[strlen(ESP3D_SD_FS_HEADER)-1]);
+#endif //ESP3D_SD_CARD_FEATURE
     case FS_FLASH:
         return flashFs.mkdir(&dirpath[strlen(ESP3D_FLASH_FS_HEADER)-1]);
     default:
@@ -333,8 +372,10 @@ bool ESP3D_GLOBALFS::rmdir(const char *dirpath)
     switch(fstype) {
     case FS_ROOT:
         break;
+#if ESP3D_SD_CARD_FEATURE
     case FS_SD:
         return sd.rmdir(&dirpath[strlen(ESP3D_SD_FS_HEADER)-1]);
+#endif //ESP3D_SD_CARD_FEATURE
     case FS_FLASH:
         return flashFs.rmdir(&dirpath[strlen(ESP3D_FLASH_FS_HEADER)-1]);
     default:
@@ -351,10 +392,12 @@ bool ESP3D_GLOBALFS::rename(const char *oldpath, const char *newpath)
         switch(fstypeold) {
         case FS_ROOT:
             break;
+#if ESP3D_SD_CARD_FEATURE
         case FS_SD:
             return sd.rename(&oldpath[strlen(ESP3D_SD_FS_HEADER)-1],&newpath[strlen(ESP3D_SD_FS_HEADER)-1]);
+#endif //ESP3D_SD_CARD_FEATURE
         case FS_FLASH:
-            return flashFs.rename(&oldpath[strlen(ESP3D_FLASH_FS_HEADER)-1],&newpath[strlen(ESP3D_SD_FS_HEADER)-1]);
+            return flashFs.rename(&oldpath[strlen(ESP3D_FLASH_FS_HEADER)-1],&newpath[strlen(ESP3D_FLASH_FS_HEADER)-1]);
         default:
             break;
         }
@@ -375,8 +418,10 @@ struct dirent *  ESP3D_GLOBALFS::readdir(DIR *dirp)
                 return &_rootEntry;
             }
             break;
+#if ESP3D_SD_CARD_FEATURE
         case GLOBAL_SD_DIR_ID:
             return sd.readdir(dirp);
+#endif //ESP3D_SD_CARD_FEATURE
         case GLOBAL_FLASH_DIR_ID:
             return flashFs.readdir(dirp);
         default:
@@ -398,9 +443,11 @@ void ESP3D_GLOBALFS::rewinddir(DIR * dirp)
         strncpy(_rootEntry.d_name,&rootDirsHeaders[0][1], strlen(rootDirsHeaders[0])-2);
         _rootEntry.d_name[strlen(rootDirsHeaders[0])-2]='\0';
         break;
+#if ESP3D_SD_CARD_FEATURE
     case GLOBAL_SD_DIR_ID:
         sd.rewinddir(dirp);
         break;
+#endif //ESP3D_SD_CARD_FEATURE
     case GLOBAL_FLASH_DIR_ID:
         flashFs.rewinddir(dirp);
         break;
@@ -415,10 +462,12 @@ FILE * ESP3D_GLOBALFS::open ( const char * filename, const char * mode )
     switch(fstype) {
     case FS_ROOT:
         break;
+#if ESP3D_SD_CARD_FEATURE
     case FS_SD:
         return sd.open (&filename[strlen(ESP3D_SD_FS_HEADER)-1],mode );
+#endif //ESP3D_SD_CARD_FEATURE
     case FS_FLASH:
-        return flashFs.open (&filename[strlen(ESP3D_SD_FS_HEADER)-1],mode );
+        return flashFs.open (&filename[strlen(ESP3D_FLASH_FS_HEADER)-1],mode );
     default:
         break;
     }
@@ -431,9 +480,11 @@ void ESP3D_GLOBALFS::close(FILE * fd, const char * filename)
     switch(fstype) {
     case FS_ROOT:
         break;
+#if ESP3D_SD_CARD_FEATURE
     case FS_SD:
         sd.close(fd);
         break;
+#endif //ESP3D_SD_CARD_FEATURE
     case FS_FLASH:
         flashFs.close(fd);
         break;

@@ -95,9 +95,13 @@ void Esp3DCommands::ESP800(int cmd_params_pos,esp3d_msg_t * msg)
     if (!dispatchKeyValue(json,"Setup", tmpstr.c_str(), target,requestId)) {
         return;
     }
+    std::string sdconnection = "none";
+#if ESP3D_SD_CARD_FEATURE
+    sdconnection ="direct"
+#endif //ESP3D_SD_CARD_FEATURE
 
-    //SD connection
-    if (!dispatchKeyValue(json,"SDConnection", "direct", target,requestId)) {
+                  //SD connection
+    if (!dispatchKeyValue(json,"SDConnection", sdconnection.c_str(), target,requestId)) {
         return;
     }
 

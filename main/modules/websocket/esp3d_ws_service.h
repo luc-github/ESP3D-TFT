@@ -94,9 +94,9 @@ private:
     uint _max_clients;
     esp3d_http_socket_t _type;
 };
-
+#if ESP3D_WS_SERVICE_FEATURE
 extern Esp3DWsService  esp3dWsDataService;
-
+#endif //ESP3D_WS_SERVICE_FEATURE
 #ifdef __cplusplus
 } // extern "C"
 #endif

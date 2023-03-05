@@ -44,12 +44,23 @@ const char * help[]= {"[ESP](id) - display this help",
                       "[ESP130](State) - display/set Telnet state which can be ON, OFF, CLOSE",
                       "[ESP131](Port) - display/set Telnet port ",
 #endif //ESP3D_TELNET_FEATURE
+#if ESP3D_WS_SERVICE_FEATURE
                       "[ESP160](State) - display/set WebSocket state which can be ON, OFF, CLOSE",
+#endif //ESP3D_WS_SERVICE_FEATURE     
+#if ESP3D_SD_CARD_FEATURE
                       "[ESP200](RELEASE) (REFRESH)- display/set SD Card Status",
+#if ESP3D_SD_FEATURE_IS_SPI
                       "[ESP202](factor) - display / set  SD Card  SD card Speed divider factor (1 2 4 6 8 16 32)",
+#endif //ESP3D_SD_FEATURE_IS_SPI
+#endif //ESP3D_SD_CARD_FEATURE
                       "[ESP400] - display ESP3D settings",
                       "[ESP401]P=(position) T=(type) V=(value) - Set specific setting",
+#if ESP3D_SD_CARD_FEATURE
+#if ESP3D_UPDATE_FEATURE
                       "[ESP402](State) - display/set Check update at boot state which can be ON, OFF",
+#endif //ESP3D_UPDATE_FEATURE 
+#endif //ESP3D_SD_CARD_FEATURE
+
                       "[ESP410] - display available AP list",
                       "[ESP420] - display ESP3D current status",
                       "[ESP444](state) - set ESP3D state (RESET/RESTART)",
@@ -69,8 +80,10 @@ const char * help[]= {"[ESP](id) - display this help",
                       "[ESP710]FORMATFS - Format ESP3D Filesystem",
                       "[ESP720](path) - List ESP3D Filesystem",
                       "[ESP730](Action)=(path) - rmdir / remove / mkdir / exists / create on ESP3D FileSystem (path)",
+#if ESP3D_SD_CARD_FEATURE
                       "[ESP740](path) - List SD Filesystem",
                       "[ESP750](Action)=(path) - rmdir / remove / mkdir / exists / create on SD (path)",
+#endif //ESP3D_SD_CARD_FEATURE
                       "[ESP780](path) - List Global Filesystem",
                       "[ESP790](Action)=(path) - rmdir / remove / mkdir / exists / create on Global FileSystem (path)",
                       "[ESP800](time=YYYY-MM-DDTHH:mm:ss)(version= webui version)(setup=0/1) - display FW Informations /set time",
@@ -103,12 +116,24 @@ const uint cmdlist[]= {0,
                        130,
                        131,
 #endif //ESP3D_TELNET_FEATURE
+#if ESP3D_WS_SERVICE_FEATURE
                        160,
+#endif //ESP3D_WS_SERVICE_FEATURE
+#if ESP3D_SD_CARD_FEATURE
                        200,
+#if ESP3D_SD_FEATURE_IS_SPI
                        202,
+#endif //ESP3D_SD_FEATURE_IS_SPI
+
+#endif //ESP3D_SD_CARD_FEATURE
+
                        400,
                        401,
+#if ESP3D_SD_CARD_FEATURE
+#if ESP3D_UPDATE_FEATURE
                        402,
+#endif //ESP3D_UPDATE_FEATURE
+#endif //ESP3D_SD_CARD_FEATURE
                        410,
                        420,
 #if ESP3D_MDNS_FEATURE
@@ -128,8 +153,11 @@ const uint cmdlist[]= {0,
                        710,
                        720,
                        730,
+#if ESP3D_SD_CARD_FEATURE
                        740,
                        750,
+#endif //ESP3D_SD_CARD_FEATURE
+
                        780,
                        790,
                        800,

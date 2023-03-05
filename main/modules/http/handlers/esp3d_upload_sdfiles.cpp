@@ -17,7 +17,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
+#if ESP3D_SD_CARD_FEATURE
 #include "http/esp3d_http_service.h"
 #include <sys/param.h>
 #include "esp_wifi.h"
@@ -107,3 +107,5 @@ esp_err_t Esp3DHttpService::upload_to_sd_handler(const uint8_t * data, size_t da
     }
     return ESP_OK;
 }
+
+#endif //ESP3D_SD_CARD_FEATURE

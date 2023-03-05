@@ -37,7 +37,10 @@
 #include "esp3d_commands.h"
 #include "bsp.h"
 #include "filesystem/esp3d_flash.h"
+#if ESP3D_SD_CARD_FEATURE
 #include "filesystem/esp3d_sd.h"
+#endif // ESP3D_SD_CARD_FEATURE
+
 #if ESP3D_UPDATE_FEATURE
 #include "update/esp3d_update_service.h"
 #endif // ESP3D_UPDATE_FEATURE
@@ -97,7 +100,10 @@ bool Esp3DTFT::begin()
     }
 #endif //#if ESP3D_USB_SERIAL_FEATURE
     bool successFs = flashFs.begin();
-    bool successSd = sd.begin();
+    bool successSd = true;
+#if ESP3D_SD_CARD_FEATURE
+    successSd = sd.begin();
+#endif //ESP3D_SD_CARD_FEATURE
     bool success =  true;
 #if ESP3D_DISPLAY_FEATURE
     esp3dTFTui.begin();

@@ -63,7 +63,6 @@ const esp3d_setting_desc_t Esp3DSettingsData [] = {
     {esp3d_usb_serial_baud_rate, esp3d_integer, 4, ESP3D_USB_SERIAL_BAUDRATE}, //BaudRate
     {esp3d_output_client, esp3d_byte, 1,"1"},
 #endif //ESP3D_USB_SERIAL_FEATURE
-    {esp3d_spi_divider, esp3d_byte, 1, "1"},                               //SPIdivider
     {esp3d_hostname, esp3d_string, SIZE_OF_SETTING_HOSTNAME,"esp3d-tft"},
     {esp3d_radio_boot_mode, esp3d_byte, 1,"1"},
     {esp3d_radio_mode, esp3d_byte, 1,"3"},
@@ -83,7 +82,15 @@ const esp3d_setting_desc_t Esp3DSettingsData [] = {
     {esp3d_http_on, esp3d_byte, 1,"1"},
     {esp3d_setup, esp3d_byte, 1,"0"},
     {esp3d_target_firmware, esp3d_byte, 1,"0"},
+#if ESP3D_SD_CARD_FEATURE
+#if ESP3D_SD_FEATURE_IS_SPI
+    {esp3d_spi_divider, esp3d_byte, 1, "1"}, //SPIdivider
+#endif //ESP3D_SD_FEATURE_IS_SPI
+#if ESP3D_UPDATE_FEATURE
     {esp3d_check_update_on_sd, esp3d_byte, 1,"1"},
+#endif //ESP3D_UPDATE_FEATURE
+#endif //ESP3D_SD_CARD_FEATURE
+
 #if ESP3D_NOTIFICATIONS_FEATURE
     {esp3d_notification_type, esp3d_byte, 1,"0"},
     {esp3d_auto_notification, esp3d_byte, 1,"0"},
@@ -95,7 +102,9 @@ const esp3d_setting_desc_t Esp3DSettingsData [] = {
     {esp3d_socket_port, esp3d_integer, 4, "23"},
     {esp3d_socket_on, esp3d_byte, 1,"1"},
 #endif //ESP3D_TELNET_FEATURE
+#if ESP3D_WS_SERVICE_FEATURE
     {esp3d_ws_on, esp3d_byte, 1,"1"},
+#endif //ESP3D_WS_SERVICE_FEATURE
 #if ESP3D_AUTHENTICATION_FEATURE
     {esp3d_admin_password, esp3d_string, SIZE_OF_LOCAL_PASSWORD,"admin"},
     {esp3d_user_password, esp3d_string, SIZE_OF_LOCAL_PASSWORD,"user"},
@@ -191,13 +200,19 @@ bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t set
         return false;
     }
     switch(settingElement) {
+#if ESP3D_SD_CARD_FEATURE
+#if ESP3D_UPDATE_FEATURE
     case esp3d_check_update_on_sd:
+#endif //ESP3D_UPDATE_FEATURE
+#endif //ESP3D_SD_CARD_FEATURE
+
     case esp3d_setup:
 #if ESP3D_TELNET_FEATURE
     case esp3d_socket_on:
 #endif //ESP3D_TELNET_FEATURE
-
+#if ESP3D_WS_SERVICE_FEATURE
     case esp3d_ws_on:
+#endif //ESP3D_WS_SERVICE_FEATURE
     case esp3d_http_on:
     case esp3d_radio_boot_mode:
 #if ESP3D_NOTIFICATIONS_FEATURE
@@ -247,6 +262,8 @@ bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t set
             }
         }
         break;
+#if ESP3D_SD_CARD_FEATURE
+#if ESP3D_SD_FEATURE_IS_SPI
     case esp3d_spi_divider:
         for(uint8_t i=0; i<SupportedSPIDividerSize; i++) {
             if (SupportedSPIDivider[i]==value) {
@@ -254,6 +271,9 @@ bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t set
             }
         }
         break;
+#endif//ESP3D_SD_FEATURE_IS_SPI
+#endif //ESP3D_SD_CARD_FEATURE
+
     case esp3d_target_firmware:
         for (size_t i = esp3d_unknown; i !=last_esp3d_target_firmware_index_t; i++) {
             if ((esp3d_target_firmware_index_t)value == (esp3d_target_firmware_index_t)i) {
