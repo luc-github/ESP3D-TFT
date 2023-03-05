@@ -141,7 +141,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     if (!dispatchIdValue(json,"flash size",tmpstr.c_str(), target,requestId)) {
         return;
     }
-
+#if ESP3D_UPDATE_FEATURE
     //Update max
     tmpstr = esp3d_strings::formatBytes(esp3dUpdateService.maxUpdateSize());
     if (!dispatchIdValue(json,"size for update",tmpstr.c_str(), target,requestId)) {
@@ -158,6 +158,11 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     if (!dispatchIdValue(json,"SD updater",tmpstr.c_str(), target,requestId)) {
         return;
     }
+#else
+    if (!dispatchIdValue(json,"FW Update","OFF", target,requestId)) {
+        return;
+    }
+#endif //ESP3D_UPDATE_FEATURE
 
     //FileSystem
     size_t totalBytes=0;

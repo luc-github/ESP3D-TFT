@@ -38,7 +38,10 @@
 #include "bsp.h"
 #include "filesystem/esp3d_flash.h"
 #include "filesystem/esp3d_sd.h"
+#if ESP3D_UPDATE_FEATURE
 #include "update/esp3d_update_service.h"
+#endif // ESP3D_UPDATE_FEATURE
+
 
 /**********************
  *  STATIC PROTOTYPES
@@ -99,9 +102,11 @@ bool Esp3DTFT::begin()
 #if ESP3D_DISPLAY_FEATURE
     esp3dTFTui.begin();
 #endif //ESP3D_DISPLAY_FEATURE
+#if ESP3D_UPDATE_FEATURE
     if (successSd) {
         esp3dUpdateService.begin();
     }
+#endif //ESP3D_UPDATE_FEATURE
     if (success) {
         success = esp3dTFTstream.begin();
     }

@@ -169,7 +169,12 @@ void Esp3DCommands::ESP800(int cmd_params_pos,esp3d_msg_t * msg)
         return;
     }
     //WebUpdate
-    if (!dispatchKeyValue(json,"WebUpdate", esp3dUpdateService.canUpdate()?"Enabled":"Disabled", target,requestId)) {
+    std::string canupdate = "Disabled";
+#if ESP3D_UPDATE_FEATURE
+    canupdate = esp3dUpdateService.canUpdate()?"Enabled":"Disabled";
+#endif //ESP3D_UPDATE_FEATURE
+
+    if (!dispatchKeyValue(json,"WebUpdate", canupdate.c_str(), target,requestId)) {
         return;
     }
     //FlashFileSystem
