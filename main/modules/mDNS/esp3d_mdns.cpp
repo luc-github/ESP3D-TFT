@@ -131,8 +131,13 @@ bool Esp3DmDNS::begin()
         {"firmware", ESP3D_CODE_BASE },
         {"version", ESP3D_TFT_VERSION }
     };
-    uint32_t httpPort = esp3dTFTsettings.readUint32(esp3d_http_port);
+    //to avoid crash if no web service is enabled
+    uint32_t httpPort = 80;
+#if ESP3D_HTTP_FEATURE
+    httpPort = esp3dTFTsettings.readUint32(esp3d_http_port);
+#endif //ESP3D_HTTP_FEATURE
     err =  mdns_service_add(esp3dNetwork.getHostName(), ESP3D_MDNS_SERVICE_NAME, ESP3D_MDNS_SERVICE_PROTO, httpPort, serviceTxtData, 2);
+//TODO: add other protocols : e.g: telnet
     if (err!= ESP_OK) {
         mdns_free();
         esp3d_log_e("Failed to add instance");

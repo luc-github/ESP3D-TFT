@@ -97,10 +97,10 @@ void Esp3DCommands::ESP800(int cmd_params_pos,esp3d_msg_t * msg)
     }
     std::string sdconnection = "none";
 #if ESP3D_SD_CARD_FEATURE
-    sdconnection ="direct"
+    sdconnection ="direct";
 #endif //ESP3D_SD_CARD_FEATURE
 
-                  //SD connection
+    //SD connection
     if (!dispatchKeyValue(json,"SDConnection", sdconnection.c_str(), target,requestId)) {
         return;
     }
@@ -119,6 +119,7 @@ void Esp3DCommands::ESP800(int cmd_params_pos,esp3d_msg_t * msg)
     if (!dispatchKeyValue(json,"Authentication", tmpstr.c_str(), target,requestId)) {
         return;
     }
+#if ESP3D_HTTP_FEATURE
     //WebCommunication
     if (!dispatchKeyValue(json,"WebCommunication", "Asynchronous", target,requestId)) {
         return;
@@ -137,6 +138,7 @@ void Esp3DCommands::ESP800(int cmd_params_pos,esp3d_msg_t * msg)
             return;
         }
     }
+#endif //ESP3D_HTTP_FEATURE
     //Hostname
     const esp3d_setting_desc_t * settingPtr = esp3dTFTsettings.getSettingPtr(esp3d_hostname);
     if (settingPtr) {

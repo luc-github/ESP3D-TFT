@@ -126,7 +126,9 @@ const esp3d_setting_index_t ServstringKeysPos[] = {
 
 //Integer values
 const char * ServintKeysVal[] = {
-    "HTTP_Port"
+#if ESP3D_HTTP_FEATURE
+    "HTTP_Port",
+#endif //ESP3D_HTTP_FEATURE
 #if ESP3D_TELNET_FEATURE
     "TELNET_Port",
 #endif //ESP3D_TELNET_FEATURE
@@ -140,7 +142,9 @@ const char * ServintKeysVal[] = {
 };
 
 const esp3d_setting_index_t ServintKeysPos[] = {
+#if ESP3D_HTTP_FEATURE
     esp3d_http_port,
+#endif// ESP3D_HTTP_FEATURE
 #if ESP3D_TELNET_FEATURE
     esp3d_socket_port,
 #endif //ESP3D_TELNET_FEATURE
@@ -155,7 +159,9 @@ const esp3d_setting_index_t ServintKeysPos[] = {
 
 //Boolean values
 const char * ServboolKeysVal[] = {
+#if ESP3D_HTTP_FEATURE
     "HTTP_active",
+#endif //ESP3D_HTTP_FEATURE
 #if ESP3D_NOTIFICATIONS_FEATURE
     "AUTONOTIFICATION",
 #endif //ESP3D_NOTIFICATIONS_FEATURE
@@ -177,7 +183,10 @@ const char * ServboolKeysVal[] = {
 } ;
 
 const esp3d_setting_index_t ServboolKeysPos[] = {
+#if ESP3D_HTTP_FEATURE
     esp3d_http_on,
+#endif //ESP3D_HTTP_FEATURE
+
 #if ESP3D_NOTIFICATIONS_FEATURE
     esp3d_auto_notification,
 #endif //ESP3D_NOTIFICATIONS_FEATURE

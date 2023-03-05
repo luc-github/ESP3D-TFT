@@ -78,8 +78,10 @@ const esp3d_setting_desc_t Esp3DSettingsData [] = {
     {esp3d_ap_password, esp3d_string, SIZE_OF_SETTING_SSID_PWD,"12345678"},
     {esp3d_ap_ip_static, esp3d_ip, 4,"192.168.0.1"},
     {esp3d_ap_channel, esp3d_byte, 1,"2"},
+#if ESP3D_HTTP_FEATURE
     {esp3d_http_port, esp3d_integer, 4, "80"},
     {esp3d_http_on, esp3d_byte, 1,"1"},
+#endif //ESP3D_HTTP_FEATURE
     {esp3d_setup, esp3d_byte, 1,"0"},
     {esp3d_target_firmware, esp3d_byte, 1,"0"},
 #if ESP3D_SD_CARD_FEATURE
@@ -178,12 +180,14 @@ bool  Esp3DSettings::isValidIntegerSetting(uint32_t value, esp3d_setting_index_t
 #if ESP3D_TELNET_FEATURE
     case esp3d_socket_port:
 #endif //ESP3D_TELNET_FEATURE
-
+#if ESP3D_HTTP_FEATURE
     case esp3d_http_port:
         if (value>=1 && value<65535) {
             return true;
         }
         break;
+#endif //ESP3D_HTTP_FEATURE
+
     default:
         return false;
     }
@@ -213,7 +217,9 @@ bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t set
 #if ESP3D_WS_SERVICE_FEATURE
     case esp3d_ws_on:
 #endif //ESP3D_WS_SERVICE_FEATURE
+#if ESP3D_HTTP_FEATURE
     case esp3d_http_on:
+#endif //ESP3D_HTTP_FEATURE
     case esp3d_radio_boot_mode:
 #if ESP3D_NOTIFICATIONS_FEATURE
     case esp3d_auto_notification:

@@ -155,7 +155,7 @@ esp3d_msg_t * Esp3DClient::newMsg(esp3d_request_t requestId)
 {
     esp3d_msg_t * newMsgPtr = newMsg();
     if (newMsgPtr) {
-        newMsgPtr->origin = WEBUI_CLIENT;
+        newMsgPtr->origin = ESP3D_COMMAND;
         newMsgPtr->requestId = requestId;
     }
     return newMsgPtr;

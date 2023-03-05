@@ -16,8 +16,6 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
-
 #include "esp3d_ws_service.h"
 #include "tasks_def.h"
 #include <esp_system.h>
@@ -495,5 +493,3 @@ esp_err_t Esp3DWsService::BroadcastBin(uint8_t *msg, size_t len, int ignore)
     }
     return ESP_OK;
 }
-
-

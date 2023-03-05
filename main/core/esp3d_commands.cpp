@@ -246,9 +246,11 @@ bool Esp3DCommands::dispatchAuthenticationError(esp3d_msg_t * msg, uint cmdid, b
         return false;
     }
     msg->authentication_level =ESP3D_LEVEL_NOT_AUTHENTICATED;
+#if ESP3D_HTTP_FEATURE
     if (msg->target==WEBUI_CLIENT && msg->requestId.httpReq ) {
         httpd_resp_set_status(msg->requestId.httpReq,"401 UNAUTHORIZED");
     }
+#endif//ESP3D_HTTP_FEATURE  
 //answer is one message, override for safety
     msg->type= msg_unique;
     if (json) {
@@ -391,6 +393,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
     //currently only echo back no test done on success
     //TODO check add is successful
     switch (msg->target) {
+#if ESP3D_HTTP_FEATURE
     case WEBUI_CLIENT:
         if (esp3dHttpService.started()) {
             esp3dHttpService.process(msg);
@@ -417,7 +420,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
         }
         break;
 #endif //ESP3D_WS_SERVICE_FEATURE
-
+#endif //ESP3D_HTTP_FEATURE
 #if ESP3D_TELNET_FEATURE
     case TELNET_CLIENT:
         if (esp3dSocketServer.started()) {
@@ -490,7 +493,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
             }
         }
         #endif //#if ESP3D_USB_SERIAL_FEATURE*/
-
+#if ESP3D_HTTP_FEATURE
         //WEBUI_WEBSOCKET_CLIENT
         if (msg->origin!=WEBUI_WEBSOCKET_CLIENT) {
             if (msg->target==ALL_CLIENTS) {
@@ -526,6 +529,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t * msg)
             }
         }
 #endif //ESP3D_WS_SERVICE_FEATURE
+#endif //#if ESP3D_HTTP_FEATURE
 #if ESP3D_TELNET_FEATURE
         //TELNET_CLIENT
         if (msg->origin!=TELNET_CLIENT) {
@@ -790,12 +794,15 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
     case 115:
         ESP115(cmd_params_pos, msg);
         break;
+#if ESP3D_HTTP_FEATURE
     case 120:
         ESP120(cmd_params_pos, msg);
         break;
     case 121:
         ESP121(cmd_params_pos, msg);
         break;
+#endif //ESP3D_HTTP_FEATURE
+
 #if ESP3D_TELNET_FEATURE
     case 130:
         ESP130(cmd_params_pos, msg);
@@ -804,11 +811,13 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
         ESP131(cmd_params_pos, msg);
         break;
 #endif //ESP3D_TELNET_FEATURE
+#if ESP3D_HTTP_FEATURE
 #if ESP3D_WS_SERVICE_FEATURE
     case 160:
         ESP160(cmd_params_pos, msg);
         break;
 #endif //ESP3D_WS_SERVICE_FEATURE
+#endif //ESP3D_HTTP_FEATURE
 #if ESP3D_SD_CARD_FEATURE
     case 200:
         ESP200(cmd_params_pos, msg);

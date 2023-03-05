@@ -37,8 +37,12 @@
 #include "esp_flash.h"
 #include "esp_wifi_ap_get_sta_list.h"
 #include "network/esp3d_network.h"
+#if ESP3D_HTTP_FEATURE
 #include "http/esp3d_http_service.h"
+#endif //ESP3D_HTTP_FEATURE
+#if ESP3D_UPDATE_FEATURE
 #include "update/esp3d_update_service.h"
+#endif // ESP3D_UPDATE_FEATURE
 #if ESP3D_MDNS_FEATURE
 #include "mDNS/esp3d_mdns.h"
 #endif//ESP3D_MDNS_FEATURE
@@ -448,6 +452,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
         }
     }
 #endif //ESP3D_TELNET_FEATURE
+#if ESP3D_HTTP_FEATURE
 #if ESP3D_WS_SERVICE_FEATURE
     //Web socket server
     if (!esp3dWsDataService.started() ) {
@@ -482,7 +487,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
         }
     }
 #endif //ESP3D_WS_SERVICE_FEATURE
-
+#endif//ESP3D_HTTP_FEATURE  
 #if ESP3D_NOTIFICATIONS_FEATURE
 //Notifications
     if (!esp3dNotificationsService.started() || esp3dNotificationsService.getType()==esp3d_no_notification) {

@@ -63,13 +63,19 @@ public:
     void ESP112(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP114(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP115(int cmd_params_pos,esp3d_msg_t * msg);
+#if ESP3D_HTTP_FEATURE
     void ESP120(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP121(int cmd_params_pos,esp3d_msg_t * msg);
+#endif//ESP3D_HTTP_FEATURE
+#if ESP3D_TELNET_FEATURE
     void ESP130(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP131(int cmd_params_pos,esp3d_msg_t * msg);
+#endif //ESP3D_TELNET_FEATURE
+#if ESP3D_HTTP_FEATURE
 #if ESP3D_WS_SERVICE_FEATURE
     void ESP160(int cmd_params_pos,esp3d_msg_t * msg);
 #endif // ESP3D_WS_SERVICE_FEATURE
+#endif //ESP3D_HTTP_FEATURE
 #if ESP3D_SD_CARD_FEATURE
     void ESP200(int cmd_params_pos,esp3d_msg_t * msg);
 #if ESP3D_SD_FEATURE_IS_SPI

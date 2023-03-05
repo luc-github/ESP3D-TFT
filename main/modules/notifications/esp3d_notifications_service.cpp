@@ -23,9 +23,9 @@
 #include "esp3d_settings.h"
 #include "mbedtls/base64.h"
 #include "network/esp3d_network.h"
+#if ESP3D_HTTP_FEATURE
 #include "websocket/esp3d_webui_service.h"
-
-
+#endif//ESP3D_HTTP_FEATURE  
 
 Esp3DNotificationsService esp3dNotificationsService;
 
@@ -123,8 +123,10 @@ bool Esp3DNotificationsService::sendMSG(const char * title, const char * message
     if (formated_title.length()==0) {
         formated_title="Notification";
     }
-
+#if ESP3D_HTTP_FEATURE
     esp3dWsWebUiService.pushNotification(formated_message.c_str());
+#endif //ESP3D_HTTP_FEATURE
+
     if (_started) {
         switch(_notificationType) {
         case esp3d_pushover_notification:

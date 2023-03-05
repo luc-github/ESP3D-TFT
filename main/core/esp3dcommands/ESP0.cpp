@@ -38,15 +38,19 @@ const char * help[]= {"[ESP](id) - display this help",
                       "[ESP112](Hostname) - display/set Hostname",
                       "[ESP114](State) - display/set boot Radio state which can be ON, OFF",
                       "[ESP115](State) - display/set immediate Radio state which can be ON, OFF",
+#if ESP3D_HTTP_FEATURE
                       "[ESP120](State) - display/set HTTP state which can be ON, OFF",
                       "[ESP121](Port) - display/set HTTP port",
+#endif //ESP3D_HTTP_FEATURE
 #if ESP3D_TELNET_FEATURE
                       "[ESP130](State) - display/set Telnet state which can be ON, OFF, CLOSE",
                       "[ESP131](Port) - display/set Telnet port ",
 #endif //ESP3D_TELNET_FEATURE
+#if ESP3D_HTTP_FEATURE
 #if ESP3D_WS_SERVICE_FEATURE
                       "[ESP160](State) - display/set WebSocket state which can be ON, OFF, CLOSE",
-#endif //ESP3D_WS_SERVICE_FEATURE     
+#endif //ESP3D_WS_SERVICE_FEATURE    
+#endif //ESP3D_HTTP_FEATURE 
 #if ESP3D_SD_CARD_FEATURE
                       "[ESP200](RELEASE) (REFRESH)- display/set SD Card Status",
 #if ESP3D_SD_FEATURE_IS_SPI
@@ -110,15 +114,19 @@ const uint cmdlist[]= {0,
                        112,
                        114,
                        115,
+#if ESP3D_HTTP_FEATURE
                        120,
                        121,
+#endif //ESP3D_HTTP_FEATURE
 #if ESP3D_TELNET_FEATURE
                        130,
                        131,
 #endif //ESP3D_TELNET_FEATURE
+#if ESP3D_HTTP_FEATURE
 #if ESP3D_WS_SERVICE_FEATURE
                        160,
 #endif //ESP3D_WS_SERVICE_FEATURE
+#endif //ESP3D_HTTP_FEATURE
 #if ESP3D_SD_CARD_FEATURE
                        200,
 #if ESP3D_SD_FEATURE_IS_SPI
