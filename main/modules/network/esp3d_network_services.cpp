@@ -16,7 +16,7 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
+#if ESP3D_WIFI_FEATURE
 #include "esp3d_network_services.h"
 #include <stdio.h>
 #include "esp_wifi.h"
@@ -103,3 +103,4 @@ void Esp3DNetworkServices::end()
 
     _started = false;
 }
+#endif //ESP3D_WIFI_FEATURE

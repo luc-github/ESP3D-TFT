@@ -22,7 +22,9 @@
 #include "nvs_flash.h"
 #include "nvs.h"
 #include "nvs_handle.hpp"
+#if ESP3D_WIFI_FEATURE
 #include "lwip/ip_addr.h"
+#endif //ESP3D_WIFI_FEATURE
 #include "esp_system.h"
 #include <cstring>
 #include <regex>
@@ -66,6 +68,7 @@ const esp3d_setting_desc_t Esp3DSettingsData [] = {
     {esp3d_hostname, esp3d_string, SIZE_OF_SETTING_HOSTNAME,"esp3d-tft"},
     {esp3d_radio_boot_mode, esp3d_byte, 1,"1"},
     {esp3d_radio_mode, esp3d_byte, 1,"3"},
+#if ESP3D_WIFI_FEATURE
     {esp3d_fallback_mode, esp3d_byte, 1,"3"},
     {esp3d_sta_ssid, esp3d_string, SIZE_OF_SETTING_SSID_ID,""},
     {esp3d_sta_password, esp3d_string, SIZE_OF_SETTING_SSID_PWD,""},
@@ -78,6 +81,7 @@ const esp3d_setting_desc_t Esp3DSettingsData [] = {
     {esp3d_ap_password, esp3d_string, SIZE_OF_SETTING_SSID_PWD,"12345678"},
     {esp3d_ap_ip_static, esp3d_ip, 4,"192.168.0.1"},
     {esp3d_ap_channel, esp3d_byte, 1,"2"},
+#endif //ESP3D_WIFI_FEATURE
 #if ESP3D_HTTP_FEATURE
     {esp3d_http_port, esp3d_integer, 4, "80"},
     {esp3d_http_on, esp3d_byte, 1,"1"},
@@ -92,7 +96,6 @@ const esp3d_setting_desc_t Esp3DSettingsData [] = {
     {esp3d_check_update_on_sd, esp3d_byte, 1,"1"},
 #endif //ESP3D_UPDATE_FEATURE
 #endif //ESP3D_SD_CARD_FEATURE
-
 #if ESP3D_NOTIFICATIONS_FEATURE
     {esp3d_notification_type, esp3d_byte, 1,"0"},
     {esp3d_auto_notification, esp3d_byte, 1,"0"},
@@ -127,14 +130,18 @@ bool  Esp3DSettings::isValidStringSetting(const char* value, esp3d_setting_index
         return false;
     }
     //use strlen because it crash with regex if value is longer than 41 characters
+#if ESP3D_WIFI_FEATURE
     size_t len = strlen(value);
+#endif //ESP3D_WIFI_FEATURE
     switch(settingElement) {
+#if ESP3D_WIFI_FEATURE
     case esp3d_ap_ssid:
     case esp3d_sta_ssid:
         return  (len>0 && len<=SIZE_OF_SETTING_SSID_ID); //any string from 1 to 32
     case esp3d_sta_password:
     case esp3d_ap_password:
         return (len==0 || (len>=8 && len<=SIZE_OF_SETTING_SSID_PWD)); //any string from 8 to 64 or 0
+#endif //ESP3D_WIFI_FEATURE
     case esp3d_hostname:
         esp3d_log("Checking hostname validity");
         return  std::regex_match (value, std::regex("^[a-zA-Z0-9]{1}[a-zA-Z0-9\\-]{0,31}$"));//any string alphanumeric or '-' from 1 to 32
@@ -245,7 +252,7 @@ bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t set
         }
         break;
 #endif //ESP3D_NOTIFICATIONS_FEATURE
-
+#if ESP3D_WIFI_FEATURE
     case esp3d_sta_ip_mode:
         if(value==(uint8_t)esp3d_ip_mode_dhcp || value==(uint8_t)esp3d_ip_mode_static) {
             return true;
@@ -256,8 +263,13 @@ bool  Esp3DSettings::isValidByteSetting(uint8_t value, esp3d_setting_index_t set
             return true;
         }
         break;
+#endif //ESP3D_WIFI_FEATURE
     case esp3d_radio_mode:
-        if (value==(uint8_t)esp3d_radio_off  || value==(uint8_t)esp3d_wifi_sta  || value==(uint8_t)esp3d_wifi_ap  || value==(uint8_t)esp3d_wifi_ap_config || value==(uint8_t)esp3d_bluetooth_serial) {
+        if (value==(uint8_t)esp3d_radio_off
+#if ESP3D_WIFI_FEATURE
+                || value==(uint8_t)esp3d_wifi_sta  || value==(uint8_t)esp3d_wifi_ap  || value==(uint8_t)esp3d_wifi_ap_config
+#endif //ESP3D_WIFI_FEATURE 
+                || value==(uint8_t)esp3d_bluetooth_serial) {
             return true;
         }
         break;

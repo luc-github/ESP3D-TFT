@@ -56,40 +56,55 @@ const char * protectedkeys[] = {"NOTIF_TOKEN1","NOTIF_TOKEN2","AP_Password","STA
 //Network
 //String values
 const char * NetstringKeysVal[] = {"hostname",
+#if ESP3D_WIFI_FEATURE
                                    "STA_SSID",
                                    "STA_Password",
                                    "AP_SSID",
                                    "AP_Password"
+#endif //ESP3D_WIFI_FEATURE
                                   } ;
 
-const esp3d_setting_index_t NetstringKeysPos[] = {esp3d_hostname,
-                                                  esp3d_sta_ssid,
-                                                  esp3d_sta_password,
-                                                  esp3d_ap_ssid,
-                                                  esp3d_ap_password
-                                                 };
+const esp3d_setting_index_t NetstringKeysPos[] = {
+    esp3d_hostname,
+#if ESP3D_WIFI_FEATURE
+    esp3d_sta_ssid,
+    esp3d_sta_password,
+    esp3d_ap_ssid,
+    esp3d_ap_password
+#endif //ESP3D_WIFI_FEATURE
+};
 
 //IP values
-const char * IPKeysVal[] = {"STA_IP",
-                            "STA_GW",
-                            "STA_MSK",
-                            "STA_DNS",
-                            "AP_IP"
-                           };
+const char * IPKeysVal[] = {
+#if ESP3D_WIFI_FEATURE
+    "STA_IP",
+    "STA_GW",
+    "STA_MSK",
+    "STA_DNS",
+    "AP_IP"
+#endif //ESP3D_WIFI_FEATURE
+};
 
-const esp3d_setting_index_t IPKeysPos[] = {esp3d_sta_ip_static,
-                                           esp3d_sta_gw_static,
-                                           esp3d_sta_mask_static,
-                                           esp3d_sta_dns_static,
-                                           esp3d_ap_ip_static
-                                          };
+const esp3d_setting_index_t IPKeysPos[] = {
+#if ESP3D_WIFI_FEATURE
+    esp3d_sta_ip_static,
+    esp3d_sta_gw_static,
+    esp3d_sta_mask_static,
+    esp3d_sta_dns_static,
+    esp3d_ap_ip_static
+#endif //ESP3D_WIFI_FEATURE
+};
 //Bytes values
 const char * NetbyteKeysVal[] = {
+#if ESP3D_WIFI_FEATURE
     "AP_channel"
+#endif //ESP3D_WIFI_FEATURE
 };
 
 const esp3d_setting_index_t NetbyteKeysPos[] = {
+#if ESP3D_WIFI_FEATURE
     esp3d_ap_channel
+#endif //ESP3D_WIFI_FEATURE
 };
 
 //Services
@@ -570,19 +585,24 @@ bool Esp3DUpdateService::processingFileFunction (const char * section, const cha
                 done = true;
                 if (strcasecmp("BT",value)==0) {
                     b=esp3d_bluetooth_serial;
-                } else if (strcasecmp("STA",value)==0) {
-                    b=esp3d_wifi_sta;
-                } else if (strcasecmp("AP",value)==0) {
-                    b=esp3d_wifi_ap;
-                } else if (strcasecmp("SETUP",value)==0) {
-                    b=esp3d_wifi_ap_config;
-                } else if (strcasecmp("OFF",value)==0) {
-                    b=esp3d_radio_off;
-                } else {
-                    P= last_esp3d_setting_index_t;    //invalid value
-                }
+                } else
+#if ESP3D_WIFI_FEATURE
+                    if (strcasecmp("STA",value)==0) {
+                        b=esp3d_wifi_sta;
+                    } else if (strcasecmp("AP",value)==0) {
+                        b=esp3d_wifi_ap;
+                    } else if (strcasecmp("SETUP",value)==0) {
+                        b=esp3d_wifi_ap_config;
+                    } else
+#endif //ESP3D_WIFI_FEATURE
+                        if (strcasecmp("OFF",value)==0) {
+                            b=esp3d_radio_off;
+                        } else {
+                            P= last_esp3d_setting_index_t;    //invalid value
+                        }
             }
         }
+#if ESP3D_WIFI_FEATURE
         //STA fallback mode BT, WIFI-AP, OFF
         if (!done) {
             if (strcasecmp("sta_fallback",key)==0) {
@@ -616,6 +636,7 @@ bool Esp3DUpdateService::processingFileFunction (const char * section, const cha
                 }
             }
         }
+#endif //ESP3D_WIFI_FEATURE
     } else if (strcasecmp("services",section)==0) {
         if (!done) {
             done = processString(ServstringKeysVal,ServstringKeysPos,sizeof(ServstringKeysVal)/sizeof(char*),  key, value, T, P );

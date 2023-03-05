@@ -49,6 +49,7 @@ public:
     bool dispatchAuthenticationError(esp3d_msg_t * msg, uint cmdid, bool json);
     bool formatCommand(char * cmd, size_t len);
     void ESP0(int cmd_params_pos,esp3d_msg_t * msg);
+#if ESP3D_WIFI_FEATURE
     void ESP100(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP101(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP102(int cmd_params_pos,esp3d_msg_t * msg);
@@ -58,8 +59,11 @@ public:
     void ESP106(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP107(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP108(int cmd_params_pos,esp3d_msg_t * msg);
+#endif //ESP3D_WIFI_FEATURE
     void ESP110(int cmd_params_pos,esp3d_msg_t * msg);
+#if ESP3D_WIFI_FEATURE
     void ESP111(int cmd_params_pos,esp3d_msg_t * msg);
+#endif //ESP3D_WIFI_FEATURE
     void ESP112(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP114(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP115(int cmd_params_pos,esp3d_msg_t * msg);
@@ -89,7 +93,9 @@ public:
     void ESP402(int cmd_params_pos,esp3d_msg_t * msg);
 #endif // ESP3D_UPDATE_FEATURE
 #endif // ESP3D_SD_CARD_FEATURE
+#if ESP3D_WIFI_FEATURE
     void ESP410(int cmd_params_pos,esp3d_msg_t * msg);
+#endif //ESP3D_WIFI_FEATURE
     void ESP420(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP444(int cmd_params_pos,esp3d_msg_t * msg);
 #if ESP3D_MDNS_FEATURE

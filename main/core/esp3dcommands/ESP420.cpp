@@ -230,6 +230,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
     if (!dispatchIdValue(json,"hostname",tmpstr.c_str(), target,requestId)) {
         return;
     }
+#if ESP3D_WIFI_FEATURE
     //sta
     if (esp3dNetwork.getMode()==esp3d_wifi_sta) {
         tmpstr="ON";
@@ -380,6 +381,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos,esp3d_msg_t * msg)
             }
         }
     }
+#endif //ESP3D_WIFI_FEATURE
     //bt
     if (esp3dNetwork.getMode()==esp3d_bluetooth_serial ) {
         tmpstr="ON";

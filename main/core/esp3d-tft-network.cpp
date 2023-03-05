@@ -52,10 +52,12 @@ static void networkTask(void *pvParameter)
 
     (void) pvParameter;
     xNetworkSemaphore = xSemaphoreCreateMutex();
+#if ESP3D_WIFI_FEATURE
     esp3d_log("Init Netif and network event loop");
     ESP_ERROR_CHECK(esp_netif_init()); //desinit is not yet support so do it once
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     vTaskDelay(pdMS_TO_TICKS(100));
+#endif //#ESP3D_WIFI_FEATURE
     esp3dNetwork.begin();
     while (1) {
         /* Delay */

@@ -51,31 +51,39 @@ void Esp3DCommands::ESP110(int cmd_params_pos,esp3d_msg_t * msg)
         byteValue = esp3dTFTsettings.readByte(esp3d_radio_mode);
         if (byteValue==(uint8_t)esp3d_bluetooth_serial) {
             ok_msg="BT";
-        } else  if (byteValue==(uint8_t)esp3d_wifi_ap) {
-            ok_msg="AP";
-        } else  if (byteValue==(uint8_t)esp3d_wifi_sta) {
-            ok_msg="STA";
-        } else if (byteValue==(uint8_t)esp3d_wifi_ap_config) {
-            ok_msg="CONFIG";
-        }  else if (byteValue==(uint8_t)esp3d_radio_off) {
-            ok_msg="OFF";
-        } else {
-            ok_msg="Unknown";
-        }
+        } else
+#if ESP3D_WIFI_FEATURE
+            if (byteValue==(uint8_t)esp3d_wifi_ap) {
+                ok_msg="AP";
+            } else  if (byteValue==(uint8_t)esp3d_wifi_sta) {
+                ok_msg="STA";
+            } else if (byteValue==(uint8_t)esp3d_wifi_ap_config) {
+                ok_msg="CONFIG";
+            }  else
+#endif //ESP3D_WIFI_FEATURE
+                if (byteValue==(uint8_t)esp3d_radio_off) {
+                    ok_msg="OFF";
+                } else {
+                    ok_msg="Unknown";
+                }
     } else {
         if (tmpstr=="BT") {
             byteValue=(uint8_t)esp3d_bluetooth_serial;
-        } else if (tmpstr=="AP") {
-            byteValue=(uint8_t)esp3d_wifi_ap;
-        } else if (tmpstr=="STA") {
-            byteValue=(uint8_t)esp3d_wifi_sta;
-        } else if (tmpstr=="CONFIG") {
-            byteValue=(uint8_t)esp3d_wifi_ap_config;
-        } else if (tmpstr=="OFF") {
-            byteValue=(uint8_t)esp3d_radio_off;
-        } else {
-            byteValue=(uint8_t)-1; //unknow flag so put outof range value
-        }
+        } else
+#if ESP3D_WIFI_FEATURE
+            if (tmpstr=="AP") {
+                byteValue=(uint8_t)esp3d_wifi_ap;
+            } else if (tmpstr=="STA") {
+                byteValue=(uint8_t)esp3d_wifi_sta;
+            } else if (tmpstr=="CONFIG") {
+                byteValue=(uint8_t)esp3d_wifi_ap_config;
+            } else
+#endif //ESP3D_WIFI_FEATURE
+                if (tmpstr=="OFF") {
+                    byteValue=(uint8_t)esp3d_radio_off;
+                } else {
+                    byteValue=(uint8_t)-1; //unknow flag so put outof range value
+                }
         esp3d_log("got %s param for a value of %d, is valid %d", tmpstr.c_str(),byteValue, esp3dTFTsettings.isValidByteSetting(byteValue, esp3d_radio_mode));
         if (esp3dTFTsettings.isValidByteSetting(byteValue, esp3d_radio_mode)) {
             esp3d_log("Value %d is valid",byteValue);

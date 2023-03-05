@@ -752,6 +752,7 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
     case 0:
         ESP0(cmd_params_pos, msg);
         break;
+#if ESP3D_WIFI_FEATURE
     case 100:
         ESP100(cmd_params_pos, msg);
         break;
@@ -779,12 +780,15 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
     case 108:
         ESP108(cmd_params_pos, msg);
         break;
+#endif //ESP3D_WIFI_FEATURE
     case 110:
         ESP110(cmd_params_pos, msg);
         break;
+#if ESP3D_WIFI_FEATURE
     case 111:
         ESP111(cmd_params_pos, msg);
         break;
+#endif //ESP3D_WIFI_FEATURE
     case 112:
         ESP112(cmd_params_pos, msg);
         break;
@@ -842,9 +846,11 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
         break;
 #endif //ESP3D_UPDATE_FEATURE 
 #endif //ESP3D_SD_CARD_FEATURE
+#if ESP3D_WIFI_FEATURE
     case 410:
         ESP410(cmd_params_pos, msg);
         break;
+#endif //ESP3D_WIFI_FEATURE
     case 420:
         ESP420(cmd_params_pos, msg);
         break;

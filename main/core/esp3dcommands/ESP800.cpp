@@ -153,6 +153,7 @@ void Esp3DCommands::ESP800(int cmd_params_pos,esp3d_msg_t * msg)
 
     //WiFiMode
     switch (esp3dNetwork.getMode()) {
+#if ESP3D_WIFI_FEATURE
     case esp3d_wifi_sta:
         tmpstr = "STA";
         break;
@@ -162,6 +163,7 @@ void Esp3DCommands::ESP800(int cmd_params_pos,esp3d_msg_t * msg)
     case esp3d_wifi_ap_config:
         tmpstr = "CONFIG";
         break;
+#endif //ESP3D_WIFI_FEATURE
     case esp3d_radio_off:
         tmpstr = "RADIO OFF";
         break;

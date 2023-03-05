@@ -60,7 +60,7 @@ add_compile_options(-DLV_LVGL_H_INCLUDE_SIMPLE=1)
 # ESP3D-TFT specific log level
 # Enabled  = 1
 # Disabled = 0
-add_compile_options(-DESP3D_TFT_LOG=1)
+add_compile_options(-DESP3D_TFT_LOG=0)
 
 # ESP3D-TFT specific bechmark
 # Enabled  = 1
@@ -79,32 +79,36 @@ if(TIMESTAMP_ON_FILES)
     add_compile_options(-DESP3D_TIMESTAMP_FEATURE=1)
 endif()
 
-if(SSDP_SERVICE)
-    add_compile_options(-DESP3D_SSDP_FEATURE=1)
-endif()
-
-if(MDNS_SERVICE)
-    add_compile_options(-DESP3D_MDNS_FEATURE=1)
-endif()
-
 if(WIFI_SERVICE)
     add_compile_options(-DESP3D_WIFI_FEATURE=1)
+
+    if(SSDP_SERVICE)
+        add_compile_options(-DESP3D_SSDP_FEATURE=1)
+    endif()
+
+    if(MDNS_SERVICE)
+        add_compile_options(-DESP3D_MDNS_FEATURE=1)
+    endif()
+
+    if(WEB_SERVICES)
+        add_compile_options(-DESP3D_HTTP_FEATURE=1)
+
+        if(WS_SERVICE)
+            add_compile_options(-DESP3D_WS_SERVICE_FEATURE=1)
+        endif()
+    endif()
+
+    if(TELNET_SERVICE)
+        add_compile_options(-DESP3D_TELNET_FEATURE=1)
+    endif()
+
+    if(NOTIFICATIONS_SERVICE)
+        add_compile_options(-DESP3D_NOTIFICATIONS_FEATURE=1)
+    endif()
 endif()
 
 if(BT_SERVICE)
     add_compile_options(-DESP3D_BLUETOOTH_FEATURE=1)
-endif()
-
-if(WEB_SERVICES)
-    add_compile_options(-DESP3D_HTTP_FEATURE=1)
-endif()
-
-if(TELNET_SERVICE)
-    add_compile_options(-DESP3D_TELNET_FEATURE=1)
-endif()
-
-if(WS_SERVICE)
-    add_compile_options(-DESP3D_WS_SERVICE_FEATURE=1)
 endif()
 
 if(TFT_UI_SERVICE)
@@ -113,14 +117,10 @@ endif()
 
 if(SD_CARD_SERVICE)
     add_compile_options(-DESP3D_SD_CARD_FEATURE=1)
-endif()
 
-if(NOTIFICATIONS_SERVICE)
-    add_compile_options(-DESP3D_NOTIFICATIONS_FEATURE=1)
-endif()
-
-if(UPDATE_SERVICE)
-    add_compile_options(-DESP3D_UPDATE_FEATURE=1)
+    if(UPDATE_SERVICE)
+        add_compile_options(-DESP3D_UPDATE_FEATURE=1)
+    endif()
 endif()
 
 if(GCODE_HOST_SERVICE)

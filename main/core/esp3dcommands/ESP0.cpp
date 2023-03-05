@@ -24,6 +24,7 @@
 #include <cstring>
 
 const char * help[]= {"[ESP](id) - display this help",
+#if ESP3D_WIFI_FEATURE
                       "[ESP100](SSID) - display/set STA SSID",
                       "[ESP101](Password) (CLEAR)- set STA password",
                       "[ESP102](Mode) - display/set STA IP mode (DHCP/STATIC)",
@@ -33,8 +34,11 @@ const char * help[]= {"[ESP](id) - display this help",
                       "[ESP106](Password) - set AP password",
                       "[ESP107](IP) - display/set AP IP",
                       "[ESP108](Chanel) - display/set AP chanel",
+#endif //ESP3D_WIFI_FEATURE
                       "[ESP110](State) - display/set radio state which can be STA,AP, CONFIG, BT OFF",
+#if ESP3D_WIFI_FEATURE
                       "[ESP111] - display current IP",
+#endif //ESP3D_WIFI_FEATURE
                       "[ESP112](Hostname) - display/set Hostname",
                       "[ESP114](State) - display/set boot Radio state which can be ON, OFF",
                       "[ESP115](State) - display/set immediate Radio state which can be ON, OFF",
@@ -64,8 +68,9 @@ const char * help[]= {"[ESP](id) - display this help",
                       "[ESP402](State) - display/set Check update at boot state which can be ON, OFF",
 #endif //ESP3D_UPDATE_FEATURE 
 #endif //ESP3D_SD_CARD_FEATURE
-
+#if ESP3D_WIFI_FEATURE
                       "[ESP410] - display available AP list",
+#endif //ESP3D_WIFI_FEATURE
                       "[ESP420] - display ESP3D current status",
                       "[ESP444](state) - set ESP3D state (RESET/RESTART)",
 #if ESP3D_MDNS_FEATURE
@@ -100,6 +105,7 @@ const char * help[]= {"[ESP](id) - display this help",
                      };
 
 const uint cmdlist[]= {0,
+#if ESP3D_WIFI_FEATURE
                        100,
                        101,
                        102,
@@ -109,8 +115,11 @@ const uint cmdlist[]= {0,
                        106,
                        107,
                        108,
+#endif //ESP3D_WIFI_FEATURE
                        110,
+#if ESP3D_WIFI_FEATURE
                        111,
+#endif //ESP3D_WIFI_FEATURE
                        112,
                        114,
                        115,
@@ -142,7 +151,9 @@ const uint cmdlist[]= {0,
                        402,
 #endif //ESP3D_UPDATE_FEATURE
 #endif //ESP3D_SD_CARD_FEATURE
+#if ESP3D_WIFI_FEATURE
                        410,
+#endif //ESP3D_WIFI_FEATURE
                        420,
 #if ESP3D_MDNS_FEATURE
                        450,

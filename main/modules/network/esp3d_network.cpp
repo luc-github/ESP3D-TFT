@@ -19,23 +19,27 @@
 
 #include "esp3d_network.h"
 #include <stdio.h>
+#if ESP3D_WIFI_FEATURE
 #include "esp_wifi.h"
 #include "esp_event.h"
+#include "esp3d_network_services.h"
+#include "lwip/apps/netbiosns.h"
+#endif //ESP3D_WIFI_FEATURE
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_settings.h"
 #include "esp3d_commands.h"
-#include "lwip/apps/netbiosns.h"
-#include "esp3d_network_services.h"
 
 Esp3DNetwork esp3dNetwork;
 
 /* The event group allows multiple bits for each event, but we only care about two events:
  * - we are connected to the AP with an IP
  * - we failed to connect after the maximum amount of retries */
+#if ESP3D_WIFI_FEATURE
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT      BIT1
 #define WIFI_STA_LOST_IP   BIT2
+
 
 #define MIN_RSSI           -78
 #define ESP3D_STA_MAXIMUM_RETRY 10
@@ -166,12 +170,16 @@ bool  Esp3DNetwork::getLocalIp(esp3d_ip_info_t * ipInfo)
     return false;
 }
 
+#endif //ESP3D_WIFI_FEATURE
+
 Esp3DNetwork::Esp3DNetwork()
 {
     _current_radio_mode = esp3d_radio_off;
+#if ESP3D_WIFI_FEATURE
     _wifiApPtr = nullptr;
     _s_wifi_event_group = nullptr;
     _useStaticIp = false;
+#endif //ESP3D_WIFI_FEATURE
     _started = false;
 }
 
@@ -194,8 +202,6 @@ bool Esp3DNetwork::begin()
     if (_current_radio_mode!=esp3d_radio_off) {
         setMode(esp3d_radio_off);
     }
-
-    esp3d_log("Starting Network service...");
     uint8_t radioMode = esp3dTFTsettings.readByte(esp3d_radio_mode);
     _started = setMode((esp3d_radio_mode_t)radioMode);
     return _started;
@@ -203,19 +209,23 @@ bool Esp3DNetwork::begin()
 
 void Esp3DNetwork::handle()
 {
+#if ESP3D_WIFI_FEATURE
     if (_current_radio_mode==esp3d_wifi_sta && ( xEventGroupGetBits(_s_wifi_event_group)& WIFI_STA_LOST_IP)) {
         xEventGroupClearBits(_s_wifi_event_group, WIFI_STA_LOST_IP);
         esp3d_log("Force restart wifi station");
         setMode (esp3d_wifi_sta, true);
     }
+#endif //ESP3D_WIFI_FEATURE
 }
 
 void Esp3DNetwork::end()
 {
     _started = false;
+#if ESP3D_WIFI_FEATURE
     _useStaticIp= false;
+#endif//ESP3D_WIFI_FEATURE
 }
-
+#if ESP3D_WIFI_FEATURE
 const char * Esp3DNetwork::getAPMac()
 {
     return getMac(ESP_MAC_WIFI_SOFTAP);
@@ -224,6 +234,7 @@ const char * Esp3DNetwork::getSTAMac()
 {
     return getMac(ESP_MAC_WIFI_STA);
 }
+#endif //ESP3D_WIFI_FEATURE
 const char * Esp3DNetwork::getBTMac()
 {
     return getMac(ESP_MAC_BT);
@@ -250,12 +261,14 @@ const char * Esp3DNetwork::getModeStr(esp3d_radio_mode_t mode)
     switch(mode) {
     case esp3d_radio_off:
         return "No Radio";
+#if ESP3D_WIFI_FEATURE
     case esp3d_wifi_sta:
         return "Client";
     case esp3d_wifi_ap:
         return "Access point";
     case esp3d_wifi_ap_config:
         return "Configuration";
+#endif //ESP3D_WIFI_FEATURE
     case esp3d_bluetooth_serial:
         return "Bluetooth";
     default:
@@ -263,7 +276,7 @@ const char * Esp3DNetwork::getModeStr(esp3d_radio_mode_t mode)
     }
     return "Unknown";
 }
-
+#if ESP3D_WIFI_FEATURE
 bool Esp3DNetwork::startStaMode()
 {
     bool connected = false;
@@ -557,6 +570,8 @@ bool Esp3DNetwork::startApMode(bool configMode)
     return success;
 }
 
+#endif //ESP3D_WIFI_FEATURE
+
 bool  Esp3DNetwork::startNoRadioMode()
 {
     esp3d_log("Start No Radio Mode");
@@ -573,14 +588,6 @@ bool  Esp3DNetwork::stopNoRadioMode()
     return true;
 }
 
-bool Esp3DNetwork::startConfigMode()
-{
-    esp3d_log("Init Config Mode");
-    bool res = startApMode(true);
-    _current_radio_mode = esp3d_wifi_ap_config;
-    return res;
-}
-
 bool Esp3DNetwork::startBtMode()
 {
     esp3d_log("Init BT Mode");
@@ -588,6 +595,14 @@ bool Esp3DNetwork::startBtMode()
     return false;
 }
 
+#if ESP3D_WIFI_FEATURE
+bool Esp3DNetwork::startConfigMode()
+{
+    esp3d_log("Init Config Mode");
+    bool res = startApMode(true);
+    _current_radio_mode = esp3d_wifi_ap_config;
+    return res;
+}
 bool  Esp3DNetwork::stopStaMode()
 {
     if (!(_current_radio_mode==esp3d_wifi_sta)) {
@@ -669,6 +684,8 @@ bool  Esp3DNetwork::stopConfigMode()
     bool res = stopApMode();
     return res;
 }
+#endif //ESP3D_WIFI_FEATURE
+
 bool  Esp3DNetwork::stopBtMode()
 {
     esp3d_log("Stop BT Mode");
@@ -688,6 +705,7 @@ bool Esp3DNetwork::setMode (esp3d_radio_mode_t mode, bool restart)
     case esp3d_radio_off:
         stopNoRadioMode();
         break;
+#if ESP3D_WIFI_FEATURE
     case esp3d_wifi_sta:
         stopStaMode();
         break;
@@ -697,6 +715,7 @@ bool Esp3DNetwork::setMode (esp3d_radio_mode_t mode, bool restart)
     case esp3d_wifi_ap_config:
         stopConfigMode();
         break;
+#endif //ESP3D_WIFI_FEATURE
     case esp3d_bluetooth_serial:
         stopBtMode();
         break;
@@ -708,6 +727,7 @@ bool Esp3DNetwork::setMode (esp3d_radio_mode_t mode, bool restart)
     case esp3d_radio_off:
         startNoRadioMode();
         break;
+#if ESP3D_WIFI_FEATURE
     case esp3d_wifi_sta:
         if (!startStaMode()) {
             setMode((esp3d_radio_mode_t) esp3dTFTsettings.readByte(esp3d_fallback_mode));
@@ -719,11 +739,13 @@ bool Esp3DNetwork::setMode (esp3d_radio_mode_t mode, bool restart)
     case esp3d_wifi_ap_config:
         startConfigMode();
         break;
+#endif //ESP3D_WIFI_FEATURE
     case esp3d_bluetooth_serial:
         startBtMode();
         break;
     default:
         esp3d_log_e("Unknown radio mode");
+        startNoRadioMode();
     };
     return true;
 }

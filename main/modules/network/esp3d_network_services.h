@@ -44,8 +44,9 @@ public:
 private:
     bool _started;
 };
-
+#if ESP3D_WIFI_FEATURE
 extern Esp3DNetworkServices esp3dNetworkServices;
+#endif // ESP3D_WIFI_FEATURE
 #ifdef __cplusplus
 } // extern "C"
 #endif
