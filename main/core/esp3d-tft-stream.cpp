@@ -28,7 +28,9 @@
 #include "esp3d_log.h"
 #include "esp3d_commands.h"
 #include "serial/esp3d_serial_client.h"
+#if ESP3D_GCODE_HOST_FEATURE
 #include "gcode_host/esp3d_gcode_host_service.h"
+#endif // ESP3D_GCODE_HOST_FEATURE
 #include "tasks_def.h"
 #if ESP3D_USB_SERIAL_FEATURE
 #include "usb_serial/esp3d_usb_serial_client.h"
@@ -55,9 +57,11 @@ static void streamTask(void *pvParameter)
 
     (void) pvParameter;
     xStreamSemaphore = xSemaphoreCreateMutex();
+#if ESP3D_GCODE_HOST_FEATURE
     if (!gcodeHostService.begin()) {
         esp3d_log_e("Failed to begin gcode host service");
     }
+#endif //ESP3D_GCODE_HOST_FEATURE
     while (1) {
         /* Delay */
         vTaskDelay(pdMS_TO_TICKS(10));

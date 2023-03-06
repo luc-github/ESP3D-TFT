@@ -112,8 +112,10 @@ public:
     void ESP600(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP610(int cmd_params_pos,esp3d_msg_t * msg);
 #endif //ESP3D_NOTIFICATIONS_FEATURE
+#if ESP3D_GCODE_HOST_FEATURE
     void ESP700(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP701(int cmd_params_pos,esp3d_msg_t * msg);
+#endif //ESP3D_GCODE_HOST_FEATURE
     void ESP710(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP720(int cmd_params_pos,esp3d_msg_t * msg);
     void ESP730(int cmd_params_pos,esp3d_msg_t * msg);

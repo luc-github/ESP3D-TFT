@@ -82,10 +82,14 @@ const char * help[]= {"[ESP](id) - display this help",
                       "[ESP550](password) - set admin password",
                       "[ESP555](password) - set user password",
 #endif //#if ESP3D_AUTHENTICATION_FEATURE
+#if ESP3D_NOTIFICATIONS_FEATURE
                       "[ESP600](message) - send notification",
                       "[ESP610](type=NONE/PUSHOVER/EMAIL/LINE/IFTTT) (AUTO=YES/NO) (T1=token1) (T2=token2) (TS=Settings)",
+#endif //ESP3D_NOTIFICATIONS_FEATURE
+#if ESP3D_GCODE_HOST_FEATURE
                       "[ESP700](script / file name) - read and process/stream script/file",
                       "[ESP701]action=(PAUSE/RESUME/ABORT) - query and control ESP700 stream",
+#endif //ESP3D_GCODE_HOST_FEATURE
                       "[ESP710]FORMATFS - Format ESP3D Filesystem",
                       "[ESP720](path) - List ESP3D Filesystem",
                       "[ESP730](Action)=(path) - rmdir / remove / mkdir / exists / create on ESP3D FileSystem (path)",
@@ -165,10 +169,14 @@ const uint cmdlist[]= {0,
                        550,
                        555,
 #endif //#if ESP3D_AUTHENTICATION_FEATURE
+#if ESP3D_NOTIFICATIONS_FEATURE
                        600,
                        610,
+#endif //ESP3D_NOTIFICATIONS_FEATURE
+#if ESP3D_GCODE_HOST_FEATURE
                        700,
                        701,
+#endif //ESP3D_GCODE_HOST_FEATURE
                        710,
                        720,
                        730,

@@ -885,13 +885,14 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,esp3d_m
         ESP610(cmd_params_pos, msg);
         break;
 #endif //ESP3D_NOTIFICATIONS_FEATURE
-
+#if ESP3D_GCODE_HOST_FEATURE
     case 700:
         ESP700(cmd_params_pos, msg);
         break;
     case 701:
         ESP701(cmd_params_pos, msg);
         break;
+#endif //ESP3D_GCODE_HOST_FEATURE
     case 710:
         ESP710(cmd_params_pos, msg);
         break;
