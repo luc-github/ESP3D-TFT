@@ -26,12 +26,12 @@
 const char * help[]= {"[ESP](id) - display this help",
 #if ESP3D_WIFI_FEATURE
                       "[ESP100](SSID) - display/set STA SSID",
-                      "[ESP101](Password) (CLEAR)- set STA password",
+                      "[ESP101](Password)/(NOPASSWORD)- set STA password",
                       "[ESP102](Mode) - display/set STA IP mode (DHCP/STATIC)",
                       "[ESP103](IP=xxxx MSK=xxxx GW=xxxx DNS=XXXXX) - display/set STA IP/Mask/GW/DNS",
                       "[ESP104](State) - display/set sta fallback mode which can be CONFIG, BT, OFF",
                       "[ESP105](SSID) - display/set AP SSID",
-                      "[ESP106](Password) - set AP password",
+                      "[ESP106](Password)/(NOPASSWORD) - set AP password",
                       "[ESP107](IP) - display/set AP IP",
                       "[ESP108](Chanel) - display/set AP chanel",
 #endif //ESP3D_WIFI_FEATURE
