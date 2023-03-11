@@ -69,5 +69,12 @@
         "map": "cpp",
         "xtree": "cpp",
         "usb_serial.h": "c"
+    },
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "xaver.clang-format",
+    "editor.formatOnPaste": true,
+    "editor.formatOnType": true,
+    "[cpp]": {
+        "editor.defaultFormatter": "xaver.clang-format"
     }
 }
