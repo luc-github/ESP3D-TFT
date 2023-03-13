@@ -1,5 +1,5 @@
 /*
-  esp3d-tft log functions
+  esp3d_tft log functions
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 

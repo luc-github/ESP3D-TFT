@@ -1,5 +1,5 @@
 /*
-  esp3d-tft project
+  esp3d_tft project
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -30,8 +30,8 @@ extern "C" {
 #include "esp_err.h"
 
 /*********************
-*      DEFINES
-*********************/
+ *      DEFINES
+ *********************/
 
 /**********************
  * GLOBAL PROTOTYPES

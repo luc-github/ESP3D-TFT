@@ -45,8 +45,8 @@ The reference boards I have bought :
 			   - littlefs/ -...  
 			   - SSDP_IDF / -...  
 			   - mdns/ -...  
-	     - main/ - core/ - esp3d-tft.cpp   
-			     - includes/ - esp3d-tft.h   
+	     - main/ - core/ - esp3d_tft.cpp   
+			     - includes/ - esp3d_tft.h   
 					 - CMakeLists.txt
 					 - components.mk
 					 - main.cpp

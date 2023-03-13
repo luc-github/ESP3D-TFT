@@ -1,5 +1,5 @@
 /*
-  esp3d-tft project
+  esp3d_tft project
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -22,11 +22,11 @@
 /*Notification Title used according notification type*/
 #define ESP3D_NOTIFICATION_TITLE "Hi from ESP3D"
 /* Notification message when online
-* The message that will be sent when the ESP is online
-*/
+ * The message that will be sent when the ESP is online
+ */
 #define ESP3D_NOTIFICATION_ONLINE "Hi, %ESP_NAME% is now online at %ESP_IP%"
 
 /* Sender email to be used for sending notification email
-* if not defined it use the destination address provided in TS
-*/
-//#define ESP3D@mysmtp.com
+ * if not defined it use the destination address provided in TS
+ */
+// #define ESP3D@mysmtp.com

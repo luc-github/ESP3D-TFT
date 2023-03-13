@@ -1,5 +1,5 @@
 /*
-  esp3d-tft-network
+  esp3d_tft_stream
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -20,25 +20,29 @@
 
 #pragma once
 #include <stdio.h>
+
+#include "esp3d_settings.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-class Esp3DTFTNetwork final
-{
-public:
-    Esp3DTFTNetwork();
-    ~Esp3DTFTNetwork();
-    bool begin();
-    void handle();
-    bool end();
+class Esp3DTFTStream final {
+ public:
+  Esp3DTFTStream();
+  ~Esp3DTFTStream();
+  bool begin();
+  void handle();
+  bool end();
+  esp3d_target_firmware_index_t getTargetFirmware(bool fromSettings = false);
 
-private:
-    bool _started;
+ private:
+  bool _started;
+  esp3d_target_firmware_index_t _target_firmware;
 };
 
-extern Esp3DTFTNetwork esp3dTFTnetwork;
+extern Esp3DTFTStream esp3dTFTstream;
 
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif

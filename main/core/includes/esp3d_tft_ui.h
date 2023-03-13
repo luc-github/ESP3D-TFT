@@ -1,5 +1,5 @@
 /*
-  esp3d-tft
+  esp3d_tft_ui
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -24,19 +24,20 @@
 extern "C" {
 #endif
 
-class Esp3DTFT final
-{
-public:
-    Esp3DTFT();
-    ~Esp3DTFT();
-    bool begin();
-    void handle();
-    bool end();
+class Esp3DTFTUi final {
+ public:
+  Esp3DTFTUi();
+  ~Esp3DTFTUi();
+  bool begin();
+  void handle();
+  bool end();
 
-private:
-    bool _started;
+ private:
+  bool _started;
 };
 
+extern Esp3DTFTUi esp3dTFTui;
+
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif

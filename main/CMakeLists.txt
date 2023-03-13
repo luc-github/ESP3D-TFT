@@ -1,7 +1,7 @@
 # main application directives
 
 set(SOURCES .
-    core core/esp3dcommands
+    core core/commands
     modules/authentication
     modules/serial
     modules/network

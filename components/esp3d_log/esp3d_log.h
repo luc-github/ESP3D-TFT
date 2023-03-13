@@ -1,5 +1,5 @@
 /*
-  esp3d-tft log functions
+  esp3d_tft log functions
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -21,15 +21,17 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define esp3d_log_error(format, ...)  esp3d_log_e(format, ...)
-#define esp3d_log_warning(format, ...)  esp3d_log_w(format, ...)
+#define esp3d_log_error(format, ...) esp3d_log_e(format, ...)
+#define esp3d_log_warning(format, ...) esp3d_log_w(format, ...)
 
 #if ESP3D_TFT_LOG || ESP3D_TFT_BENCHMARK
 #include <stdio.h>
 #include <string.h>
+
 #include "esp_log.h"
-const char *   pathToFileName(const char * path);
-#endif // ESP3D_TFT_LOG || ESP3D_TFT_BENCHMARK
+
+const char* pathToFileName(const char* path);
+#endif  // ESP3D_TFT_LOG || ESP3D_TFT_BENCHMARK
 #if ESP3D_TFT_LOG
 #if DISABLE_COLOR_LOG
 #define LOG_COLOR_NORMAL ""
@@ -43,10 +45,18 @@ const char *   pathToFileName(const char * path);
 #define LOG_NO_COLOR "\e[0;37m\e[0m"
 #endif
 
-
-#define esp3d_log(format, ...) esp_log_write(ESP_LOG_NONE,"[ESP3D-TFT]","%s[%s:%u] %s(): " format "%s\n" , LOG_COLOR_NORMAL,pathToFileName(__FILE__), __LINE__, __FUNCTION__, ##__VA_ARGS__,LOG_NO_COLOR)
-#define esp3d_log_e(format, ...) esp_log_write(ESP_LOG_NONE,"[ESP3D-TFT]","%s[%s:%u] %s(): " format "%s\n" , LOG_COLOR_ERROR, pathToFileName(__FILE__), __LINE__, __FUNCTION__, ##__VA_ARGS__,LOG_NO_COLOR)
-#define esp3d_log_w(format, ...) esp_log_write(ESP_LOG_NONE,"[ESP3D-TFT]","%s[%s:%u] %s(): " format "%s\n" , LOG_COLOR_WARNING, pathToFileName(__FILE__), __LINE__, __FUNCTION__, ##__VA_ARGS__,LOG_NO_COLOR)
+#define esp3d_log(format, ...)                                                 \
+  esp_log_write(ESP_LOG_NONE, "[ESP3D-TFT]", "%s[%s:%u] %s(): " format "%s\n", \
+                LOG_COLOR_NORMAL, pathToFileName(__FILE__), __LINE__,          \
+                __FUNCTION__, ##__VA_ARGS__, LOG_NO_COLOR)
+#define esp3d_log_e(format, ...)                                               \
+  esp_log_write(ESP_LOG_NONE, "[ESP3D-TFT]", "%s[%s:%u] %s(): " format "%s\n", \
+                LOG_COLOR_ERROR, pathToFileName(__FILE__), __LINE__,           \
+                __FUNCTION__, ##__VA_ARGS__, LOG_NO_COLOR)
+#define esp3d_log_w(format, ...)                                               \
+  esp_log_write(ESP_LOG_NONE, "[ESP3D-TFT]", "%s[%s:%u] %s(): " format "%s\n", \
+                LOG_COLOR_WARNING, pathToFileName(__FILE__), __LINE__,         \
+                __FUNCTION__, ##__VA_ARGS__, LOG_NO_COLOR)
 
 #else
 #define esp3d_log(format, ...)
@@ -55,13 +65,13 @@ const char *   pathToFileName(const char * path);
 #endif
 
 #if ESP3D_TFT_BENCHMARK
-#define esp3d_report(format, ...) esp_log_write(ESP_LOG_NONE,"[ESP3D-TFT]","[%s:%u] %s(): " format "\n" ,pathToFileName(__FILE__), __LINE__, __FUNCTION__, ##__VA_ARGS__)
+#define esp3d_report(format, ...)                                          \
+  esp_log_write(ESP_LOG_NONE, "[ESP3D-TFT]", "[%s:%u] %s(): " format "\n", \
+                pathToFileName(__FILE__), __LINE__, __FUNCTION__,          \
+                ##__VA_ARGS__)
 #else
 #define esp3d_report(format, ...)
 #endif
-
-
-
 
 #ifdef __cplusplus
 } /* extern "C" */

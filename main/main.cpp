@@ -1,5 +1,5 @@
 /*
-  esp3d-tft project
+  esp3d_tft project
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -17,11 +17,8 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include "esp3d-tft.h"
+#include "esp3d_tft.h"
 
 static Esp3DTFT myTft;
 
-extern "C" void app_main(void)
-{
-    myTft.begin();
-}
+extern "C" void app_main(void) { myTft.begin(); }
