@@ -26,55 +26,56 @@
 extern "C" {
 #endif
 
-typedef enum {
-    ESP3D_NO_WAIT = 0,
-    ESP3D_WAIT_ACK,
-    ESP3D_WAIT_BUSY,
-    ESP3D_WAIT_PROCESSING,
-    ESP3D_WAIT_HEATING
-} esp3d_gcode_host_wait_t;
+enum class Esp3dGcodeHostWait : uint8_t {
+  no_wait = 0,
+  wait_ack,
+  busy,
+  processing,
+  heating
+};
 
-typedef enum {
-    ESP3D_HOST_NO_STREAM = 0,
-    ESP3D_HOST_START,
-    ESP3D_HOST_END,
-    ESP3D_HOST_READ_LINE,
-    ESP3D_HOST_PROCESS_LINE,
-    ESP3D_HOST_WAIT4_ACK,
-    ESP3D_HOST_PAUSE_STREAM,
-    ESP3D_HOST_PAUSED_STREAM,
-    ESP3D_HOST_RESUME_STREAM,
-    ESP3D_HOST_STOP,
-    ESP3D_HOST_ERROR,
-    ESP3D_HOST_ABORT,
-    ESP3D_HOST_WAIT,
-    ESP3D_HOST_NEXT_STATE
-} esp3d_gcode_host_state_t;
+enum class Esp3dGcodeHostState : uint8_t {
+  no_stream = 0,
+  start,
+  end,
+  read_line,
+  process_line,
+  wait_for_ack,
+  pause,
+  paused,
+  resume,
+  stop,
+  error,
+  abort,
+  wait,
+  next_state,
+};
 
-typedef enum {
-    ESP3D_NO_ERROR_STREAM =          0,
-    ESP3D_ERROR_TIME_OUT,
-    ESP3D_ERROR_CANNOT_SEND_DATA,
-    ESP3D_ERROR_LINE_NUMBER,
-    ESP3D_ERROR_ACK_NUMBER,
-    ESP3D_ERROR_MEMORY_PROBLEM,
-    ESP3D_ERROR_RESEND,
-    ESP3D_ERROR_NUMBER_MISMATCH,
-    ESP3D_ERROR_LINE_IGNORED,
-    ESP3D_ERROR_FILE_SYSTEM,
-    ESP3D_ERROR_CHECKSUM,
-    ESP3D_ERROR_UNKNOW,
-    ESP3D_ERROR_FILE_NOT_FOUND,
-    ESP3D_ERROR_STREAM_ABORTED
-} esp3d_gcode_host_error_t;
+enum class Esp3dGcodeHostError {
+  no_error = 0,
+  time_out,
+  data_send,
+  line_number,
+  ack_number,
+  memory_allocation,
+  resend,
+  number_mismatch,
+  line_ignored,
+  file_system,
+  check_sum,
+  unknow,
+  file_not_found,
+  aborted
+};
 
-typedef enum {
-    ESP3D_TYPE_SINGLE_COMMAND,
-    ESP3D_TYPE_SCRIPT_STREAM,
-    ESP3D_TYPE_FS_STREAM,
-    ESP3D_TYPE_SD_STREAM,
-} esp3d_gcode_host_script_type_t;
+enum class Esp3dGcodeHostScriptType {
+  single_command,
+  multiple_commands,
+  filesystem,
+  sd_card,
+  unknown
+};
 
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif

@@ -47,7 +47,7 @@
 #include "authentication/esp3d_authentication.h"
 
 #define STORAGE_NAME "ESP3D_TFT"
-#define SETTING_VERSION "ESP3D_TFT-V3.0.1"
+#define SETTING_VERSION "ESP3D_TFT-V1.0.0"
 
 Esp3DSettings esp3dTFTsettings;
 
