@@ -624,9 +624,9 @@ bool Esp3DUpdateService::processingFileFunction(const char *section,
         P = esp3d_sta_ip_mode;
         done = true;
         if (strcasecmp("DHCP", value) == 0) {
-          b = esp3d_ip_mode_dhcp;
+          b = static_cast<uint8_t>(Esp3dIpMode::dhcp);
         } else if (strcasecmp("STATIC", key) == 0) {
-          b = esp3d_ip_mode_static;
+          b = static_cast<uint8_t>(Esp3dIpMode::staticIp);
         } else {
           P = last_esp3d_setting_index_t;  // invalid value
         }
@@ -666,17 +666,17 @@ bool Esp3DUpdateService::processingFileFunction(const char *section,
         P = esp3d_notification_type;
         done = true;
         if (strcasecmp("None", value) == 0) {
-          b = esp3d_no_notification;
+          b = static_cast<uint8_t>(Esp3dNotificationType::none);
         } else if (strcasecmp("PushOver", value) == 0) {
-          b = esp3d_pushover_notification;
+          b = static_cast<uint8_t>(Esp3dNotificationType::pushover);
         } else if (strcasecmp("Line", value) == 0) {
-          b = esp3d_line_notification;
+          b = static_cast<uint8_t>(Esp3dNotificationType::line);
         } else if (strcasecmp("Email", value) == 0) {
-          b = esp3d_email_notification;
+          b = static_cast<uint8_t>(Esp3dNotificationType::email);
         } else if (strcasecmp("Telegram", value) == 0) {
-          b = esp3d_telegram_notification;
+          b = static_cast<uint8_t>(Esp3dNotificationType::telegram);
         } else if (strcasecmp("IFTTT", value) == 0) {
-          b = esp3d_ifttt_notification;
+          b = static_cast<uint8_t>(Esp3dNotificationType::ifttt);
         } else {
           P = last_esp3d_setting_index_t;  // invalid value
         }

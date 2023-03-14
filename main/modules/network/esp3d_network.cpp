@@ -311,7 +311,8 @@ bool Esp3DNetwork::startStaMode() {
   uint8_t ipMode = esp3dTFTsettings.readByte(esp3d_sta_ip_mode);
   esp3d_log("Got  STA settings: SSID:<%s> password:<%s> ip mode :<%s>",
             ssid_str, ssid_pwd_str,
-            ipMode == esp3d_ip_mode_static ? "Static" : "DHCP");
+            ipMode == static_cast<uint8_t>(Esp3dIpMode::staticIp) ? "Static"
+                                                                  : "DHCP");
   wifi_config_t wifi_config;
   strcpy((char*)wifi_config.sta.ssid, ssid_str);
   strcpy((char*)wifi_config.sta.password, ssid_pwd_str);
@@ -326,7 +327,7 @@ bool Esp3DNetwork::startStaMode() {
   wifi_config.sta.pmf_cfg.capable = true;
   wifi_config.sta.pmf_cfg.required = false;
 
-  if ((esp3d_ip_mode_t)ipMode == esp3d_ip_mode_static) {
+  if (ipMode == static_cast<uint8_t>(Esp3dIpMode::staticIp)) {
     _useStaticIp = true;
     esp3d_log("Set IP static mode");
     esp_netif_dhcpc_stop(_wifiStaPtr);

@@ -62,23 +62,23 @@ void Esp3DCommands::ESP610(int cmd_params_pos, esp3d_msg_t* msg) {
       ok_msg = "type: ";
     }
     uint8_t b = esp3dTFTsettings.readByte(esp3d_notification_type);
-    switch ((esp3d_notification_type_t)b) {
-      case esp3d_no_notification:
+    switch ((Esp3dNotificationType)b) {
+      case Esp3dNotificationType::none:
         ok_msg += "NONE";
         break;
-      case esp3d_pushover_notification:
+      case Esp3dNotificationType::pushover:
         ok_msg += "PUSHOVER";
         break;
-      case esp3d_email_notification:
+      case Esp3dNotificationType::email:
         ok_msg += "EMAIL";
         break;
-      case esp3d_line_notification:
+      case Esp3dNotificationType::line:
         ok_msg += "LINE";
         break;
-      case esp3d_telegram_notification:
+      case Esp3dNotificationType::telegram:
         ok_msg += "TELEGRAM";
         break;
-      case esp3d_ifttt_notification:
+      case Esp3dNotificationType::ifttt:
         ok_msg += "IFTTT";
         break;
       default:
@@ -116,17 +116,17 @@ void Esp3DCommands::ESP610(int cmd_params_pos, esp3d_msg_t* msg) {
         switch (settingIndex[i]) {
           case esp3d_notification_type:
             if (strcasecmp(tmpstr.c_str(), "NONE") == 0) {
-              val = esp3d_no_notification;
+              val = static_cast<uint8_t>(Esp3dNotificationType::none);
             } else if (strcasecmp(tmpstr.c_str(), "PUSHOVER") == 0) {
-              val = esp3d_pushover_notification;
+              val = static_cast<uint8_t>(Esp3dNotificationType::pushover);
             } else if (strcasecmp(tmpstr.c_str(), "LINE") == 0) {
-              val = esp3d_line_notification;
+              val = static_cast<uint8_t>(Esp3dNotificationType::line);
             } else if (strcasecmp(tmpstr.c_str(), "EMAIL") == 0) {
-              val = esp3d_email_notification;
+              val = static_cast<uint8_t>(Esp3dNotificationType::email);
             } else if (strcasecmp(tmpstr.c_str(), "IFTTT") == 0) {
-              val = esp3d_ifttt_notification;
+              val = static_cast<uint8_t>(Esp3dNotificationType::ifttt);
             } else if (strcasecmp(tmpstr.c_str(), "TELEGRAM") == 0) {
-              val = esp3d_telegram_notification;
+              val = static_cast<uint8_t>(Esp3dNotificationType::telegram);
             } else {
               hasError = true;
               error_msg = "Invalid type parameter";

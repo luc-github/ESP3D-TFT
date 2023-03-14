@@ -49,18 +49,18 @@ void Esp3DCommands::ESP102(int cmd_params_pos, esp3d_msg_t* msg) {
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
     byteValue = esp3dTFTsettings.readByte(esp3d_sta_ip_mode);
-    if (byteValue == (uint8_t)esp3d_ip_mode_dhcp) {
+    if (byteValue == static_cast<uint8_t>(Esp3dIpMode::dhcp)) {
       ok_msg = "DHCP";
-    } else if (byteValue == (uint8_t)esp3d_ip_mode_static) {
+    } else if (byteValue == static_cast<uint8_t>(Esp3dIpMode::staticIp)) {
       ok_msg = "STATIC";
     } else {
       ok_msg = "Unknown";
     }
   } else {
     if (tmpstr == "DHCP") {
-      byteValue = (uint8_t)esp3d_ip_mode_dhcp;
+      byteValue = static_cast<uint8_t>(Esp3dIpMode::dhcp);
     } else if (tmpstr == "STATIC") {
-      byteValue = (uint8_t)esp3d_ip_mode_static;
+      byteValue = static_cast<uint8_t>(Esp3dIpMode::staticIp);
     } else {
       byteValue = (uint8_t)-1;  // unknow flag so put outof range value
     }

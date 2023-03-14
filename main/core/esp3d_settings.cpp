@@ -273,20 +273,20 @@ bool Esp3DSettings::isValidByteSetting(uint8_t value,
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
 #if ESP3D_NOTIFICATIONS_FEATURE
     case esp3d_notification_type:
-      if (value == (uint8_t)esp3d_no_notification ||
-          value == (uint8_t)esp3d_pushover_notification ||
-          value == (uint8_t)esp3d_email_notification ||
-          value == (uint8_t)esp3d_line_notification ||
-          value == (uint8_t)esp3d_telegram_notification ||
-          value == (uint8_t)esp3d_ifttt_notification) {
+      if (value == static_cast<uint8_t>(Esp3dNotificationType::none) ||
+          value == static_cast<uint8_t>(Esp3dNotificationType::pushover) ||
+          value == static_cast<uint8_t>(Esp3dNotificationType::email) ||
+          value == static_cast<uint8_t>(Esp3dNotificationType::line) ||
+          value == static_cast<uint8_t>(Esp3dNotificationType::telegram) ||
+          value == static_cast<uint8_t>(Esp3dNotificationType::ifttt)) {
         return true;
       }
       break;
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 #if ESP3D_WIFI_FEATURE
     case esp3d_sta_ip_mode:
-      if (value == (uint8_t)esp3d_ip_mode_dhcp ||
-          value == (uint8_t)esp3d_ip_mode_static) {
+      if (value == static_cast<uint8_t>(Esp3dIpMode::dhcp) ||
+          value == static_cast<uint8_t>(Esp3dIpMode::staticIp)) {
         return true;
       }
       break;

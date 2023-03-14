@@ -55,7 +55,8 @@ void Esp3DCommands::ESP600(int cmd_params_pos, esp3d_msg_t* msg) {
                                            tmpstr.c_str())) {
       hasError = true;
       error_msg = "Invalid parameter, error " +
-                  std::to_string(esp3dNotificationsService.getLastError());
+                  std::to_string(static_cast<uint8_t>(
+                      esp3dNotificationsService.getLastError()));
     }
   }
   if (!dispatchAnswer(msg, COMMAND_ID, json, hasError,

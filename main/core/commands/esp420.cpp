@@ -515,7 +515,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos, esp3d_msg_t *msg) {
 #if ESP3D_NOTIFICATIONS_FEATURE
   // Notifications
   if (!esp3dNotificationsService.started() ||
-      esp3dNotificationsService.getType() == esp3d_no_notification) {
+      esp3dNotificationsService.getType() == Esp3dNotificationType::none) {
     tmpstr = "OFF";
   } else {
     tmpstr = "ON (";
