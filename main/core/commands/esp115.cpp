@@ -45,25 +45,25 @@ void Esp3DCommands::ESP115(int cmd_params_pos, esp3d_msg_t* msg) {
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
-  esp3d_radio_mode_t setting_radio_mode =
-      (esp3d_radio_mode_t)esp3dTFTsettings.readByte(esp3d_radio_mode);
-  esp3d_radio_mode_t current_radio_mode = esp3dNetwork.getMode();
+  Esp3dRadioMode setting_radio_mode =
+      static_cast<Esp3dRadioMode>(esp3dTFTsettings.readByte(esp3d_radio_mode));
+  Esp3dRadioMode current_radio_mode = esp3dNetwork.getMode();
   if (tmpstr.length() == 0) {
-    if (current_radio_mode == esp3d_radio_off) {
+    if (current_radio_mode == Esp3dRadioMode::off) {
       ok_msg = "OFF";
     } else {
       ok_msg = "ON";
     }
   } else {
     if (tmpstr == "OFF") {
-      if (current_radio_mode != esp3d_radio_off) {
-        if (!esp3dNetwork.setMode(esp3d_radio_off)) {
+      if (current_radio_mode != Esp3dRadioMode::off) {
+        if (!esp3dNetwork.setMode(Esp3dRadioMode::off)) {
           hasError = true;
           error_msg = "Fail to stop network";
         }
       }
     } else if (tmpstr == "ON") {
-      if (current_radio_mode == esp3d_radio_off) {
+      if (current_radio_mode == Esp3dRadioMode::off) {
         if (!esp3dNetwork.setMode(setting_radio_mode)) {
           hasError = true;
           error_msg = "Fail to start network";

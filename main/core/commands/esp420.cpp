@@ -216,8 +216,8 @@ void Esp3DCommands::ESP420(int cmd_params_pos, esp3d_msg_t *msg) {
 #endif  // #if ESP3D_USB_SERIAL
 
   // wifi
-  if (esp3dNetwork.getMode() == esp3d_radio_off ||
-      esp3dNetwork.getMode() == esp3d_bluetooth_serial) {
+  if (esp3dNetwork.getMode() == Esp3dRadioMode::off ||
+      esp3dNetwork.getMode() == Esp3dRadioMode::bluetooth_serial) {
     tmpstr = "OFF";
   } else {
     tmpstr = "ON";
@@ -241,7 +241,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos, esp3d_msg_t *msg) {
   }
 #if ESP3D_WIFI_FEATURE
   // sta
-  if (esp3dNetwork.getMode() == esp3d_wifi_sta) {
+  if (esp3dNetwork.getMode() == Esp3dRadioMode::wifi_sta) {
     tmpstr = "ON";
   } else {
     tmpstr = "OFF";
@@ -254,7 +254,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos, esp3d_msg_t *msg) {
     return;
   }
 
-  if (esp3dNetwork.getMode() == esp3d_wifi_sta) {
+  if (esp3dNetwork.getMode() == Esp3dRadioMode::wifi_sta) {
     wifi_ap_record_t ap;
     esp_err_t res = esp_wifi_sta_get_ap_info(&ap);
     if (res == ESP_OK) {
@@ -312,8 +312,8 @@ void Esp3DCommands::ESP420(int cmd_params_pos, esp3d_msg_t *msg) {
     }
   }
   // ap
-  if (esp3dNetwork.getMode() == esp3d_wifi_ap ||
-      esp3dNetwork.getMode() == esp3d_wifi_ap_config) {
+  if (esp3dNetwork.getMode() == Esp3dRadioMode::wifi_ap ||
+      esp3dNetwork.getMode() == Esp3dRadioMode::wifi_ap_config) {
     tmpstr = "ON";
   } else {
     tmpstr = "OFF";
@@ -325,13 +325,13 @@ void Esp3DCommands::ESP420(int cmd_params_pos, esp3d_msg_t *msg) {
   if (!dispatchIdValue(json, "ap", tmpstr.c_str(), target, requestId)) {
     return;
   }
-  if (esp3dNetwork.getMode() == esp3d_wifi_ap_config) {
+  if (esp3dNetwork.getMode() == Esp3dRadioMode::wifi_ap_config) {
     if (!dispatchIdValue(json, "config", "ON", target, requestId)) {
       return;
     }
   }
-  if (esp3dNetwork.getMode() == esp3d_wifi_ap ||
-      esp3dNetwork.getMode() == esp3d_wifi_ap_config) {
+  if (esp3dNetwork.getMode() == Esp3dRadioMode::wifi_ap ||
+      esp3dNetwork.getMode() == Esp3dRadioMode::wifi_ap_config) {
     wifi_config_t wconfig;
     esp_err_t res = esp_wifi_get_config(WIFI_IF_AP, &wconfig);
     if (res == ESP_OK) {
@@ -397,7 +397,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos, esp3d_msg_t *msg) {
   }
 #endif  // ESP3D_WIFI_FEATURE
   // bt
-  if (esp3dNetwork.getMode() == esp3d_bluetooth_serial) {
+  if (esp3dNetwork.getMode() == Esp3dRadioMode::bluetooth_serial) {
     tmpstr = "ON";
   } else {
     tmpstr = "OFF";

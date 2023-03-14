@@ -42,15 +42,13 @@ enum class Esp3dIpMode : uint8_t {
   staticIp = 1,
 };
 #endif  // ESP3D_WIFI_FEATURE
-typedef enum {
-  esp3d_radio_off = 0,
-#if ESP3D_WIFI_FEATURE
-  esp3d_wifi_sta = 1,
-  esp3d_wifi_ap = 2,
-  esp3d_wifi_ap_config = 3,
-#endif  // ESP3D_WIFI_FEATURE
-  esp3d_bluetooth_serial = 4
-} esp3d_radio_mode_t;
+enum class Esp3dRadioMode : uint8_t {
+  off = 0,
+  wifi_sta = 1,
+  wifi_ap = 2,
+  wifi_ap_config = 3,
+  bluetooth_serial = 4
+};
 
 class Esp3DNetwork final {
  public:
@@ -81,12 +79,12 @@ class Esp3DNetwork final {
   bool startBtMode();
   bool stopNoRadioMode();
   bool stopBtMode();
-  bool setMode(esp3d_radio_mode_t mode, bool restart = false);
+  bool setMode(Esp3dRadioMode mode, bool restart = false);
   const char* getBTMac();
   const char* getMacAddress(uint8_t mac[6]);
-  const char* getModeStr(esp3d_radio_mode_t mode);
+  const char* getModeStr(Esp3dRadioMode mode);
 
-  esp3d_radio_mode_t getMode() { return _current_radio_mode; };
+  Esp3dRadioMode getMode() { return _current_radio_mode; };
   bool started() { return _started; };
 
   const char* getHostName() { return _hostname.c_str(); }
@@ -99,7 +97,7 @@ class Esp3DNetwork final {
   esp_netif_t* _wifiStaPtr;
   EventGroupHandle_t _s_wifi_event_group;
 #endif  // ESP3D_WIFI_FEATURE
-  esp3d_radio_mode_t _current_radio_mode;
+  Esp3dRadioMode _current_radio_mode;
   std::string _hostname;
   const char* getMac(esp_mac_type_t type);
 };

@@ -580,19 +580,19 @@ bool Esp3DUpdateService::processingFileFunction(const char *section,
         P = esp3d_radio_mode;
         done = true;
         if (strcasecmp("BT", value) == 0) {
-          b = esp3d_bluetooth_serial;
+          b = static_cast<uint8_t>(Esp3dRadioMode::bluetooth_serial);
         } else
 #if ESP3D_WIFI_FEATURE
             if (strcasecmp("STA", value) == 0) {
-          b = esp3d_wifi_sta;
+          b = static_cast<uint8_t>(Esp3dRadioMode::wifi_sta);
         } else if (strcasecmp("AP", value) == 0) {
-          b = esp3d_wifi_ap;
+          b = static_cast<uint8_t>(Esp3dRadioMode::wifi_ap);
         } else if (strcasecmp("SETUP", value) == 0) {
-          b = esp3d_wifi_ap_config;
+          b = static_cast<uint8_t>(Esp3dRadioMode::wifi_ap_config);
         } else
 #endif  // ESP3D_WIFI_FEATURE
           if (strcasecmp("OFF", value) == 0) {
-            b = esp3d_radio_off;
+            b = static_cast<uint8_t>(Esp3dRadioMode::off);
           } else {
             P = last_esp3d_setting_index_t;  // invalid value
           }
@@ -606,11 +606,11 @@ bool Esp3DUpdateService::processingFileFunction(const char *section,
         P = esp3d_fallback_mode;
         done = true;
         if (strcasecmp("BT", value) == 0) {
-          b = esp3d_bluetooth_serial;
+          b = static_cast<uint8_t>(Esp3dRadioMode::bluetooth_serial);
         } else if (strcasecmp("WIFI-SETUP", value) == 0) {
-          b = esp3d_wifi_ap_config;
+          b = static_cast<uint8_t>(Esp3dRadioMode::wifi_ap_config);
         } else if (strcasecmp("OFF", value) == 0) {
-          b = esp3d_radio_off;
+          b = static_cast<uint8_t>(Esp3dRadioMode::off);
         } else {
           P = last_esp3d_setting_index_t;  // invalid value
         }

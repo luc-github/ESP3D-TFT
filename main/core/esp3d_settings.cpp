@@ -291,21 +291,21 @@ bool Esp3DSettings::isValidByteSetting(uint8_t value,
       }
       break;
     case esp3d_fallback_mode:
-      if (value == (uint8_t)esp3d_radio_off ||
-          value == (uint8_t)esp3d_wifi_ap_config ||
-          value == (uint8_t)esp3d_bluetooth_serial) {
+      if (value == (uint8_t)Esp3dRadioMode::off ||
+          value == (uint8_t)Esp3dRadioMode::wifi_ap_config ||
+          value == (uint8_t)Esp3dRadioMode::bluetooth_serial) {
         return true;
       }
       break;
 #endif  // ESP3D_WIFI_FEATURE
     case esp3d_radio_mode:
-      if (value == (uint8_t)esp3d_radio_off
+      if (value == (uint8_t)Esp3dRadioMode::off
 #if ESP3D_WIFI_FEATURE
-          || value == (uint8_t)esp3d_wifi_sta ||
-          value == (uint8_t)esp3d_wifi_ap ||
-          value == (uint8_t)esp3d_wifi_ap_config
+          || value == (uint8_t)Esp3dRadioMode::wifi_sta ||
+          value == (uint8_t)Esp3dRadioMode::wifi_ap ||
+          value == (uint8_t)Esp3dRadioMode::wifi_ap_config
 #endif  // ESP3D_WIFI_FEATURE
-          || value == (uint8_t)esp3d_bluetooth_serial) {
+          || value == (uint8_t)Esp3dRadioMode::bluetooth_serial) {
         return true;
       }
       break;

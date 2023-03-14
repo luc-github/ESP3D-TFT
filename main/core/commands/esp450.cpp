@@ -50,8 +50,8 @@ void Esp3DCommands::ESP450(int cmd_params_pos, esp3d_msg_t* msg) {
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
 
-  if (esp3dNetwork.getMode() == esp3d_radio_off ||
-      esp3dNetwork.getMode() == esp3d_bluetooth_serial) {
+  if (esp3dNetwork.getMode() == Esp3dRadioMode::off ||
+      esp3dNetwork.getMode() == Esp3dRadioMode::bluetooth_serial) {
     tmpstr = "Network not enabled";
     dispatchAnswer(msg, COMMAND_ID, json, true, tmpstr.c_str());
     return;
