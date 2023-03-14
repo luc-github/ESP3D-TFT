@@ -49,18 +49,18 @@ void Esp3DCommands::ESP114(int cmd_params_pos, esp3d_msg_t* msg) {
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
     byteValue = esp3dTFTsettings.readByte(esp3d_radio_boot_mode);
-    if (byteValue == (uint8_t)esp3d_state_off) {
+    if (byteValue == (uint8_t)Esp3dState::off) {
       ok_msg = "OFF";
-    } else if (byteValue == (uint8_t)esp3d_state_on) {
+    } else if (byteValue == (uint8_t)Esp3dState::on) {
       ok_msg = "ON";
     } else {
       ok_msg = "Unknown";
     }
   } else {
     if (tmpstr == "OFF") {
-      byteValue = (uint8_t)esp3d_state_off;
+      byteValue = (uint8_t)Esp3dState::off;
     } else if (tmpstr == "ON") {
-      byteValue = (uint8_t)esp3d_state_on;
+      byteValue = (uint8_t)Esp3dState::on;
     } else {
       byteValue = (uint8_t)-1;  // unknow flag so put outof range value
     }

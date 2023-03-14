@@ -157,9 +157,9 @@ void Esp3DCommands::ESP420(int cmd_params_pos, esp3d_msg_t *msg) {
   }
 #if ESP3D_SD_CARD_FEATURE
   // SD updater
-  esp3d_state_t statesetting =
-      (esp3d_state_t)esp3dTFTsettings.readByte(esp3d_check_update_on_sd);
-  if (statesetting == esp3d_state_off) {
+  Esp3dState statesetting =
+      (Esp3dState)esp3dTFTsettings.readByte(esp3d_check_update_on_sd);
+  if (statesetting == Esp3dState::off) {
     tmpstr = "OFF";
   } else {
     tmpstr = "ON";

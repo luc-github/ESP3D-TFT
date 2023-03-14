@@ -76,5 +76,9 @@
     "editor.formatOnType": true,
     "[cpp]": {
         "editor.defaultFormatter": "xaver.clang-format"
-    }
+    },
+    "clang-format.language.cpp.fallbackStyle": "",
+    "clang-format.language.cpp.style": "",
+    "clang-format.fallbackStyle": "Google",
+    "clang-format.executable": "C:\\Program Files\\LLVM\\bin\\clang-format.exe"
 }

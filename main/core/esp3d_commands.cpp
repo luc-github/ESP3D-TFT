@@ -133,24 +133,24 @@ bool Esp3DCommands::dispatchSetting(bool json, const char* filter,
     return false;
   }
   switch (elementSetting->type) {
-    case esp3d_byte:
+    case Esp3dSettingType::byte_t:
       value = std::to_string(esp3dTFTsettings.readByte(index));
       break;
-    case esp3d_integer:
+    case Esp3dSettingType::integer_t:
       value = std::to_string(esp3dTFTsettings.readUint32(index));
       break;
-    case esp3d_ip:
+    case Esp3dSettingType::ip:
       value = esp3dTFTsettings.readIPString(index);
       break;
-    case esp3d_float:
+    case Esp3dSettingType::float_t:
       // TODO Add float support ?
       value = "Not supported";
       break;
-    case esp3d_mask:
+    case Esp3dSettingType::mask:
       // TODO Add Mask support ?
       value = "Not supported";
       break;
-    case esp3d_bitsfield:
+    case Esp3dSettingType::bitsfield:
       // TODO Add bitfield support ?
       value = "Not supported";
       break;
@@ -179,22 +179,22 @@ bool Esp3DCommands::dispatchSetting(bool json, const char* filter,
     tmpstr += std::to_string(index);
     tmpstr += "\",\"T\":\"";
     switch (elementSetting->type) {
-      case esp3d_byte:
+      case Esp3dSettingType::byte_t:
         tmpstr += "B";
         break;
-      case esp3d_integer:
+      case Esp3dSettingType::integer_t:
         tmpstr += "I";
         break;
-      case esp3d_ip:
+      case Esp3dSettingType::ip:
         tmpstr += "A";
         break;
-      case esp3d_float:
-        tmpstr += "B";
+      case Esp3dSettingType::float_t:
+        tmpstr += "F";
         break;
-      case esp3d_mask:
+      case Esp3dSettingType::mask:
         tmpstr += "M";
         break;
-      case esp3d_bitsfield:
+      case Esp3dSettingType::bitsfield:
         tmpstr += "X";
         break;
       default:

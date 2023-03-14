@@ -83,8 +83,7 @@ void Esp3DCommands::ESP800(int cmd_params_pos, esp3d_msg_t* msg) {
   }
   uint8_t b = esp3dTFTsettings.readByte(esp3d_target_firmware);
   // FWTarget
-  tmpstr = esp3dTFTsettings.GetFirmwareTargetShortName(
-      (esp3d_target_firmware_index_t)b);
+  tmpstr = esp3dTFTsettings.GetFirmwareTargetShortName((Esp3dTargetFirmware)b);
   if (!dispatchKeyValue(json, "FWTarget", tmpstr.c_str(), target, requestId)) {
     return;
   }

@@ -307,13 +307,13 @@ size_t Esp3DUpdateService::maxUpdateSize() {
 bool Esp3DUpdateService::begin() {
   esp3d_log("Starting Update Service");
   bool restart = false;
-  esp3d_state_t setting_check_update = esp3d_state_off;
+  Esp3dState setting_check_update = Esp3dState::off;
 #if ESP3D_SD_CARD_FEATURE
   setting_check_update =
-      (esp3d_state_t)esp3dTFTsettings.readByte(esp3d_check_update_on_sd);
+      (Esp3dState)esp3dTFTsettings.readByte(esp3d_check_update_on_sd);
 #endif  // ESP3D_SD_CARD_FEATURE
 
-  if (setting_check_update == esp3d_state_off || !canUpdate()) {
+  if (setting_check_update == Esp3dState::off || !canUpdate()) {
     esp3d_log("Update Service disabled");
     return true;
   }
@@ -702,19 +702,19 @@ bool Esp3DUpdateService::processingFileFunction(const char *section,
         P = esp3d_target_firmware;
         done = true;
         if (strcasecmp("None", value) == 0) {
-          b = esp3d_unknown;
+          b = static_cast<uint8_t>(Esp3dTargetFirmware::unknown);
         } else if (strcasecmp("MARLIN", value) == 0) {
-          b = esp3d_marlin;
+          b = static_cast<uint8_t>(Esp3dTargetFirmware::marlin);
         } else if (strcasecmp("GRBLHAL", value) == 0) {
-          b = esp3d_grblhal;
+          b = static_cast<uint8_t>(Esp3dTargetFirmware::grblhal);
         } else if (strcasecmp("GRBL", value) == 0) {
-          b = esp3d_grbl;
+          b = static_cast<uint8_t>(Esp3dTargetFirmware::grbl);
         } else if (strcasecmp("REPETIER", value) == 0) {
-          b = esp3d_repetier;
+          b = static_cast<uint8_t>(Esp3dTargetFirmware::repetier);
         } else if (strcasecmp("SMOOTHIEWARE", value) == 0) {
-          b = esp3d_smoothieware;
+          b = static_cast<uint8_t>(Esp3dTargetFirmware::smoothieware);
         } else if (strcasecmp("HP_GL", value) == 0) {
-          b = esp3d_hp_gl;
+          b = static_cast<uint8_t>(Esp3dTargetFirmware::hp_gl);
         } else {
           P = last_esp3d_setting_index_t;  // invalid value
         }

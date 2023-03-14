@@ -324,8 +324,8 @@ bool ESP3DSocketServer::isEndChar(uint8_t ch) {
 
 bool ESP3DSocketServer::begin() {
   end();
-  if (esp3d_state_on !=
-      (esp3d_state_t)esp3dTFTsettings.readByte(esp3d_socket_on)) {
+  if (Esp3dState::on !=
+      (Esp3dState)esp3dTFTsettings.readByte(esp3d_socket_on)) {
     esp3d_log("Telnet is not enabled");
     // return true because no error but _started is false
     return true;

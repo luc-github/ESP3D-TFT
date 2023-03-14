@@ -50,10 +50,10 @@ void Esp3DCommands::ESP130(int cmd_params_pos, esp3d_msg_t* msg) {
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
-  esp3d_state_t setting_mode =
-      (esp3d_state_t)esp3dTFTsettings.readByte(esp3d_socket_on);
+  Esp3dState setting_mode =
+      (Esp3dState)esp3dTFTsettings.readByte(esp3d_socket_on);
   if (tmpstr.length() == 0) {
-    if (setting_mode == esp3d_state_off) {
+    if (setting_mode == Esp3dState::off) {
       ok_msg = "OFF";
     } else {
       ok_msg = "ON";

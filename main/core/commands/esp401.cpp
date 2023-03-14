@@ -78,7 +78,7 @@ void Esp3DCommands::ESP401(int cmd_params_pos, esp3d_msg_t* msg) {
     } else {
       switch (settingType[0]) {
         case 'B':
-          if (settingPtr->type == esp3d_byte) {
+          if (settingPtr->type == Esp3dSettingType::byte_t) {
             valueb = (uint8_t)atoi(settingValue.c_str());
             if (esp3dTFTsettings.isValidByteSetting(valueb, index_setting)) {
               if (!esp3dTFTsettings.writeByte(index_setting, valueb)) {
@@ -95,7 +95,7 @@ void Esp3DCommands::ESP401(int cmd_params_pos, esp3d_msg_t* msg) {
           }
           break;
         case 'I':
-          if (settingPtr->type == esp3d_integer) {
+          if (settingPtr->type == Esp3dSettingType::integer_t) {
             value32 = (uint32_t)atoi(settingValue.c_str());
             if (esp3dTFTsettings.isValidIntegerSetting(value32,
                                                        index_setting)) {
@@ -113,7 +113,7 @@ void Esp3DCommands::ESP401(int cmd_params_pos, esp3d_msg_t* msg) {
           }
           break;
         case 'S':
-          if (settingPtr->type == esp3d_string) {
+          if (settingPtr->type == Esp3dSettingType::string_t) {
             if (esp3dTFTsettings.isValidStringSetting(settingValue.c_str(),
                                                       index_setting)) {
               if (!esp3dTFTsettings.writeString(index_setting,
@@ -132,7 +132,7 @@ void Esp3DCommands::ESP401(int cmd_params_pos, esp3d_msg_t* msg) {
           break;
         case 'A':
 
-          if (settingPtr->type == esp3d_ip) {
+          if (settingPtr->type == Esp3dSettingType ::ip) {
             if (esp3dTFTsettings.isValidIPStringSetting(settingValue.c_str(),
                                                         index_setting)) {
               if (!esp3dTFTsettings.writeIPString(index_setting,
