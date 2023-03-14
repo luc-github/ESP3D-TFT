@@ -18,54 +18,57 @@
 */
 #if ESP3D_SD_CARD_FEATURE
 #if ESP3D_UPDATE_FEATURE
-#include "esp3d_commands.h"
-#include "esp3d_string.h"
 #include "authentication/esp3d_authentication.h"
+#include "esp3d_commands.h"
 #include "esp3d_settings.h"
+#include "esp3d_string.h"
+
 #define COMMAND_ID 402
-//Get/Set Check update at boot state which can be ON, OFF
+// Get/Set Check update at boot state which can be ON, OFF
 //[ESP402]<state> json=<no> pwd=<admin password>
-void Esp3DCommands::ESP402(int cmd_params_pos,esp3d_msg_t * msg)
-{
-    esp3d_clients_t target = msg->origin;
-    esp3d_request_t requestId = msg->requestId;
-    (void)requestId;
-    msg->target = target;
-    msg->origin = ESP3D_COMMAND;
-    bool hasError = false;
-    std::string error_msg ="Invalid parameters";
-    std::string ok_msg ="ok";
-    bool json = hasTag (msg,cmd_params_pos,"json");
-    std::string tmpstr;
+void Esp3DCommands::ESP402(int cmd_params_pos, esp3d_msg_t* msg) {
+  esp3d_clients_t target = msg->origin;
+  esp3d_request_t requestId = msg->requestId;
+  (void)requestId;
+  msg->target = target;
+  msg->origin = ESP3D_COMMAND;
+  bool hasError = false;
+  std::string error_msg = "Invalid parameters";
+  std::string ok_msg = "ok";
+  bool json = hasTag(msg, cmd_params_pos, "json");
+  std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
-    if (msg->authentication_level == ESP3D_LEVEL_GUEST) {
-        msg->authentication_level =ESP3D_LEVEL_NOT_AUTHENTICATED;
-        dispatchAuthenticationError(msg, COMMAND_ID,json);
-        return;
-    }
-#endif //ESP3D_AUTHENTICATION_FEATURE
-    tmpstr = get_clean_param(msg,cmd_params_pos);
-    if (tmpstr.length()==0) {
-        esp3d_state_t setting_check_update = (esp3d_state_t)esp3dTFTsettings.readByte(esp3d_check_update_on_sd);
-        if (setting_check_update==esp3d_state_off) {
-            ok_msg = "OFF";
-        } else {
-            ok_msg= "ON";
-        }
+  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
+    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+    dispatchAuthenticationError(msg, COMMAND_ID, json);
+    return;
+  }
+#endif  // ESP3D_AUTHENTICATION_FEATURE
+  tmpstr = get_clean_param(msg, cmd_params_pos);
+  if (tmpstr.length() == 0) {
+    esp3d_state_t setting_check_update =
+        (esp3d_state_t)esp3dTFTsettings.readByte(esp3d_check_update_on_sd);
+    if (setting_check_update == esp3d_state_off) {
+      ok_msg = "OFF";
     } else {
-        if (tmpstr=="OFF" || tmpstr=="ON") {
-            if (!esp3dTFTsettings.writeByte (esp3d_check_update_on_sd, tmpstr=="OFF"?0:1)) {
-                hasError = true;
-                error_msg="Set value failed";
-            }
-        } else {
-            hasError = true;
-            error_msg ="Invalid parameter";
-        }
+      ok_msg = "ON";
     }
-    if(!dispatchAnswer(msg,COMMAND_ID, json, hasError, hasError?error_msg.c_str():ok_msg.c_str())) {
-        esp3d_log_e("Error sending response to clients");
+  } else {
+    if (tmpstr == "OFF" || tmpstr == "ON") {
+      if (!esp3dTFTsettings.writeByte(esp3d_check_update_on_sd,
+                                      tmpstr == "OFF" ? 0 : 1)) {
+        hasError = true;
+        error_msg = "Set value failed";
+      }
+    } else {
+      hasError = true;
+      error_msg = "Invalid parameter";
     }
+  }
+  if (!dispatchAnswer(msg, COMMAND_ID, json, hasError,
+                      hasError ? error_msg.c_str() : ok_msg.c_str())) {
+    esp3d_log_e("Error sending response to clients");
+  }
 }
-#endif //ESP3D_UPDATE_FEATURE
-#endif //ESP3D_SD_CARD_FEATURE
+#endif  // ESP3D_UPDATE_FEATURE
+#endif  // ESP3D_SD_CARD_FEATURE

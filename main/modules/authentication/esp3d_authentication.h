@@ -20,77 +20,71 @@
 
 #pragma once
 #include <stdio.h>
+
+#include <list>
 #include <string>
+
+#include "esp3d_authentication_records.h"
+#include "esp3d_authentication_types.h"
 #include "esp3d_log.h"
 #include "lwip/sockets.h"
-#include "esp3d_authentication_types.h"
-#include "esp3d_authentication_records.h"
-#include <list>
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-class Esp3DAuthenticationService final
-{
-public:
-    Esp3DAuthenticationService();
-    ~Esp3DAuthenticationService();
-    esp3d_authentication_level_t  getAuthenticatedLevel(const  char * pwd = nullptr);
-    bool begin();
-    void handle();
-    void end();
-    bool isAdmin (const char *pwd);
-    bool isUser (const char *pwd);
-    void updateRecords();
+class Esp3DAuthenticationService final {
+ public:
+  Esp3DAuthenticationService();
+  ~Esp3DAuthenticationService();
+  Esp3dAuthenticationLevel getAuthenticatedLevel(const char *pwd = nullptr);
+  bool begin();
+  void handle();
+  void end();
+  bool isAdmin(const char *pwd);
+  bool isUser(const char *pwd);
+  void updateRecords();
 #if ESP3D_AUTHENTICATION_FEATURE
-    const char * getAdminPassword()
-    {
-        return _admin_pwd.c_str();
-    }
-    const char * getUserPassword()
-    {
-        return _user_pwd.c_str();
-    }
-    void setAdminPassword( const char *pwd)
-    {
-        _admin_pwd = pwd;
-    }
-    void setUserPassword( const char *pwd)
-    {
-        _user_pwd = pwd;
-    }
-    void setSessionTimeout(uint8_t timeout) //minutes
-    {
-        _session_timeout = timeout;
-    }
-    uint64_t getSessionTimeout() //milliseconds
+  const char *getAdminPassword() { return _admin_pwd.c_str(); }
+  const char *getUserPassword() { return _user_pwd.c_str(); }
+  void setAdminPassword(const char *pwd) { _admin_pwd = pwd; }
+  void setUserPassword(const char *pwd) { _user_pwd = pwd; }
+  void setSessionTimeout(uint8_t timeout)  // minutes
+  {
+    _session_timeout = timeout;
+  }
+  uint64_t getSessionTimeout()  // milliseconds
 
-    {
-        return 60 * 1000 * _session_timeout;
-    }
-    bool createRecord (const char * sessionId, int socketId, esp3d_authentication_level_t level, esp3d_clients_t client_type);
-    bool clearSession(const char * sessionId);
-    void clearSessions(esp3d_clients_t client_type);
-    bool updateRecord(int socketId, esp3d_clients_t client_type, esp3d_authentication_level_t newlevel);
-    void clearAllSessions();
-    esp3d_authentication_record_t * getRecord(const char * sessionId);
-    esp3d_authentication_record_t * getRecord(int socketId, esp3d_clients_t client_type);
-    const char* create_session_id(struct sockaddr_storage source_addr, int socketId);
-    uint8_t activeSessionsCount( esp3d_clients_t type);
-#endif //#if ESP3D_AUTHENTICATION_FEATURE
-private:
-
+  {
+    return 60 * 1000 * _session_timeout;
+  }
+  bool createRecord(const char *sessionId, int socketId,
+                    Esp3dAuthenticationLevel level,
+                    esp3d_clients_t client_type);
+  bool clearSession(const char *sessionId);
+  void clearSessions(esp3d_clients_t client_type);
+  bool updateRecord(int socketId, esp3d_clients_t client_type,
+                    Esp3dAuthenticationLevel newlevel);
+  void clearAllSessions();
+  esp3d_authentication_record_t *getRecord(const char *sessionId);
+  esp3d_authentication_record_t *getRecord(int socketId,
+                                           esp3d_clients_t client_type);
+  const char *create_session_id(struct sockaddr_storage source_addr,
+                                int socketId);
+  uint8_t activeSessionsCount(esp3d_clients_t type);
+#endif  // #if ESP3D_AUTHENTICATION_FEATURE
+ private:
 #if ESP3D_AUTHENTICATION_FEATURE
-    std::string _admin_pwd;
-    std::string _user_pwd;
-    uint8_t _session_timeout;
-    std::list<esp3d_authentication_record_t> _sessions;
-#endif //#if ESP3D_AUTHENTICATION_FEATURE
+  std::string _admin_pwd;
+  std::string _user_pwd;
+  uint8_t _session_timeout;
+  std::list<esp3d_authentication_record_t> _sessions;
+#endif  // #if ESP3D_AUTHENTICATION_FEATURE
 };
 
 extern Esp3DAuthenticationService esp3dAuthenthicationService;
 
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif

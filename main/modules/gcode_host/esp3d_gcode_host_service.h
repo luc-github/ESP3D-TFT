@@ -35,19 +35,19 @@ extern "C" {
 #endif
 
 struct Esp3dScript {
-  uint8_t id;
+  uint8_t id = 0;
   std::string script;
   std::string current_command;
-  Esp3dGcodeHostScriptType type;
-  Esp3dGcodeHostState state;
-  Esp3dGcodeHostState next_state;
-  Esp3dGcodeHostWait wait_state;
-  Esp3dGcodeHostError error;
-  esp3d_authentication_level_t auth_type;
-  uint64_t total;
-  uint64_t progress;
-  uint64_t timestamp;
-  FILE* fileScript;
+  Esp3dGcodeHostScriptType type = Esp3dGcodeHostScriptType::unknown;
+  Esp3dGcodeHostState state = Esp3dGcodeHostState::no_stream;
+  Esp3dGcodeHostState next_state = Esp3dGcodeHostState::no_stream;
+  Esp3dGcodeHostWait wait_state = Esp3dGcodeHostWait::no_wait;
+  Esp3dGcodeHostError error = Esp3dGcodeHostError::no_error;
+  Esp3dAuthenticationLevel auth_type = Esp3dAuthenticationLevel::guest;
+  uint64_t total = 0;
+  uint64_t progress = 0;
+  uint64_t timestamp = 0;
+  FILE* fileScript = nullptr;
 };
 
 class Esp3DGCodeHostService : public Esp3DClient {
@@ -61,8 +61,7 @@ class Esp3DGCodeHostService : public Esp3DClient {
   bool pushMsgToRxQueue(const uint8_t* msg, size_t size);
   void flush();
   bool started() { return _started; }
-  bool processScript(const char* script,
-                     esp3d_authentication_level_t auth_type);
+  bool processScript(const char* script, Esp3dAuthenticationLevel auth_type);
   bool abort();
   bool pause();
   bool resume();

@@ -17,30 +17,31 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
-#include "http/esp3d_http_service.h"
+#include "authentication/esp3d_authentication.h"
+#include "esp3d_commands.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
-#include "esp3d_commands.h"
-#include  "authentication/esp3d_authentication.h"
+#include "http/esp3d_http_service.h"
 
-esp_err_t Esp3DHttpService::config_handler(httpd_req_t *req)
-{
-    esp3d_log("Uri: %s", req->uri);
-    esp3d_authentication_level_t authentication_level =getAuthenticationLevel(req);
+esp_err_t Esp3DHttpService::config_handler(httpd_req_t *req) {
+  esp3d_log("Uri: %s", req->uri);
+  Esp3dAuthenticationLevel authentication_level = getAuthenticationLevel(req);
 #if ESP3D_AUTHENTICATION_FEATURE
-    if (authentication_level==ESP3D_LEVEL_GUEST) {
-        //send 401
-        return not_authenticated_handler(req);
-    }
-#endif //#if ESP3D_AUTHENTICATION_FEATURE
-    esp3d_msg_t * newMsgPtr = Esp3DClient::newMsg( WEBUI_CLIENT, ESP3D_COMMAND, (const uint8_t *) "[ESP420]addPreTag",  strlen("[ESP420]addPreTag"), authentication_level);
-    if (newMsgPtr) {
-        newMsgPtr->requestId.httpReq = req;
-        esp3dCommands.process(newMsgPtr);
-        return ESP_OK;
-    } else {
-        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Message creation failed");
-    }
-    return ESP_FAIL;
+  if (authentication_level == Esp3dAuthenticationLevel::guest) {
+    // send 401
+    return not_authenticated_handler(req);
+  }
+#endif  // #if ESP3D_AUTHENTICATION_FEATURE
+  esp3d_msg_t *newMsgPtr = Esp3DClient::newMsg(
+      WEBUI_CLIENT, ESP3D_COMMAND, (const uint8_t *)"[ESP420]addPreTag",
+      strlen("[ESP420]addPreTag"), authentication_level);
+  if (newMsgPtr) {
+    newMsgPtr->requestId.httpReq = req;
+    esp3dCommands.process(newMsgPtr);
+    return ESP_OK;
+  } else {
+    httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR,
+                        "Message creation failed");
+  }
+  return ESP_FAIL;
 }

@@ -21,18 +21,17 @@
 #pragma once
 #include <stdio.h>
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef enum {
-    ESP3D_LEVEL_GUEST,
-    ESP3D_LEVEL_USER,
-    ESP3D_LEVEL_ADMIN,
-    ESP3D_LEVEL_NOT_AUTHENTICATED,
-} esp3d_authentication_level_t;
+enum class Esp3dAuthenticationLevel {
+  guest,
+  user,
+  admin,
+  not_authenticated,
+};
 
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif

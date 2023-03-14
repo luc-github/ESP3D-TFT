@@ -48,8 +48,8 @@ static void esp3d_gcode_host_task(void* pvParameter) {
   vTaskDelete(NULL);
 }
 
-bool Esp3DGCodeHostService::processScript(
-    const char* script, esp3d_authentication_level_t auth_type) {
+bool Esp3DGCodeHostService::processScript(const char* script,
+                                          Esp3dAuthenticationLevel auth_type) {
   esp3d_log("Processing script: %s,  with authentication level=%d", script,
             auth_type);
 
@@ -145,7 +145,7 @@ bool Esp3DGCodeHostService::pushMsgToRxQueue(const uint8_t* msg, size_t size) {
   esp3d_msg_t* newMsgPtr = newMsg();
   if (newMsgPtr) {
     if (Esp3DClient::setDataContent(newMsgPtr, msg, size)) {
-      newMsgPtr->authentication_level = ESP3D_LEVEL_USER;
+      newMsgPtr->authentication_level = Esp3dAuthenticationLevel::user;
       newMsgPtr->origin = STREAM_CLIENT;
       if (!addRXData(newMsgPtr)) {
         // delete message as cannot be added to the queue

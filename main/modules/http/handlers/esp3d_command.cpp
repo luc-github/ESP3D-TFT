@@ -17,82 +17,85 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
-#include "http/esp3d_http_service.h"
 #include <stdio.h>
-#include "esp_wifi.h"
-#include "esp3d_log.h"
-#include "esp3d_string.h"
-#include "esp3d_settings.h"
+
 #include "esp3d_commands.h"
+#include "esp3d_log.h"
+#include "esp3d_settings.h"
+#include "esp3d_string.h"
+#include "esp_wifi.h"
+#include "http/esp3d_http_service.h"
 #include "network/esp3d_network.h"
 
-
-esp_err_t Esp3DHttpService::command_handler(httpd_req_t *req)
-{
-    //TODO: check authentication level
-    esp3d_authentication_level_t authentication_level= getAuthenticationLevel(req);
+esp_err_t Esp3DHttpService::command_handler(httpd_req_t *req) {
+  // TODO: check authentication level
+  Esp3dAuthenticationLevel authentication_level = getAuthenticationLevel(req);
 #if ESP3D_AUTHENTICATION_FEATURE
-    if (authentication_level==ESP3D_LEVEL_GUEST) {
-        //send 401
-        return not_authenticated_handler(req);
-    }
-#endif //#if ESP3D_AUTHENTICATION_FEATURE
-    esp3d_log("Uri: %s", req->uri);
-    char*  buf;
-    size_t buf_len;
-    char cmd[255+1]= {0};
-    buf_len = httpd_req_get_url_query_len(req) + 1;
-    if (buf_len > 1) {
-        buf = (char *)malloc(buf_len);
-        if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) {
-            esp3d_log("query string: %s", buf);
-            if (httpd_query_key_value(buf, "cmd", cmd, 255)==ESP_OK) {
-                strcpy(cmd,esp3d_strings::urlDecode(cmd));
-                esp3d_log("command is: %s", cmd);
-            } else if (httpd_query_key_value(buf, "PING", cmd, 255)==ESP_OK) {
-                if (strcmp(cmd, "PING")==0) {
-                    esp3d_log("command is a PING");
-                    //we do not care the value a command was sent and reset is already done
-                    free(buf);
-                    //Just do nothing
-                    return ESP_OK;
-                }
-
-            } else {
-                esp3d_log_e("Invalid param");
-            }
-        }
-        free(buf);
-    }
-    if (strlen(cmd)>0) {
-        esp3d_request_t requestId;
-        if (esp3dCommands.is_esp_command((uint8_t*)cmd, strlen(cmd))) {
-            requestId.httpReq = req;
-            esp3d_msg_t * newMsgPtr = Esp3DClient::newMsg( WEBUI_CLIENT, ESP3D_COMMAND, (const uint8_t *) cmd,  strlen(cmd), authentication_level);
-            if (newMsgPtr) {
-                newMsgPtr->requestId.httpReq = req;
-                esp3dCommands.process(newMsgPtr);
-                return ESP_OK;
-            } else {
-                httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Message creation failed");
-            }
-        } else {
-            httpd_resp_sendstr(req, "ESP3D says: command forwarded");
-            requestId.id = 0;
-            //check format is correct
-            if (!esp3d_strings::endsWith(cmd, "\n")) {
-                if (!esp3dCommands.formatCommand(cmd,255)) {
-                    esp3d_log_e("Error command is too long");
-                    return ESP_FAIL;
-                }
-            }
-            esp3dCommands.dispatch(cmd, esp3dCommands.getOutputClient(), requestId,msg_unique, WEBUI_CLIENT, authentication_level);
-            return ESP_OK;
+  if (authentication_level == Esp3dAuthenticationLevel::guest) {
+    // send 401
+    return not_authenticated_handler(req);
+  }
+#endif  // #if ESP3D_AUTHENTICATION_FEATURE
+  esp3d_log("Uri: %s", req->uri);
+  char *buf;
+  size_t buf_len;
+  char cmd[255 + 1] = {0};
+  buf_len = httpd_req_get_url_query_len(req) + 1;
+  if (buf_len > 1) {
+    buf = (char *)malloc(buf_len);
+    if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) {
+      esp3d_log("query string: %s", buf);
+      if (httpd_query_key_value(buf, "cmd", cmd, 255) == ESP_OK) {
+        strcpy(cmd, esp3d_strings::urlDecode(cmd));
+        esp3d_log("command is: %s", cmd);
+      } else if (httpd_query_key_value(buf, "PING", cmd, 255) == ESP_OK) {
+        if (strcmp(cmd, "PING") == 0) {
+          esp3d_log("command is a PING");
+          // we do not care the value a command was sent and reset is already
+          // done
+          free(buf);
+          // Just do nothing
+          return ESP_OK;
         }
 
+      } else {
+        esp3d_log_e("Invalid param");
+      }
+    }
+    free(buf);
+  }
+  if (strlen(cmd) > 0) {
+    esp3d_request_t requestId;
+    if (esp3dCommands.is_esp_command((uint8_t *)cmd, strlen(cmd))) {
+      requestId.httpReq = req;
+      esp3d_msg_t *newMsgPtr =
+          Esp3DClient::newMsg(WEBUI_CLIENT, ESP3D_COMMAND, (const uint8_t *)cmd,
+                              strlen(cmd), authentication_level);
+      if (newMsgPtr) {
+        newMsgPtr->requestId.httpReq = req;
+        esp3dCommands.process(newMsgPtr);
+        return ESP_OK;
+      } else {
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR,
+                            "Message creation failed");
+      }
     } else {
-        httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid request");
+      httpd_resp_sendstr(req, "ESP3D says: command forwarded");
+      requestId.id = 0;
+      // check format is correct
+      if (!esp3d_strings::endsWith(cmd, "\n")) {
+        if (!esp3dCommands.formatCommand(cmd, 255)) {
+          esp3d_log_e("Error command is too long");
+          return ESP_FAIL;
+        }
+      }
+      esp3dCommands.dispatch(cmd, esp3dCommands.getOutputClient(), requestId,
+                             msg_unique, WEBUI_CLIENT, authentication_level);
+      return ESP_OK;
     }
-    return ESP_FAIL;
+
+  } else {
+    httpd_resp_send_err(req, HTTPD_400_BAD_REQUEST, "Invalid request");
+  }
+  return ESP_FAIL;
 }

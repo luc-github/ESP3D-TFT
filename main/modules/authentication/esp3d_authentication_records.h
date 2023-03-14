@@ -20,27 +20,27 @@
 
 #pragma once
 #include <stdio.h>
-#include "lwip/sockets.h"
+
 #include <string>
-#include "esp3d_client_types.h"
+
 #include "esp3d_authentication_types.h"
+#include "esp3d_client_types.h"
+#include "lwip/sockets.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #if ESP3D_AUTHENTICATION_FEATURE
-typedef struct  {
-    esp3d_authentication_level_t level;
-    int socketId;
-    esp3d_clients_t client_type;
-    char sessionId[25];
-    int64_t last_time;
+typedef struct {
+  Esp3dAuthenticationLevel level;
+  int socketId;
+  esp3d_clients_t client_type;
+  char sessionId[25];
+  int64_t last_time;
 } esp3d_authentication_record_t;
-#endif //ESP3D_AUTHENTICATION_FEATURE
-
-
+#endif  // ESP3D_AUTHENTICATION_FEATURE
 
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif

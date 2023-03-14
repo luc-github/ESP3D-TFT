@@ -47,8 +47,8 @@ void Esp3DCommands::ESP401(int cmd_params_pos, esp3d_msg_t* msg) {
   std::string error_msg = "Invalid parameters";
 
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level != ESP3D_LEVEL_ADMIN) {
-    msg->authentication_level = ESP3D_LEVEL_NOT_AUTHENTICATED;
+  if (msg->authentication_level != Esp3dAuthenticationLevel::admin) {
+    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }

@@ -17,100 +17,99 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "esp3d_commands.h"
-#include "esp3d_client.h"
-#include "esp3d_string.h"
 #include "authentication/esp3d_authentication.h"
+#include "esp3d_client.h"
+#include "esp3d_commands.h"
+#include "esp3d_string.h"
 #include "filesystem/esp3d_flash.h"
+
 #define COMMAND_ID 730
 // Action on ESP3D Filesystem
-//rmdir / remove / mkdir / exists /create
+// rmdir / remove / mkdir / exists /create
 //[ESP730]<Action>=<path> json=<no> pwd=<admin password>
-void Esp3DCommands::ESP730(int cmd_params_pos,esp3d_msg_t * msg)
-{
-    esp3d_clients_t target = msg->origin;
-    esp3d_request_t requestId = msg->requestId;
-    (void)requestId;
-    msg->target = target;
-    msg->origin = ESP3D_COMMAND;
-    bool hasError = false;
-    std::string error_msg ="Invalid parameters";
-    std::string ok_msg ="ok";
-    bool json = hasTag (msg,cmd_params_pos,"json");
-    std::string tmpstr;
-    const char * cmdList [] = {"rmdir=", "remove=", "mkdir=", "exists=", "create="};
-    uint8_t cmdListSize = sizeof(cmdList) / sizeof(char*);
+void Esp3DCommands::ESP730(int cmd_params_pos, esp3d_msg_t* msg) {
+  esp3d_clients_t target = msg->origin;
+  esp3d_request_t requestId = msg->requestId;
+  (void)requestId;
+  msg->target = target;
+  msg->origin = ESP3D_COMMAND;
+  bool hasError = false;
+  std::string error_msg = "Invalid parameters";
+  std::string ok_msg = "ok";
+  bool json = hasTag(msg, cmd_params_pos, "json");
+  std::string tmpstr;
+  const char* cmdList[] = {"rmdir=", "remove=", "mkdir=", "exists=", "create="};
+  uint8_t cmdListSize = sizeof(cmdList) / sizeof(char*);
 #if ESP3D_AUTHENTICATION_FEATURE
-    if (msg->authentication_level == ESP3D_LEVEL_GUEST) {
-        msg->authentication_level =ESP3D_LEVEL_NOT_AUTHENTICATED;
-        dispatchAuthenticationError(msg, COMMAND_ID,json);
-        return;
+  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
+    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+    dispatchAuthenticationError(msg, COMMAND_ID, json);
+    return;
+  }
+#endif  // ESP3D_AUTHENTICATION_FEATURE
+  uint8_t i;
+  for (i = 0; i < cmdListSize; i++) {
+    tmpstr = get_param(msg, cmd_params_pos, cmdList[i]);
+    if (tmpstr.length() != 0) {
+      break;
     }
-#endif //ESP3D_AUTHENTICATION_FEATURE
-    uint8_t i  ;
-    for ( i = 0; i< cmdListSize; i++) {
-
-        tmpstr = get_param (msg, cmd_params_pos,cmdList[i]);
-        if (tmpstr.length()!=0) {
-            break;
-        }
-    }
-    if (i>=cmdListSize ||tmpstr.length()==0 ) {
-        hasError = true;
-    } else {
-        if (flashFs.accessFS()) {
-            switch (i) {
-            case 0:
-                if (!flashFs.rmdir(tmpstr.c_str())) {
-                    hasError = true;
-                    error_msg="rmdir failed";
-                }
-                break;
-            case 1:
-                if (!flashFs.remove(tmpstr.c_str())) {
-                    hasError = true;
-                    error_msg="remove failed";
-                }
-                break;
-            case 2:
-                if (!flashFs.mkdir(tmpstr.c_str())) {
-                    hasError = true;
-                    error_msg="mkdir failed";
-                }
-                break;
-            case 3:
-                if (flashFs.exists(tmpstr.c_str())) {
-                    ok_msg="yes";
-                } else {
-                    ok_msg="no";
-                }
-                break;
-            case 4: {
-                FILE* fd = flashFs.open(tmpstr.c_str(), "w");
-                if (fd) {
-                    flashFs.close(fd);
-                } else {
-                    hasError = true;
-                    error_msg="creation failed";
-                }
-            }
-            break;
-            default:
-                hasError = true;
-                break;
-            }
-            flashFs.releaseFS();
-        } else {
+  }
+  if (i >= cmdListSize || tmpstr.length() == 0) {
+    hasError = true;
+  } else {
+    if (flashFs.accessFS()) {
+      switch (i) {
+        case 0:
+          if (!flashFs.rmdir(tmpstr.c_str())) {
             hasError = true;
-            if (flashFs.isMounted()) {
-                error_msg = "Flash not available";
-            } else {
-                error_msg = "Flash partition not mounted";
-            }
-        }
+            error_msg = "rmdir failed";
+          }
+          break;
+        case 1:
+          if (!flashFs.remove(tmpstr.c_str())) {
+            hasError = true;
+            error_msg = "remove failed";
+          }
+          break;
+        case 2:
+          if (!flashFs.mkdir(tmpstr.c_str())) {
+            hasError = true;
+            error_msg = "mkdir failed";
+          }
+          break;
+        case 3:
+          if (flashFs.exists(tmpstr.c_str())) {
+            ok_msg = "yes";
+          } else {
+            ok_msg = "no";
+          }
+          break;
+        case 4: {
+          FILE* fd = flashFs.open(tmpstr.c_str(), "w");
+          if (fd) {
+            flashFs.close(fd);
+          } else {
+            hasError = true;
+            error_msg = "creation failed";
+          }
+        } break;
+        default:
+          hasError = true;
+          break;
+      }
+      flashFs.releaseFS();
+    } else {
+      hasError = true;
+      if (flashFs.isMounted()) {
+        error_msg = "Flash not available";
+      } else {
+        error_msg = "Flash partition not mounted";
+      }
     }
+  }
 
-    if(!dispatchAnswer(msg,COMMAND_ID,json, hasError, hasError?error_msg.c_str():ok_msg.c_str())) {
-        esp3d_log_e("Error sending response to clients");
-    }
+  if (!dispatchAnswer(msg, COMMAND_ID, json, hasError,
+                      hasError ? error_msg.c_str() : ok_msg.c_str())) {
+    esp3d_log_e("Error sending response to clients");
+  }
 }
