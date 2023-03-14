@@ -27,11 +27,11 @@
 // Get SD Card Status
 //[ESP200]<RELEASE> <REFRESH> pwd=<user/admin password>
 void Esp3DCommands::ESP200(int cmd_params_pos, esp3d_msg_t* msg) {
-  esp3d_clients_t target = msg->origin;
+  Esp3dClient target = msg->origin;
   esp3d_request_t requestId = msg->requestId;
   (void)requestId;
   msg->target = target;
-  msg->origin = ESP3D_COMMAND;
+  msg->origin = Esp3dClient::command;
   bool isRelease = hasTag(msg, cmd_params_pos, "RELEASE");
   bool isRefresh = hasTag(msg, cmd_params_pos, "REFRESH");
   bool json = hasTag(msg, cmd_params_pos, "json");

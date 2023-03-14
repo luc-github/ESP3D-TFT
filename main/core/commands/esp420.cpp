@@ -67,10 +67,10 @@
 // output is JSON or plain text according parameter
 //[ESP420]json=<no>
 void Esp3DCommands::ESP420(int cmd_params_pos, esp3d_msg_t *msg) {
-  esp3d_clients_t target = msg->origin;
+  Esp3dClient target = msg->origin;
   esp3d_request_t requestId = msg->requestId;
   msg->target = target;
-  msg->origin = ESP3D_COMMAND;
+  msg->origin = Esp3dClient::command;
   bool json = hasTag(msg, cmd_params_pos, "json");
   bool addPreTag = hasTag(msg, cmd_params_pos, "addPreTag");
   std::string tmpstr;
@@ -186,7 +186,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos, esp3d_msg_t *msg) {
     return;
   }
 
-  if (esp3dCommands.getOutputClient() == SERIAL_CLIENT) {
+  if (esp3dCommands.getOutputClient() == Esp3dClient::serial) {
     if (!dispatchIdValue(json, "output", "serial port", target, requestId)) {
       return;
     }
@@ -198,7 +198,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos, esp3d_msg_t *msg) {
     }
   }
 #if ESP3D_USB_SERIAL_FEATURE
-  else if (esp3dCommands.getOutputClient() == USB_SERIAL_CLIENT) {
+  else if (esp3dCommands.getOutputClient() == Esp3dClient::usb_serial) {
     if (!dispatchIdValue(json, "output", "usb port", target, requestId)) {
       return;
     }

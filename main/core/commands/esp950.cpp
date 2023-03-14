@@ -29,11 +29,11 @@
 // Get / Set Serial Output // Only used in ESP3D-TFT with board having the
 // feature [ESP950]<SERIAL/USB> json=<no> pwd=<admin/user password>
 void Esp3DCommands::ESP950(int cmd_params_pos, esp3d_msg_t* msg) {
-  esp3d_clients_t target = msg->origin;
+  Esp3dClient target = msg->origin;
   esp3d_request_t requestId = msg->requestId;
   (void)requestId;
   msg->target = target;
-  msg->origin = ESP3D_COMMAND;
+  msg->origin = Esp3dClient::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
@@ -50,19 +50,20 @@ void Esp3DCommands::ESP950(int cmd_params_pos, esp3d_msg_t* msg) {
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
-  esp3d_clients_t client_output =
-      (esp3d_clients_t)esp3dTFTsettings.readByte(esp3d_output_client);
+  Esp3dClient client_output =
+      (Esp3dClient)esp3dTFTsettings.readByte(esp3d_output_client);
   if (tmpstr.length() == 0) {
-    if (client_output == USB_SERIAL_CLIENT) {
+    if (client_output == Esp3dClient::usb_serial) {
       ok_msg = "USB";
     } else {
       ok_msg = "SERIAL";
     }
   } else {
     if ((usbclient && !serialclient) || (serialclient && !usbclient)) {
-      esp3d_clients_t newoutput =
-          serialclient ? SERIAL_CLIENT : USB_SERIAL_CLIENT;
-      if (!esp3dTFTsettings.writeByte(esp3d_output_client, newoutput)) {
+      Esp3dClient newoutput =
+          serialclient ? Esp3dClient::serial : Esp3dClient::usb_serial;
+      if (!esp3dTFTsettings.writeByte(esp3d_output_client,
+                                      static_cast<uint8_t>(newoutput))) {
         hasError = true;
         error_msg = "Set value failed";
       }  // hot change not yet supported
@@ -70,7 +71,7 @@ void Esp3DCommands::ESP950(int cmd_params_pos, esp3d_msg_t* msg) {
 
           if (esp3dCommands.getOutputClient() != newoutput) {
               //hot change only if different
-              if (esp3dCommands.getOutputClient()==USB_SERIAL_CLIENT) {
+              if (esp3dCommands.getOutputClient()==Esp3dClient::usb_serial) {
                   usbSerialClient.end();
                   serialClient.begin();
               } else {

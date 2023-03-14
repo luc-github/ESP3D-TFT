@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-enum class Esp3dAuthenticationLevel {
+enum class Esp3dAuthenticationLevel : uint8_t {
   guest,
   user,
   admin,

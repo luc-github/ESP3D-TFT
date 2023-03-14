@@ -327,7 +327,7 @@ bool Esp3DWsService::pushMsgToRxQueue(int socketId, const uint8_t *msg,
     // 3 -  add session id to _sessions list
     if (!esp3dAuthenthicationService.createRecord(
             client->sessionId, client->socketId, authentication_level,
-            WEBSOCKET_CLIENT)) {
+            Esp3dClient::websocket)) {
       esp3d_log("Authentication error, rejected.");
       pushMsgTxt(client->socketId, ERROR_MSG);
       return false;
@@ -352,12 +352,12 @@ bool Esp3DWsService::pushMsgToRxQueue(int socketId, const uint8_t *msg,
   if (newMsgPtr) {
     if (Esp3DClient::setDataContent(newMsgPtr, msg, size)) {
       newMsgPtr->authentication_level = authentication_level;
-      newMsgPtr->origin = WEBSOCKET_CLIENT;
+      newMsgPtr->origin = Esp3dClient::websocket;
       newMsgPtr->target = esp3dCommands.getOutputClient();
       newMsgPtr->type = msg_unique;
       newMsgPtr->requestId.id = socketId;
       if (esp3dCommands.is_esp_command((uint8_t *)msg, size)) {
-        newMsgPtr->target = ESP3D_COMMAND;
+        newMsgPtr->target = Esp3dClient::command;
       }
       esp3dCommands.process(newMsgPtr);
     } else {

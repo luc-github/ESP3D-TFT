@@ -162,8 +162,9 @@ void Esp3DHttpService::close_fn(httpd_handle_t hd, int socketFd) {
 
 void Esp3DHttpService::onClose(int socketFd) {
 #if ESP3D_AUTHENTICATION_FEATURE
-  esp3d_log_w("Closing client connection %d and all WEBUI_CLIENT", socketFd);
-  esp3dAuthenthicationService.clearSessions(WEBUI_CLIENT);
+  esp3d_log_w("Closing client connection %d and all Esp3dClient::webui",
+              socketFd);
+  esp3dAuthenthicationService.clearSessions(Esp3dClient::webui);
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
 }
 
@@ -607,7 +608,7 @@ Esp3dAuthenticationLevel Esp3DHttpService::getAuthenticationLevel(
         // We have no record for this session ID so create one
         if (esp3dAuthenthicationService.createRecord(
                 sessionID.c_str(), socketId, authentication_level,
-                WEBUI_CLIENT)) {
+                Esp3dClient::webui)) {
           esp3d_log("Record created for level %d", authentication_level);
         } else {
           esp3d_log_e("Failed to create session id");
@@ -626,7 +627,7 @@ Esp3dAuthenticationLevel Esp3DHttpService::getAuthenticationLevel(
       // update record list
       if (esp3dAuthenthicationService.createRecord(sessionID.c_str(), socketId,
                                                    authentication_level,
-                                                   WEBUI_CLIENT)) {
+                                                   Esp3dClient::webui)) {
         esp3d_log("Record created for level %d", authentication_level);
         // Add Cookie to session ID
 

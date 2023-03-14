@@ -27,13 +27,13 @@
 // Set/Get STA SSID
 // output is JSON or plain text according parameter
 //[ESP100]<SSID> json=<no> pwd=<admin password for set/get & user password to
-//get>
+// get>
 void Esp3DCommands::ESP100(int cmd_params_pos, esp3d_msg_t* msg) {
-  esp3d_clients_t target = msg->origin;
+  Esp3dClient target = msg->origin;
   esp3d_request_t requestId = msg->requestId;
   (void)requestId;
   msg->target = target;
-  msg->origin = ESP3D_COMMAND;
+  msg->origin = Esp3dClient::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";

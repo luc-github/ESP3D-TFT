@@ -26,26 +26,20 @@
 extern "C" {
 #endif
 
-typedef enum {
-    NO_CLIENT=0,
-    SERIAL_CLIENT = 1,
-    USB_SERIAL_CLIENT = 2,
-    STREAM_CLIENT = 3,
-#if ESP3D_TELNET_FEATURE
-    TELNET_CLIENT = 4,
-#endif //ESP3D_TELNET_FEATURE
-#if ESP3D_HTTP_FEATURE
-    WEBUI_CLIENT = 5,
-    WEBUI_WEBSOCKET_CLIENT = 6,
-#if ESP3D_WS_SERVICE_FEATURE
-    WEBSOCKET_CLIENT = 7,
-#endif //ESP3D_WS_SERVICE_FEATURE
-#endif //ESP3D_HTTP_FEATURE
-    ESP3D_COMMAND = 8,
-    ESP3D_SYSTEM,
-    ALL_CLIENTS
-} esp3d_clients_t;
+enum class Esp3dClient : uint8_t {
+  no_client = 0,
+  serial = 1,
+  usb_serial = 2,
+  stream = 3,
+  telnet = 4,
+  webui = 5,
+  webui_websocket = 6,
+  websocket = 7,
+  command = 8,
+  system,
+  all_clients
+};
 
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif

@@ -146,7 +146,7 @@ bool Esp3DGCodeHostService::pushMsgToRxQueue(const uint8_t* msg, size_t size) {
   if (newMsgPtr) {
     if (Esp3DClient::setDataContent(newMsgPtr, msg, size)) {
       newMsgPtr->authentication_level = Esp3dAuthenticationLevel::user;
-      newMsgPtr->origin = STREAM_CLIENT;
+      newMsgPtr->origin = Esp3dClient::stream;
       if (!addRXData(newMsgPtr)) {
         // delete message as cannot be added to the queue
         Esp3DClient::deleteMsg(newMsgPtr);

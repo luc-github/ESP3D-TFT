@@ -29,7 +29,6 @@
 #include "esp3d_log.h"
 #include "lwip/sockets.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -60,19 +59,18 @@ class Esp3DAuthenticationService final {
     return 60 * 1000 * _session_timeout;
   }
   bool createRecord(const char *sessionId, int socketId,
-                    Esp3dAuthenticationLevel level,
-                    esp3d_clients_t client_type);
+                    Esp3dAuthenticationLevel level, Esp3dClient client_type);
   bool clearSession(const char *sessionId);
-  void clearSessions(esp3d_clients_t client_type);
-  bool updateRecord(int socketId, esp3d_clients_t client_type,
+  void clearSessions(Esp3dClient client_type);
+  bool updateRecord(int socketId, Esp3dClient client_type,
                     Esp3dAuthenticationLevel newlevel);
   void clearAllSessions();
   esp3d_authentication_record_t *getRecord(const char *sessionId);
   esp3d_authentication_record_t *getRecord(int socketId,
-                                           esp3d_clients_t client_type);
+                                           Esp3dClient client_type);
   const char *create_session_id(struct sockaddr_storage source_addr,
                                 int socketId);
-  uint8_t activeSessionsCount(esp3d_clients_t type);
+  uint8_t activeSessionsCount(Esp3dClient type);
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
  private:
 #if ESP3D_AUTHENTICATION_FEATURE

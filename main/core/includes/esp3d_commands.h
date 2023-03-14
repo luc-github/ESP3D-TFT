@@ -40,24 +40,24 @@ class Esp3DCommands {
   bool dispatchAnswer(esp3d_msg_t* msg, uint cmdid, bool json, bool hasError,
                       const char* answerMsg);
   bool dispatchIdValue(bool json, const char* Id, const char* value,
-                       esp3d_clients_t target, esp3d_request_t requestId,
+                       Esp3dClient target, esp3d_request_t requestId,
                        bool isFirst = false);
   bool dispatchKeyValue(bool json, const char* key, const char* value,
-                        esp3d_clients_t target, esp3d_request_t requestId,
+                        Esp3dClient target, esp3d_request_t requestId,
                         bool nested = false, bool isFirst = false);
   bool dispatchSetting(bool json, const char* filter,
                        esp3d_setting_index_t index, const char* help,
                        const char** optionValues, const char** optionLabels,
                        uint32_t maxsize, uint32_t minsize, uint32_t minsize2,
                        uint8_t precision, const char* unit, bool needRestart,
-                       esp3d_clients_t target, esp3d_request_t requestId,
+                       Esp3dClient target, esp3d_request_t requestId,
                        bool isFirst = false);
   bool dispatch(esp3d_msg_t* msg);
   bool dispatch(esp3d_msg_t* msg, uint8_t* sbuf, size_t len);
   bool dispatch(esp3d_msg_t* msg, const char* sbuf);
-  bool dispatch(const char* sbuf, esp3d_clients_t target,
-                esp3d_request_t requestId, esp3d_msg_type_t type = msg_head,
-                esp3d_clients_t origin = ESP3D_COMMAND,
+  bool dispatch(const char* sbuf, Esp3dClient target, esp3d_request_t requestId,
+                esp3d_msg_type_t type = msg_head,
+                Esp3dClient origin = Esp3dClient::command,
                 Esp3dAuthenticationLevel authentication_level =
                     Esp3dAuthenticationLevel::guest);
   bool dispatchAuthenticationError(esp3d_msg_t* msg, uint cmdid, bool json);
@@ -153,13 +153,13 @@ class Esp3DCommands {
   bool has_param(esp3d_msg_t* msg, uint start);
   bool hasTag(esp3d_msg_t* msg, uint start, const char* label);
   void flush();
-  esp3d_clients_t getOutputClient(bool fromSettings = false);
-  void setOutputClient(esp3d_clients_t output_client) {
+  Esp3dClient getOutputClient(bool fromSettings = false);
+  void setOutputClient(Esp3dClient output_client) {
     _output_client = output_client;
   }
 
  private:
-  esp3d_clients_t _output_client;
+  Esp3dClient _output_client;
 };
 
 extern Esp3DCommands esp3dCommands;

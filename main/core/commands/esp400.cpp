@@ -65,10 +65,10 @@ const char* ApChannelsList[] = {"1", "2", "3",  "4",  "5",  "6",  "7",
 // Get full ESP3D settings
 //[ESP400]<pwd=admin>
 void Esp3DCommands::ESP400(int cmd_params_pos, esp3d_msg_t* msg) {
-  esp3d_clients_t target = msg->origin;
+  Esp3dClient target = msg->origin;
   esp3d_request_t requestId = msg->requestId;
   msg->target = target;
-  msg->origin = ESP3D_COMMAND;
+  msg->origin = Esp3dClient::command;
 
   bool json = hasTag(msg, cmd_params_pos, "json");
   std::string tmpstr;

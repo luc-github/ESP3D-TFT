@@ -267,8 +267,8 @@ bool Esp3DSettings::isValidByteSetting(uint8_t value,
 #endif  // ESP3D_AUTHENTICATION_FEATURE
 #if ESP3D_USB_SERIAL_FEATURE
     case esp3d_output_client:
-      return ((esp3d_clients_t)value == SERIAL_CLIENT ||
-              (esp3d_clients_t)value == USB_SERIAL_CLIENT);
+      return ((Esp3dClient)value == Esp3dClient::serial ||
+              (Esp3dClient)value == Esp3dClient::usb_serial);
       break;
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
 #if ESP3D_NOTIFICATIONS_FEATURE

@@ -68,9 +68,9 @@ esp_err_t Esp3DHttpService::command_handler(httpd_req_t *req) {
     esp3d_request_t requestId;
     if (esp3dCommands.is_esp_command((uint8_t *)cmd, strlen(cmd))) {
       requestId.httpReq = req;
-      esp3d_msg_t *newMsgPtr =
-          Esp3DClient::newMsg(WEBUI_CLIENT, ESP3D_COMMAND, (const uint8_t *)cmd,
-                              strlen(cmd), authentication_level);
+      esp3d_msg_t *newMsgPtr = Esp3DClient::newMsg(
+          Esp3dClient::webui, Esp3dClient::command, (const uint8_t *)cmd,
+          strlen(cmd), authentication_level);
       if (newMsgPtr) {
         newMsgPtr->requestId.httpReq = req;
         esp3dCommands.process(newMsgPtr);
@@ -90,7 +90,8 @@ esp_err_t Esp3DHttpService::command_handler(httpd_req_t *req) {
         }
       }
       esp3dCommands.dispatch(cmd, esp3dCommands.getOutputClient(), requestId,
-                             msg_unique, WEBUI_CLIENT, authentication_level);
+                             msg_unique, Esp3dClient::webui,
+                             authentication_level);
       return ESP_OK;
     }
 

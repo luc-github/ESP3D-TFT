@@ -35,7 +35,7 @@ extern "C" {
 typedef struct {
   Esp3dAuthenticationLevel level;
   int socketId;
-  esp3d_clients_t client_type;
+  Esp3dClient client_type;
   char sessionId[25];
   int64_t last_time;
 } esp3d_authentication_record_t;

@@ -31,7 +31,6 @@
 #include "freertos/task.h"
 #include "serial_def.h"
 
-
 Esp3DSerialClient serialClient;
 
 #define RX_FLUSH_TIME_OUT 1500  // milliseconds timeout
@@ -192,7 +191,7 @@ bool Esp3DSerialClient::pushMsgToRxQueue(const uint8_t *msg, size_t size) {
 #if ESP3D_DISABLE_SERIAL_AUTHENTICATION_FEATURE
       newMsgPtr->authentication_level = Esp3dAuthenticationLevel::admin;
 #endif  // ESP3D_DISABLE_SERIAL_AUTHENTICATION
-      newMsgPtr->origin = SERIAL_CLIENT;
+      newMsgPtr->origin = Esp3dClient::serial;
       if (!addRXData(newMsgPtr)) {
         // delete message as cannot be added to the queue
         Esp3DClient::deleteMsg(newMsgPtr);

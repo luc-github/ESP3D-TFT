@@ -86,7 +86,7 @@ bool Esp3DTFT::begin() {
     }
   }
 #if ESP3D_USB_SERIAL_FEATURE
-  if (esp3dCommands.getOutputClient(true) == USB_SERIAL_CLIENT) {
+  if (esp3dCommands.getOutputClient(true) == Esp3dClient::usb_serial) {
     bsp_init_usb();
   } else {
     if (bsp_deinit_usb() != ESP_OK) {

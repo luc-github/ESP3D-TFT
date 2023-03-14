@@ -51,7 +51,7 @@ enum class Esp3dGcodeHostState : uint8_t {
   next_state,
 };
 
-enum class Esp3dGcodeHostError {
+enum class Esp3dGcodeHostError : uint8_t {
   no_error = 0,
   time_out,
   data_send,
@@ -68,7 +68,7 @@ enum class Esp3dGcodeHostError {
   aborted
 };
 
-enum class Esp3dGcodeHostScriptType {
+enum class Esp3dGcodeHostScriptType : uint8_t {
   single_command,
   multiple_commands,
   filesystem,
