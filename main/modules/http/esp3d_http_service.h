@@ -29,65 +29,62 @@
 #include "esp3d_client.h"
 #include "esp3d_string.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 // for file upload
-typedef enum {
-  upload_file_start,
-  upload_file_write,
-  upload_file_end,
-  upload_file_aborted,
-} esp3d_upload_state_t;
+enum class Esp3dUploadState : uint8_t {
+  upload_start,
+  file_write,
+  upload_end,
+  upload_aborted,
+};
 
 // for complete upload (several files in upload)
-typedef enum {
-  upload_not_started,
-  upload_ongoing,
-  upload_error,
-  upload_success,
-} esp3d_upload_status_t;
+enum class Esp3dUploadStatus : uint8_t {
+  not_started,
+  on_going,
+  error,
+  success
+};
 
-typedef enum {
+enum class Esp3dUploadError : uint8_t {
   // Errors code
-  ESP3D_HTTP_NO_ERROR = 0,
-  ESP3D_HTTP_ERROR_AUTHENTICATION,
-  ESP3D_HTTP_FILE_CREATION,
-  ESP3D_HTTP_FILE_WRITE,
-  ESP3D_HTTP_UPLOAD,
-  ESP3D_HTTP_NOT_ENOUGH_SPACE,
-  ESP3D_HTTP_START_UPDATE,
-  ESP3D_HTTP_FILE_CLOSE,
-  ESP3D_HTTP_NO_SD,
-  ESP3D_HTTP_MOUNT_SD,
-  ESP3D_HTTP_RESET_NUMBERING,  // not used
-  ESP3D_HTTP_MEMORY_ERROR,
-  ESP3D_HTTP_ACCESS_ERROR,
-  ESP3D_HTTP_SIZE,
-  ESP3D_HTTP_UPDATE,
+  no_error = 0,
+  authentication_failed,
+  file_create_failed,
+  write_failed,
+  upload,
+  not_enough_space,
+  start_update_failed,
+  close_failed,
+  no_sd,
+  mount_sd_failed,
+  reset_numbering,  // not used
+  memory_allocation,
+  access_denied,
+  wrong_size,
+  update_failed,
+};
 
-} esp3d_http_error_t;
-
-typedef enum {
-  ESP3D_UNKNOW_SOCKET,
-  ESP3D_HTTP_SOCKET,
-  ESP3D_WS_WEBUI_SOCKET,
-  ESP3D_WS_DATA_SOCKET,
-  ESP3D_WS_MAX_SOCKETS
-} esp3d_http_socket_t;
+enum class esp3dSocketType : uint8_t {
+  unknown,
+  http,
+  websocket_webui,
+  websocket_data,
+};
 
 #define HTTPD_401 "401 UNAUTHORIZED" /*!< HTTP Response 401 */
 
 typedef struct {
   esp_err_t (*writeFn)(const uint8_t *data, size_t datasize,
-                       esp3d_upload_state_t file_upload_state,
-                       const char *filename, size_t filesize);
+                       Esp3dUploadState file_upload_state, const char *filename,
+                       size_t filesize);
   esp_err_t (*nextHandler)(httpd_req_t *req);
   uint packetReadSize;
   uint packetWriteSize;
-  esp3d_upload_status_t status;
+  Esp3dUploadStatus status;  // FixMe: is that necessary? currently not used
   std::list<std::pair<std::string, std::string>> args;
 } post_upload_ctx_t;
 
@@ -101,7 +98,7 @@ class Esp3DHttpService final {
   void process(esp3d_msg_t *msg);
   bool started() { return _started; };
   httpd_handle_t getServerHandle() { return _server; };
-  void pushError(esp3d_http_error_t errcode, const char *st);
+  void pushError(Esp3dUploadError errcode, const char *st);
 #if ESP3D_AUTHENTICATION_FEATURE
   static esp_err_t not_authenticated_handler(httpd_req_t *req);
   static char *generate_http_auth_basic_digest(const char *username,
@@ -122,7 +119,7 @@ class Esp3DHttpService final {
 #if ESP3D_SD_CARD_FEATURE
   static esp_err_t sdfiles_handler(httpd_req_t *req);
   static esp_err_t upload_to_sd_handler(const uint8_t *data, size_t datasize,
-                                        esp3d_upload_state_t file_upload_state,
+                                        Esp3dUploadState file_upload_state,
                                         const char *filename, size_t filesize);
 #endif  // ESP3D_SD_CARD_FEATURE
   static esp_err_t websocket_webui_handler(httpd_req_t *req);
@@ -130,16 +127,15 @@ class Esp3DHttpService final {
   static esp_err_t websocket_data_handler(httpd_req_t *req);
 #endif  // ESP3D_WS_SERVICE_FEATURE
   static esp_err_t post_multipart_handler(httpd_req_t *req);
-  static esp_err_t upload_to_flash_handler(
-      const uint8_t *data, size_t datasize,
-      esp3d_upload_state_t file_upload_state, const char *filename,
-      size_t filesize);
+  static esp_err_t upload_to_flash_handler(const uint8_t *data, size_t datasize,
+                                           Esp3dUploadState file_upload_state,
+                                           const char *filename,
+                                           size_t filesize);
 #if ESP3D_UPDATE_FEATURE
   static esp_err_t updatefw_handler(httpd_req_t *req);
   static esp_err_t upload_to_updatefw_handler(
-      const uint8_t *data, size_t datasize,
-      esp3d_upload_state_t file_upload_state, const char *filename,
-      size_t filesize);
+      const uint8_t *data, size_t datasize, Esp3dUploadState file_upload_state,
+      const char *filename, size_t filesize);
 #endif  // ESP3D_UPDATE_FEATURE
 
   // static esp_err_t open_fn(httpd_handle_t hd, int socketFd);
@@ -151,8 +147,8 @@ class Esp3DHttpService final {
   esp_err_t sendBinaryChunk(httpd_req_t *req, const uint8_t *data, size_t len,
                             bool autoClose = true);
   bool hasArg(httpd_req_t *req, const char *argname);
-  void push(esp3d_http_socket_t socketType, int socketFd);
-  void pop(esp3d_http_socket_t socketType, int socketFd);
+  void push(esp3dSocketType socketType, int socketFd);
+  void pop(esp3dSocketType socketType, int socketFd);
 
   const char *getArg(httpd_req_t *req, const char *argname);
 
@@ -171,7 +167,7 @@ class Esp3DHttpService final {
 #endif  // ESP3D_UPDATE_FEATURE
 
   static post_upload_ctx_t _post_login_ctx;
-  std::list<std::pair<esp3d_http_socket_t, int>> _sockets_list;
+  std::list<std::pair<esp3dSocketType, int>> _sockets_list;
 };
 
 extern Esp3DHttpService esp3dHttpService;

@@ -146,7 +146,7 @@ Esp3DWsService::Esp3DWsService() {
   _server = nullptr;
   _max_clients = 0;
   _clients = nullptr;
-  _type = ESP3D_UNKNOW_SOCKET;
+  _type = esp3dSocketType::unknown;
 }
 
 void Esp3DWsService::end() {
@@ -167,7 +167,7 @@ void Esp3DWsService::end() {
     _clients = nullptr;
   }
   _max_clients = 0;
-  _type = ESP3D_UNKNOW_SOCKET;
+  _type = esp3dSocketType::unknown;
 }
 
 Esp3DWsService::~Esp3DWsService() { end(); }

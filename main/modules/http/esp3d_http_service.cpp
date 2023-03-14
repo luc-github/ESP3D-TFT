@@ -40,37 +40,37 @@ char chunk[CHUNK_BUFFER_SIZE];
 Esp3DHttpService esp3dHttpService;
 
 post_upload_ctx_t Esp3DHttpService::_post_files_upload_ctx = {
-    .writeFn = (esp_err_t(*)(const uint8_t *, size_t, esp3d_upload_state_t,
-                             const char *, size_t))(
-        Esp3DHttpService::upload_to_flash_handler),
+    .writeFn =
+        (esp_err_t(*)(const uint8_t *, size_t, Esp3dUploadState, const char *,
+                      size_t))(Esp3DHttpService::upload_to_flash_handler),
     .nextHandler =
         (esp_err_t(*)(httpd_req_t *))(Esp3DHttpService::files_handler),
     .packetReadSize = 4 * 1024,   // This may need to be defined in tasks_def.h
     .packetWriteSize = 4 * 1024,  // This may need to be defined in tasks_def.h
-    .status = upload_not_started,
+    .status = Esp3dUploadStatus::not_started,
     .args = {}};
 #if ESP3D_SD_CARD_FEATURE
 post_upload_ctx_t Esp3DHttpService::_post_sdfiles_upload_ctx = {
-    .writeFn = (esp_err_t(*)(const uint8_t *, size_t, esp3d_upload_state_t,
-                             const char *,
-                             size_t))(Esp3DHttpService::upload_to_sd_handler),
+    .writeFn =
+        (esp_err_t(*)(const uint8_t *, size_t, Esp3dUploadState, const char *,
+                      size_t))(Esp3DHttpService::upload_to_sd_handler),
     .nextHandler =
         (esp_err_t(*)(httpd_req_t *))(Esp3DHttpService::sdfiles_handler),
     .packetReadSize = 4 * 1024,   // This may need to be defined in tasks_def.h
     .packetWriteSize = 4 * 1024,  // This may need to be defined in tasks_def.h
-    .status = upload_not_started,
+    .status = Esp3dUploadStatus::not_started,
     .args = {}};
 #endif  // ESP3D_SD_CARD_FEATURE
 #if ESP3D_UPDATE_FEATURE
 post_upload_ctx_t Esp3DHttpService::_post_updatefw_upload_ctx = {
-    .writeFn = (esp_err_t(*)(const uint8_t *, size_t, esp3d_upload_state_t,
-                             const char *, size_t))(
-        Esp3DHttpService::upload_to_updatefw_handler),
+    .writeFn =
+        (esp_err_t(*)(const uint8_t *, size_t, Esp3dUploadState, const char *,
+                      size_t))(Esp3DHttpService::upload_to_updatefw_handler),
     .nextHandler =
         (esp_err_t(*)(httpd_req_t *))(Esp3DHttpService::updatefw_handler),
     .packetReadSize = 1024,   // This may need to be defined in tasks_def.h
     .packetWriteSize = 1024,  // This may need to be defined in tasks_def.h
-    .status = upload_not_started,
+    .status = Esp3dUploadStatus::not_started,
     .args = {}};
 #endif  // ESP3D_UPDATE_FEATURE
 
@@ -80,11 +80,11 @@ post_upload_ctx_t Esp3DHttpService::_post_login_ctx = {
         (esp_err_t(*)(httpd_req_t *))(Esp3DHttpService::login_handler),
     .packetReadSize = 512,  // This may need to be defined in tasks_def.h
     .packetWriteSize = 0,   // This may need to be defined in tasks_def.h
-    .status = upload_not_started,
+    .status = Esp3dUploadStatus::not_started,
     .args = {}};
 
-void Esp3DHttpService::pushError(esp3d_http_error_t errcode, const char *st) {
-  std::string errmsg = "ERROR:" + std::to_string(errcode);
+void Esp3DHttpService::pushError(Esp3dUploadError errcode, const char *st) {
+  std::string errmsg = "ERROR:" + std::to_string(static_cast<uint8_t>(errcode));
   errmsg += ":";
   errmsg += st;
   errmsg += "\n";
@@ -92,12 +92,12 @@ void Esp3DHttpService::pushError(esp3d_http_error_t errcode, const char *st) {
                                    strlen(errmsg.c_str()));
 }
 
-void Esp3DHttpService::push(esp3d_http_socket_t socketType, int socketFd) {
+void Esp3DHttpService::push(esp3dSocketType socketType, int socketFd) {
   _sockets_list.push_back(std::make_pair(socketType, socketFd));
 }
 
-void Esp3DHttpService::pop(esp3d_http_socket_t socketType, int socketFd) {
-  _sockets_list.remove_if([&](std::pair<esp3d_http_socket_t, int> &p) {
+void Esp3DHttpService::pop(esp3dSocketType socketType, int socketFd) {
+  _sockets_list.remove_if([&](std::pair<esp3dSocketType, int> &p) {
     return p.first == socketType and p.second == socketFd;
   });
 }
@@ -132,12 +132,12 @@ const char *Esp3DHttpService::getArg(httpd_req_t *req, const char *argname) {
 Esp3DHttpService::Esp3DHttpService() {
   _started = false;
   _server = nullptr;
-  _post_files_upload_ctx.status = upload_not_started;
+  _post_files_upload_ctx.status = Esp3dUploadStatus::not_started;
 #if ESP3D_SD_CARD_FEATURE
-  _post_sdfiles_upload_ctx.status = upload_not_started;
+  _post_sdfiles_upload_ctx.status = Esp3dUploadStatus::not_started;
 #endif  // ESP3D_SD_CARD_FEATURE
 #if ESP3D_UPDATE_FEATURE
-  _post_updatefw_upload_ctx.status = upload_not_started;
+  _post_updatefw_upload_ctx.status = Esp3dUploadStatus::not_started;
 #endif  // ESP3D_UPDATE_FEATURE
 }
 
@@ -362,9 +362,10 @@ bool Esp3DHttpService::begin() {
         (httpd_err_handler_func_t)file_not_found_handler);
 
     // websocket service
-    esp3d_websocket_config_t wsConfig = {.serverHandle = _server,
-                                         .max_clients = 1,
-                                         .type = ESP3D_WS_WEBUI_SOCKET};
+    esp3d_websocket_config_t wsConfig = {
+        .serverHandle = _server,
+        .max_clients = 1,
+        .type = esp3dSocketType::websocket_webui};
     _started = esp3dWsWebUiService.begin(&wsConfig);
 #if ESP3D_WS_SERVICE_FEATURE
     if (_started) {
@@ -373,7 +374,7 @@ bool Esp3DHttpService::begin() {
         esp3d_log("WS is not enabled");
       } else {
         wsConfig.max_clients = 2;
-        wsConfig.type = ESP3D_WS_DATA_SOCKET;
+        wsConfig.type = esp3dSocketType::websocket_data;
         _started = esp3dWsDataService.begin(&wsConfig);
       }
     }
@@ -415,12 +416,12 @@ void Esp3DHttpService::end() {
   }
   _server = nullptr;
   _started = false;
-  _post_files_upload_ctx.status = upload_not_started;
+  _post_files_upload_ctx.status = Esp3dUploadStatus::not_started;
 #if ESP3D_SD_CARD_FEATURE
-  _post_sdfiles_upload_ctx.status = upload_not_started;
+  _post_sdfiles_upload_ctx.status = Esp3dUploadStatus::not_started;
 #endif  // ESP3D_SD_CARD_FEATURE
 #if ESP3D_UPDATE_FEATURE
-  _post_updatefw_upload_ctx.status = upload_not_started;
+  _post_updatefw_upload_ctx.status = Esp3dUploadStatus::not_started;
 #endif  // ESP3D_UPDATE_FEATURE
 }
 #if ESP3D_AUTHENTICATION_FEATURE
