@@ -21,9 +21,9 @@
 #pragma once
 #include <stdio.h>
 
-typedef enum {
-    FS_ROOT,
-    FS_FLASH,
-    FS_SD,
-    FS_UNKNOWN,
-} esp3d_fs_types;
+enum class Esp3dFileSystemType : uint8_t {
+  root,
+  flash,
+  sd,
+  unknown,
+};

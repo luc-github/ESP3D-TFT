@@ -19,54 +19,47 @@
 */
 
 #pragma once
-#include <stdio.h>
-#include "esp3d_fs_types.h"
-#include <sys/stat.h>
 #include <dirent.h>
+#include <stdio.h>
+#include <sys/stat.h>
+
+#include "esp3d_fs_types.h"
 #include "esp_vfs.h"
 
 #define ESP3D_FLASH_FS_HEADER "/fs/"
 
-class ESP3D_FLASH final
-{
-public:
-    ESP3D_FLASH();
-    bool begin();
-    bool mount();
-    void unmount();
-    bool isMounted()
-    {
-        return _mounted;
-    };
-    const char * getFileSystemName();
-    uint maxPathLength();
-    bool getSpaceInfo(size_t * totalBytes=NULL,
-                      size_t * usedBytes=NULL,
-                      size_t * freeBytes=NULL,
-                      bool refreshStats=false);
-    esp3d_fs_types getFSType(const char * path=nullptr);
-    bool  accessFS(esp3d_fs_types FS=FS_FLASH);
-    void  releaseFS(esp3d_fs_types FS=FS_FLASH);
-    bool format();
-    const char* mount_point()
-    {
-        return "/fs";
-    }
-    DIR * opendir(const char * dirpath);
-    int closedir(DIR *dirp);
-    int stat(const char * filepath,  struct  stat * entry_stat);
-    bool exists(const char* path);
-    bool remove(const char *path);
-    bool mkdir(const char *path);
-    bool rmdir(const char *path);
-    bool rename(const char *oldpath, const char *newpath);
-    struct dirent * readdir(DIR *dir);
-    void rewinddir(DIR * dir);
-    FILE * open ( const char * filename, const char * mode );
-    void close(FILE * fd);
-private:
-    bool _mounted;
-    bool _started;
+class Esp3dFlash final {
+ public:
+  Esp3dFlash();
+  bool begin();
+  bool mount();
+  void unmount();
+  bool isMounted() { return _mounted; };
+  const char *getFileSystemName();
+  uint maxPathLength();
+  bool getSpaceInfo(size_t *totalBytes = NULL, size_t *usedBytes = NULL,
+                    size_t *freeBytes = NULL, bool refreshStats = false);
+  Esp3dFileSystemType getFSType(const char *path = nullptr);
+  bool accessFS(Esp3dFileSystemType FS = Esp3dFileSystemType::flash);
+  void releaseFS(Esp3dFileSystemType FS = Esp3dFileSystemType::flash);
+  bool format();
+  const char *mount_point() { return "/fs"; }
+  DIR *opendir(const char *dirpath);
+  int closedir(DIR *dirp);
+  int stat(const char *filepath, struct stat *entry_stat);
+  bool exists(const char *path);
+  bool remove(const char *path);
+  bool mkdir(const char *path);
+  bool rmdir(const char *path);
+  bool rename(const char *oldpath, const char *newpath);
+  struct dirent *readdir(DIR *dir);
+  void rewinddir(DIR *dir);
+  FILE *open(const char *filename, const char *mode);
+  void close(FILE *fd);
+
+ private:
+  bool _mounted;
+  bool _started;
 };
 
-extern ESP3D_FLASH flashFs;
+extern Esp3dFlash flashFs;

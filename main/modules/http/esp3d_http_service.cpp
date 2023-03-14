@@ -741,10 +741,10 @@ esp_err_t Esp3DHttpService::streamFile(const char *path, httpd_req_t *req) {
             break;
           }
         }
-        esp3d_fs_types fstype = globalFs.getFSType(buf);
+        Esp3dFileSystemType fstype = globalFs.getFSType(buf);
         // assume default file serving is flash
-        if (fstype == FS_UNKNOWN) {
-          filename = globalFs.mount_point(FS_FLASH);
+        if (fstype == Esp3dFileSystemType::unknown) {
+          filename = globalFs.mount_point(Esp3dFileSystemType::flash);
         }
         filename += esp3d_strings::urlDecode((const char *)buf);
         filenameGz = filename + ".gz";

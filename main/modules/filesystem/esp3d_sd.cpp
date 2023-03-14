@@ -35,12 +35,12 @@ Esp3dSd::Esp3dSd() {
   _state = Esp3dSdState::unknown;
 }
 
-esp3d_fs_types Esp3dSd::getFSType(const char* path) {
+Esp3dFileSystemType Esp3dSd::getFSType(const char* path) {
   (void)path;
-  return FS_SD;
+  return Esp3dFileSystemType::sd;
 }
 
-bool Esp3dSd::accessFS(esp3d_fs_types FS) {
+bool Esp3dSd::accessFS(Esp3dFileSystemType FS) {
   (void)FS;
   // if card is busy do not let another task access SD and so prevent a release
   if (getState() != Esp3dSdState::idle) {
@@ -52,7 +52,7 @@ bool Esp3dSd::accessFS(esp3d_fs_types FS) {
   return true;
 }
 
-void Esp3dSd::releaseFS(esp3d_fs_types FS) {
+void Esp3dSd::releaseFS(Esp3dFileSystemType FS) {
   (void)FS;
   esp3d_log("Release SD");
   setState(Esp3dSdState::idle);

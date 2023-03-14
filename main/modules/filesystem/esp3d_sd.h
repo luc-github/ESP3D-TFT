@@ -56,9 +56,9 @@ class Esp3dSd final {
     _state = state;
     return _state;
   }
-  esp3d_fs_types getFSType(const char *path = nullptr);
-  bool accessFS(esp3d_fs_types FS = FS_SD);
-  void releaseFS(esp3d_fs_types FS = FS_SD);
+  Esp3dFileSystemType getFSType(const char *path = nullptr);
+  bool accessFS(Esp3dFileSystemType FS = Esp3dFileSystemType::sd);
+  void releaseFS(Esp3dFileSystemType FS = Esp3dFileSystemType::sd);
   const char *mount_point() { return "/sd"; }
   DIR *opendir(const char *dirpath);
   int closedir(DIR *dirp);

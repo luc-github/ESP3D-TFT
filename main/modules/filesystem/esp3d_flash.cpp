@@ -18,36 +18,32 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <stdio.h>
-#include <string.h>
-#include "esp3d_log.h"
 #include "esp3d_flash.h"
 
-ESP3D_FLASH flashFs;
+#include <stdio.h>
+#include <string.h>
 
-ESP3D_FLASH::ESP3D_FLASH()
-{
-    _mounted = false;
-    _started = false;
+#include "esp3d_log.h"
+
+Esp3dFlash flashFs;
+
+Esp3dFlash::Esp3dFlash() {
+  _mounted = false;
+  _started = false;
 }
 
-esp3d_fs_types ESP3D_FLASH::getFSType(const char * path)
-{
-    (void)path;
-    return FS_FLASH;
+Esp3dFileSystemType Esp3dFlash::getFSType(const char* path) {
+  (void)path;
+  return Esp3dFileSystemType::flash;
 }
 
-bool  ESP3D_FLASH::accessFS(esp3d_fs_types FS)
-{
-    (void)FS;
-    esp3d_log("Access FS");
-    return _mounted;
-
+bool Esp3dFlash::accessFS(Esp3dFileSystemType FS) {
+  (void)FS;
+  esp3d_log("Access FS");
+  return _mounted;
 }
 
-void  ESP3D_FLASH::releaseFS(esp3d_fs_types FS)
-{
-    (void)FS;
-    esp3d_log("Release FS");
+void Esp3dFlash::releaseFS(Esp3dFileSystemType FS) {
+  (void)FS;
+  esp3d_log("Release FS");
 }
-
