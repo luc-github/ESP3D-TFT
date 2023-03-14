@@ -818,7 +818,8 @@ void Esp3DHttpService::process(esp3d_msg_t *msg) {
       httpd_resp_send_chunk(msg->requestId.httpReq, NULL, 0);
       esp3d_log_e("Error sending data, closing chunk");
     } else {
-      if (msg->type == msg_tail || msg->type == msg_unique) {
+      if (msg->type == Esp3dMessageType::tail ||
+          msg->type == Esp3dMessageType::unique) {
         httpd_resp_send_chunk(msg->requestId.httpReq, NULL, 0);
         esp3d_log("End of messages for this req, closing chunk");
       }

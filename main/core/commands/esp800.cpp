@@ -71,7 +71,7 @@ void Esp3DCommands::ESP800(int cmd_params_pos, esp3d_msg_t* msg) {
   } else {
     tmpstr = "Capabilities:\n";
   }
-  msg->type = msg_head;
+  msg->type = Esp3dMessageType::head;
   if (!dispatch(msg, tmpstr.c_str())) {
     esp3d_log_e("Error sending response to clients");
     return;
@@ -219,12 +219,12 @@ void Esp3DCommands::ESP800(int cmd_params_pos, esp3d_msg_t* msg) {
   }
   // end of list
   if (json) {
-    if (!dispatch("}}", target, requestId, msg_tail)) {
+    if (!dispatch("}}", target, requestId, Esp3dMessageType::tail)) {
       esp3d_log_e("Error sending answer to clients");
     }
   } else {
     {
-      if (!dispatch("ok\n", target, requestId, msg_tail)) {
+      if (!dispatch("ok\n", target, requestId, Esp3dMessageType::tail)) {
         esp3d_log_e("Error sending answer to clients");
       }
     }

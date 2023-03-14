@@ -441,7 +441,7 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
       newMsgPtr->origin = Esp3dClient::telnet;
       newMsgPtr->authentication_level = authentication_level;
       newMsgPtr->target = esp3dCommands.getOutputClient();
-      newMsgPtr->type = msg_unique;
+      newMsgPtr->type = Esp3dMessageType::unique;
       newMsgPtr->requestId.id = client->socketId;
       if (!addRXData(newMsgPtr)) {
         // delete message as cannot be added to the queue

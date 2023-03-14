@@ -90,7 +90,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos, esp3d_msg_t *msg) {
       tmpstr = "Configuration:\n";
     }
   }
-  msg->type = msg_head;
+  msg->type = Esp3dMessageType::head;
   if (!dispatch(msg, tmpstr.c_str())) {
     esp3d_log_e("Error sending response to clients");
     return;
@@ -530,7 +530,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos, esp3d_msg_t *msg) {
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
   // end of list
   if (json) {
-    if (!dispatch("]}", target, requestId, msg_tail)) {
+    if (!dispatch("]}", target, requestId, Esp3dMessageType::tail)) {
       esp3d_log_e("Error sending answer to clients");
     }
   } else {
@@ -540,7 +540,8 @@ void Esp3DCommands::ESP420(int cmd_params_pos, esp3d_msg_t *msg) {
       } else {
         tmpstr = "ok\n";
       }
-      if (!dispatch(tmpstr.c_str(), target, requestId, msg_tail)) {
+      if (!dispatch(tmpstr.c_str(), target, requestId,
+                    Esp3dMessageType::tail)) {
         esp3d_log_e("Error sending answer to clients");
       }
     }

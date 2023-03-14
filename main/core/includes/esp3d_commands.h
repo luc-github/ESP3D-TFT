@@ -56,7 +56,7 @@ class Esp3DCommands {
   bool dispatch(esp3d_msg_t* msg, uint8_t* sbuf, size_t len);
   bool dispatch(esp3d_msg_t* msg, const char* sbuf);
   bool dispatch(const char* sbuf, Esp3dClient target, esp3d_request_t requestId,
-                esp3d_msg_type_t type = msg_head,
+                Esp3dMessageType type = Esp3dMessageType::head,
                 Esp3dClient origin = Esp3dClient::command,
                 Esp3dAuthenticationLevel authentication_level =
                     Esp3dAuthenticationLevel::guest);

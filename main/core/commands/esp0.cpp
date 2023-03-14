@@ -196,7 +196,7 @@ void Esp3DCommands::ESP0(int cmd_params_pos, esp3d_msg_t* msg) {
   bool json = hasTag(msg, cmd_params_pos, "json");
   if (cmdNb != cmdlistNb) {
     esp3d_log("Help corrupted: %d vs %d", cmdNb, cmdlistNb);
-    msg->type = msg_unique;
+    msg->type = Esp3dMessageType::unique;
     if (!dispatch(msg, "Help corrupted")) {
       esp3d_log_e("Error sending command to clients");
     }
@@ -210,7 +210,7 @@ void Esp3DCommands::ESP0(int cmd_params_pos, esp3d_msg_t* msg) {
     } else {
       tmpstr = "[List of ESP3D commands]\n";
     }
-    msg->type = msg_head;
+    msg->type = Esp3dMessageType::head;
     if (!dispatch(msg, tmpstr.c_str())) {
       esp3d_log_e("Error sending command to clients");
       return;
@@ -229,19 +229,20 @@ void Esp3DCommands::ESP0(int cmd_params_pos, esp3d_msg_t* msg) {
         tmpstr = help[i];
         tmpstr += "\n";
       }
-      if (!dispatch(tmpstr.c_str(), target, requestId, msg_core)) {
+      if (!dispatch(tmpstr.c_str(), target, requestId,
+                    Esp3dMessageType::core)) {
         esp3d_log_e("Error sending answer to clients");
         return;
       }
     }
 
     if (json) {
-      if (!dispatch("]}", target, requestId, msg_tail)) {
+      if (!dispatch("]}", target, requestId, Esp3dMessageType::tail)) {
         esp3d_log_e("Error sending answer to clients");
         return;
       }
     } else {
-      if (!dispatch("ok\n", target, requestId, msg_tail)) {
+      if (!dispatch("ok\n", target, requestId, Esp3dMessageType::tail)) {
         esp3d_log_e("Error sending answer to clients");
         return;
       }
@@ -260,7 +261,7 @@ void Esp3DCommands::ESP0(int cmd_params_pos, esp3d_msg_t* msg) {
           tmpstr = help[i];
           tmpstr += "\n";
         }
-        msg->type = msg_unique;
+        msg->type = Esp3dMessageType::unique;
         if (!dispatch(msg, tmpstr.c_str())) {
           return;
         }
@@ -278,7 +279,7 @@ void Esp3DCommands::ESP0(int cmd_params_pos, esp3d_msg_t* msg) {
       tmpstr += std::to_string(cmdval);
       tmpstr += "\n";
     }
-    msg->type = msg_unique;
+    msg->type = Esp3dMessageType::unique;
     if (!dispatch(msg, tmpstr.c_str())) {
       return;
     }

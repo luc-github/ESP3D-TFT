@@ -360,7 +360,7 @@ bool Esp3DNetwork::startStaMode() {
   stmp += ssid_str;
   stmp += "\n";
   esp3dCommands.dispatch(stmp.c_str(), Esp3dClient::all_clients, requestId,
-                         msg_unique, Esp3dClient::system,
+                         Esp3dMessageType::unique, Esp3dClient::system,
                          Esp3dAuthenticationLevel::admin);
   ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
   ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
@@ -414,7 +414,7 @@ bool Esp3DNetwork::startStaMode() {
     stmp += " failed\n";
   }
   esp3dCommands.dispatch(stmp.c_str(), Esp3dClient::all_clients, requestId,
-                         msg_unique, Esp3dClient::system,
+                         Esp3dMessageType::unique, Esp3dClient::system,
                          Esp3dAuthenticationLevel::admin);
   if (connected) {
     esp3dNetworkServices.begin();
@@ -547,7 +547,7 @@ bool Esp3DNetwork::startApMode(bool configMode) {
   vTaskDelay(pdMS_TO_TICKS(500));
 #endif  // ESP3D_TFT_LOG
   esp3dCommands.dispatch(stmp.c_str(), Esp3dClient::all_clients, requestId,
-                         msg_unique, Esp3dClient::system,
+                         Esp3dMessageType::unique, Esp3dClient::system,
                          Esp3dAuthenticationLevel::admin);
   if (success) {
     esp3dNetworkServices.begin();
@@ -563,7 +563,7 @@ bool Esp3DNetwork::startNoRadioMode() {
   _current_radio_mode = esp3d_radio_off;
   esp3d_request_t requestId = {.id = 0};
   esp3dCommands.dispatch(stmp.c_str(), Esp3dClient::all_clients, requestId,
-                         msg_unique, Esp3dClient::system,
+                         Esp3dMessageType::unique, Esp3dClient::system,
                          Esp3dAuthenticationLevel::admin);
   return true;
 }

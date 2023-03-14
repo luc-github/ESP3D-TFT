@@ -141,7 +141,7 @@ esp3d_msg_t* Esp3DClient::newMsg() {
     newMsgPtr->target = Esp3dClient::all_clients;
     newMsgPtr->authentication_level = Esp3dAuthenticationLevel::guest;
     newMsgPtr->requestId.id = esp_timer_get_time();
-    newMsgPtr->type = msg_head;
+    newMsgPtr->type = Esp3dMessageType::head;
   }
   return newMsgPtr;
 }

@@ -74,7 +74,7 @@ void Esp3DCommands::ESP780(int cmd_params_pos, esp3d_msg_t *msg) {
         ok_msg += tmpstr.c_str();
         ok_msg += "\n";
       }
-      msg->type = msg_head;
+      msg->type = Esp3dMessageType::head;
       if (!dispatch(msg, ok_msg.c_str())) {
         esp3d_log_e("Error sending response to clients");
       }
@@ -107,7 +107,7 @@ void Esp3DCommands::ESP780(int cmd_params_pos, esp3d_msg_t *msg) {
           continue;
         }
         esp3d_msg_t *newMsg = Esp3DClient::copyMsgInfos(msgInfo);
-        newMsg->type = msg_core;
+        newMsg->type = Esp3dMessageType::core;
         if (!dispatch(newMsg, ok_msg.c_str())) {
           esp3d_log_e("Error sending response to clients");
         }
@@ -169,7 +169,7 @@ void Esp3DCommands::ESP780(int cmd_params_pos, esp3d_msg_t *msg) {
           }
         }
         esp3d_msg_t *newMsg = Esp3DClient::copyMsgInfos(msgInfo);
-        newMsg->type = msg_core;
+        newMsg->type = Esp3dMessageType::core;
         if (!dispatch(newMsg, ok_msg.c_str())) {
           esp3d_log_e("Error sending response to clients");
         }
@@ -204,7 +204,7 @@ void Esp3DCommands::ESP780(int cmd_params_pos, esp3d_msg_t *msg) {
         ok_msg += "\n";
       }
       esp3d_msg_t *newMsg = Esp3DClient::copyMsgInfos(msgInfo);
-      newMsg->type = msg_tail;
+      newMsg->type = Esp3dMessageType::tail;
       if (!dispatch(newMsg, ok_msg.c_str())) {
         esp3d_log_e("Error sending response to clients");
       }

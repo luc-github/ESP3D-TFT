@@ -90,7 +90,7 @@ esp_err_t Esp3DHttpService::command_handler(httpd_req_t *req) {
         }
       }
       esp3dCommands.dispatch(cmd, esp3dCommands.getOutputClient(), requestId,
-                             msg_unique, Esp3dClient::webui,
+                             Esp3dMessageType::unique, Esp3dClient::webui,
                              authentication_level);
       return ESP_OK;
     }

@@ -257,7 +257,7 @@ bool Esp3DCommands::dispatchSetting(bool json, const char* filter,
     tmpstr += value;
     tmpstr += "\n";
   }
-  return dispatch(tmpstr.c_str(), target, requestId, msg_core);
+  return dispatch(tmpstr.c_str(), target, requestId, Esp3dMessageType::core);
 }
 
 bool Esp3DCommands::dispatchAuthenticationError(esp3d_msg_t* msg, uint cmdid,
@@ -273,7 +273,7 @@ bool Esp3DCommands::dispatchAuthenticationError(esp3d_msg_t* msg, uint cmdid,
   }
 #endif  // ESP3D_HTTP_FEATURE
   // answer is one message, override for safety
-  msg->type = msg_unique;
+  msg->type = Esp3dMessageType::unique;
   if (json) {
     tmpstr = "{\"cmd\":\"";
     tmpstr += std::to_string(cmdid);
@@ -293,7 +293,7 @@ bool Esp3DCommands::dispatchAnswer(esp3d_msg_t* msg, uint cmdid, bool json,
     return false;
   }
   // answer is one message, override for safety
-  msg->type = msg_unique;
+  msg->type = Esp3dMessageType::unique;
   if (json) {
     tmpstr = "{\"cmd\":\"" + std::to_string(cmdid) + "\",\"status\":\"";
 
@@ -347,7 +347,7 @@ bool Esp3DCommands::dispatchKeyValue(bool json, const char* key,
   } else {
     tmpstr += "\n";
   }
-  return dispatch(tmpstr.c_str(), target, requestId, msg_core);
+  return dispatch(tmpstr.c_str(), target, requestId, Esp3dMessageType::core);
 }
 
 bool Esp3DCommands::dispatchIdValue(bool json, const char* Id,
@@ -372,11 +372,11 @@ bool Esp3DCommands::dispatchIdValue(bool json, const char* Id,
   } else {
     tmpstr += "\n";
   }
-  return dispatch(tmpstr.c_str(), target, requestId, msg_core);
+  return dispatch(tmpstr.c_str(), target, requestId, Esp3dMessageType::core);
 }
 
 bool Esp3DCommands::dispatch(const char* sbuf, Esp3dClient target,
-                             esp3d_request_t requestId, esp3d_msg_type_t type,
+                             esp3d_request_t requestId, Esp3dMessageType type,
                              Esp3dClient origin,
                              Esp3dAuthenticationLevel authentication_level) {
   esp3d_msg_t* newMsgPtr = Esp3DClient::newMsg(origin, target);
