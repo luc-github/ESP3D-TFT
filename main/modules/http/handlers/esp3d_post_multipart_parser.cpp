@@ -32,14 +32,14 @@
 #endif  // ESP3D_TFT_BENCHMARK
 
 // TODO fine tune these values and put them in tasks_def.h
-typedef enum {
-  parse_boundary,
-  parse_content_disposition,
-  parse_content_type,
-  parse_content_separator,
-  parse_data_form,
-  parse_data_file
-} esp3d_parse_state_t;
+enum class Esp3dParseState : uint8_t {
+  boundary,
+  content_disposition,
+  content_type,
+  content_separator,
+  data_form,
+  data_file
+};
 
 esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req) {
   esp3d_log("Post Data %d on : %s", req->content_len, req->uri);
@@ -121,7 +121,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req) {
   int fileSize = -1;
   // processing the content
   if (boundaryPtr && !hasError) {
-    esp3d_parse_state_t parsing_state = parse_boundary;
+    Esp3dParseState parsing_state = Esp3dParseState::boundary;
     while (remaining > 0 && !hasError) {
       if ((received = httpd_req_recv(req, packet,
                                      post_upload_ctx->packetReadSize)) <= 0) {
@@ -152,14 +152,14 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req) {
         //  parse buffer
         switch (parsing_state) {
           //--XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-          case parse_boundary:
+          case Esp3dParseState::boundary:
             // esp3d_log("Parsing %d:  char %d:%c", pIndex, packet[pIndex],
             // packet[pIndex]);
             if (boundaryCursor < boundaryString.length()) {
               if (boundaryString[boundaryCursor] == packet[pIndex]) {
                 boundaryCursor++;
                 if (boundaryCursor == boundaryString.length()) {
-                  parsing_state = parse_content_disposition;
+                  parsing_state = Esp3dParseState::content_disposition;
                 }
               } else {
                 if (notProcessed > 4) {
@@ -186,7 +186,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req) {
               hasError = true;
             }
             break;
-          case parse_content_disposition:
+          case Esp3dParseState::content_disposition:
             // esp3d_log("Parsing %d:  char %d:%c", pIndex, packet[pIndex],
             // packet[pIndex]);
             if (packet[pIndex] == '\n') {
@@ -243,7 +243,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req) {
                   esp3d_log("Got filename=%s", fileName.c_str());
                 }
 
-                parsing_state = parse_content_type;
+                parsing_state = Esp3dParseState::content_type;
                 contentBuffer = "";
               } else {
                 esp3d_log_e(
@@ -261,7 +261,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req) {
               }
             }
             break;
-          case parse_content_type:
+          case Esp3dParseState::content_type:
             // esp3d_log("Parsing %d:  char %d:%c", pIndex, packet[pIndex],
             // packet[pIndex]);
             if (packet[pIndex] == '\n') {
@@ -270,13 +270,13 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req) {
                 esp3d_log("size: %d", contentBuffer.length());
                 if (contentBuffer.length() == 0) {
                   if (fileName.length() > 0) {
-                    parsing_state = parse_data_file;
+                    parsing_state = Esp3dParseState::data_file;
                   } else {
-                    parsing_state = parse_data_form;
+                    parsing_state = Esp3dParseState::data_form;
                     uploadState = upload_file_start;
                   }
                 } else {
-                  parsing_state = parse_content_separator;
+                  parsing_state = Esp3dParseState::content_separator;
                 }
                 contentBuffer = "";
               } else {
@@ -298,13 +298,13 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req) {
             }
 
             break;
-          case parse_content_separator:
+          case Esp3dParseState::content_separator:
             // esp3d_log("Parsing %d:  char %d:%c", pIndex, packet[pIndex],
             // packet[pIndex]);
             if (packet[pIndex] == '\n' || packet[pIndex] == '\r') {
               if (packet[pIndex] == '\n' && prevChar == '\r') {
                 if (fileName.length() > 0) {
-                  parsing_state = parse_data_file;
+                  parsing_state = Esp3dParseState::data_file;
                   if (!packetWrite || !post_upload_ctx->writeFn) {
                     esp3d_log_e("This url does not allow upload");
                     esp3dHttpService.pushError(ESP3D_HTTP_UPLOAD,
@@ -312,7 +312,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req) {
                     hasError = true;
                   }
                 } else {
-                  parsing_state = parse_data_form;
+                  parsing_state = Esp3dParseState::data_form;
                 }
               }
             } else {
@@ -322,7 +322,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req) {
               hasError = true;
             }
             break;
-          case parse_data_form:
+          case Esp3dParseState::data_form:
             // esp3d_log("Parsing %d:  char %d:%c", pIndex, packet[pIndex],
             // packet[pIndex]);
             if (packet[pIndex] == '\n') {
@@ -332,7 +332,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req) {
                     std::make_pair(argName, argValue));
                 argName = "";
                 argValue = "";
-                parsing_state = parse_boundary;
+                parsing_state = Esp3dParseState::boundary;
                 boundaryCursor = 2;
               } else {
                 esp3d_log_e("Error parsing data form, wrong end of line");
@@ -351,7 +351,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req) {
               }
             }
             break;
-          case parse_data_file:
+          case Esp3dParseState::data_file:
 
             // esp3d_log("Parsing %d:  char %d:%c", pIndex, packet[pIndex],
             // packet[pIndex]);
@@ -399,7 +399,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req) {
               if (boundaryCursor == boundaryString.length()) {
                 uploadState = upload_file_end;
                 boundaryCursor = 0;
-                parsing_state = parse_content_disposition;
+                parsing_state = Esp3dParseState::content_disposition;
               }
             } else {
               if (boundaryCursor == 0) {
@@ -412,7 +412,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req) {
                 if (packet[pIndex] == '-' && notProcessed < 4) {
                   esp3d_log("End of transfert found");
                   uploadState = upload_file_end;
-                  parsing_state = parse_boundary;
+                  parsing_state = Esp3dParseState::boundary;
                 } else {
                   // the data looks like begining of boundary but it is not
                   // finalized so copy boundary part to write buffer can be /r/n
