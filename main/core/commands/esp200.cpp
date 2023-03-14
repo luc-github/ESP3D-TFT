@@ -61,15 +61,15 @@ void Esp3DCommands::ESP200(int cmd_params_pos, esp3d_msg_t* msg) {
     if (tmpstr.length() != 0) {
       hasError = true;
     } else {
-      esp3d_sd_states state = sd.getState();
+      Esp3dSdState state = sd.getState();
       switch (state) {
-        case ESP3D_SDCARD_IDLE:
+        case Esp3dSdState::idle:
           ok_msg = "SD card ok";
           break;
-        case ESP3D_SDCARD_NOT_PRESENT:
+        case Esp3dSdState::not_present:
           ok_msg = "No SD card";
           break;
-        case ESP3D_SDCARD_BUSY:
+        case Esp3dSdState::busy:
           ok_msg = "Busy";
           break;
         default:

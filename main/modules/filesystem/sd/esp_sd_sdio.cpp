@@ -21,274 +21,244 @@
 #include "sd_def.h"
 
 #if defined(ESP3D_SD_IS_SDIO) && ESP3D_SD_IS_SDIO
-#include "filesystem/esp3d_sd.h"
-#include <string>
-#include <cstring>
 #include <string.h>
-#include "esp3d_string.h"
 #include <sys/unistd.h>
-#include "esp_vfs_fat.h"
-#include "ff.h"
-#include "sdmmc_cmd.h"
+
+#include <cstring>
+#include <string>
+
 #include "driver/sdmmc_host.h"
 #include "esp3d_log.h"
+#include "esp3d_string.h"
+#include "esp_vfs_fat.h"
+#include "ff.h"
+#include "filesystem/esp3d_sd.h"
 #include "sdkconfig.h"
+#include "sdmmc_cmd.h"
 
 sdmmc_card_t *card;
 
-
-void ESP3D_SD::unmount()
-{
-    if (!_started ) {
-        esp3d_log_e("SDCard not init.");
-        _state = ESP3D_SDCARD_UNKNOWN;
-        return;
-    }
-    esp_vfs_fat_sdcard_unmount(mount_point(), card);
-    _state = ESP3D_SDCARD_NOT_PRESENT;
-    _mounted = false;
+void Esp3dSd::unmount() {
+  if (!_started) {
+    esp3d_log_e("SDCard not init.");
+    _state = Esp3dSdState::unknown;
+    return;
+  }
+  esp_vfs_fat_sdcard_unmount(mount_point(), card);
+  _state = Esp3dSdState::not_present;
+  _mounted = false;
 }
 
-bool ESP3D_SD::mount()
-{
-    if (!_started) {
-        esp3d_log_e("SDCard not init.");
-        _state = ESP3D_SDCARD_UNKNOWN;
-        return false;
-    }
-    if (_mounted) {
-        unmount();
-    }
-    esp3d_log("Initializing SD card");
-    sdmmc_host_t host = SDMMC_HOST_DEFAULT();
-    host.max_freq_khz = ESP3D_SD_FREQ;
-    sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
-    slot_config.width = ESP3D_SDIO_BIT_WIDTH;
+bool Esp3dSd::mount() {
+  if (!_started) {
+    esp3d_log_e("SDCard not init.");
+    _state = Esp3dSdState::unknown;
+    return false;
+  }
+  if (_mounted) {
+    unmount();
+  }
+  esp3d_log("Initializing SD card");
+  sdmmc_host_t host = SDMMC_HOST_DEFAULT();
+  host.max_freq_khz = ESP3D_SD_FREQ;
+  sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
+  slot_config.width = ESP3D_SDIO_BIT_WIDTH;
 #if SOC_SDMMC_USE_GPIO_MATRIX
-    slot_config.clk = (gpio_num_t)ESP3D_SDIO_CLK_PIN;
-    slot_config.cmd = (gpio_num_t)ESP3D_SDIO_CMD_PIN;
-    slot_config.d0 = (gpio_num_t)ESP3D_SDIO_D0_PIN;
-    slot_config.d1 = (gpio_num_t)ESP3D_SDIO_D1_PIN;
-    slot_config.d2 = (gpio_num_t)ESP3D_SDIO_D2_PIN;
-    slot_config.d3 = (gpio_num_t)ESP3D_SDIO_D3_PIN;
+  slot_config.clk = (gpio_num_t)ESP3D_SDIO_CLK_PIN;
+  slot_config.cmd = (gpio_num_t)ESP3D_SDIO_CMD_PIN;
+  slot_config.d0 = (gpio_num_t)ESP3D_SDIO_D0_PIN;
+  slot_config.d1 = (gpio_num_t)ESP3D_SDIO_D1_PIN;
+  slot_config.d2 = (gpio_num_t)ESP3D_SDIO_D2_PIN;
+  slot_config.d3 = (gpio_num_t)ESP3D_SDIO_D3_PIN;
 
-#endif //SOC_SDMMC_USE_GPIO_MATRIX
-    slot_config.flags |= SDMMC_SLOT_FLAG_INTERNAL_PULLUP;
-    slot_config.cd = (gpio_num_t)ESP3D_SD_DETECT_PIN;
-    esp_vfs_fat_sdmmc_mount_config_t mount_config = {
-        .format_if_mount_failed = false,
-        .max_files = 5,
-        .allocation_unit_size = 16 * 1024,
-         /** New IDF 5.0, Try to enable if you need to handle situations when SD cards
-        * are not unmounted properly before physical removal
-        * or you are experiencing issues with SD cards.*/
-        .disk_status_check_enable=false
-    };
-    esp3d_log("Mounting filesystem");
-    esp_err_t ret = esp_vfs_fat_sdmmc_mount(mount_point(), &host, &slot_config, &mount_config, &card);
+#endif  // SOC_SDMMC_USE_GPIO_MATRIX
+  slot_config.flags |= SDMMC_SLOT_FLAG_INTERNAL_PULLUP;
+  slot_config.cd = (gpio_num_t)ESP3D_SD_DETECT_PIN;
+  esp_vfs_fat_sdmmc_mount_config_t mount_config = {
+      .format_if_mount_failed = false,
+      .max_files = 5,
+      .allocation_unit_size = 16 * 1024,
+      /** New IDF 5.0, Try to enable if you need to handle situations when SD
+       * cards are not unmounted properly before physical removal or you are
+       * experiencing issues with SD cards.*/
+      .disk_status_check_enable = false};
+  esp3d_log("Mounting filesystem");
+  esp_err_t ret = esp_vfs_fat_sdmmc_mount(mount_point(), &host, &slot_config,
+                                          &mount_config, &card);
 
-
-    if (ret != ESP_OK) {
-        _state = ESP3D_SDCARD_NOT_PRESENT;
-        if (ret == ESP_FAIL) {
-            esp3d_log_e("Failed to mount filesystem.");
-        } else {
-            esp3d_log_e("Failed to initialize the card (%s). ", esp_err_to_name(ret));
-        }
-        return false;
-    }
-    esp3d_log("Filesystem mounted");
-    _mounted = true;
-    _state = ESP3D_SDCARD_IDLE;
-    return _mounted;
-}
-
-const char * ESP3D_SD::getFileSystemName()
-{
-    return "SDFat native";
-}
-
-bool ESP3D_SD::begin()
-{
-    _started = true;
-    return true;
-}
-
-uint ESP3D_SD::maxPathLength()
-{
-    return CONFIG_FATFS_MAX_LFN;
-}
-
-bool ESP3D_SD::getSpaceInfo(uint64_t * totalBytes,
-                            uint64_t *usedBytes,
-                            uint64_t *freeBytes, bool refreshStats)
-{
-    static uint64_t _totalBytes = 0;
-    static uint64_t _usedBytes=0;
-    static uint64_t _freeBytes=0;
-    esp3d_log("Try to get total and free space");
-    //if not mounted reset values
-    if (!_mounted) {
-        esp3d_log_e("Failed to get total and free space because not mounted");
-        _totalBytes = 0;
-        _usedBytes=0;
-        _freeBytes=0;
-    }
-    //no need to try if not  mounted
-    if ((_totalBytes == 0 || refreshStats) && _mounted) {
-        FATFS *fs;
-        DWORD fre_clust;
-        //we only have one SD card with one partiti0n so should be ok to use "0:"
-        if(f_getfree("0:", &fre_clust, &fs) == FR_OK) {
-            _totalBytes = (fs->n_fatent - 2) * fs->csize;
-            _freeBytes = fre_clust * fs->csize;
-            _totalBytes =  _totalBytes  * (fs->ssize);
-            _freeBytes =   _freeBytes * (fs->ssize);
-            _usedBytes = _totalBytes-_freeBytes;
-        } else {
-            esp3d_log_e("Failed to get total and free space");
-            _totalBytes = 0;
-            _usedBytes=0;
-            _freeBytes=0;
-        }
-    }
-    //answer sizes according request
-    if (totalBytes) {
-        *totalBytes=_totalBytes;
-    }
-    if (usedBytes) {
-        *usedBytes=_usedBytes;
-    }
-    if (freeBytes) {
-        *freeBytes=_freeBytes;
-    }
-    //if total is 0 it is a failure
-    return _totalBytes!=0;
-}
-DIR * ESP3D_SD::opendir(const char * dirpath)
-{
-    std::string dir_path = mount_point();
-    if (strlen(dirpath)!=0) {
-        if (dirpath[0]!='/') {
-            dir_path+="/";
-        }
-        dir_path+=dirpath;
-    }
-    esp3d_log("openDir %s", dir_path.c_str());
-    return ::opendir(dir_path.c_str());
-}
-
-int ESP3D_SD::closedir(DIR *dirp)
-{
-    return ::closedir(dirp);
-}
-
-int ESP3D_SD::stat(const char * filepath,  struct  stat * entry_stat)
-{
-    std::string dir_path = mount_point();
-    if (strlen(filepath)!=0) {
-        if (filepath[0]!='/') {
-            dir_path+="/";
-        }
-        dir_path+=filepath;
-    }
-    //esp3d_log("Stat %s, %d", dir_path.c_str(), ::stat(dir_path.c_str(), entry_stat));
-    return ::stat(dir_path.c_str(), entry_stat);
-}
-
-bool  ESP3D_SD::exists(const char* path)
-{
-    struct  stat  entry_stat;
-    if ( stat(path,  &entry_stat)==0) {
-        return true;
+  if (ret != ESP_OK) {
+    _state = Esp3dSdState::not_present;
+    if (ret == ESP_FAIL) {
+      esp3d_log_e("Failed to mount filesystem.");
     } else {
-        return false;
+      esp3d_log_e("Failed to initialize the card (%s). ", esp_err_to_name(ret));
     }
+    return false;
+  }
+  esp3d_log("Filesystem mounted");
+  _mounted = true;
+  _state = Esp3dSdState::idle;
+  return _mounted;
 }
 
-bool  ESP3D_SD::remove(const char *path)
-{
-    std::string file_path = mount_point();
-    if (strlen(path)!=0) {
-        if (path[0]!='/') {
-            file_path+="/";
-        }
-        file_path+=path;
-    }
-    return !::unlink(file_path.c_str());
+const char *Esp3dSd::getFileSystemName() { return "SDFat native"; }
+
+bool Esp3dSd::begin() {
+  _started = true;
+  return true;
 }
 
-bool  ESP3D_SD::mkdir(const char *path)
-{
-    std::string dir_path = mount_point();
-    if (strlen(path)!=0) {
-        if (path[0]!='/') {
-            dir_path+="/";
-        }
-        dir_path+=path;
+uint Esp3dSd::maxPathLength() { return CONFIG_FATFS_MAX_LFN; }
+
+bool Esp3dSd::getSpaceInfo(uint64_t *totalBytes, uint64_t *usedBytes,
+                           uint64_t *freeBytes, bool refreshStats) {
+  static uint64_t _totalBytes = 0;
+  static uint64_t _usedBytes = 0;
+  static uint64_t _freeBytes = 0;
+  esp3d_log("Try to get total and free space");
+  // if not mounted reset values
+  if (!_mounted) {
+    esp3d_log_e("Failed to get total and free space because not mounted");
+    _totalBytes = 0;
+    _usedBytes = 0;
+    _freeBytes = 0;
+  }
+  // no need to try if not  mounted
+  if ((_totalBytes == 0 || refreshStats) && _mounted) {
+    FATFS *fs;
+    DWORD fre_clust;
+    // we only have one SD card with one partiti0n so should be ok to use "0:"
+    if (f_getfree("0:", &fre_clust, &fs) == FR_OK) {
+      _totalBytes = (fs->n_fatent - 2) * fs->csize;
+      _freeBytes = fre_clust * fs->csize;
+      _totalBytes = _totalBytes * (fs->ssize);
+      _freeBytes = _freeBytes * (fs->ssize);
+      _usedBytes = _totalBytes - _freeBytes;
+    } else {
+      esp3d_log_e("Failed to get total and free space");
+      _totalBytes = 0;
+      _usedBytes = 0;
+      _freeBytes = 0;
     }
-    return !::mkdir(dir_path.c_str(), 0777);
+  }
+  // answer sizes according request
+  if (totalBytes) {
+    *totalBytes = _totalBytes;
+  }
+  if (usedBytes) {
+    *usedBytes = _usedBytes;
+  }
+  if (freeBytes) {
+    *freeBytes = _freeBytes;
+  }
+  // if total is 0 it is a failure
+  return _totalBytes != 0;
+}
+DIR *Esp3dSd::opendir(const char *dirpath) {
+  std::string dir_path = mount_point();
+  if (strlen(dirpath) != 0) {
+    if (dirpath[0] != '/') {
+      dir_path += "/";
+    }
+    dir_path += dirpath;
+  }
+  esp3d_log("openDir %s", dir_path.c_str());
+  return ::opendir(dir_path.c_str());
 }
 
-bool  ESP3D_SD::rmdir(const char *path)
-{
-    std::string dir_path = mount_point();
-    if (strlen(path)!=0) {
-        if (path[0]!='/') {
-            dir_path+="/";
-        }
-        dir_path+=path;
+int Esp3dSd::closedir(DIR *dirp) { return ::closedir(dirp); }
+
+int Esp3dSd::stat(const char *filepath, struct stat *entry_stat) {
+  std::string dir_path = mount_point();
+  if (strlen(filepath) != 0) {
+    if (filepath[0] != '/') {
+      dir_path += "/";
     }
-    return !::rmdir(dir_path.c_str());
-}
-bool  ESP3D_SD::rename(const char *oldpath, const char *newpath)
-{
-    std::string old_path = mount_point();
-    std::string new_path = mount_point();
-    if (strlen(oldpath)!=0) {
-        if (oldpath[0]!='/') {
-            old_path+="/";
-        }
-        old_path+=oldpath;
-    }
-    if (strlen(newpath)!=0) {
-        if (newpath[0]!='/') {
-            new_path+="/";
-        }
-        new_path+=newpath;
-    }
-    struct stat st;
-    if (::stat(new_path.c_str(), &st) == 0) {
-        ::unlink(new_path.c_str());
-    }
-    return !::rename(old_path.c_str(),new_path.c_str());
+    dir_path += filepath;
+  }
+  // esp3d_log("Stat %s, %d", dir_path.c_str(), ::stat(dir_path.c_str(),
+  // entry_stat));
+  return ::stat(dir_path.c_str(), entry_stat);
 }
 
-FILE * ESP3D_SD::open ( const char * filename, const char * mode )
-{
-    std::string file_path = mount_point();
-    if (strlen(filename)!=0) {
-        if (filename[0]!='/') {
-            file_path+="/";
-        }
-        file_path+=filename;
+bool Esp3dSd::exists(const char *path) {
+  struct stat entry_stat;
+  if (stat(path, &entry_stat) == 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool Esp3dSd::remove(const char *path) {
+  std::string file_path = mount_point();
+  if (strlen(path) != 0) {
+    if (path[0] != '/') {
+      file_path += "/";
     }
-    return fopen(file_path.c_str(), mode);
+    file_path += path;
+  }
+  return !::unlink(file_path.c_str());
 }
 
-struct dirent * ESP3D_SD::readdir(DIR *dir)
-{
-    return ::readdir(dir);
+bool Esp3dSd::mkdir(const char *path) {
+  std::string dir_path = mount_point();
+  if (strlen(path) != 0) {
+    if (path[0] != '/') {
+      dir_path += "/";
+    }
+    dir_path += path;
+  }
+  return !::mkdir(dir_path.c_str(), 0777);
 }
 
-void ESP3D_SD::rewinddir(DIR * dir)
-{
-    ::rewinddir(dir);
+bool Esp3dSd::rmdir(const char *path) {
+  std::string dir_path = mount_point();
+  if (strlen(path) != 0) {
+    if (path[0] != '/') {
+      dir_path += "/";
+    }
+    dir_path += path;
+  }
+  return !::rmdir(dir_path.c_str());
+}
+bool Esp3dSd::rename(const char *oldpath, const char *newpath) {
+  std::string old_path = mount_point();
+  std::string new_path = mount_point();
+  if (strlen(oldpath) != 0) {
+    if (oldpath[0] != '/') {
+      old_path += "/";
+    }
+    old_path += oldpath;
+  }
+  if (strlen(newpath) != 0) {
+    if (newpath[0] != '/') {
+      new_path += "/";
+    }
+    new_path += newpath;
+  }
+  struct stat st;
+  if (::stat(new_path.c_str(), &st) == 0) {
+    ::unlink(new_path.c_str());
+  }
+  return !::rename(old_path.c_str(), new_path.c_str());
 }
 
-void  ESP3D_SD::close(FILE * fd)
-{
-    fclose(fd);
+FILE *Esp3dSd::open(const char *filename, const char *mode) {
+  std::string file_path = mount_point();
+  if (strlen(filename) != 0) {
+    if (filename[0] != '/') {
+      file_path += "/";
+    }
+    file_path += filename;
+  }
+  return fopen(file_path.c_str(), mode);
 }
 
-#endif//ESP3D_SD_IS_SDIO
+struct dirent *Esp3dSd::readdir(DIR *dir) { return ::readdir(dir); }
+
+void Esp3dSd::rewinddir(DIR *dir) { ::rewinddir(dir); }
+
+void Esp3dSd::close(FILE *fd) { fclose(fd); }
+
+#endif  // ESP3D_SD_IS_SDIO

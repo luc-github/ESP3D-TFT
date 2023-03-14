@@ -18,57 +18,52 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #if ESP3D_SD_CARD_FEATURE
-#include "sd_def.h"
 #include "esp3d_sd.h"
+
 #include <stdio.h>
-#include "esp3d_string.h"
+
 #include "esp3d_log.h"
+#include "esp3d_string.h"
+#include "sd_def.h"
 
-ESP3D_SD sd;
+Esp3dSd sd;
 
-ESP3D_SD::ESP3D_SD()
-{
-    _mounted = false;
-    _started = false;
-    _spi_speed_divider = 0;
-    _state = ESP3D_SDCARD_UNKNOWN;
+Esp3dSd::Esp3dSd() {
+  _mounted = false;
+  _started = false;
+  _spi_speed_divider = 0;
+  _state = Esp3dSdState::unknown;
 }
 
-esp3d_fs_types ESP3D_SD::getFSType(const char * path)
-{
-    (void)path;
-    return FS_SD;
+esp3d_fs_types Esp3dSd::getFSType(const char* path) {
+  (void)path;
+  return FS_SD;
 }
 
-bool  ESP3D_SD::accessFS(esp3d_fs_types FS)
-{
-    (void)FS;
-    //if card is busy do not let another task access SD and so prevent a release
-    if (getState() != ESP3D_SDCARD_IDLE ) {
-        esp3d_log( "SDCard not idle");
-        return false;
-    }
-    esp3d_log("Access SD");
-    _state=ESP3D_SDCARD_BUSY;
-    return true;
-
+bool Esp3dSd::accessFS(esp3d_fs_types FS) {
+  (void)FS;
+  // if card is busy do not let another task access SD and so prevent a release
+  if (getState() != Esp3dSdState::idle) {
+    esp3d_log("SDCard not idle");
+    return false;
+  }
+  esp3d_log("Access SD");
+  _state = Esp3dSdState::busy;
+  return true;
 }
 
-void  ESP3D_SD::releaseFS(esp3d_fs_types FS)
-{
-    (void)FS;
-    esp3d_log("Release SD");
-    setState(ESP3D_SDCARD_IDLE);
+void Esp3dSd::releaseFS(esp3d_fs_types FS) {
+  (void)FS;
+  esp3d_log("Release SD");
+  setState(Esp3dSdState::idle);
 }
 
-
-esp3d_sd_states ESP3D_SD::getState()
-{
-    if (_state==ESP3D_SDCARD_BUSY) {
-        return _state;
-    }
-    mount();
+Esp3dSdState Esp3dSd::getState() {
+  if (_state == Esp3dSdState::busy) {
     return _state;
+  }
+  mount();
+  return _state;
 };
 
-#endif // ESP3D_SD_CARD_FEATURE
+#endif  // ESP3D_SD_CARD_FEATURE

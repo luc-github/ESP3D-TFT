@@ -220,7 +220,7 @@ void Esp3DCommands::ESP740(int cmd_params_pos, esp3d_msg_t *msg) {
 
   } else {
     hasError = true;
-    if (sd.getState() == ESP3D_SDCARD_BUSY) {
+    if (sd.getState() == Esp3dSdState::busy) {
       error_msg = "SD busy";
     } else {
       error_msg = "No SD";
