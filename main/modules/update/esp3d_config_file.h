@@ -20,38 +20,41 @@
 
 #pragma once
 #include <stdio.h>
-#include <string>
-#include <functional>
 
+#include <functional>
+#include <string>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef std::function<bool(const char*, const char*,const char*)> TProcessingFunction;
+typedef std::function<bool(const char *, const char *, const char *)>
+    processingFunction_t;
 
-class Esp3DConfigFile final
-{
-public:
-    Esp3DConfigFile(const char * path,  TProcessingFunction fn, const char * scrambledpath =nullptr,const char ** protectedkeys=nullptr);
-    ~Esp3DConfigFile();
-    char * trimSpaces(char * line, uint8_t maxsize=0);
-    bool isComment(char * line);
-    bool isSection(char * line);
-    bool isValue(char * line);
-    char * getSectionName(char * line);
-    char * getKeyName(char * line);
-    char * getValue(char * line);
-    bool processFile();
-    bool revokeFile();
-private:
-    bool isScrambleKey(const char *key, const char * str);
-    std::string _filename;
-    std::string _scrambledFilename;
-    const char ** _protectedkeys;
-    TProcessingFunction _pfunction;
+class Esp3DConfigFile final {
+ public:
+  Esp3DConfigFile(const char *path, processingFunction_t fn,
+                  const char *scrambledpath = nullptr,
+                  const char **protectedkeys = nullptr);
+  ~Esp3DConfigFile();
+  char *trimSpaces(char *line, uint8_t maxsize = 0);
+  bool isComment(char *line);
+  bool isSection(char *line);
+  bool isValue(char *line);
+  char *getSectionName(char *line);
+  char *getKeyName(char *line);
+  char *getValue(char *line);
+  bool processFile();
+  bool revokeFile();
+
+ private:
+  bool isScrambleKey(const char *key, const char *str);
+  std::string _filename;
+  std::string _scrambledFilename;
+  const char **_protectedkeys;
+  processingFunction_t _pfunction;
 };
 
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif

@@ -30,7 +30,7 @@
 // feature [ESP950]<SERIAL/USB> json=<no> pwd=<admin/user password>
 void Esp3DCommands::ESP950(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClient target = msg->origin;
-  esp3d_request_t requestId = msg->requestId;
+  Esp3dRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
   msg->origin = Esp3dClient::command;

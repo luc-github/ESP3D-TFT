@@ -68,7 +68,7 @@
 //[ESP420]json=<no>
 void Esp3DCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
   Esp3dClient target = msg->origin;
-  esp3d_request_t requestId = msg->requestId;
+  Esp3dRequest requestId = msg->request_id;
   msg->target = target;
   msg->origin = Esp3dClient::command;
   bool json = hasTag(msg, cmd_params_pos, "json");

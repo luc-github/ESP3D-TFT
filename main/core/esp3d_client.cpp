@@ -140,17 +140,17 @@ Esp3dMessage* Esp3DClient::newMsg() {
     newMsgPtr->origin = Esp3dClient::no_client;
     newMsgPtr->target = Esp3dClient::all_clients;
     newMsgPtr->authentication_level = Esp3dAuthenticationLevel::guest;
-    newMsgPtr->requestId.id = esp_timer_get_time();
+    newMsgPtr->request_id.id = esp_timer_get_time();
     newMsgPtr->type = Esp3dMessageType::head;
   }
   return newMsgPtr;
 }
 
-Esp3dMessage* Esp3DClient::newMsg(esp3d_request_t requestId) {
+Esp3dMessage* Esp3DClient::newMsg(Esp3dRequest requestId) {
   Esp3dMessage* newMsgPtr = newMsg();
   if (newMsgPtr) {
     newMsgPtr->origin = Esp3dClient::command;
-    newMsgPtr->requestId = requestId;
+    newMsgPtr->request_id = requestId;
   }
   return newMsgPtr;
 }
@@ -162,7 +162,7 @@ bool Esp3DClient::copyMsgInfos(Esp3dMessage* newMsgPtr, Esp3dMessage msg) {
   newMsgPtr->origin = msg.origin;
   newMsgPtr->target = msg.target;
   newMsgPtr->authentication_level = msg.authentication_level;
-  newMsgPtr->requestId = msg.requestId;
+  newMsgPtr->request_id = msg.request_id;
   newMsgPtr->type = msg.type;
   return true;
 }
@@ -177,17 +177,17 @@ Esp3dMessage* Esp3DClient::copyMsgInfos(Esp3dMessage msg) {
 
 Esp3dMessage* Esp3DClient::copyMsg(Esp3dMessage msg) {
   Esp3dMessage* newMsgPtr = newMsg(msg.origin, msg.target, msg.data, msg.size,
-                               msg.authentication_level);
+                                   msg.authentication_level);
   if (newMsgPtr) {
-    newMsgPtr->requestId = msg.requestId;
+    newMsgPtr->request_id = msg.request_id;
     newMsgPtr->type = msg.type;
   }
   return newMsgPtr;
 }
 
-Esp3dMessage* Esp3DClient::newMsg(Esp3dClient origin, Esp3dClient target,
-                              const uint8_t* data, size_t length,
-                              Esp3dAuthenticationLevel authentication_level) {
+Esp3dMessage* Esp3DClient::newMsg(
+    Esp3dClient origin, Esp3dClient target, const uint8_t* data, size_t length,
+    Esp3dAuthenticationLevel authentication_level) {
   Esp3dMessage* newMsgPtr = newMsg(origin, target, authentication_level);
   if (newMsgPtr) {
     if (!setDataContent(newMsgPtr, data, length)) {
@@ -198,8 +198,9 @@ Esp3dMessage* Esp3DClient::newMsg(Esp3dClient origin, Esp3dClient target,
   return newMsgPtr;
 }
 
-Esp3dMessage* Esp3DClient::newMsg(Esp3dClient origin, Esp3dClient target,
-                              Esp3dAuthenticationLevel authentication_level) {
+Esp3dMessage* Esp3DClient::newMsg(
+    Esp3dClient origin, Esp3dClient target,
+    Esp3dAuthenticationLevel authentication_level) {
   Esp3dMessage* newMsgPtr = newMsg();
   if (newMsgPtr) {
     newMsgPtr->origin = origin;

@@ -33,10 +33,10 @@
 extern "C" {
 #endif
 
-typedef union {
+union Esp3dRequest {
   uint id;
-  httpd_req_t *httpReq;
-} esp3d_request_t;
+  httpd_req_t *http_request;
+};
 
 enum class Esp3dMessageType : uint8_t { head, core, tail, unique };
 
@@ -46,7 +46,7 @@ struct Esp3dMessage {
   Esp3dClient origin;
   Esp3dClient target;
   Esp3dAuthenticationLevel authentication_level;
-  esp3d_request_t requestId;
+  Esp3dRequest request_id;
   Esp3dMessageType type;
 };
 
@@ -76,7 +76,7 @@ class Esp3DClient {
   static Esp3dMessage *copyMsgInfos(Esp3dMessage msg);
   static bool copyMsgInfos(Esp3dMessage *newMsgPtr, Esp3dMessage msg);
   static Esp3dMessage *newMsg();
-  static Esp3dMessage *newMsg(esp3d_request_t requestId);
+  static Esp3dMessage *newMsg(Esp3dRequest requestId);
   static Esp3dMessage *newMsg(Esp3dClient origin, Esp3dClient target,
                               Esp3dAuthenticationLevel authentication_level =
                                   Esp3dAuthenticationLevel::guest);

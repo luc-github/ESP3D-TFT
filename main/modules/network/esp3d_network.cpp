@@ -356,7 +356,7 @@ bool Esp3DNetwork::startStaMode() {
     }
   }
   std::string stmp;
-  esp3d_request_t requestId = {.id = 0};
+  Esp3dRequest requestId = {.id = 0};
   stmp = "Connection to ";
   stmp += ssid_str;
   stmp += "\n";
@@ -515,7 +515,7 @@ bool Esp3DNetwork::startApMode(bool configMode) {
 
   esp_netif_ip_info_t ip_info;
   std::string stmp;
-  esp3d_request_t requestId = {.id = 0};
+  Esp3dRequest requestId = {.id = 0};
   _current_radio_mode = Esp3dRadioMode::wifi_ap;
   if (ESP_OK == esp_netif_get_ip_info(_wifiApPtr, &ip_info)) {
 #if ESP3D_TFT_LOG
@@ -562,7 +562,7 @@ bool Esp3DNetwork::startNoRadioMode() {
   esp3d_log("Start No Radio Mode");
   std::string stmp = "Radio is off\n";
   _current_radio_mode = Esp3dRadioMode::off;
-  esp3d_request_t requestId = {.id = 0};
+  Esp3dRequest requestId = {.id = 0};
   esp3dCommands.dispatch(stmp.c_str(), Esp3dClient::all_clients, requestId,
                          Esp3dMessageType::unique, Esp3dClient::system,
                          Esp3dAuthenticationLevel::admin);

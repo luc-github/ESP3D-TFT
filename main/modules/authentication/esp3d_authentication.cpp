@@ -113,8 +113,8 @@ bool Esp3DAuthenticationService::createRecord(const char *sessionId,
   memset(&rec, 0, sizeof(rec));
   rec.level = level;
   rec.client_type = client_type;
-  rec.socketId = socketId;
-  strcpy(rec.sessionId, sessionId);
+  rec.socket_id = socketId;
+  strcpy(rec.session_id, sessionId);
   rec.last_time = esp3d_hal::millis();
   _sessions.push_back(rec);
   return true;
@@ -127,8 +127,8 @@ bool Esp3DAuthenticationService::clearSession(const char *sessionId) {
     for (auto session = _sessions.begin(); session != _sessions.end();
          ++session) {
       esp3d_log("checking session %s vs %s, type: %d, socketId: %d", sessionId,
-                session->sessionId, session->client_type, session->socketId);
-      if (strcmp(session->sessionId, sessionId) == 0) {
+                session->session_id, session->client_type, session->socket_id);
+      if (strcmp(session->session_id, sessionId) == 0) {
         esp3d_log("Clear session %s succeed", sessionId);
         _sessions.erase(session++);
         return true;
@@ -146,7 +146,7 @@ void Esp3DAuthenticationService::clearSessions(Esp3dClient client_type) {
   for (auto session = _sessions.begin(); session != _sessions.end();
        ++session) {
     if (session->client_type == client_type) {
-      esp3d_log("Clear session %s succeed", session->sessionId);
+      esp3d_log("Clear session %s succeed", session->session_id);
       _sessions.erase(session++);
     }
   }
@@ -157,7 +157,7 @@ Esp3dAuthenticationRecord *Esp3DAuthenticationService::getRecord(
     const char *sessionId) {
   for (auto session = _sessions.begin(); session != _sessions.end();
        ++session) {
-    if (strcmp(session->sessionId, sessionId) == 0) {
+    if (strcmp(session->session_id, sessionId) == 0) {
       return &(*session);
     }
   }
@@ -168,9 +168,9 @@ Esp3dAuthenticationRecord *Esp3DAuthenticationService::getRecord(
     int socketId, Esp3dClient client_type) {
   for (auto session = _sessions.begin(); session != _sessions.end();
        ++session) {
-    if ((socketId == -1 || session->socketId == socketId) &&
+    if ((socketId == -1 || session->socket_id == socketId) &&
         session->client_type == client_type) {
-      esp3d_log("Found session %s", session->sessionId);
+      esp3d_log("Found session %s", session->session_id);
       return &(*session);
     }
   }
@@ -182,7 +182,7 @@ bool Esp3DAuthenticationService::updateRecord(
     int socketId, Esp3dClient client_type, Esp3dAuthenticationLevel newlevel) {
   for (auto session = _sessions.begin(); session != _sessions.end();
        ++session) {
-    if (session->client_type == client_type && session->socketId == socketId) {
+    if (session->client_type == client_type && session->socket_id == socketId) {
       session->level = newlevel;
       return true;
     }
@@ -195,8 +195,8 @@ uint8_t Esp3DAuthenticationService::activeSessionsCount(Esp3dClient type) {
   for (auto session = _sessions.begin(); session != _sessions.end();
        ++session) {
     if (session->client_type == type) {
-      esp3d_log("Session found: %s, socket: %d, lvl: %d ", session->sessionId,
-                session->socketId, session->level);
+      esp3d_log("Session found: %s, socket: %d, lvl: %d ", session->session_id,
+                session->socket_id, session->level);
       ++count;
     }
   }
@@ -206,7 +206,7 @@ uint8_t Esp3DAuthenticationService::activeSessionsCount(Esp3dClient type) {
 void Esp3DAuthenticationService::updateRecords() {
   for (auto session = _sessions.begin(); session != _sessions.end();
        ++session) {
-    esp3d_log("session %s, type %d", session->sessionId, session->client_type);
+    esp3d_log("session %s, type %d", session->session_id, session->client_type);
     // todo if type == webui check timestamp and last update
     // if session timout=0 =>TBD
     // other : TBD

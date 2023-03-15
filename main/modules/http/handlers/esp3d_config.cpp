@@ -37,7 +37,7 @@ esp_err_t Esp3DHttpService::config_handler(httpd_req_t *req) {
                           (const uint8_t *)"[ESP420]addPreTag",
                           strlen("[ESP420]addPreTag"), authentication_level);
   if (newMsgPtr) {
-    newMsgPtr->requestId.httpReq = req;
+    newMsgPtr->request_id.http_request = req;
     esp3dCommands.process(newMsgPtr);
     return ESP_OK;
   } else {

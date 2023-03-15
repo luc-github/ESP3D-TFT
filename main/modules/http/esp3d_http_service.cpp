@@ -361,7 +361,7 @@ bool Esp3DHttpService::begin() {
         (httpd_err_handler_func_t)file_not_found_handler);
 
     // websocket service
-    Esp3dWebSocketConfig wsConfig = {.serverHandle = _server,
+    Esp3dWebSocketConfig wsConfig = {.server_handle = _server,
                                      .max_clients = 1,
                                      .type = esp3dSocketType::websocket_webui};
     _started = esp3dWsWebUiService.begin(&wsConfig);
@@ -810,16 +810,16 @@ esp_err_t Esp3DHttpService::streamFile(const char *path, httpd_req_t *req) {
 }
 
 void Esp3DHttpService::process(Esp3dMessage *msg) {
-  if (msg->requestId.httpReq) {
+  if (msg->request_id.http_request) {
     // esp3d_log("Msg type : %d", msg->type);
-    if (httpd_resp_send_chunk(msg->requestId.httpReq, (const char *)msg->data,
-                              msg->size) != ESP_OK) {
-      httpd_resp_send_chunk(msg->requestId.httpReq, NULL, 0);
+    if (httpd_resp_send_chunk(msg->request_id.http_request,
+                              (const char *)msg->data, msg->size) != ESP_OK) {
+      httpd_resp_send_chunk(msg->request_id.http_request, NULL, 0);
       esp3d_log_e("Error sending data, closing chunk");
     } else {
       if (msg->type == Esp3dMessageType::tail ||
           msg->type == Esp3dMessageType::unique) {
-        httpd_resp_send_chunk(msg->requestId.httpReq, NULL, 0);
+        httpd_resp_send_chunk(msg->request_id.http_request, NULL, 0);
         esp3d_log("End of messages for this req, closing chunk");
       }
     }

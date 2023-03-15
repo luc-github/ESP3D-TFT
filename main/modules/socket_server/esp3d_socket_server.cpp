@@ -56,7 +56,7 @@ uint ESP3DSocketServer::clientsConnected() {
   uint count = 0;
   if (_started) {
     for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
-      if (_clients[s].socketId != FREE_SOCKET_HANDLE) {
+      if (_clients[s].socket_id != FREE_SOCKET_HANDLE) {
         count++;
       }
     }
@@ -67,7 +67,7 @@ uint ESP3DSocketServer::clientsConnected() {
 Esp3dSocketInfos *ESP3DSocketServer::getClientInfos(uint index) {
   if (_started) {
     if (index <= ESP3D_MAX_SOCKET_CLIENTS) {
-      if (_clients[index].socketId != FREE_SOCKET_HANDLE) {
+      if (_clients[index].socket_id != FREE_SOCKET_HANDLE) {
         return &_clients[index];
       }
     }
@@ -149,20 +149,20 @@ void ESP3DSocketServer::readSockets() {
   }
 
   for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
-    if (_clients[s].socketId != FREE_SOCKET_HANDLE) {
-      len = recv(_clients[s].socketId, _data, ESP3D_SOCKET_RX_BUFFER_SIZE, 0);
+    if (_clients[s].socket_id != FREE_SOCKET_HANDLE) {
+      len = recv(_clients[s].socket_id, _data, ESP3D_SOCKET_RX_BUFFER_SIZE, 0);
       if (len < 0) {
         if (errno == EINPROGRESS || errno == EAGAIN || errno == EWOULDBLOCK) {
           continue;  // Not an error
         }
         if (errno == ENOTCONN) {
           esp3d_log("Connection closed");
-          closeSocket(_clients[s].socketId);
+          closeSocket(_clients[s].socket_id);
           continue;
         }
         esp3d_log_e("Error occurred during receiving: errno %d on socket %d",
                     errno, s);
-        closeSocket(_clients[s].socketId);
+        closeSocket(_clients[s].socket_id);
       } else {
         _data[len] = 0;  // Null-terminate whatever is received and treat it
                          // like a string
@@ -252,19 +252,19 @@ bool ESP3DSocketServer::getClient() {
     return false;
   }
 #if ESP3D_AUTHENTICATION_FEATURE
-  memset(_clients[freeIndex].sessionId, 0,
-         sizeof(_clients[freeIndex].sessionId));
+  memset(_clients[freeIndex].session_id, 0,
+         sizeof(_clients[freeIndex].session_id));
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
   // copy informations of the client
-  _clients[freeIndex].socketId = sock;
+  _clients[freeIndex].socket_id = sock;
   memcpy(&_clients[freeIndex].source_addr, &source_addr, sizeof(source_addr));
   // Marking the socket as non-blocking
-  int flags = fcntl(_clients[freeIndex].socketId, F_GETFL);
-  if (fcntl(_clients[freeIndex].socketId, F_SETFL, flags | O_NONBLOCK) ==
+  int flags = fcntl(_clients[freeIndex].socket_id, F_GETFL);
+  if (fcntl(_clients[freeIndex].socket_id, F_SETFL, flags | O_NONBLOCK) ==
       SOCKET_ERROR) {
     esp3d_log_e("Unable to set socket non blocking: errno %d: %s", errno,
                 strerror(errno));
-    closeSocket(_clients[freeIndex].socketId);
+    closeSocket(_clients[freeIndex].socket_id);
     return false;
   }
 #if ESP3D_TFT_LOG
@@ -279,7 +279,7 @@ bool ESP3DSocketServer::getClient() {
 
 int ESP3DSocketServer::getFreeClientSlot() {
   for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
-    if (_clients[s].socketId == FREE_SOCKET_HANDLE) {
+    if (_clients[s].socket_id == FREE_SOCKET_HANDLE) {
       return s;
     }
   }
@@ -290,13 +290,13 @@ bool ESP3DSocketServer::closeSocket(int socketId) {
   if (socketId != FREE_SOCKET_HANDLE)
 
     for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
-      if (_clients[s].socketId == socketId) {
+      if (_clients[s].socket_id == socketId) {
 #if ESP3D_AUTHENTICATION_FEATURE
-        esp3dAuthenthicationService.clearSession(_clients[s].sessionId);
+        esp3dAuthenthicationService.clearSession(_clients[s].session_id);
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
         shutdown(socketId, 0);
         close(socketId);
-        _clients[s].socketId = FREE_SOCKET_HANDLE;
+        _clients[s].socket_id = FREE_SOCKET_HANDLE;
         memset(&_clients[s].source_addr, 0, sizeof(struct sockaddr_storage));
         return true;
       }
@@ -310,7 +310,7 @@ ESP3DSocketServer::ESP3DSocketServer() {
   _listen_socket = FREE_SOCKET_HANDLE;
   memset(_clients, 0, sizeof(Esp3dSocketInfos) * ESP3D_MAX_SOCKET_CLIENTS);
   for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
-    _clients[s].socketId = FREE_SOCKET_HANDLE;
+    _clients[s].socket_id = FREE_SOCKET_HANDLE;
   }
   _data = NULL;
   _buffer = NULL;
@@ -394,7 +394,7 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
       Esp3dAuthenticationLevel::guest;
 #if ESP3D_AUTHENTICATION_FEATURE
   esp3d_log("Check authentication level");
-  if (strlen(client->sessionId) == 0) {
+  if (strlen(client->session_id) == 0) {
     esp3d_log("No sessionId");
     std::string str =
         esp3dCommands.get_param((const char *)msg, size, 0, "pwd=");
@@ -403,26 +403,26 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
     esp3d_log("Authentication Level = %d", authentication_level);
     if (authentication_level == Esp3dAuthenticationLevel::guest) {
       esp3d_log("Authentication Level = GUEST, for %s", (const char *)msg);
-      sendToSocket(client->socketId, ERROR_MSG, strlen(ERROR_MSG));
+      sendToSocket(client->socket_id, ERROR_MSG, strlen(ERROR_MSG));
       return false;
     }
     // 1 -  create  session id
     // 2 -  add session id to client info
-    strcpy(client->sessionId, esp3dAuthenthicationService.create_session_id(
-                                  client->source_addr, client->socketId));
+    strcpy(client->session_id, esp3dAuthenthicationService.create_session_id(
+                                   client->source_addr, client->socket_id));
     // 3 -  add session id to _sessions list
     if (!esp3dAuthenthicationService.createRecord(
-            client->sessionId, client->socketId, authentication_level,
+            client->session_id, client->socket_id, authentication_level,
             Esp3dClient::telnet)) {
       esp3d_log("Authentication error, rejected.");
-      sendToSocket(client->socketId, ERROR_MSG, strlen(ERROR_MSG));
+      sendToSocket(client->socket_id, ERROR_MSG, strlen(ERROR_MSG));
       return false;
     }
   } else {
-    esp3d_log("SessionId is %s", client->sessionId);
+    esp3d_log("SessionId is %s", client->session_id);
     // No need to check time out as session is deleted on close
     Esp3dAuthenticationRecord *rec =
-        esp3dAuthenthicationService.getRecord(client->sessionId);
+        esp3dAuthenthicationService.getRecord(client->session_id);
     if (rec != NULL) {
       authentication_level = rec->level;
     } else {
@@ -441,7 +441,7 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
       newMsgPtr->authentication_level = authentication_level;
       newMsgPtr->target = esp3dCommands.getOutputClient();
       newMsgPtr->type = Esp3dMessageType::unique;
-      newMsgPtr->requestId.id = client->socketId;
+      newMsgPtr->request_id.id = client->socket_id;
       if (!addRXData(newMsgPtr)) {
         // delete message as cannot be added to the queue
         Esp3DClient::deleteMsg(newMsgPtr);
@@ -473,10 +473,10 @@ void ESP3DSocketServer::handle() {
       Esp3dMessage *msg = popTx();
       if (msg) {
         for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
-          if (_clients[s].socketId != FREE_SOCKET_HANDLE) {
-            if (msg->requestId.id == 0 ||
-                msg->requestId.id == _clients[s].socketId) {
-              sendToSocket(_clients[s].socketId, (const char *)msg->data,
+          if (_clients[s].socket_id != FREE_SOCKET_HANDLE) {
+            if (msg->request_id.id == 0 ||
+                msg->request_id.id == _clients[s].socket_id) {
+              sendToSocket(_clients[s].socket_id, (const char *)msg->data,
                            msg->size);
             }
           }
@@ -539,6 +539,6 @@ void ESP3DSocketServer::end() {
 
 void ESP3DSocketServer::closeAllClients() {
   for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
-    closeSocket(_clients[s].socketId);
+    closeSocket(_clients[s].socket_id);
   }
 }

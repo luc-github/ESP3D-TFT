@@ -395,7 +395,7 @@ uint32_t Esp3DSettings::getDefaultIntegerSetting(
     esp3d_setting_index_t settingElement) {
   const Esp3dSettingDescription* query = getSettingPtr(settingElement);
   if (query) {
-    return (uint32_t)std::stoul(std::string(query->defaultval), NULL, 0);
+    return (uint32_t)std::stoul(std::string(query->default_val), NULL, 0);
   }
   return 0;
 }
@@ -403,7 +403,7 @@ const char* Esp3DSettings::getDefaultStringSetting(
     esp3d_setting_index_t settingElement) {
   const Esp3dSettingDescription* query = getSettingPtr(settingElement);
   if (query) {
-    return query->defaultval;
+    return query->default_val;
   }
   return nullptr;
 }
@@ -411,7 +411,7 @@ uint8_t Esp3DSettings::getDefaultByteSetting(
     esp3d_setting_index_t settingElement) {
   const Esp3dSettingDescription* query = getSettingPtr(settingElement);
   if (query) {
-    return (uint8_t)std::stoul(std::string(query->defaultval), NULL, 0);
+    return (uint8_t)std::stoul(std::string(query->default_val), NULL, 0);
   }
   return 0;
 }
@@ -468,29 +468,29 @@ bool Esp3DSettings::reset() {
     esp3d_setting_index_t setting = (esp3d_setting_index_t)i;
     const Esp3dSettingDescription* query = getSettingPtr(setting);
     if (query) {
-      esp3d_log("Reseting %d value to %s", setting, query->defaultval);
+      esp3d_log("Reseting %d value to %s", setting, query->default_val);
       switch (query->type) {
         case Esp3dSettingType::byte_t:
           if (!Esp3DSettings::writeByte(
-                  setting, (uint8_t)std::stoul(std::string(query->defaultval),
+                  setting, (uint8_t)std::stoul(std::string(query->default_val),
                                                NULL, 0))) {
-            esp3d_log_e("Error writing %s to settings %d", query->defaultval,
+            esp3d_log_e("Error writing %s to settings %d", query->default_val,
                         setting);
             result = false;
           }
           break;
         case Esp3dSettingType::ip:
-          if (!Esp3DSettings::writeIPString(setting, query->defaultval)) {
-            esp3d_log_e("Error writing %s to settings %d", query->defaultval,
+          if (!Esp3DSettings::writeIPString(setting, query->default_val)) {
+            esp3d_log_e("Error writing %s to settings %d", query->default_val,
                         setting);
             result = false;
           }
           break;
         case Esp3dSettingType::integer_t:
           if (!Esp3DSettings::writeUint32(
-                  setting, (uint32_t)std::stoul(std::string(query->defaultval),
+                  setting, (uint32_t)std::stoul(std::string(query->default_val),
                                                 NULL, 0))) {
-            esp3d_log_e("Error writing %s to settings %d", query->defaultval,
+            esp3d_log_e("Error writing %s to settings %d", query->default_val,
                         setting);
             result = false;
           }
@@ -498,13 +498,13 @@ bool Esp3DSettings::reset() {
         case Esp3dSettingType::string_t:
           if (setting == esp3d_version) {
             if (!Esp3DSettings::writeString(setting, SETTING_VERSION)) {
-              esp3d_log_e("Error writing %s to settings %d", query->defaultval,
+              esp3d_log_e("Error writing %s to settings %d", query->default_val,
                           setting);
               result = false;
             }
           } else {
-            if (!Esp3DSettings::writeString(setting, query->defaultval)) {
-              esp3d_log_e("Error writing %s to settings %d", query->defaultval,
+            if (!Esp3DSettings::writeString(setting, query->default_val)) {
+              esp3d_log_e("Error writing %s to settings %d", query->default_val,
                           setting);
               result = false;
             }
@@ -548,7 +548,7 @@ uint8_t Esp3DSettings::readByte(esp3d_setting_index_t index, bool* haserror) {
           return value;
         }
         if (err == ESP_ERR_NVS_NOT_FOUND) {
-          value = (uint8_t)std::stoul(std::string(query->defaultval), NULL, 0);
+          value = (uint8_t)std::stoul(std::string(query->default_val), NULL, 0);
           if (haserror) {
             *haserror = false;
           }
@@ -587,10 +587,10 @@ uint32_t Esp3DSettings::readUint32(esp3d_setting_index_t index,
         if (err == ESP_ERR_NVS_NOT_FOUND) {
           if (query->type == Esp3dSettingType::integer_t) {
             value =
-                (uint32_t)std::stoul(std::string(query->defaultval), NULL, 0);
+                (uint32_t)std::stoul(std::string(query->default_val), NULL, 0);
           } else {  // ip is stored as uin32t but default value is ip format
                     // string
-            value = StringtoIPUInt32(query->defaultval);
+            value = StringtoIPUInt32(query->default_val);
           }
 
           if (haserror) {
@@ -639,8 +639,8 @@ const char* Esp3DSettings::readString(esp3d_setting_index_t index,
             esp3d_log_w("Got error %d %s", err, esp_err_to_name(err));
             if (err == ESP_ERR_NVS_NOT_FOUND) {
               esp3d_log_w("Not found value for %s, use default %s", key.c_str(),
-                          query->defaultval);
-              strcpy(out_str, query->defaultval);
+                          query->default_val);
+              strcpy(out_str, query->default_val);
               if (haserror) {
                 *haserror = false;
               }

@@ -31,18 +31,18 @@ extern "C" {
 #endif
 
 struct Esp3dWebSocketConfig {
-  httpd_handle_t serverHandle;
+  httpd_handle_t server_handle;
   uint max_clients;
   esp3dSocketType type;
 };
 
 struct Esp3dWebSocketInfos {
-  int socketId;
+  int socket_id;
   struct sockaddr_storage source_addr;
   char *buffer;
-  uint bufPos;
+  uint buf_position;
 #if ESP3D_AUTHENTICATION_FEATURE
-  char sessionId[25];
+  char session_id[25];
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
 };
 

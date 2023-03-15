@@ -121,7 +121,7 @@ bool Esp3DCommands::dispatchSetting(bool json, const char* filter,
                                     uint32_t minsize, uint32_t minsize2,
                                     uint8_t precision, const char* unit,
                                     bool needRestart, Esp3dClient target,
-                                    esp3d_request_t requestId, bool isFirst) {
+                                    Esp3dRequest requestId, bool isFirst) {
   std::string tmpstr;
   std::string value;
   char out_str[255];
@@ -268,8 +268,8 @@ bool Esp3DCommands::dispatchAuthenticationError(Esp3dMessage* msg, uint cmdid,
   }
   msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
 #if ESP3D_HTTP_FEATURE
-  if (msg->target == Esp3dClient::webui && msg->requestId.httpReq) {
-    httpd_resp_set_status(msg->requestId.httpReq, "401 UNAUTHORIZED");
+  if (msg->target == Esp3dClient::webui && msg->request_id.http_request) {
+    httpd_resp_set_status(msg->request_id.http_request, "401 UNAUTHORIZED");
   }
 #endif  // ESP3D_HTTP_FEATURE
   // answer is one message, override for safety
@@ -320,7 +320,7 @@ bool Esp3DCommands::dispatchAnswer(Esp3dMessage* msg, uint cmdid, bool json,
 
 bool Esp3DCommands::dispatchKeyValue(bool json, const char* key,
                                      const char* value, Esp3dClient target,
-                                     esp3d_request_t requestId, bool nested,
+                                     Esp3dRequest requestId, bool nested,
                                      bool isFirst) {
   std::string tmpstr = "";
   if (json) {
@@ -352,7 +352,7 @@ bool Esp3DCommands::dispatchKeyValue(bool json, const char* key,
 
 bool Esp3DCommands::dispatchIdValue(bool json, const char* Id,
                                     const char* value, Esp3dClient target,
-                                    esp3d_request_t requestId, bool isFirst) {
+                                    Esp3dRequest requestId, bool isFirst) {
   std::string tmpstr = "";
   if (json) {
     if (!isFirst) {
@@ -376,12 +376,12 @@ bool Esp3DCommands::dispatchIdValue(bool json, const char* Id,
 }
 
 bool Esp3DCommands::dispatch(const char* sbuf, Esp3dClient target,
-                             esp3d_request_t requestId, Esp3dMessageType type,
+                             Esp3dRequest requestId, Esp3dMessageType type,
                              Esp3dClient origin,
                              Esp3dAuthenticationLevel authentication_level) {
   Esp3dMessage* newMsgPtr = Esp3DClient::newMsg(origin, target);
   if (newMsgPtr) {
-    newMsgPtr->requestId = requestId;
+    newMsgPtr->request_id = requestId;
     newMsgPtr->type = type;
     return dispatch(newMsgPtr, sbuf);
   }
@@ -542,7 +542,7 @@ bool Esp3DCommands::dispatch(Esp3dMessage* msg) {
 #if ESP3D_WS_SERVICE_FEATURE
       // Esp3dClient::websocket
       if (msg->origin != Esp3dClient::websocket) {
-        msg->requestId.id = 0;
+        msg->request_id.id = 0;
         if (msg->target == Esp3dClient::all_clients) {
           // become the reference message
           msg->target = Esp3dClient::websocket;
@@ -562,7 +562,7 @@ bool Esp3DCommands::dispatch(Esp3dMessage* msg) {
 #if ESP3D_TELNET_FEATURE
       // Esp3dClient::telnet
       if (msg->origin != Esp3dClient::telnet) {
-        msg->requestId.id = 0;
+        msg->request_id.id = 0;
         if (msg->target == Esp3dClient::all_clients) {
           // become the reference message
           msg->target = Esp3dClient::telnet;
@@ -765,7 +765,7 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,
       esp3d_log("Authentication level change from %d to %d",
                 msg->authentication_level, lvl);
       msg->authentication_level = lvl;
-      if (!esp3dAuthenthicationService.updateRecord(msg->requestId.id,
+      if (!esp3dAuthenthicationService.updateRecord(msg->request_id.id,
                                                     msg->origin, lvl)) {
         esp3d_log_e("Did not found the corresponding session");
       }

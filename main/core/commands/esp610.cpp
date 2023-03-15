@@ -32,7 +32,7 @@
 // only, not the protected T1/T2
 void Esp3DCommands::ESP610(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClient target = msg->origin;
-  esp3d_request_t requestId = msg->requestId;
+  Esp3dRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
   msg->origin = Esp3dClient::command;

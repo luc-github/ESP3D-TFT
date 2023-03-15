@@ -110,7 +110,7 @@ struct Esp3dSettingDescription {
   esp3d_setting_index_t index;
   Esp3dSettingType type;
   uint16_t size;
-  const char* defaultval;
+  const char* default_val;
 };
 
 class Esp3DSettings final {

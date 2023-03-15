@@ -38,8 +38,8 @@ esp_err_t Esp3DWebUiService::onOpen(httpd_req_t *req) {
     Esp3dWebSocketInfos *client = getClientInfos(maxClients() - 1);
     if (client) {
       esp3d_log_w("Already connected: %d client with socket %d",
-                  clientsConnected(), client->socketId);
-      int currentSocketId = client->socketId;
+                  clientsConnected(), client->socket_id);
+      int currentSocketId = client->socket_id;
       if (currentSocketId != -1) {
         tmpstr = "activeID:";
         tmpstr += std::to_string(currentFd);

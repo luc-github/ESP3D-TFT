@@ -66,7 +66,7 @@ const char* ApChannelsList[] = {"1", "2", "3",  "4",  "5",  "6",  "7",
 //[ESP400]<pwd=admin>
 void Esp3DCommands::ESP400(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClient target = msg->origin;
-  esp3d_request_t requestId = msg->requestId;
+  Esp3dRequest requestId = msg->request_id;
   msg->target = target;
   msg->origin = Esp3dClient::command;
 

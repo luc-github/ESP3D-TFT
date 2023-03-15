@@ -34,9 +34,9 @@ extern "C" {
 #if ESP3D_AUTHENTICATION_FEATURE
 struct Esp3dAuthenticationRecord {
   Esp3dAuthenticationLevel level;
-  int socketId;
+  int socket_id;
   Esp3dClient client_type;
-  char sessionId[25];
+  char session_id[25];
   int64_t last_time;
 };
 #endif  // ESP3D_AUTHENTICATION_FEATURE

@@ -35,10 +35,10 @@ extern "C" {
 #define ESP3D_MAX_SOCKET_CLIENTS 2
 
 struct Esp3dSocketInfos {
-  int socketId;
+  int socket_id;
   struct sockaddr_storage source_addr;
 #if ESP3D_AUTHENTICATION_FEATURE
-  char sessionId[25];
+  char session_id[25];
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
 };
 
