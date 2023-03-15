@@ -65,9 +65,8 @@ class Esp3DAuthenticationService final {
   bool updateRecord(int socketId, Esp3dClient client_type,
                     Esp3dAuthenticationLevel newlevel);
   void clearAllSessions();
-  esp3d_authentication_record_t *getRecord(const char *sessionId);
-  esp3d_authentication_record_t *getRecord(int socketId,
-                                           Esp3dClient client_type);
+  Esp3dAuthenticationRecord *getRecord(const char *sessionId);
+  Esp3dAuthenticationRecord *getRecord(int socketId, Esp3dClient client_type);
   const char *create_session_id(struct sockaddr_storage source_addr,
                                 int socketId);
   uint8_t activeSessionsCount(Esp3dClient type);
@@ -77,7 +76,7 @@ class Esp3DAuthenticationService final {
   std::string _admin_pwd;
   std::string _user_pwd;
   uint8_t _session_timeout;
-  std::list<esp3d_authentication_record_t> _sessions;
+  std::list<Esp3dAuthenticationRecord> _sessions;
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
 };
 

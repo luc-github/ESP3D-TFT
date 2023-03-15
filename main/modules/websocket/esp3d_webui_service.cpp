@@ -120,7 +120,7 @@ esp_err_t Esp3DWebUiService::onMessage(httpd_req_t *req) {
                 currentFd);
       if (esp3d_strings::startsWith((const char *)buf, "PING:")) {
         esp3d_log("Got PING on sessionID %s", (const char *)&buf[5]);
-        esp3d_authentication_record_t *rec =
+        Esp3dAuthenticationRecord *rec =
             esp3dAuthenthicationService.getRecord((const char *)&buf[5]);
         std::string tmpStr = "PING:";
         uint64_t session = esp3dAuthenthicationService.getSessionTimeout();

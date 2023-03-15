@@ -109,7 +109,7 @@ bool Esp3DAuthenticationService::createRecord(const char *sessionId,
   if (strlen(sessionId) == 0) {
     return false;
   }
-  esp3d_authentication_record_t rec;
+  Esp3dAuthenticationRecord rec;
   memset(&rec, 0, sizeof(rec));
   rec.level = level;
   rec.client_type = client_type;
@@ -153,7 +153,7 @@ void Esp3DAuthenticationService::clearSessions(Esp3dClient client_type) {
 }
 
 void Esp3DAuthenticationService::clearAllSessions() { _sessions.clear(); }
-esp3d_authentication_record_t *Esp3DAuthenticationService::getRecord(
+Esp3dAuthenticationRecord *Esp3DAuthenticationService::getRecord(
     const char *sessionId) {
   for (auto session = _sessions.begin(); session != _sessions.end();
        ++session) {
@@ -164,7 +164,7 @@ esp3d_authentication_record_t *Esp3DAuthenticationService::getRecord(
   return NULL;
 }
 
-esp3d_authentication_record_t *Esp3DAuthenticationService::getRecord(
+Esp3dAuthenticationRecord *Esp3DAuthenticationService::getRecord(
     int socketId, Esp3dClient client_type) {
   for (auto session = _sessions.begin(); session != _sessions.end();
        ++session) {

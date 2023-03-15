@@ -335,7 +335,7 @@ bool Esp3DWsService::pushMsgToRxQueue(int socketId, const uint8_t *msg,
   } else {
     esp3d_log("SessionId is %s", client->sessionId);
     // No need to check time out as session is deleted on close
-    esp3d_authentication_record_t *rec =
+    Esp3dAuthenticationRecord *rec =
         esp3dAuthenthicationService.getRecord(client->sessionId);
     if (rec != NULL) {
       authentication_level = rec->level;

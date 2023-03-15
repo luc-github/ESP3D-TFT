@@ -595,7 +595,7 @@ Esp3dAuthenticationLevel Esp3DHttpService::getAuthenticationLevel(
     if (sessionID.length() != 0) {
       // Update Session ID
       esp3d_log("Found Session ID: %s", sessionID.c_str());
-      esp3d_authentication_record_t *rec =
+      Esp3dAuthenticationRecord *rec =
           esp3dAuthenthicationService.getRecord(sessionID.c_str());
       if (rec) {
         // we have a record for this session ID so update it
@@ -659,7 +659,7 @@ Esp3dAuthenticationLevel Esp3DHttpService::getAuthenticationLevel(
       // we have a session ID
       // check if time out is set
       esp3d_log("Got Session ID: %s", sessionID.c_str());
-      esp3d_authentication_record_t *rec =
+      Esp3dAuthenticationRecord *rec =
           esp3dAuthenthicationService.getRecord(sessionID.c_str());
       if (rec) {
         if (esp3dAuthenthicationService.getSessionTimeout() !=
