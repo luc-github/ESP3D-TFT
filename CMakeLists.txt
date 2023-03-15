@@ -61,7 +61,7 @@ add_compile_options(-DLV_LVGL_H_INCLUDE_SIMPLE=1)
 # All  = 1
 # Error only = 1
 # Disabled = 0
-add_compile_options(-DESP3D_TFT_LOG=1)
+add_compile_options(-DESP3D_TFT_LOG=0)
 
 
 # ESP3D-TFT specific bechmark
