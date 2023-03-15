@@ -367,7 +367,7 @@ bool Esp3DNetwork::startStaMode() {
   ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
 
   // Set hostname
-  const esp3d_setting_desc_t* settingPtr =
+  const Esp3dSettingDescription* settingPtr =
       esp3dTFTsettings.getSettingPtr(esp3d_hostname);
   if (settingPtr) {
     char out_str[33] = {0};
@@ -500,7 +500,7 @@ bool Esp3DNetwork::startApMode(bool configMode) {
   esp3d_log("Start wifi");
   ESP_ERROR_CHECK(esp_wifi_start());
   // Set hostname
-  const esp3d_setting_desc_t* settingPtr =
+  const Esp3dSettingDescription* settingPtr =
       esp3dTFTsettings.getSettingPtr(esp3d_hostname);
   if (settingPtr) {
     char out_str[33] = {0};

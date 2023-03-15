@@ -46,7 +46,7 @@ void Esp3DCommands::ESP550(int cmd_params_pos, Esp3dMessage* msg) {
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
-    const esp3d_setting_desc_t* settingPtr =
+    const Esp3dSettingDescription* settingPtr =
         esp3dTFTsettings.getSettingPtr(esp3d_admin_password);
     if (settingPtr) {
       ok_msg = HIDDEN_SETTING_VALUE;

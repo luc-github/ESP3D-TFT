@@ -70,7 +70,7 @@ void Esp3DCommands::ESP401(int cmd_params_pos, Esp3dMessage* msg) {
     uint32_t value32 = 0;
     esp3d_setting_index_t index_setting =
         (esp3d_setting_index_t)atoi(settingIndex.c_str());
-    const esp3d_setting_desc_t* settingPtr =
+    const Esp3dSettingDescription* settingPtr =
         esp3dTFTsettings.getSettingPtr(index_setting);
     if (!settingPtr) {
       hasError = true;

@@ -106,12 +106,12 @@ enum class Esp3dSettingType : uint8_t {
   unknown
 };
 
-typedef struct {
+struct Esp3dSettingDescription {
   esp3d_setting_index_t index;
   Esp3dSettingType type;
   uint16_t size;
   const char* defaultval;
-} esp3d_setting_desc_t;
+};
 
 class Esp3DSettings final {
  public:
@@ -138,7 +138,8 @@ class Esp3DSettings final {
   uint32_t getDefaultIntegerSetting(esp3d_setting_index_t settingElement);
   const char* getDefaultStringSetting(esp3d_setting_index_t settingElement);
   uint8_t getDefaultByteSetting(esp3d_setting_index_t settingElement);
-  const esp3d_setting_desc_t* getSettingPtr(const esp3d_setting_index_t index);
+  const Esp3dSettingDescription* getSettingPtr(
+      const esp3d_setting_index_t index);
   const char* GetFirmwareTargetShortName(Esp3dTargetFirmware index);
 
  private:

@@ -227,7 +227,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
   }
 
   // hostname
-  const esp3d_setting_desc_t *settingPtr =
+  const Esp3dSettingDescription *settingPtr =
       esp3dTFTsettings.getSettingPtr(esp3d_hostname);
   if (settingPtr) {
     char out_str[(settingPtr->size) + 1] = {0};

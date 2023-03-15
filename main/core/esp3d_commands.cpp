@@ -127,7 +127,7 @@ bool Esp3DCommands::dispatchSetting(bool json, const char* filter,
   char out_str[255];
   tmpstr.reserve(
       350);  // to save time and avoid several memories allocation delay
-  const esp3d_setting_desc_t* elementSetting =
+  const Esp3dSettingDescription* elementSetting =
       esp3dTFTsettings.getSettingPtr(index);
   if (!elementSetting) {
     return false;
