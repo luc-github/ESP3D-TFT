@@ -35,7 +35,7 @@ esp_err_t Esp3DWebUiService::onOpen(httpd_req_t *req) {
   esp3d_log("New connection %d", currentFd);
   if (clientsConnected() == maxClients()) {
     esp3d_log("Already connected: %d client", clientsConnected());
-    esp3d_ws_client_info_t *client = getClientInfo(maxClients() - 1);
+    Esp3dWebSocketInfos *client = getClientInfos(maxClients() - 1);
     if (client) {
       esp3d_log_w("Already connected: %d client with socket %d",
                   clientsConnected(), client->socketId);

@@ -64,7 +64,7 @@ uint ESP3DSocketServer::clientsConnected() {
   return count;
 }
 
-Esp3dSocketInfos *ESP3DSocketServer::getClientInfo(uint index) {
+Esp3dSocketInfos *ESP3DSocketServer::getClientInfos(uint index) {
   if (_started) {
     if (index <= ESP3D_MAX_SOCKET_CLIENTS) {
       if (_clients[index].socketId != FREE_SOCKET_HANDLE) {
@@ -385,7 +385,7 @@ bool ESP3DSocketServer::begin() {
 
 bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
                                          size_t size) {
-  Esp3dSocketInfos *client = getClientInfo(index);
+  Esp3dSocketInfos *client = getClientInfos(index);
   if (client == NULL) {
     esp3d_log_e("No client");
     return false;

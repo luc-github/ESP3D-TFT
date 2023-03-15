@@ -60,7 +60,7 @@ class ESP3DSocketServer : public Esp3DClient {
   bool getClient();
   uint clientsConnected();
   void closeAllClients();
-  Esp3dSocketInfos* getClientInfo(uint index);
+  Esp3dSocketInfos* getClientInfos(uint index);
 
  private:
   bool sendToSocket(const int sock, const char* data, const size_t len);

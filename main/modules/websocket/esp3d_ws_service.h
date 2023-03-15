@@ -30,13 +30,13 @@
 extern "C" {
 #endif
 
-typedef struct {
+struct Esp3dWebSocketConfig {
   httpd_handle_t serverHandle;
   uint max_clients;
   esp3dSocketType type;
-} esp3d_websocket_config_t;
+};
 
-typedef struct {
+struct Esp3dWebSocketInfos {
   int socketId;
   struct sockaddr_storage source_addr;
   char *buffer;
@@ -44,13 +44,13 @@ typedef struct {
 #if ESP3D_AUTHENTICATION_FEATURE
   char sessionId[25];
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
-} esp3d_ws_client_info_t;
+};
 
 class Esp3DWsService {
  public:
   Esp3DWsService();
   ~Esp3DWsService();
-  bool begin(esp3d_websocket_config_t *config);
+  bool begin(Esp3dWebSocketConfig *config);
   void handle();
   void end();
   esp_err_t http_handler(httpd_req_t *req);
@@ -63,8 +63,8 @@ class Esp3DWsService {
   bool isEndChar(uint8_t ch);
   int getFreeClientIndex();
   uint clientsConnected();
-  esp3d_ws_client_info_t *getClientInfo(uint index);
-  esp3d_ws_client_info_t *getClientInfoFromSocketId(int socketId);
+  Esp3dWebSocketInfos *getClientInfos(uint index);
+  Esp3dWebSocketInfos *getClientInfosFromSocketId(int socketId);
   bool addClient(int socketid);
   void closeClients();
   bool closeClient(int socketId);
@@ -81,7 +81,7 @@ class Esp3DWsService {
  private:
   httpd_handle_t _server;
   bool _started;
-  esp3d_ws_client_info_t *_clients;
+  Esp3dWebSocketInfos *_clients;
   uint _max_clients;
   esp3dSocketType _type;
 };

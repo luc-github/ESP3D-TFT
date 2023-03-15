@@ -361,10 +361,9 @@ bool Esp3DHttpService::begin() {
         (httpd_err_handler_func_t)file_not_found_handler);
 
     // websocket service
-    esp3d_websocket_config_t wsConfig = {
-        .serverHandle = _server,
-        .max_clients = 1,
-        .type = esp3dSocketType::websocket_webui};
+    Esp3dWebSocketConfig wsConfig = {.serverHandle = _server,
+                                     .max_clients = 1,
+                                     .type = esp3dSocketType::websocket_webui};
     _started = esp3dWsWebUiService.begin(&wsConfig);
 #if ESP3D_WS_SERVICE_FEATURE
     if (_started) {

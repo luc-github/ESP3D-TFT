@@ -455,10 +455,10 @@ void Esp3DCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
     }
     for (int i = 0; i < ESP3D_MAX_SOCKET_CLIENTS; i++) {
       // Print the mac address of the connected station
-      if (esp3dSocketServer.getClientInfo(i)) {
+      if (esp3dSocketServer.getClientInfos(i)) {
         char addr_str[16];
         inet_ntoa_r(((struct sockaddr_in *)&(
-                         esp3dSocketServer.getClientInfo(i)->source_addr))
+                         esp3dSocketServer.getClientInfos(i)->source_addr))
                         ->sin_addr,
                     addr_str, sizeof(addr_str) - 1);
         tmpstr = addr_str;
@@ -494,10 +494,10 @@ void Esp3DCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
     }
     for (int i = 0; i < esp3dWsDataService.maxClients(); i++) {
       // Print the mac address of the connected station
-      if (esp3dWsDataService.getClientInfo(i)) {
+      if (esp3dWsDataService.getClientInfos(i)) {
         char addr_str[16];
         inet_ntoa_r(((struct sockaddr_in *)&(
-                         esp3dWsDataService.getClientInfo(i)->source_addr))
+                         esp3dWsDataService.getClientInfos(i)->source_addr))
                         ->sin_addr,
                     addr_str, sizeof(addr_str) - 1);
         tmpstr = addr_str;

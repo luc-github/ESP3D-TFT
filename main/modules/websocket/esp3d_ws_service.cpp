@@ -69,8 +69,7 @@ uint Esp3DWsService::clientsConnected() {
   return count;
 }
 
-esp3d_ws_client_info_t *Esp3DWsService::getClientInfoFromSocketId(
-    int socketId) {
+Esp3dWebSocketInfos *Esp3DWsService::getClientInfosFromSocketId(int socketId) {
   for (uint index = 0; index < _max_clients; index++) {
     if (_clients[index].socketId == socketId) {
       return &_clients[index];
@@ -80,7 +79,7 @@ esp3d_ws_client_info_t *Esp3DWsService::getClientInfoFromSocketId(
   return nullptr;
 }
 
-esp3d_ws_client_info_t *Esp3DWsService::getClientInfo(uint index) {
+Esp3dWebSocketInfos *Esp3DWsService::getClientInfos(uint index) {
   if (index < _max_clients) {
     if (_clients[index].socketId != FREE_SOCKET_HANDLE) {
       return &_clients[index];
@@ -172,7 +171,7 @@ void Esp3DWsService::end() {
 
 Esp3DWsService::~Esp3DWsService() { end(); }
 
-bool Esp3DWsService::begin(esp3d_websocket_config_t *config) {
+bool Esp3DWsService::begin(Esp3dWebSocketConfig *config) {
   esp3d_log("Starting Ws Service");
   end();
   _server = config->serverHandle;
@@ -186,8 +185,8 @@ bool Esp3DWsService::begin(esp3d_websocket_config_t *config) {
     esp3d_log_e("max_clients cannot be 0");
     return false;
   }
-  _clients = (esp3d_ws_client_info_t *)malloc(_max_clients *
-                                              sizeof(esp3d_ws_client_info_t));
+  _clients =
+      (Esp3dWebSocketInfos *)malloc(_max_clients * sizeof(Esp3dWebSocketInfos));
   if (_clients == NULL) {
     esp3d_log_e("Memory allocation failed");
     _started = false;
@@ -233,7 +232,7 @@ esp_err_t Esp3DWsService::onMessage(httpd_req_t *req) {
   memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
   int currentFd = httpd_req_to_sockfd(req);
   esp3d_log("Message from %d", currentFd);
-  esp3d_ws_client_info_t *client = getClientInfoFromSocketId(currentFd);
+  Esp3dWebSocketInfos *client = getClientInfosFromSocketId(currentFd);
   if (client == NULL) {
     esp3d_log_e("Unregistered client");
     return ESP_FAIL;
@@ -299,7 +298,7 @@ esp_err_t Esp3DWsService::onMessage(httpd_req_t *req) {
 bool Esp3DWsService::pushMsgToRxQueue(int socketId, const uint8_t *msg,
                                       size_t size) {
   esp3d_log("Pushing `%s` %d", msg, size);
-  esp3d_ws_client_info_t *client = getClientInfoFromSocketId(socketId);
+  Esp3dWebSocketInfos *client = getClientInfosFromSocketId(socketId);
   if (client == NULL) {
     esp3d_log_e("No client");
     return false;
