@@ -32,10 +32,10 @@
 extern "C" {
 #endif
 #if ESP3D_WIFI_FEATURE
-typedef struct {
+struct Esp3dIpInfos {
   esp_netif_ip_info_t ip_info;
   esp_netif_dns_info_t dns_info;
-} esp3d_ip_info_t;
+};
 
 enum class Esp3dIpMode : uint8_t {
   dhcp = 0,
@@ -72,7 +72,7 @@ class Esp3DNetwork final {
   int32_t getSignal(int32_t RSSI, bool filter = true);
   EventGroupHandle_t getEventGroup() { return _s_wifi_event_group; };
   bool useStaticIp() { return _useStaticIp; };
-  bool getLocalIp(esp3d_ip_info_t* ipInfo);
+  bool getLocalIp(Esp3dIpInfos* ipInfo);
   const char* getLocalIpString();
 
 #endif  // ESP3D_WIFI_FEATURE

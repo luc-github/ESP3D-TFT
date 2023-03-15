@@ -124,7 +124,7 @@ static void wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
 
 const char* Esp3DNetwork::getLocalIpString() {
   static std::string tmpstr;
-  esp3d_ip_info_t ipInfo;
+  Esp3dIpInfos ipInfo;
   if (esp3dNetwork.getLocalIp(&ipInfo)) {
     tmpstr = ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.ip_info.ip));
   } else {
@@ -133,7 +133,7 @@ const char* Esp3DNetwork::getLocalIpString() {
   return tmpstr.c_str();
 }
 
-bool Esp3DNetwork::getLocalIp(esp3d_ip_info_t* ipInfo) {
+bool Esp3DNetwork::getLocalIp(Esp3dIpInfos* ipInfo) {
   if (!ipInfo) {
     return false;
   }

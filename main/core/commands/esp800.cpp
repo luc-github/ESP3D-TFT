@@ -133,7 +133,7 @@ void Esp3DCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
   }
 
   // WebSocketIP
-  esp3d_ip_info_t ipInfo;
+  Esp3dIpInfos ipInfo;
   if (esp3dNetwork.getLocalIp(&ipInfo)) {
     tmpstr = ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.ip_info.ip));
     if (!dispatchKeyValue(json, "WebSocketIP", tmpstr.c_str(), target,

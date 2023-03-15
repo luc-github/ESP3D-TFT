@@ -290,7 +290,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
     if (!dispatchIdValue(json, "ip mode", tmpstr.c_str(), target, requestId)) {
       return;
     }
-    esp3d_ip_info_t ipInfo;
+    Esp3dIpInfos ipInfo;
     if (esp3dNetwork.getLocalIp(&ipInfo)) {
       tmpstr = ip4addr_ntoa((const ip4_addr_t *)&(ipInfo.ip_info.ip));
       if (!dispatchIdValue(json, "ip", tmpstr.c_str(), target, requestId)) {
@@ -347,7 +347,7 @@ void Esp3DCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
         return;
       }
     }
-    esp3d_ip_info_t ipInfo;
+    Esp3dIpInfos ipInfo;
     if (esp3dNetwork.getLocalIp(&ipInfo)) {
       tmpstr = ip4addr_ntoa((const ip4_addr_t *)&(ipInfo.ip_info.ip));
       if (!dispatchIdValue(json, "ip", tmpstr.c_str(), target, requestId)) {
