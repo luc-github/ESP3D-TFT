@@ -34,13 +34,13 @@ extern "C" {
 
 #define ESP3D_MAX_SOCKET_CLIENTS 2
 
-typedef struct {
+struct Esp3dSocketInfos {
   int socketId;
   struct sockaddr_storage source_addr;
 #if ESP3D_AUTHENTICATION_FEATURE
   char sessionId[25];
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
-} esp3d_socket_client_info_t;
+};
 
 class ESP3DSocketServer : public Esp3DClient {
  public:
@@ -60,13 +60,13 @@ class ESP3DSocketServer : public Esp3DClient {
   bool getClient();
   uint clientsConnected();
   void closeAllClients();
-  esp3d_socket_client_info_t* getClientInfo(uint index);
+  Esp3dSocketInfos* getClientInfo(uint index);
 
  private:
   bool sendToSocket(const int sock, const char* data, const size_t len);
   bool closeSocket(int socketId);
   int getFreeClientSlot();
-  esp3d_socket_client_info_t _clients[ESP3D_MAX_SOCKET_CLIENTS];
+  Esp3dSocketInfos _clients[ESP3D_MAX_SOCKET_CLIENTS];
   int _listen_socket;
   bool _started;
   uint32_t _port;
