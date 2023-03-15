@@ -61,7 +61,7 @@ esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req) {
   char *packet = nullptr;
   char *packetWrite = nullptr;
   const char *boundaryPtr = nullptr;
-  post_upload_ctx_t *post_upload_ctx = (post_upload_ctx_t *)req->user_ctx;
+  PostUploadContext *post_upload_ctx = (PostUploadContext *)req->user_ctx;
   if (!post_upload_ctx) {
     esp3d_log_e("Context not found");
     esp3dHttpService.pushError(Esp3dUploadError::upload, "Upload error");

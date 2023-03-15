@@ -77,7 +77,7 @@ enum class esp3dSocketType : uint8_t {
 
 #define HTTPD_401 "401 UNAUTHORIZED" /*!< HTTP Response 401 */
 
-typedef struct {
+struct PostUploadContext {
   esp_err_t (*writeFn)(const uint8_t *data, size_t datasize,
                        Esp3dUploadState file_upload_state, const char *filename,
                        size_t filesize);
@@ -86,7 +86,7 @@ typedef struct {
   uint packetWriteSize;
   Esp3dUploadStatus status;  // FixMe: is that necessary? currently not used
   std::list<std::pair<std::string, std::string>> args;
-} post_upload_ctx_t;
+};
 
 class Esp3DHttpService final {
  public:
@@ -157,16 +157,16 @@ class Esp3DHttpService final {
   httpd_handle_t _server;
   const char *getBoundaryString(httpd_req_t *req);
   // it is based on : `only one post is supported at once`
-  static post_upload_ctx_t _post_files_upload_ctx;
+  static PostUploadContext _post_files_upload_ctx;
 #if ESP3D_SD_CARD_FEATURE
-  static post_upload_ctx_t _post_sdfiles_upload_ctx;
+  static PostUploadContext _post_sdfiles_upload_ctx;
 #endif  // ESP3D_SD_CARD_FEATURE
 
 #if ESP3D_UPDATE_FEATURE
-  static post_upload_ctx_t _post_updatefw_upload_ctx;
+  static PostUploadContext _post_updatefw_upload_ctx;
 #endif  // ESP3D_UPDATE_FEATURE
 
-  static post_upload_ctx_t _post_login_ctx;
+  static PostUploadContext _post_login_ctx;
   std::list<std::pair<esp3dSocketType, int>> _sockets_list;
 };
 

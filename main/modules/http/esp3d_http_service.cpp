@@ -39,7 +39,7 @@ char chunk[CHUNK_BUFFER_SIZE];
 
 Esp3DHttpService esp3dHttpService;
 
-post_upload_ctx_t Esp3DHttpService::_post_files_upload_ctx = {
+PostUploadContext Esp3DHttpService::_post_files_upload_ctx = {
     .writeFn =
         (esp_err_t(*)(const uint8_t *, size_t, Esp3dUploadState, const char *,
                       size_t))(Esp3DHttpService::upload_to_flash_handler),
@@ -50,7 +50,7 @@ post_upload_ctx_t Esp3DHttpService::_post_files_upload_ctx = {
     .status = Esp3dUploadStatus::not_started,
     .args = {}};
 #if ESP3D_SD_CARD_FEATURE
-post_upload_ctx_t Esp3DHttpService::_post_sdfiles_upload_ctx = {
+PostUploadContext Esp3DHttpService::_post_sdfiles_upload_ctx = {
     .writeFn =
         (esp_err_t(*)(const uint8_t *, size_t, Esp3dUploadState, const char *,
                       size_t))(Esp3DHttpService::upload_to_sd_handler),
@@ -62,7 +62,7 @@ post_upload_ctx_t Esp3DHttpService::_post_sdfiles_upload_ctx = {
     .args = {}};
 #endif  // ESP3D_SD_CARD_FEATURE
 #if ESP3D_UPDATE_FEATURE
-post_upload_ctx_t Esp3DHttpService::_post_updatefw_upload_ctx = {
+PostUploadContext Esp3DHttpService::_post_updatefw_upload_ctx = {
     .writeFn =
         (esp_err_t(*)(const uint8_t *, size_t, Esp3dUploadState, const char *,
                       size_t))(Esp3DHttpService::upload_to_updatefw_handler),
@@ -74,7 +74,7 @@ post_upload_ctx_t Esp3DHttpService::_post_updatefw_upload_ctx = {
     .args = {}};
 #endif  // ESP3D_UPDATE_FEATURE
 
-post_upload_ctx_t Esp3DHttpService::_post_login_ctx = {
+PostUploadContext Esp3DHttpService::_post_login_ctx = {
     .writeFn = NULL,
     .nextHandler =
         (esp_err_t(*)(httpd_req_t *))(Esp3DHttpService::login_handler),
@@ -103,7 +103,7 @@ void Esp3DHttpService::pop(esp3dSocketType socketType, int socketFd) {
 }
 
 bool Esp3DHttpService::hasArg(httpd_req_t *req, const char *argname) {
-  post_upload_ctx_t *post_upload_ctx = (post_upload_ctx_t *)req->user_ctx;
+  PostUploadContext *post_upload_ctx = (PostUploadContext *)req->user_ctx;
   if (post_upload_ctx) {
     for (auto itr = post_upload_ctx->args.begin();
          itr != post_upload_ctx->args.end(); itr++) {
@@ -117,7 +117,7 @@ bool Esp3DHttpService::hasArg(httpd_req_t *req, const char *argname) {
 }
 
 const char *Esp3DHttpService::getArg(httpd_req_t *req, const char *argname) {
-  post_upload_ctx_t *post_upload_ctx = (post_upload_ctx_t *)req->user_ctx;
+  PostUploadContext *post_upload_ctx = (PostUploadContext *)req->user_ctx;
   if (post_upload_ctx) {
     for (auto itr = post_upload_ctx->args.begin();
          itr != post_upload_ctx->args.end(); itr++) {
@@ -485,7 +485,7 @@ Esp3dAuthenticationLevel Esp3DHttpService::getAuthenticationLevel(
     esp3d_log_e("Failed to get address for new connection");
   }
   //  1 - check post parameter SUBMIT + USER + PASSWORD
-  post_upload_ctx_t *post_upload_ctx = (post_upload_ctx_t *)req->user_ctx;
+  PostUploadContext *post_upload_ctx = (PostUploadContext *)req->user_ctx;
   char *buf = NULL;
   size_t buf_len = 0;
   if (post_upload_ctx) {
