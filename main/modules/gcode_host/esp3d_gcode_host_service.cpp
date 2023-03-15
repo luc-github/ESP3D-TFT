@@ -51,7 +51,7 @@ static void esp3d_gcode_host_task(void* pvParameter) {
 bool Esp3DGCodeHostService::processScript(const char* script,
                                           Esp3dAuthenticationLevel auth_type) {
   esp3d_log("Processing script: %s,  with authentication level=%d", script,
-            auth_type);
+            static_cast<uint8_t>(auth_type));
 
   return false;
 }

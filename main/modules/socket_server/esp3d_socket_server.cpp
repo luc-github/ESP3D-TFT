@@ -400,7 +400,8 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
         esp3dCommands.get_param((const char *)msg, size, 0, "pwd=");
     authentication_level =
         esp3dAuthenthicationService.getAuthenticatedLevel(str.c_str());
-    esp3d_log("Authentication Level = %d", authentication_level);
+    esp3d_log("Authentication Level = %d",
+              static_cast<uint8_t>(authentication_level));
     if (authentication_level == Esp3dAuthenticationLevel::guest) {
       esp3d_log("Authentication Level = GUEST, for %s", (const char *)msg);
       sendToSocket(client->socket_id, ERROR_MSG, strlen(ERROR_MSG));

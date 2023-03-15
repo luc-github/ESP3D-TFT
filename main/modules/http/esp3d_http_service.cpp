@@ -461,7 +461,7 @@ Esp3dAuthenticationLevel Esp3DHttpService::getAuthenticationLevel(
   Esp3dAuthenticationLevel authentication_level =
       Esp3dAuthenticationLevel::guest;
   esp3d_log_w("Checking URI: %s, Authentication level is %d", req->uri,
-              authentication_level);
+              static_cast<uint8_t>(authentication_level));
 #endif  // ESP3D_AUTHENTICATION_FEATURE
 
   if (req->sess_ctx) {
@@ -586,11 +586,13 @@ Esp3dAuthenticationLevel Esp3DHttpService::getAuthenticationLevel(
     esp3d_log_w("Failed to get sessionID, err %s", esp_err_to_name(res));
     sessionID.clear();
   }
-  esp3d_log("Authentication level is %d", authentication_level);
+  esp3d_log("Authentication level is %d",
+            static_cast<uint8_t>(authentication_level));
   // if authentication_level is not Esp3dAuthenticationLevel::guest
   // Create / update Session ID and cookie
   if (authentication_level != Esp3dAuthenticationLevel::guest) {
-    esp3d_log("Authentication level is %d", authentication_level);
+    esp3d_log("Authentication level is %d",
+              static_cast<uint8_t>(authentication_level));
     // Authentication level is not Esp3dAuthenticationLevel::guest
     // check if session ID is already set
     if (sessionID.length() != 0) {
@@ -602,7 +604,8 @@ Esp3dAuthenticationLevel Esp3DHttpService::getAuthenticationLevel(
         // we have a record for this session ID so update it
         // update timeout
         // update level
-        esp3d_log("Record created for level %d", authentication_level);
+        esp3d_log("Record created for level %d",
+                  static_cast<uint8_t>(authentication_level));
         rec->level = authentication_level;
         rec->last_time = esp3d_hal::millis();
       } else {
@@ -610,7 +613,8 @@ Esp3dAuthenticationLevel Esp3DHttpService::getAuthenticationLevel(
         if (esp3dAuthenthicationService.createRecord(
                 sessionID.c_str(), socketId, authentication_level,
                 Esp3dClient::webui)) {
-          esp3d_log("Record created for level %d", authentication_level);
+          esp3d_log("Record created for level %d",
+                    static_cast<uint8_t>(authentication_level));
         } else {
           esp3d_log_e("Failed to create session id");
           // TBD:
@@ -629,7 +633,8 @@ Esp3dAuthenticationLevel Esp3DHttpService::getAuthenticationLevel(
       if (esp3dAuthenthicationService.createRecord(sessionID.c_str(), socketId,
                                                    authentication_level,
                                                    Esp3dClient::webui)) {
-        esp3d_log("Record created for level %d", authentication_level);
+        esp3d_log("Record created for level %d",
+                  static_cast<uint8_t>(authentication_level));
         // Add Cookie to session ID
 
         std::string cookie = "ESPSESSIONID=" + sessionID;
@@ -669,7 +674,8 @@ Esp3dAuthenticationLevel Esp3DHttpService::getAuthenticationLevel(
               esp3dAuthenthicationService.getSessionTimeout()) {
             esp3d_log("Update Session timeout");
             rec->last_time = esp3d_hal::millis();
-            esp3d_log("Authentication level now %d", rec->level);
+            esp3d_log("Authentication level now %d",
+                      static_cast<uint8_t>(rec->level));
             authentication_level = rec->level;
 
           } else {  // session  reached limit
@@ -706,7 +712,7 @@ Esp3dAuthenticationLevel Esp3DHttpService::getAuthenticationLevel(
     }
   }
   esp3d_log_w("URI: %s, Authentication level is %d", req->uri,
-              authentication_level);
+              static_cast<uint8_t>(authentication_level));
   return authentication_level;
 #else
   return Esp3dAuthenticationLevel::admin;

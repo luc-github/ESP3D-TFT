@@ -128,7 +128,8 @@ bool Esp3DAuthenticationService::clearSession(const char *sessionId) {
     for (auto session = _sessions.begin(); session != _sessions.end();
          ++session) {
       esp3d_log("checking session %s vs %s, type: %d, socketId: %d", sessionId,
-                session->session_id, session->client_type, session->socket_id);
+                session->session_id, static_cast<uint8_t>(session->client_type),
+                session->socket_id);
       if (strcmp(session->session_id, sessionId) == 0) {
         esp3d_log("Clear session %s succeed", sessionId);
         _sessions.erase(session++);
@@ -143,7 +144,7 @@ bool Esp3DAuthenticationService::clearSession(const char *sessionId) {
 }
 
 void Esp3DAuthenticationService::clearSessions(Esp3dClient client_type) {
-  esp3d_log("Clear all sessions %d", client_type);
+  esp3d_log("Clear all sessions %d", static_cast<uint8_t>(client_type));
   for (auto session = _sessions.begin(); session != _sessions.end();
        ++session) {
     if (session->client_type == client_type) {
@@ -197,7 +198,7 @@ uint8_t Esp3DAuthenticationService::activeSessionsCount(Esp3dClient type) {
        ++session) {
     if (session->client_type == type) {
       esp3d_log("Session found: %s, socket: %d, lvl: %d ", session->session_id,
-                session->socket_id, session->level);
+                session->socket_id, static_cast<uint8_t>(session->level));
       ++count;
     }
   }
@@ -207,7 +208,8 @@ uint8_t Esp3DAuthenticationService::activeSessionsCount(Esp3dClient type) {
 void Esp3DAuthenticationService::updateRecords() {
   for (auto session = _sessions.begin(); session != _sessions.end();
        ++session) {
-    esp3d_log("session %s, type %d", session->session_id, session->client_type);
+    esp3d_log("session %s, type %d", session->session_id,
+              static_cast<uint8_t>(session->client_type));
     // todo if type == webui check timestamp and last update
     // if session timout=0 =>TBD
     // other : TBD

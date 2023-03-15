@@ -97,7 +97,8 @@ void Esp3DCommands::process(Esp3dMessage* msg) {
     // execute esp command
     execute_internal_command(cmdId, espcmdpos, msg);
   } else {
-    esp3d_log("Dispatch command, len %d, to %d", msg->size, msg->target);
+    esp3d_log("Dispatch command, len %d, to %d", msg->size,
+              static_cast<uint8_t>(msg->target));
 
     // Work around to avoid to dispatch single \n or \r to everyone as it is
     // part of previous ESP3D command
@@ -411,7 +412,9 @@ bool Esp3DCommands::dispatch(Esp3dMessage* msg, uint8_t* sbuf, size_t len) {
 bool Esp3DCommands::dispatch(Esp3dMessage* msg) {
   bool sendOk = true;
   esp3d_log("Dispatch message origin %d to client %d , size: %d,  type: %d",
-            msg->origin, msg->target, msg->size, msg->type);
+            static_cast<uint8_t>(msg->origin),
+            static_cast<uint8_t>(msg->target), msg->size,
+            static_cast<uint8_t>(msg->type));
   if (!msg) {
     esp3d_log_e("no msg");
     return false;
@@ -588,7 +591,8 @@ bool Esp3DCommands::dispatch(Esp3dMessage* msg) {
       }
       break;
     default:
-      esp3d_log_e("No valid target specified %d", msg->target);
+      esp3d_log_e("No valid target specified %d",
+                  static_cast<uint8_t>(msg->target));
       sendOk = false;
   }
   // clear message
@@ -765,7 +769,8 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,
         esp3dAuthenthicationService.getAuthenticatedLevel(pwd.c_str());
     if (msg->authentication_level != lvl) {
       esp3d_log("Authentication level change from %d to %d",
-                msg->authentication_level, lvl);
+                static_cast<uint8_t>(msg->authentication_level),
+                static_cast<uint8_t>(lvl));
       msg->authentication_level = lvl;
       if (!esp3dAuthenthicationService.updateRecord(msg->request_id.id,
                                                     msg->origin, lvl)) {
@@ -1019,6 +1024,6 @@ Esp3dClient Esp3DCommands::getOutputClient(bool fromSettings) {
     }
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
   }
-  esp3d_log("Output client is %d", _output_client);
+  esp3d_log("Output client is %d", static_cast<uint8_t>(_output_client));
   return _output_client;
 }

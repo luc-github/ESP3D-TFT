@@ -481,21 +481,22 @@ bool Esp3DSettings::reset() {
     Esp3dSettingIndex setting = i.index;
     const Esp3dSettingDescription* query = getSettingPtr(setting);
     if (query) {
-      esp3d_log("Reseting %d value to %s", setting, query->default_val);
+      esp3d_log("Reseting %d value to %s", static_cast<uint16_t>(setting),
+                query->default_val);
       switch (query->type) {
         case Esp3dSettingType::byte_t:
           if (!Esp3DSettings::writeByte(
                   setting, (uint8_t)std::stoul(std::string(query->default_val),
                                                NULL, 0))) {
             esp3d_log_e("Error writing %s to settings %d", query->default_val,
-                        setting);
+                        static_cast<uint16_t>(setting));
             result = false;
           }
           break;
         case Esp3dSettingType::ip:
           if (!Esp3DSettings::writeIPString(setting, query->default_val)) {
             esp3d_log_e("Error writing %s to settings %d", query->default_val,
-                        setting);
+                        static_cast<uint16_t>(setting));
             result = false;
           }
           break;
@@ -504,7 +505,7 @@ bool Esp3DSettings::reset() {
                   setting, (uint32_t)std::stoul(std::string(query->default_val),
                                                 NULL, 0))) {
             esp3d_log_e("Error writing %s to settings %d", query->default_val,
-                        setting);
+                        static_cast<uint16_t>(setting));
             result = false;
           }
           break;
@@ -512,13 +513,13 @@ bool Esp3DSettings::reset() {
           if (setting == Esp3dSettingIndex::esp3d_version) {
             if (!Esp3DSettings::writeString(setting, SETTING_VERSION)) {
               esp3d_log_e("Error writing %s to settings %d", query->default_val,
-                          setting);
+                          static_cast<uint16_t>(setting));
               result = false;
             }
           } else {
             if (!Esp3DSettings::writeString(setting, query->default_val)) {
               esp3d_log_e("Error writing %s to settings %d", query->default_val,
-                          setting);
+                          static_cast<uint16_t>(setting));
               result = false;
             }
           }
@@ -526,12 +527,13 @@ bool Esp3DSettings::reset() {
           break;
         default:
           result = false;  // type is not handle
-          esp3d_log_e("Setting  %d , type %d is not handled ", setting,
-                      query->type);
+          esp3d_log_e("Setting  %d , type %d is not handled ",
+                      static_cast<uint16_t>(setting),
+                      static_cast<uint8_t>(query->type));
       }
     } else {
       result = false;  // setting invalid
-      esp3d_log_e("Setting  %d is unknown", setting);
+      esp3d_log_e("Setting  %d is unknown", static_cast<uint16_t>(setting));
     }
   }
   return result;
@@ -672,7 +674,7 @@ const char* Esp3DSettings::readString(Esp3dSettingIndex index, char* out_str,
       esp3d_log_e("Error setting is not a string");
     }
   } else {
-    esp3d_log_e("Cannot find %d entry", index);
+    esp3d_log_e("Cannot find %d entry", static_cast<uint16_t>(index));
   }
   if (haserror) {
     *haserror = true;
@@ -726,16 +728,16 @@ bool Esp3DSettings::writeIPString(Esp3dSettingIndex index,
                                   const char* byte_buffer) {
   uint32_t ipInt = StringtoIPUInt32(byte_buffer);
   std::string ipStr = IPUInt32toString(ipInt);
-  esp3d_log("write setting %d : %s to %ld to %s", index, byte_buffer, ipInt,
-            ipStr.c_str());
+  esp3d_log("write setting %d : %s to %ld to %s", static_cast<uint8_t>(index),
+            byte_buffer, ipInt, ipStr.c_str());
 
   return writeUint32(index, StringtoIPUInt32(byte_buffer));
 }
 
 bool Esp3DSettings::writeString(Esp3dSettingIndex index,
                                 const char* byte_buffer) {
-  esp3d_log("write setting %d : (%d bytes) %s ", index, strlen(byte_buffer),
-            byte_buffer);
+  esp3d_log("write setting %d : (%d bytes) %s ", static_cast<uint16_t>(index),
+            strlen(byte_buffer), byte_buffer);
   const Esp3dSettingDescription* query = getSettingPtr(index);
   if (query) {
     if (query->type == Esp3dSettingType::string_t &&

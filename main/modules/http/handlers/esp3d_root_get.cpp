@@ -25,7 +25,7 @@ esp_err_t Esp3DHttpService::root_get_handler(httpd_req_t *req) {
   // not blocking
 #if ESP3D_AUTHENTICATION_FEATURE
   Esp3dAuthenticationLevel level = getAuthenticationLevel(req);
-  esp3d_log("Uri: %s, %d", req->uri, level);
+  esp3d_log("Uri: %s, %d", req->uri, static_cast<uint8_t>(level));
   (void)level;
 #endif  // ESP3D_AUTHENTICATION_FEATURE
 

@@ -152,7 +152,7 @@ void Esp3DWsService::end() {
   if (!_started) {
     return;
   }
-  esp3d_log("Stop Ws Service %d", _type);
+  esp3d_log("Stop Ws Service %d", static_cast<uint8_t>(_type));
   closeClients();
   _server = nullptr;
   _started = false;
@@ -205,7 +205,7 @@ bool Esp3DWsService::begin(Esp3dWebSocketConfig *config) {
   }
   _started = true;
   if (_started) {
-    esp3d_log("Ws Service Started type:%d", _type);
+    esp3d_log("Ws Service Started type:%d", static_cast<uint8_t>(_type));
   }
   return _started;
 }
@@ -313,7 +313,8 @@ bool Esp3DWsService::pushMsgToRxQueue(int socketId, const uint8_t *msg,
         esp3dCommands.get_param((const char *)msg, size, 0, "pwd=");
     authentication_level =
         esp3dAuthenthicationService.getAuthenticatedLevel(str.c_str());
-    esp3d_log("Authentication Level = %d", authentication_level);
+    esp3d_log("Authentication Level = %d",
+              static_cast<uint8_t>(authentication_level));
     if (authentication_level == Esp3dAuthenticationLevel::guest) {
       esp3d_log("Authentication Level = GUEST, for %s", (const char *)msg);
       pushMsgTxt(client->socket_id, ERROR_MSG);

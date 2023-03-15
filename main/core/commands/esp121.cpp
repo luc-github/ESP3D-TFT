@@ -55,7 +55,7 @@ void Esp3DCommands::ESP121(int cmd_params_pos, Esp3dMessage* msg) {
     esp3d_log("got %s param for a value of %ld, is valid %d", tmpstr.c_str(),
               intValue,
               esp3dTFTsettings.isValidIntegerSetting(
-                  intValue, Esp3dSettingIndex::esp3d_esp3d_http_port));
+                  intValue, Esp3dSettingIndex::esp3d_http_port));
     if (esp3dTFTsettings.isValidIntegerSetting(
             intValue, Esp3dSettingIndex::esp3d_http_port)) {
       esp3d_log("Value %ld is valid", intValue);
