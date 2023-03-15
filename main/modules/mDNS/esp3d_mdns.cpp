@@ -24,7 +24,6 @@
 #include "esp3d_version.h"
 #include "network/esp3d_network.h"
 
-
 #define ESP3D_MDNS_SERVICE_NAME "_esp3d"
 #define ESP3D_MDNS_SERVICE_PROTO "_tcp"
 #define ESP3D_CODE_BASE "ESP3D-TFT"
@@ -113,7 +112,8 @@ bool Esp3DmDNS::begin() {
   err = mdns_hostname_set(esp3dNetwork.getHostName());
   if (err != ESP_OK) {
     mdns_free();
-    esp3d_log_e("Failed to set hostname : %s", esp_err_to_name(err));
+    esp3d_log_e("Failed to set hostname : %s , error:%s",
+                esp3dNetwork.getHostName(), esp_err_to_name(err));
     return false;
   }
   err = mdns_instance_name_set(esp3dNetwork.getHostName());

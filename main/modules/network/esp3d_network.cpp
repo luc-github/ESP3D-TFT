@@ -50,7 +50,7 @@ Esp3DNetwork esp3dNetwork;
 static void wifi_ap_event_handler(void* arg, esp_event_base_t event_base,
                                   int32_t event_id, void* event_data) {
   if (event_id == WIFI_EVENT_AP_STACONNECTED) {
-#if ESP3D_TFT_LOG
+#if ESP3D_TFT_LOG && ESP3D_TFT_LOG == 2
     wifi_event_ap_staconnected_t* event =
         (wifi_event_ap_staconnected_t*)event_data;
     esp3d_log("station " MACSTR " join, AID=%d", MAC2STR(event->mac),
@@ -59,7 +59,7 @@ static void wifi_ap_event_handler(void* arg, esp_event_base_t event_base,
     // TODO: TBD
 #endif  // ESP3D_TFT_LOG
   } else if (event_id == WIFI_EVENT_AP_STADISCONNECTED) {
-#if ESP3D_TFT_LOG
+#if ESP3D_TFT_LOG && ESP3D_TFT_LOG == 2
     wifi_event_ap_stadisconnected_t* event =
         (wifi_event_ap_stadisconnected_t*)event_data;
     esp3d_log("station " MACSTR " leave, AID=%d", MAC2STR(event->mac),
@@ -108,7 +108,7 @@ static void wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
     }
 
   } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
-#if ESP3D_TFT_LOG
+#if ESP3D_TFT_LOG && ESP3D_TFT_LOG == 2
     ip_event_got_ip_t* event = (ip_event_got_ip_t*)event_data;
     esp3d_log("got ip:" IPSTR, IP2STR(&event->ip_info.ip));
 #else
@@ -515,9 +515,9 @@ bool Esp3DNetwork::startApMode(bool configMode) {
       esp3dTFTsettings.getSettingPtr(Esp3dSettingIndex::esp3d_hostname);
   if (settingPtr) {
     char out_str[33] = {0};
-    std::string hostname = esp3dTFTsettings.readString(
-        Esp3dSettingIndex::esp3d_hostname, out_str, settingPtr->size);
-    if (ESP_OK != esp_netif_set_hostname(_wifiApPtr, hostname.c_str())) {
+    _hostname = esp3dTFTsettings.readString(Esp3dSettingIndex::esp3d_hostname,
+                                            out_str, settingPtr->size);
+    if (ESP_OK != esp_netif_set_hostname(_wifiApPtr, _hostname.c_str())) {
       esp3d_log_e("Failed to set hostname");
     }
   } else {

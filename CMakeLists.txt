@@ -9,7 +9,7 @@ OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-S
 # #######################################
 # Select the Options
 # #######################################
-OPTION(ESP3D_AUTHENTICATION "Authentication on all clients" OFF)
+OPTION(ESP3D_AUTHENTICATION "Authentication on all clients" ON)
 OPTION(DISABLE_SERIAL_AUTHENTICATION "Disable Serial Authentication" ON)
 OPTION(TIMESTAMP_ON_FILES "Time on file" OFF)
 OPTION(SSDP_SERVICE "SSDP service" ON)
@@ -58,9 +58,11 @@ add_compile_options(-DLV_CONF_INCLUDE_SIMPLE=1)
 add_compile_options(-DLV_LVGL_H_INCLUDE_SIMPLE=1)
 
 # ESP3D-TFT specific log level
-# Enabled  = 1
+# All  = 1
+# Error only = 1
 # Disabled = 0
-add_compile_options(-DESP3D_TFT_LOG=0)
+add_compile_options(-DESP3D_TFT_LOG=1)
+
 
 # ESP3D-TFT specific bechmark
 # Enabled  = 1
