@@ -68,7 +68,7 @@ esp_err_t Esp3DHttpService::command_handler(httpd_req_t *req) {
     esp3d_request_t requestId;
     if (esp3dCommands.is_esp_command((uint8_t *)cmd, strlen(cmd))) {
       requestId.httpReq = req;
-      esp3d_msg_t *newMsgPtr = Esp3DClient::newMsg(
+      Esp3dMessage *newMsgPtr = Esp3DClient::newMsg(
           Esp3dClient::webui, Esp3dClient::command, (const uint8_t *)cmd,
           strlen(cmd), authentication_level);
       if (newMsgPtr) {

@@ -31,7 +31,7 @@
 // Set ESP State
 //`cmd` can be  `RESTART` to restart board or `RESET` to reset all setting to
 // defaults values [ESP444]<cmd> json=<no> <pwd=admin>`
-void Esp3DCommands::ESP444(int cmd_params_pos, esp3d_msg_t* msg) {
+void Esp3DCommands::ESP444(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClient target = msg->origin;
   esp3d_request_t requestId = msg->requestId;
   (void)requestId;

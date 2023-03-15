@@ -27,7 +27,7 @@
 
 // Format ESP Filesystem
 //[ESP710]FORMATFS json=<no> pwd=<admin password>
-void Esp3DCommands::ESP710(int cmd_params_pos, esp3d_msg_t* msg) {
+void Esp3DCommands::ESP710(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClient target = msg->origin;
   esp3d_request_t requestId = msg->requestId;
   (void)requestId;
@@ -46,7 +46,7 @@ void Esp3DCommands::ESP710(int cmd_params_pos, esp3d_msg_t* msg) {
     return;
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
-  esp3d_msg_t* endMsg = nullptr;
+  Esp3dMessage* endMsg = nullptr;
   if (needFormat) {
     ok_msg = "Starting formating...";
     endMsg = Esp3DClient::copyMsgInfos(*msg);

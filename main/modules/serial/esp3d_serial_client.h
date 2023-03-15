@@ -19,44 +19,42 @@
 */
 
 #pragma once
+#include <pthread.h>
 #include <stdio.h>
+
 #include "esp3d_client.h"
 #include "esp3d_log.h"
-#include <pthread.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-class Esp3DSerialClient : public Esp3DClient
-{
-public:
-    Esp3DSerialClient();
-    ~Esp3DSerialClient();
-    bool begin();
-    void handle();
-    void end();
-    void process(esp3d_msg_t * msg);
-    bool isEndChar(uint8_t ch);
-    bool pushMsgToRxQueue(const uint8_t* msg, size_t size);
-    void flush();
-    bool started()
-    {
-        return _started;
-    }
-    void readSerial();
-private:
-    TaskHandle_t _xHandle;
-    bool _started;
-    pthread_mutex_t _tx_mutex;
-    pthread_mutex_t _rx_mutex;
-    uint8_t * _data;
-    uint8_t * _buffer;
-    size_t _bufferPos;
+class Esp3DSerialClient : public Esp3DClient {
+ public:
+  Esp3DSerialClient();
+  ~Esp3DSerialClient();
+  bool begin();
+  void handle();
+  void end();
+  void process(Esp3dMessage* msg);
+  bool isEndChar(uint8_t ch);
+  bool pushMsgToRxQueue(const uint8_t* msg, size_t size);
+  void flush();
+  bool started() { return _started; }
+  void readSerial();
+
+ private:
+  TaskHandle_t _xHandle;
+  bool _started;
+  pthread_mutex_t _tx_mutex;
+  pthread_mutex_t _rx_mutex;
+  uint8_t* _data;
+  uint8_t* _buffer;
+  size_t _bufferPos;
 };
 
 extern Esp3DSerialClient serialClient;
 
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif

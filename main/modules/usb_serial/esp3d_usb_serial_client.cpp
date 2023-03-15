@@ -177,7 +177,7 @@ Esp3DUsbSerialClient::Esp3DUsbSerialClient() {
 }
 Esp3DUsbSerialClient::~Esp3DUsbSerialClient() { end(); }
 
-void Esp3DUsbSerialClient::process(esp3d_msg_t *msg) {
+void Esp3DUsbSerialClient::process(Esp3dMessage *msg) {
   esp3d_log("Add message to queue");
   if (!addTXData(msg)) {
     flush();
@@ -248,7 +248,7 @@ bool Esp3DUsbSerialClient::begin() {
 }
 
 bool Esp3DUsbSerialClient::pushMsgToRxQueue(const uint8_t *msg, size_t size) {
-  esp3d_msg_t *newMsgPtr = newMsg();
+  Esp3dMessage *newMsgPtr = newMsg();
   if (newMsgPtr) {
     if (Esp3DClient::setDataContent(newMsgPtr, msg, size)) {
 #if ESP3D_DISABLE_SERIAL_AUTHENTICATION_FEATURE
@@ -277,13 +277,13 @@ bool Esp3DUsbSerialClient::pushMsgToRxQueue(const uint8_t *msg, size_t size) {
 void Esp3DUsbSerialClient::handle() {
   if (_started) {
     if (getRxMsgsCount() > 0) {
-      esp3d_msg_t *msg = popRx();
+      Esp3dMessage *msg = popRx();
       if (msg) {
         esp3dCommands.process(msg);
       }
     }
     if (getTxMsgsCount() > 0) {
-      esp3d_msg_t *msg = popTx();
+      Esp3dMessage *msg = popTx();
       if (msg) {
         esp3d_log("Got message to send");
         if (_connected) {

@@ -28,7 +28,7 @@
 #define COMMAND_ID 950
 // Get / Set Serial Output // Only used in ESP3D-TFT with board having the
 // feature [ESP950]<SERIAL/USB> json=<no> pwd=<admin/user password>
-void Esp3DCommands::ESP950(int cmd_params_pos, esp3d_msg_t* msg) {
+void Esp3DCommands::ESP950(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClient target = msg->origin;
   esp3d_request_t requestId = msg->requestId;
   (void)requestId;

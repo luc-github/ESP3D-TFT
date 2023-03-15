@@ -40,7 +40,7 @@ typedef union {
 
 enum class Esp3dMessageType : uint8_t { head, core, tail, unique };
 
-typedef struct {
+struct Esp3dMessage {
   uint8_t *data;
   size_t size;
   Esp3dClient origin;
@@ -48,7 +48,7 @@ typedef struct {
   Esp3dAuthenticationLevel authentication_level;
   esp3d_request_t requestId;
   Esp3dMessageType type;
-} esp3d_msg_t;
+};
 
 class Esp3DClient {
  public:
@@ -60,36 +60,36 @@ class Esp3DClient {
   virtual void flush(){};
   void setTxMaxSize(size_t max) { _tx_max_size = max; };
   void setRxMaxSize(size_t max) { _rx_max_size = max; };
-  bool addRXData(esp3d_msg_t *msg);
-  bool addTXData(esp3d_msg_t *msg);
-  esp3d_msg_t *popRx();
-  esp3d_msg_t *popTx();
-  static void deleteMsg(esp3d_msg_t *msg);
-  bool addFrontTXData(esp3d_msg_t *msg);
+  bool addRXData(Esp3dMessage *msg);
+  bool addTXData(Esp3dMessage *msg);
+  Esp3dMessage *popRx();
+  Esp3dMessage *popTx();
+  static void deleteMsg(Esp3dMessage *msg);
+  bool addFrontTXData(Esp3dMessage *msg);
   void setRxMutex(pthread_mutex_t *mutex) { _rx_mutex = mutex; };
   void setTxMutex(pthread_mutex_t *mutex) { _tx_mutex = mutex; };
   bool clearRxQueue();
   bool clearTxQueue();
   size_t getRxMsgsCount() { return _rx_queue.size(); }
   size_t getTxMsgsCount() { return _tx_queue.size(); }
-  static esp3d_msg_t *copyMsg(esp3d_msg_t msg);
-  static esp3d_msg_t *copyMsgInfos(esp3d_msg_t msg);
-  static bool copyMsgInfos(esp3d_msg_t *newMsgPtr, esp3d_msg_t msg);
-  static esp3d_msg_t *newMsg();
-  static esp3d_msg_t *newMsg(esp3d_request_t requestId);
-  static esp3d_msg_t *newMsg(Esp3dClient origin, Esp3dClient target,
-                             Esp3dAuthenticationLevel authentication_level =
-                                 Esp3dAuthenticationLevel::guest);
-  static esp3d_msg_t *newMsg(Esp3dClient origin, Esp3dClient target,
-                             const uint8_t *data, size_t length,
-                             Esp3dAuthenticationLevel authentication_level =
-                                 Esp3dAuthenticationLevel::guest);
-  static bool setDataContent(esp3d_msg_t *msg, const uint8_t *data,
+  static Esp3dMessage *copyMsg(Esp3dMessage msg);
+  static Esp3dMessage *copyMsgInfos(Esp3dMessage msg);
+  static bool copyMsgInfos(Esp3dMessage *newMsgPtr, Esp3dMessage msg);
+  static Esp3dMessage *newMsg();
+  static Esp3dMessage *newMsg(esp3d_request_t requestId);
+  static Esp3dMessage *newMsg(Esp3dClient origin, Esp3dClient target,
+                              Esp3dAuthenticationLevel authentication_level =
+                                  Esp3dAuthenticationLevel::guest);
+  static Esp3dMessage *newMsg(Esp3dClient origin, Esp3dClient target,
+                              const uint8_t *data, size_t length,
+                              Esp3dAuthenticationLevel authentication_level =
+                                  Esp3dAuthenticationLevel::guest);
+  static bool setDataContent(Esp3dMessage *msg, const uint8_t *data,
                              size_t length);
 
  private:
-  std::deque<esp3d_msg_t *> _rx_queue;
-  std::deque<esp3d_msg_t *> _tx_queue;
+  std::deque<Esp3dMessage *> _rx_queue;
+  std::deque<Esp3dMessage *> _tx_queue;
   size_t _rx_size;
   size_t _tx_size;
   size_t _rx_max_size;

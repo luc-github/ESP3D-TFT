@@ -32,7 +32,7 @@ esp_err_t Esp3DHttpService::config_handler(httpd_req_t *req) {
     return not_authenticated_handler(req);
   }
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
-  esp3d_msg_t *newMsgPtr =
+  Esp3dMessage *newMsgPtr =
       Esp3DClient::newMsg(Esp3dClient::webui, Esp3dClient::command,
                           (const uint8_t *)"[ESP420]addPreTag",
                           strlen("[ESP420]addPreTag"), authentication_level);

@@ -118,7 +118,7 @@ bool ESP3DSocketServer::startSocketServer() {
   return true;
 }
 
-void ESP3DSocketServer::process(esp3d_msg_t *msg) {
+void ESP3DSocketServer::process(Esp3dMessage *msg) {
   if (!addTXData(msg)) {
     flush();
     if (!addTXData(msg)) {
@@ -435,7 +435,7 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
   authentication_level = Esp3dAuthenticationLevel::admin;
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   esp3d_log("Pushing `%s` %d", msg, size);
-  esp3d_msg_t *newMsgPtr = newMsg();
+  Esp3dMessage *newMsgPtr = newMsg();
   if (newMsgPtr) {
     if (Esp3DClient::setDataContent(newMsgPtr, msg, size)) {
       newMsgPtr->origin = Esp3dClient::telnet;
@@ -465,13 +465,13 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
 void ESP3DSocketServer::handle() {
   if (_started) {
     if (getRxMsgsCount() > 0) {
-      esp3d_msg_t *msg = popRx();
+      Esp3dMessage *msg = popRx();
       if (msg) {
         esp3dCommands.process(msg);
       }
     }
     if (getTxMsgsCount() > 0) {
-      esp3d_msg_t *msg = popTx();
+      Esp3dMessage *msg = popTx();
       if (msg) {
         for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
           if (_clients[s].socketId != FREE_SOCKET_HANDLE) {

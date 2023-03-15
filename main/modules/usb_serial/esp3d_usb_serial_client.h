@@ -19,13 +19,14 @@
 */
 
 #pragma once
+#include <pthread.h>
 #include <stdio.h>
+
 #include "esp3d_client.h"
 #include "esp3d_log.h"
 #include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
 #include "freertos/semphr.h"
-#include <pthread.h>
+#include "freertos/task.h"
 #include "usb/cdc_acm_host.h"
 #include "usb/usb_host.h"
 #include "usb/vcp.hpp"
@@ -34,53 +35,41 @@
 extern "C" {
 #endif
 
-class Esp3DUsbSerialClient : public Esp3DClient
-{
-public:
-    Esp3DUsbSerialClient();
-    ~Esp3DUsbSerialClient();
-    bool begin();
-    void handle();
-    void end();
-    void process(esp3d_msg_t * msg);
-    bool isEndChar(uint8_t ch);
-    bool pushMsgToRxQueue(const uint8_t* msg, size_t size);
-    void flush();
-    void connectDevice();
-    void handle_rx (uint8_t *data, size_t data_len);
-    bool started()
-    {
-        return _started;
-    }
-    void setConnected(bool connected);
-    bool isConnected()
-    {
-        return _connected;
-    }
-    void setBaudRate(uint32_t baudRate)
-    {
-        _baudrate = baudRate;
-    }
-    uint32_t getBaudRate()
-    {
-        return _baudrate;
-    }
-private:
-    TaskHandle_t _xHandle;
-    size_t _rx_pos;
-    uint8_t * _rx_buffer;
-    uint32_t _baudrate;
-    bool _stopConnect;
-    bool _started;
-    bool _connected;
-    pthread_mutex_t _tx_mutex;
-    pthread_mutex_t _rx_mutex;
-    SemaphoreHandle_t _device_disconnected_sem;
-    std::unique_ptr<CdcAcmDevice> _vcp;
+class Esp3DUsbSerialClient : public Esp3DClient {
+ public:
+  Esp3DUsbSerialClient();
+  ~Esp3DUsbSerialClient();
+  bool begin();
+  void handle();
+  void end();
+  void process(Esp3dMessage* msg);
+  bool isEndChar(uint8_t ch);
+  bool pushMsgToRxQueue(const uint8_t* msg, size_t size);
+  void flush();
+  void connectDevice();
+  void handle_rx(uint8_t* data, size_t data_len);
+  bool started() { return _started; }
+  void setConnected(bool connected);
+  bool isConnected() { return _connected; }
+  void setBaudRate(uint32_t baudRate) { _baudrate = baudRate; }
+  uint32_t getBaudRate() { return _baudrate; }
+
+ private:
+  TaskHandle_t _xHandle;
+  size_t _rx_pos;
+  uint8_t* _rx_buffer;
+  uint32_t _baudrate;
+  bool _stopConnect;
+  bool _started;
+  bool _connected;
+  pthread_mutex_t _tx_mutex;
+  pthread_mutex_t _rx_mutex;
+  SemaphoreHandle_t _device_disconnected_sem;
+  std::unique_ptr<CdcAcmDevice> _vcp;
 };
 
 extern Esp3DUsbSerialClient usbSerialClient;
 
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif

@@ -57,7 +57,7 @@ class Esp3DGCodeHostService : public Esp3DClient {
   bool begin();
   void handle();
   void end();
-  void process(esp3d_msg_t* msg);
+  void process(Esp3dMessage* msg);
   bool pushMsgToRxQueue(const uint8_t* msg, size_t size);
   void flush();
   bool started() { return _started; }

@@ -26,7 +26,6 @@
 #include "http/esp3d_http_service.h"
 #include "lwip/sockets.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -55,7 +54,7 @@ class Esp3DWsService {
   void handle();
   void end();
   esp_err_t http_handler(httpd_req_t *req);
-  virtual void process(esp3d_msg_t *msg);
+  virtual void process(Esp3dMessage *msg);
   virtual esp_err_t onOpen(httpd_req_t *req);
   virtual esp_err_t onMessage(httpd_req_t *req);
   virtual esp_err_t onClose(int fd);

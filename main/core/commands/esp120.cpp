@@ -26,7 +26,7 @@
 #define COMMAND_ID 120
 // Get/Set HTTP state which can be ON, OFF
 //[ESP120]<state> json=<no> pwd=<admin password>
-void Esp3DCommands::ESP120(int cmd_params_pos, esp3d_msg_t* msg) {
+void Esp3DCommands::ESP120(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClient target = msg->origin;
   esp3d_request_t requestId = msg->requestId;
   (void)requestId;

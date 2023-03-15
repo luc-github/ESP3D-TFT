@@ -92,7 +92,7 @@ Esp3DGCodeHostService::Esp3DGCodeHostService() {
 }
 Esp3DGCodeHostService::~Esp3DGCodeHostService() { end(); }
 
-void Esp3DGCodeHostService::process(esp3d_msg_t* msg) {
+void Esp3DGCodeHostService::process(Esp3dMessage* msg) {
   esp3d_log("Add message to queue");
   if (!addTXData(msg)) {
     flush();
@@ -142,7 +142,7 @@ bool Esp3DGCodeHostService::begin() {
 }
 
 bool Esp3DGCodeHostService::pushMsgToRxQueue(const uint8_t* msg, size_t size) {
-  esp3d_msg_t* newMsgPtr = newMsg();
+  Esp3dMessage* newMsgPtr = newMsg();
   if (newMsgPtr) {
     if (Esp3DClient::setDataContent(newMsgPtr, msg, size)) {
       newMsgPtr->authentication_level = Esp3dAuthenticationLevel::user;
@@ -227,13 +227,13 @@ void Esp3DGCodeHostService::handle() {
     }
 
     /* if(getRxMsgsCount() > 0) {
-         esp3d_msg_t * msg = popRx();
+         Esp3dMessage * msg = popRx();
          if (msg) {
              esp3dCommands.process(msg);
          }
      }
      if(getTxMsgsCount() > 0) {
-         esp3d_msg_t * msg = popTx();
+         Esp3dMessage * msg = popTx();
          if (msg) {
               size_t len = uart_write_bytes(ESP3D_GCODE_HOST_PORT, msg->data,
      msg->size); if (len != msg->size) { esp3d_log_e("Error writing message %s",

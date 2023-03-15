@@ -810,7 +810,7 @@ esp_err_t Esp3DHttpService::streamFile(const char *path, httpd_req_t *req) {
   return res;
 }
 
-void Esp3DHttpService::process(esp3d_msg_t *msg) {
+void Esp3DHttpService::process(Esp3dMessage *msg) {
   if (msg->requestId.httpReq) {
     // esp3d_log("Msg type : %d", msg->type);
     if (httpd_resp_send_chunk(msg->requestId.httpReq, (const char *)msg->data,

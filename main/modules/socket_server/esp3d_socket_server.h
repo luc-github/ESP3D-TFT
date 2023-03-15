@@ -19,13 +19,14 @@
 */
 
 #pragma once
+#include <pthread.h>
 #include <stdio.h>
+
+#include "esp3d_client.h"
+#include "esp3d_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "lwip/sockets.h"
-#include "esp3d_client.h"
-#include "esp3d_log.h"
-#include <pthread.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,58 +35,50 @@ extern "C" {
 #define ESP3D_MAX_SOCKET_CLIENTS 2
 
 typedef struct {
-    int socketId;
-    struct sockaddr_storage source_addr;
+  int socketId;
+  struct sockaddr_storage source_addr;
 #if ESP3D_AUTHENTICATION_FEATURE
-    char sessionId[25];
-#endif //#if ESP3D_AUTHENTICATION_FEATURE
+  char sessionId[25];
+#endif  // #if ESP3D_AUTHENTICATION_FEATURE
 } esp3d_socket_client_info_t;
 
-class ESP3DSocketServer : public Esp3DClient
-{
-public:
-    ESP3DSocketServer();
-    ~ESP3DSocketServer();
-    bool begin();
-    void handle();
-    void process(esp3d_msg_t * msg);
-    void readSockets();
-    void end();
-    bool isEndChar(uint8_t ch);
-    bool pushMsgToRxQueue(uint index, const uint8_t* msg, size_t size);
-    void flush();
-    bool started()
-    {
-        return _started;
-    }
-    uint32_t port()
-    {
-        return _port;
-    }
-    bool startSocketServer();
-    bool getClient();
-    uint clientsConnected();
-    void closeAllClients();
-    esp3d_socket_client_info_t * getClientInfo(uint index);
+class ESP3DSocketServer : public Esp3DClient {
+ public:
+  ESP3DSocketServer();
+  ~ESP3DSocketServer();
+  bool begin();
+  void handle();
+  void process(Esp3dMessage* msg);
+  void readSockets();
+  void end();
+  bool isEndChar(uint8_t ch);
+  bool pushMsgToRxQueue(uint index, const uint8_t* msg, size_t size);
+  void flush();
+  bool started() { return _started; }
+  uint32_t port() { return _port; }
+  bool startSocketServer();
+  bool getClient();
+  uint clientsConnected();
+  void closeAllClients();
+  esp3d_socket_client_info_t* getClientInfo(uint index);
 
-private:
-
-    bool sendToSocket(const int sock, const char * data, const size_t len);
-    bool closeSocket(int socketId);
-    int getFreeClientSlot();
-    esp3d_socket_client_info_t _clients[ESP3D_MAX_SOCKET_CLIENTS];
-    int _listen_socket;
-    bool _started;
-    uint32_t _port;
-    pthread_mutex_t _tx_mutex;
-    pthread_mutex_t _rx_mutex;
-    TaskHandle_t _xHandle;
-    char ** _buffer;
-    char * _data;
+ private:
+  bool sendToSocket(const int sock, const char* data, const size_t len);
+  bool closeSocket(int socketId);
+  int getFreeClientSlot();
+  esp3d_socket_client_info_t _clients[ESP3D_MAX_SOCKET_CLIENTS];
+  int _listen_socket;
+  bool _started;
+  uint32_t _port;
+  pthread_mutex_t _tx_mutex;
+  pthread_mutex_t _rx_mutex;
+  TaskHandle_t _xHandle;
+  char** _buffer;
+  char* _data;
 };
 
 extern ESP3DSocketServer esp3dSocketServer;
 
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif

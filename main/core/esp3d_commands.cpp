@@ -67,7 +67,7 @@ bool Esp3DCommands::is_esp_command(uint8_t* sbuf, size_t len) {
   return false;
 }
 
-void Esp3DCommands::process(esp3d_msg_t* msg) {
+void Esp3DCommands::process(Esp3dMessage* msg) {
   static bool lastIsESP3D = false;
   if (!msg) {
     return;
@@ -260,7 +260,7 @@ bool Esp3DCommands::dispatchSetting(bool json, const char* filter,
   return dispatch(tmpstr.c_str(), target, requestId, Esp3dMessageType::core);
 }
 
-bool Esp3DCommands::dispatchAuthenticationError(esp3d_msg_t* msg, uint cmdid,
+bool Esp3DCommands::dispatchAuthenticationError(Esp3dMessage* msg, uint cmdid,
                                                 bool json) {
   std::string tmpstr;
   if (!msg) {
@@ -285,7 +285,7 @@ bool Esp3DCommands::dispatchAuthenticationError(esp3d_msg_t* msg, uint cmdid,
   return dispatch(msg, tmpstr.c_str());
 }
 
-bool Esp3DCommands::dispatchAnswer(esp3d_msg_t* msg, uint cmdid, bool json,
+bool Esp3DCommands::dispatchAnswer(Esp3dMessage* msg, uint cmdid, bool json,
                                    bool hasError, const char* answerMsg) {
   std::string tmpstr;
   if (!msg || !answerMsg) {
@@ -379,7 +379,7 @@ bool Esp3DCommands::dispatch(const char* sbuf, Esp3dClient target,
                              esp3d_request_t requestId, Esp3dMessageType type,
                              Esp3dClient origin,
                              Esp3dAuthenticationLevel authentication_level) {
-  esp3d_msg_t* newMsgPtr = Esp3DClient::newMsg(origin, target);
+  Esp3dMessage* newMsgPtr = Esp3DClient::newMsg(origin, target);
   if (newMsgPtr) {
     newMsgPtr->requestId = requestId;
     newMsgPtr->type = type;
@@ -389,11 +389,11 @@ bool Esp3DCommands::dispatch(const char* sbuf, Esp3dClient target,
   return false;
 }
 
-bool Esp3DCommands::dispatch(esp3d_msg_t* msg, const char* sbuf) {
+bool Esp3DCommands::dispatch(Esp3dMessage* msg, const char* sbuf) {
   return dispatch(msg, (uint8_t*)sbuf, strlen(sbuf));
 }
 
-bool Esp3DCommands::dispatch(esp3d_msg_t* msg, uint8_t* sbuf, size_t len) {
+bool Esp3DCommands::dispatch(Esp3dMessage* msg, uint8_t* sbuf, size_t len) {
   if (!msg) {
     esp3d_log_e("no msg");
     return false;
@@ -406,7 +406,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t* msg, uint8_t* sbuf, size_t len) {
   return dispatch(msg);
 }
 
-bool Esp3DCommands::dispatch(esp3d_msg_t* msg) {
+bool Esp3DCommands::dispatch(Esp3dMessage* msg) {
   bool sendOk = true;
   esp3d_log("Dispatch message origin %d to client %d , size: %d,  type: %d",
             msg->origin, msg->target, msg->size, msg->type);
@@ -494,7 +494,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t* msg) {
                msg->target=Esp3dClient::serial;
            } else {
                //duplicate message because current is  already pending
-               esp3d_msg_t * copy_msg = Esp3DClient::copyMsg(*msg);
+               Esp3dMessage * copy_msg = Esp3DClient::copyMsg(*msg);
                if (copy_msg) {
                    copy_msg->target = Esp3dClient::serial;
                    dispatch(copy_msg);
@@ -512,7 +512,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t* msg) {
               msg->target=Esp3dClient::usb_serial;
           } else {
               //duplicate message because current is  already pending
-              esp3d_msg_t * copy_msg = Esp3DClient::copyMsg(*msg);
+              Esp3dMessage * copy_msg = Esp3DClient::copyMsg(*msg);
               if (copy_msg) {
                   copy_msg->target = Esp3dClient::usb_serial;
                   dispatch(copy_msg);
@@ -530,7 +530,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t* msg) {
           msg->target = Esp3dClient::webui_websocket;
         } else {
           // duplicate message because current is  already pending
-          esp3d_msg_t* copy_msg = Esp3DClient::copyMsg(*msg);
+          Esp3dMessage* copy_msg = Esp3DClient::copyMsg(*msg);
           if (copy_msg) {
             copy_msg->target = Esp3dClient::webui_websocket;
             dispatch(copy_msg);
@@ -548,7 +548,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t* msg) {
           msg->target = Esp3dClient::websocket;
         } else {
           // duplicate message because current is  already pending
-          esp3d_msg_t* copy_msg = Esp3DClient::copyMsg(*msg);
+          Esp3dMessage* copy_msg = Esp3DClient::copyMsg(*msg);
           if (copy_msg) {
             copy_msg->target = Esp3dClient::websocket;
             dispatch(copy_msg);
@@ -568,7 +568,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t* msg) {
           msg->target = Esp3dClient::telnet;
         } else {
           // duplicate message because current is  already pending
-          esp3d_msg_t* copy_msg = Esp3DClient::copyMsg(*msg);
+          Esp3dMessage* copy_msg = Esp3DClient::copyMsg(*msg);
           if (copy_msg) {
             copy_msg->target = Esp3dClient::telnet;
             dispatch(copy_msg);
@@ -597,7 +597,7 @@ bool Esp3DCommands::dispatch(esp3d_msg_t* msg) {
   return sendOk;
 }
 
-bool Esp3DCommands::hasTag(esp3d_msg_t* msg, uint start, const char* label) {
+bool Esp3DCommands::hasTag(Esp3dMessage* msg, uint start, const char* label) {
   if (!msg) {
     esp3d_log_e("no msg for tag %s", label);
     return false;
@@ -650,7 +650,7 @@ bool Esp3DCommands::hasTag(esp3d_msg_t* msg, uint start, const char* label) {
   return false;
 }
 
-const char* Esp3DCommands::get_param(esp3d_msg_t* msg, uint start,
+const char* Esp3DCommands::get_param(Esp3dMessage* msg, uint start,
                                      const char* label) {
   if (!msg) {
     return "";
@@ -705,7 +705,7 @@ const char* Esp3DCommands::get_param(const char* data, uint size, uint start,
   return value.c_str();
 }
 
-const char* Esp3DCommands::get_clean_param(esp3d_msg_t* msg, uint start) {
+const char* Esp3DCommands::get_clean_param(Esp3dMessage* msg, uint start) {
   if (!msg) {
     return "";
   }
@@ -746,12 +746,12 @@ const char* Esp3DCommands::get_clean_param(esp3d_msg_t* msg, uint start) {
   return value.c_str();
 }
 
-bool Esp3DCommands::has_param(esp3d_msg_t* msg, uint start) {
+bool Esp3DCommands::has_param(Esp3dMessage* msg, uint start) {
   return strlen(get_clean_param(msg, start)) != 0;
 }
 
 void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,
-                                             esp3d_msg_t* msg) {
+                                             Esp3dMessage* msg) {
   // execute commands
   if (!msg) {
     return;

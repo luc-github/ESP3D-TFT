@@ -27,7 +27,7 @@
 #define COMMAND_ID 600
 // Send Notification
 //[ESP600]msg json=<no> pwd=<admin/user password>
-void Esp3DCommands::ESP600(int cmd_params_pos, esp3d_msg_t* msg) {
+void Esp3DCommands::ESP600(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClient target = msg->origin;
   esp3d_request_t requestId = msg->requestId;
   (void)requestId;

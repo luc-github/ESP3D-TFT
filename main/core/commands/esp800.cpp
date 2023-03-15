@@ -41,7 +41,7 @@
 // eventually set time with pc time
 // output is JSON or plain text according parameter
 //[ESP800]json=<no> <time=YYYY-MM-DDTHH:mm:ss> <version=3.0.0-a11> <setup=0/1>
-void Esp3DCommands::ESP800(int cmd_params_pos, esp3d_msg_t* msg) {
+void Esp3DCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClient target = msg->origin;
   esp3d_request_t requestId = msg->requestId;
   msg->target = target;

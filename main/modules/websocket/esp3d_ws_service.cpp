@@ -348,7 +348,7 @@ bool Esp3DWsService::pushMsgToRxQueue(int socketId, const uint8_t *msg,
   authentication_level = Esp3dAuthenticationLevel::admin;
 #endif  // ESP3D_AUTHENTICATION_FEATURE
 
-  esp3d_msg_t *newMsgPtr = Esp3DClient::newMsg();
+  Esp3dMessage *newMsgPtr = Esp3DClient::newMsg();
   if (newMsgPtr) {
     if (Esp3DClient::setDataContent(newMsgPtr, msg, size)) {
       newMsgPtr->authentication_level = authentication_level;
@@ -389,7 +389,7 @@ esp_err_t Esp3DWsService::onClose(int fd) {
   return ESP_FAIL;
 }
 
-void Esp3DWsService::process(esp3d_msg_t *msg) {
+void Esp3DWsService::process(Esp3dMessage *msg) {
   esp3d_log("Processing message");
   // Broadcast ?
   if (msg->requestId.id == 0) {

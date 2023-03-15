@@ -26,17 +26,16 @@
 extern "C" {
 #endif
 
-class Esp3DWebUiService: public Esp3DWsService
-{
-public:
-    void process(esp3d_msg_t * msg);
-    esp_err_t pushNotification(const char *msg);
-    esp_err_t onOpen(httpd_req_t *req);
-    esp_err_t onMessage(httpd_req_t *req);
+class Esp3DWebUiService : public Esp3DWsService {
+ public:
+  void process(Esp3dMessage *msg);
+  esp_err_t pushNotification(const char *msg);
+  esp_err_t onOpen(httpd_req_t *req);
+  esp_err_t onMessage(httpd_req_t *req);
 };
 
 extern Esp3DWebUiService esp3dWsWebUiService;
 
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif
