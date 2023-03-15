@@ -45,11 +45,12 @@ Esp3dAuthenticationLevel Esp3DAuthenticationService::getAuthenticatedLevel(
 bool Esp3DAuthenticationService::begin() {
 #if ESP3D_AUTHENTICATION_FEATURE
   char tmpStr[SIZE_OF_LOCAL_PASSWORD + 1];
-  _admin_pwd = esp3dTFTsettings.readString(esp3d_admin_password, tmpStr,
-                                           SIZE_OF_LOCAL_PASSWORD);
-  _user_pwd = esp3dTFTsettings.readString(esp3d_user_password, tmpStr,
-                                          SIZE_OF_LOCAL_PASSWORD);
-  _session_timeout = esp3dTFTsettings.readByte(esp3d_session_timeout);
+  _admin_pwd = esp3dTFTsettings.readString(
+      Esp3dSettingIndex::esp3d_admin_password, tmpStr, SIZE_OF_LOCAL_PASSWORD);
+  _user_pwd = esp3dTFTsettings.readString(
+      Esp3dSettingIndex::esp3d_user_password, tmpStr, SIZE_OF_LOCAL_PASSWORD);
+  _session_timeout =
+      esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_session_timeout);
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   return true;
 }

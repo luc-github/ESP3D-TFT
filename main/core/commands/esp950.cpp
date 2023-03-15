@@ -50,8 +50,8 @@ void Esp3DCommands::ESP950(int cmd_params_pos, Esp3dMessage* msg) {
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
-  Esp3dClient client_output =
-      (Esp3dClient)esp3dTFTsettings.readByte(esp3d_output_client);
+  Esp3dClient client_output = (Esp3dClient)esp3dTFTsettings.readByte(
+      Esp3dSettingIndex::esp3d_output_client);
   if (tmpstr.length() == 0) {
     if (client_output == Esp3dClient::usb_serial) {
       ok_msg = "USB";
@@ -62,7 +62,7 @@ void Esp3DCommands::ESP950(int cmd_params_pos, Esp3dMessage* msg) {
     if ((usbclient && !serialclient) || (serialclient && !usbclient)) {
       Esp3dClient newoutput =
           serialclient ? Esp3dClient::serial : Esp3dClient::usb_serial;
-      if (!esp3dTFTsettings.writeByte(esp3d_output_client,
+      if (!esp3dTFTsettings.writeByte(Esp3dSettingIndex::esp3d_output_client,
                                       static_cast<uint8_t>(newoutput))) {
         hasError = true;
         error_msg = "Set value failed";

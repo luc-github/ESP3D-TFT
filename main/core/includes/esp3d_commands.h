@@ -45,13 +45,12 @@ class Esp3DCommands {
   bool dispatchKeyValue(bool json, const char* key, const char* value,
                         Esp3dClient target, Esp3dRequest requestId,
                         bool nested = false, bool isFirst = false);
-  bool dispatchSetting(bool json, const char* filter,
-                       esp3d_setting_index_t index, const char* help,
-                       const char** optionValues, const char** optionLabels,
-                       uint32_t maxsize, uint32_t minsize, uint32_t minsize2,
-                       uint8_t precision, const char* unit, bool needRestart,
-                       Esp3dClient target, Esp3dRequest requestId,
-                       bool isFirst = false);
+  bool dispatchSetting(bool json, const char* filter, Esp3dSettingIndex index,
+                       const char* help, const char** optionValues,
+                       const char** optionLabels, uint32_t maxsize,
+                       uint32_t minsize, uint32_t minsize2, uint8_t precision,
+                       const char* unit, bool needRestart, Esp3dClient target,
+                       Esp3dRequest requestId, bool isFirst = false);
   bool dispatch(Esp3dMessage* msg);
   bool dispatch(Esp3dMessage* msg, uint8_t* sbuf, size_t len);
   bool dispatch(Esp3dMessage* msg, const char* sbuf);

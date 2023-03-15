@@ -173,13 +173,15 @@ bool Esp3DHttpService::begin() {
 
   end();
   // check if start
-  if (Esp3dState::on != (Esp3dState)esp3dTFTsettings.readByte(esp3d_http_on)) {
+  if (Esp3dState::on !=
+      (Esp3dState)esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_http_on)) {
     esp3d_log("Http is not enabled");
     // return true because no error but _started is false
     return true;
   }
   httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-  uint32_t intValue = esp3dTFTsettings.readUint32(esp3d_http_port);
+  uint32_t intValue =
+      esp3dTFTsettings.readUint32(Esp3dSettingIndex::esp3d_http_port);
   // HTTP port
   config.server_port = intValue;
   // Http server core
@@ -367,8 +369,8 @@ bool Esp3DHttpService::begin() {
     _started = esp3dWsWebUiService.begin(&wsConfig);
 #if ESP3D_WS_SERVICE_FEATURE
     if (_started) {
-      if (Esp3dState::on !=
-          (Esp3dState)esp3dTFTsettings.readByte(esp3d_ws_on)) {
+      if (Esp3dState::on != (Esp3dState)esp3dTFTsettings.readByte(
+                                Esp3dSettingIndex::esp3d_ws_on)) {
         esp3d_log("WS is not enabled");
       } else {
         wsConfig.max_clients = 2;

@@ -68,8 +68,8 @@ void Esp3DCommands::ESP401(int cmd_params_pos, Esp3dMessage* msg) {
     // check parameters are correct
     uint8_t valueb = 0;
     uint32_t value32 = 0;
-    esp3d_setting_index_t index_setting =
-        (esp3d_setting_index_t)atoi(settingIndex.c_str());
+    Esp3dSettingIndex index_setting =
+        (Esp3dSettingIndex)atoi(settingIndex.c_str());
     const Esp3dSettingDescription* settingPtr =
         esp3dTFTsettings.getSettingPtr(index_setting);
     if (!settingPtr) {
@@ -175,33 +175,33 @@ void Esp3DCommands::ESP401(int cmd_params_pos, Esp3dMessage* msg) {
       switch (index_setting) {
 #if ESP3D_SD_CARD_FEATURE
 #if ESP3D_SD_FEATURE_IS_SPI
-        case esp3d_spi_divider:
+        case Esp3dSettingIndex::esp3d_spi_divider:
           sd.setSPISpeedDivider(valueb);
           break;
 #endif  // ESP3D_SD_FEATURE_IS_SPI
 #endif  // ESP3D_SD_CARD_FEATURE
 #if ESP3D_AUTHENTICATION_FEATURE
-        case esp3d_admin_password:
+        case Esp3dSettingIndex::esp3d_admin_password:
           esp3dAuthenthicationService.setAdminPassword(settingValue.c_str());
           break;
-        case esp3d_user_password:
+        case Esp3dSettingIndex::esp3d_user_password:
           esp3dAuthenthicationService.setUserPassword(settingValue.c_str());
           break;
-        case esp3d_session_timeout:
+        case Esp3dSettingIndex::esp3d_session_timeout:
           esp3dAuthenthicationService.setSessionTimeout(valueb);
           break;
 #endif  // ESP3D_AUTHENTICATION_FEATURE
 #if ESP3D_NOTIFICATIONS_FEATURE
-        case esp3d_notification_type:
-        case esp3d_auto_notification:
-        case esp3d_notification_token_1:
-        case esp3d_notification_token_2:
-        case esp3d_notification_token_setting:
+        case Esp3dSettingIndex::esp3d_notification_type:
+        case Esp3dSettingIndex::esp3d_auto_notification:
+        case Esp3dSettingIndex::esp3d_notification_token_1:
+        case Esp3dSettingIndex::esp3d_notification_token_2:
+        case Esp3dSettingIndex::esp3d_notification_token_setting:
           esp3dNotificationsService.begin();
           break;
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 
-        case esp3d_target_firmware:
+        case Esp3dSettingIndex::esp3d_target_firmware:
           esp3dTFTstream.getTargetFirmware(true);
           break;
         default:

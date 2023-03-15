@@ -74,7 +74,8 @@ bool Esp3DTFT::begin() {
   if (esp3dTFTsettings.isValidSettingsNvs()) {
     esp3d_log("NVS is valid");
     char result[50] = {0};
-    if (esp3dTFTsettings.readString(esp3d_version, result, 50)) {
+    if (esp3dTFTsettings.readString(Esp3dSettingIndex::esp3d_version, result,
+                                    50)) {
       esp3d_log("NVS Setting version is %s", result);
     }
   } else {

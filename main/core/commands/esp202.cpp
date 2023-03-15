@@ -48,15 +48,19 @@ void Esp3DCommands::ESP202(int cmd_params_pos, Esp3dMessage* msg) {
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
-    ok_msg = std::to_string(esp3dTFTsettings.readByte(esp3d_spi_divider));
+    ok_msg = std::to_string(
+        esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_spi_divider));
   } else {
     uint8_t spidiv = atoi(tmpstr.c_str());
     esp3d_log("got %s param for a value of %d, is valid %d", tmpstr.c_str(),
               spidiv,
-              esp3dTFTsettings.isValidByteSetting(spidiv, esp3d_spi_divider));
-    if (esp3dTFTsettings.isValidByteSetting(spidiv, esp3d_spi_divider)) {
+              esp3dTFTsettings.isValidByteSetting(
+                  spidiv, Esp3dSettingIndex::esp3d_spi_divider));
+    if (esp3dTFTsettings.isValidByteSetting(
+            spidiv, Esp3dSettingIndex::esp3d_spi_divider)) {
       esp3d_log("Value %d is valid", spidiv);
-      if (!esp3dTFTsettings.writeByte(esp3d_spi_divider, spidiv)) {
+      if (!esp3dTFTsettings.writeByte(Esp3dSettingIndex::esp3d_spi_divider,
+                                      spidiv)) {
         hasError = true;
         error_msg = "Set value failed";
       }

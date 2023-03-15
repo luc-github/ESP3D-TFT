@@ -46,8 +46,8 @@ void Esp3DCommands::ESP402(int cmd_params_pos, Esp3dMessage* msg) {
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
-    Esp3dState setting_check_update =
-        (Esp3dState)esp3dTFTsettings.readByte(esp3d_check_update_on_sd);
+    Esp3dState setting_check_update = (Esp3dState)esp3dTFTsettings.readByte(
+        Esp3dSettingIndex::esp3d_check_update_on_sd);
     if (setting_check_update == Esp3dState::off) {
       ok_msg = "OFF";
     } else {
@@ -55,8 +55,9 @@ void Esp3DCommands::ESP402(int cmd_params_pos, Esp3dMessage* msg) {
     }
   } else {
     if (tmpstr == "OFF" || tmpstr == "ON") {
-      if (!esp3dTFTsettings.writeByte(esp3d_check_update_on_sd,
-                                      tmpstr == "OFF" ? 0 : 1)) {
+      if (!esp3dTFTsettings.writeByte(
+              Esp3dSettingIndex::esp3d_check_update_on_sd,
+              tmpstr == "OFF" ? 0 : 1)) {
         hasError = true;
         error_msg = "Set value failed";
       }

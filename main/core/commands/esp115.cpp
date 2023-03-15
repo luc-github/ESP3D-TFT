@@ -45,8 +45,8 @@ void Esp3DCommands::ESP115(int cmd_params_pos, Esp3dMessage* msg) {
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
-  Esp3dRadioMode setting_radio_mode =
-      static_cast<Esp3dRadioMode>(esp3dTFTsettings.readByte(esp3d_radio_mode));
+  Esp3dRadioMode setting_radio_mode = static_cast<Esp3dRadioMode>(
+      esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_radio_mode));
   Esp3dRadioMode current_radio_mode = esp3dNetwork.getMode();
   if (tmpstr.length() == 0) {
     if (current_radio_mode == Esp3dRadioMode::off) {

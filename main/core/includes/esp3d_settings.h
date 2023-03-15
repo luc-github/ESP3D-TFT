@@ -38,7 +38,7 @@ extern "C" {
 #define HIDDEN_SETTING_VALUE "********"
 // do not change the order of the enum
 // using #if to keep consistency if user update feature
-typedef enum {
+enum class Esp3dSettingIndex : uint16_t {
   esp3d_version,
   esp3d_baud_rate,
   esp3d_spi_divider,
@@ -75,8 +75,8 @@ typedef enum {
   esp3d_admin_password,
   esp3d_user_password,
   esp3d_session_timeout,
-  last_esp3d_setting_index_t
-} esp3d_setting_index_t;
+  unknown_index
+};
 
 enum class Esp3dTargetFirmware : uint8_t {
   unknown = 0,
@@ -107,7 +107,7 @@ enum class Esp3dSettingType : uint8_t {
 };
 
 struct Esp3dSettingDescription {
-  esp3d_setting_index_t index;
+  Esp3dSettingIndex index;
   Esp3dSettingType type;
   uint16_t size;
   const char* default_val;
@@ -118,28 +118,26 @@ class Esp3DSettings final {
   Esp3DSettings();
   ~Esp3DSettings();
   bool isValidSettingsNvs();
-  uint8_t readByte(esp3d_setting_index_t index, bool* haserror = NULL);
-  uint32_t readUint32(esp3d_setting_index_t index, bool* haserror = NULL);
-  const char* readIPString(esp3d_setting_index_t index, bool* haserror = NULL);
-  const char* readString(esp3d_setting_index_t index, char* out_str, size_t len,
+  uint8_t readByte(Esp3dSettingIndex index, bool* haserror = NULL);
+  uint32_t readUint32(Esp3dSettingIndex index, bool* haserror = NULL);
+  const char* readIPString(Esp3dSettingIndex index, bool* haserror = NULL);
+  const char* readString(Esp3dSettingIndex index, char* out_str, size_t len,
                          bool* haserror = NULL);
-  bool writeByte(esp3d_setting_index_t index, const uint8_t value);
-  bool writeUint32(esp3d_setting_index_t index, const uint32_t value);
-  bool writeIPString(esp3d_setting_index_t index, const char* byte_buffer);
-  bool writeString(esp3d_setting_index_t index, const char* byte_buffer);
+  bool writeByte(Esp3dSettingIndex index, const uint8_t value);
+  bool writeUint32(Esp3dSettingIndex index, const uint32_t value);
+  bool writeIPString(Esp3dSettingIndex index, const char* byte_buffer);
+  bool writeString(Esp3dSettingIndex index, const char* byte_buffer);
   bool reset();
   bool isValidIPStringSetting(const char* value,
-                              esp3d_setting_index_t settingElement);
+                              Esp3dSettingIndex settingElement);
   bool isValidStringSetting(const char* value,
-                            esp3d_setting_index_t settingElement);
-  bool isValidIntegerSetting(uint32_t value,
-                             esp3d_setting_index_t settingElement);
-  bool isValidByteSetting(uint8_t value, esp3d_setting_index_t settingElement);
-  uint32_t getDefaultIntegerSetting(esp3d_setting_index_t settingElement);
-  const char* getDefaultStringSetting(esp3d_setting_index_t settingElement);
-  uint8_t getDefaultByteSetting(esp3d_setting_index_t settingElement);
-  const Esp3dSettingDescription* getSettingPtr(
-      const esp3d_setting_index_t index);
+                            Esp3dSettingIndex settingElement);
+  bool isValidIntegerSetting(uint32_t value, Esp3dSettingIndex settingElement);
+  bool isValidByteSetting(uint8_t value, Esp3dSettingIndex settingElement);
+  uint32_t getDefaultIntegerSetting(Esp3dSettingIndex settingElement);
+  const char* getDefaultStringSetting(Esp3dSettingIndex settingElement);
+  uint8_t getDefaultByteSetting(Esp3dSettingIndex settingElement);
+  const Esp3dSettingDescription* getSettingPtr(const Esp3dSettingIndex index);
   const char* GetFirmwareTargetShortName(Esp3dTargetFirmware index);
 
  private:

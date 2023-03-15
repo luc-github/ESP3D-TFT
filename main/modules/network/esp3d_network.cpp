@@ -193,7 +193,8 @@ bool Esp3DNetwork::begin() {
   esp3d_log("Free mem %ld", esp_get_minimum_free_heap_size());
   if (!bootDone) {
     bootDone = true;
-    uint8_t bootMode = esp3dTFTsettings.readByte(esp3d_radio_boot_mode);
+    uint8_t bootMode =
+        esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_radio_boot_mode);
     if (bootMode == static_cast<uint8_t>(Esp3dRadioMode::off)) {
       esp3d_log("Radio is off at boot time");
       _started = true;
@@ -204,7 +205,8 @@ bool Esp3DNetwork::begin() {
   if (_current_radio_mode != Esp3dRadioMode::off) {
     setMode(Esp3dRadioMode::off);
   }
-  uint8_t radioMode = esp3dTFTsettings.readByte(esp3d_radio_mode);
+  uint8_t radioMode =
+      esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_radio_mode);
   _started = setMode(static_cast<Esp3dRadioMode>(radioMode));
   return _started;
 }
@@ -275,7 +277,7 @@ bool Esp3DNetwork::startStaMode() {
     stopStaMode();
   }
   esp3d_log("Init STA Mode");
-  esp3dTFTsettings.readString(esp3d_sta_ssid, ssid_str, 33);
+  esp3dTFTsettings.readString(Esp3dSettingIndex::esp3d_sta_ssid, ssid_str, 33);
   if (strlen(ssid_str) == 0) {
     return false;
   }
@@ -306,9 +308,11 @@ bool Esp3DNetwork::startStaMode() {
   ESP_ERROR_CHECK(esp_event_handler_instance_register(
       IP_EVENT, ESP_EVENT_ANY_ID, &wifi_sta_event_handler, NULL, NULL));
   esp3d_log("Configure STA settings");
-  esp3dTFTsettings.readString(esp3d_sta_ssid, ssid_str, 33);
-  esp3dTFTsettings.readString(esp3d_sta_password, ssid_pwd_str, 65);
-  uint8_t ipMode = esp3dTFTsettings.readByte(esp3d_sta_ip_mode);
+  esp3dTFTsettings.readString(Esp3dSettingIndex::esp3d_sta_ssid, ssid_str, 33);
+  esp3dTFTsettings.readString(Esp3dSettingIndex::esp3d_sta_password,
+                              ssid_pwd_str, 65);
+  uint8_t ipMode =
+      esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_sta_ip_mode);
   esp3d_log("Got  STA settings: SSID:<%s> password:<%s> ip mode :<%s>",
             ssid_str, ssid_pwd_str,
             ipMode == static_cast<uint8_t>(Esp3dIpMode::staticIp) ? "Static"
@@ -331,10 +335,14 @@ bool Esp3DNetwork::startStaMode() {
     _useStaticIp = true;
     esp3d_log("Set IP static mode");
     esp_netif_dhcpc_stop(_wifiStaPtr);
-    uint32_t ip_int = esp3dTFTsettings.readUint32(esp3d_sta_ip_static);
-    uint32_t gw_int = esp3dTFTsettings.readUint32(esp3d_sta_gw_static);
-    uint32_t msk_int = esp3dTFTsettings.readUint32(esp3d_sta_mask_static);
-    uint32_t dns_int = esp3dTFTsettings.readUint32(esp3d_sta_dns_static);
+    uint32_t ip_int =
+        esp3dTFTsettings.readUint32(Esp3dSettingIndex::esp3d_sta_ip_static);
+    uint32_t gw_int =
+        esp3dTFTsettings.readUint32(Esp3dSettingIndex::esp3d_sta_gw_static);
+    uint32_t msk_int =
+        esp3dTFTsettings.readUint32(Esp3dSettingIndex::esp3d_sta_mask_static);
+    uint32_t dns_int =
+        esp3dTFTsettings.readUint32(Esp3dSettingIndex::esp3d_sta_dns_static);
     esp_netif_ip_info_t ip_info;
     ip_info.ip.addr = ip_int;
     ip_info.gw.addr = gw_int;
@@ -368,11 +376,11 @@ bool Esp3DNetwork::startStaMode() {
 
   // Set hostname
   const Esp3dSettingDescription* settingPtr =
-      esp3dTFTsettings.getSettingPtr(esp3d_hostname);
+      esp3dTFTsettings.getSettingPtr(Esp3dSettingIndex::esp3d_hostname);
   if (settingPtr) {
     char out_str[33] = {0};
-    _hostname =
-        esp3dTFTsettings.readString(esp3d_hostname, out_str, settingPtr->size);
+    _hostname = esp3dTFTsettings.readString(Esp3dSettingIndex::esp3d_hostname,
+                                            out_str, settingPtr->size);
     if (ESP_OK != esp_netif_set_hostname(_wifiStaPtr, _hostname.c_str())) {
       esp3d_log_e("Failed to set hostname");
     }
@@ -461,10 +469,13 @@ bool Esp3DNetwork::startApMode(bool configMode) {
   esp3d_log("Register wifi handler");
   ESP_ERROR_CHECK(esp_event_handler_instance_register(
       WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_ap_event_handler, NULL, NULL));
-  esp3dTFTsettings.readString(esp3d_ap_ssid, ssid_str, 33);
-  uint8_t channel = esp3dTFTsettings.readByte(esp3d_ap_channel);
-  uint32_t ip_int = esp3dTFTsettings.readUint32(esp3d_ap_ip_static);
-  esp3dTFTsettings.readString(esp3d_ap_password, ssid_pwd_str, 65);
+  esp3dTFTsettings.readString(Esp3dSettingIndex::esp3d_ap_ssid, ssid_str, 33);
+  uint8_t channel =
+      esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_ap_channel);
+  uint32_t ip_int =
+      esp3dTFTsettings.readUint32(Esp3dSettingIndex::esp3d_ap_ip_static);
+  esp3dTFTsettings.readString(Esp3dSettingIndex::esp3d_ap_password,
+                              ssid_pwd_str, 65);
   esp3d_log("Got  AP settings: SSID:<%s> password:<%s> channel:<%d>", ssid_str,
             ssid_pwd_str, channel);
   wifi_config_t wifi_config;
@@ -501,11 +512,11 @@ bool Esp3DNetwork::startApMode(bool configMode) {
   ESP_ERROR_CHECK(esp_wifi_start());
   // Set hostname
   const Esp3dSettingDescription* settingPtr =
-      esp3dTFTsettings.getSettingPtr(esp3d_hostname);
+      esp3dTFTsettings.getSettingPtr(Esp3dSettingIndex::esp3d_hostname);
   if (settingPtr) {
     char out_str[33] = {0};
-    std::string hostname =
-        esp3dTFTsettings.readString(esp3d_hostname, out_str, settingPtr->size);
+    std::string hostname = esp3dTFTsettings.readString(
+        Esp3dSettingIndex::esp3d_hostname, out_str, settingPtr->size);
     if (ESP_OK != esp_netif_set_hostname(_wifiApPtr, hostname.c_str())) {
       esp3d_log_e("Failed to set hostname");
     }
@@ -710,7 +721,7 @@ bool Esp3DNetwork::setMode(Esp3dRadioMode mode, bool restart) {
     case Esp3dRadioMode::wifi_sta:
       if (!startStaMode()) {
         setMode(static_cast<Esp3dRadioMode>(
-            esp3dTFTsettings.readByte(esp3d_fallback_mode)));
+            esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_fallback_mode)));
       }
       break;
     case Esp3dRadioMode::wifi_ap:

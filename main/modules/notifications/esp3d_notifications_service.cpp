@@ -40,40 +40,49 @@ bool Esp3DNotificationsService::begin(bool sendAutoNotificationMsg) {
   bool res = true;
   char buffer[SIZE_OF_SETTING_NOFIFICATION_T1];
   end();
-  _notificationType =
-      (Esp3dNotificationType)esp3dTFTsettings.readByte(esp3d_notification_type);
+  _notificationType = (Esp3dNotificationType)esp3dTFTsettings.readByte(
+      Esp3dSettingIndex::esp3d_notification_type);
   switch (_notificationType) {
     case Esp3dNotificationType::none:  // no notification = no error but no
                                        // start
       _started = true;
       return true;
     case Esp3dNotificationType::pushover:
-      _token1 = esp3dTFTsettings.readString(esp3d_notification_token_1, buffer,
-                                            SIZE_OF_SETTING_NOFIFICATION_T1);
-      _token2 = esp3dTFTsettings.readString(esp3d_notification_token_2, buffer,
-                                            SIZE_OF_SETTING_NOFIFICATION_T2);
+      _token1 = esp3dTFTsettings.readString(
+          Esp3dSettingIndex::esp3d_notification_token_1, buffer,
+          SIZE_OF_SETTING_NOFIFICATION_T1);
+      _token2 = esp3dTFTsettings.readString(
+          Esp3dSettingIndex::esp3d_notification_token_2, buffer,
+          SIZE_OF_SETTING_NOFIFICATION_T2);
       break;
     case Esp3dNotificationType::telegram:
-      _token1 = esp3dTFTsettings.readString(esp3d_notification_token_1, buffer,
-                                            SIZE_OF_SETTING_NOFIFICATION_T1);
-      _token2 = esp3dTFTsettings.readString(esp3d_notification_token_2, buffer,
-                                            SIZE_OF_SETTING_NOFIFICATION_T2);
+      _token1 = esp3dTFTsettings.readString(
+          Esp3dSettingIndex::esp3d_notification_token_1, buffer,
+          SIZE_OF_SETTING_NOFIFICATION_T1);
+      _token2 = esp3dTFTsettings.readString(
+          Esp3dSettingIndex::esp3d_notification_token_2, buffer,
+          SIZE_OF_SETTING_NOFIFICATION_T2);
       break;
     case Esp3dNotificationType::line:
-      _token1 = esp3dTFTsettings.readString(esp3d_notification_token_1, buffer,
-                                            SIZE_OF_SETTING_NOFIFICATION_T1);
+      _token1 = esp3dTFTsettings.readString(
+          Esp3dSettingIndex::esp3d_notification_token_1, buffer,
+          SIZE_OF_SETTING_NOFIFICATION_T1);
       break;
     case Esp3dNotificationType::ifttt:
-      _token1 = esp3dTFTsettings.readString(esp3d_notification_token_1, buffer,
-                                            SIZE_OF_SETTING_NOFIFICATION_T1);
-      _token2 = esp3dTFTsettings.readString(esp3d_notification_token_2, buffer,
-                                            SIZE_OF_SETTING_NOFIFICATION_T2);
+      _token1 = esp3dTFTsettings.readString(
+          Esp3dSettingIndex::esp3d_notification_token_1, buffer,
+          SIZE_OF_SETTING_NOFIFICATION_T1);
+      _token2 = esp3dTFTsettings.readString(
+          Esp3dSettingIndex::esp3d_notification_token_2, buffer,
+          SIZE_OF_SETTING_NOFIFICATION_T2);
       break;
     case Esp3dNotificationType::email:
-      _token1 = esp3dTFTsettings.readString(esp3d_notification_token_1, buffer,
-                                            SIZE_OF_SETTING_NOFIFICATION_T1);
-      _token2 = esp3dTFTsettings.readString(esp3d_notification_token_2, buffer,
-                                            SIZE_OF_SETTING_NOFIFICATION_T2);
+      _token1 = esp3dTFTsettings.readString(
+          Esp3dSettingIndex::esp3d_notification_token_1, buffer,
+          SIZE_OF_SETTING_NOFIFICATION_T1);
+      _token2 = esp3dTFTsettings.readString(
+          Esp3dSettingIndex::esp3d_notification_token_2, buffer,
+          SIZE_OF_SETTING_NOFIFICATION_T2);
       if (!getEmailInformationsFromSettings()) {
         res = false;
       }
@@ -87,7 +96,8 @@ bool Esp3DNotificationsService::begin(bool sendAutoNotificationMsg) {
     esp3d_log_e("Failed to start notification service");
     end();
   } else {
-    _autonotification = esp3dTFTsettings.readByte(esp3d_auto_notification);
+    _autonotification =
+        esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_auto_notification);
   }
   _started = res;
   if (sendAutoNotificationMsg) {

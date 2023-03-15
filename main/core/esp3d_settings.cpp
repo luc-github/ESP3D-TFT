@@ -67,78 +67,92 @@ const uint8_t SupportedApChannelsSize =
 
 // value of settings, default value are all strings
 const Esp3dSettingDescription Esp3DSettingsData[] = {
-    {esp3d_version, Esp3dSettingType::string_t, SIZE_OF_SETTING_VERSION,
-     "Invalid data"},  // Version
-    {esp3d_baud_rate, Esp3dSettingType::integer_t, 4,
+    {Esp3dSettingIndex::esp3d_version, Esp3dSettingType::string_t,
+     SIZE_OF_SETTING_VERSION, "Invalid data"},  // Version
+    {Esp3dSettingIndex::esp3d_baud_rate, Esp3dSettingType::integer_t, 4,
      ESP3D_SERIAL_BAUDRATE},  // BaudRate
 #if ESP3D_USB_SERIAL_FEATURE
-    {esp3d_usb_serial_baud_rate, Esp3dSettingType::integer_t, 4,
-     ESP3D_USB_SERIAL_BAUDRATE},  // BaudRate
-    {esp3d_output_client, Esp3dSettingType::byte_t, 1, "1"},
+    {Esp3dSettingIndex::esp3d_usb_serial_baud_rate, Esp3dSettingType::integer_t,
+     4, ESP3D_USB_SERIAL_BAUDRATE},  // BaudRate
+    {Esp3dSettingIndex::esp3d_output_client, Esp3dSettingType::byte_t, 1, "1"},
 #endif  // ESP3D_USB_SERIAL_FEATURE
-    {esp3d_hostname, Esp3dSettingType::string_t, SIZE_OF_SETTING_HOSTNAME,
-     "esp3d-tft"},
-    {esp3d_radio_boot_mode, Esp3dSettingType::byte_t, 1, "1"},
-    {esp3d_radio_mode, Esp3dSettingType::byte_t, 1, "3"},
+    {Esp3dSettingIndex::esp3d_hostname, Esp3dSettingType::string_t,
+     SIZE_OF_SETTING_HOSTNAME, "esp3d-tft"},
+    {Esp3dSettingIndex::esp3d_radio_boot_mode, Esp3dSettingType::byte_t, 1,
+     "1"},
+    {Esp3dSettingIndex::esp3d_radio_mode, Esp3dSettingType::byte_t, 1, "3"},
 #if ESP3D_WIFI_FEATURE
-    {esp3d_fallback_mode, Esp3dSettingType::byte_t, 1, "3"},
-    {esp3d_sta_ssid, Esp3dSettingType::string_t, SIZE_OF_SETTING_SSID_ID, ""},
-    {esp3d_sta_password, Esp3dSettingType::string_t, SIZE_OF_SETTING_SSID_PWD,
-     ""},
-    {esp3d_sta_ip_mode, Esp3dSettingType::byte_t, 1, "0"},
-    {esp3d_sta_ip_static, Esp3dSettingType::ip, 4, "192.168.1.100"},
-    {esp3d_sta_mask_static, Esp3dSettingType::ip, 4, "255.255.255.0"},
-    {esp3d_sta_gw_static, Esp3dSettingType::ip, 4, "192.168.1.1"},
-    {esp3d_sta_dns_static, Esp3dSettingType::ip, 4, "192.168.1.1"},
-    {esp3d_ap_ssid, Esp3dSettingType::string_t, SIZE_OF_SETTING_SSID_ID,
-     "esp3dtft"},
-    {esp3d_ap_password, Esp3dSettingType::string_t, SIZE_OF_SETTING_SSID_PWD,
-     "12345678"},
-    {esp3d_ap_ip_static, Esp3dSettingType::ip, 4, "192.168.0.1"},
-    {esp3d_ap_channel, Esp3dSettingType::byte_t, 1, "2"},
+    {Esp3dSettingIndex::esp3d_fallback_mode, Esp3dSettingType::byte_t, 1, "3"},
+    {Esp3dSettingIndex::esp3d_sta_ssid, Esp3dSettingType::string_t,
+     SIZE_OF_SETTING_SSID_ID, ""},
+    {Esp3dSettingIndex::esp3d_sta_password, Esp3dSettingType::string_t,
+     SIZE_OF_SETTING_SSID_PWD, ""},
+    {Esp3dSettingIndex::esp3d_sta_ip_mode, Esp3dSettingType::byte_t, 1, "0"},
+    {Esp3dSettingIndex::esp3d_sta_ip_static, Esp3dSettingType::ip, 4,
+     "192.168.1.100"},
+    {Esp3dSettingIndex::esp3d_sta_mask_static, Esp3dSettingType::ip, 4,
+     "255.255.255.0"},
+    {Esp3dSettingIndex::esp3d_sta_gw_static, Esp3dSettingType::ip, 4,
+     "192.168.1.1"},
+    {Esp3dSettingIndex::esp3d_sta_dns_static, Esp3dSettingType::ip, 4,
+     "192.168.1.1"},
+    {Esp3dSettingIndex::esp3d_ap_ssid, Esp3dSettingType::string_t,
+     SIZE_OF_SETTING_SSID_ID, "esp3dtft"},
+    {Esp3dSettingIndex::esp3d_ap_password, Esp3dSettingType::string_t,
+     SIZE_OF_SETTING_SSID_PWD, "12345678"},
+    {Esp3dSettingIndex::esp3d_ap_ip_static, Esp3dSettingType::ip, 4,
+     "192.168.0.1"},
+    {Esp3dSettingIndex::esp3d_ap_channel, Esp3dSettingType::byte_t, 1, "2"},
 #endif  // ESP3D_WIFI_FEATURE
 #if ESP3D_HTTP_FEATURE
-    {esp3d_http_port, Esp3dSettingType::integer_t, 4, "80"},
-    {esp3d_http_on, Esp3dSettingType::byte_t, 1, "1"},
+    {Esp3dSettingIndex::esp3d_http_port, Esp3dSettingType::integer_t, 4, "80"},
+    {Esp3dSettingIndex::esp3d_http_on, Esp3dSettingType::byte_t, 1, "1"},
 #endif  // ESP3D_HTTP_FEATURE
-    {esp3d_setup, Esp3dSettingType::byte_t, 1, "0"},
-    {esp3d_target_firmware, Esp3dSettingType::byte_t, 1, "0"},
+    {Esp3dSettingIndex::esp3d_setup, Esp3dSettingType::byte_t, 1, "0"},
+    {Esp3dSettingIndex::esp3d_target_firmware, Esp3dSettingType::byte_t, 1,
+     "0"},
 #if ESP3D_SD_CARD_FEATURE
 #if ESP3D_SD_FEATURE_IS_SPI
-    {esp3d_spi_divider, Esp3dSettingType::byte_t, 1, "1"},  // SPIdivider
-#endif  // ESP3D_SD_FEATURE_IS_SPI
+    {Esp3dSettingIndex::esp3d_spi_divider, Esp3dSettingType::byte_t, 1,
+     "1"},  // SPIdivider
+#endif      // ESP3D_SD_FEATURE_IS_SPI
 #if ESP3D_UPDATE_FEATURE
-    {esp3d_check_update_on_sd, Esp3dSettingType::byte_t, 1, "1"},
+    {Esp3dSettingIndex::esp3d_check_update_on_sd, Esp3dSettingType::byte_t, 1,
+     "1"},
 #endif  // ESP3D_UPDATE_FEATURE
 #endif  // ESP3D_SD_CARD_FEATURE
 #if ESP3D_NOTIFICATIONS_FEATURE
-    {esp3d_notification_type, Esp3dSettingType::byte_t, 1, "0"},
-    {esp3d_auto_notification, Esp3dSettingType::byte_t, 1, "0"},
-    {esp3d_notification_token_1, Esp3dSettingType::string_t,
+    {Esp3dSettingIndex::esp3d_notification_type, Esp3dSettingType::byte_t, 1,
+     "0"},
+    {Esp3dSettingIndex::esp3d_auto_notification, Esp3dSettingType::byte_t, 1,
+     "0"},
+    {Esp3dSettingIndex::esp3d_notification_token_1, Esp3dSettingType::string_t,
      SIZE_OF_SETTING_NOFIFICATION_T1, ""},
-    {esp3d_notification_token_2, Esp3dSettingType::string_t,
+    {Esp3dSettingIndex::esp3d_notification_token_2, Esp3dSettingType::string_t,
      SIZE_OF_SETTING_NOFIFICATION_T2, ""},
-    {esp3d_notification_token_setting, Esp3dSettingType::string_t,
-     SIZE_OF_SETTING_NOFIFICATION_TS, ""},
+    {Esp3dSettingIndex::esp3d_notification_token_setting,
+     Esp3dSettingType::string_t, SIZE_OF_SETTING_NOFIFICATION_TS, ""},
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 #if ESP3D_TELNET_FEATURE
-    {esp3d_socket_port, Esp3dSettingType::integer_t, 4, "23"},
-    {esp3d_socket_on, Esp3dSettingType::byte_t, 1, "1"},
+    {Esp3dSettingIndex::esp3d_socket_port, Esp3dSettingType::integer_t, 4,
+     "23"},
+    {Esp3dSettingIndex::esp3d_socket_on, Esp3dSettingType::byte_t, 1, "1"},
 #endif  // ESP3D_TELNET_FEATURE
 #if ESP3D_WS_SERVICE_FEATURE
-    {esp3d_ws_on, Esp3dSettingType::byte_t, 1, "1"},
+    {Esp3dSettingIndex::esp3d_ws_on, Esp3dSettingType::byte_t, 1, "1"},
 #endif  // ESP3D_WS_SERVICE_FEATURE
 #if ESP3D_AUTHENTICATION_FEATURE
-    {esp3d_admin_password, Esp3dSettingType::string_t, SIZE_OF_LOCAL_PASSWORD,
-     "admin"},
-    {esp3d_user_password, Esp3dSettingType::string_t, SIZE_OF_LOCAL_PASSWORD,
-     "user"},
-    {esp3d_session_timeout, Esp3dSettingType::byte_t, 1, "3"},
+    {Esp3dSettingIndex::esp3d_admin_password, Esp3dSettingType::string_t,
+     SIZE_OF_LOCAL_PASSWORD, "admin"},
+    {Esp3dSettingIndex::esp3d_user_password, Esp3dSettingType::string_t,
+     SIZE_OF_LOCAL_PASSWORD, "user"},
+    {Esp3dSettingIndex::esp3d_session_timeout, Esp3dSettingType::byte_t, 1,
+     "3"},
 #endif  // ESP3D_AUTHENTICATION_FEATURE
 };
 
 bool Esp3DSettings::isValidStringSetting(const char* value,
-                                         esp3d_setting_index_t settingElement) {
+                                         Esp3dSettingIndex settingElement) {
   const Esp3dSettingDescription* settingPtr = getSettingPtr(settingElement);
   if (!settingPtr) {
     return false;
@@ -156,18 +170,18 @@ bool Esp3DSettings::isValidStringSetting(const char* value,
 #endif  // ESP3D_WIFI_FEATURE
   switch (settingElement) {
 #if ESP3D_WIFI_FEATURE
-    case esp3d_ap_ssid:
-    case esp3d_sta_ssid:
+    case Esp3dSettingIndex::esp3d_ap_ssid:
+    case Esp3dSettingIndex::esp3d_sta_ssid:
       return (len > 0 &&
               len <= SIZE_OF_SETTING_SSID_ID);  // any string from 1 to 32
-    case esp3d_sta_password:
-    case esp3d_ap_password:
+    case Esp3dSettingIndex::esp3d_sta_password:
+    case Esp3dSettingIndex::esp3d_ap_password:
       return (
           len == 0 ||
           (len >= 8 &&
            len <= SIZE_OF_SETTING_SSID_PWD));  // any string from 8 to 64 or 0
 #endif                                         // ESP3D_WIFI_FEATURE
-    case esp3d_hostname:
+    case Esp3dSettingIndex::esp3d_hostname:
       esp3d_log("Checking hostname validity");
       return std::regex_match(
           value,
@@ -176,17 +190,17 @@ bool Esp3DSettings::isValidStringSetting(const char* value,
                                                          // alphanumeric or '-'
                                                          // from 1 to 32
 #if ESP3D_NOTIFICATIONS_FEATURE
-    case esp3d_notification_token_1:
+    case Esp3dSettingIndex::esp3d_notification_token_1:
       return len <= SIZE_OF_SETTING_NOFIFICATION_T1;  // any string from 0 to 64
-    case esp3d_notification_token_2:
+    case Esp3dSettingIndex::esp3d_notification_token_2:
       return len <= SIZE_OF_SETTING_NOFIFICATION_T2;  // any string from 0 to 64
-    case esp3d_notification_token_setting:
+    case Esp3dSettingIndex::esp3d_notification_token_setting:
       return len <= SIZE_OF_SETTING_NOFIFICATION_TS;  // any string from 0 to
                                                       // 128
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 #if ESP3D_AUTHENTICATION_FEATURE
-    case esp3d_admin_password:
-    case esp3d_user_password:
+    case Esp3dSettingIndex::esp3d_admin_password:
+    case Esp3dSettingIndex::esp3d_user_password:
       return len <= SIZE_OF_LOCAL_PASSWORD;  // any string from 0 to 20
 #endif                                       // ESP3D_AUTHENTICATION_FEATURE
     default:
@@ -195,8 +209,8 @@ bool Esp3DSettings::isValidStringSetting(const char* value,
   return false;
 }
 
-bool Esp3DSettings::isValidIntegerSetting(
-    uint32_t value, esp3d_setting_index_t settingElement) {
+bool Esp3DSettings::isValidIntegerSetting(uint32_t value,
+                                          Esp3dSettingIndex settingElement) {
   const Esp3dSettingDescription* settingPtr = getSettingPtr(settingElement);
   if (!settingPtr) {
     return false;
@@ -207,9 +221,9 @@ bool Esp3DSettings::isValidIntegerSetting(
   }
   switch (settingElement) {
 #if ESP3D_USB_SERIAL_FEATURE
-    case esp3d_usb_serial_baud_rate:
+    case Esp3dSettingIndex::esp3d_usb_serial_baud_rate:
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
-    case esp3d_baud_rate:
+    case Esp3dSettingIndex::esp3d_baud_rate:
       for (uint8_t i = 0; i < SupportedBaudListSize; i++) {
         if (SupportedBaudList[i] == value) {
           return true;
@@ -217,10 +231,10 @@ bool Esp3DSettings::isValidIntegerSetting(
       }
       break;
 #if ESP3D_TELNET_FEATURE
-    case esp3d_socket_port:
+    case Esp3dSettingIndex::esp3d_socket_port:
 #endif  // ESP3D_TELNET_FEATURE
 #if ESP3D_HTTP_FEATURE
-    case esp3d_http_port:
+    case Esp3dSettingIndex::esp3d_http_port:
       if (value >= 1 && value < 65535) {
         return true;
       }
@@ -234,7 +248,7 @@ bool Esp3DSettings::isValidIntegerSetting(
 }
 
 bool Esp3DSettings::isValidByteSetting(uint8_t value,
-                                       esp3d_setting_index_t settingElement) {
+                                       Esp3dSettingIndex settingElement) {
   const Esp3dSettingDescription* settingPtr = getSettingPtr(settingElement);
   if (!settingPtr) {
     return false;
@@ -245,23 +259,23 @@ bool Esp3DSettings::isValidByteSetting(uint8_t value,
   switch (settingElement) {
 #if ESP3D_SD_CARD_FEATURE
 #if ESP3D_UPDATE_FEATURE
-    case esp3d_check_update_on_sd:
+    case Esp3dSettingIndex::esp3d_check_update_on_sd:
 #endif  // ESP3D_UPDATE_FEATURE
 #endif  // ESP3D_SD_CARD_FEATURE
 
-    case esp3d_setup:
+    case Esp3dSettingIndex::esp3d_setup:
 #if ESP3D_TELNET_FEATURE
-    case esp3d_socket_on:
+    case Esp3dSettingIndex::esp3d_socket_on:
 #endif  // ESP3D_TELNET_FEATURE
 #if ESP3D_WS_SERVICE_FEATURE
-    case esp3d_ws_on:
+    case Esp3dSettingIndex::esp3d_ws_on:
 #endif  // ESP3D_WS_SERVICE_FEATURE
 #if ESP3D_HTTP_FEATURE
-    case esp3d_http_on:
+    case Esp3dSettingIndex::esp3d_http_on:
 #endif  // ESP3D_HTTP_FEATURE
-    case esp3d_radio_boot_mode:
+    case Esp3dSettingIndex::esp3d_radio_boot_mode:
 #if ESP3D_NOTIFICATIONS_FEATURE
-    case esp3d_auto_notification:
+    case Esp3dSettingIndex::esp3d_auto_notification:
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
       if (value == (uint8_t)Esp3dState::off ||
           value == (uint8_t)Esp3dState::on) {
@@ -269,18 +283,18 @@ bool Esp3DSettings::isValidByteSetting(uint8_t value,
       }
       break;
 #if ESP3D_AUTHENTICATION_FEATURE
-    case esp3d_session_timeout:
+    case Esp3dSettingIndex::esp3d_session_timeout:
       return true;  // 0 ->255 minutes
       break;
 #endif  // ESP3D_AUTHENTICATION_FEATURE
 #if ESP3D_USB_SERIAL_FEATURE
-    case esp3d_output_client:
+    case Esp3dSettingIndex::esp3d_output_client:
       return ((Esp3dClient)value == Esp3dClient::serial ||
               (Esp3dClient)value == Esp3dClient::usb_serial);
       break;
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
 #if ESP3D_NOTIFICATIONS_FEATURE
-    case esp3d_notification_type:
+    case Esp3dSettingIndex::esp3d_notification_type:
       if (value == static_cast<uint8_t>(Esp3dNotificationType::none) ||
           value == static_cast<uint8_t>(Esp3dNotificationType::pushover) ||
           value == static_cast<uint8_t>(Esp3dNotificationType::email) ||
@@ -292,13 +306,13 @@ bool Esp3DSettings::isValidByteSetting(uint8_t value,
       break;
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 #if ESP3D_WIFI_FEATURE
-    case esp3d_sta_ip_mode:
+    case Esp3dSettingIndex::esp3d_sta_ip_mode:
       if (value == static_cast<uint8_t>(Esp3dIpMode::dhcp) ||
           value == static_cast<uint8_t>(Esp3dIpMode::staticIp)) {
         return true;
       }
       break;
-    case esp3d_fallback_mode:
+    case Esp3dSettingIndex::esp3d_fallback_mode:
       if (value == (uint8_t)Esp3dRadioMode::off ||
           value == (uint8_t)Esp3dRadioMode::wifi_ap_config ||
           value == (uint8_t)Esp3dRadioMode::bluetooth_serial) {
@@ -306,7 +320,7 @@ bool Esp3DSettings::isValidByteSetting(uint8_t value,
       }
       break;
 #endif  // ESP3D_WIFI_FEATURE
-    case esp3d_radio_mode:
+    case Esp3dSettingIndex::esp3d_radio_mode:
       if (value == (uint8_t)Esp3dRadioMode::off
 #if ESP3D_WIFI_FEATURE
           || value == (uint8_t)Esp3dRadioMode::wifi_sta ||
@@ -317,7 +331,7 @@ bool Esp3DSettings::isValidByteSetting(uint8_t value,
         return true;
       }
       break;
-    case esp3d_ap_channel:
+    case Esp3dSettingIndex::esp3d_ap_channel:
       for (uint8_t i = 0; i < SupportedApChannelsSize; i++) {
         if (SupportedApChannels[i] == value) {
           return true;
@@ -326,7 +340,7 @@ bool Esp3DSettings::isValidByteSetting(uint8_t value,
       break;
 #if ESP3D_SD_CARD_FEATURE
 #if ESP3D_SD_FEATURE_IS_SPI
-    case esp3d_spi_divider:
+    case Esp3dSettingIndex::esp3d_spi_divider:
       for (uint8_t i = 0; i < SupportedSPIDividerSize; i++) {
         if (SupportedSPIDivider[i] == value) {
           return true;
@@ -336,7 +350,7 @@ bool Esp3DSettings::isValidByteSetting(uint8_t value,
 #endif  // ESP3D_SD_FEATURE_IS_SPI
 #endif  // ESP3D_SD_CARD_FEATURE
 
-    case esp3d_target_firmware:
+    case Esp3dSettingIndex::esp3d_target_firmware:
       if (static_cast<Esp3dTargetFirmware>(value) ==
               Esp3dTargetFirmware::unknown ||
           static_cast<Esp3dTargetFirmware>(value) ==
@@ -362,8 +376,8 @@ bool Esp3DSettings::isValidByteSetting(uint8_t value,
   }
   return false;
 }
-bool Esp3DSettings::isValidIPStringSetting(
-    const char* value, esp3d_setting_index_t settingElement) {
+bool Esp3DSettings::isValidIPStringSetting(const char* value,
+                                           Esp3dSettingIndex settingElement) {
   const Esp3dSettingDescription* settingPtr = getSettingPtr(settingElement);
   if (!settingPtr) {
     return false;
@@ -377,7 +391,7 @@ bool Esp3DSettings::isValidIPStringSetting(
 
 bool Esp3DSettings::isValidSettingsNvs() {
   char result[SIZE_OF_SETTING_VERSION + 1] = {0};
-  if (esp3dTFTsettings.readString(esp3d_version, result,
+  if (esp3dTFTsettings.readString(Esp3dSettingIndex::esp3d_version, result,
                                   SIZE_OF_SETTING_VERSION + 1)) {
     if (strcmp(SETTING_VERSION, result) != 0) {
       esp3d_log_e("Expected %s but got %s", SETTING_VERSION, result);
@@ -392,7 +406,7 @@ bool Esp3DSettings::isValidSettingsNvs() {
 }
 
 uint32_t Esp3DSettings::getDefaultIntegerSetting(
-    esp3d_setting_index_t settingElement) {
+    Esp3dSettingIndex settingElement) {
   const Esp3dSettingDescription* query = getSettingPtr(settingElement);
   if (query) {
     return (uint32_t)std::stoul(std::string(query->default_val), NULL, 0);
@@ -400,15 +414,14 @@ uint32_t Esp3DSettings::getDefaultIntegerSetting(
   return 0;
 }
 const char* Esp3DSettings::getDefaultStringSetting(
-    esp3d_setting_index_t settingElement) {
+    Esp3dSettingIndex settingElement) {
   const Esp3dSettingDescription* query = getSettingPtr(settingElement);
   if (query) {
     return query->default_val;
   }
   return nullptr;
 }
-uint8_t Esp3DSettings::getDefaultByteSetting(
-    esp3d_setting_index_t settingElement) {
+uint8_t Esp3DSettings::getDefaultByteSetting(Esp3dSettingIndex settingElement) {
   const Esp3dSettingDescription* query = getSettingPtr(settingElement);
   if (query) {
     return (uint8_t)std::stoul(std::string(query->default_val), NULL, 0);
@@ -464,8 +477,8 @@ bool Esp3DSettings::reset() {
   // behavior [-Waggressive-loop-optimizations] may be use a vector of enum
   // would solve also fortunaly this is to reset all settings so it is ok for
   // current situation and it avoid to create an array of enums
-  for (size_t i = esp3d_version; i != last_esp3d_setting_index_t; i++) {
-    esp3d_setting_index_t setting = (esp3d_setting_index_t)i;
+  for (auto i : Esp3DSettingsData) {
+    Esp3dSettingIndex setting = i.index;
     const Esp3dSettingDescription* query = getSettingPtr(setting);
     if (query) {
       esp3d_log("Reseting %d value to %s", setting, query->default_val);
@@ -496,7 +509,7 @@ bool Esp3DSettings::reset() {
           }
           break;
         case Esp3dSettingType::string_t:
-          if (setting == esp3d_version) {
+          if (setting == Esp3dSettingIndex::esp3d_version) {
             if (!Esp3DSettings::writeString(setting, SETTING_VERSION)) {
               esp3d_log_e("Error writing %s to settings %d", query->default_val,
                           setting);
@@ -528,7 +541,7 @@ Esp3DSettings::Esp3DSettings() {}
 
 Esp3DSettings::~Esp3DSettings() {}
 
-uint8_t Esp3DSettings::readByte(esp3d_setting_index_t index, bool* haserror) {
+uint8_t Esp3DSettings::readByte(Esp3dSettingIndex index, bool* haserror) {
   uint8_t value = 0;
   const Esp3dSettingDescription* query = getSettingPtr(index);
   if (query) {
@@ -563,8 +576,7 @@ uint8_t Esp3DSettings::readByte(esp3d_setting_index_t index, bool* haserror) {
   return 0;
 }
 
-uint32_t Esp3DSettings::readUint32(esp3d_setting_index_t index,
-                                   bool* haserror) {
+uint32_t Esp3DSettings::readUint32(Esp3dSettingIndex index, bool* haserror) {
   uint32_t value = 0;
   const Esp3dSettingDescription* query = getSettingPtr(index);
   if (query) {
@@ -607,7 +619,7 @@ uint32_t Esp3DSettings::readUint32(esp3d_setting_index_t index,
   return 0;
 }
 
-const char* Esp3DSettings::readIPString(esp3d_setting_index_t index,
+const char* Esp3DSettings::readIPString(Esp3dSettingIndex index,
                                         bool* haserror) {
   uint32_t ipInt = readUint32(index, haserror);
   std::string ipStr = IPUInt32toString(ipInt);
@@ -615,9 +627,8 @@ const char* Esp3DSettings::readIPString(esp3d_setting_index_t index,
   return IPUInt32toString(ipInt);
 }
 
-const char* Esp3DSettings::readString(esp3d_setting_index_t index,
-                                      char* out_str, size_t len,
-                                      bool* haserror) {
+const char* Esp3DSettings::readString(Esp3dSettingIndex index, char* out_str,
+                                      size_t len, bool* haserror) {
   const Esp3dSettingDescription* query = getSettingPtr(index);
   if (query) {
     if (query->type == Esp3dSettingType::string_t) {
@@ -670,8 +681,7 @@ const char* Esp3DSettings::readString(esp3d_setting_index_t index,
   return "";
 }
 
-bool Esp3DSettings::writeByte(esp3d_setting_index_t index,
-                              const uint8_t value) {
+bool Esp3DSettings::writeByte(Esp3dSettingIndex index, const uint8_t value) {
   const Esp3dSettingDescription* query = getSettingPtr(index);
   if (query) {
     if (query->type == Esp3dSettingType::byte_t) {
@@ -691,8 +701,7 @@ bool Esp3DSettings::writeByte(esp3d_setting_index_t index,
   return false;
 }
 
-bool Esp3DSettings::writeUint32(esp3d_setting_index_t index,
-                                const uint32_t value) {
+bool Esp3DSettings::writeUint32(Esp3dSettingIndex index, const uint32_t value) {
   const Esp3dSettingDescription* query = getSettingPtr(index);
   if (query) {
     if (query->type == Esp3dSettingType::integer_t ||
@@ -713,7 +722,7 @@ bool Esp3DSettings::writeUint32(esp3d_setting_index_t index,
   return false;
 }
 
-bool Esp3DSettings::writeIPString(esp3d_setting_index_t index,
+bool Esp3DSettings::writeIPString(Esp3dSettingIndex index,
                                   const char* byte_buffer) {
   uint32_t ipInt = StringtoIPUInt32(byte_buffer);
   std::string ipStr = IPUInt32toString(ipInt);
@@ -723,7 +732,7 @@ bool Esp3DSettings::writeIPString(esp3d_setting_index_t index,
   return writeUint32(index, StringtoIPUInt32(byte_buffer));
 }
 
-bool Esp3DSettings::writeString(esp3d_setting_index_t index,
+bool Esp3DSettings::writeString(Esp3dSettingIndex index,
                                 const char* byte_buffer) {
   esp3d_log("write setting %d : (%d bytes) %s ", index, strlen(byte_buffer),
             byte_buffer);
@@ -774,7 +783,7 @@ uint32_t Esp3DSettings::StringtoIPUInt32(const char* s) {
 }
 
 const Esp3dSettingDescription* Esp3DSettings::getSettingPtr(
-    const esp3d_setting_index_t index) {
+    const Esp3dSettingIndex index) {
   for (uint16_t i = 0; i < sizeof(Esp3DSettingsData); i++) {
     if (Esp3DSettingsData[i].index == index) {
       return &Esp3DSettingsData[i];

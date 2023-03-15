@@ -50,22 +50,24 @@ void Esp3DCommands::ESP100(int cmd_params_pos, Esp3dMessage* msg) {
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
     const Esp3dSettingDescription* settingPtr =
-        esp3dTFTsettings.getSettingPtr(esp3d_sta_ssid);
+        esp3dTFTsettings.getSettingPtr(Esp3dSettingIndex::esp3d_sta_ssid);
     if (settingPtr) {
-      ok_msg = esp3dTFTsettings.readString(esp3d_sta_ssid, out_str,
-                                           settingPtr->size);
+      ok_msg = esp3dTFTsettings.readString(Esp3dSettingIndex::esp3d_sta_ssid,
+                                           out_str, settingPtr->size);
     } else {
       hasError = true;
       error_msg = "This setting is unknown";
     }
   } else {
-    esp3d_log(
-        "got %s param for a value of %s, is valid %d", tmpstr.c_str(),
-        tmpstr.c_str(),
-        esp3dTFTsettings.isValidStringSetting(tmpstr.c_str(), esp3d_sta_ssid));
-    if (esp3dTFTsettings.isValidStringSetting(tmpstr.c_str(), esp3d_sta_ssid)) {
+    esp3d_log("got %s param for a value of %s, is valid %d", tmpstr.c_str(),
+              tmpstr.c_str(),
+              esp3dTFTsettings.isValidStringSetting(
+                  tmpstr.c_str(), Esp3dSettingIndex::esp3d_sta_ssid));
+    if (esp3dTFTsettings.isValidStringSetting(
+            tmpstr.c_str(), Esp3dSettingIndex::esp3d_sta_ssid)) {
       esp3d_log("Value %s is valid", tmpstr.c_str());
-      if (!esp3dTFTsettings.writeString(esp3d_sta_ssid, tmpstr.c_str())) {
+      if (!esp3dTFTsettings.writeString(Esp3dSettingIndex::esp3d_sta_ssid,
+                                        tmpstr.c_str())) {
         hasError = true;
         error_msg = "Set value failed";
       }

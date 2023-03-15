@@ -138,10 +138,13 @@ bool Esp3DSerialClient::begin() {
   }
   setTxMutex(&_tx_mutex);
   // load baudrate
-  uint32_t baudrate = esp3dTFTsettings.readUint32(esp3d_baud_rate);
-  if (!esp3dTFTsettings.isValidIntegerSetting(baudrate, esp3d_baud_rate)) {
+  uint32_t baudrate =
+      esp3dTFTsettings.readUint32(Esp3dSettingIndex::esp3d_baud_rate);
+  if (!esp3dTFTsettings.isValidIntegerSetting(
+          baudrate, Esp3dSettingIndex::esp3d_baud_rate)) {
     esp3d_log_w("Invalid baudrate use default");
-    baudrate = esp3dTFTsettings.getDefaultIntegerSetting(esp3d_baud_rate);
+    baudrate = esp3dTFTsettings.getDefaultIntegerSetting(
+        Esp3dSettingIndex::esp3d_baud_rate);
   }
   esp3d_log("Use %ld Serial Baud Rate", baudrate);
   uart_config_t uart_config = {

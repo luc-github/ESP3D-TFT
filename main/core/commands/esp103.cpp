@@ -39,9 +39,11 @@ void Esp3DCommands::ESP103(int cmd_params_pos, Esp3dMessage* msg) {
   std::string tmpstr;
   const char* cmdList[] = {"IP=", "MSK=", "GW=", "DNS="};
   uint8_t cmdListSize = sizeof(cmdList) / sizeof(char*);
-  const esp3d_setting_index_t settingIndex[] = {
-      esp3d_sta_ip_static, esp3d_sta_mask_static, esp3d_sta_gw_static,
-      esp3d_sta_dns_static};
+  const Esp3dSettingIndex settingIndex[] = {
+      Esp3dSettingIndex::esp3d_sta_ip_static,
+      Esp3dSettingIndex::esp3d_sta_mask_static,
+      Esp3dSettingIndex::esp3d_sta_gw_static,
+      Esp3dSettingIndex::esp3d_sta_dns_static};
 #if ESP3D_AUTHENTICATION_FEATURE
   if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
     msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
@@ -56,25 +58,29 @@ void Esp3DCommands::ESP103(int cmd_params_pos, Esp3dMessage* msg) {
     } else {
       ok_msg = "IP: ";
     }
-    ok_msg += esp3dTFTsettings.readIPString(esp3d_sta_ip_static);
+    ok_msg +=
+        esp3dTFTsettings.readIPString(Esp3dSettingIndex::esp3d_sta_ip_static);
     if (json) {
       ok_msg += "\",\"gw\":\"";
     } else {
       ok_msg += ", GW: ";
     }
-    ok_msg += esp3dTFTsettings.readIPString(esp3d_sta_gw_static);
+    ok_msg +=
+        esp3dTFTsettings.readIPString(Esp3dSettingIndex::esp3d_sta_gw_static);
     if (json) {
       ok_msg += "\",\"msk\":\"";
     } else {
       ok_msg += ", MSK: ";
     }
-    ok_msg += esp3dTFTsettings.readIPString(esp3d_sta_mask_static);
+    ok_msg +=
+        esp3dTFTsettings.readIPString(Esp3dSettingIndex::esp3d_sta_mask_static);
     if (json) {
       ok_msg += "\",\"dns\":\"";
     } else {
       ok_msg += ", DNS: ";
     }
-    ok_msg += esp3dTFTsettings.readIPString(esp3d_sta_dns_static);
+    ok_msg +=
+        esp3dTFTsettings.readIPString(Esp3dSettingIndex::esp3d_sta_dns_static);
     if (json) {
       ok_msg += "\"}";
     } else {

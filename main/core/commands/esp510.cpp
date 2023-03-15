@@ -48,17 +48,20 @@ void Esp3DCommands::ESP510(int cmd_params_pos, Esp3dMessage* msg) {
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
-    byteValue = esp3dTFTsettings.readByte(esp3d_session_timeout);
+    byteValue =
+        esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_session_timeout);
     ok_msg = std::to_string(byteValue);
   } else {
     byteValue = atoi(tmpstr.c_str());
-    esp3d_log(
-        "got %s param for a value of %d, is valid %d", tmpstr.c_str(),
-        byteValue,
-        esp3dTFTsettings.isValidByteSetting(byteValue, esp3d_session_timeout));
-    if (esp3dTFTsettings.isValidByteSetting(byteValue, esp3d_session_timeout)) {
+    esp3d_log("got %s param for a value of %d, is valid %d", tmpstr.c_str(),
+              byteValue,
+              esp3dTFTsettings.isValidByteSetting(
+                  byteValue, Esp3dSettingIndex::esp3d_session_timeout));
+    if (esp3dTFTsettings.isValidByteSetting(
+            byteValue, Esp3dSettingIndex::esp3d_session_timeout)) {
       esp3d_log("Value %d is valid", byteValue);
-      if (!esp3dTFTsettings.writeByte(esp3d_session_timeout, byteValue)) {
+      if (!esp3dTFTsettings.writeByte(Esp3dSettingIndex::esp3d_session_timeout,
+                                      byteValue)) {
         hasError = true;
         error_msg = "Set value failed";
       }

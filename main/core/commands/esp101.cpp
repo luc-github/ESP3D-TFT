@@ -56,12 +56,13 @@ void Esp3DCommands::ESP101(int cmd_params_pos, Esp3dMessage* msg) {
     }
     esp3d_log("got %s param for a value of %s, is valid %d", tmpstr.c_str(),
               tmpstr.c_str(),
-              esp3dTFTsettings.isValidStringSetting(tmpstr.c_str(),
-                                                    esp3d_sta_password));
-    if (esp3dTFTsettings.isValidStringSetting(tmpstr.c_str(),
-                                              esp3d_sta_password)) {
+              esp3dTFTsettings.isValidStringSetting(
+                  tmpstr.c_str(), Esp3dSettingIndex::esp3d_sta_password));
+    if (esp3dTFTsettings.isValidStringSetting(
+            tmpstr.c_str(), Esp3dSettingIndex::esp3d_sta_password)) {
       esp3d_log("Value %s is valid", tmpstr.c_str());
-      if (!esp3dTFTsettings.writeString(esp3d_sta_password, tmpstr.c_str())) {
+      if (!esp3dTFTsettings.writeString(Esp3dSettingIndex::esp3d_sta_password,
+                                        tmpstr.c_str())) {
         hasError = true;
         error_msg = "Set value failed";
       }

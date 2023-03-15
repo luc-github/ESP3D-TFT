@@ -323,8 +323,8 @@ bool ESP3DSocketServer::isEndChar(uint8_t ch) {
 
 bool ESP3DSocketServer::begin() {
   end();
-  if (Esp3dState::on !=
-      (Esp3dState)esp3dTFTsettings.readByte(esp3d_socket_on)) {
+  if (Esp3dState::on != (Esp3dState)esp3dTFTsettings.readByte(
+                            Esp3dSettingIndex::esp3d_socket_on)) {
     esp3d_log("Telnet is not enabled");
     // return true because no error but _started is false
     return true;
@@ -343,7 +343,7 @@ bool ESP3DSocketServer::begin() {
   setTxMutex(&_tx_mutex);
 
   // Read port
-  _port = esp3dTFTsettings.readUint32(esp3d_socket_port);
+  _port = esp3dTFTsettings.readUint32(Esp3dSettingIndex::esp3d_socket_port);
 
   _data = (char *)malloc(ESP3D_SOCKET_RX_BUFFER_SIZE + 1);
   if (_data == NULL) {

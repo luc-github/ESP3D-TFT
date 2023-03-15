@@ -47,7 +47,7 @@ void Esp3DCommands::ESP555(int cmd_params_pos, Esp3dMessage* msg) {
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
     const Esp3dSettingDescription* settingPtr =
-        esp3dTFTsettings.getSettingPtr(esp3d_user_password);
+        esp3dTFTsettings.getSettingPtr(Esp3dSettingIndex::esp3d_user_password);
     if (settingPtr) {
       ok_msg = HIDDEN_SETTING_VALUE;
     } else {
@@ -57,12 +57,13 @@ void Esp3DCommands::ESP555(int cmd_params_pos, Esp3dMessage* msg) {
   } else {
     esp3d_log("got %s param for a value of %s, is valid %d", tmpstr.c_str(),
               tmpstr.c_str(),
-              esp3dTFTsettings.isValidStringSetting(tmpstr.c_str(),
-                                                    esp3d_user_password));
-    if (esp3dTFTsettings.isValidStringSetting(tmpstr.c_str(),
-                                              esp3d_user_password)) {
+              esp3dTFTsettings.isValidStringSetting(
+                  tmpstr.c_str(), Esp3dSettingIndex::esp3d_user_password));
+    if (esp3dTFTsettings.isValidStringSetting(
+            tmpstr.c_str(), Esp3dSettingIndex::esp3d_user_password)) {
       esp3d_log("Value %s is valid", tmpstr.c_str());
-      if (!esp3dTFTsettings.writeString(esp3d_user_password, tmpstr.c_str())) {
+      if (!esp3dTFTsettings.writeString(Esp3dSettingIndex::esp3d_user_password,
+                                        tmpstr.c_str())) {
         hasError = true;
         error_msg = "Set value failed";
       }

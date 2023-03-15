@@ -60,7 +60,8 @@ void Esp3DCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
     // TODO: init time parameter
   }
   if (setupparam.length() > 0) {
-    if (!esp3dTFTsettings.writeByte(esp3d_setup, setupparam == "1" ? 1 : 0)) {
+    if (!esp3dTFTsettings.writeByte(Esp3dSettingIndex::esp3d_setup,
+                                    setupparam == "1" ? 1 : 0)) {
       // not blocking error
       esp3d_log_e("Error writing setup state");
     }
@@ -81,7 +82,8 @@ void Esp3DCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
                         false, true)) {
     return;
   }
-  uint8_t b = esp3dTFTsettings.readByte(esp3d_target_firmware);
+  uint8_t b =
+      esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_target_firmware);
   // FWTarget
   tmpstr = esp3dTFTsettings.GetFirmwareTargetShortName((Esp3dTargetFirmware)b);
   if (!dispatchKeyValue(json, "FWTarget", tmpstr.c_str(), target, requestId)) {
@@ -95,7 +97,9 @@ void Esp3DCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
   }
 
   // Setup
-  tmpstr = esp3dTFTsettings.readByte(esp3d_setup) == 1 ? "Enabled" : "Disabled";
+  tmpstr = esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_setup) == 1
+               ? "Enabled"
+               : "Disabled";
   if (!dispatchKeyValue(json, "Setup", tmpstr.c_str(), target, requestId)) {
     return;
   }
@@ -140,7 +144,8 @@ void Esp3DCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
                           requestId)) {
       return;
     }
-    uint32_t intValue = esp3dTFTsettings.readUint32(esp3d_http_port);
+    uint32_t intValue =
+        esp3dTFTsettings.readUint32(Esp3dSettingIndex::esp3d_http_port);
     tmpstr = std::to_string(intValue);
     if (!dispatchKeyValue(json, "WebSocketPort", tmpstr.c_str(), target,
                           requestId)) {
@@ -150,11 +155,11 @@ void Esp3DCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
 #endif  // ESP3D_HTTP_FEATURE
   // Hostname
   const Esp3dSettingDescription* settingPtr =
-      esp3dTFTsettings.getSettingPtr(esp3d_hostname);
+      esp3dTFTsettings.getSettingPtr(Esp3dSettingIndex::esp3d_hostname);
   if (settingPtr) {
     char out_str[(settingPtr->size) + 1] = {0};
-    tmpstr =
-        esp3dTFTsettings.readString(esp3d_hostname, out_str, settingPtr->size);
+    tmpstr = esp3dTFTsettings.readString(Esp3dSettingIndex::esp3d_hostname,
+                                         out_str, settingPtr->size);
   } else {
     tmpstr = "Error!!";
   }

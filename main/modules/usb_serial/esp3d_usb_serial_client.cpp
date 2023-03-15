@@ -219,12 +219,13 @@ bool Esp3DUsbSerialClient::begin() {
   }
   setTxMutex(&_tx_mutex);
   // load baudrate
-  _baudrate = esp3dTFTsettings.readUint32(esp3d_usb_serial_baud_rate);
-  if (!esp3dTFTsettings.isValidIntegerSetting(_baudrate,
-                                              esp3d_usb_serial_baud_rate)) {
+  _baudrate = esp3dTFTsettings.readUint32(
+      Esp3dSettingIndex::esp3d_usb_serial_baud_rate);
+  if (!esp3dTFTsettings.isValidIntegerSetting(
+          _baudrate, Esp3dSettingIndex::esp3d_usb_serial_baud_rate)) {
     esp3d_log_w("Invalid baudrate, %ld, use default", _baudrate);
-    _baudrate =
-        esp3dTFTsettings.getDefaultIntegerSetting(esp3d_usb_serial_baud_rate);
+    _baudrate = esp3dTFTsettings.getDefaultIntegerSetting(
+        Esp3dSettingIndex::esp3d_usb_serial_baud_rate);
   }
   esp3d_log("Use %ld USB Serial Baud Rate", _baudrate);
 

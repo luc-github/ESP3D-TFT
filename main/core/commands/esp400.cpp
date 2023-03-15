@@ -93,20 +93,22 @@ void Esp3DCommands::ESP400(int cmd_params_pos, Esp3dMessage* msg) {
 
 #if ESP3D_USB_SERIAL_FEATURE
   // output client (first item)
-  if (!dispatchSetting(json, "system/system", esp3d_output_client, "output",
+  if (!dispatchSetting(json, "system/system",
+                       Esp3dSettingIndex::esp3d_output_client, "output",
                        OutputClientsValues, OutputClientsLabels,
                        sizeof(OutputClientsValues) / sizeof(char*), -1, -1, -1,
                        nullptr, true, target, requestId, true)) {
     esp3d_log_e("Error sending response to clients");
   }
   // Baud rate (first item)
-  if (!dispatchSetting(json, "system/system", esp3d_baud_rate, "baud",
-                       BaudRateList, BaudRateList,
-                       sizeof(BaudRateList) / sizeof(char*), -1, -1, -1,
-                       nullptr, true, target, requestId)) {
+  if (!dispatchSetting(json, "system/system",
+                       Esp3dSettingIndex::esp3d_baud_rate, "baud", BaudRateList,
+                       BaudRateList, sizeof(BaudRateList) / sizeof(char*), -1,
+                       -1, -1, nullptr, true, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
-  if (!dispatchSetting(json, "system/system", esp3d_usb_serial_baud_rate,
+  if (!dispatchSetting(json, "system/system",
+                       Esp3dSettingIndex::esp3d_usb_serial_baud_rate,
                        "usb-serial baud", BaudRateList, BaudRateList,
                        sizeof(BaudRateList) / sizeof(char*), -1, -1, -1,
                        nullptr, true, target, requestId)) {
@@ -114,16 +116,17 @@ void Esp3DCommands::ESP400(int cmd_params_pos, Esp3dMessage* msg) {
   }
 #else
   // Baud rate (first item)
-  if (!dispatchSetting(json, "system/system", esp3d_baud_rate, "baud",
-                       BaudRateList, BaudRateList,
-                       sizeof(BaudRateList) / sizeof(char*), -1, -1, -1,
-                       nullptr, true, target, requestId, true)) {
+  if (!dispatchSetting(json, "system/system",
+                       Esp3dSettingIndex::esp3d_baud_rate, "baud", BaudRateList,
+                       BaudRateList, sizeof(BaudRateList) / sizeof(char*), -1,
+                       -1, -1, nullptr, true, target, requestId, true)) {
     esp3d_log_e("Error sending response to clients");
   }
 #endif  // ESP3D_USB_SERIAL_FEATURE
 
   // Target Firmware
-  if (!dispatchSetting(json, "system/system", esp3d_target_firmware, "targetfw",
+  if (!dispatchSetting(json, "system/system",
+                       Esp3dSettingIndex::esp3d_target_firmware, "targetfw",
                        FirmwareValues, FirmwareLabels,
                        sizeof(FirmwareValues) / sizeof(char*), -1, -1, -1,
                        nullptr, false, target, requestId)) {
@@ -131,7 +134,8 @@ void Esp3DCommands::ESP400(int cmd_params_pos, Esp3dMessage* msg) {
   }
 
   // Radio mode
-  if (!dispatchSetting(json, "network/network", esp3d_radio_mode, "radio mode",
+  if (!dispatchSetting(json, "network/network",
+                       Esp3dSettingIndex::esp3d_radio_mode, "radio mode",
                        RadioModeValues, RadioModeLabels,
                        sizeof(RadioModeValues) / sizeof(char*), -1, -1, -1,
                        nullptr, true, target, requestId)) {
@@ -139,7 +143,8 @@ void Esp3DCommands::ESP400(int cmd_params_pos, Esp3dMessage* msg) {
   }
 
   // Radio boot mode
-  if (!dispatchSetting(json, "network/network", esp3d_radio_mode, "radio_boot",
+  if (!dispatchSetting(json, "network/network",
+                       Esp3dSettingIndex::esp3d_radio_mode, "radio_boot",
                        YesNoValues, YesNoLabels,
                        sizeof(YesNoValues) / sizeof(char*), -1, -1, -1, nullptr,
                        true, target, requestId)) {
@@ -147,36 +152,39 @@ void Esp3DCommands::ESP400(int cmd_params_pos, Esp3dMessage* msg) {
   }
 
   // Hostname
-  if (!dispatchSetting(json, "network/network", esp3d_hostname, "hostname",
-                       nullptr, nullptr, SIZE_OF_SETTING_HOSTNAME, 1, 1, -1,
-                       nullptr, true, target, requestId)) {
-    esp3d_log_e("Error sending response to clients");
-  }
-
-  // STA SSID
-  if (!dispatchSetting(json, "network/sta", esp3d_sta_ssid, "SSID", nullptr,
-                       nullptr, SIZE_OF_SETTING_SSID_ID, 1, 1, -1, nullptr,
+  if (!dispatchSetting(json, "network/network",
+                       Esp3dSettingIndex::esp3d_hostname, "hostname", nullptr,
+                       nullptr, SIZE_OF_SETTING_HOSTNAME, 1, 1, -1, nullptr,
                        true, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 
+  // STA SSID
+  if (!dispatchSetting(json, "network/sta", Esp3dSettingIndex::esp3d_sta_ssid,
+                       "SSID", nullptr, nullptr, SIZE_OF_SETTING_SSID_ID, 1, 1,
+                       -1, nullptr, true, target, requestId)) {
+    esp3d_log_e("Error sending response to clients");
+  }
+
   // STA Password
-  if (!dispatchSetting(json, "network/sta", esp3d_sta_password, "pwd", nullptr,
+  if (!dispatchSetting(json, "network/sta",
+                       Esp3dSettingIndex::esp3d_sta_password, "pwd", nullptr,
                        nullptr, SIZE_OF_SETTING_SSID_PWD, 8, 0, -1, nullptr,
                        true, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 
   // STA ip mode
-  if (!dispatchSetting(json, "network/sta", esp3d_sta_ip_mode, "ip mode",
-                       IpModeValues, IpModeLabels,
-                       sizeof(IpModeLabels) / sizeof(char*), -1, -1, -1,
-                       nullptr, true, target, requestId)) {
+  if (!dispatchSetting(
+          json, "network/sta", Esp3dSettingIndex::esp3d_sta_ip_mode, "ip mode",
+          IpModeValues, IpModeLabels, sizeof(IpModeLabels) / sizeof(char*), -1,
+          -1, -1, nullptr, true, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 
   // STA fallback mode
-  if (!dispatchSetting(json, "network/sta", esp3d_fallback_mode,
+  if (!dispatchSetting(json, "network/sta",
+                       Esp3dSettingIndex::esp3d_fallback_mode,
                        "sta fallback mode", FallbackValues, FallbackLabels,
                        sizeof(FallbackValues) / sizeof(char*), -1, -1, -1,
                        nullptr, true, target, requestId)) {
@@ -184,127 +192,133 @@ void Esp3DCommands::ESP400(int cmd_params_pos, Esp3dMessage* msg) {
   }
 
   // STA static ip
-  if (!dispatchSetting(json, "network/sta", esp3d_sta_ip_static, "ip", nullptr,
-                       nullptr, -1, -1, -1, -1, nullptr, true, target,
-                       requestId)) {
+  if (!dispatchSetting(
+          json, "network/sta", Esp3dSettingIndex::esp3d_sta_ip_static, "ip",
+          nullptr, nullptr, -1, -1, -1, -1, nullptr, true, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 
   // STA static mask
-  if (!dispatchSetting(json, "network/sta", esp3d_sta_mask_static, "msk",
-                       nullptr, nullptr, -1, -1, -1, -1, nullptr, true, target,
-                       requestId)) {
+  if (!dispatchSetting(
+          json, "network/sta", Esp3dSettingIndex::esp3d_sta_mask_static, "msk",
+          nullptr, nullptr, -1, -1, -1, -1, nullptr, true, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 
   // STA static gateway
-  if (!dispatchSetting(json, "network/sta", esp3d_sta_gw_static, "gw", nullptr,
-                       nullptr, -1, -1, -1, -1, nullptr, true, target,
-                       requestId)) {
+  if (!dispatchSetting(
+          json, "network/sta", Esp3dSettingIndex::esp3d_sta_gw_static, "gw",
+          nullptr, nullptr, -1, -1, -1, -1, nullptr, true, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 
   // STA static dns
-  if (!dispatchSetting(json, "network/sta", esp3d_sta_dns_static, "DNS",
-                       nullptr, nullptr, -1, -1, -1, -1, nullptr, true, target,
-                       requestId)) {
+  if (!dispatchSetting(
+          json, "network/sta", Esp3dSettingIndex::esp3d_sta_dns_static, "DNS",
+          nullptr, nullptr, -1, -1, -1, -1, nullptr, true, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 
   // AP SSID
-  if (!dispatchSetting(json, "network/ap", esp3d_ap_ssid, "SSID", nullptr,
-                       nullptr, SIZE_OF_SETTING_SSID_ID, 1, 1, -1, nullptr,
-                       true, target, requestId)) {
+  if (!dispatchSetting(json, "network/ap", Esp3dSettingIndex::esp3d_ap_ssid,
+                       "SSID", nullptr, nullptr, SIZE_OF_SETTING_SSID_ID, 1, 1,
+                       -1, nullptr, true, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 
   // AP Password
-  if (!dispatchSetting(json, "network/ap", esp3d_ap_password, "pwd", nullptr,
-                       nullptr, SIZE_OF_SETTING_SSID_PWD, 8, 0, -1, nullptr,
-                       true, target, requestId)) {
+  if (!dispatchSetting(json, "network/ap", Esp3dSettingIndex::esp3d_ap_password,
+                       "pwd", nullptr, nullptr, SIZE_OF_SETTING_SSID_PWD, 8, 0,
+                       -1, nullptr, true, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 
   // AP static ip
-  if (!dispatchSetting(json, "network/ap", esp3d_ap_ip_static, "ip", nullptr,
-                       nullptr, -1, -1, -1, -1, nullptr, true, target,
-                       requestId)) {
+  if (!dispatchSetting(
+          json, "network/ap", Esp3dSettingIndex::esp3d_ap_ip_static, "ip",
+          nullptr, nullptr, -1, -1, -1, -1, nullptr, true, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 
   // AP Channel
-  if (!dispatchSetting(json, "network/ap", esp3d_ap_channel, "channel",
-                       ApChannelsList, ApChannelsList,
+  if (!dispatchSetting(json, "network/ap", Esp3dSettingIndex::esp3d_ap_channel,
+                       "channel", ApChannelsList, ApChannelsList,
                        sizeof(ApChannelsList) / sizeof(char*), -1, -1, -1,
                        nullptr, true, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 #if ESP3D_AUTHENTICATION_FEATURE
   // Session timeout
-  if (!dispatchSetting(json, "security/security", esp3d_session_timeout,
+  if (!dispatchSetting(json, "security/security",
+                       Esp3dSettingIndex::esp3d_session_timeout,
                        "session timeout", nullptr, nullptr, 255, 0, -1, -1,
                        nullptr, false, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 
   // Admin Password
-  if (!dispatchSetting(json, "security/security", esp3d_admin_password,
-                       "admin pwd", nullptr, nullptr, SIZE_OF_LOCAL_PASSWORD, 0,
-                       -1, -1, nullptr, false, target, requestId)) {
+  if (!dispatchSetting(json, "security/security",
+                       Esp3dSettingIndex::esp3d_admin_password, "admin pwd",
+                       nullptr, nullptr, SIZE_OF_LOCAL_PASSWORD, 0, -1, -1,
+                       nullptr, false, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 
   // User Password
-  if (!dispatchSetting(json, "security/security", esp3d_user_password,
-                       "user pwd", nullptr, nullptr, SIZE_OF_LOCAL_PASSWORD, 0,
-                       -1, -1, nullptr, false, target, requestId)) {
+  if (!dispatchSetting(json, "security/security",
+                       Esp3dSettingIndex::esp3d_user_password, "user pwd",
+                       nullptr, nullptr, SIZE_OF_LOCAL_PASSWORD, 0, -1, -1,
+                       nullptr, false, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
 #if ESP3D_HTTP_FEATURE
   // Http service on
-  if (!dispatchSetting(json, "service/http", esp3d_http_on, "enable",
-                       YesNoValues, YesNoLabels,
+  if (!dispatchSetting(json, "service/http", Esp3dSettingIndex::esp3d_http_on,
+                       "enable", YesNoValues, YesNoLabels,
                        sizeof(YesNoValues) / sizeof(char*), -1, -1, -1, nullptr,
                        true, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 
   // Http port
-  if (!dispatchSetting(json, "service/http", esp3d_http_port, "port", nullptr,
-                       nullptr, MAX_PORT_NUMBER, MIN_PORT_NUMBER, -1, -1,
-                       nullptr, true, target, requestId)) {
+  if (!dispatchSetting(json, "service/http", Esp3dSettingIndex::esp3d_http_port,
+                       "port", nullptr, nullptr, MAX_PORT_NUMBER,
+                       MIN_PORT_NUMBER, -1, -1, nullptr, true, target,
+                       requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 #endif  // ESP3D_HTTP_FEATURE
 
 #if ESP3D_TELNET_FEATURE
   // Socket/Telnet
-  if (!dispatchSetting(json, "service/telnetp", esp3d_socket_on, "enable",
-                       YesNoValues, YesNoLabels,
-                       sizeof(YesNoValues) / sizeof(char*), -1, -1, -1, nullptr,
-                       true, target, requestId)) {
+  if (!dispatchSetting(
+          json, "service/telnetp", Esp3dSettingIndex::esp3d_socket_on, "enable",
+          YesNoValues, YesNoLabels, sizeof(YesNoValues) / sizeof(char*), -1, -1,
+          -1, nullptr, true, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 
   // Socket/Telnet port
-  if (!dispatchSetting(json, "service/telnetp", esp3d_socket_port, "port",
-                       nullptr, nullptr, MAX_PORT_NUMBER, MIN_PORT_NUMBER, -1,
-                       -1, nullptr, true, target, requestId)) {
+  if (!dispatchSetting(json, "service/telnetp",
+                       Esp3dSettingIndex::esp3d_socket_port, "port", nullptr,
+                       nullptr, MAX_PORT_NUMBER, MIN_PORT_NUMBER, -1, -1,
+                       nullptr, true, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 #endif  // ESP3D_TELNET_FEATURE
 
   // WebSocket
-  if (!dispatchSetting(json, "service/websocketp", esp3d_ws_on, "enable",
-                       YesNoValues, YesNoLabels,
-                       sizeof(YesNoValues) / sizeof(char*), -1, -1, -1, nullptr,
-                       true, target, requestId)) {
+  if (!dispatchSetting(json, "service/websocketp",
+                       Esp3dSettingIndex::esp3d_ws_on, "enable", YesNoValues,
+                       YesNoLabels, sizeof(YesNoValues) / sizeof(char*), -1, -1,
+                       -1, nullptr, true, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 #if ESP3D_NOTIFICATIONS_FEATURE
   // Notifications type
-  if (!dispatchSetting(json, "service/notification", esp3d_notification_type,
+  if (!dispatchSetting(json, "service/notification",
+                       Esp3dSettingIndex::esp3d_notification_type,
                        "notification", NotificationsValues, NotificationsLabels,
                        sizeof(NotificationsValues) / sizeof(char*), -1, -1, -1,
                        nullptr, false, target, requestId)) {
@@ -312,31 +326,34 @@ void Esp3DCommands::ESP400(int cmd_params_pos, Esp3dMessage* msg) {
   }
 
   // Auto notifications
-  if (!dispatchSetting(json, "service/notification", esp3d_auto_notification,
-                       "auto notif", YesNoValues, YesNoLabels,
+  if (!dispatchSetting(json, "service/notification",
+                       Esp3dSettingIndex::esp3d_auto_notification, "auto notif",
+                       YesNoValues, YesNoLabels,
                        sizeof(YesNoValues) / sizeof(char*), -1, -1, -1, nullptr,
                        false, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 
   // Notification token 1
-  if (!dispatchSetting(json, "service/notification", esp3d_notification_token_1,
-                       "t1", nullptr, nullptr, SIZE_OF_SETTING_NOFIFICATION_T1,
-                       0, 0, -1, nullptr, false, target, requestId)) {
+  if (!dispatchSetting(json, "service/notification",
+                       Esp3dSettingIndex::esp3d_notification_token_1, "t1",
+                       nullptr, nullptr, SIZE_OF_SETTING_NOFIFICATION_T1, 0, 0,
+                       -1, nullptr, false, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
   // Notification token 2
-  if (!dispatchSetting(json, "service/notification", esp3d_notification_token_2,
-                       "t2", nullptr, nullptr, SIZE_OF_SETTING_NOFIFICATION_T2,
-                       0, 0, -1, nullptr, false, target, requestId)) {
+  if (!dispatchSetting(json, "service/notification",
+                       Esp3dSettingIndex::esp3d_notification_token_2, "t2",
+                       nullptr, nullptr, SIZE_OF_SETTING_NOFIFICATION_T2, 0, 0,
+                       -1, nullptr, false, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 
   // Notification token setting
   if (!dispatchSetting(json, "service/notification",
-                       esp3d_notification_token_setting, "ts", nullptr, nullptr,
-                       SIZE_OF_SETTING_NOFIFICATION_TS, 0, 0, -1, nullptr,
-                       false, target, requestId)) {
+                       Esp3dSettingIndex::esp3d_notification_token_setting,
+                       "ts", nullptr, nullptr, SIZE_OF_SETTING_NOFIFICATION_TS,
+                       0, 0, -1, nullptr, false, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
@@ -344,8 +361,8 @@ void Esp3DCommands::ESP400(int cmd_params_pos, Esp3dMessage* msg) {
 #if ESP3D_SD_CARD_FEATURE
 #if ESP3D_SD_FEATURE_IS_SPI
   // SPI Divider factor
-  if (!dispatchSetting(json, "device/sd", esp3d_spi_divider, "speedx",
-                       SPIDivider, SPIDivider,
+  if (!dispatchSetting(json, "device/sd", Esp3dSettingIndex::esp3d_spi_divider,
+                       "speedx", SPIDivider, SPIDivider,
                        sizeof(SPIDivider) / sizeof(char*), -1, -1, -1, nullptr,
                        false, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
@@ -353,7 +370,8 @@ void Esp3DCommands::ESP400(int cmd_params_pos, Esp3dMessage* msg) {
 #endif  // ESP3D_SD_FEATURE_IS_SPI
 #if ESP3D_UPDATE_FEATURE
   // SD updater
-  if (!dispatchSetting(json, "device/sd", esp3d_check_update_on_sd,
+  if (!dispatchSetting(json, "device/sd",
+                       Esp3dSettingIndex::esp3d_check_update_on_sd,
                        "SD updater", YesNoValues, YesNoLabels,
                        sizeof(YesNoValues) / sizeof(char*), -1, -1, -1, nullptr,
                        false, target, requestId)) {

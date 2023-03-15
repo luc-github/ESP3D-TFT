@@ -115,8 +115,8 @@ void Esp3DCommands::process(Esp3dMessage* msg) {
 }
 
 bool Esp3DCommands::dispatchSetting(bool json, const char* filter,
-                                    esp3d_setting_index_t index,
-                                    const char* help, const char** optionValues,
+                                    Esp3dSettingIndex index, const char* help,
+                                    const char** optionValues,
                                     const char** optionLabels, uint32_t maxsize,
                                     uint32_t minsize, uint32_t minsize2,
                                     uint8_t precision, const char* unit,
@@ -155,14 +155,16 @@ bool Esp3DCommands::dispatchSetting(bool json, const char* filter,
       value = "Not supported";
       break;
     default:  // String
-      if (index == esp3d_sta_password || index == esp3d_ap_password ||
+      if (index == Esp3dSettingIndex::esp3d_sta_password ||
+          index == Esp3dSettingIndex::esp3d_ap_password ||
 #if ESP3D_NOTIFICATIONS_FEATURE
-          index == esp3d_notification_token_1 ||
-          index == esp3d_notification_token_2 ||
+          index == Esp3dSettingIndex::esp3d_notification_token_1 ||
+          index == Esp3dSettingIndex::esp3d_notification_token_2 ||
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 
-          index == esp3d_admin_password ||
-          index == esp3d_user_password) {  // hide passwords using  ********
+          index == Esp3dSettingIndex::esp3d_admin_password ||
+          index == Esp3dSettingIndex::esp3d_user_password) {  // hide passwords
+                                                              // using  ********
         value = HIDDEN_SETTING_VALUE;
       } else {
         value =
@@ -176,7 +178,7 @@ bool Esp3DCommands::dispatchSetting(bool json, const char* filter,
     tmpstr += "{\"F\":\"";
     tmpstr += filter;
     tmpstr += "\",\"P\":\"";
-    tmpstr += std::to_string(index);
+    tmpstr += std::to_string(static_cast<uint16_t>(index));
     tmpstr += "\",\"T\":\"";
     switch (elementSetting->type) {
       case Esp3dSettingType::byte_t:
@@ -1002,7 +1004,8 @@ Esp3dClient Esp3DCommands::getOutputClient(bool fromSettings) {
   if (fromSettings) {
     _output_client = Esp3dClient::serial;
 #if ESP3D_USB_SERIAL_FEATURE
-    uint8_t value = esp3dTFTsettings.readByte(esp3d_output_client);
+    uint8_t value =
+        esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_output_client);
     switch ((Esp3dClient)value) {
       case Esp3dClient::serial:
         _output_client = Esp3dClient::serial;

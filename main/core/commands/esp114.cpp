@@ -48,7 +48,8 @@ void Esp3DCommands::ESP114(int cmd_params_pos, Esp3dMessage* msg) {
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
-    byteValue = esp3dTFTsettings.readByte(esp3d_radio_boot_mode);
+    byteValue =
+        esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_radio_boot_mode);
     if (byteValue == (uint8_t)Esp3dState::off) {
       ok_msg = "OFF";
     } else if (byteValue == (uint8_t)Esp3dState::on) {
@@ -64,13 +65,15 @@ void Esp3DCommands::ESP114(int cmd_params_pos, Esp3dMessage* msg) {
     } else {
       byteValue = (uint8_t)-1;  // unknow flag so put outof range value
     }
-    esp3d_log(
-        "got %s param for a value of %d, is valid %d", tmpstr.c_str(),
-        byteValue,
-        esp3dTFTsettings.isValidByteSetting(byteValue, esp3d_radio_boot_mode));
-    if (esp3dTFTsettings.isValidByteSetting(byteValue, esp3d_radio_boot_mode)) {
+    esp3d_log("got %s param for a value of %d, is valid %d", tmpstr.c_str(),
+              byteValue,
+              esp3dTFTsettings.isValidByteSetting(
+                  byteValue, Esp3dSettingIndex::esp3d_radio_boot_mode));
+    if (esp3dTFTsettings.isValidByteSetting(
+            byteValue, Esp3dSettingIndex::esp3d_radio_boot_mode)) {
       esp3d_log("Value %d is valid", byteValue);
-      if (!esp3dTFTsettings.writeByte(esp3d_radio_boot_mode, byteValue)) {
+      if (!esp3dTFTsettings.writeByte(Esp3dSettingIndex::esp3d_radio_boot_mode,
+                                      byteValue)) {
         hasError = true;
         error_msg = "Set value failed";
       }

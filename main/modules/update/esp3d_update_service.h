@@ -20,38 +20,45 @@
 
 #pragma once
 #include <stdio.h>
-#include "esp3d_settings.h"
 
+#include "esp3d_settings.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
-class Esp3DUpdateService final
-{
-public:
-    Esp3DUpdateService();
-    ~Esp3DUpdateService();
-    bool begin();
-    void handle();
-    void end();
+class Esp3DUpdateService final {
+ public:
+  Esp3DUpdateService();
+  ~Esp3DUpdateService();
+  bool begin();
+  void handle();
+  void end();
 #if ESP3D_SD_CARD_FEATURE
-    bool updateFW();
-#endif // ESP3D_SD_CARD_FEATURE
-    bool updateConfig();
-    bool canUpdate();
-    size_t maxUpdateSize();
-    static bool processingFileFunction (const char * section, const char * key, const char * value);
-private:
-    bool _canUpdate;
-    size_t _maxUpdateSize;
-    static bool processString(const char** keysval, const esp3d_setting_index_t * keypos, const size_t size, const char * key, const char * value, char & T, esp3d_setting_index_t & P );
-    static bool processInt(const char** keysval, const esp3d_setting_index_t * keypos, const size_t size, const char * key, const char * value, char & T, esp3d_setting_index_t & P,  uint32_t & v);
-    static bool processBool(const char** keysval, const esp3d_setting_index_t * keypos, const size_t size, const char * key, const char * value, char & T, esp3d_setting_index_t & P,  uint8_t & b);
+  bool updateFW();
+#endif  // ESP3D_SD_CARD_FEATURE
+  bool updateConfig();
+  bool canUpdate();
+  size_t maxUpdateSize();
+  static bool processingFileFunction(const char* section, const char* key,
+                                     const char* value);
+
+ private:
+  bool _canUpdate;
+  size_t _maxUpdateSize;
+  static bool processString(const char** keysval,
+                            const Esp3dSettingIndex* keypos, const size_t size,
+                            const char* key, const char* value, char& T,
+                            Esp3dSettingIndex& P);
+  static bool processInt(const char** keysval, const Esp3dSettingIndex* keypos,
+                         const size_t size, const char* key, const char* value,
+                         char& T, Esp3dSettingIndex& P, uint32_t& v);
+  static bool processBool(const char** keysval, const Esp3dSettingIndex* keypos,
+                          const size_t size, const char* key, const char* value,
+                          char& T, Esp3dSettingIndex& P, uint8_t& b);
 };
 
 extern Esp3DUpdateService esp3dUpdateService;
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif

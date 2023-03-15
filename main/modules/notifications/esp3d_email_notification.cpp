@@ -45,8 +45,9 @@
 // Email#serveraddress:port:(optional)method(SSL=default/TLS)
 bool Esp3DNotificationsService::getEmailInformationsFromSettings() {
   char buffer[SIZE_OF_SETTING_NOFIFICATION_TS + 1];
-  esp3dTFTsettings.readString(esp3d_notification_token_setting, buffer,
-                              SIZE_OF_SETTING_NOFIFICATION_TS);
+  esp3dTFTsettings.readString(
+      Esp3dSettingIndex::esp3d_notification_token_setting, buffer,
+      SIZE_OF_SETTING_NOFIFICATION_TS);
   _settings.clear();
   _serveraddress.clear();
   _port.clear();

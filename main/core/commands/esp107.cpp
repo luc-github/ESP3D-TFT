@@ -46,12 +46,14 @@ void Esp3DCommands::ESP107(int cmd_params_pos, Esp3dMessage* msg) {
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
-    ok_msg = esp3dTFTsettings.readIPString(esp3d_ap_ip_static);
+    ok_msg =
+        esp3dTFTsettings.readIPString(Esp3dSettingIndex::esp3d_ap_ip_static);
   } else {
-    if (esp3dTFTsettings.isValidIPStringSetting(tmpstr.c_str(),
-                                                esp3d_ap_ip_static)) {
+    if (esp3dTFTsettings.isValidIPStringSetting(
+            tmpstr.c_str(), Esp3dSettingIndex::esp3d_ap_ip_static)) {
       esp3d_log("Value %s is valid", tmpstr.c_str());
-      if (!esp3dTFTsettings.writeIPString(esp3d_ap_ip_static, tmpstr.c_str())) {
+      if (!esp3dTFTsettings.writeIPString(Esp3dSettingIndex::esp3d_ap_ip_static,
+                                          tmpstr.c_str())) {
         hasError = true;
         error_msg = "Set value failed";
       }

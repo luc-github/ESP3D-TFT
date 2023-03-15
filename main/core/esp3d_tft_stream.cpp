@@ -83,8 +83,8 @@ Esp3DTFTStream::~Esp3DTFTStream() {}
 
 Esp3dTargetFirmware Esp3DTFTStream::getTargetFirmware(bool fromSettings) {
   if (fromSettings) {
-    _target_firmware =
-        (Esp3dTargetFirmware)esp3dTFTsettings.readByte(esp3d_target_firmware);
+    _target_firmware = (Esp3dTargetFirmware)esp3dTFTsettings.readByte(
+        Esp3dSettingIndex::esp3d_target_firmware);
   }
 
   return _target_firmware;
