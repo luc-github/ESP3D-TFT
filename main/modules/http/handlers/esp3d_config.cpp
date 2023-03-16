@@ -23,17 +23,17 @@
 #include "esp3d_string.h"
 #include "http/esp3d_http_service.h"
 
-esp_err_t Esp3dHttpService::config_handler(httpd_req_t *req) {
+esp_err_t ESP3DHttpService::config_handler(httpd_req_t *req) {
   esp3d_log("Uri: %s", req->uri);
-  Esp3dAuthenticationLevel authentication_level = getAuthenticationLevel(req);
+  ESP3DAuthenticationLevel authentication_level = getAuthenticationLevel(req);
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (authentication_level == Esp3dAuthenticationLevel::guest) {
+  if (authentication_level == ESP3DAuthenticationLevel::guest) {
     // send 401
     return not_authenticated_handler(req);
   }
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
-  Esp3dMessage *newMsgPtr =
-      Esp3dClient::newMsg(Esp3dClientType::webui, Esp3dClientType::command,
+  ESP3DMessage *newMsgPtr =
+      ESP3DClient::newMsg(ESP3DClientType::webui, ESP3DClientType::command,
                           (const uint8_t *)"[ESP420]addPreTag",
                           strlen("[ESP420]addPreTag"), authentication_level);
   if (newMsgPtr) {

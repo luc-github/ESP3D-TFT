@@ -25,12 +25,12 @@
 #define COMMAND_ID 500
 // Get/Set connection status
 //[ESP500] json=<no> pwd=<admin password>
-void Esp3dCommands::ESP500(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP500(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
@@ -39,13 +39,13 @@ void Esp3dCommands::ESP500(int cmd_params_pos, Esp3dMessage* msg) {
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
     switch (msg->authentication_level) {
-      case Esp3dAuthenticationLevel::admin:
+      case ESP3DAuthenticationLevel::admin:
         ok_msg = "admin";
         break;
-      case Esp3dAuthenticationLevel::user:
+      case ESP3DAuthenticationLevel::user:
         ok_msg = "user";
         break;
-      case Esp3dAuthenticationLevel::not_authenticated:
+      case ESP3DAuthenticationLevel::not_authenticated:
         ok_msg = "Not authenticated";
         break;
       default:

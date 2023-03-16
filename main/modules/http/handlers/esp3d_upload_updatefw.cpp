@@ -23,8 +23,8 @@
 #include "esp_ota_ops.h"
 #include "http/esp3d_http_service.h"
 
-esp_err_t Esp3dHttpService::upload_to_updatefw_handler(
-    const uint8_t *data, size_t datasize, Esp3dUploadState file_upload_state,
+esp_err_t ESP3DHttpService::upload_to_updatefw_handler(
+    const uint8_t *data, size_t datasize, ESP3DUploadState file_upload_state,
     const char *filename, size_t filesize) {
   // No need Authentication as already handled in multipart_parser
   static esp_ota_handle_t update_handle = 0;
@@ -32,13 +32,13 @@ esp_err_t Esp3dHttpService::upload_to_updatefw_handler(
   static size_t update_size = 0;
   esp_err_t err;
   switch (file_upload_state) {
-    case Esp3dUploadState::upload_start:
+    case ESP3DUploadState::upload_start:
       esp3d_log("Starting update upload");
       update_size = 0;
       update_partition = esp_ota_get_next_update_partition(NULL);
       if (!update_partition) {
         esp3d_log_e("Error accessing flash filesystem");
-        esp3dHttpService.pushError(Esp3dUploadError::start_update_failed,
+        esp3dHttpService.pushError(ESP3DUploadError::start_update_failed,
                                    "Error accessing update partition");
         return ESP_FAIL;
       }
@@ -47,7 +47,7 @@ esp_err_t Esp3dHttpService::upload_to_updatefw_handler(
           esp3d_log_e(
               "Error not enough space on flash filesystem have %ld and need %d",
               update_partition->size, filesize);
-          esp3dHttpService.pushError(Esp3dUploadError::not_enough_space,
+          esp3dHttpService.pushError(ESP3DUploadError::not_enough_space,
                                      "Error not enough space");
           return ESP_FAIL;
         }
@@ -56,25 +56,25 @@ esp_err_t Esp3dHttpService::upload_to_updatefw_handler(
                           &update_handle);
       if (err != ESP_OK) {
         esp3d_log_e("esp_ota_begin failed (%s)", esp_err_to_name(err));
-        esp3dHttpService.pushError(Esp3dUploadError::file_create_failed,
+        esp3dHttpService.pushError(ESP3DUploadError::file_create_failed,
                                    "Error update begin failed");
         return ESP_FAIL;
       }
       break;
-    case Esp3dUploadState::file_write:
+    case ESP3DUploadState::file_write:
       // esp3d_log("Write :%d bytes", datasize);
       if (datasize && update_handle) {
         if (esp_ota_write(update_handle, (const void *)data, datasize) !=
             ESP_OK) {
           esp3d_log_e("Error cannot writing data on update partition ");
-          esp3dHttpService.pushError(Esp3dUploadError::write_failed,
+          esp3dHttpService.pushError(ESP3DUploadError::write_failed,
                                      "Error update write failed");
           return ESP_FAIL;
         }
         update_size += datasize;
       }
       break;
-    case Esp3dUploadState::upload_end:
+    case ESP3DUploadState::upload_end:
       esp3d_log("Ending upload");
       if (filesize != (size_t)-1) {
         if (filesize != update_size) {
@@ -84,7 +84,7 @@ esp_err_t Esp3dHttpService::upload_to_updatefw_handler(
           tmperr += std::to_string(update_size);
           tmperr += " vs ";
           tmperr += std::to_string(filesize);
-          esp3dHttpService.pushError(Esp3dUploadError::wrong_size,
+          esp3dHttpService.pushError(ESP3DUploadError::wrong_size,
                                      tmperr.c_str());
           return ESP_FAIL;
         } else {
@@ -97,7 +97,7 @@ esp_err_t Esp3dHttpService::upload_to_updatefw_handler(
         std::string tmperr = "Error update failed(";
         tmperr += esp_err_to_name(err);
         tmperr += ")";
-        esp3dHttpService.pushError(Esp3dUploadError::close_failed,
+        esp3dHttpService.pushError(ESP3DUploadError::close_failed,
                                    tmperr.c_str());
         return ESP_FAIL;
       }
@@ -108,12 +108,12 @@ esp_err_t Esp3dHttpService::upload_to_updatefw_handler(
         std::string tmperr = "Error update failed(";
         tmperr += esp_err_to_name(err);
         tmperr += ")";
-        esp3dHttpService.pushError(Esp3dUploadError::update_failed,
+        esp3dHttpService.pushError(ESP3DUploadError::update_failed,
                                    tmperr.c_str());
         return ESP_FAIL;
       }
       break;
-    case Esp3dUploadState::upload_aborted:
+    case ESP3DUploadState::upload_aborted:
       esp3d_log("Error happened: cleanup");
       esp_ota_abort(update_handle);
       update_handle = 0;

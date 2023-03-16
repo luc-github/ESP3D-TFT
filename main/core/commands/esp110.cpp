@@ -27,12 +27,12 @@
 #define COMMAND_ID 110
 // Set radio state at boot which can be BT, CONFIG STA, AP, OFF
 //[ESP110]<state>  json=<no> pwd=<admin password>
-void Esp3dCommands::ESP110(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP110(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
@@ -40,63 +40,63 @@ void Esp3dCommands::ESP110(int cmd_params_pos, Esp3dMessage* msg) {
   std::string tmpstr;
   uint8_t byteValue = (uint8_t)-1;
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
-    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
+    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
-    byteValue = esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_radio_mode);
-    if (byteValue == (uint8_t)Esp3dRadioMode::bluetooth_serial) {
+    byteValue = esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_radio_mode);
+    if (byteValue == (uint8_t)ESP3DRadioMode::bluetooth_serial) {
       ok_msg = "BT";
     } else
 #if ESP3D_WIFI_FEATURE
-        if (byteValue == (uint8_t)Esp3dRadioMode::wifi_ap) {
+        if (byteValue == (uint8_t)ESP3DRadioMode::wifi_ap) {
       ok_msg = "AP";
-    } else if (byteValue == (uint8_t)Esp3dRadioMode::wifi_sta) {
+    } else if (byteValue == (uint8_t)ESP3DRadioMode::wifi_sta) {
       ok_msg = "STA";
-    } else if (byteValue == (uint8_t)Esp3dRadioMode::wifi_ap_config) {
+    } else if (byteValue == (uint8_t)ESP3DRadioMode::wifi_ap_config) {
       ok_msg = "CONFIG";
     } else
 #endif  // ESP3D_WIFI_FEATURE
-      if (byteValue == (uint8_t)Esp3dRadioMode::off) {
+      if (byteValue == (uint8_t)ESP3DRadioMode::off) {
         ok_msg = "OFF";
       } else {
         ok_msg = "Unknown";
       }
   } else {
     if (tmpstr == "BT") {
-      byteValue = (uint8_t)Esp3dRadioMode::bluetooth_serial;
+      byteValue = (uint8_t)ESP3DRadioMode::bluetooth_serial;
     } else
 #if ESP3D_WIFI_FEATURE
         if (tmpstr == "AP") {
-      byteValue = (uint8_t)Esp3dRadioMode::wifi_ap;
+      byteValue = (uint8_t)ESP3DRadioMode::wifi_ap;
     } else if (tmpstr == "STA") {
-      byteValue = (uint8_t)Esp3dRadioMode::wifi_sta;
+      byteValue = (uint8_t)ESP3DRadioMode::wifi_sta;
     } else if (tmpstr == "CONFIG") {
-      byteValue = (uint8_t)Esp3dRadioMode::wifi_ap_config;
+      byteValue = (uint8_t)ESP3DRadioMode::wifi_ap_config;
     } else
 #endif  // ESP3D_WIFI_FEATURE
       if (tmpstr == "OFF") {
-        byteValue = (uint8_t)Esp3dRadioMode::off;
+        byteValue = (uint8_t)ESP3DRadioMode::off;
       } else {
         byteValue = (uint8_t)-1;  // unknow flag so put outof range value
       }
     esp3d_log("got %s param for a value of %d, is valid %d", tmpstr.c_str(),
               byteValue,
               esp3dTftsettings.isValidByteSetting(
-                  byteValue, Esp3dSettingIndex::esp3d_radio_mode));
+                  byteValue, ESP3DSettingIndex::esp3d_radio_mode));
     if (esp3dTftsettings.isValidByteSetting(
-            byteValue, Esp3dSettingIndex::esp3d_radio_mode)) {
+            byteValue, ESP3DSettingIndex::esp3d_radio_mode)) {
       esp3d_log("Value %d is valid", byteValue);
-      if (!esp3dTftsettings.writeByte(Esp3dSettingIndex::esp3d_radio_mode,
+      if (!esp3dTftsettings.writeByte(ESP3DSettingIndex::esp3d_radio_mode,
                                       byteValue)) {
         hasError = true;
         error_msg = "Set value failed";
       } else {
-        esp3dNetwork.setMode(static_cast<Esp3dRadioMode>(byteValue));
+        esp3dNetwork.setMode(static_cast<ESP3DRadioMode>(byteValue));
       }
     } else {
       hasError = true;

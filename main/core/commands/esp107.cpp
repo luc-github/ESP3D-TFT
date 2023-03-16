@@ -26,20 +26,20 @@
 #define COMMAND_ID 107
 // Change AP IP
 //[ESP107]<IP> json=no pwd=<admin password>
-void Esp3dCommands::ESP107(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP107(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
   bool json = hasTag(msg, cmd_params_pos, "json");
   std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
-    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
+    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
@@ -47,12 +47,12 @@ void Esp3dCommands::ESP107(int cmd_params_pos, Esp3dMessage* msg) {
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
     ok_msg =
-        esp3dTftsettings.readIPString(Esp3dSettingIndex::esp3d_ap_ip_static);
+        esp3dTftsettings.readIPString(ESP3DSettingIndex::esp3d_ap_ip_static);
   } else {
     if (esp3dTftsettings.isValidIPStringSetting(
-            tmpstr.c_str(), Esp3dSettingIndex::esp3d_ap_ip_static)) {
+            tmpstr.c_str(), ESP3DSettingIndex::esp3d_ap_ip_static)) {
       esp3d_log("Value %s is valid", tmpstr.c_str());
-      if (!esp3dTftsettings.writeIPString(Esp3dSettingIndex::esp3d_ap_ip_static,
+      if (!esp3dTftsettings.writeIPString(ESP3DSettingIndex::esp3d_ap_ip_static,
                                           tmpstr.c_str())) {
         hasError = true;
         error_msg = "Set value failed";

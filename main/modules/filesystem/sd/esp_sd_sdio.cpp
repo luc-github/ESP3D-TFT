@@ -38,21 +38,21 @@
 
 sdmmc_card_t *card;
 
-void Esp3dSd::unmount() {
+void ESP3DSd::unmount() {
   if (!_started) {
     esp3d_log_e("SDCard not init.");
-    _state = Esp3dSdState::unknown;
+    _state = ESP3DSdState::unknown;
     return;
   }
   esp_vfs_fat_sdcard_unmount(mount_point(), card);
-  _state = Esp3dSdState::not_present;
+  _state = ESP3DSdState::not_present;
   _mounted = false;
 }
 
-bool Esp3dSd::mount() {
+bool ESP3DSd::mount() {
   if (!_started) {
     esp3d_log_e("SDCard not init.");
-    _state = Esp3dSdState::unknown;
+    _state = ESP3DSdState::unknown;
     return false;
   }
   if (_mounted) {
@@ -87,7 +87,7 @@ bool Esp3dSd::mount() {
                                           &mount_config, &card);
 
   if (ret != ESP_OK) {
-    _state = Esp3dSdState::not_present;
+    _state = ESP3DSdState::not_present;
     if (ret == ESP_FAIL) {
       esp3d_log_e("Failed to mount filesystem.");
     } else {
@@ -97,20 +97,20 @@ bool Esp3dSd::mount() {
   }
   esp3d_log("Filesystem mounted");
   _mounted = true;
-  _state = Esp3dSdState::idle;
+  _state = ESP3DSdState::idle;
   return _mounted;
 }
 
-const char *Esp3dSd::getFileSystemName() { return "SDFat native"; }
+const char *ESP3DSd::getFileSystemName() { return "SDFat native"; }
 
-bool Esp3dSd::begin() {
+bool ESP3DSd::begin() {
   _started = true;
   return true;
 }
 
-uint Esp3dSd::maxPathLength() { return CONFIG_FATFS_MAX_LFN; }
+uint ESP3DSd::maxPathLength() { return CONFIG_FATFS_MAX_LFN; }
 
-bool Esp3dSd::getSpaceInfo(uint64_t *totalBytes, uint64_t *usedBytes,
+bool ESP3DSd::getSpaceInfo(uint64_t *totalBytes, uint64_t *usedBytes,
                            uint64_t *freeBytes, bool refreshStats) {
   static uint64_t _totalBytes = 0;
   static uint64_t _usedBytes = 0;
@@ -154,7 +154,7 @@ bool Esp3dSd::getSpaceInfo(uint64_t *totalBytes, uint64_t *usedBytes,
   // if total is 0 it is a failure
   return _totalBytes != 0;
 }
-DIR *Esp3dSd::opendir(const char *dirpath) {
+DIR *ESP3DSd::opendir(const char *dirpath) {
   std::string dir_path = mount_point();
   if (strlen(dirpath) != 0) {
     if (dirpath[0] != '/') {
@@ -166,9 +166,9 @@ DIR *Esp3dSd::opendir(const char *dirpath) {
   return ::opendir(dir_path.c_str());
 }
 
-int Esp3dSd::closedir(DIR *dirp) { return ::closedir(dirp); }
+int ESP3DSd::closedir(DIR *dirp) { return ::closedir(dirp); }
 
-int Esp3dSd::stat(const char *filepath, struct stat *entry_stat) {
+int ESP3DSd::stat(const char *filepath, struct stat *entry_stat) {
   std::string dir_path = mount_point();
   if (strlen(filepath) != 0) {
     if (filepath[0] != '/') {
@@ -181,7 +181,7 @@ int Esp3dSd::stat(const char *filepath, struct stat *entry_stat) {
   return ::stat(dir_path.c_str(), entry_stat);
 }
 
-bool Esp3dSd::exists(const char *path) {
+bool ESP3DSd::exists(const char *path) {
   struct stat entry_stat;
   if (stat(path, &entry_stat) == 0) {
     return true;
@@ -190,7 +190,7 @@ bool Esp3dSd::exists(const char *path) {
   }
 }
 
-bool Esp3dSd::remove(const char *path) {
+bool ESP3DSd::remove(const char *path) {
   std::string file_path = mount_point();
   if (strlen(path) != 0) {
     if (path[0] != '/') {
@@ -201,7 +201,7 @@ bool Esp3dSd::remove(const char *path) {
   return !::unlink(file_path.c_str());
 }
 
-bool Esp3dSd::mkdir(const char *path) {
+bool ESP3DSd::mkdir(const char *path) {
   std::string dir_path = mount_point();
   if (strlen(path) != 0) {
     if (path[0] != '/') {
@@ -212,7 +212,7 @@ bool Esp3dSd::mkdir(const char *path) {
   return !::mkdir(dir_path.c_str(), 0777);
 }
 
-bool Esp3dSd::rmdir(const char *path) {
+bool ESP3DSd::rmdir(const char *path) {
   std::string dir_path = mount_point();
   if (strlen(path) != 0) {
     if (path[0] != '/') {
@@ -222,7 +222,7 @@ bool Esp3dSd::rmdir(const char *path) {
   }
   return !::rmdir(dir_path.c_str());
 }
-bool Esp3dSd::rename(const char *oldpath, const char *newpath) {
+bool ESP3DSd::rename(const char *oldpath, const char *newpath) {
   std::string old_path = mount_point();
   std::string new_path = mount_point();
   if (strlen(oldpath) != 0) {
@@ -244,7 +244,7 @@ bool Esp3dSd::rename(const char *oldpath, const char *newpath) {
   return !::rename(old_path.c_str(), new_path.c_str());
 }
 
-FILE *Esp3dSd::open(const char *filename, const char *mode) {
+FILE *ESP3DSd::open(const char *filename, const char *mode) {
   std::string file_path = mount_point();
   if (strlen(filename) != 0) {
     if (filename[0] != '/') {
@@ -255,10 +255,10 @@ FILE *Esp3dSd::open(const char *filename, const char *mode) {
   return fopen(file_path.c_str(), mode);
 }
 
-struct dirent *Esp3dSd::readdir(DIR *dir) { return ::readdir(dir); }
+struct dirent *ESP3DSd::readdir(DIR *dir) { return ::readdir(dir); }
 
-void Esp3dSd::rewinddir(DIR *dir) { ::rewinddir(dir); }
+void ESP3DSd::rewinddir(DIR *dir) { ::rewinddir(dir); }
 
-void Esp3dSd::close(FILE *fd) { fclose(fd); }
+void ESP3DSd::close(FILE *fd) { fclose(fd); }
 
 #endif  // ESP3D_SD_IS_SDIO

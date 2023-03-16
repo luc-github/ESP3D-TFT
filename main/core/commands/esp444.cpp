@@ -31,12 +31,12 @@
 // Set ESP State
 //`cmd` can be  `RESTART` to restart board or `RESET` to reset all setting to
 // defaults values [ESP444]<cmd> json=<no> <pwd=admin>`
-void Esp3dCommands::ESP444(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP444(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool json = hasTag(msg, cmd_params_pos, "json");
   std::string tmpstr;
   bool isRestart = hasTag(msg, cmd_params_pos, "RESTART");
@@ -45,8 +45,8 @@ void Esp3dCommands::ESP444(int cmd_params_pos, Esp3dMessage* msg) {
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "";
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level != Esp3dAuthenticationLevel::admin) {
-    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level != ESP3DAuthenticationLevel::admin) {
+    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }

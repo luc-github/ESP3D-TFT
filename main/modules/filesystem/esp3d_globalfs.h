@@ -26,18 +26,18 @@
 #include "esp3d_fs_types.h"
 #include "esp_vfs.h"
 
-class Esp3dGlobalFileSystem final {
+class ESP3DGlobalFileSystem final {
  public:
-  Esp3dGlobalFileSystem();
+  ESP3DGlobalFileSystem();
   bool begin();
   const char *getFileSystemName(char *path);
-  uint maxPathLength(Esp3dFileSystemType fstype = Esp3dFileSystemType::flash);
+  uint maxPathLength(ESP3DFileSystemType fstype = ESP3DFileSystemType::flash);
   bool getSpaceInfo(uint64_t *totalBytes = NULL, uint64_t *usedBytes = NULL,
                     uint64_t *freeBytes = NULL, const char *path = NULL,
                     bool refreshStats = false);
   const char *mount_point(
-      Esp3dFileSystemType fstype = Esp3dFileSystemType::flash);
-  Esp3dFileSystemType getFSType(const char *path = nullptr);
+      ESP3DFileSystemType fstype = ESP3DFileSystemType::flash);
+  ESP3DFileSystemType getFSType(const char *path = nullptr);
   bool accessFS(const char *path);
   void releaseFS(const char *path);
   DIR *opendir(const char *dirpath);
@@ -59,4 +59,4 @@ class Esp3dGlobalFileSystem final {
   DIR _rootDir;    // there no multiple access to root so 1 should be enough
 };
 
-extern Esp3dGlobalFileSystem globalFs;
+extern ESP3DGlobalFileSystem globalFs;

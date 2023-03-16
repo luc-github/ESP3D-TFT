@@ -27,12 +27,12 @@
 // Action on ESP3D Filesystem
 // rmdir / remove / mkdir / exists /create
 //[ESP730]<Action>=<path> json=<no> pwd=<admin password>
-void Esp3dCommands::ESP730(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP730(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
@@ -41,8 +41,8 @@ void Esp3dCommands::ESP730(int cmd_params_pos, Esp3dMessage* msg) {
   const char* cmdList[] = {"rmdir=", "remove=", "mkdir=", "exists=", "create="};
   uint8_t cmdListSize = sizeof(cmdList) / sizeof(char*);
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
-    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
+    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }

@@ -64,7 +64,7 @@ uint ESP3DSocketServer::clientsConnected() {
   return count;
 }
 
-Esp3dSocketInfos *ESP3DSocketServer::getClientInfos(uint index) {
+ESP3DSocketInfos *ESP3DSocketServer::getClientInfos(uint index) {
   if (_started) {
     if (index <= ESP3D_MAX_SOCKET_CLIENTS) {
       if (_clients[index].socket_id != FREE_SOCKET_HANDLE) {
@@ -118,7 +118,7 @@ bool ESP3DSocketServer::startSocketServer() {
   return true;
 }
 
-void ESP3DSocketServer::process(Esp3dMessage *msg) {
+void ESP3DSocketServer::process(ESP3DMessage *msg) {
   if (!addTxData(msg)) {
     flush();
     if (!addTxData(msg)) {
@@ -308,7 +308,7 @@ ESP3DSocketServer::ESP3DSocketServer() {
   _xHandle = NULL;
   _started = false;
   _listen_socket = FREE_SOCKET_HANDLE;
-  memset(_clients, 0, sizeof(Esp3dSocketInfos) * ESP3D_MAX_SOCKET_CLIENTS);
+  memset(_clients, 0, sizeof(ESP3DSocketInfos) * ESP3D_MAX_SOCKET_CLIENTS);
   for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
     _clients[s].socket_id = FREE_SOCKET_HANDLE;
   }
@@ -323,8 +323,8 @@ bool ESP3DSocketServer::isEndChar(uint8_t ch) {
 
 bool ESP3DSocketServer::begin() {
   end();
-  if (Esp3dState::on != (Esp3dState)esp3dTftsettings.readByte(
-                            Esp3dSettingIndex::esp3d_socket_on)) {
+  if (ESP3DState::on != (ESP3DState)esp3dTftsettings.readByte(
+                            ESP3DSettingIndex::esp3d_socket_on)) {
     esp3d_log("Telnet is not enabled");
     // return true because no error but _started is false
     return true;
@@ -343,7 +343,7 @@ bool ESP3DSocketServer::begin() {
   setTxMutex(&_tx_mutex);
 
   // Read port
-  _port = esp3dTftsettings.readUint32(Esp3dSettingIndex::esp3d_socket_port);
+  _port = esp3dTftsettings.readUint32(ESP3DSettingIndex::esp3d_socket_port);
 
   _data = (char *)malloc(ESP3D_SOCKET_RX_BUFFER_SIZE + 1);
   if (_data == NULL) {
@@ -385,13 +385,13 @@ bool ESP3DSocketServer::begin() {
 
 bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
                                          size_t size) {
-  Esp3dSocketInfos *client = getClientInfos(index);
+  ESP3DSocketInfos *client = getClientInfos(index);
   if (client == NULL) {
     esp3d_log_e("No client");
     return false;
   }
-  Esp3dAuthenticationLevel authentication_level =
-      Esp3dAuthenticationLevel::guest;
+  ESP3DAuthenticationLevel authentication_level =
+      ESP3DAuthenticationLevel::guest;
 #if ESP3D_AUTHENTICATION_FEATURE
   esp3d_log("Check authentication level");
   if (strlen(client->session_id) == 0) {
@@ -402,7 +402,7 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
         esp3dAuthenthicationService.getAuthenticatedLevel(str.c_str());
     esp3d_log("Authentication Level = %d",
               static_cast<uint8_t>(authentication_level));
-    if (authentication_level == Esp3dAuthenticationLevel::guest) {
+    if (authentication_level == ESP3DAuthenticationLevel::guest) {
       esp3d_log("Authentication Level = GUEST, for %s", (const char *)msg);
       sendToSocket(client->socket_id, ERROR_MSG, strlen(ERROR_MSG));
       return false;
@@ -414,7 +414,7 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
     // 3 -  add session id to _sessions list
     if (!esp3dAuthenthicationService.createRecord(
             client->session_id, client->socket_id, authentication_level,
-            Esp3dClientType::telnet)) {
+            ESP3DClientType::telnet)) {
       esp3d_log("Authentication error, rejected.");
       sendToSocket(client->socket_id, ERROR_MSG, strlen(ERROR_MSG));
       return false;
@@ -422,7 +422,7 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
   } else {
     esp3d_log("SessionId is %s", client->session_id);
     // No need to check time out as session is deleted on close
-    Esp3dAuthenticationRecord *rec =
+    ESP3DAuthenticationRecord *rec =
         esp3dAuthenthicationService.getRecord(client->session_id);
     if (rec != NULL) {
       authentication_level = rec->level;
@@ -432,20 +432,20 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
     }
   }
 #else
-  authentication_level = Esp3dAuthenticationLevel::admin;
+  authentication_level = ESP3DAuthenticationLevel::admin;
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   esp3d_log("Pushing `%s` %d", msg, size);
-  Esp3dMessage *newMsgPtr = newMsg();
+  ESP3DMessage *newMsgPtr = newMsg();
   if (newMsgPtr) {
-    if (Esp3dClient::setDataContent(newMsgPtr, msg, size)) {
-      newMsgPtr->origin = Esp3dClientType::telnet;
+    if (ESP3DClient::setDataContent(newMsgPtr, msg, size)) {
+      newMsgPtr->origin = ESP3DClientType::telnet;
       newMsgPtr->authentication_level = authentication_level;
       newMsgPtr->target = esp3dCommands.getOutputClient();
-      newMsgPtr->type = Esp3dMessageType::unique;
+      newMsgPtr->type = ESP3DMessageType::unique;
       newMsgPtr->request_id.id = client->socket_id;
       if (!addRxData(newMsgPtr)) {
         // delete message as cannot be added to the queue
-        Esp3dClient::deleteMsg(newMsgPtr);
+        ESP3DClient::deleteMsg(newMsgPtr);
         esp3d_log_e("Failed to add message to rx queue");
         return false;
       }
@@ -465,13 +465,13 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
 void ESP3DSocketServer::handle() {
   if (_started) {
     if (getRxMsgsCount() > 0) {
-      Esp3dMessage *msg = popRx();
+      ESP3DMessage *msg = popRx();
       if (msg) {
         esp3dCommands.process(msg);
       }
     }
     if (getTxMsgsCount() > 0) {
-      Esp3dMessage *msg = popTx();
+      ESP3DMessage *msg = popTx();
       if (msg) {
         for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
           if (_clients[s].socket_id != FREE_SOCKET_HANDLE) {

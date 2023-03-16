@@ -43,10 +43,10 @@
 #define BUF_SIZE 512
 
 // Email#serveraddress:port:(optional)method(SSL=default/TLS)
-bool Esp3dNotificationsService::getEmailInformationsFromSettings() {
+bool ESP3DNotificationsService::getEmailInformationsFromSettings() {
   char buffer[SIZE_OF_SETTING_NOFIFICATION_TS + 1];
   esp3dTftsettings.readString(
-      Esp3dSettingIndex::esp3d_notification_token_setting, buffer,
+      ESP3DSettingIndex::esp3d_notification_token_setting, buffer,
       SIZE_OF_SETTING_NOFIFICATION_TS);
   _settings.clear();
   _serveraddress.clear();
@@ -93,7 +93,7 @@ bool Esp3dNotificationsService::getEmailInformationsFromSettings() {
   return true;
 }
 
-int Esp3dNotificationsService::perform_tls_handshake(mbedtls_ssl_context *ssl) {
+int ESP3DNotificationsService::perform_tls_handshake(mbedtls_ssl_context *ssl) {
   int ret = -1;
   uint32_t flags;
   char *buf = NULL;
@@ -132,7 +132,7 @@ int Esp3dNotificationsService::perform_tls_handshake(mbedtls_ssl_context *ssl) {
   return ret;
 }
 
-int Esp3dNotificationsService::write_ssl_and_get_response(
+int ESP3DNotificationsService::write_ssl_and_get_response(
     mbedtls_ssl_context *ssl, unsigned char *buf, size_t len) {
   int ret;
   const size_t DATA_SIZE = 128;
@@ -189,7 +189,7 @@ int Esp3dNotificationsService::write_ssl_and_get_response(
   return ret;
 }
 
-int Esp3dNotificationsService::write_tls_and_get_response(
+int ESP3DNotificationsService::write_tls_and_get_response(
     mbedtls_net_context *sock_fd, unsigned char *buf, size_t len) {
   int ret;
   const size_t DATA_SIZE = 128;
@@ -240,7 +240,7 @@ int Esp3dNotificationsService::write_tls_and_get_response(
   return ret;
 }
 
-bool Esp3dNotificationsService::sendEmailMSG(const char *title,
+bool ESP3DNotificationsService::sendEmailMSG(const char *title,
                                              const char *message) {
   if (_token1.length() == 0 || _token2.length() == 0 ||
       _settings.length() == 0 || _port.length() == 0 ||
@@ -320,7 +320,7 @@ bool Esp3dNotificationsService::sendEmailMSG(const char *title,
                                    _port.c_str(), MBEDTLS_NET_PROTO_TCP)) !=
         0) {
       esp3d_log_e("mbedtls_net_connect returned -0x%x", -ret);
-      _lastError = Esp3dNotificationError::invalid_url;
+      _lastError = ESP3DNotificationError::invalid_url;
       hasError = true;
     }
   }
@@ -422,7 +422,7 @@ bool Esp3dNotificationsService::sendEmailMSG(const char *title,
     ret = write_ssl_and_get_response(&ssl, (unsigned char *)buf, len);
     if (ret < 300 || ret > 399) {
       esp3d_log_e("Failed to get proper response");
-      _lastError = Esp3dNotificationError::invalid_token1;
+      _lastError = ESP3DNotificationError::invalid_token1;
       hasError = true;
     }
   }
@@ -443,7 +443,7 @@ bool Esp3dNotificationsService::sendEmailMSG(const char *title,
     ret = write_ssl_and_get_response(&ssl, (unsigned char *)buf, len);
     if (ret < 200 || ret > 399) {
       esp3d_log_e("Failed to get proper response");
-      _lastError = Esp3dNotificationError::invalid_token2;
+      _lastError = ESP3DNotificationError::invalid_token2;
       hasError = true;
     }
   }
@@ -497,7 +497,7 @@ bool Esp3dNotificationsService::sendEmailMSG(const char *title,
     if (ret < 200 || ret > 299) {
       esp3d_log_e("Failed to get proper response");
       hasError = true;
-      _lastError = Esp3dNotificationError::invalid_data;
+      _lastError = ESP3DNotificationError::invalid_data;
     }
   }
 
@@ -515,10 +515,10 @@ bool Esp3dNotificationsService::sendEmailMSG(const char *title,
   if (!hasError) {
     /* Close connection */
     mbedtls_ssl_close_notify(&ssl);
-    _lastError = Esp3dNotificationError::no_error;
+    _lastError = ESP3DNotificationError::no_error;
   } else {
-    if (_lastError == Esp3dNotificationError::no_error) {
-      _lastError = Esp3dNotificationError::error;
+    if (_lastError == ESP3DNotificationError::no_error) {
+      _lastError = ESP3DNotificationError::error;
     }
   }
 

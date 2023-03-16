@@ -27,12 +27,12 @@
 #define COMMAND_ID 510
 // Get/Set session timeout
 //[ESP510]<timeout> json=<no> pwd=<admin password>
-void Esp3dCommands::ESP510(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP510(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
@@ -40,8 +40,8 @@ void Esp3dCommands::ESP510(int cmd_params_pos, Esp3dMessage* msg) {
   std::string tmpstr;
   uint8_t byteValue = 0;
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
-    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
+    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
@@ -49,18 +49,18 @@ void Esp3dCommands::ESP510(int cmd_params_pos, Esp3dMessage* msg) {
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
     byteValue =
-        esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_session_timeout);
+        esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_session_timeout);
     ok_msg = std::to_string(byteValue);
   } else {
     byteValue = atoi(tmpstr.c_str());
     esp3d_log("got %s param for a value of %d, is valid %d", tmpstr.c_str(),
               byteValue,
               esp3dTftsettings.isValidByteSetting(
-                  byteValue, Esp3dSettingIndex::esp3d_session_timeout));
+                  byteValue, ESP3DSettingIndex::esp3d_session_timeout));
     if (esp3dTftsettings.isValidByteSetting(
-            byteValue, Esp3dSettingIndex::esp3d_session_timeout)) {
+            byteValue, ESP3DSettingIndex::esp3d_session_timeout)) {
       esp3d_log("Value %d is valid", byteValue);
-      if (!esp3dTftsettings.writeByte(Esp3dSettingIndex::esp3d_session_timeout,
+      if (!esp3dTftsettings.writeByte(ESP3DSettingIndex::esp3d_session_timeout,
                                       byteValue)) {
         hasError = true;
         error_msg = "Set value failed";

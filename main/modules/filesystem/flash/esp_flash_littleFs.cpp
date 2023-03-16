@@ -34,7 +34,7 @@
 
 #define PARTITION_LABEL "flashfs"
 
-void Esp3dFlash::unmount() {
+void ESP3DFlash::unmount() {
   if (!_started) {
     esp3d_log_e("LittleFs not init.");
     return;
@@ -43,7 +43,7 @@ void Esp3dFlash::unmount() {
   _mounted = false;
 }
 
-bool Esp3dFlash::mount() {
+bool ESP3DFlash::mount() {
   if (_mounted) {
     unmount();
   }
@@ -81,9 +81,9 @@ bool Esp3dFlash::mount() {
   return _mounted;
 }
 
-const char *Esp3dFlash::getFileSystemName() { return "LittleFS"; }
+const char *ESP3DFlash::getFileSystemName() { return "LittleFS"; }
 
-bool Esp3dFlash::format() {
+bool ESP3DFlash::format() {
   if (_mounted) {
     unmount();
   }
@@ -95,15 +95,15 @@ bool Esp3dFlash::format() {
   return (isFormated && _mounted);
 }
 
-bool Esp3dFlash::Esp3dFlash::begin() {
+bool ESP3DFlash::ESP3DFlash::begin() {
   _started = mount();
   getSpaceInfo();
   return _started;
 }
 
-uint Esp3dFlash::maxPathLength() { return CONFIG_LITTLEFS_OBJ_NAME_LEN; }
+uint ESP3DFlash::maxPathLength() { return CONFIG_LITTLEFS_OBJ_NAME_LEN; }
 
-bool Esp3dFlash::getSpaceInfo(size_t *totalBytes, size_t *usedBytes,
+bool ESP3DFlash::getSpaceInfo(size_t *totalBytes, size_t *usedBytes,
                               size_t *freeBytes, bool refreshStats) {
   static size_t _totalBytes = 0;
   static size_t _usedBytes = 0;
@@ -146,7 +146,7 @@ bool Esp3dFlash::getSpaceInfo(size_t *totalBytes, size_t *usedBytes,
   return _totalBytes != 0;
 }
 
-DIR *Esp3dFlash::opendir(const char *dirpath) {
+DIR *ESP3DFlash::opendir(const char *dirpath) {
   std::string dir_path = mount_point();
   if (strlen(dirpath) != 0) {
     if (dirpath[0] != '/') {
@@ -158,9 +158,9 @@ DIR *Esp3dFlash::opendir(const char *dirpath) {
   return ::opendir(dir_path.c_str());
 }
 
-int Esp3dFlash::closedir(DIR *dirp) { return ::closedir(dirp); }
+int ESP3DFlash::closedir(DIR *dirp) { return ::closedir(dirp); }
 
-int Esp3dFlash::stat(const char *filepath, struct stat *entry_stat) {
+int ESP3DFlash::stat(const char *filepath, struct stat *entry_stat) {
   std::string dir_path = mount_point();
   if (strlen(filepath) != 0) {
     if (filepath[0] != '/') {
@@ -173,7 +173,7 @@ int Esp3dFlash::stat(const char *filepath, struct stat *entry_stat) {
   return ::stat(dir_path.c_str(), entry_stat);
 }
 
-bool Esp3dFlash::exists(const char *path) {
+bool ESP3DFlash::exists(const char *path) {
   struct stat entry_stat;
   if (stat(path, &entry_stat) == 0) {
     return true;
@@ -182,7 +182,7 @@ bool Esp3dFlash::exists(const char *path) {
   }
 }
 
-bool Esp3dFlash::remove(const char *path) {
+bool ESP3DFlash::remove(const char *path) {
   std::string file_path = mount_point();
   if (strlen(path) != 0) {
     if (path[0] != '/') {
@@ -193,7 +193,7 @@ bool Esp3dFlash::remove(const char *path) {
   return !unlink(file_path.c_str());
 }
 
-bool Esp3dFlash::mkdir(const char *path) {
+bool ESP3DFlash::mkdir(const char *path) {
   std::string dir_path = mount_point();
   if (strlen(path) != 0) {
     if (path[0] != '/') {
@@ -204,7 +204,7 @@ bool Esp3dFlash::mkdir(const char *path) {
   return !::mkdir(dir_path.c_str(), 0777);
 }
 
-bool Esp3dFlash::rmdir(const char *path) {
+bool ESP3DFlash::rmdir(const char *path) {
   std::string dir_path = mount_point();
   if (strlen(path) != 0) {
     if (path[0] != '/') {
@@ -214,7 +214,7 @@ bool Esp3dFlash::rmdir(const char *path) {
   }
   return !::rmdir(dir_path.c_str());
 }
-bool Esp3dFlash::rename(const char *oldpath, const char *newpath) {
+bool ESP3DFlash::rename(const char *oldpath, const char *newpath) {
   std::string old_path = mount_point();
   std::string new_path = mount_point();
   if (strlen(oldpath) != 0) {
@@ -236,7 +236,7 @@ bool Esp3dFlash::rename(const char *oldpath, const char *newpath) {
   return !::rename(old_path.c_str(), new_path.c_str());
 }
 
-FILE *Esp3dFlash::open(const char *filename, const char *mode) {
+FILE *ESP3DFlash::open(const char *filename, const char *mode) {
   std::string file_path = mount_point();
   if (strlen(filename) != 0) {
     if (filename[0] != '/') {
@@ -247,11 +247,11 @@ FILE *Esp3dFlash::open(const char *filename, const char *mode) {
   return fopen(file_path.c_str(), mode);
 }
 
-struct dirent *Esp3dFlash::readdir(DIR *dir) { return ::readdir(dir); }
+struct dirent *ESP3DFlash::readdir(DIR *dir) { return ::readdir(dir); }
 
-void Esp3dFlash::rewinddir(DIR *dir) { ::rewinddir(dir); }
+void ESP3DFlash::rewinddir(DIR *dir) { ::rewinddir(dir); }
 
-void Esp3dFlash::close(FILE *fd) {
+void ESP3DFlash::close(FILE *fd) {
   fclose(fd);
   fd = nullptr;
 }

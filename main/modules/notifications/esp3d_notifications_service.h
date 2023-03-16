@@ -32,7 +32,7 @@
 extern "C" {
 #endif
 
-enum class Esp3dNotificationError : uint8_t {
+enum class ESP3DNotificationError : uint8_t {
   no_error,
   empty_message,
   invalid_message,
@@ -43,7 +43,7 @@ enum class Esp3dNotificationError : uint8_t {
   error,
 };
 
-enum class Esp3dNotificationType : uint8_t {
+enum class ESP3DNotificationType : uint8_t {
   none,
   pushover,
   email,
@@ -52,10 +52,10 @@ enum class Esp3dNotificationType : uint8_t {
   ifttt
 };
 
-class Esp3dNotificationsService final {
+class ESP3DNotificationsService final {
  public:
-  Esp3dNotificationsService();
-  ~Esp3dNotificationsService();
+  ESP3DNotificationsService();
+  ~ESP3DNotificationsService();
   bool begin(bool sendAutoNotificationMsg = false);
   void handle();
   void end();
@@ -66,12 +66,12 @@ class Esp3dNotificationsService final {
   bool sendTelegramMSG(const char *title, const char *message);
   bool sendIFTTTMSG(const char *title, const char *message);
   const char *getTypeString();
-  Esp3dNotificationType getType() { return _notificationType; }
+  ESP3DNotificationType getType() { return _notificationType; }
   bool started() { return _started; }
   bool isAutonotification() { return _autonotification; };
   void setAutonotification(bool value) { _autonotification = value; };
   bool sendAutoNotification(const char *msg);
-  Esp3dNotificationError getLastError() { return _lastError; }
+  ESP3DNotificationError getLastError() { return _lastError; }
   int perform_tls_handshake(mbedtls_ssl_context *ssl);
   int write_ssl_and_get_response(mbedtls_ssl_context *ssl, unsigned char *buf,
                                  size_t len);
@@ -81,18 +81,18 @@ class Esp3dNotificationsService final {
  private:
   bool _started;
   bool _autonotification;
-  Esp3dNotificationType _notificationType;
+  ESP3DNotificationType _notificationType;
   std::string _token1;
   std::string _token2;
   std::string _settings;
   std::string _serveraddress;
   std::string _port;
   std::string _method;
-  Esp3dNotificationError _lastError;
+  ESP3DNotificationError _lastError;
   bool getEmailInformationsFromSettings();
 };
 
-extern Esp3dNotificationsService esp3dNotificationsService;
+extern ESP3DNotificationsService esp3dNotificationsService;
 #ifdef __cplusplus
 }  // extern "C"
 #endif

@@ -51,11 +51,11 @@
  *  STATIC PROTOTYPES
  **********************/
 
-Esp3dTft::Esp3dTft() {}
+ESP3DTft::ESP3DTft() {}
 
-Esp3dTft::~Esp3dTft() {}
+ESP3DTft::~ESP3DTft() {}
 
-bool Esp3dTft::begin() {
+bool ESP3DTft::begin() {
   // Generic board initialization
   std::string target = TFT_TARGET;
   esp3d_log("Starting ESP3D-TFT on %s ", target.c_str());
@@ -74,7 +74,7 @@ bool Esp3dTft::begin() {
   if (esp3dTftsettings.isValidSettingsNvs()) {
     esp3d_log("NVS is valid");
     char result[50] = {0};
-    if (esp3dTftsettings.readString(Esp3dSettingIndex::esp3d_version, result,
+    if (esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_version, result,
                                     50)) {
       esp3d_log("NVS Setting version is %s", result);
     }
@@ -87,7 +87,7 @@ bool Esp3dTft::begin() {
     }
   }
 #if ESP3D_USB_SERIAL_FEATURE
-  if (esp3dCommands.getOutputClient(true) == Esp3dClientType::usb_serial) {
+  if (esp3dCommands.getOutputClient(true) == ESP3DClientType::usb_serial) {
     bsp_init_usb();
   } else {
     if (bsp_deinit_usb() != ESP_OK) {
@@ -118,6 +118,6 @@ bool Esp3dTft::begin() {
   return success && successFs && successSd;
 }
 
-void Esp3dTft::handle() {}
+void ESP3DTft::handle() {}
 
-bool Esp3dTft::end() { return true; }
+bool ESP3DTft::end() { return true; }

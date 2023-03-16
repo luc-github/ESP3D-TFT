@@ -40,7 +40,7 @@
  **********************/
 static void networkTask(void *pvParameter);
 
-Esp3dTftNetwork esp3dTftnetwork;
+ESP3DTftNetwork esp3dTftnetwork;
 
 /* Creates a semaphore to handle concurrent call to task stuff
  * If you wish to call *any* class function from other threads/tasks
@@ -72,11 +72,11 @@ static void networkTask(void *pvParameter) {
   vTaskDelete(NULL);
 }
 
-Esp3dTftNetwork::Esp3dTftNetwork() {}
+ESP3DTftNetwork::ESP3DTftNetwork() {}
 
-Esp3dTftNetwork::~Esp3dTftNetwork() {}
+ESP3DTftNetwork::~ESP3DTftNetwork() {}
 
-bool Esp3dTftNetwork::begin() {
+bool ESP3DTftNetwork::begin() {
   esp3d_log("Free mem %ld", esp_get_minimum_free_heap_size());
   // Ui creation
   TaskHandle_t xHandle = NULL;
@@ -94,6 +94,6 @@ bool Esp3dTftNetwork::begin() {
   }
 }
 
-void Esp3dTftNetwork::handle() {}
+void ESP3DTftNetwork::handle() {}
 
-bool Esp3dTftNetwork::end() { return true; }
+bool ESP3DTftNetwork::end() { return true; }

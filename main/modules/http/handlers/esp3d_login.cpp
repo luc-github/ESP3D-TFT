@@ -28,7 +28,7 @@
 #include "http/esp3d_http_service.h"
 #include "network/esp3d_network.h"
 
-esp_err_t Esp3dHttpService::login_handler(httpd_req_t *req) {
+esp_err_t ESP3DHttpService::login_handler(httpd_req_t *req) {
   esp3d_log("Uri: %s", req->uri);
 #if ESP3D_AUTHENTICATION_FEATURE
   std::string tmpstr;
@@ -40,18 +40,18 @@ esp_err_t Esp3dHttpService::login_handler(httpd_req_t *req) {
     }
   }
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
-  Esp3dAuthenticationLevel level = getAuthenticationLevel(req);
+  ESP3DAuthenticationLevel level = getAuthenticationLevel(req);
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (level == Esp3dAuthenticationLevel::guest) {
+  if (level == ESP3DAuthenticationLevel::guest) {
     // send 401
     return not_authenticated_handler(req);
   }
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
   // send 200
   std::string resp = "{\"status\":\"ok\",\"authentication_lvl\":\"";
-  if (level == Esp3dAuthenticationLevel::admin) {
+  if (level == ESP3DAuthenticationLevel::admin) {
     resp += "admin";
-  } else if (level == Esp3dAuthenticationLevel::user) {
+  } else if (level == ESP3DAuthenticationLevel::user) {
     resp += "user";
   } else {
     resp += "guest";

@@ -34,7 +34,7 @@
 #include "esp3d_sd.h"
 #endif  // ESP3D_SD_CARD_FEATURE
 
-Esp3dGlobalFileSystem globalFs;
+ESP3DGlobalFileSystem globalFs;
 #define GLOBAL_ROOT_DIR_ID 8888
 #define GLOBAL_FLASH_DIR_ID 1111
 #if ESP3D_SD_CARD_FEATURE
@@ -48,28 +48,28 @@ const char *rootDirsHeaders[] = {ESP3D_FLASH_FS_HEADER
 #endif  // ESP3D_SD_CARD_FEATURE
 };
 uint8_t rootDirsHeadersSize = sizeof(rootDirsHeaders) / sizeof(char *);
-const Esp3dFileSystemType rootDirsFSType[] = {Esp3dFileSystemType::flash
+const ESP3DFileSystemType rootDirsFSType[] = {ESP3DFileSystemType::flash
 #if ESP3D_SD_CARD_FEATURE
                                               ,
-                                              Esp3dFileSystemType::sd
+                                              ESP3DFileSystemType::sd
 #endif  // ESP3D_SD_CARD_FEATURE
 };
 
-Esp3dGlobalFileSystem::Esp3dGlobalFileSystem() {
+ESP3DGlobalFileSystem::ESP3DGlobalFileSystem() {
   _rootDir.dd_vfs_idx = (uint16_t)-1;
   _rootDir.dd_rsv = GLOBAL_ROOT_DIR_ID;
   rewinddir(&_rootDir);
 }
 
-const char *Esp3dGlobalFileSystem::mount_point(Esp3dFileSystemType fstype) {
+const char *ESP3DGlobalFileSystem::mount_point(ESP3DFileSystemType fstype) {
   switch (fstype) {
-    case Esp3dFileSystemType::root:
+    case ESP3DFileSystemType::root:
       return "/";
 #if ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::sd:
+    case ESP3DFileSystemType::sd:
       return sd.mount_point();
 #endif  // ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::flash:
+    case ESP3DFileSystemType::flash:
       return flashFs.mount_point();
     default:
       break;
@@ -77,12 +77,12 @@ const char *Esp3dGlobalFileSystem::mount_point(Esp3dFileSystemType fstype) {
   return "/";
 }
 
-Esp3dFileSystemType Esp3dGlobalFileSystem::getFSType(const char *path) {
+ESP3DFileSystemType ESP3DGlobalFileSystem::getFSType(const char *path) {
   if (!path || strlen(path) == 0) {
-    return Esp3dFileSystemType::unknown;
+    return ESP3DFileSystemType::unknown;
   }
   if (strlen(path) == 1 && path[0] == '/') {
-    return Esp3dFileSystemType::root;
+    return ESP3DFileSystemType::root;
   }
   std::string fullPath;
   if (path[0] != '/') {
@@ -106,20 +106,20 @@ Esp3dFileSystemType Esp3dGlobalFileSystem::getFSType(const char *path) {
       }
     }
   }
-  return Esp3dFileSystemType::unknown;
+  return ESP3DFileSystemType::unknown;
 }
 
-bool Esp3dGlobalFileSystem::accessFS(const char *path) {
-  Esp3dFileSystemType fstype = getFSType(path);
+bool ESP3DGlobalFileSystem::accessFS(const char *path) {
+  ESP3DFileSystemType fstype = getFSType(path);
   switch (fstype) {
-    case Esp3dFileSystemType::root:
+    case ESP3DFileSystemType::root:
       return true;
       break;
 #if ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::sd:
+    case ESP3DFileSystemType::sd:
       return sd.accessFS();
 #endif  // ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::flash:
+    case ESP3DFileSystemType::flash:
       return flashFs.accessFS();
     default:
       break;
@@ -127,17 +127,17 @@ bool Esp3dGlobalFileSystem::accessFS(const char *path) {
   return false;
 }
 
-void Esp3dGlobalFileSystem::releaseFS(const char *path) {
-  Esp3dFileSystemType fstype = getFSType(path);
+void ESP3DGlobalFileSystem::releaseFS(const char *path) {
+  ESP3DFileSystemType fstype = getFSType(path);
   switch (fstype) {
-    case Esp3dFileSystemType::root:
+    case ESP3DFileSystemType::root:
       break;
 #if ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::sd:
+    case ESP3DFileSystemType::sd:
       sd.releaseFS();
       break;
 #endif  // ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::flash:
+    case ESP3DFileSystemType::flash:
       flashFs.releaseFS();
       break;
     default:
@@ -145,54 +145,54 @@ void Esp3dGlobalFileSystem::releaseFS(const char *path) {
   }
 }
 
-bool Esp3dGlobalFileSystem::begin() { return true; }
+bool ESP3DGlobalFileSystem::begin() { return true; }
 
-const char *Esp3dGlobalFileSystem::getFileSystemName(char *path) {
-  Esp3dFileSystemType fstype = getFSType(path);
+const char *ESP3DGlobalFileSystem::getFileSystemName(char *path) {
+  ESP3DFileSystemType fstype = getFSType(path);
   switch (fstype) {
-    case Esp3dFileSystemType::root:
+    case ESP3DFileSystemType::root:
       return "Global";
       break;
 #if ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::sd:
+    case ESP3DFileSystemType::sd:
       return sd.getFileSystemName();
 #endif  // ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::flash:
+    case ESP3DFileSystemType::flash:
       return flashFs.getFileSystemName();
     default:
       break;
   }
   return "Unknown";
 }
-uint Esp3dGlobalFileSystem::maxPathLength(Esp3dFileSystemType fstype) {
+uint ESP3DGlobalFileSystem::maxPathLength(ESP3DFileSystemType fstype) {
   switch (fstype) {
-    case Esp3dFileSystemType::root:
+    case ESP3DFileSystemType::root:
       return 0;
 #if ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::sd:
+    case ESP3DFileSystemType::sd:
       return sd.maxPathLength();
 #endif  // ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::flash:
+    case ESP3DFileSystemType::flash:
       return flashFs.maxPathLength();
     default:
       break;
   }
   return false;
 }
-bool Esp3dGlobalFileSystem::getSpaceInfo(uint64_t *totalBytes,
+bool ESP3DGlobalFileSystem::getSpaceInfo(uint64_t *totalBytes,
                                          uint64_t *usedBytes,
                                          uint64_t *freeBytes, const char *path,
                                          bool refreshStats) {
-  Esp3dFileSystemType fstype = getFSType(path);
+  ESP3DFileSystemType fstype = getFSType(path);
   switch (fstype) {
-    case Esp3dFileSystemType::root:
+    case ESP3DFileSystemType::root:
       return false;
       break;
 #if ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::sd:
+    case ESP3DFileSystemType::sd:
       return sd.getSpaceInfo(totalBytes, usedBytes, freeBytes, refreshStats);
 #endif  // ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::flash: {
+    case ESP3DFileSystemType::flash: {
       size_t total_Bytes;
       size_t used_Bytes;
       size_t free_Bytes;
@@ -227,15 +227,15 @@ bool Esp3dGlobalFileSystem::getSpaceInfo(uint64_t *totalBytes,
   return false;
 }
 
-DIR *Esp3dGlobalFileSystem::opendir(const char *dirpath) {
-  Esp3dFileSystemType fstype = getFSType(dirpath);
+DIR *ESP3DGlobalFileSystem::opendir(const char *dirpath) {
+  ESP3DFileSystemType fstype = getFSType(dirpath);
   switch (fstype) {
-    case Esp3dFileSystemType::root:
+    case ESP3DFileSystemType::root:
       rewinddir(&_rootDir);
       return &_rootDir;
       break;
 #if ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::sd: {
+    case ESP3DFileSystemType::sd: {
       DIR *dirfd = sd.opendir(&dirpath[strlen(ESP3D_SD_FS_HEADER) - 1]);
       if (dirfd) {
         dirfd->dd_rsv = GLOBAL_SD_DIR_ID;
@@ -244,7 +244,7 @@ DIR *Esp3dGlobalFileSystem::opendir(const char *dirpath) {
     }
 #endif  // ESP3D_SD_CARD_FEATURE
     break;
-    case Esp3dFileSystemType::flash: {
+    case ESP3DFileSystemType::flash: {
       DIR *dirfd = flashFs.opendir(&dirpath[strlen(ESP3D_FLASH_FS_HEADER) - 1]);
       if (dirfd) {
         dirfd->dd_rsv = GLOBAL_FLASH_DIR_ID;
@@ -256,7 +256,7 @@ DIR *Esp3dGlobalFileSystem::opendir(const char *dirpath) {
   }
   return NULL;
 }
-int Esp3dGlobalFileSystem::closedir(DIR *dirp) {
+int ESP3DGlobalFileSystem::closedir(DIR *dirp) {
   if (dirp) {
     switch (dirp->dd_rsv) {
       case GLOBAL_ROOT_DIR_ID:
@@ -273,18 +273,18 @@ int Esp3dGlobalFileSystem::closedir(DIR *dirp) {
   }
   return -1;
 }
-int Esp3dGlobalFileSystem::stat(const char *filepath, struct stat *entry_stat) {
+int ESP3DGlobalFileSystem::stat(const char *filepath, struct stat *entry_stat) {
   esp3d_log("stat for %s", filepath);
-  Esp3dFileSystemType fstype = getFSType(filepath);
+  ESP3DFileSystemType fstype = getFSType(filepath);
   switch (fstype) {
-    case Esp3dFileSystemType::root:
+    case ESP3DFileSystemType::root:
       return -1;
 #if ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::sd:
+    case ESP3DFileSystemType::sd:
       esp3d_log("Is SD %s", filepath);
       return sd.stat(&filepath[strlen(ESP3D_SD_FS_HEADER) - 1], entry_stat);
 #endif  // ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::flash:
+    case ESP3DFileSystemType::flash:
       return flashFs.stat(&filepath[strlen(ESP3D_FLASH_FS_HEADER) - 1],
                           entry_stat);
     default:
@@ -293,19 +293,19 @@ int Esp3dGlobalFileSystem::stat(const char *filepath, struct stat *entry_stat) {
   return -1;
 }
 
-bool Esp3dGlobalFileSystem::exists(const char *path) {
-  Esp3dFileSystemType fstype = getFSType(path);
+bool ESP3DGlobalFileSystem::exists(const char *path) {
+  ESP3DFileSystemType fstype = getFSType(path);
   switch (fstype) {
-    case Esp3dFileSystemType::root:
+    case ESP3DFileSystemType::root:
       if (strlen(path) == 0 && path[0] == '/') {
         return true;
       }
       break;
 #if ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::sd:
+    case ESP3DFileSystemType::sd:
       return sd.exists(&path[strlen(ESP3D_SD_FS_HEADER) - 1]);
 #endif  // ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::flash:
+    case ESP3DFileSystemType::flash:
       return flashFs.exists(&path[strlen(ESP3D_FLASH_FS_HEADER) - 1]);
     default:
       break;
@@ -313,16 +313,16 @@ bool Esp3dGlobalFileSystem::exists(const char *path) {
   return false;
 }
 
-bool Esp3dGlobalFileSystem::remove(const char *path) {
-  Esp3dFileSystemType fstype = getFSType(path);
+bool ESP3DGlobalFileSystem::remove(const char *path) {
+  ESP3DFileSystemType fstype = getFSType(path);
   switch (fstype) {
-    case Esp3dFileSystemType::root:
+    case ESP3DFileSystemType::root:
       break;
 #if ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::sd:
+    case ESP3DFileSystemType::sd:
       return sd.remove(&path[strlen(ESP3D_SD_FS_HEADER) - 1]);
 #endif  // ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::flash:
+    case ESP3DFileSystemType::flash:
       return flashFs.remove(&path[strlen(ESP3D_FLASH_FS_HEADER) - 1]);
     default:
       break;
@@ -330,16 +330,16 @@ bool Esp3dGlobalFileSystem::remove(const char *path) {
   return false;
 }
 
-bool Esp3dGlobalFileSystem::mkdir(const char *dirpath) {
-  Esp3dFileSystemType fstype = getFSType(dirpath);
+bool ESP3DGlobalFileSystem::mkdir(const char *dirpath) {
+  ESP3DFileSystemType fstype = getFSType(dirpath);
   switch (fstype) {
-    case Esp3dFileSystemType::root:
+    case ESP3DFileSystemType::root:
       break;
 #if ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::sd:
+    case ESP3DFileSystemType::sd:
       return sd.mkdir(&dirpath[strlen(ESP3D_SD_FS_HEADER) - 1]);
 #endif  // ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::flash:
+    case ESP3DFileSystemType::flash:
       return flashFs.mkdir(&dirpath[strlen(ESP3D_FLASH_FS_HEADER) - 1]);
     default:
       break;
@@ -347,16 +347,16 @@ bool Esp3dGlobalFileSystem::mkdir(const char *dirpath) {
   return false;
 }
 
-bool Esp3dGlobalFileSystem::rmdir(const char *dirpath) {
-  Esp3dFileSystemType fstype = getFSType(dirpath);
+bool ESP3DGlobalFileSystem::rmdir(const char *dirpath) {
+  ESP3DFileSystemType fstype = getFSType(dirpath);
   switch (fstype) {
-    case Esp3dFileSystemType::root:
+    case ESP3DFileSystemType::root:
       break;
 #if ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::sd:
+    case ESP3DFileSystemType::sd:
       return sd.rmdir(&dirpath[strlen(ESP3D_SD_FS_HEADER) - 1]);
 #endif  // ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::flash:
+    case ESP3DFileSystemType::flash:
       return flashFs.rmdir(&dirpath[strlen(ESP3D_FLASH_FS_HEADER) - 1]);
     default:
       break;
@@ -364,19 +364,19 @@ bool Esp3dGlobalFileSystem::rmdir(const char *dirpath) {
   return false;
 }
 
-bool Esp3dGlobalFileSystem::rename(const char *oldpath, const char *newpath) {
-  Esp3dFileSystemType fstypeold = getFSType(oldpath);
-  Esp3dFileSystemType fstypenew = getFSType(newpath);
+bool ESP3DGlobalFileSystem::rename(const char *oldpath, const char *newpath) {
+  ESP3DFileSystemType fstypeold = getFSType(oldpath);
+  ESP3DFileSystemType fstypenew = getFSType(newpath);
   if (fstypeold == fstypenew) {
     switch (fstypeold) {
-      case Esp3dFileSystemType::root:
+      case ESP3DFileSystemType::root:
         break;
 #if ESP3D_SD_CARD_FEATURE
-      case Esp3dFileSystemType::sd:
+      case ESP3DFileSystemType::sd:
         return sd.rename(&oldpath[strlen(ESP3D_SD_FS_HEADER) - 1],
                          &newpath[strlen(ESP3D_SD_FS_HEADER) - 1]);
 #endif  // ESP3D_SD_CARD_FEATURE
-      case Esp3dFileSystemType::flash:
+      case ESP3DFileSystemType::flash:
         return flashFs.rename(&oldpath[strlen(ESP3D_FLASH_FS_HEADER) - 1],
                               &newpath[strlen(ESP3D_FLASH_FS_HEADER) - 1]);
       default:
@@ -386,7 +386,7 @@ bool Esp3dGlobalFileSystem::rename(const char *oldpath, const char *newpath) {
   return false;
 }
 
-struct dirent *Esp3dGlobalFileSystem::readdir(DIR *dirp) {
+struct dirent *ESP3DGlobalFileSystem::readdir(DIR *dirp) {
   if (dirp) {
     switch (dirp->dd_rsv) {
       case GLOBAL_ROOT_DIR_ID:
@@ -413,7 +413,7 @@ struct dirent *Esp3dGlobalFileSystem::readdir(DIR *dirp) {
   return NULL;
 }
 
-void Esp3dGlobalFileSystem::rewinddir(DIR *dirp) {
+void ESP3DGlobalFileSystem::rewinddir(DIR *dirp) {
   if (!dirp) {
     return;
   }
@@ -438,16 +438,16 @@ void Esp3dGlobalFileSystem::rewinddir(DIR *dirp) {
   }
 }
 
-FILE *Esp3dGlobalFileSystem::open(const char *filename, const char *mode) {
-  Esp3dFileSystemType fstype = getFSType(filename);
+FILE *ESP3DGlobalFileSystem::open(const char *filename, const char *mode) {
+  ESP3DFileSystemType fstype = getFSType(filename);
   switch (fstype) {
-    case Esp3dFileSystemType::root:
+    case ESP3DFileSystemType::root:
       break;
 #if ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::sd:
+    case ESP3DFileSystemType::sd:
       return sd.open(&filename[strlen(ESP3D_SD_FS_HEADER) - 1], mode);
 #endif  // ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::flash:
+    case ESP3DFileSystemType::flash:
       return flashFs.open(&filename[strlen(ESP3D_FLASH_FS_HEADER) - 1], mode);
     default:
       break;
@@ -455,17 +455,17 @@ FILE *Esp3dGlobalFileSystem::open(const char *filename, const char *mode) {
   return NULL;
 }
 
-void Esp3dGlobalFileSystem::close(FILE *fd, const char *filename) {
-  Esp3dFileSystemType fstype = getFSType(filename);
+void ESP3DGlobalFileSystem::close(FILE *fd, const char *filename) {
+  ESP3DFileSystemType fstype = getFSType(filename);
   switch (fstype) {
-    case Esp3dFileSystemType::root:
+    case ESP3DFileSystemType::root:
       break;
 #if ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::sd:
+    case ESP3DFileSystemType::sd:
       sd.close(fd);
       break;
 #endif  // ESP3D_SD_CARD_FEATURE
-    case Esp3dFileSystemType::flash:
+    case ESP3DFileSystemType::flash:
       flashFs.close(fd);
       break;
     default:

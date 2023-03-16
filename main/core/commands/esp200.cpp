@@ -26,12 +26,12 @@
 #define COMMAND_ID 200
 // Get SD Card Status
 //[ESP200]<RELEASE> <REFRESH> pwd=<user/admin password>
-void Esp3dCommands::ESP200(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP200(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool isRelease = hasTag(msg, cmd_params_pos, "RELEASE");
   bool isRefresh = hasTag(msg, cmd_params_pos, "REFRESH");
   bool json = hasTag(msg, cmd_params_pos, "json");
@@ -40,8 +40,8 @@ void Esp3dCommands::ESP200(int cmd_params_pos, Esp3dMessage* msg) {
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
-    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
+    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
@@ -61,15 +61,15 @@ void Esp3dCommands::ESP200(int cmd_params_pos, Esp3dMessage* msg) {
     if (tmpstr.length() != 0) {
       hasError = true;
     } else {
-      Esp3dSdState state = sd.getState();
+      ESP3DSdState state = sd.getState();
       switch (state) {
-        case Esp3dSdState::idle:
+        case ESP3DSdState::idle:
           ok_msg = "SD card ok";
           break;
-        case Esp3dSdState::not_present:
+        case ESP3DSdState::not_present:
           ok_msg = "No SD card";
           break;
-        case Esp3dSdState::busy:
+        case ESP3DSdState::busy:
           ok_msg = "Busy";
           break;
         default:

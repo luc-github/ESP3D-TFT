@@ -26,12 +26,12 @@
 #define COMMAND_ID 105
 // AP SSID
 //[ESP105]<SSID> json=no pwd=<admin password>
-void Esp3dCommands::ESP105(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP105(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
@@ -39,18 +39,18 @@ void Esp3dCommands::ESP105(int cmd_params_pos, Esp3dMessage* msg) {
   std::string tmpstr;
   char out_str[255] = {0};
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
-    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
+    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
-    const Esp3dSettingDescription* settingPtr =
-        esp3dTftsettings.getSettingPtr(Esp3dSettingIndex::esp3d_ap_ssid);
+    const ESP3DSettingDescription* settingPtr =
+        esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_ap_ssid);
     if (settingPtr) {
-      ok_msg = esp3dTftsettings.readString(Esp3dSettingIndex::esp3d_ap_ssid,
+      ok_msg = esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_ap_ssid,
                                            out_str, settingPtr->size);
     } else {
       hasError = true;
@@ -60,11 +60,11 @@ void Esp3dCommands::ESP105(int cmd_params_pos, Esp3dMessage* msg) {
     esp3d_log("got %s param for a value of %s, is valid %d", tmpstr.c_str(),
               tmpstr.c_str(),
               esp3dTftsettings.isValidStringSetting(
-                  tmpstr.c_str(), Esp3dSettingIndex::esp3d_ap_ssid));
+                  tmpstr.c_str(), ESP3DSettingIndex::esp3d_ap_ssid));
     if (esp3dTftsettings.isValidStringSetting(
-            tmpstr.c_str(), Esp3dSettingIndex::esp3d_ap_ssid)) {
+            tmpstr.c_str(), ESP3DSettingIndex::esp3d_ap_ssid)) {
       esp3d_log("Value %s is valid", tmpstr.c_str());
-      if (!esp3dTftsettings.writeString(Esp3dSettingIndex::esp3d_ap_ssid,
+      if (!esp3dTftsettings.writeString(ESP3DSettingIndex::esp3d_ap_ssid,
                                         tmpstr.c_str())) {
         hasError = true;
         error_msg = "Set value failed";

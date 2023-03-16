@@ -21,10 +21,10 @@
 #include "esp3d_string.h"
 #include "http/esp3d_http_service.h"
 
-esp_err_t Esp3dHttpService::root_get_handler(httpd_req_t *req) {
+esp_err_t ESP3DHttpService::root_get_handler(httpd_req_t *req) {
   // not blocking
 #if ESP3D_AUTHENTICATION_FEATURE
-  Esp3dAuthenticationLevel level = getAuthenticationLevel(req);
+  ESP3DAuthenticationLevel level = getAuthenticationLevel(req);
   esp3d_log("Uri: %s, %d", req->uri, static_cast<uint8_t>(level));
   (void)level;
 #endif  // ESP3D_AUTHENTICATION_FEATURE

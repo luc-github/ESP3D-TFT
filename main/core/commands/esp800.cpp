@@ -41,17 +41,17 @@
 // eventually set time with pc time
 // output is JSON or plain text according parameter
 //[ESP800]json=<no> <time=YYYY-MM-DDTHH:mm:ss> <version=3.0.0-a11> <setup=0/1>
-void Esp3dCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP800(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   std::string timeparam = get_param(msg, cmd_params_pos, "time=");
   std::string setupparam = get_param(msg, cmd_params_pos, "setup=");
   bool json = hasTag(msg, cmd_params_pos, "json");
   std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
+  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
@@ -60,7 +60,7 @@ void Esp3dCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
     // TODO: init time parameter
   }
   if (setupparam.length() > 0) {
-    if (!esp3dTftsettings.writeByte(Esp3dSettingIndex::esp3d_setup,
+    if (!esp3dTftsettings.writeByte(ESP3DSettingIndex::esp3d_setup,
                                     setupparam == "1" ? 1 : 0)) {
       // not blocking error
       esp3d_log_e("Error writing setup state");
@@ -72,7 +72,7 @@ void Esp3dCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
   } else {
     tmpstr = "Capabilities:\n";
   }
-  msg->type = Esp3dMessageType::head;
+  msg->type = ESP3DMessageType::head;
   if (!dispatch(msg, tmpstr.c_str())) {
     esp3d_log_e("Error sending response to clients");
     return;
@@ -83,9 +83,9 @@ void Esp3dCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
     return;
   }
   uint8_t b =
-      esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_target_firmware);
+      esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_target_firmware);
   // FWTarget
-  tmpstr = esp3dTftsettings.GetFirmwareTargetShortName((Esp3dTargetFirmware)b);
+  tmpstr = esp3dTftsettings.GetFirmwareTargetShortName((ESP3DTargetFirmware)b);
   if (!dispatchKeyValue(json, "FWTarget", tmpstr.c_str(), target, requestId)) {
     return;
   }
@@ -97,7 +97,7 @@ void Esp3dCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
   }
 
   // Setup
-  tmpstr = esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_setup) == 1
+  tmpstr = esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_setup) == 1
                ? "Enabled"
                : "Disabled";
   if (!dispatchKeyValue(json, "Setup", tmpstr.c_str(), target, requestId)) {
@@ -137,7 +137,7 @@ void Esp3dCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
   }
 
   // WebSocketIP
-  Esp3dIpInfos ipInfo;
+  ESP3DIpInfos ipInfo;
   if (esp3dNetwork.getLocalIp(&ipInfo)) {
     tmpstr = ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.ip_info.ip));
     if (!dispatchKeyValue(json, "WebSocketIP", tmpstr.c_str(), target,
@@ -145,7 +145,7 @@ void Esp3dCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
       return;
     }
     uint32_t intValue =
-        esp3dTftsettings.readUint32(Esp3dSettingIndex::esp3d_http_port);
+        esp3dTftsettings.readUint32(ESP3DSettingIndex::esp3d_http_port);
     tmpstr = std::to_string(intValue);
     if (!dispatchKeyValue(json, "WebSocketPort", tmpstr.c_str(), target,
                           requestId)) {
@@ -154,11 +154,11 @@ void Esp3dCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
   }
 #endif  // ESP3D_HTTP_FEATURE
   // Hostname
-  const Esp3dSettingDescription* settingPtr =
-      esp3dTftsettings.getSettingPtr(Esp3dSettingIndex::esp3d_hostname);
+  const ESP3DSettingDescription* settingPtr =
+      esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_hostname);
   if (settingPtr) {
     char out_str[(settingPtr->size) + 1] = {0};
-    tmpstr = esp3dTftsettings.readString(Esp3dSettingIndex::esp3d_hostname,
+    tmpstr = esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_hostname,
                                          out_str, settingPtr->size);
   } else {
     tmpstr = "Error!!";
@@ -170,20 +170,20 @@ void Esp3dCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
   // WiFiMode
   switch (esp3dNetwork.getMode()) {
 #if ESP3D_WIFI_FEATURE
-    case Esp3dRadioMode::wifi_sta:
+    case ESP3DRadioMode::wifi_sta:
       tmpstr = "STA";
       break;
-    case Esp3dRadioMode::wifi_ap:
+    case ESP3DRadioMode::wifi_ap:
       tmpstr = "AP";
       break;
-    case Esp3dRadioMode::wifi_ap_config:
+    case ESP3DRadioMode::wifi_ap_config:
       tmpstr = "CONFIG";
       break;
 #endif  // ESP3D_WIFI_FEATURE
-    case Esp3dRadioMode::off:
+    case ESP3DRadioMode::off:
       tmpstr = "RADIO OFF";
       break;
-    case Esp3dRadioMode::bluetooth_serial:
+    case ESP3DRadioMode::bluetooth_serial:
       tmpstr = "BT";
       break;
     default:
@@ -223,12 +223,12 @@ void Esp3dCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
   }
   // end of list
   if (json) {
-    if (!dispatch("}}", target, requestId, Esp3dMessageType::tail)) {
+    if (!dispatch("}}", target, requestId, ESP3DMessageType::tail)) {
       esp3d_log_e("Error sending answer to clients");
     }
   } else {
     {
-      if (!dispatch("ok\n", target, requestId, Esp3dMessageType::tail)) {
+      if (!dispatch("ok\n", target, requestId, ESP3DMessageType::tail)) {
         esp3d_log_e("Error sending answer to clients");
       }
     }

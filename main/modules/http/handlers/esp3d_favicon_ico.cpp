@@ -21,7 +21,7 @@
 #include "esp3d_string.h"
 #include "http/esp3d_http_service.h"
 
-esp_err_t Esp3dHttpService::favicon_ico_handler(httpd_req_t *req) {
+esp_err_t ESP3DHttpService::favicon_ico_handler(httpd_req_t *req) {
   // No authentication for this URL
   esp3d_log("Uri: %s", req->uri);
   esp_err_t err = esp3dHttpService.streamFile("/fs/favicon.ico", req);

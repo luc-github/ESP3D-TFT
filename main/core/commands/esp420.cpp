@@ -66,16 +66,16 @@
 // Get ESP current status
 // output is JSON or plain text according parameter
 //[ESP420]json=<no>
-void Esp3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP420(int cmd_params_pos, ESP3DMessage *msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool json = hasTag(msg, cmd_params_pos, "json");
   bool addPreTag = hasTag(msg, cmd_params_pos, "addPreTag");
   std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
+  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
@@ -90,7 +90,7 @@ void Esp3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
       tmpstr = "Configuration:\n";
     }
   }
-  msg->type = Esp3dMessageType::head;
+  msg->type = ESP3DMessageType::head;
   if (!dispatch(msg, tmpstr.c_str())) {
     esp3d_log_e("Error sending response to clients");
     return;
@@ -157,9 +157,9 @@ void Esp3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
   }
 #if ESP3D_SD_CARD_FEATURE
   // SD updater
-  Esp3dState statesetting = (Esp3dState)esp3dTftsettings.readByte(
-      Esp3dSettingIndex::esp3d_check_update_on_sd);
-  if (statesetting == Esp3dState::off) {
+  ESP3DState statesetting = (ESP3DState)esp3dTftsettings.readByte(
+      ESP3DSettingIndex::esp3d_check_update_on_sd);
+  if (statesetting == ESP3DState::off) {
     tmpstr = "OFF";
   } else {
     tmpstr = "ON";
@@ -186,25 +186,25 @@ void Esp3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
     return;
   }
 
-  if (esp3dCommands.getOutputClient() == Esp3dClientType::serial) {
+  if (esp3dCommands.getOutputClient() == ESP3DClientType::serial) {
     if (!dispatchIdValue(json, "output", "serial port", target, requestId)) {
       return;
     }
     // Serial BaudRate
     uint32_t baud =
-        esp3dTftsettings.readUint32(Esp3dSettingIndex::esp3d_baud_rate);
+        esp3dTftsettings.readUint32(ESP3DSettingIndex::esp3d_baud_rate);
     tmpstr = std::to_string(baud);
     if (!dispatchIdValue(json, "baud", tmpstr.c_str(), target, requestId)) {
       return;
     }
   }
 #if ESP3D_USB_SERIAL_FEATURE
-  else if (esp3dCommands.getOutputClient() == Esp3dClientType::usb_serial) {
+  else if (esp3dCommands.getOutputClient() == ESP3DClientType::usb_serial) {
     if (!dispatchIdValue(json, "output", "usb port", target, requestId)) {
       return;
     }
     uint32_t baud = esp3dTftsettings.readUint32(
-        Esp3dSettingIndex::esp3d_usb_serial_baud_rate);
+        ESP3DSettingIndex::esp3d_usb_serial_baud_rate);
     tmpstr = std::to_string(baud);
     if (!dispatchIdValue(json, "baud", tmpstr.c_str(), target, requestId)) {
       return;
@@ -218,8 +218,8 @@ void Esp3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
 #endif  // #if ESP3D_USB_SERIAL
 
   // wifi
-  if (esp3dNetwork.getMode() == Esp3dRadioMode::off ||
-      esp3dNetwork.getMode() == Esp3dRadioMode::bluetooth_serial) {
+  if (esp3dNetwork.getMode() == ESP3DRadioMode::off ||
+      esp3dNetwork.getMode() == ESP3DRadioMode::bluetooth_serial) {
     tmpstr = "OFF";
   } else {
     tmpstr = "ON";
@@ -229,11 +229,11 @@ void Esp3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
   }
 
   // hostname
-  const Esp3dSettingDescription *settingPtr =
-      esp3dTftsettings.getSettingPtr(Esp3dSettingIndex::esp3d_hostname);
+  const ESP3DSettingDescription *settingPtr =
+      esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_hostname);
   if (settingPtr) {
     char out_str[(settingPtr->size) + 1] = {0};
-    tmpstr = esp3dTftsettings.readString(Esp3dSettingIndex::esp3d_hostname,
+    tmpstr = esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_hostname,
                                          out_str, settingPtr->size);
   } else {
     tmpstr = "Error!!";
@@ -243,7 +243,7 @@ void Esp3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
   }
 #if ESP3D_WIFI_FEATURE
   // sta
-  if (esp3dNetwork.getMode() == Esp3dRadioMode::wifi_sta) {
+  if (esp3dNetwork.getMode() == ESP3DRadioMode::wifi_sta) {
     tmpstr = "ON";
   } else {
     tmpstr = "OFF";
@@ -256,7 +256,7 @@ void Esp3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
     return;
   }
 
-  if (esp3dNetwork.getMode() == Esp3dRadioMode::wifi_sta) {
+  if (esp3dNetwork.getMode() == ESP3DRadioMode::wifi_sta) {
     wifi_ap_record_t ap;
     esp_err_t res = esp_wifi_sta_get_ap_info(&ap);
     if (res == ESP_OK) {
@@ -292,7 +292,7 @@ void Esp3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
     if (!dispatchIdValue(json, "ip mode", tmpstr.c_str(), target, requestId)) {
       return;
     }
-    Esp3dIpInfos ipInfo;
+    ESP3DIpInfos ipInfo;
     if (esp3dNetwork.getLocalIp(&ipInfo)) {
       tmpstr = ip4addr_ntoa((const ip4_addr_t *)&(ipInfo.ip_info.ip));
       if (!dispatchIdValue(json, "ip", tmpstr.c_str(), target, requestId)) {
@@ -314,8 +314,8 @@ void Esp3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
     }
   }
   // ap
-  if (esp3dNetwork.getMode() == Esp3dRadioMode::wifi_ap ||
-      esp3dNetwork.getMode() == Esp3dRadioMode::wifi_ap_config) {
+  if (esp3dNetwork.getMode() == ESP3DRadioMode::wifi_ap ||
+      esp3dNetwork.getMode() == ESP3DRadioMode::wifi_ap_config) {
     tmpstr = "ON";
   } else {
     tmpstr = "OFF";
@@ -327,13 +327,13 @@ void Esp3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
   if (!dispatchIdValue(json, "ap", tmpstr.c_str(), target, requestId)) {
     return;
   }
-  if (esp3dNetwork.getMode() == Esp3dRadioMode::wifi_ap_config) {
+  if (esp3dNetwork.getMode() == ESP3DRadioMode::wifi_ap_config) {
     if (!dispatchIdValue(json, "config", "ON", target, requestId)) {
       return;
     }
   }
-  if (esp3dNetwork.getMode() == Esp3dRadioMode::wifi_ap ||
-      esp3dNetwork.getMode() == Esp3dRadioMode::wifi_ap_config) {
+  if (esp3dNetwork.getMode() == ESP3DRadioMode::wifi_ap ||
+      esp3dNetwork.getMode() == ESP3DRadioMode::wifi_ap_config) {
     wifi_config_t wconfig;
     esp_err_t res = esp_wifi_get_config(WIFI_IF_AP, &wconfig);
     if (res == ESP_OK) {
@@ -349,7 +349,7 @@ void Esp3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
         return;
       }
     }
-    Esp3dIpInfos ipInfo;
+    ESP3DIpInfos ipInfo;
     if (esp3dNetwork.getLocalIp(&ipInfo)) {
       tmpstr = ip4addr_ntoa((const ip4_addr_t *)&(ipInfo.ip_info.ip));
       if (!dispatchIdValue(json, "ip", tmpstr.c_str(), target, requestId)) {
@@ -399,7 +399,7 @@ void Esp3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
   }
 #endif  // ESP3D_WIFI_FEATURE
   // bt
-  if (esp3dNetwork.getMode() == Esp3dRadioMode::bluetooth_serial) {
+  if (esp3dNetwork.getMode() == ESP3DRadioMode::bluetooth_serial) {
     tmpstr = "ON";
   } else {
     tmpstr = "OFF";
@@ -517,7 +517,7 @@ void Esp3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
 #if ESP3D_NOTIFICATIONS_FEATURE
   // Notifications
   if (!esp3dNotificationsService.started() ||
-      esp3dNotificationsService.getType() == Esp3dNotificationType::none) {
+      esp3dNotificationsService.getType() == ESP3DNotificationType::none) {
     tmpstr = "OFF";
   } else {
     tmpstr = "ON (";
@@ -532,7 +532,7 @@ void Esp3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
   // end of list
   if (json) {
-    if (!dispatch("]}", target, requestId, Esp3dMessageType::tail)) {
+    if (!dispatch("]}", target, requestId, ESP3DMessageType::tail)) {
       esp3d_log_e("Error sending answer to clients");
     }
   } else {
@@ -543,7 +543,7 @@ void Esp3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
         tmpstr = "ok\n";
       }
       if (!dispatch(tmpstr.c_str(), target, requestId,
-                    Esp3dMessageType::tail)) {
+                    ESP3DMessageType::tail)) {
         esp3d_log_e("Error sending answer to clients");
       }
     }

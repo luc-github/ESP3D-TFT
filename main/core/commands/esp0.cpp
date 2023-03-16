@@ -185,18 +185,18 @@ const uint cmdlist[] = {
 };
 // ESP3D Help
 //[ESP0] or [ESP]<command>
-void Esp3dCommands::ESP0(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP0(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   std::string tmpstr;
   const uint cmdNb = sizeof(help) / sizeof(char*);
   const uint cmdlistNb = sizeof(cmdlist) / sizeof(uint);
   bool json = hasTag(msg, cmd_params_pos, "json");
   if (cmdNb != cmdlistNb) {
     esp3d_log("Help corrupted: %d vs %d", cmdNb, cmdlistNb);
-    msg->type = Esp3dMessageType::unique;
+    msg->type = ESP3DMessageType::unique;
     if (!dispatch(msg, "Help corrupted")) {
       esp3d_log_e("Error sending command to clients");
     }
@@ -210,7 +210,7 @@ void Esp3dCommands::ESP0(int cmd_params_pos, Esp3dMessage* msg) {
     } else {
       tmpstr = "[List of ESP3D commands]\n";
     }
-    msg->type = Esp3dMessageType::head;
+    msg->type = ESP3DMessageType::head;
     if (!dispatch(msg, tmpstr.c_str())) {
       esp3d_log_e("Error sending command to clients");
       return;
@@ -230,19 +230,19 @@ void Esp3dCommands::ESP0(int cmd_params_pos, Esp3dMessage* msg) {
         tmpstr += "\n";
       }
       if (!dispatch(tmpstr.c_str(), target, requestId,
-                    Esp3dMessageType::core)) {
+                    ESP3DMessageType::core)) {
         esp3d_log_e("Error sending answer to clients");
         return;
       }
     }
 
     if (json) {
-      if (!dispatch("]}", target, requestId, Esp3dMessageType::tail)) {
+      if (!dispatch("]}", target, requestId, ESP3DMessageType::tail)) {
         esp3d_log_e("Error sending answer to clients");
         return;
       }
     } else {
-      if (!dispatch("ok\n", target, requestId, Esp3dMessageType::tail)) {
+      if (!dispatch("ok\n", target, requestId, ESP3DMessageType::tail)) {
         esp3d_log_e("Error sending answer to clients");
         return;
       }
@@ -261,7 +261,7 @@ void Esp3dCommands::ESP0(int cmd_params_pos, Esp3dMessage* msg) {
           tmpstr = help[i];
           tmpstr += "\n";
         }
-        msg->type = Esp3dMessageType::unique;
+        msg->type = ESP3DMessageType::unique;
         if (!dispatch(msg, tmpstr.c_str())) {
           return;
         }
@@ -279,7 +279,7 @@ void Esp3dCommands::ESP0(int cmd_params_pos, Esp3dMessage* msg) {
       tmpstr += std::to_string(cmdval);
       tmpstr += "\n";
     }
-    msg->type = Esp3dMessageType::unique;
+    msg->type = ESP3DMessageType::unique;
     if (!dispatch(msg, tmpstr.c_str())) {
       return;
     }

@@ -47,7 +47,7 @@
 // #define FS_FILE "/esp3dfs.bin"
 #define CHUNK_BUFFER_SIZE 1024
 
-Esp3dUpdateService esp3dUpdateService;
+ESP3DUpdateService esp3dUpdateService;
 
 const char *protectedkeys[] = {"NOTIF_TOKEN1",   "NOTIF_TOKEN2",
                                "AP_Password",    "STA_Password",
@@ -62,11 +62,11 @@ const char *NetstringKeysVal[] = {"hostname",
 #endif  // ESP3D_WIFI_FEATURE
 };
 
-const Esp3dSettingIndex NetstringKeysPos[] = {
-    Esp3dSettingIndex::esp3d_hostname,
+const ESP3DSettingIndex NetstringKeysPos[] = {
+    ESP3DSettingIndex::esp3d_hostname,
 #if ESP3D_WIFI_FEATURE
-    Esp3dSettingIndex::esp3d_sta_ssid, Esp3dSettingIndex::esp3d_sta_password,
-    Esp3dSettingIndex::esp3d_ap_ssid, Esp3dSettingIndex::esp3d_ap_password
+    ESP3DSettingIndex::esp3d_sta_ssid, ESP3DSettingIndex::esp3d_sta_password,
+    ESP3DSettingIndex::esp3d_ap_ssid, ESP3DSettingIndex::esp3d_ap_password
 #endif  // ESP3D_WIFI_FEATURE
 };
 
@@ -77,13 +77,13 @@ const char *IPKeysVal[] = {
 #endif  // ESP3D_WIFI_FEATURE
 };
 
-const Esp3dSettingIndex IPKeysPos[] = {
+const ESP3DSettingIndex IPKeysPos[] = {
 #if ESP3D_WIFI_FEATURE
-    Esp3dSettingIndex::esp3d_sta_ip_static,
-    Esp3dSettingIndex::esp3d_sta_gw_static,
-    Esp3dSettingIndex::esp3d_sta_mask_static,
-    Esp3dSettingIndex::esp3d_sta_dns_static,
-    Esp3dSettingIndex::esp3d_ap_ip_static
+    ESP3DSettingIndex::esp3d_sta_ip_static,
+    ESP3DSettingIndex::esp3d_sta_gw_static,
+    ESP3DSettingIndex::esp3d_sta_mask_static,
+    ESP3DSettingIndex::esp3d_sta_dns_static,
+    ESP3DSettingIndex::esp3d_ap_ip_static
 #endif  // ESP3D_WIFI_FEATURE
 };
 // Bytes values
@@ -93,9 +93,9 @@ const char *NetbyteKeysVal[] = {
 #endif  // ESP3D_WIFI_FEATURE
 };
 
-const Esp3dSettingIndex NetbyteKeysPos[] = {
+const ESP3DSettingIndex NetbyteKeysPos[] = {
 #if ESP3D_WIFI_FEATURE
-    Esp3dSettingIndex::esp3d_ap_channel
+    ESP3DSettingIndex::esp3d_ap_channel
 #endif  // ESP3D_WIFI_FEATURE
 };
 
@@ -113,18 +113,18 @@ const char *ServstringKeysVal[] = {
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 };
 
-const Esp3dSettingIndex ServstringKeysPos[] = {
+const ESP3DSettingIndex ServstringKeysPos[] = {
 //   ESP_TIME_SERVER1,
 //   ESP_TIME_SERVER2,
 //   ESP_TIME_SERVER3,
 #if ESP3D_AUTHENTICATION_FEATURE
-    Esp3dSettingIndex::esp3d_admin_password,
-    Esp3dSettingIndex::esp3d_user_password,
+    ESP3DSettingIndex::esp3d_admin_password,
+    ESP3DSettingIndex::esp3d_user_password,
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
 #if ESP3D_NOTIFICATIONS_FEATURE
-    Esp3dSettingIndex::esp3d_notification_token_1,
-    Esp3dSettingIndex::esp3d_notification_token_2,
-    Esp3dSettingIndex::esp3d_notification_token_setting
+    ESP3DSettingIndex::esp3d_notification_token_1,
+    ESP3DSettingIndex::esp3d_notification_token_2,
+    ESP3DSettingIndex::esp3d_notification_token_setting
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 };
 
@@ -145,12 +145,12 @@ const char *ServintKeysVal[] = {
     //    "FTP_Passive_Port"
 };
 
-const Esp3dSettingIndex ServintKeysPos[] = {
+const ESP3DSettingIndex ServintKeysPos[] = {
 #if ESP3D_HTTP_FEATURE
-    Esp3dSettingIndex::esp3d_http_port,
+    ESP3DSettingIndex::esp3d_http_port,
 #endif  // ESP3D_HTTP_FEATURE
 #if ESP3D_TELNET_FEATURE
-    Esp3dSettingIndex::esp3d_socket_port,
+    ESP3DSettingIndex::esp3d_socket_port,
 #endif  // ESP3D_TELNET_FEATURE
 
     //    ESP_SENSOR_INTERVAL,
@@ -185,28 +185,28 @@ const char *ServboolKeysVal[] = {
     //"Active_Internet_time",
     "Radio_enabled"};
 
-const Esp3dSettingIndex ServboolKeysPos[] = {
+const ESP3DSettingIndex ServboolKeysPos[] = {
 #if ESP3D_HTTP_FEATURE
-    Esp3dSettingIndex::esp3d_http_on,
+    ESP3DSettingIndex::esp3d_http_on,
 #endif  // ESP3D_HTTP_FEATURE
 
 #if ESP3D_NOTIFICATIONS_FEATURE
-    Esp3dSettingIndex::esp3d_auto_notification,
+    ESP3DSettingIndex::esp3d_auto_notification,
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 #if ESP3D_TELNET_FEATURE
-    Esp3dSettingIndex::esp3d_socket_on,
+    ESP3DSettingIndex::esp3d_socket_on,
 #endif  // ESP3D_TELNET_FEATURE
 #if ESP3D_WS_SERVICE_FEATURE
-    Esp3dSettingIndex::esp3d_ws_on,
+    ESP3DSettingIndex::esp3d_ws_on,
 #endif  // ESP3D_WS_SERVICE_FEATURE
 // ESP_WEBDAV_ON,
 // ESP_TIME_IS_DST,
 #if ESP3D_SD_CARD_FEATURE
-    Esp3dSettingIndex::esp3d_check_update_on_sd,
+    ESP3DSettingIndex::esp3d_check_update_on_sd,
 #endif  // ESP3D_SD_CARD_FEATURE
     // ESP_BUZZER,
     // ESP_INTERNET_TIME,
-    Esp3dSettingIndex::esp3d_radio_boot_mode};
+    ESP3DSettingIndex::esp3d_radio_boot_mode};
 
 // Byte values
 const char *ServbyteKeysVal[] = {
@@ -223,14 +223,14 @@ const char *ServbyteKeysVal[] = {
     //"Time_DST"
 };
 
-const Esp3dSettingIndex ServbyteKeysPos[] = {
+const ESP3DSettingIndex ServbyteKeysPos[] = {
 // ESP_TIMEZONE,
 #if ESP3D_AUTHENTICATION_FEATURE
-    Esp3dSettingIndex::esp3d_session_timeout,
+    ESP3DSettingIndex::esp3d_session_timeout,
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
 #if ESP3D_SD_CARD_FEATURE
 #if ESP3D_SD_FEATURE_IS_SPI
-    Esp3dSettingIndex::esp3d_spi_divider
+    ESP3DSettingIndex::esp3d_spi_divider
 #endif  // ESP3D_SD_FEATURE_IS_SPI
 #endif  // ESP3D_SD_CARD_FEATURE
 
@@ -246,10 +246,10 @@ const char *SysintKeysVal[] = {"Baud_rate",
         //"Boot_delay"
 };
 
-const Esp3dSettingIndex SysintKeysPos[] = {
-    Esp3dSettingIndex::esp3d_baud_rate,
+const ESP3DSettingIndex SysintKeysPos[] = {
+    ESP3DSettingIndex::esp3d_baud_rate,
 #if ESP3D_USB_SERIAL_FEATURE
-    Esp3dSettingIndex::esp3d_usb_serial_baud_rate
+    ESP3DSettingIndex::esp3d_usb_serial_baud_rate
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
         // ESP_BOOT_DELAY
 };
@@ -263,7 +263,7 @@ const char *SysboolKeysVal[] = {
     //"Secure_serial"
 };
 
-const Esp3dSettingIndex SysboolKeysPos[] = {
+const ESP3DSettingIndex SysboolKeysPos[] = {
     // ESP_SERIAL_FLAG,
     // ESP_WEBSOCKET_FLAG,
     // ESP_TELNET_FLAG,
@@ -272,11 +272,11 @@ const Esp3dSettingIndex SysboolKeysPos[] = {
     // ESP_SECURE_SERIAL
 };
 
-Esp3dUpdateService::Esp3dUpdateService() {}
+ESP3DUpdateService::ESP3DUpdateService() {}
 
-Esp3dUpdateService::~Esp3dUpdateService() {}
+ESP3DUpdateService::~ESP3DUpdateService() {}
 
-bool Esp3dUpdateService::canUpdate() {
+bool ESP3DUpdateService::canUpdate() {
   const esp_partition_t *running = esp_ota_get_running_partition();
   const esp_partition_t *update_partition =
       esp_ota_get_next_update_partition(NULL);
@@ -299,7 +299,7 @@ bool Esp3dUpdateService::canUpdate() {
   return true;
 }
 
-size_t Esp3dUpdateService::maxUpdateSize() {
+size_t ESP3DUpdateService::maxUpdateSize() {
   size_t max_size = 0;
   const esp_partition_t *update_partition =
       esp_ota_get_next_update_partition(NULL);
@@ -311,16 +311,16 @@ size_t Esp3dUpdateService::maxUpdateSize() {
   return max_size;
 }
 
-bool Esp3dUpdateService::begin() {
+bool ESP3DUpdateService::begin() {
   esp3d_log("Starting Update Service");
   bool restart = false;
-  Esp3dState setting_check_update = Esp3dState::off;
+  ESP3DState setting_check_update = ESP3DState::off;
 #if ESP3D_SD_CARD_FEATURE
-  setting_check_update = (Esp3dState)esp3dTftsettings.readByte(
-      Esp3dSettingIndex::esp3d_check_update_on_sd);
+  setting_check_update = (ESP3DState)esp3dTftsettings.readByte(
+      ESP3DSettingIndex::esp3d_check_update_on_sd);
 #endif  // ESP3D_SD_CARD_FEATURE
 
-  if (setting_check_update == Esp3dState::off || !canUpdate()) {
+  if (setting_check_update == ESP3DState::off || !canUpdate()) {
     esp3d_log("Update Service disabled");
     return true;
   }
@@ -373,9 +373,9 @@ bool Esp3dUpdateService::begin() {
   return true;
 }
 
-bool Esp3dUpdateService::updateConfig() {
+bool ESP3DUpdateService::updateConfig() {
   bool res = false;
-  Esp3dConfigFile updateConfig(CONFIG_FILE,
+  ESP3DConfigFile updateConfig(CONFIG_FILE,
                                esp3dUpdateService.processingFileFunction,
                                CONFIG_FILE_OK, protectedkeys);
   if (updateConfig.processFile()) {
@@ -392,7 +392,7 @@ bool Esp3dUpdateService::updateConfig() {
   return res;
 }
 #if ESP3D_SD_CARD_FEATURE
-bool Esp3dUpdateService::updateFW() {
+bool ESP3DUpdateService::updateFW() {
   bool isSuccess = true;
   char chunk[CHUNK_BUFFER_SIZE];
   esp_ota_handle_t update_handle = 0;
@@ -475,15 +475,15 @@ bool Esp3dUpdateService::updateFW() {
   return isSuccess;
 }
 #endif  // ESP3D_SD_CARD_FEATURE
-void Esp3dUpdateService::handle() {}
+void ESP3DUpdateService::handle() {}
 
-void Esp3dUpdateService::end() { esp3d_log("Stop Update Service"); }
+void ESP3DUpdateService::end() { esp3d_log("Stop Update Service"); }
 
-bool Esp3dUpdateService::processString(const char **keysval,
-                                       const Esp3dSettingIndex *keypos,
+bool ESP3DUpdateService::processString(const char **keysval,
+                                       const ESP3DSettingIndex *keypos,
                                        const size_t size, const char *key,
                                        const char *value, char &T,
-                                       Esp3dSettingIndex &P) {
+                                       ESP3DSettingIndex &P) {
   for (uint i = 0; i < size; i++) {
     if (strcasecmp(keysval[i], key) == 0) {
       // if it is a previouly saved scrambled password ignore it
@@ -499,11 +499,11 @@ bool Esp3dUpdateService::processString(const char **keysval,
   return false;
 }
 
-bool Esp3dUpdateService::processInt(const char **keysval,
-                                    const Esp3dSettingIndex *keypos,
+bool ESP3DUpdateService::processInt(const char **keysval,
+                                    const ESP3DSettingIndex *keypos,
                                     const size_t size, const char *key,
                                     const char *value, char &T,
-                                    Esp3dSettingIndex &P, uint32_t &v) {
+                                    ESP3DSettingIndex &P, uint32_t &v) {
   for (uint i = 0; i < size; i++) {
     if (strcasecmp(keysval[i], key) == 0) {
       T = 'I';
@@ -517,11 +517,11 @@ bool Esp3dUpdateService::processInt(const char **keysval,
   return false;
 }
 
-bool Esp3dUpdateService::processBool(const char **keysval,
-                                     const Esp3dSettingIndex *keypos,
+bool ESP3DUpdateService::processBool(const char **keysval,
+                                     const ESP3DSettingIndex *keypos,
                                      const size_t size, const char *key,
                                      const char *value, char &T,
-                                     Esp3dSettingIndex &P, uint8_t &b) {
+                                     ESP3DSettingIndex &P, uint8_t &b) {
   for (uint i = 0; i < size; i++) {
     if (strcasecmp(keysval[i], key) == 0) {
       T = 'B';
@@ -546,13 +546,13 @@ bool Esp3dUpdateService::processBool(const char **keysval,
   return false;
 }
 
-bool Esp3dUpdateService::processingFileFunction(const char *section,
+bool ESP3DUpdateService::processingFileFunction(const char *section,
                                                 const char *key,
                                                 const char *value) {
   esp3d_log("Processing Section: %s, Key: %s, Value: %s", section, key, value);
   bool res = true;
   char T = '\0';
-  Esp3dSettingIndex P = Esp3dSettingIndex::unknown_index;
+  ESP3DSettingIndex P = ESP3DSettingIndex::unknown_index;
   uint32_t v = 0;
   uint8_t b = 0;
   bool done = false;
@@ -584,24 +584,24 @@ bool Esp3dUpdateService::processingFileFunction(const char *section,
     if (!done) {
       if (strcasecmp("radio_mode", key) == 0) {
         T = 'B';
-        P = Esp3dSettingIndex::esp3d_radio_mode;
+        P = ESP3DSettingIndex::esp3d_radio_mode;
         done = true;
         if (strcasecmp("BT", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dRadioMode::bluetooth_serial);
+          b = static_cast<uint8_t>(ESP3DRadioMode::bluetooth_serial);
         } else
 #if ESP3D_WIFI_FEATURE
             if (strcasecmp("STA", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dRadioMode::wifi_sta);
+          b = static_cast<uint8_t>(ESP3DRadioMode::wifi_sta);
         } else if (strcasecmp("AP", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dRadioMode::wifi_ap);
+          b = static_cast<uint8_t>(ESP3DRadioMode::wifi_ap);
         } else if (strcasecmp("SETUP", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dRadioMode::wifi_ap_config);
+          b = static_cast<uint8_t>(ESP3DRadioMode::wifi_ap_config);
         } else
 #endif  // ESP3D_WIFI_FEATURE
           if (strcasecmp("OFF", value) == 0) {
-            b = static_cast<uint8_t>(Esp3dRadioMode::off);
+            b = static_cast<uint8_t>(ESP3DRadioMode::off);
           } else {
-            P = Esp3dSettingIndex::unknown_index;  // invalid value
+            P = ESP3DSettingIndex::unknown_index;  // invalid value
           }
       }
     }
@@ -610,16 +610,16 @@ bool Esp3dUpdateService::processingFileFunction(const char *section,
     if (!done) {
       if (strcasecmp("sta_fallback", key) == 0) {
         T = 'B';
-        P = Esp3dSettingIndex::esp3d_fallback_mode;
+        P = ESP3DSettingIndex::esp3d_fallback_mode;
         done = true;
         if (strcasecmp("BT", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dRadioMode::bluetooth_serial);
+          b = static_cast<uint8_t>(ESP3DRadioMode::bluetooth_serial);
         } else if (strcasecmp("WIFI-SETUP", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dRadioMode::wifi_ap_config);
+          b = static_cast<uint8_t>(ESP3DRadioMode::wifi_ap_config);
         } else if (strcasecmp("OFF", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dRadioMode::off);
+          b = static_cast<uint8_t>(ESP3DRadioMode::off);
         } else {
-          P = Esp3dSettingIndex::unknown_index;  // invalid value
+          P = ESP3DSettingIndex::unknown_index;  // invalid value
         }
       }
     }
@@ -628,14 +628,14 @@ bool Esp3dUpdateService::processingFileFunction(const char *section,
     if (!done) {
       if (strcasecmp("STA_IP_mode", key) == 0) {
         T = 'B';
-        P = Esp3dSettingIndex::esp3d_sta_ip_mode;
+        P = ESP3DSettingIndex::esp3d_sta_ip_mode;
         done = true;
         if (strcasecmp("DHCP", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dIpMode::dhcp);
+          b = static_cast<uint8_t>(ESP3DIpMode::dhcp);
         } else if (strcasecmp("STATIC", key) == 0) {
-          b = static_cast<uint8_t>(Esp3dIpMode::staticIp);
+          b = static_cast<uint8_t>(ESP3DIpMode::staticIp);
         } else {
-          P = Esp3dSettingIndex::unknown_index;  // invalid value
+          P = ESP3DSettingIndex::unknown_index;  // invalid value
         }
       }
     }
@@ -670,22 +670,22 @@ bool Esp3dUpdateService::processingFileFunction(const char *section,
 #if ESP3D_NOTIFICATIONS_FEATURE
       if (strcasecmp("NOTIF_TYPE", key) == 0) {
         T = 'B';
-        P = Esp3dSettingIndex::esp3d_notification_type;
+        P = ESP3DSettingIndex::esp3d_notification_type;
         done = true;
         if (strcasecmp("None", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dNotificationType::none);
+          b = static_cast<uint8_t>(ESP3DNotificationType::none);
         } else if (strcasecmp("PushOver", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dNotificationType::pushover);
+          b = static_cast<uint8_t>(ESP3DNotificationType::pushover);
         } else if (strcasecmp("Line", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dNotificationType::line);
+          b = static_cast<uint8_t>(ESP3DNotificationType::line);
         } else if (strcasecmp("Email", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dNotificationType::email);
+          b = static_cast<uint8_t>(ESP3DNotificationType::email);
         } else if (strcasecmp("Telegram", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dNotificationType::telegram);
+          b = static_cast<uint8_t>(ESP3DNotificationType::telegram);
         } else if (strcasecmp("IFTTT", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dNotificationType::ifttt);
+          b = static_cast<uint8_t>(ESP3DNotificationType::ifttt);
         } else {
-          P = Esp3dSettingIndex::unknown_index;  // invalid value
+          P = ESP3DSettingIndex::unknown_index;  // invalid value
         }
       }
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
@@ -706,24 +706,24 @@ bool Esp3dUpdateService::processingFileFunction(const char *section,
     if (!done) {
       if (strcasecmp("TargetFW", key) == 0) {
         T = 'B';
-        P = Esp3dSettingIndex::esp3d_target_firmware;
+        P = ESP3DSettingIndex::esp3d_target_firmware;
         done = true;
         if (strcasecmp("None", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dTargetFirmware::unknown);
+          b = static_cast<uint8_t>(ESP3DTargetFirmware::unknown);
         } else if (strcasecmp("MARLIN", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dTargetFirmware::marlin);
+          b = static_cast<uint8_t>(ESP3DTargetFirmware::marlin);
         } else if (strcasecmp("GRBLHAL", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dTargetFirmware::grblhal);
+          b = static_cast<uint8_t>(ESP3DTargetFirmware::grblhal);
         } else if (strcasecmp("GRBL", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dTargetFirmware::grbl);
+          b = static_cast<uint8_t>(ESP3DTargetFirmware::grbl);
         } else if (strcasecmp("REPETIER", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dTargetFirmware::repetier);
+          b = static_cast<uint8_t>(ESP3DTargetFirmware::repetier);
         } else if (strcasecmp("SMOOTHIEWARE", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dTargetFirmware::smoothieware);
+          b = static_cast<uint8_t>(ESP3DTargetFirmware::smoothieware);
         } else if (strcasecmp("HP_GL", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dTargetFirmware::hp_gl);
+          b = static_cast<uint8_t>(ESP3DTargetFirmware::hp_gl);
         } else {
-          P = Esp3dSettingIndex::unknown_index;  // invalid value
+          P = ESP3DSettingIndex::unknown_index;  // invalid value
         }
       }
     }
@@ -731,14 +731,14 @@ bool Esp3dUpdateService::processingFileFunction(const char *section,
     if (!done) {
       if (strcasecmp("output", key) == 0) {
         T = 'B';
-        P = Esp3dSettingIndex::esp3d_output_client;
+        P = ESP3DSettingIndex::esp3d_output_client;
         done = true;
         if (strcasecmp("USB", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dClientType::usb_serial);
+          b = static_cast<uint8_t>(ESP3DClientType::usb_serial);
         } else if (strcasecmp("SERIAL", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dClientType::serial);
+          b = static_cast<uint8_t>(ESP3DClientType::serial);
         } else {
-          P = Esp3dSettingIndex::unknown_index;  // invalid value
+          P = ESP3DSettingIndex::unknown_index;  // invalid value
         }
       }
     }
@@ -747,7 +747,7 @@ bool Esp3dUpdateService::processingFileFunction(const char *section,
   // now we save - handle saving status
   // if setting is not recognized it is not a problem
   // but if save is fail - that is a problem - so report it
-  if (P != Esp3dSettingIndex::unknown_index) {
+  if (P != ESP3DSettingIndex::unknown_index) {
     switch (T) {
       case 'S':
         if (esp3dTftsettings.isValidStringSetting(value, P)) {

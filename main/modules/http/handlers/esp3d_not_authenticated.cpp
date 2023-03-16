@@ -28,7 +28,7 @@
 #define HTTPD_401 "401 UNAUTHORIZED" /*!< HTTP Response 401 */
 #define HTTPD_401_RESPONSE \
   "{\"status\":\"disconnected\",\"authentication_lvl\":\"guest\"}"
-esp_err_t Esp3dHttpService::not_authenticated_handler(httpd_req_t *req) {
+esp_err_t ESP3DHttpService::not_authenticated_handler(httpd_req_t *req) {
   int socketId = httpd_req_to_sockfd(req);
   esp3d_log("Uri: %s, socket: %d", req->uri, socketId);
   esp3dHttpService.onClose(socketId);

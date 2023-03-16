@@ -35,23 +35,23 @@
 // Get available ESP3D list
 // output is JSON or plain text according parameter
 //[ESP450]json=<no> <pwd=admin/user>
-void Esp3dCommands::ESP450(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP450(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool json = hasTag(msg, cmd_params_pos, "json");
   std::string tmpstr;
 
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
+  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
 
-  if (esp3dNetwork.getMode() == Esp3dRadioMode::off ||
-      esp3dNetwork.getMode() == Esp3dRadioMode::bluetooth_serial) {
+  if (esp3dNetwork.getMode() == ESP3DRadioMode::off ||
+      esp3dNetwork.getMode() == ESP3DRadioMode::bluetooth_serial) {
     tmpstr = "Network not enabled";
     dispatchAnswer(msg, COMMAND_ID, json, true, tmpstr.c_str());
     return;
@@ -63,7 +63,7 @@ void Esp3dCommands::ESP450(int cmd_params_pos, Esp3dMessage* msg) {
   } else {
     tmpstr = "Start Scan\n";
   }
-  msg->type = Esp3dMessageType::head;
+  msg->type = ESP3DMessageType::head;
   if (!dispatch(msg, tmpstr.c_str())) {
     esp3d_log_e("Error sending response to clients");
     return;
@@ -131,7 +131,7 @@ void Esp3dCommands::ESP450(int cmd_params_pos, Esp3dMessage* msg) {
         tmpstr += "\n";
       }
       if (!dispatch(tmpstr.c_str(), target, requestId,
-                    Esp3dMessageType::core)) {
+                    ESP3DMessageType::core)) {
         esp3d_log_e("Error sending answer to clients");
       }
     }
@@ -145,7 +145,7 @@ void Esp3dCommands::ESP450(int cmd_params_pos, Esp3dMessage* msg) {
   } else {
     tmpstr = "End Scan\n";
   }
-  if (!dispatch(tmpstr.c_str(), target, requestId, Esp3dMessageType::tail)) {
+  if (!dispatch(tmpstr.c_str(), target, requestId, ESP3DMessageType::tail)) {
     esp3d_log_e("Error sending answer to clients");
   }
 }

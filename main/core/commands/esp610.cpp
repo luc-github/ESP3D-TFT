@@ -30,12 +30,12 @@
 //[ESP610]type=<NONE/PUSHOVER/EMAIL/LINE/IFTTT> T1=<token1> T2=<token2>
 // TS=<Settings> json=<no> pwd=<admin password> Get will give type and settings
 // only, not the protected T1/T2
-void Esp3dCommands::ESP610(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP610(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
@@ -43,15 +43,15 @@ void Esp3dCommands::ESP610(int cmd_params_pos, Esp3dMessage* msg) {
   std::string tmpstr;
   const char* cmdList[] = {"type=", "T1=", "T2=", "TS=", "AUTO="};
   uint8_t cmdListSize = sizeof(cmdList) / sizeof(char*);
-  const Esp3dSettingIndex settingIndex[] = {
-      Esp3dSettingIndex::esp3d_notification_type,
-      Esp3dSettingIndex::esp3d_notification_token_1,
-      Esp3dSettingIndex::esp3d_notification_token_2,
-      Esp3dSettingIndex::esp3d_notification_token_setting,
-      Esp3dSettingIndex::esp3d_auto_notification};
+  const ESP3DSettingIndex settingIndex[] = {
+      ESP3DSettingIndex::esp3d_notification_type,
+      ESP3DSettingIndex::esp3d_notification_token_1,
+      ESP3DSettingIndex::esp3d_notification_token_2,
+      ESP3DSettingIndex::esp3d_notification_token_setting,
+      ESP3DSettingIndex::esp3d_auto_notification};
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
-    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
+    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
@@ -64,24 +64,24 @@ void Esp3dCommands::ESP610(int cmd_params_pos, Esp3dMessage* msg) {
       ok_msg = "type: ";
     }
     uint8_t b =
-        esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_notification_type);
-    switch ((Esp3dNotificationType)b) {
-      case Esp3dNotificationType::none:
+        esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_notification_type);
+    switch ((ESP3DNotificationType)b) {
+      case ESP3DNotificationType::none:
         ok_msg += "NONE";
         break;
-      case Esp3dNotificationType::pushover:
+      case ESP3DNotificationType::pushover:
         ok_msg += "PUSHOVER";
         break;
-      case Esp3dNotificationType::email:
+      case ESP3DNotificationType::email:
         ok_msg += "EMAIL";
         break;
-      case Esp3dNotificationType::line:
+      case ESP3DNotificationType::line:
         ok_msg += "LINE";
         break;
-      case Esp3dNotificationType::telegram:
+      case ESP3DNotificationType::telegram:
         ok_msg += "TELEGRAM";
         break;
-      case Esp3dNotificationType::ifttt:
+      case ESP3DNotificationType::ifttt:
         ok_msg += "IFTTT";
         break;
       default:
@@ -94,7 +94,7 @@ void Esp3dCommands::ESP610(int cmd_params_pos, Esp3dMessage* msg) {
     }
 
     ok_msg += esp3dTftsettings.readByte(
-                  Esp3dSettingIndex::esp3d_auto_notification) == 1
+                  ESP3DSettingIndex::esp3d_auto_notification) == 1
                   ? "YES"
                   : "NO";
     char buffer[SIZE_OF_SETTING_NOFIFICATION_TS + 1];
@@ -104,7 +104,7 @@ void Esp3dCommands::ESP610(int cmd_params_pos, Esp3dMessage* msg) {
       ok_msg += ", TS: ";
     }
     ok_msg += esp3dTftsettings.readString(
-        Esp3dSettingIndex::esp3d_notification_token_setting, buffer,
+        ESP3DSettingIndex::esp3d_notification_token_setting, buffer,
         SIZE_OF_SETTING_NOFIFICATION_TS);
     if (json) {
       ok_msg += "\"}";
@@ -119,19 +119,19 @@ void Esp3dCommands::ESP610(int cmd_params_pos, Esp3dMessage* msg) {
       if (tmpstr.length() != 0) {
         hasParam = true;
         switch (settingIndex[i]) {
-          case Esp3dSettingIndex::esp3d_notification_type:
+          case ESP3DSettingIndex::esp3d_notification_type:
             if (strcasecmp(tmpstr.c_str(), "NONE") == 0) {
-              val = static_cast<uint8_t>(Esp3dNotificationType::none);
+              val = static_cast<uint8_t>(ESP3DNotificationType::none);
             } else if (strcasecmp(tmpstr.c_str(), "PUSHOVER") == 0) {
-              val = static_cast<uint8_t>(Esp3dNotificationType::pushover);
+              val = static_cast<uint8_t>(ESP3DNotificationType::pushover);
             } else if (strcasecmp(tmpstr.c_str(), "LINE") == 0) {
-              val = static_cast<uint8_t>(Esp3dNotificationType::line);
+              val = static_cast<uint8_t>(ESP3DNotificationType::line);
             } else if (strcasecmp(tmpstr.c_str(), "EMAIL") == 0) {
-              val = static_cast<uint8_t>(Esp3dNotificationType::email);
+              val = static_cast<uint8_t>(ESP3DNotificationType::email);
             } else if (strcasecmp(tmpstr.c_str(), "IFTTT") == 0) {
-              val = static_cast<uint8_t>(Esp3dNotificationType::ifttt);
+              val = static_cast<uint8_t>(ESP3DNotificationType::ifttt);
             } else if (strcasecmp(tmpstr.c_str(), "TELEGRAM") == 0) {
-              val = static_cast<uint8_t>(Esp3dNotificationType::telegram);
+              val = static_cast<uint8_t>(ESP3DNotificationType::telegram);
             } else {
               hasError = true;
               error_msg = "Invalid type parameter";
@@ -143,9 +143,9 @@ void Esp3dCommands::ESP610(int cmd_params_pos, Esp3dMessage* msg) {
               }
             }
             break;
-          case Esp3dSettingIndex::esp3d_notification_token_1:
-          case Esp3dSettingIndex::esp3d_notification_token_2:
-          case Esp3dSettingIndex::esp3d_notification_token_setting:
+          case ESP3DSettingIndex::esp3d_notification_token_1:
+          case ESP3DSettingIndex::esp3d_notification_token_2:
+          case ESP3DSettingIndex::esp3d_notification_token_setting:
             if (esp3dTftsettings.isValidStringSetting(tmpstr.c_str(),
                                                       settingIndex[i])) {
               esp3d_log("Value %s is valid", tmpstr.c_str());
@@ -159,7 +159,7 @@ void Esp3dCommands::ESP610(int cmd_params_pos, Esp3dMessage* msg) {
               error_msg = "Invalid token parameter";
             }
             break;
-          case Esp3dSettingIndex::esp3d_auto_notification:
+          case ESP3DSettingIndex::esp3d_auto_notification:
             if (strcasecmp(tmpstr.c_str(), "YES") == 0 ||
                 strcasecmp(tmpstr.c_str(), "1") == 0 ||
                 strcasecmp(tmpstr.c_str(), "ON") == 0 ||

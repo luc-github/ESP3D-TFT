@@ -25,25 +25,25 @@
 
 #include "esp3d_log.h"
 
-Esp3dFlash flashFs;
+ESP3DFlash flashFs;
 
-Esp3dFlash::Esp3dFlash() {
+ESP3DFlash::ESP3DFlash() {
   _mounted = false;
   _started = false;
 }
 
-Esp3dFileSystemType Esp3dFlash::getFSType(const char* path) {
+ESP3DFileSystemType ESP3DFlash::getFSType(const char* path) {
   (void)path;
-  return Esp3dFileSystemType::flash;
+  return ESP3DFileSystemType::flash;
 }
 
-bool Esp3dFlash::accessFS(Esp3dFileSystemType FS) {
+bool ESP3DFlash::accessFS(ESP3DFileSystemType FS) {
   (void)FS;
   esp3d_log("Access FS");
   return _mounted;
 }
 
-void Esp3dFlash::releaseFS(Esp3dFileSystemType FS) {
+void ESP3DFlash::releaseFS(ESP3DFileSystemType FS) {
   (void)FS;
   esp3d_log("Release FS");
 }

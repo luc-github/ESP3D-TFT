@@ -26,44 +26,44 @@
 #define COMMAND_ID 115
 // Get/Set immediate Network (WiFi/BT/Ethernet) state which can be ON, OFF
 //[ESP115]<state> json=<no> pwd=<admin password>
-void Esp3dCommands::ESP115(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP115(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
   bool json = hasTag(msg, cmd_params_pos, "json");
   std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
-    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
+    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
-  Esp3dRadioMode setting_radio_mode = static_cast<Esp3dRadioMode>(
-      esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_radio_mode));
-  Esp3dRadioMode current_radio_mode = esp3dNetwork.getMode();
+  ESP3DRadioMode setting_radio_mode = static_cast<ESP3DRadioMode>(
+      esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_radio_mode));
+  ESP3DRadioMode current_radio_mode = esp3dNetwork.getMode();
   if (tmpstr.length() == 0) {
-    if (current_radio_mode == Esp3dRadioMode::off) {
+    if (current_radio_mode == ESP3DRadioMode::off) {
       ok_msg = "OFF";
     } else {
       ok_msg = "ON";
     }
   } else {
     if (tmpstr == "OFF") {
-      if (current_radio_mode != Esp3dRadioMode::off) {
-        if (!esp3dNetwork.setMode(Esp3dRadioMode::off)) {
+      if (current_radio_mode != ESP3DRadioMode::off) {
+        if (!esp3dNetwork.setMode(ESP3DRadioMode::off)) {
           hasError = true;
           error_msg = "Fail to stop network";
         }
       }
     } else if (tmpstr == "ON") {
-      if (current_radio_mode == Esp3dRadioMode::off) {
+      if (current_radio_mode == ESP3DRadioMode::off) {
         if (!esp3dNetwork.setMode(setting_radio_mode)) {
           hasError = true;
           error_msg = "Fail to start network";

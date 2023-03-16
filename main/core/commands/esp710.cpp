@@ -27,12 +27,12 @@
 
 // Format ESP Filesystem
 //[ESP710]FORMATFS json=<no> pwd=<admin password>
-void Esp3dCommands::ESP710(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP710(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "Format successful";
@@ -40,16 +40,16 @@ void Esp3dCommands::ESP710(int cmd_params_pos, Esp3dMessage* msg) {
   bool needFormat = hasTag(msg, cmd_params_pos, "FORMATFS");
   std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
-    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
+    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
-  Esp3dMessage* endMsg = nullptr;
+  ESP3DMessage* endMsg = nullptr;
   if (needFormat) {
     ok_msg = "Starting formating...";
-    endMsg = Esp3dClient::copyMsgInfos(*msg);
+    endMsg = ESP3DClient::copyMsgInfos(*msg);
   } else {
     hasError = true;
   }
@@ -60,7 +60,7 @@ void Esp3dCommands::ESP710(int cmd_params_pos, Esp3dMessage* msg) {
       esp3d_log_e("Error sending response to clients");
     }
   } else {
-    Esp3dClient::deleteMsg(msg);
+    ESP3DClient::deleteMsg(msg);
   }
   if (!hasError) {
     flush();

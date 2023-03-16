@@ -29,59 +29,59 @@
 #include "websocket/esp3d_webui_service.h"
 #endif  // ESP3D_HTTP_FEATURE
 
-Esp3dNotificationsService esp3dNotificationsService;
+ESP3DNotificationsService esp3dNotificationsService;
 
-Esp3dNotificationsService::Esp3dNotificationsService() { end(); }
+ESP3DNotificationsService::ESP3DNotificationsService() { end(); }
 
-Esp3dNotificationsService::~Esp3dNotificationsService() {}
+ESP3DNotificationsService::~ESP3DNotificationsService() {}
 
-bool Esp3dNotificationsService::begin(bool sendAutoNotificationMsg) {
+bool ESP3DNotificationsService::begin(bool sendAutoNotificationMsg) {
   esp3d_log("Start notification service");
   bool res = true;
   char buffer[SIZE_OF_SETTING_NOFIFICATION_T1];
   end();
-  _notificationType = (Esp3dNotificationType)esp3dTftsettings.readByte(
-      Esp3dSettingIndex::esp3d_notification_type);
+  _notificationType = (ESP3DNotificationType)esp3dTftsettings.readByte(
+      ESP3DSettingIndex::esp3d_notification_type);
   switch (_notificationType) {
-    case Esp3dNotificationType::none:  // no notification = no error but no
+    case ESP3DNotificationType::none:  // no notification = no error but no
                                        // start
       _started = true;
       return true;
-    case Esp3dNotificationType::pushover:
+    case ESP3DNotificationType::pushover:
       _token1 = esp3dTftsettings.readString(
-          Esp3dSettingIndex::esp3d_notification_token_1, buffer,
+          ESP3DSettingIndex::esp3d_notification_token_1, buffer,
           SIZE_OF_SETTING_NOFIFICATION_T1);
       _token2 = esp3dTftsettings.readString(
-          Esp3dSettingIndex::esp3d_notification_token_2, buffer,
+          ESP3DSettingIndex::esp3d_notification_token_2, buffer,
           SIZE_OF_SETTING_NOFIFICATION_T2);
       break;
-    case Esp3dNotificationType::telegram:
+    case ESP3DNotificationType::telegram:
       _token1 = esp3dTftsettings.readString(
-          Esp3dSettingIndex::esp3d_notification_token_1, buffer,
+          ESP3DSettingIndex::esp3d_notification_token_1, buffer,
           SIZE_OF_SETTING_NOFIFICATION_T1);
       _token2 = esp3dTftsettings.readString(
-          Esp3dSettingIndex::esp3d_notification_token_2, buffer,
+          ESP3DSettingIndex::esp3d_notification_token_2, buffer,
           SIZE_OF_SETTING_NOFIFICATION_T2);
       break;
-    case Esp3dNotificationType::line:
+    case ESP3DNotificationType::line:
       _token1 = esp3dTftsettings.readString(
-          Esp3dSettingIndex::esp3d_notification_token_1, buffer,
+          ESP3DSettingIndex::esp3d_notification_token_1, buffer,
           SIZE_OF_SETTING_NOFIFICATION_T1);
       break;
-    case Esp3dNotificationType::ifttt:
+    case ESP3DNotificationType::ifttt:
       _token1 = esp3dTftsettings.readString(
-          Esp3dSettingIndex::esp3d_notification_token_1, buffer,
+          ESP3DSettingIndex::esp3d_notification_token_1, buffer,
           SIZE_OF_SETTING_NOFIFICATION_T1);
       _token2 = esp3dTftsettings.readString(
-          Esp3dSettingIndex::esp3d_notification_token_2, buffer,
+          ESP3DSettingIndex::esp3d_notification_token_2, buffer,
           SIZE_OF_SETTING_NOFIFICATION_T2);
       break;
-    case Esp3dNotificationType::email:
+    case ESP3DNotificationType::email:
       _token1 = esp3dTftsettings.readString(
-          Esp3dSettingIndex::esp3d_notification_token_1, buffer,
+          ESP3DSettingIndex::esp3d_notification_token_1, buffer,
           SIZE_OF_SETTING_NOFIFICATION_T1);
       _token2 = esp3dTftsettings.readString(
-          Esp3dSettingIndex::esp3d_notification_token_2, buffer,
+          ESP3DSettingIndex::esp3d_notification_token_2, buffer,
           SIZE_OF_SETTING_NOFIFICATION_T2);
       if (!getEmailInformationsFromSettings()) {
         res = false;
@@ -97,7 +97,7 @@ bool Esp3dNotificationsService::begin(bool sendAutoNotificationMsg) {
     end();
   } else {
     _autonotification =
-        esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_auto_notification);
+        esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_auto_notification);
   }
   _started = res;
   if (sendAutoNotificationMsg) {
@@ -105,22 +105,22 @@ bool Esp3dNotificationsService::begin(bool sendAutoNotificationMsg) {
   }
   return _started;
 }
-void Esp3dNotificationsService::handle() {}
+void ESP3DNotificationsService::handle() {}
 
-void Esp3dNotificationsService::end() {
+void ESP3DNotificationsService::end() {
   _started = false;
   _autonotification = false;
-  _notificationType = Esp3dNotificationType::none;
+  _notificationType = ESP3DNotificationType::none;
   _token1.clear();
   _token2.clear();
   _settings.clear();
   _serveraddress.clear();
   _port.clear();
   _method.clear();
-  _lastError = Esp3dNotificationError::no_error;
+  _lastError = ESP3DNotificationError::no_error;
 }
 
-bool Esp3dNotificationsService::sendMSG(const char* title,
+bool ESP3DNotificationsService::sendMSG(const char* title,
                                         const char* message) {
   std::string formated_message = message;
   std::string formated_title = title;
@@ -132,7 +132,7 @@ bool Esp3dNotificationsService::sendMSG(const char* title,
         formated_message.c_str(), "%ESP_NAME%", esp3dNetwork.getHostName());
   }
   if (formated_message.length() == 0) {
-    _lastError = Esp3dNotificationError::empty_message;
+    _lastError = ESP3DNotificationError::empty_message;
     esp3d_log_e("Empty notification message");
     return false;
   }
@@ -151,21 +151,21 @@ bool Esp3dNotificationsService::sendMSG(const char* title,
 
   if (_started) {
     switch (_notificationType) {
-      case Esp3dNotificationType::pushover:
+      case ESP3DNotificationType::pushover:
         return sendPushoverMSG(formated_title.c_str(),
                                formated_message.c_str());
         break;
-      case Esp3dNotificationType::telegram:
+      case ESP3DNotificationType::telegram:
         return sendTelegramMSG(formated_title.c_str(),
                                formated_message.c_str());
         break;
-      case Esp3dNotificationType::line:
+      case ESP3DNotificationType::line:
         return sendLineMSG(formated_title.c_str(), formated_message.c_str());
         break;
-      case Esp3dNotificationType::ifttt:
+      case ESP3DNotificationType::ifttt:
         return sendIFTTTMSG(formated_title.c_str(), formated_message.c_str());
         break;
-      case Esp3dNotificationType::email:
+      case ESP3DNotificationType::email:
         return sendEmailMSG(formated_title.c_str(), formated_message.c_str());
         break;
       default:
@@ -175,17 +175,17 @@ bool Esp3dNotificationsService::sendMSG(const char* title,
   return true;
 }
 
-const char* Esp3dNotificationsService::getTypeString() {
+const char* ESP3DNotificationsService::getTypeString() {
   switch (_notificationType) {
-    case Esp3dNotificationType::pushover:
+    case ESP3DNotificationType::pushover:
       return "pushover";
-    case Esp3dNotificationType::email:
+    case ESP3DNotificationType::email:
       return "email";
-    case Esp3dNotificationType::line:
+    case ESP3DNotificationType::line:
       return "line";
-    case Esp3dNotificationType::telegram:
+    case ESP3DNotificationType::telegram:
       return "telegram";
-    case Esp3dNotificationType::ifttt:
+    case ESP3DNotificationType::ifttt:
       return "IFTTT";
     default:
       break;
@@ -193,7 +193,7 @@ const char* Esp3dNotificationsService::getTypeString() {
   return "none";
 }
 
-bool Esp3dNotificationsService::sendAutoNotification(const char* msg) {
+bool ESP3DNotificationsService::sendAutoNotification(const char* msg) {
   if (_autonotification && _started) {
     return sendMSG(ESP3D_NOTIFICATION_TITLE, msg);
   }

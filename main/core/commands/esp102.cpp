@@ -27,12 +27,12 @@
 #define COMMAND_ID 102
 // Change STA IP mode (DHCP/STATIC)
 //[ESP102]<mode> json=no pwd=<admin password>
-void Esp3dCommands::ESP102(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP102(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
@@ -40,38 +40,38 @@ void Esp3dCommands::ESP102(int cmd_params_pos, Esp3dMessage* msg) {
   std::string tmpstr;
   uint8_t byteValue = (uint8_t)-1;
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
-    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
+    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
-    byteValue = esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_sta_ip_mode);
-    if (byteValue == static_cast<uint8_t>(Esp3dIpMode::dhcp)) {
+    byteValue = esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_sta_ip_mode);
+    if (byteValue == static_cast<uint8_t>(ESP3DIpMode::dhcp)) {
       ok_msg = "DHCP";
-    } else if (byteValue == static_cast<uint8_t>(Esp3dIpMode::staticIp)) {
+    } else if (byteValue == static_cast<uint8_t>(ESP3DIpMode::staticIp)) {
       ok_msg = "STATIC";
     } else {
       ok_msg = "Unknown";
     }
   } else {
     if (tmpstr == "DHCP") {
-      byteValue = static_cast<uint8_t>(Esp3dIpMode::dhcp);
+      byteValue = static_cast<uint8_t>(ESP3DIpMode::dhcp);
     } else if (tmpstr == "STATIC") {
-      byteValue = static_cast<uint8_t>(Esp3dIpMode::staticIp);
+      byteValue = static_cast<uint8_t>(ESP3DIpMode::staticIp);
     } else {
       byteValue = (uint8_t)-1;  // unknow flag so put outof range value
     }
     esp3d_log("got %s param for a value of %d, is valid %d", tmpstr.c_str(),
               byteValue,
               esp3dTftsettings.isValidByteSetting(
-                  byteValue, Esp3dSettingIndex::esp3d_sta_ip_mode));
+                  byteValue, ESP3DSettingIndex::esp3d_sta_ip_mode));
     if (esp3dTftsettings.isValidByteSetting(
-            byteValue, Esp3dSettingIndex::esp3d_sta_ip_mode)) {
+            byteValue, ESP3DSettingIndex::esp3d_sta_ip_mode)) {
       esp3d_log("Value %d is valid", byteValue);
-      if (!esp3dTftsettings.writeByte(Esp3dSettingIndex::esp3d_sta_ip_mode,
+      if (!esp3dTftsettings.writeByte(ESP3DSettingIndex::esp3d_sta_ip_mode,
                                       byteValue)) {
         hasError = true;
         error_msg = "Set value failed";

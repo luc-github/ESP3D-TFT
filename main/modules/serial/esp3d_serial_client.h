@@ -29,14 +29,14 @@
 extern "C" {
 #endif
 
-class Esp3dSerialClient : public Esp3dClient {
+class ESP3DSerialClient : public ESP3DClient {
  public:
-  Esp3dSerialClient();
-  ~Esp3dSerialClient();
+  ESP3DSerialClient();
+  ~ESP3DSerialClient();
   bool begin();
   void handle();
   void end();
-  void process(Esp3dMessage* msg);
+  void process(ESP3DMessage* msg);
   bool isEndChar(uint8_t ch);
   bool pushMsgToRxQueue(const uint8_t* msg, size_t size);
   void flush();
@@ -53,7 +53,7 @@ class Esp3dSerialClient : public Esp3dClient {
   size_t _bufferPos;
 };
 
-extern Esp3dSerialClient serialClient;
+extern ESP3DSerialClient serialClient;
 
 #ifdef __cplusplus
 }  // extern "C"

@@ -32,17 +32,17 @@
 extern "C" {
 #endif
 #if ESP3D_WIFI_FEATURE
-struct Esp3dIpInfos {
+struct ESP3DIpInfos {
   esp_netif_ip_info_t ip_info;
   esp_netif_dns_info_t dns_info;
 };
 
-enum class Esp3dIpMode : uint8_t {
+enum class ESP3DIpMode : uint8_t {
   dhcp = 0,
   staticIp = 1,
 };
 #endif  // ESP3D_WIFI_FEATURE
-enum class Esp3dRadioMode : uint8_t {
+enum class ESP3DRadioMode : uint8_t {
   off = 0,
   wifi_sta = 1,
   wifi_ap = 2,
@@ -50,10 +50,10 @@ enum class Esp3dRadioMode : uint8_t {
   bluetooth_serial = 4
 };
 
-class Esp3dNetwork final {
+class ESP3DNetwork final {
  public:
-  Esp3dNetwork();
-  ~Esp3dNetwork();
+  ESP3DNetwork();
+  ~ESP3DNetwork();
   bool begin();
   void handle();
   void end();
@@ -72,19 +72,19 @@ class Esp3dNetwork final {
   int32_t getSignal(int32_t RSSI, bool filter = true);
   EventGroupHandle_t getEventGroup() { return _s_wifi_event_group; };
   bool useStaticIp() { return _useStaticIp; };
-  bool getLocalIp(Esp3dIpInfos* ipInfo);
+  bool getLocalIp(ESP3DIpInfos* ipInfo);
   const char* getLocalIpString();
 
 #endif  // ESP3D_WIFI_FEATURE
   bool startBtMode();
   bool stopNoRadioMode();
   bool stopBtMode();
-  bool setMode(Esp3dRadioMode mode, bool restart = false);
+  bool setMode(ESP3DRadioMode mode, bool restart = false);
   const char* getBTMac();
   const char* getMacAddress(uint8_t mac[6]);
-  const char* getModeStr(Esp3dRadioMode mode);
+  const char* getModeStr(ESP3DRadioMode mode);
 
-  Esp3dRadioMode getMode() { return _current_radio_mode; };
+  ESP3DRadioMode getMode() { return _current_radio_mode; };
   bool started() { return _started; };
 
   const char* getHostName() { return _hostname.c_str(); }
@@ -97,12 +97,12 @@ class Esp3dNetwork final {
   esp_netif_t* _wifiStaPtr;
   EventGroupHandle_t _s_wifi_event_group;
 #endif  // ESP3D_WIFI_FEATURE
-  Esp3dRadioMode _current_radio_mode;
+  ESP3DRadioMode _current_radio_mode;
   std::string _hostname;
   const char* getMac(esp_mac_type_t type);
 };
 
-extern Esp3dNetwork esp3dNetwork;
+extern ESP3DNetwork esp3dNetwork;
 #ifdef __cplusplus
 }  // extern "C"
 #endif

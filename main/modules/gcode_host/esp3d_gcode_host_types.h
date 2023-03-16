@@ -26,7 +26,7 @@
 extern "C" {
 #endif
 
-enum class Esp3dGcodeHostWait : uint8_t {
+enum class ESP3DGcodeHostWait : uint8_t {
   no_wait = 0,
   wait_ack,
   busy,
@@ -34,7 +34,7 @@ enum class Esp3dGcodeHostWait : uint8_t {
   heating
 };
 
-enum class Esp3dGcodeHostState : uint8_t {
+enum class ESP3DGcodeHostState : uint8_t {
   no_stream = 0,
   start,
   end,
@@ -51,7 +51,7 @@ enum class Esp3dGcodeHostState : uint8_t {
   next_state,
 };
 
-enum class Esp3dGcodeHostError : uint8_t {
+enum class ESP3DGcodeHostError : uint8_t {
   no_error = 0,
   time_out,
   data_send,
@@ -68,7 +68,7 @@ enum class Esp3dGcodeHostError : uint8_t {
   aborted
 };
 
-enum class Esp3dGcodeHostScriptType : uint8_t {
+enum class ESP3DGcodeHostScriptType : uint8_t {
   single_command,
   multiple_commands,
   filesystem,

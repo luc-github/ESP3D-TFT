@@ -31,7 +31,7 @@
 #define KEY_MAX_SIZE 30
 #define VALUE_MAX_SIZE 128
 
-Esp3dConfigFile::Esp3dConfigFile(const char* path, processingFunction_t fn,
+ESP3DConfigFile::ESP3DConfigFile(const char* path, processingFunction_t fn,
                                  const char* scrambledpath,
                                  const char** protectedkeys) {
   _filename = path;
@@ -42,7 +42,7 @@ Esp3dConfigFile::Esp3dConfigFile(const char* path, processingFunction_t fn,
   _pfunction = fn;
 }
 
-bool Esp3dConfigFile::processFile() {
+bool ESP3DConfigFile::processFile() {
 #if ESP3D_SD_CARD_FEATURE
   bool res = true;
   if (!_filename.length()) {
@@ -105,7 +105,7 @@ bool Esp3dConfigFile::processFile() {
   return false;
 }
 
-bool Esp3dConfigFile::isComment(char* line) {
+bool ESP3DConfigFile::isComment(char* line) {
   if (strlen(line) > 0) {
     if ((line[0] == ';') || (line[0] == '#')) {
       return true;
@@ -114,7 +114,7 @@ bool Esp3dConfigFile::isComment(char* line) {
   return false;
 }
 
-bool Esp3dConfigFile::isSection(char* line) {
+bool ESP3DConfigFile::isSection(char* line) {
   if (strlen(line) > 0) {
     if ((line[0] == '[') && (line[strlen(line) - 1] == ']')) {
       return true;
@@ -123,7 +123,7 @@ bool Esp3dConfigFile::isSection(char* line) {
   return false;
 }
 
-bool Esp3dConfigFile::isValue(char* line) {
+bool ESP3DConfigFile::isValue(char* line) {
   if (strlen(line) > 3) {
     for (uint8_t i = 1; i < strlen(line) - 2; i++) {
       if (line[i] == '=') {
@@ -134,12 +134,12 @@ bool Esp3dConfigFile::isValue(char* line) {
   return false;
 }
 
-char* Esp3dConfigFile::getSectionName(char* line) {
+char* ESP3DConfigFile::getSectionName(char* line) {
   line[strlen(line) - 1] = '\0';
   return trimSpaces(&line[1], SECTION_MAX_SIZE);
 }
 
-char* Esp3dConfigFile::getKeyName(char* line) {
+char* ESP3DConfigFile::getKeyName(char* line) {
   for (uint8_t i = 0; i < strlen(line); i++) {
     if (line[i] == '=') {
       line[i] = '\0';
@@ -149,7 +149,7 @@ char* Esp3dConfigFile::getKeyName(char* line) {
   return NULL;
 }
 
-char* Esp3dConfigFile::getValue(char* line) {
+char* ESP3DConfigFile::getValue(char* line) {
   char* startptr = line + strlen(line) + 1;
   while (*startptr == '\0') {
     startptr++;
@@ -157,7 +157,7 @@ char* Esp3dConfigFile::getValue(char* line) {
   return trimSpaces(startptr, VALUE_MAX_SIZE);
 }
 
-char* Esp3dConfigFile::trimSpaces(char* line, uint8_t maxsize) {
+char* ESP3DConfigFile::trimSpaces(char* line, uint8_t maxsize) {
   char* endptr = line + strlen(line) - 1;
   char* startptr = line;
   while (endptr >= line && isspace(*endptr)) {
@@ -173,9 +173,9 @@ char* Esp3dConfigFile::trimSpaces(char* line, uint8_t maxsize) {
   return startptr;
 }
 
-Esp3dConfigFile::~Esp3dConfigFile() {}
+ESP3DConfigFile::~ESP3DConfigFile() {}
 
-bool Esp3dConfigFile::isScrambleKey(const char* key, const char* str) {
+bool ESP3DConfigFile::isScrambleKey(const char* key, const char* str) {
   if (strlen(key) > strlen(str)) {
     return false;
   }
@@ -198,7 +198,7 @@ bool Esp3dConfigFile::isScrambleKey(const char* key, const char* str) {
   return false;
 }
 
-bool Esp3dConfigFile::revokeFile() {
+bool ESP3DConfigFile::revokeFile() {
   if (!_scrambledFilename.length()) {
     esp3d_log_e("No scrambled filename provided");
     return false;

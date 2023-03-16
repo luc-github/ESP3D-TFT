@@ -28,12 +28,12 @@
 #define COMMAND_ID 160
 // Get/Set WebSocket state which can be ON, OFF, CLOSE
 //[ESP160]<state> json=<no> pwd=<admin password>
-void Esp3dCommands::ESP160(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP160(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
@@ -44,24 +44,24 @@ void Esp3dCommands::ESP160(int cmd_params_pos, Esp3dMessage* msg) {
   bool has_param = false;
   std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
-    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
+    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
-  Esp3dState setting_mode =
-      (Esp3dState)esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_ws_on);
+  ESP3DState setting_mode =
+      (ESP3DState)esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_ws_on);
   if (tmpstr.length() == 0) {
-    if (setting_mode == Esp3dState::off) {
+    if (setting_mode == ESP3DState::off) {
       ok_msg = "OFF";
     } else {
       ok_msg = "ON";
     }
   } else {
     if (stateON || stateOFF) {
-      if (!esp3dTftsettings.writeByte(Esp3dSettingIndex::esp3d_ws_on,
+      if (!esp3dTftsettings.writeByte(ESP3DSettingIndex::esp3d_ws_on,
                                       stateOFF ? 0 : 1)) {
         hasError = true;
         error_msg = "Set value failed";

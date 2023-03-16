@@ -27,21 +27,21 @@
 extern "C" {
 #endif
 
-class Esp3dTftStream final {
+class ESP3DTftStream final {
  public:
-  Esp3dTftStream();
-  ~Esp3dTftStream();
+  ESP3DTftStream();
+  ~ESP3DTftStream();
   bool begin();
   void handle();
   bool end();
-  Esp3dTargetFirmware getTargetFirmware(bool fromSettings = false);
+  ESP3DTargetFirmware getTargetFirmware(bool fromSettings = false);
 
  private:
   bool _started;
-  Esp3dTargetFirmware _target_firmware;
+  ESP3DTargetFirmware _target_firmware;
 };
 
-extern Esp3dTftStream esp3dTftstream;
+extern ESP3DTftStream esp3dTftstream;
 
 #ifdef __cplusplus
 }  // extern "C"

@@ -27,7 +27,7 @@
 #include "usb_serial_def.h"
 #include "websocket/esp3d_webui_service.h"
 
-Esp3dUsbSerialClient usbSerialClient;
+ESP3DUsbSerialClient usbSerialClient;
 
 #define RX_FLUSH_TIME_OUT 1500  // milliseconds timeout
 
@@ -40,7 +40,7 @@ void rx_callback(uint8_t *data, size_t data_len, void *arg) {
   usbSerialClient.handle_rx(data, data_len);
 }
 
-void Esp3dUsbSerialClient::handle_rx(uint8_t *data, size_t data_len) {
+void ESP3DUsbSerialClient::handle_rx(uint8_t *data, size_t data_len) {
   static uint64_t startTimeout = 0;  // microseconds
   // parse data
   startTimeout = esp3d_hal::millis();
@@ -94,7 +94,7 @@ void handle_event(const cdc_acm_host_dev_event_data_t *event, void *user_ctx) {
   }
 }
 
-void Esp3dUsbSerialClient::connectDevice() {
+void ESP3DUsbSerialClient::connectDevice() {
   if (_stopConnect) {
     return;
   }
@@ -153,7 +153,7 @@ static void esp3d_usb_serial_connection_task(void *pvParameter) {
   vTaskDelete(NULL);
 }
 
-void Esp3dUsbSerialClient::setConnected(bool connected) {
+void ESP3DUsbSerialClient::setConnected(bool connected) {
   _connected = connected;
 
   if (connected) {
@@ -165,7 +165,7 @@ void Esp3dUsbSerialClient::setConnected(bool connected) {
   }
 }
 
-Esp3dUsbSerialClient::Esp3dUsbSerialClient() {
+ESP3DUsbSerialClient::ESP3DUsbSerialClient() {
   _started = false;
   _connected = false;
   _device_disconnected_sem = NULL;
@@ -175,9 +175,9 @@ Esp3dUsbSerialClient::Esp3dUsbSerialClient() {
   _vcp = NULL;
   _stopConnect = false;
 }
-Esp3dUsbSerialClient::~Esp3dUsbSerialClient() { end(); }
+ESP3DUsbSerialClient::~ESP3DUsbSerialClient() { end(); }
 
-void Esp3dUsbSerialClient::process(Esp3dMessage *msg) {
+void ESP3DUsbSerialClient::process(ESP3DMessage *msg) {
   esp3d_log("Add message to queue");
   if (!addTxData(msg)) {
     flush();
@@ -190,11 +190,11 @@ void Esp3dUsbSerialClient::process(Esp3dMessage *msg) {
   }
 }
 
-bool Esp3dUsbSerialClient::isEndChar(uint8_t ch) {
+bool ESP3DUsbSerialClient::isEndChar(uint8_t ch) {
   return ((char)ch == '\n' || (char)ch == '\r');
 }
 
-bool Esp3dUsbSerialClient::begin() {
+bool ESP3DUsbSerialClient::begin() {
   end();
   _rx_buffer = (uint8_t *)malloc(ESP3D_USB_SERIAL_RX_BUFFER_SIZE);
   if (!_rx_buffer) {
@@ -220,12 +220,12 @@ bool Esp3dUsbSerialClient::begin() {
   setTxMutex(&_tx_mutex);
   // load baudrate
   _baudrate = esp3dTftsettings.readUint32(
-      Esp3dSettingIndex::esp3d_usb_serial_baud_rate);
+      ESP3DSettingIndex::esp3d_usb_serial_baud_rate);
   if (!esp3dTftsettings.isValidIntegerSetting(
-          _baudrate, Esp3dSettingIndex::esp3d_usb_serial_baud_rate)) {
+          _baudrate, ESP3DSettingIndex::esp3d_usb_serial_baud_rate)) {
     esp3d_log_w("Invalid baudrate, %ld, use default", _baudrate);
     _baudrate = esp3dTftsettings.getDefaultIntegerSetting(
-        Esp3dSettingIndex::esp3d_usb_serial_baud_rate);
+        ESP3DSettingIndex::esp3d_usb_serial_baud_rate);
   }
   esp3d_log("Use %ld USB Serial Baud Rate", _baudrate);
 
@@ -248,17 +248,17 @@ bool Esp3dUsbSerialClient::begin() {
   }
 }
 
-bool Esp3dUsbSerialClient::pushMsgToRxQueue(const uint8_t *msg, size_t size) {
-  Esp3dMessage *newMsgPtr = newMsg();
+bool ESP3DUsbSerialClient::pushMsgToRxQueue(const uint8_t *msg, size_t size) {
+  ESP3DMessage *newMsgPtr = newMsg();
   if (newMsgPtr) {
-    if (Esp3dClient::setDataContent(newMsgPtr, msg, size)) {
+    if (ESP3DClient::setDataContent(newMsgPtr, msg, size)) {
 #if ESP3D_DISABLE_SERIAL_AUTHENTICATION_FEATURE
-      newMsgPtr->authentication_level = Esp3dAuthenticationLevel::admin;
+      newMsgPtr->authentication_level = ESP3DAuthenticationLevel::admin;
 #endif  // ESP3D_DISABLE_SERIAL_AUTHENTICATION
-      newMsgPtr->origin = Esp3dClientType::serial;
+      newMsgPtr->origin = ESP3DClientType::serial;
       if (!addRxData(newMsgPtr)) {
         // delete message as cannot be added to the queue
-        Esp3dClient::deleteMsg(newMsgPtr);
+        ESP3DClient::deleteMsg(newMsgPtr);
         esp3d_log_e("Failed to add message to rx queue");
         return false;
       }
@@ -275,16 +275,16 @@ bool Esp3dUsbSerialClient::pushMsgToRxQueue(const uint8_t *msg, size_t size) {
   return true;
 }
 
-void Esp3dUsbSerialClient::handle() {
+void ESP3DUsbSerialClient::handle() {
   if (_started) {
     if (getRxMsgsCount() > 0) {
-      Esp3dMessage *msg = popRx();
+      ESP3DMessage *msg = popRx();
       if (msg) {
         esp3dCommands.process(msg);
       }
     }
     if (getTxMsgsCount() > 0) {
-      Esp3dMessage *msg = popTx();
+      ESP3DMessage *msg = popTx();
       if (msg) {
         esp3d_log("Got message to send");
         if (_connected) {
@@ -304,9 +304,9 @@ void Esp3dUsbSerialClient::handle() {
   }
 }
 
-void Esp3dUsbSerialClient::flush() {}
+void ESP3DUsbSerialClient::flush() {}
 
-void Esp3dUsbSerialClient::end() {
+void ESP3DUsbSerialClient::end() {
   _stopConnect = true;
   if (_started) {
     flush();

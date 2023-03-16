@@ -26,12 +26,12 @@
 #define COMMAND_ID 111
 // Get current IP
 //[ESP111]<ALL> [json=no]
-void Esp3dCommands::ESP111(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP111(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
@@ -39,8 +39,8 @@ void Esp3dCommands::ESP111(int cmd_params_pos, Esp3dMessage* msg) {
   bool showAll = hasTag(msg, cmd_params_pos, "ALL");
   std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
-    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
+    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
@@ -49,7 +49,7 @@ void Esp3dCommands::ESP111(int cmd_params_pos, Esp3dMessage* msg) {
   if (tmpstr.length() != 0 && !showAll) {
     hasError = true;
   } else {
-    Esp3dIpInfos ipInfo;
+    ESP3DIpInfos ipInfo;
     if (esp3dNetwork.getLocalIp(&ipInfo)) {
       ok_msg = ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.ip_info.ip));
     } else {

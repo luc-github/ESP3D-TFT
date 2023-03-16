@@ -27,20 +27,20 @@
 #define COMMAND_ID 902
 // Set USB Serial baudrate
 //[ESP902]<baud rate> json=<no> pwd=<admin password>
-void Esp3dCommands::ESP902(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP902(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
   bool json = hasTag(msg, cmd_params_pos, "json");
   std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level != Esp3dAuthenticationLevel::admin) {
-    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level != ESP3DAuthenticationLevel::admin) {
+    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
@@ -48,19 +48,19 @@ void Esp3dCommands::ESP902(int cmd_params_pos, Esp3dMessage* msg) {
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
     uint32_t br = esp3dTftsettings.readUint32(
-        Esp3dSettingIndex::esp3d_usb_serial_baud_rate);
+        ESP3DSettingIndex::esp3d_usb_serial_baud_rate);
     ok_msg = std::to_string(br);
   } else {
     uint32_t br = atoi(tmpstr.c_str());
     esp3d_log("got %s param for a value of %ld, is valid %d", tmpstr.c_str(),
               br,
               esp3dTftsettings.isValidIntegerSetting(
-                  br, Esp3dSettingIndex::esp3d_usb_serial_baud_rate));
+                  br, ESP3DSettingIndex::esp3d_usb_serial_baud_rate));
     if (esp3dTftsettings.isValidIntegerSetting(
-            br, Esp3dSettingIndex::esp3d_usb_serial_baud_rate)) {
+            br, ESP3DSettingIndex::esp3d_usb_serial_baud_rate)) {
       esp3d_log("Value %ld is valid", br);
       if (!esp3dTftsettings.writeUint32(
-              Esp3dSettingIndex::esp3d_usb_serial_baud_rate, br)) {
+              ESP3DSettingIndex::esp3d_usb_serial_baud_rate, br)) {
         hasError = true;
         error_msg = "Set value failed";
       }

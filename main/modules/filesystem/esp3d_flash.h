@@ -28,9 +28,9 @@
 
 #define ESP3D_FLASH_FS_HEADER "/fs/"
 
-class Esp3dFlash final {
+class ESP3DFlash final {
  public:
-  Esp3dFlash();
+  ESP3DFlash();
   bool begin();
   bool mount();
   void unmount();
@@ -39,9 +39,9 @@ class Esp3dFlash final {
   uint maxPathLength();
   bool getSpaceInfo(size_t *totalBytes = NULL, size_t *usedBytes = NULL,
                     size_t *freeBytes = NULL, bool refreshStats = false);
-  Esp3dFileSystemType getFSType(const char *path = nullptr);
-  bool accessFS(Esp3dFileSystemType FS = Esp3dFileSystemType::flash);
-  void releaseFS(Esp3dFileSystemType FS = Esp3dFileSystemType::flash);
+  ESP3DFileSystemType getFSType(const char *path = nullptr);
+  bool accessFS(ESP3DFileSystemType FS = ESP3DFileSystemType::flash);
+  void releaseFS(ESP3DFileSystemType FS = ESP3DFileSystemType::flash);
   bool format();
   const char *mount_point() { return "/fs"; }
   DIR *opendir(const char *dirpath);
@@ -62,4 +62,4 @@ class Esp3dFlash final {
   bool _started;
 };
 
-extern Esp3dFlash flashFs;
+extern ESP3DFlash flashFs;

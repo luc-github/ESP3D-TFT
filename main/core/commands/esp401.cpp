@@ -33,22 +33,22 @@
 
 // Set EEPROM setting
 //[ESP401]P=<position> T=<type> V=<value> json=<no> pwd=<admin password>
-void Esp3dCommands::ESP401(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP401(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
 
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
-  msg->type = Esp3dMessageType::unique;
+  msg->origin = ESP3DClientType::command;
+  msg->type = ESP3DMessageType::unique;
   bool json = hasTag(msg, cmd_params_pos, "json");
   std::string tmpstr;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
 
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level != Esp3dAuthenticationLevel::admin) {
-    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level != ESP3DAuthenticationLevel::admin) {
+    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
@@ -68,9 +68,9 @@ void Esp3dCommands::ESP401(int cmd_params_pos, Esp3dMessage* msg) {
     // check parameters are correct
     uint8_t valueb = 0;
     uint32_t value32 = 0;
-    Esp3dSettingIndex index_setting =
-        (Esp3dSettingIndex)atoi(settingIndex.c_str());
-    const Esp3dSettingDescription* settingPtr =
+    ESP3DSettingIndex index_setting =
+        (ESP3DSettingIndex)atoi(settingIndex.c_str());
+    const ESP3DSettingDescription* settingPtr =
         esp3dTftsettings.getSettingPtr(index_setting);
     if (!settingPtr) {
       hasError = true;
@@ -78,7 +78,7 @@ void Esp3dCommands::ESP401(int cmd_params_pos, Esp3dMessage* msg) {
     } else {
       switch (settingType[0]) {
         case 'B':
-          if (settingPtr->type == Esp3dSettingType::byte_t) {
+          if (settingPtr->type == ESP3DSettingType::byte_t) {
             valueb = (uint8_t)atoi(settingValue.c_str());
             if (esp3dTftsettings.isValidByteSetting(valueb, index_setting)) {
               if (!esp3dTftsettings.writeByte(index_setting, valueb)) {
@@ -95,7 +95,7 @@ void Esp3dCommands::ESP401(int cmd_params_pos, Esp3dMessage* msg) {
           }
           break;
         case 'I':
-          if (settingPtr->type == Esp3dSettingType::integer_t) {
+          if (settingPtr->type == ESP3DSettingType::integer_t) {
             value32 = (uint32_t)atoi(settingValue.c_str());
             if (esp3dTftsettings.isValidIntegerSetting(value32,
                                                        index_setting)) {
@@ -113,7 +113,7 @@ void Esp3dCommands::ESP401(int cmd_params_pos, Esp3dMessage* msg) {
           }
           break;
         case 'S':
-          if (settingPtr->type == Esp3dSettingType::string_t) {
+          if (settingPtr->type == ESP3DSettingType::string_t) {
             if (esp3dTftsettings.isValidStringSetting(settingValue.c_str(),
                                                       index_setting)) {
               if (!esp3dTftsettings.writeString(index_setting,
@@ -132,7 +132,7 @@ void Esp3dCommands::ESP401(int cmd_params_pos, Esp3dMessage* msg) {
           break;
         case 'A':
 
-          if (settingPtr->type == Esp3dSettingType ::ip) {
+          if (settingPtr->type == ESP3DSettingType ::ip) {
             if (esp3dTftsettings.isValidIPStringSetting(settingValue.c_str(),
                                                         index_setting)) {
               if (!esp3dTftsettings.writeIPString(index_setting,
@@ -175,33 +175,33 @@ void Esp3dCommands::ESP401(int cmd_params_pos, Esp3dMessage* msg) {
       switch (index_setting) {
 #if ESP3D_SD_CARD_FEATURE
 #if ESP3D_SD_FEATURE_IS_SPI
-        case Esp3dSettingIndex::esp3d_spi_divider:
+        case ESP3DSettingIndex::esp3d_spi_divider:
           sd.setSPISpeedDivider(valueb);
           break;
 #endif  // ESP3D_SD_FEATURE_IS_SPI
 #endif  // ESP3D_SD_CARD_FEATURE
 #if ESP3D_AUTHENTICATION_FEATURE
-        case Esp3dSettingIndex::esp3d_admin_password:
+        case ESP3DSettingIndex::esp3d_admin_password:
           esp3dAuthenthicationService.setAdminPassword(settingValue.c_str());
           break;
-        case Esp3dSettingIndex::esp3d_user_password:
+        case ESP3DSettingIndex::esp3d_user_password:
           esp3dAuthenthicationService.setUserPassword(settingValue.c_str());
           break;
-        case Esp3dSettingIndex::esp3d_session_timeout:
+        case ESP3DSettingIndex::esp3d_session_timeout:
           esp3dAuthenthicationService.setSessionTimeout(valueb);
           break;
 #endif  // ESP3D_AUTHENTICATION_FEATURE
 #if ESP3D_NOTIFICATIONS_FEATURE
-        case Esp3dSettingIndex::esp3d_notification_type:
-        case Esp3dSettingIndex::esp3d_auto_notification:
-        case Esp3dSettingIndex::esp3d_notification_token_1:
-        case Esp3dSettingIndex::esp3d_notification_token_2:
-        case Esp3dSettingIndex::esp3d_notification_token_setting:
+        case ESP3DSettingIndex::esp3d_notification_type:
+        case ESP3DSettingIndex::esp3d_auto_notification:
+        case ESP3DSettingIndex::esp3d_notification_token_1:
+        case ESP3DSettingIndex::esp3d_notification_token_2:
+        case ESP3DSettingIndex::esp3d_notification_token_setting:
           esp3dNotificationsService.begin();
           break;
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 
-        case Esp3dSettingIndex::esp3d_target_firmware:
+        case ESP3DSettingIndex::esp3d_target_firmware:
           esp3dTftstream.getTargetFirmware(true);
           break;
         default:

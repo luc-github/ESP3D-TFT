@@ -21,7 +21,7 @@
 #include "http/esp3d_http_service.h"
 #include "websocket/esp3d_webui_service.h"
 
-esp_err_t Esp3dHttpService::websocket_webui_handler(httpd_req_t *req) {
+esp_err_t ESP3DHttpService::websocket_webui_handler(httpd_req_t *req) {
   // No need authentication as handled by service itself
   // Delegate to websocket webui service
   return esp3dWsWebUiService.http_handler(req);

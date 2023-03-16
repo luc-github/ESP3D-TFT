@@ -24,54 +24,54 @@
 #include "esp3d_hal.h"
 #include "esp3d_settings.h"
 
-Esp3dAuthenticationService esp3dAuthenthicationService;
+ESP3DAuthenticationService esp3dAuthenthicationService;
 
-Esp3dAuthenticationService::Esp3dAuthenticationService() {}
-Esp3dAuthenticationService::~Esp3dAuthenticationService() {}
-Esp3dAuthenticationLevel Esp3dAuthenticationService::getAuthenticatedLevel(
+ESP3DAuthenticationService::ESP3DAuthenticationService() {}
+ESP3DAuthenticationService::~ESP3DAuthenticationService() {}
+ESP3DAuthenticationLevel ESP3DAuthenticationService::getAuthenticatedLevel(
     const char *pwd) {
 #if ESP3D_AUTHENTICATION_FEATURE
   if (isAdmin(pwd)) {
-    return Esp3dAuthenticationLevel::admin;
+    return ESP3DAuthenticationLevel::admin;
   }
   if (isUser(pwd)) {
-    return Esp3dAuthenticationLevel::user;
+    return ESP3DAuthenticationLevel::user;
   }
-  return Esp3dAuthenticationLevel::guest;
+  return ESP3DAuthenticationLevel::guest;
 #else
-  return Esp3dAuthenticationLevel::admin;
+  return ESP3DAuthenticationLevel::admin;
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
 }
-bool Esp3dAuthenticationService::begin() {
+bool ESP3DAuthenticationService::begin() {
 #if ESP3D_AUTHENTICATION_FEATURE
   char tmpStr[SIZE_OF_LOCAL_PASSWORD + 1];
   _admin_pwd = esp3dTftsettings.readString(
-      Esp3dSettingIndex::esp3d_admin_password, tmpStr, SIZE_OF_LOCAL_PASSWORD);
+      ESP3DSettingIndex::esp3d_admin_password, tmpStr, SIZE_OF_LOCAL_PASSWORD);
   _user_pwd = esp3dTftsettings.readString(
-      Esp3dSettingIndex::esp3d_user_password, tmpStr, SIZE_OF_LOCAL_PASSWORD);
+      ESP3DSettingIndex::esp3d_user_password, tmpStr, SIZE_OF_LOCAL_PASSWORD);
   _session_timeout =
-      esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_session_timeout);
+      esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_session_timeout);
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   return true;
 }
-void Esp3dAuthenticationService::handle() {
+void ESP3DAuthenticationService::handle() {
   // TODO  clear time out session
 }
-void Esp3dAuthenticationService::end() {
+void ESP3DAuthenticationService::end() {
 #if ESP3D_AUTHENTICATION_FEATURE
   _admin_pwd.clear();
   _user_pwd.clear();
   clearAllSessions();
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
 }
-bool Esp3dAuthenticationService::isAdmin(const char *pwd) {
+bool ESP3DAuthenticationService::isAdmin(const char *pwd) {
 #if ESP3D_AUTHENTICATION_FEATURE
   return _admin_pwd == pwd;
 #else
   return true;
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
 }
-bool Esp3dAuthenticationService::isUser(const char *pwd) {
+bool ESP3DAuthenticationService::isUser(const char *pwd) {
 #if ESP3D_AUTHENTICATION_FEATURE
   return _user_pwd == pwd;
 #else
@@ -80,7 +80,7 @@ bool Esp3dAuthenticationService::isUser(const char *pwd) {
 }
 
 #if ESP3D_AUTHENTICATION_FEATURE
-const char *Esp3dAuthenticationService::create_session_id(
+const char *ESP3DAuthenticationService::create_session_id(
     struct sockaddr_storage source_addr, int socketId) {
   static char sessionID[25];
   memset(sessionID, 0, sizeof(sessionID));
@@ -103,14 +103,14 @@ const char *Esp3dAuthenticationService::create_session_id(
   return sessionID;
 }
 
-bool Esp3dAuthenticationService::createRecord(const char *sessionId,
+bool ESP3DAuthenticationService::createRecord(const char *sessionId,
                                               int socketId,
-                                              Esp3dAuthenticationLevel level,
-                                              Esp3dClientType client_type) {
+                                              ESP3DAuthenticationLevel level,
+                                              ESP3DClientType client_type) {
   if (strlen(sessionId) == 0) {
     return false;
   }
-  Esp3dAuthenticationRecord rec;
+  ESP3DAuthenticationRecord rec;
   memset(&rec, 0, sizeof(rec));
   rec.level = level;
   rec.client_type = client_type;
@@ -121,7 +121,7 @@ bool Esp3dAuthenticationService::createRecord(const char *sessionId,
   return true;
 }
 
-bool Esp3dAuthenticationService::clearSession(const char *sessionId) {
+bool ESP3DAuthenticationService::clearSession(const char *sessionId) {
   if (sessionId && strlen(sessionId) == 24) {
     esp3d_log("Clear session %s, size:%d  among %d sessions", sessionId,
               strlen(sessionId), _sessions.size());
@@ -143,7 +143,7 @@ bool Esp3dAuthenticationService::clearSession(const char *sessionId) {
   return false;
 }
 
-void Esp3dAuthenticationService::clearSessions(Esp3dClientType client_type) {
+void ESP3DAuthenticationService::clearSessions(ESP3DClientType client_type) {
   esp3d_log("Clear all sessions %d", static_cast<uint8_t>(client_type));
   for (auto session = _sessions.begin(); session != _sessions.end();
        ++session) {
@@ -154,8 +154,8 @@ void Esp3dAuthenticationService::clearSessions(Esp3dClientType client_type) {
   }
 }
 
-void Esp3dAuthenticationService::clearAllSessions() { _sessions.clear(); }
-Esp3dAuthenticationRecord *Esp3dAuthenticationService::getRecord(
+void ESP3DAuthenticationService::clearAllSessions() { _sessions.clear(); }
+ESP3DAuthenticationRecord *ESP3DAuthenticationService::getRecord(
     const char *sessionId) {
   for (auto session = _sessions.begin(); session != _sessions.end();
        ++session) {
@@ -166,8 +166,8 @@ Esp3dAuthenticationRecord *Esp3dAuthenticationService::getRecord(
   return NULL;
 }
 
-Esp3dAuthenticationRecord *Esp3dAuthenticationService::getRecord(
-    int socketId, Esp3dClientType client_type) {
+ESP3DAuthenticationRecord *ESP3DAuthenticationService::getRecord(
+    int socketId, ESP3DClientType client_type) {
   for (auto session = _sessions.begin(); session != _sessions.end();
        ++session) {
     if ((socketId == -1 || session->socket_id == socketId) &&
@@ -180,9 +180,9 @@ Esp3dAuthenticationRecord *Esp3dAuthenticationService::getRecord(
   return NULL;
 }
 
-bool Esp3dAuthenticationService::updateRecord(
-    int socketId, Esp3dClientType client_type,
-    Esp3dAuthenticationLevel newlevel) {
+bool ESP3DAuthenticationService::updateRecord(
+    int socketId, ESP3DClientType client_type,
+    ESP3DAuthenticationLevel newlevel) {
   for (auto session = _sessions.begin(); session != _sessions.end();
        ++session) {
     if (session->client_type == client_type && session->socket_id == socketId) {
@@ -193,7 +193,7 @@ bool Esp3dAuthenticationService::updateRecord(
   return false;
 }
 
-uint8_t Esp3dAuthenticationService::activeSessionsCount(Esp3dClientType type) {
+uint8_t ESP3DAuthenticationService::activeSessionsCount(ESP3DClientType type) {
   uint8_t count = 0;
   for (auto session = _sessions.begin(); session != _sessions.end();
        ++session) {
@@ -206,7 +206,7 @@ uint8_t Esp3dAuthenticationService::activeSessionsCount(Esp3dClientType type) {
   return count;
 }
 
-void Esp3dAuthenticationService::updateRecords() {
+void ESP3DAuthenticationService::updateRecords() {
   for (auto session = _sessions.begin(); session != _sessions.end();
        ++session) {
     esp3d_log("session %s, type %d", session->session_id,

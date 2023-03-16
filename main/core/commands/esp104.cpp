@@ -27,12 +27,12 @@
 #define COMMAND_ID 104
 // Set STA fallback mode state at boot which can be BT, CONFIG,  OFF
 //[ESP104]<state> json=<no> pwd=<admin password>
-void Esp3dCommands::ESP104(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP104(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
@@ -40,8 +40,8 @@ void Esp3dCommands::ESP104(int cmd_params_pos, Esp3dMessage* msg) {
   std::string tmpstr;
   uint8_t byteValue = (uint8_t)-1;
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
-    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
+    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
@@ -49,34 +49,34 @@ void Esp3dCommands::ESP104(int cmd_params_pos, Esp3dMessage* msg) {
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
     byteValue =
-        esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_fallback_mode);
-    if (byteValue == (uint8_t)Esp3dRadioMode::bluetooth_serial) {
+        esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_fallback_mode);
+    if (byteValue == (uint8_t)ESP3DRadioMode::bluetooth_serial) {
       ok_msg = "BT";
-    } else if (byteValue == (uint8_t)Esp3dRadioMode::wifi_ap_config) {
+    } else if (byteValue == (uint8_t)ESP3DRadioMode::wifi_ap_config) {
       ok_msg = "CONFIG";
-    } else if (byteValue == (uint8_t)Esp3dRadioMode::off) {
+    } else if (byteValue == (uint8_t)ESP3DRadioMode::off) {
       ok_msg = "OFF";
     } else {
       ok_msg = "Unknown";
     }
   } else {
     if (tmpstr == "BT") {
-      byteValue = (uint8_t)Esp3dRadioMode::bluetooth_serial;
+      byteValue = (uint8_t)ESP3DRadioMode::bluetooth_serial;
     } else if (tmpstr == "CONFIG") {
-      byteValue = (uint8_t)Esp3dRadioMode::wifi_ap_config;
+      byteValue = (uint8_t)ESP3DRadioMode::wifi_ap_config;
     } else if (tmpstr == "OFF") {
-      byteValue = (uint8_t)Esp3dRadioMode::off;
+      byteValue = (uint8_t)ESP3DRadioMode::off;
     } else {
       byteValue = (uint8_t)-1;  // unknow flag so put outof range value
     }
     esp3d_log("got %s param for a value of %d, is valid %d", tmpstr.c_str(),
               byteValue,
               esp3dTftsettings.isValidByteSetting(
-                  byteValue, Esp3dSettingIndex::esp3d_fallback_mode));
+                  byteValue, ESP3DSettingIndex::esp3d_fallback_mode));
     if (esp3dTftsettings.isValidByteSetting(
-            byteValue, Esp3dSettingIndex::esp3d_fallback_mode)) {
+            byteValue, ESP3DSettingIndex::esp3d_fallback_mode)) {
       esp3d_log("Value %d is valid", byteValue);
-      if (!esp3dTftsettings.writeByte(Esp3dSettingIndex::esp3d_fallback_mode,
+      if (!esp3dTftsettings.writeByte(ESP3DSettingIndex::esp3d_fallback_mode,
                                       byteValue)) {
         hasError = true;
         error_msg = "Set value failed";

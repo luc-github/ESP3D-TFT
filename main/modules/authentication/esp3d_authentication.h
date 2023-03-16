@@ -33,11 +33,11 @@
 extern "C" {
 #endif
 
-class Esp3dAuthenticationService final {
+class ESP3DAuthenticationService final {
  public:
-  Esp3dAuthenticationService();
-  ~Esp3dAuthenticationService();
-  Esp3dAuthenticationLevel getAuthenticatedLevel(const char *pwd = nullptr);
+  ESP3DAuthenticationService();
+  ~ESP3DAuthenticationService();
+  ESP3DAuthenticationLevel getAuthenticatedLevel(const char *pwd = nullptr);
   bool begin();
   void handle();
   void end();
@@ -59,30 +59,30 @@ class Esp3dAuthenticationService final {
     return 60 * 1000 * _session_timeout;
   }
   bool createRecord(const char *sessionId, int socketId,
-                    Esp3dAuthenticationLevel level,
-                    Esp3dClientType client_type);
+                    ESP3DAuthenticationLevel level,
+                    ESP3DClientType client_type);
   bool clearSession(const char *sessionId);
-  void clearSessions(Esp3dClientType client_type);
-  bool updateRecord(int socketId, Esp3dClientType client_type,
-                    Esp3dAuthenticationLevel newlevel);
+  void clearSessions(ESP3DClientType client_type);
+  bool updateRecord(int socketId, ESP3DClientType client_type,
+                    ESP3DAuthenticationLevel newlevel);
   void clearAllSessions();
-  Esp3dAuthenticationRecord *getRecord(const char *sessionId);
-  Esp3dAuthenticationRecord *getRecord(int socketId,
-                                       Esp3dClientType client_type);
+  ESP3DAuthenticationRecord *getRecord(const char *sessionId);
+  ESP3DAuthenticationRecord *getRecord(int socketId,
+                                       ESP3DClientType client_type);
   const char *create_session_id(struct sockaddr_storage source_addr,
                                 int socketId);
-  uint8_t activeSessionsCount(Esp3dClientType type);
+  uint8_t activeSessionsCount(ESP3DClientType type);
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
  private:
 #if ESP3D_AUTHENTICATION_FEATURE
   std::string _admin_pwd;
   std::string _user_pwd;
   uint8_t _session_timeout;
-  std::list<Esp3dAuthenticationRecord> _sessions;
+  std::list<ESP3DAuthenticationRecord> _sessions;
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
 };
 
-extern Esp3dAuthenticationService esp3dAuthenthicationService;
+extern ESP3DAuthenticationService esp3dAuthenthicationService;
 
 #ifdef __cplusplus
 }  // extern "C"

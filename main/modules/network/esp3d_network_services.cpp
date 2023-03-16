@@ -42,13 +42,13 @@
 #endif  // ESP3D_TELNET_FEATURE
 #include "authentication/esp3d_authentication.h"
 
-Esp3dNetworkServices esp3dNetworkServices;
+ESP3DNetworkServices esp3dNetworkServices;
 
-Esp3dNetworkServices::Esp3dNetworkServices() { _started = false; }
+ESP3DNetworkServices::ESP3DNetworkServices() { _started = false; }
 
-Esp3dNetworkServices::~Esp3dNetworkServices() {}
+ESP3DNetworkServices::~ESP3DNetworkServices() {}
 
-bool Esp3dNetworkServices::begin() {
+bool ESP3DNetworkServices::begin() {
   esp3d_log("Starting Services");
   _started = esp3dAuthenthicationService.begin();
 #if ESP3D_HTTP_FEATURE
@@ -71,9 +71,9 @@ bool Esp3dNetworkServices::begin() {
   return _started;
 }
 
-void Esp3dNetworkServices::handle() { esp3dAuthenthicationService.handle(); }
+void ESP3DNetworkServices::handle() { esp3dAuthenthicationService.handle(); }
 
-void Esp3dNetworkServices::end() {
+void ESP3DNetworkServices::end() {
   if (!_started) {
     return;
   }

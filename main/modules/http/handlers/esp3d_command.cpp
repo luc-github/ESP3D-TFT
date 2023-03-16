@@ -27,11 +27,11 @@
 #include "http/esp3d_http_service.h"
 #include "network/esp3d_network.h"
 
-esp_err_t Esp3dHttpService::command_handler(httpd_req_t *req) {
+esp_err_t ESP3DHttpService::command_handler(httpd_req_t *req) {
   // TODO: check authentication level
-  Esp3dAuthenticationLevel authentication_level = getAuthenticationLevel(req);
+  ESP3DAuthenticationLevel authentication_level = getAuthenticationLevel(req);
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (authentication_level == Esp3dAuthenticationLevel::guest) {
+  if (authentication_level == ESP3DAuthenticationLevel::guest) {
     // send 401
     return not_authenticated_handler(req);
   }
@@ -65,11 +65,11 @@ esp_err_t Esp3dHttpService::command_handler(httpd_req_t *req) {
     free(buf);
   }
   if (strlen(cmd) > 0) {
-    Esp3dRequest requestId;
+    ESP3DRequest requestId;
     if (esp3dCommands.is_esp_command((uint8_t *)cmd, strlen(cmd))) {
       requestId.http_request = req;
-      Esp3dMessage *newMsgPtr = Esp3dClient::newMsg(
-          Esp3dClientType::webui, Esp3dClientType::command,
+      ESP3DMessage *newMsgPtr = ESP3DClient::newMsg(
+          ESP3DClientType::webui, ESP3DClientType::command,
           (const uint8_t *)cmd, strlen(cmd), authentication_level);
       if (newMsgPtr) {
         newMsgPtr->request_id.http_request = req;
@@ -90,7 +90,7 @@ esp_err_t Esp3dHttpService::command_handler(httpd_req_t *req) {
         }
       }
       esp3dCommands.dispatch(cmd, esp3dCommands.getOutputClient(), requestId,
-                             Esp3dMessageType::unique, Esp3dClientType::webui,
+                             ESP3DMessageType::unique, ESP3DClientType::webui,
                              authentication_level);
       return ESP_OK;
     }

@@ -27,15 +27,15 @@
 #include "ssdp.h"
 #include "ssdp/customizations.h"
 
-Esp3dssdp esp3d_ssdp_service;
+ESP3Dssdp esp3d_ssdp_service;
 
-Esp3dssdp::Esp3dssdp() { _started = false; }
+ESP3Dssdp::ESP3Dssdp() { _started = false; }
 
-Esp3dssdp::~Esp3dssdp() { end(); }
+ESP3Dssdp::~ESP3Dssdp() { end(); }
 
-const char *Esp3dssdp::get_schema() { return get_ssdp_schema_str(); }
+const char *ESP3Dssdp::get_schema() { return get_ssdp_schema_str(); }
 
-bool Esp3dssdp::begin() {
+bool ESP3Dssdp::begin() {
   if (_started) {
     end();
   }
@@ -49,7 +49,7 @@ bool Esp3dssdp::begin() {
   config.serial_number = efuseMacStr.c_str();
   // Http port
   uint32_t portValue =
-      esp3dTftsettings.readUint32(Esp3dSettingIndex::esp3d_http_port);
+      esp3dTftsettings.readUint32(ESP3DSettingIndex::esp3d_http_port);
   config.port = portValue;
   // User customization if any
   // Modele name
@@ -99,9 +99,9 @@ bool Esp3dssdp::begin() {
   return _started;
 }
 
-void Esp3dssdp::handle() {}
+void ESP3Dssdp::handle() {}
 
-void Esp3dssdp::end() {
+void ESP3Dssdp::end() {
   ssdp_stop();
   _started = false;
 }

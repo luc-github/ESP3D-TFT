@@ -26,28 +26,28 @@
 #define COMMAND_ID 555
 // Change user password
 //[ESP555]<password> json=<no> pwd=<admin/user password>
-void Esp3dCommands::ESP555(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP555(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
   bool json = hasTag(msg, cmd_params_pos, "json");
   std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
-    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
+    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
-    const Esp3dSettingDescription* settingPtr =
-        esp3dTftsettings.getSettingPtr(Esp3dSettingIndex::esp3d_user_password);
+    const ESP3DSettingDescription* settingPtr =
+        esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_user_password);
     if (settingPtr) {
       ok_msg = HIDDEN_SETTING_VALUE;
     } else {
@@ -58,11 +58,11 @@ void Esp3dCommands::ESP555(int cmd_params_pos, Esp3dMessage* msg) {
     esp3d_log("got %s param for a value of %s, is valid %d", tmpstr.c_str(),
               tmpstr.c_str(),
               esp3dTftsettings.isValidStringSetting(
-                  tmpstr.c_str(), Esp3dSettingIndex::esp3d_user_password));
+                  tmpstr.c_str(), ESP3DSettingIndex::esp3d_user_password));
     if (esp3dTftsettings.isValidStringSetting(
-            tmpstr.c_str(), Esp3dSettingIndex::esp3d_user_password)) {
+            tmpstr.c_str(), ESP3DSettingIndex::esp3d_user_password)) {
       esp3d_log("Value %s is valid", tmpstr.c_str());
-      if (!esp3dTftsettings.writeString(Esp3dSettingIndex::esp3d_user_password,
+      if (!esp3dTftsettings.writeString(ESP3DSettingIndex::esp3d_user_password,
                                         tmpstr.c_str())) {
         hasError = true;
         error_msg = "Set value failed";

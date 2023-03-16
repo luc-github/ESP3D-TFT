@@ -24,10 +24,10 @@
 extern "C" {
 #endif
 
-class Esp3dTftNetwork final {
+class ESP3DTftNetwork final {
  public:
-  Esp3dTftNetwork();
-  ~Esp3dTftNetwork();
+  ESP3DTftNetwork();
+  ~ESP3DTftNetwork();
   bool begin();
   void handle();
   bool end();
@@ -36,7 +36,7 @@ class Esp3dTftNetwork final {
   bool _started;
 };
 
-extern Esp3dTftNetwork esp3dTftnetwork;
+extern ESP3DTftNetwork esp3dTftnetwork;
 
 #ifdef __cplusplus
 }  // extern "C"

@@ -27,10 +27,10 @@
 extern "C" {
 #endif
 
-class Esp3dmDNS final {
+class ESP3DmDNS final {
  public:
-  Esp3dmDNS();
-  ~Esp3dmDNS();
+  ESP3DmDNS();
+  ~ESP3DmDNS();
   bool begin();
   void handle();
   void end();
@@ -47,7 +47,7 @@ class Esp3dmDNS final {
   uint16_t _count;
 };
 
-extern Esp3dmDNS esp3dmDNS;
+extern ESP3DmDNS esp3dmDNS;
 #ifdef __cplusplus
 }  // extern "C"
 #endif

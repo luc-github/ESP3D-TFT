@@ -31,12 +31,12 @@ extern "C" {
 typedef std::function<bool(const char *, const char *, const char *)>
     processingFunction_t;
 
-class Esp3dConfigFile final {
+class ESP3DConfigFile final {
  public:
-  Esp3dConfigFile(const char *path, processingFunction_t fn,
+  ESP3DConfigFile(const char *path, processingFunction_t fn,
                   const char *scrambledpath = nullptr,
                   const char **protectedkeys = nullptr);
-  ~Esp3dConfigFile();
+  ~ESP3DConfigFile();
   char *trimSpaces(char *line, uint8_t maxsize = 0);
   bool isComment(char *line);
   bool isSection(char *line);

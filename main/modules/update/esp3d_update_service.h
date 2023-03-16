@@ -27,10 +27,10 @@
 extern "C" {
 #endif
 
-class Esp3dUpdateService final {
+class ESP3DUpdateService final {
  public:
-  Esp3dUpdateService();
-  ~Esp3dUpdateService();
+  ESP3DUpdateService();
+  ~ESP3DUpdateService();
   bool begin();
   void handle();
   void end();
@@ -47,18 +47,18 @@ class Esp3dUpdateService final {
   bool _canUpdate;
   size_t _maxUpdateSize;
   static bool processString(const char** keysval,
-                            const Esp3dSettingIndex* keypos, const size_t size,
+                            const ESP3DSettingIndex* keypos, const size_t size,
                             const char* key, const char* value, char& T,
-                            Esp3dSettingIndex& P);
-  static bool processInt(const char** keysval, const Esp3dSettingIndex* keypos,
+                            ESP3DSettingIndex& P);
+  static bool processInt(const char** keysval, const ESP3DSettingIndex* keypos,
                          const size_t size, const char* key, const char* value,
-                         char& T, Esp3dSettingIndex& P, uint32_t& v);
-  static bool processBool(const char** keysval, const Esp3dSettingIndex* keypos,
+                         char& T, ESP3DSettingIndex& P, uint32_t& v);
+  static bool processBool(const char** keysval, const ESP3DSettingIndex* keypos,
                           const size_t size, const char* key, const char* value,
-                          char& T, Esp3dSettingIndex& P, uint8_t& b);
+                          char& T, ESP3DSettingIndex& P, uint8_t& b);
 };
 
-extern Esp3dUpdateService esp3dUpdateService;
+extern ESP3DUpdateService esp3dUpdateService;
 #ifdef __cplusplus
 }  // extern "C"
 #endif

@@ -25,10 +25,10 @@
 extern "C" {
 #endif
 
-class Esp3dNetworkServices final {
+class ESP3DNetworkServices final {
  public:
-  Esp3dNetworkServices();
-  ~Esp3dNetworkServices();
+  ESP3DNetworkServices();
+  ~ESP3DNetworkServices();
   bool begin();
   void handle();
   void end();
@@ -39,7 +39,7 @@ class Esp3dNetworkServices final {
   bool _started;
 };
 #if ESP3D_WIFI_FEATURE
-extern Esp3dNetworkServices esp3dNetworkServices;
+extern ESP3DNetworkServices esp3dNetworkServices;
 #endif  // ESP3D_WIFI_FEATURE
 #ifdef __cplusplus
 }  // extern "C"

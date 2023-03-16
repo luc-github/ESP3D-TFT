@@ -27,15 +27,15 @@
 #include "esp3d_string.h"
 #include "http/esp3d_http_service.h"
 
-Esp3dWebUiService esp3dWsWebUiService;
+ESP3DWebUiService esp3dWsWebUiService;
 
-esp_err_t Esp3dWebUiService::onOpen(httpd_req_t *req) {
+esp_err_t ESP3DWebUiService::onOpen(httpd_req_t *req) {
   int currentFd = httpd_req_to_sockfd(req);
   std::string tmpstr;
   esp3d_log("New connection %d", currentFd);
   if (clientsConnected() == maxClients()) {
     esp3d_log("Already connected: %d client", clientsConnected());
-    Esp3dWebSocketInfos *client = getClientInfos(maxClients() - 1);
+    ESP3DWebSocketInfos *client = getClientInfos(maxClients() - 1);
     if (client) {
       esp3d_log_w("Already connected: %d client with socket %d",
                   clientsConnected(), client->socket_id);
@@ -71,14 +71,14 @@ esp_err_t Esp3dWebUiService::onOpen(httpd_req_t *req) {
   return ESP_OK;
 }
 
-void Esp3dWebUiService::process(Esp3dMessage *msg) {
+void ESP3DWebUiService::process(ESP3DMessage *msg) {
   // webui use bin for the stream
   esp3d_log("Processing message");
   BroadcastBin(msg->data, msg->size);
-  Esp3dClient::deleteMsg(msg);
+  ESP3DClient::deleteMsg(msg);
 }
 
-esp_err_t Esp3dWebUiService::pushNotification(const char *msg) {
+esp_err_t ESP3DWebUiService::pushNotification(const char *msg) {
   // webui use TXT for internal messages
   std::string tmp = "NOTIFICATION:";
   tmp += msg;
@@ -86,7 +86,7 @@ esp_err_t Esp3dWebUiService::pushNotification(const char *msg) {
   return BroadcastTxt(tmp.c_str());
 }
 
-esp_err_t Esp3dWebUiService::onMessage(httpd_req_t *req) {
+esp_err_t ESP3DWebUiService::onMessage(httpd_req_t *req) {
   httpd_ws_frame_t ws_pkt;
   uint8_t *buf = NULL;
   memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
@@ -120,7 +120,7 @@ esp_err_t Esp3dWebUiService::onMessage(httpd_req_t *req) {
                 currentFd);
       if (esp3d_strings::startsWith((const char *)buf, "PING:")) {
         esp3d_log("Got PING on sessionID %s", (const char *)&buf[5]);
-        Esp3dAuthenticationRecord *rec =
+        ESP3DAuthenticationRecord *rec =
             esp3dAuthenthicationService.getRecord((const char *)&buf[5]);
         std::string tmpStr = "PING:";
         uint64_t session = esp3dAuthenthicationService.getSessionTimeout();

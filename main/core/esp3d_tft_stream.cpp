@@ -48,7 +48,7 @@
  **********************/
 static void streamTask(void *pvParameter);
 
-Esp3dTftStream esp3dTftstream;
+ESP3DTftStream esp3dTftstream;
 
 /* Creates a semaphore to handle concurrent call to task stuff
  * If you wish to call *any* class function from other threads/tasks
@@ -77,20 +77,20 @@ static void streamTask(void *pvParameter) {
   vTaskDelete(NULL);
 }
 
-Esp3dTftStream::Esp3dTftStream() {}
+ESP3DTftStream::ESP3DTftStream() {}
 
-Esp3dTftStream::~Esp3dTftStream() {}
+ESP3DTftStream::~ESP3DTftStream() {}
 
-Esp3dTargetFirmware Esp3dTftStream::getTargetFirmware(bool fromSettings) {
+ESP3DTargetFirmware ESP3DTftStream::getTargetFirmware(bool fromSettings) {
   if (fromSettings) {
-    _target_firmware = (Esp3dTargetFirmware)esp3dTftsettings.readByte(
-        Esp3dSettingIndex::esp3d_target_firmware);
+    _target_firmware = (ESP3DTargetFirmware)esp3dTftsettings.readByte(
+        ESP3DSettingIndex::esp3d_target_firmware);
   }
 
   return _target_firmware;
 }
 
-bool Esp3dTftStream::begin() {
+bool ESP3DTftStream::begin() {
   // Task creation
   TaskHandle_t xHandle = NULL;
   BaseType_t res =
@@ -104,13 +104,13 @@ bool Esp3dTftStream::begin() {
 #endif  // ESP3D_TFT_LOG
     getTargetFirmware(true);
 
-    if (esp3dCommands.getOutputClient(true) == Esp3dClientType::serial) {
+    if (esp3dCommands.getOutputClient(true) == ESP3DClientType::serial) {
       if (serialClient.begin()) {
         return true;
       }
     }
 #if ESP3D_USB_SERIAL_FEATURE
-    else if (esp3dCommands.getOutputClient() == Esp3dClientType::usb_serial) {
+    else if (esp3dCommands.getOutputClient() == ESP3DClientType::usb_serial) {
       if (usbSerialClient.begin()) {
         return true;
       }
@@ -123,14 +123,14 @@ bool Esp3dTftStream::begin() {
   return false;
 }
 
-void Esp3dTftStream::handle() {
+void ESP3DTftStream::handle() {
   serialClient.handle();
 #if ESP3D_USB_SERIAL_FEATURE
   usbSerialClient.handle();
 #endif  // ESP3D_USB_SERIAL_FEATURE
 }
 
-bool Esp3dTftStream::end() {
+bool ESP3DTftStream::end() {
   // TODO
   // this part is never called
   //  if called need to kill task also

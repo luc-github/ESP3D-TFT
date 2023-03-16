@@ -26,12 +26,12 @@
 #define COMMAND_ID 106
 // AP Password
 //[ESP106]<Password> <NOPASSWORD> json=no pwd=<admin password>
-void Esp3dCommands::ESP106(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP106(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
@@ -39,8 +39,8 @@ void Esp3dCommands::ESP106(int cmd_params_pos, Esp3dMessage* msg) {
   bool json = hasTag(msg, cmd_params_pos, "json");
   std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
-    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
+    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
@@ -57,11 +57,11 @@ void Esp3dCommands::ESP106(int cmd_params_pos, Esp3dMessage* msg) {
     esp3d_log("got %s param for a value of %s, is valid %d", tmpstr.c_str(),
               tmpstr.c_str(),
               esp3dTftsettings.isValidStringSetting(
-                  tmpstr.c_str(), Esp3dSettingIndex::esp3d_ap_password));
+                  tmpstr.c_str(), ESP3DSettingIndex::esp3d_ap_password));
     if (esp3dTftsettings.isValidStringSetting(
-            tmpstr.c_str(), Esp3dSettingIndex::esp3d_ap_password)) {
+            tmpstr.c_str(), ESP3DSettingIndex::esp3d_ap_password)) {
       esp3d_log("Value %s is valid", tmpstr.c_str());
-      if (!esp3dTftsettings.writeString(Esp3dSettingIndex::esp3d_ap_password,
+      if (!esp3dTftsettings.writeString(ESP3DSettingIndex::esp3d_ap_password,
                                         tmpstr.c_str())) {
         hasError = true;
         error_msg = "Set value failed";

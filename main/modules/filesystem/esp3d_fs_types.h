@@ -21,7 +21,7 @@
 #pragma once
 #include <stdio.h>
 
-enum class Esp3dFileSystemType : uint8_t {
+enum class ESP3DFileSystemType : uint8_t {
   root,
   flash,
   sd,

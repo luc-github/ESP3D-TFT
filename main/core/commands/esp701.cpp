@@ -27,32 +27,32 @@
 
 // Query and Control ESP700 stream
 //[ESP701]action=<PAUSE/RESUME/ABORT> json=<no> pwd=<admin/user password>`
-void Esp3dCommands::ESP701(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP701(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
   bool json = hasTag(msg, cmd_params_pos, "json");
   std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
-    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
+    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_param(msg, cmd_params_pos, "action=");
-  Esp3dGcodeHostState status = gcodeHostService.getState();
-  Esp3dGcodeHostError errorNum = gcodeHostService.getErrorNum();
+  ESP3DGcodeHostState status = gcodeHostService.getState();
+  ESP3DGcodeHostError errorNum = gcodeHostService.getErrorNum();
   if (tmpstr.length() == 0) {
-    if (status == Esp3dGcodeHostState::no_stream) {
+    if (status == ESP3DGcodeHostState::no_stream) {
       if (json) {
         ok_msg = "{\"status\":\"no stream\"";
-        if (errorNum != Esp3dGcodeHostError::no_error) {
+        if (errorNum != ESP3DGcodeHostError::no_error) {
           ok_msg += "\",\"code\":\"";
           ok_msg += std::to_string(static_cast<uint8_t>(errorNum));
           ok_msg += "\"";
@@ -60,15 +60,15 @@ void Esp3dCommands::ESP701(int cmd_params_pos, Esp3dMessage* msg) {
         ok_msg += "}";
       } else {
         ok_msg = "no stream";
-        if (errorNum != Esp3dGcodeHostError::no_error) {
+        if (errorNum != ESP3DGcodeHostError::no_error) {
           ok_msg += ", last error ";
           ok_msg += std::to_string(static_cast<uint8_t>(errorNum));
         }
       }
     } else {
-      Esp3dScript* script = gcodeHostService.getCurrentScript();
+      ESP3DScript* script = gcodeHostService.getCurrentScript();
       if (script) {
-        if (status == Esp3dGcodeHostState::paused) {
+        if (status == ESP3DGcodeHostState::paused) {
           if (json) {
             ok_msg = "{\"status\":\"paused\"";
           } else {
@@ -88,8 +88,8 @@ void Esp3dCommands::ESP701(int cmd_params_pos, Esp3dMessage* msg) {
           ok_msg += std::to_string(script->progress);
           ok_msg += "\",\"type\":\"";
           ok_msg += std::to_string(static_cast<uint8_t>(script->type));
-          if (script->type == Esp3dGcodeHostScriptType::sd_card ||
-              script->type == Esp3dGcodeHostScriptType::filesystem) {
+          if (script->type == ESP3DGcodeHostScriptType::sd_card ||
+              script->type == ESP3DGcodeHostScriptType::filesystem) {
             ok_msg += "\",\"name\":\"";
             ok_msg += script->script;
             ok_msg += "\"";

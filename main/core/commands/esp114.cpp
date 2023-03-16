@@ -27,12 +27,12 @@
 #define COMMAND_ID 114
 // Get/Set Boot radio state which can be ON, OFF
 //[ESP114]<state> json=<no> pwd=<user/admin password>
-void Esp3dCommands::ESP114(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClientType target = msg->origin;
-  Esp3dRequest requestId = msg->request_id;
+void ESP3DCommands::ESP114(int cmd_params_pos, ESP3DMessage* msg) {
+  ESP3DClientType target = msg->origin;
+  ESP3DRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClientType::command;
+  msg->origin = ESP3DClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
@@ -40,8 +40,8 @@ void Esp3dCommands::ESP114(int cmd_params_pos, Esp3dMessage* msg) {
   std::string tmpstr;
   uint8_t byteValue = (uint8_t)-1;
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
-    msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
+    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
@@ -49,30 +49,30 @@ void Esp3dCommands::ESP114(int cmd_params_pos, Esp3dMessage* msg) {
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
     byteValue =
-        esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_radio_boot_mode);
-    if (byteValue == (uint8_t)Esp3dState::off) {
+        esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_radio_boot_mode);
+    if (byteValue == (uint8_t)ESP3DState::off) {
       ok_msg = "OFF";
-    } else if (byteValue == (uint8_t)Esp3dState::on) {
+    } else if (byteValue == (uint8_t)ESP3DState::on) {
       ok_msg = "ON";
     } else {
       ok_msg = "Unknown";
     }
   } else {
     if (tmpstr == "OFF") {
-      byteValue = (uint8_t)Esp3dState::off;
+      byteValue = (uint8_t)ESP3DState::off;
     } else if (tmpstr == "ON") {
-      byteValue = (uint8_t)Esp3dState::on;
+      byteValue = (uint8_t)ESP3DState::on;
     } else {
       byteValue = (uint8_t)-1;  // unknow flag so put outof range value
     }
     esp3d_log("got %s param for a value of %d, is valid %d", tmpstr.c_str(),
               byteValue,
               esp3dTftsettings.isValidByteSetting(
-                  byteValue, Esp3dSettingIndex::esp3d_radio_boot_mode));
+                  byteValue, ESP3DSettingIndex::esp3d_radio_boot_mode));
     if (esp3dTftsettings.isValidByteSetting(
-            byteValue, Esp3dSettingIndex::esp3d_radio_boot_mode)) {
+            byteValue, ESP3DSettingIndex::esp3d_radio_boot_mode)) {
       esp3d_log("Value %d is valid", byteValue);
-      if (!esp3dTftsettings.writeByte(Esp3dSettingIndex::esp3d_radio_boot_mode,
+      if (!esp3dTftsettings.writeByte(ESP3DSettingIndex::esp3d_radio_boot_mode,
                                       byteValue)) {
         hasError = true;
         error_msg = "Set value failed";

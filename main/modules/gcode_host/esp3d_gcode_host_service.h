@@ -34,40 +34,40 @@
 extern "C" {
 #endif
 
-struct Esp3dScript {
+struct ESP3DScript {
   uint8_t id = 0;
   std::string script;
   std::string current_command;
-  Esp3dGcodeHostScriptType type = Esp3dGcodeHostScriptType::unknown;
-  Esp3dGcodeHostState state = Esp3dGcodeHostState::no_stream;
-  Esp3dGcodeHostState next_state = Esp3dGcodeHostState::no_stream;
-  Esp3dGcodeHostWait wait_state = Esp3dGcodeHostWait::no_wait;
-  Esp3dGcodeHostError error = Esp3dGcodeHostError::no_error;
-  Esp3dAuthenticationLevel auth_type = Esp3dAuthenticationLevel::guest;
+  ESP3DGcodeHostScriptType type = ESP3DGcodeHostScriptType::unknown;
+  ESP3DGcodeHostState state = ESP3DGcodeHostState::no_stream;
+  ESP3DGcodeHostState next_state = ESP3DGcodeHostState::no_stream;
+  ESP3DGcodeHostWait wait_state = ESP3DGcodeHostWait::no_wait;
+  ESP3DGcodeHostError error = ESP3DGcodeHostError::no_error;
+  ESP3DAuthenticationLevel auth_type = ESP3DAuthenticationLevel::guest;
   uint64_t total = 0;
   uint64_t progress = 0;
   uint64_t timestamp = 0;
   FILE* fileScript = nullptr;
 };
 
-class Esp3dGCodeHostService : public Esp3dClient {
+class ESP3DGCodeHostService : public ESP3DClient {
  public:
-  Esp3dGCodeHostService();
-  ~Esp3dGCodeHostService();
+  ESP3DGCodeHostService();
+  ~ESP3DGCodeHostService();
   bool begin();
   void handle();
   void end();
-  void process(Esp3dMessage* msg);
+  void process(ESP3DMessage* msg);
   bool pushMsgToRxQueue(const uint8_t* msg, size_t size);
   void flush();
   bool started() { return _started; }
-  bool processScript(const char* script, Esp3dAuthenticationLevel auth_type);
+  bool processScript(const char* script, ESP3DAuthenticationLevel auth_type);
   bool abort();
   bool pause();
   bool resume();
-  Esp3dGcodeHostState getState();
-  Esp3dGcodeHostError getErrorNum();
-  Esp3dScript* getCurrentScript();
+  ESP3DGcodeHostState getState();
+  ESP3DGcodeHostError getErrorNum();
+  ESP3DScript* getCurrentScript();
 
  private:
   bool isAck(const char* cmd);
@@ -78,16 +78,16 @@ class Esp3dGCodeHostService : public Esp3dClient {
   bool readNextCommand();
   bool endStream();
   bool isEndChar(uint8_t ch);
-  Esp3dGcodeHostScriptType getScriptType(const char* script);
+  ESP3DGcodeHostScriptType getScriptType(const char* script);
   TaskHandle_t _xHandle;
   bool _started;
   pthread_mutex_t _tx_mutex;
   pthread_mutex_t _rx_mutex;
-  std::list<Esp3dScript> _scripts;
-  Esp3dScript* _current_script;
+  std::list<ESP3DScript> _scripts;
+  ESP3DScript* _current_script;
 };
 
-extern Esp3dGCodeHostService gcodeHostService;
+extern ESP3DGCodeHostService gcodeHostService;
 
 #ifdef __cplusplus
 }  // extern "C"

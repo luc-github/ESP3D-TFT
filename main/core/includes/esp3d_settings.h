@@ -38,7 +38,7 @@ extern "C" {
 #define HIDDEN_SETTING_VALUE "********"
 // do not change the order of the enum
 // using #if to keep consistency if user update feature
-enum class Esp3dSettingIndex : uint16_t {
+enum class ESP3DSettingIndex : uint16_t {
   esp3d_version,
   esp3d_baud_rate,
   esp3d_spi_divider,
@@ -78,7 +78,7 @@ enum class Esp3dSettingIndex : uint16_t {
   unknown_index
 };
 
-enum class Esp3dTargetFirmware : uint8_t {
+enum class ESP3DTargetFirmware : uint8_t {
   unknown = 0,
   grbl = 10,
   marlin = 20,
@@ -90,12 +90,12 @@ enum class Esp3dTargetFirmware : uint8_t {
   hp_gl = 90,
 };
 
-enum class Esp3dState : uint8_t {
+enum class ESP3DState : uint8_t {
   off = 0,
   on = 1,
 };
 
-enum class Esp3dSettingType : uint8_t {
+enum class ESP3DSettingType : uint8_t {
   byte_t,     // byte
   integer_t,  // 4 bytes
   string_t,   // string
@@ -106,46 +106,46 @@ enum class Esp3dSettingType : uint8_t {
   unknown
 };
 
-struct Esp3dSettingDescription {
-  Esp3dSettingIndex index;
-  Esp3dSettingType type;
+struct ESP3DSettingDescription {
+  ESP3DSettingIndex index;
+  ESP3DSettingType type;
   uint16_t size;
   const char* default_val;
 };
 
-class Esp3dSettings final {
+class ESP3DSettings final {
  public:
-  Esp3dSettings();
-  ~Esp3dSettings();
+  ESP3DSettings();
+  ~ESP3DSettings();
   bool isValidSettingsNvs();
-  uint8_t readByte(Esp3dSettingIndex index, bool* haserror = NULL);
-  uint32_t readUint32(Esp3dSettingIndex index, bool* haserror = NULL);
-  const char* readIPString(Esp3dSettingIndex index, bool* haserror = NULL);
-  const char* readString(Esp3dSettingIndex index, char* out_str, size_t len,
+  uint8_t readByte(ESP3DSettingIndex index, bool* haserror = NULL);
+  uint32_t readUint32(ESP3DSettingIndex index, bool* haserror = NULL);
+  const char* readIPString(ESP3DSettingIndex index, bool* haserror = NULL);
+  const char* readString(ESP3DSettingIndex index, char* out_str, size_t len,
                          bool* haserror = NULL);
-  bool writeByte(Esp3dSettingIndex index, const uint8_t value);
-  bool writeUint32(Esp3dSettingIndex index, const uint32_t value);
-  bool writeIPString(Esp3dSettingIndex index, const char* byte_buffer);
-  bool writeString(Esp3dSettingIndex index, const char* byte_buffer);
+  bool writeByte(ESP3DSettingIndex index, const uint8_t value);
+  bool writeUint32(ESP3DSettingIndex index, const uint32_t value);
+  bool writeIPString(ESP3DSettingIndex index, const char* byte_buffer);
+  bool writeString(ESP3DSettingIndex index, const char* byte_buffer);
   bool reset();
   bool isValidIPStringSetting(const char* value,
-                              Esp3dSettingIndex settingElement);
+                              ESP3DSettingIndex settingElement);
   bool isValidStringSetting(const char* value,
-                            Esp3dSettingIndex settingElement);
-  bool isValidIntegerSetting(uint32_t value, Esp3dSettingIndex settingElement);
-  bool isValidByteSetting(uint8_t value, Esp3dSettingIndex settingElement);
-  uint32_t getDefaultIntegerSetting(Esp3dSettingIndex settingElement);
-  const char* getDefaultStringSetting(Esp3dSettingIndex settingElement);
-  uint8_t getDefaultByteSetting(Esp3dSettingIndex settingElement);
-  const Esp3dSettingDescription* getSettingPtr(const Esp3dSettingIndex index);
-  const char* GetFirmwareTargetShortName(Esp3dTargetFirmware index);
+                            ESP3DSettingIndex settingElement);
+  bool isValidIntegerSetting(uint32_t value, ESP3DSettingIndex settingElement);
+  bool isValidByteSetting(uint8_t value, ESP3DSettingIndex settingElement);
+  uint32_t getDefaultIntegerSetting(ESP3DSettingIndex settingElement);
+  const char* getDefaultStringSetting(ESP3DSettingIndex settingElement);
+  uint8_t getDefaultByteSetting(ESP3DSettingIndex settingElement);
+  const ESP3DSettingDescription* getSettingPtr(const ESP3DSettingIndex index);
+  const char* GetFirmwareTargetShortName(ESP3DTargetFirmware index);
 
  private:
   const char* IPUInt32toString(uint32_t ip_int);
   uint32_t StringtoIPUInt32(const char* s);
 };
 
-extern Esp3dSettings esp3dTftsettings;
+extern ESP3DSettings esp3dTftsettings;
 
 #ifdef __cplusplus
 }  // extern "C"

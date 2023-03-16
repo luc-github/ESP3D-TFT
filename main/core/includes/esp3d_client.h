@@ -33,63 +33,63 @@
 extern "C" {
 #endif
 
-union Esp3dRequest {
+union ESP3DRequest {
   uint id;
   httpd_req_t *http_request;
 };
 
-enum class Esp3dMessageType : uint8_t { head, core, tail, unique };
+enum class ESP3DMessageType : uint8_t { head, core, tail, unique };
 
-struct Esp3dMessage {
+struct ESP3DMessage {
   uint8_t *data;
   size_t size;
-  Esp3dClientType origin;
-  Esp3dClientType target;
-  Esp3dAuthenticationLevel authentication_level;
-  Esp3dRequest request_id;
-  Esp3dMessageType type;
+  ESP3DClientType origin;
+  ESP3DClientType target;
+  ESP3DAuthenticationLevel authentication_level;
+  ESP3DRequest request_id;
+  ESP3DMessageType type;
 };
 
-class Esp3dClient {
+class ESP3DClient {
  public:
-  Esp3dClient();
-  ~Esp3dClient();
+  ESP3DClient();
+  ~ESP3DClient();
   virtual bool begin() { return false; };
   virtual void handle(){};
   virtual void end(){};
   virtual void flush(){};
   void setTxMaxSize(size_t max) { _tx_max_size = max; };
   void setRxMaxSize(size_t max) { _rx_max_size = max; };
-  bool addRxData(Esp3dMessage *msg);
-  bool addTxData(Esp3dMessage *msg);
-  Esp3dMessage *popRx();
-  Esp3dMessage *popTx();
-  static void deleteMsg(Esp3dMessage *msg);
-  bool addFrontTxData(Esp3dMessage *msg);
+  bool addRxData(ESP3DMessage *msg);
+  bool addTxData(ESP3DMessage *msg);
+  ESP3DMessage *popRx();
+  ESP3DMessage *popTx();
+  static void deleteMsg(ESP3DMessage *msg);
+  bool addFrontTxData(ESP3DMessage *msg);
   void setRxMutex(pthread_mutex_t *mutex) { _rx_mutex = mutex; };
   void setTxMutex(pthread_mutex_t *mutex) { _tx_mutex = mutex; };
   bool clearRxQueue();
   bool clearTxQueue();
   size_t getRxMsgsCount() { return _rx_queue.size(); }
   size_t getTxMsgsCount() { return _tx_queue.size(); }
-  static Esp3dMessage *copyMsg(Esp3dMessage msg);
-  static Esp3dMessage *copyMsgInfos(Esp3dMessage msg);
-  static bool copyMsgInfos(Esp3dMessage *newMsgPtr, Esp3dMessage msg);
-  static Esp3dMessage *newMsg();
-  static Esp3dMessage *newMsg(Esp3dRequest requestId);
-  static Esp3dMessage *newMsg(Esp3dClientType origin, Esp3dClientType target,
-                              Esp3dAuthenticationLevel authentication_level =
-                                  Esp3dAuthenticationLevel::guest);
-  static Esp3dMessage *newMsg(Esp3dClientType origin, Esp3dClientType target,
+  static ESP3DMessage *copyMsg(ESP3DMessage msg);
+  static ESP3DMessage *copyMsgInfos(ESP3DMessage msg);
+  static bool copyMsgInfos(ESP3DMessage *newMsgPtr, ESP3DMessage msg);
+  static ESP3DMessage *newMsg();
+  static ESP3DMessage *newMsg(ESP3DRequest requestId);
+  static ESP3DMessage *newMsg(ESP3DClientType origin, ESP3DClientType target,
+                              ESP3DAuthenticationLevel authentication_level =
+                                  ESP3DAuthenticationLevel::guest);
+  static ESP3DMessage *newMsg(ESP3DClientType origin, ESP3DClientType target,
                               const uint8_t *data, size_t length,
-                              Esp3dAuthenticationLevel authentication_level =
-                                  Esp3dAuthenticationLevel::guest);
-  static bool setDataContent(Esp3dMessage *msg, const uint8_t *data,
+                              ESP3DAuthenticationLevel authentication_level =
+                                  ESP3DAuthenticationLevel::guest);
+  static bool setDataContent(ESP3DMessage *msg, const uint8_t *data,
                              size_t length);
 
  private:
-  std::deque<Esp3dMessage *> _rx_queue;
-  std::deque<Esp3dMessage *> _tx_queue;
+  std::deque<ESP3DMessage *> _rx_queue;
+  std::deque<ESP3DMessage *> _tx_queue;
   size_t _rx_size;
   size_t _tx_size;
   size_t _rx_max_size;

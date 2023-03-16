@@ -28,16 +28,16 @@
 
 #define ESP3D_SD_FS_HEADER "/sd/"
 
-enum class Esp3dSdState : uint8_t {
+enum class ESP3DSdState : uint8_t {
   idle,
   not_present,
   busy,
   unknown,
 };
 
-class Esp3dSd final {
+class ESP3DSd final {
  public:
-  Esp3dSd();
+  ESP3DSd();
   bool begin();
   bool mount();
   void unmount();
@@ -51,14 +51,14 @@ class Esp3dSd final {
   bool getSpaceInfo(uint64_t *totalBytes = NULL, uint64_t *usedBytes = NULL,
                     uint64_t *freeBytes = NULL, bool refreshStats = false);
 
-  Esp3dSdState getState();
-  Esp3dSdState setState(Esp3dSdState state) {
+  ESP3DSdState getState();
+  ESP3DSdState setState(ESP3DSdState state) {
     _state = state;
     return _state;
   }
-  Esp3dFileSystemType getFSType(const char *path = nullptr);
-  bool accessFS(Esp3dFileSystemType FS = Esp3dFileSystemType::sd);
-  void releaseFS(Esp3dFileSystemType FS = Esp3dFileSystemType::sd);
+  ESP3DFileSystemType getFSType(const char *path = nullptr);
+  bool accessFS(ESP3DFileSystemType FS = ESP3DFileSystemType::sd);
+  void releaseFS(ESP3DFileSystemType FS = ESP3DFileSystemType::sd);
   const char *mount_point() { return "/sd"; }
   DIR *opendir(const char *dirpath);
   int closedir(DIR *dirp);
@@ -76,8 +76,8 @@ class Esp3dSd final {
  private:
   bool _mounted;
   bool _started;
-  Esp3dSdState _state;
+  ESP3DSdState _state;
   uint8_t _spi_speed_divider;
 };
 
-extern Esp3dSd sd;
+extern ESP3DSd sd;

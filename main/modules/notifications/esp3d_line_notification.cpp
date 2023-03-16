@@ -25,11 +25,11 @@
 #define SERVER_URL "https://notify-api.line.me"
 #define SERVER_PORT 443
 
-bool Esp3dNotificationsService::sendLineMSG(const char* title,
+bool ESP3DNotificationsService::sendLineMSG(const char* title,
                                             const char* message) {
   if (_token1.length() == 0) {
     esp3d_log_e("Token is missing");
-    _lastError = Esp3dNotificationError::invalid_token1;
+    _lastError = ESP3DNotificationError::invalid_token1;
     return false;
   }
   bool res = true;
@@ -42,7 +42,7 @@ bool Esp3dNotificationsService::sendLineMSG(const char* title,
   esp_http_client_handle_t client = esp_http_client_init(&config);
   if (!client) {
     esp3d_log_e("Failed to create http client");
-    _lastError = Esp3dNotificationError::error;
+    _lastError = ESP3DNotificationError::error;
     return false;
   }
   esp3d_log("Client created");
@@ -67,22 +67,22 @@ bool Esp3dNotificationsService::sendLineMSG(const char* title,
   esp_err_t err = esp_http_client_perform(client);
   if (err != ESP_OK) {
     esp3d_log_e("Failed to open HTTP connection: %s", esp_err_to_name(err));
-    _lastError = Esp3dNotificationError::error;
+    _lastError = ESP3DNotificationError::error;
     res = false;
   } else {
     uint code = esp_http_client_get_status_code(client);
     if (code != 200) {
       esp3d_log_e("Server response: %d", code);
       if (code == 401) {
-        _lastError = Esp3dNotificationError::invalid_token1;
+        _lastError = ESP3DNotificationError::invalid_token1;
       } else if (code == 404) {
-        _lastError = Esp3dNotificationError::invalid_url;
+        _lastError = ESP3DNotificationError::invalid_url;
       } else {
-        _lastError = Esp3dNotificationError::invalid_message;
+        _lastError = ESP3DNotificationError::invalid_message;
       }
       res = false;
     } else {
-      _lastError = Esp3dNotificationError::no_error;
+      _lastError = ESP3DNotificationError::no_error;
     }
   }
   esp_http_client_cleanup(client);
