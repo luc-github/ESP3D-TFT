@@ -83,7 +83,7 @@ Esp3DClient::~Esp3DClient() {
   clearRxQueue();
 }
 
-bool Esp3DClient::addRXData(Esp3dMessage* msg) {
+bool Esp3DClient::addRxData(Esp3dMessage* msg) {
   bool res = false;
   if (_rx_mutex) {
     if (pthread_mutex_lock(_rx_mutex) == 0) {
@@ -97,7 +97,7 @@ bool Esp3DClient::addRXData(Esp3dMessage* msg) {
   }
   return res;
 }
-bool Esp3DClient::addTXData(Esp3dMessage* msg) {
+bool Esp3DClient::addTxData(Esp3dMessage* msg) {
   bool res = false;
   if (_tx_mutex) {
     if (pthread_mutex_lock(_tx_mutex) == 0) {
@@ -116,7 +116,7 @@ bool Esp3DClient::addTXData(Esp3dMessage* msg) {
   }
   return res;
 }
-bool Esp3DClient::addFrontTXData(Esp3dMessage* msg) {
+bool Esp3DClient::addFrontTxData(Esp3dMessage* msg) {
   bool res = false;
   if (_tx_mutex) {
     if (pthread_mutex_lock(_tx_mutex) == 0) {

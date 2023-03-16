@@ -94,9 +94,9 @@ Esp3DGCodeHostService::~Esp3DGCodeHostService() { end(); }
 
 void Esp3DGCodeHostService::process(Esp3dMessage* msg) {
   esp3d_log("Add message to queue");
-  if (!addTXData(msg)) {
+  if (!addTxData(msg)) {
     flush();
-    if (!addTXData(msg)) {
+    if (!addTxData(msg)) {
       esp3d_log_e("Cannot add msg to client queue");
       deleteMsg(msg);
     }
@@ -147,7 +147,7 @@ bool Esp3DGCodeHostService::pushMsgToRxQueue(const uint8_t* msg, size_t size) {
     if (Esp3DClient::setDataContent(newMsgPtr, msg, size)) {
       newMsgPtr->authentication_level = Esp3dAuthenticationLevel::user;
       newMsgPtr->origin = Esp3dClient::stream;
-      if (!addRXData(newMsgPtr)) {
+      if (!addRxData(newMsgPtr)) {
         // delete message as cannot be added to the queue
         Esp3DClient::deleteMsg(newMsgPtr);
         esp3d_log_e("Failed to add message to rx queue");

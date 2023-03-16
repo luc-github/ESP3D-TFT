@@ -60,12 +60,12 @@ class Esp3DClient {
   virtual void flush(){};
   void setTxMaxSize(size_t max) { _tx_max_size = max; };
   void setRxMaxSize(size_t max) { _rx_max_size = max; };
-  bool addRXData(Esp3dMessage *msg);
-  bool addTXData(Esp3dMessage *msg);
+  bool addRxData(Esp3dMessage *msg);
+  bool addTxData(Esp3dMessage *msg);
   Esp3dMessage *popRx();
   Esp3dMessage *popTx();
   static void deleteMsg(Esp3dMessage *msg);
-  bool addFrontTXData(Esp3dMessage *msg);
+  bool addFrontTxData(Esp3dMessage *msg);
   void setRxMutex(pthread_mutex_t *mutex) { _rx_mutex = mutex; };
   void setTxMutex(pthread_mutex_t *mutex) { _tx_mutex = mutex; };
   bool clearRxQueue();

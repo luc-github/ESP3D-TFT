@@ -119,9 +119,9 @@ bool ESP3DSocketServer::startSocketServer() {
 }
 
 void ESP3DSocketServer::process(Esp3dMessage *msg) {
-  if (!addTXData(msg)) {
+  if (!addTxData(msg)) {
     flush();
-    if (!addTXData(msg)) {
+    if (!addTxData(msg)) {
       esp3d_log_e("Cannot add msg to client queue");
       deleteMsg(msg);
     }
@@ -443,7 +443,7 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
       newMsgPtr->target = esp3dCommands.getOutputClient();
       newMsgPtr->type = Esp3dMessageType::unique;
       newMsgPtr->request_id.id = client->socket_id;
-      if (!addRXData(newMsgPtr)) {
+      if (!addRxData(newMsgPtr)) {
         // delete message as cannot be added to the queue
         Esp3DClient::deleteMsg(newMsgPtr);
         esp3d_log_e("Failed to add message to rx queue");
