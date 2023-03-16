@@ -24,10 +24,10 @@
 extern "C" {
 #endif
 
-class ESP3dTFT final {
+class Esp3dTft final {
  public:
-  ESP3dTFT();
-  ~ESP3dTFT();
+  Esp3dTft();
+  ~Esp3dTft();
   bool begin();
   void handle();
   bool end();

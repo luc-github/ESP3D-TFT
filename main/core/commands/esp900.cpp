@@ -27,7 +27,7 @@
 
 // Get state / Set Enable / Disable Serial Communication
 //[ESP900]<ENABLE/DISABLE> json=<no> pwd=<admin/user password>
-void ESP3dCommands::ESP900(int cmd_params_pos, Esp3dMessage* msg) {
+void Esp3dCommands::ESP900(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;

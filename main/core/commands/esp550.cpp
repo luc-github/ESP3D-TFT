@@ -26,7 +26,7 @@
 #define COMMAND_ID 550
 // Change admin password
 //[ESP550]<password> json=<no> pwd=<admin password>
-void ESP3dCommands::ESP550(int cmd_params_pos, Esp3dMessage* msg) {
+void Esp3dCommands::ESP550(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;
@@ -47,7 +47,7 @@ void ESP3dCommands::ESP550(int cmd_params_pos, Esp3dMessage* msg) {
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
     const Esp3dSettingDescription* settingPtr =
-        esp3dTFTsettings.getSettingPtr(Esp3dSettingIndex::esp3d_admin_password);
+        esp3dTftsettings.getSettingPtr(Esp3dSettingIndex::esp3d_admin_password);
     if (settingPtr) {
       ok_msg = HIDDEN_SETTING_VALUE;
     } else {
@@ -57,12 +57,12 @@ void ESP3dCommands::ESP550(int cmd_params_pos, Esp3dMessage* msg) {
   } else {
     esp3d_log("got %s param for a value of %s, is valid %d", tmpstr.c_str(),
               tmpstr.c_str(),
-              esp3dTFTsettings.isValidStringSetting(
+              esp3dTftsettings.isValidStringSetting(
                   tmpstr.c_str(), Esp3dSettingIndex::esp3d_admin_password));
-    if (esp3dTFTsettings.isValidStringSetting(
+    if (esp3dTftsettings.isValidStringSetting(
             tmpstr.c_str(), Esp3dSettingIndex::esp3d_admin_password)) {
       esp3d_log("Value %s is valid", tmpstr.c_str());
-      if (!esp3dTFTsettings.writeString(Esp3dSettingIndex::esp3d_admin_password,
+      if (!esp3dTftsettings.writeString(Esp3dSettingIndex::esp3d_admin_password,
                                         tmpstr.c_str())) {
         hasError = true;
         error_msg = "Set value failed";

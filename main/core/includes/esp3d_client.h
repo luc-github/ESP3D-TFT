@@ -50,10 +50,10 @@ struct Esp3dMessage {
   Esp3dMessageType type;
 };
 
-class ESP3dClient {
+class Esp3dClient {
  public:
-  ESP3dClient();
-  ~ESP3dClient();
+  Esp3dClient();
+  ~Esp3dClient();
   virtual bool begin() { return false; };
   virtual void handle(){};
   virtual void end(){};

@@ -25,7 +25,7 @@
 #define SERVER_URL "https://notify-api.line.me"
 #define SERVER_PORT 443
 
-bool ESP3dNotificationsService::sendLineMSG(const char* title,
+bool Esp3dNotificationsService::sendLineMSG(const char* title,
                                             const char* message) {
   if (_token1.length() == 0) {
     esp3d_log_e("Token is missing");

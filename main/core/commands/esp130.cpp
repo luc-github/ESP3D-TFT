@@ -27,7 +27,7 @@
 #define COMMAND_ID 130
 // Get/Set Socket state which can be ON, OFF
 //[ESP130]<state> json=<no> pwd=<admin password>
-void ESP3dCommands::ESP130(int cmd_params_pos, Esp3dMessage* msg) {
+void Esp3dCommands::ESP130(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;
@@ -51,7 +51,7 @@ void ESP3dCommands::ESP130(int cmd_params_pos, Esp3dMessage* msg) {
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
   Esp3dState setting_mode =
-      (Esp3dState)esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_socket_on);
+      (Esp3dState)esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_socket_on);
   if (tmpstr.length() == 0) {
     if (setting_mode == Esp3dState::off) {
       ok_msg = "OFF";
@@ -60,7 +60,7 @@ void ESP3dCommands::ESP130(int cmd_params_pos, Esp3dMessage* msg) {
     }
   } else {
     if (stateON || stateOFF) {
-      if (!esp3dTFTsettings.writeByte(Esp3dSettingIndex::esp3d_socket_on,
+      if (!esp3dTftsettings.writeByte(Esp3dSettingIndex::esp3d_socket_on,
                                       stateOFF ? 0 : 1)) {
         hasError = true;
         error_msg = "Set value failed";

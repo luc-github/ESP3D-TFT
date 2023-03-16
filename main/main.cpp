@@ -19,6 +19,6 @@
 */
 #include "esp3d_tft.h"
 
-static ESP3dTFT myTft;
+static Esp3dTft myTft;
 
 extern "C" void app_main(void) { myTft.begin(); }

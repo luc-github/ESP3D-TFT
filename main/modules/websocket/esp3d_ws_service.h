@@ -46,10 +46,10 @@ struct Esp3dWebSocketInfos {
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
 };
 
-class ESP3dWsService {
+class Esp3dWsService {
  public:
-  ESP3dWsService();
-  ~ESP3dWsService();
+  Esp3dWsService();
+  ~Esp3dWsService();
   bool begin(Esp3dWebSocketConfig *config);
   void handle();
   void end();
@@ -86,7 +86,7 @@ class ESP3dWsService {
   esp3dSocketType _type;
 };
 #if ESP3D_WS_SERVICE_FEATURE
-extern ESP3dWsService esp3dWsDataService;
+extern Esp3dWsService esp3dWsDataService;
 #endif  // ESP3D_WS_SERVICE_FEATURE
 #ifdef __cplusplus
 }  // extern "C"

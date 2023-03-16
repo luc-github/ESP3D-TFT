@@ -48,7 +48,7 @@
  **********************/
 static void streamTask(void *pvParameter);
 
-ESP3dTFTStream esp3dTFTstream;
+Esp3dTftStream esp3dTftstream;
 
 /* Creates a semaphore to handle concurrent call to task stuff
  * If you wish to call *any* class function from other threads/tasks
@@ -68,7 +68,7 @@ static void streamTask(void *pvParameter) {
     vTaskDelay(pdMS_TO_TICKS(10));
 
     if (pdTRUE == xSemaphoreTake(xStreamSemaphore, portMAX_DELAY)) {
-      esp3dTFTstream.handle();
+      esp3dTftstream.handle();
       xSemaphoreGive(xStreamSemaphore);
     }
   }
@@ -77,20 +77,20 @@ static void streamTask(void *pvParameter) {
   vTaskDelete(NULL);
 }
 
-ESP3dTFTStream::ESP3dTFTStream() {}
+Esp3dTftStream::Esp3dTftStream() {}
 
-ESP3dTFTStream::~ESP3dTFTStream() {}
+Esp3dTftStream::~Esp3dTftStream() {}
 
-Esp3dTargetFirmware ESP3dTFTStream::getTargetFirmware(bool fromSettings) {
+Esp3dTargetFirmware Esp3dTftStream::getTargetFirmware(bool fromSettings) {
   if (fromSettings) {
-    _target_firmware = (Esp3dTargetFirmware)esp3dTFTsettings.readByte(
+    _target_firmware = (Esp3dTargetFirmware)esp3dTftsettings.readByte(
         Esp3dSettingIndex::esp3d_target_firmware);
   }
 
   return _target_firmware;
 }
 
-bool ESP3dTFTStream::begin() {
+bool Esp3dTftStream::begin() {
   // Task creation
   TaskHandle_t xHandle = NULL;
   BaseType_t res =
@@ -123,14 +123,14 @@ bool ESP3dTFTStream::begin() {
   return false;
 }
 
-void ESP3dTFTStream::handle() {
+void Esp3dTftStream::handle() {
   serialClient.handle();
 #if ESP3D_USB_SERIAL_FEATURE
   usbSerialClient.handle();
 #endif  // ESP3D_USB_SERIAL_FEATURE
 }
 
-bool ESP3dTFTStream::end() {
+bool Esp3dTftStream::end() {
   // TODO
   // this part is never called
   //  if called need to kill task also

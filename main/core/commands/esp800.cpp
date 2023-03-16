@@ -41,7 +41,7 @@
 // eventually set time with pc time
 // output is JSON or plain text according parameter
 //[ESP800]json=<no> <time=YYYY-MM-DDTHH:mm:ss> <version=3.0.0-a11> <setup=0/1>
-void ESP3dCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
+void Esp3dCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   msg->target = target;
@@ -60,7 +60,7 @@ void ESP3dCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
     // TODO: init time parameter
   }
   if (setupparam.length() > 0) {
-    if (!esp3dTFTsettings.writeByte(Esp3dSettingIndex::esp3d_setup,
+    if (!esp3dTftsettings.writeByte(Esp3dSettingIndex::esp3d_setup,
                                     setupparam == "1" ? 1 : 0)) {
       // not blocking error
       esp3d_log_e("Error writing setup state");
@@ -83,9 +83,9 @@ void ESP3dCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
     return;
   }
   uint8_t b =
-      esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_target_firmware);
+      esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_target_firmware);
   // FWTarget
-  tmpstr = esp3dTFTsettings.GetFirmwareTargetShortName((Esp3dTargetFirmware)b);
+  tmpstr = esp3dTftsettings.GetFirmwareTargetShortName((Esp3dTargetFirmware)b);
   if (!dispatchKeyValue(json, "FWTarget", tmpstr.c_str(), target, requestId)) {
     return;
   }
@@ -97,7 +97,7 @@ void ESP3dCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
   }
 
   // Setup
-  tmpstr = esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_setup) == 1
+  tmpstr = esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_setup) == 1
                ? "Enabled"
                : "Disabled";
   if (!dispatchKeyValue(json, "Setup", tmpstr.c_str(), target, requestId)) {
@@ -145,7 +145,7 @@ void ESP3dCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
       return;
     }
     uint32_t intValue =
-        esp3dTFTsettings.readUint32(Esp3dSettingIndex::esp3d_http_port);
+        esp3dTftsettings.readUint32(Esp3dSettingIndex::esp3d_http_port);
     tmpstr = std::to_string(intValue);
     if (!dispatchKeyValue(json, "WebSocketPort", tmpstr.c_str(), target,
                           requestId)) {
@@ -155,10 +155,10 @@ void ESP3dCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
 #endif  // ESP3D_HTTP_FEATURE
   // Hostname
   const Esp3dSettingDescription* settingPtr =
-      esp3dTFTsettings.getSettingPtr(Esp3dSettingIndex::esp3d_hostname);
+      esp3dTftsettings.getSettingPtr(Esp3dSettingIndex::esp3d_hostname);
   if (settingPtr) {
     char out_str[(settingPtr->size) + 1] = {0};
-    tmpstr = esp3dTFTsettings.readString(Esp3dSettingIndex::esp3d_hostname,
+    tmpstr = esp3dTftsettings.readString(Esp3dSettingIndex::esp3d_hostname,
                                          out_str, settingPtr->size);
   } else {
     tmpstr = "Error!!";

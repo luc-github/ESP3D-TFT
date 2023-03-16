@@ -28,7 +28,7 @@
 #define COMMAND_ID 950
 // Get / Set Serial Output // Only used in ESP3D-TFT with board having the
 // feature [ESP950]<SERIAL/USB> json=<no> pwd=<admin/user password>
-void ESP3dCommands::ESP950(int cmd_params_pos, Esp3dMessage* msg) {
+void Esp3dCommands::ESP950(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;
@@ -50,7 +50,7 @@ void ESP3dCommands::ESP950(int cmd_params_pos, Esp3dMessage* msg) {
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
-  Esp3dClientType client_output = (Esp3dClientType)esp3dTFTsettings.readByte(
+  Esp3dClientType client_output = (Esp3dClientType)esp3dTftsettings.readByte(
       Esp3dSettingIndex::esp3d_output_client);
   if (tmpstr.length() == 0) {
     if (client_output == Esp3dClientType::usb_serial) {
@@ -62,7 +62,7 @@ void ESP3dCommands::ESP950(int cmd_params_pos, Esp3dMessage* msg) {
     if ((usbclient && !serialclient) || (serialclient && !usbclient)) {
       Esp3dClientType newoutput =
           serialclient ? Esp3dClientType::serial : Esp3dClientType::usb_serial;
-      if (!esp3dTFTsettings.writeByte(Esp3dSettingIndex::esp3d_output_client,
+      if (!esp3dTftsettings.writeByte(Esp3dSettingIndex::esp3d_output_client,
                                       static_cast<uint8_t>(newoutput))) {
         hasError = true;
         error_msg = "Set value failed";

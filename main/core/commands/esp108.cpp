@@ -26,7 +26,7 @@
 #define COMMAND_ID 108
 // Change AP channel
 //[ESP108]<channel> json=no pwd=<admin password>
-void ESP3dCommands::ESP108(int cmd_params_pos, Esp3dMessage* msg) {
+void Esp3dCommands::ESP108(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;
@@ -47,18 +47,18 @@ void ESP3dCommands::ESP108(int cmd_params_pos, Esp3dMessage* msg) {
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
-    byteValue = esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_ap_channel);
+    byteValue = esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_ap_channel);
     ok_msg = std::to_string(byteValue);
   } else {
     byteValue = atoi(tmpstr.c_str());
     esp3d_log("got %s param for a value of %d, is valid %d", tmpstr.c_str(),
               byteValue,
-              esp3dTFTsettings.isValidByteSetting(
+              esp3dTftsettings.isValidByteSetting(
                   byteValue, Esp3dSettingIndex::esp3d_ap_channel));
-    if (esp3dTFTsettings.isValidByteSetting(
+    if (esp3dTftsettings.isValidByteSetting(
             byteValue, Esp3dSettingIndex::esp3d_ap_channel)) {
       esp3d_log("Value %d is valid", byteValue);
-      if (!esp3dTFTsettings.writeByte(Esp3dSettingIndex::esp3d_ap_channel,
+      if (!esp3dTftsettings.writeByte(Esp3dSettingIndex::esp3d_ap_channel,
                                       byteValue)) {
         hasError = true;
         error_msg = "Set value failed";

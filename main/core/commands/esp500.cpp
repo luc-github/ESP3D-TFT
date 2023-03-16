@@ -25,7 +25,7 @@
 #define COMMAND_ID 500
 // Get/Set connection status
 //[ESP500] json=<no> pwd=<admin password>
-void ESP3dCommands::ESP500(int cmd_params_pos, Esp3dMessage* msg) {
+void Esp3dCommands::ESP500(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;

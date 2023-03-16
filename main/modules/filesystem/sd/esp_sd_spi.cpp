@@ -141,7 +141,7 @@ bool Esp3dSd::begin() {
   };
 
   _spi_speed_divider =
-      esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_spi_divider);
+      esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_spi_divider);
   ret = spi_bus_initialize((spi_host_device_t)host.slot, &bus_cfg,
                            SPI_DMA_CH_AUTO);
   if (ret != ESP_OK) {

@@ -113,10 +113,10 @@ struct Esp3dSettingDescription {
   const char* default_val;
 };
 
-class ESP3dSettings final {
+class Esp3dSettings final {
  public:
-  ESP3dSettings();
-  ~ESP3dSettings();
+  Esp3dSettings();
+  ~Esp3dSettings();
   bool isValidSettingsNvs();
   uint8_t readByte(Esp3dSettingIndex index, bool* haserror = NULL);
   uint32_t readUint32(Esp3dSettingIndex index, bool* haserror = NULL);
@@ -145,7 +145,7 @@ class ESP3dSettings final {
   uint32_t StringtoIPUInt32(const char* s);
 };
 
-extern ESP3dSettings esp3dTFTsettings;
+extern Esp3dSettings esp3dTftsettings;
 
 #ifdef __cplusplus
 }  // extern "C"

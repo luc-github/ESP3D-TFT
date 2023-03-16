@@ -26,7 +26,7 @@
 #define COMMAND_ID 107
 // Change AP IP
 //[ESP107]<IP> json=no pwd=<admin password>
-void ESP3dCommands::ESP107(int cmd_params_pos, Esp3dMessage* msg) {
+void Esp3dCommands::ESP107(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;
@@ -47,12 +47,12 @@ void ESP3dCommands::ESP107(int cmd_params_pos, Esp3dMessage* msg) {
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
     ok_msg =
-        esp3dTFTsettings.readIPString(Esp3dSettingIndex::esp3d_ap_ip_static);
+        esp3dTftsettings.readIPString(Esp3dSettingIndex::esp3d_ap_ip_static);
   } else {
-    if (esp3dTFTsettings.isValidIPStringSetting(
+    if (esp3dTftsettings.isValidIPStringSetting(
             tmpstr.c_str(), Esp3dSettingIndex::esp3d_ap_ip_static)) {
       esp3d_log("Value %s is valid", tmpstr.c_str());
-      if (!esp3dTFTsettings.writeIPString(Esp3dSettingIndex::esp3d_ap_ip_static,
+      if (!esp3dTftsettings.writeIPString(Esp3dSettingIndex::esp3d_ap_ip_static,
                                           tmpstr.c_str())) {
         hasError = true;
         error_msg = "Set value failed";

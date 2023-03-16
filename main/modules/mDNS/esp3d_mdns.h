@@ -23,15 +23,14 @@
 
 #include "mdns.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-class ESP3dmDNS final {
+class Esp3dmDNS final {
  public:
-  ESP3dmDNS();
-  ~ESP3dmDNS();
+  Esp3dmDNS();
+  ~Esp3dmDNS();
   bool begin();
   void handle();
   void end();
@@ -48,7 +47,7 @@ class ESP3dmDNS final {
   uint16_t _count;
 };
 
-extern ESP3dmDNS esp3dmDNS;
+extern Esp3dmDNS esp3dmDNS;
 #ifdef __cplusplus
 }  // extern "C"
 #endif

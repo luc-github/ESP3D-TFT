@@ -30,7 +30,7 @@
 #endif  // ESP3D_TIMESTAMP_FEATURE
 #include "authentication/esp3d_authentication.h"
 
-esp_err_t ESP3dHttpService::sdfiles_handler(httpd_req_t *req) {
+esp_err_t Esp3dHttpService::sdfiles_handler(httpd_req_t *req) {
 #if ESP3D_AUTHENTICATION_FEATURE
   Esp3dAuthenticationLevel authentication_level = getAuthenticationLevel(req);
   if (authentication_level == Esp3dAuthenticationLevel::guest) {

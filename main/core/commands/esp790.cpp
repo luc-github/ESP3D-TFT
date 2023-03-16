@@ -27,7 +27,7 @@
 // Action on Global Filesystem
 // rmdir / remove / mkdir / exists /create
 //[ESP790]<Action>=<path> json=<no> pwd=<admin password>
-void ESP3dCommands::ESP790(int cmd_params_pos, Esp3dMessage* msg) {
+void Esp3dCommands::ESP790(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;

@@ -43,9 +43,9 @@
 #define BUF_SIZE 512
 
 // Email#serveraddress:port:(optional)method(SSL=default/TLS)
-bool ESP3dNotificationsService::getEmailInformationsFromSettings() {
+bool Esp3dNotificationsService::getEmailInformationsFromSettings() {
   char buffer[SIZE_OF_SETTING_NOFIFICATION_TS + 1];
-  esp3dTFTsettings.readString(
+  esp3dTftsettings.readString(
       Esp3dSettingIndex::esp3d_notification_token_setting, buffer,
       SIZE_OF_SETTING_NOFIFICATION_TS);
   _settings.clear();
@@ -93,7 +93,7 @@ bool ESP3dNotificationsService::getEmailInformationsFromSettings() {
   return true;
 }
 
-int ESP3dNotificationsService::perform_tls_handshake(mbedtls_ssl_context *ssl) {
+int Esp3dNotificationsService::perform_tls_handshake(mbedtls_ssl_context *ssl) {
   int ret = -1;
   uint32_t flags;
   char *buf = NULL;
@@ -132,7 +132,7 @@ int ESP3dNotificationsService::perform_tls_handshake(mbedtls_ssl_context *ssl) {
   return ret;
 }
 
-int ESP3dNotificationsService::write_ssl_and_get_response(
+int Esp3dNotificationsService::write_ssl_and_get_response(
     mbedtls_ssl_context *ssl, unsigned char *buf, size_t len) {
   int ret;
   const size_t DATA_SIZE = 128;
@@ -189,7 +189,7 @@ int ESP3dNotificationsService::write_ssl_and_get_response(
   return ret;
 }
 
-int ESP3dNotificationsService::write_tls_and_get_response(
+int Esp3dNotificationsService::write_tls_and_get_response(
     mbedtls_net_context *sock_fd, unsigned char *buf, size_t len) {
   int ret;
   const size_t DATA_SIZE = 128;
@@ -240,7 +240,7 @@ int ESP3dNotificationsService::write_tls_and_get_response(
   return ret;
 }
 
-bool ESP3dNotificationsService::sendEmailMSG(const char *title,
+bool Esp3dNotificationsService::sendEmailMSG(const char *title,
                                              const char *message) {
   if (_token1.length() == 0 || _token2.length() == 0 ||
       _settings.length() == 0 || _port.length() == 0 ||

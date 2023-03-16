@@ -323,7 +323,7 @@ bool ESP3DSocketServer::isEndChar(uint8_t ch) {
 
 bool ESP3DSocketServer::begin() {
   end();
-  if (Esp3dState::on != (Esp3dState)esp3dTFTsettings.readByte(
+  if (Esp3dState::on != (Esp3dState)esp3dTftsettings.readByte(
                             Esp3dSettingIndex::esp3d_socket_on)) {
     esp3d_log("Telnet is not enabled");
     // return true because no error but _started is false
@@ -343,7 +343,7 @@ bool ESP3DSocketServer::begin() {
   setTxMutex(&_tx_mutex);
 
   // Read port
-  _port = esp3dTFTsettings.readUint32(Esp3dSettingIndex::esp3d_socket_port);
+  _port = esp3dTftsettings.readUint32(Esp3dSettingIndex::esp3d_socket_port);
 
   _data = (char *)malloc(ESP3D_SOCKET_RX_BUFFER_SIZE + 1);
   if (_data == NULL) {
@@ -437,7 +437,7 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
   esp3d_log("Pushing `%s` %d", msg, size);
   Esp3dMessage *newMsgPtr = newMsg();
   if (newMsgPtr) {
-    if (ESP3dClient::setDataContent(newMsgPtr, msg, size)) {
+    if (Esp3dClient::setDataContent(newMsgPtr, msg, size)) {
       newMsgPtr->origin = Esp3dClientType::telnet;
       newMsgPtr->authentication_level = authentication_level;
       newMsgPtr->target = esp3dCommands.getOutputClient();
@@ -445,7 +445,7 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
       newMsgPtr->request_id.id = client->socket_id;
       if (!addRxData(newMsgPtr)) {
         // delete message as cannot be added to the queue
-        ESP3dClient::deleteMsg(newMsgPtr);
+        Esp3dClient::deleteMsg(newMsgPtr);
         esp3d_log_e("Failed to add message to rx queue");
         return false;
       }

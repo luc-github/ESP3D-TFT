@@ -21,7 +21,7 @@
 #include "esp3d_string.h"
 #include "http/esp3d_http_service.h"
 
-esp_err_t ESP3dHttpService::root_get_handler(httpd_req_t *req) {
+esp_err_t Esp3dHttpService::root_get_handler(httpd_req_t *req) {
   // not blocking
 #if ESP3D_AUTHENTICATION_FEATURE
   Esp3dAuthenticationLevel level = getAuthenticationLevel(req);

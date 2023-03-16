@@ -27,7 +27,7 @@
 #define COMMAND_ID 114
 // Get/Set Boot radio state which can be ON, OFF
 //[ESP114]<state> json=<no> pwd=<user/admin password>
-void ESP3dCommands::ESP114(int cmd_params_pos, Esp3dMessage* msg) {
+void Esp3dCommands::ESP114(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;
@@ -49,7 +49,7 @@ void ESP3dCommands::ESP114(int cmd_params_pos, Esp3dMessage* msg) {
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
     byteValue =
-        esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_radio_boot_mode);
+        esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_radio_boot_mode);
     if (byteValue == (uint8_t)Esp3dState::off) {
       ok_msg = "OFF";
     } else if (byteValue == (uint8_t)Esp3dState::on) {
@@ -67,12 +67,12 @@ void ESP3dCommands::ESP114(int cmd_params_pos, Esp3dMessage* msg) {
     }
     esp3d_log("got %s param for a value of %d, is valid %d", tmpstr.c_str(),
               byteValue,
-              esp3dTFTsettings.isValidByteSetting(
+              esp3dTftsettings.isValidByteSetting(
                   byteValue, Esp3dSettingIndex::esp3d_radio_boot_mode));
-    if (esp3dTFTsettings.isValidByteSetting(
+    if (esp3dTftsettings.isValidByteSetting(
             byteValue, Esp3dSettingIndex::esp3d_radio_boot_mode)) {
       esp3d_log("Value %d is valid", byteValue);
-      if (!esp3dTFTsettings.writeByte(Esp3dSettingIndex::esp3d_radio_boot_mode,
+      if (!esp3dTftsettings.writeByte(Esp3dSettingIndex::esp3d_radio_boot_mode,
                                       byteValue)) {
         hasError = true;
         error_msg = "Set value failed";

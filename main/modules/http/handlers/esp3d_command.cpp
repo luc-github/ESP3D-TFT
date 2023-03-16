@@ -27,7 +27,7 @@
 #include "http/esp3d_http_service.h"
 #include "network/esp3d_network.h"
 
-esp_err_t ESP3dHttpService::command_handler(httpd_req_t *req) {
+esp_err_t Esp3dHttpService::command_handler(httpd_req_t *req) {
   // TODO: check authentication level
   Esp3dAuthenticationLevel authentication_level = getAuthenticationLevel(req);
 #if ESP3D_AUTHENTICATION_FEATURE
@@ -68,7 +68,7 @@ esp_err_t ESP3dHttpService::command_handler(httpd_req_t *req) {
     Esp3dRequest requestId;
     if (esp3dCommands.is_esp_command((uint8_t *)cmd, strlen(cmd))) {
       requestId.http_request = req;
-      Esp3dMessage *newMsgPtr = ESP3dClient::newMsg(
+      Esp3dMessage *newMsgPtr = Esp3dClient::newMsg(
           Esp3dClientType::webui, Esp3dClientType::command,
           (const uint8_t *)cmd, strlen(cmd), authentication_level);
       if (newMsgPtr) {

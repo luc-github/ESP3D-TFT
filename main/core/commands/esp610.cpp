@@ -30,7 +30,7 @@
 //[ESP610]type=<NONE/PUSHOVER/EMAIL/LINE/IFTTT> T1=<token1> T2=<token2>
 // TS=<Settings> json=<no> pwd=<admin password> Get will give type and settings
 // only, not the protected T1/T2
-void ESP3dCommands::ESP610(int cmd_params_pos, Esp3dMessage* msg) {
+void Esp3dCommands::ESP610(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;
@@ -64,7 +64,7 @@ void ESP3dCommands::ESP610(int cmd_params_pos, Esp3dMessage* msg) {
       ok_msg = "type: ";
     }
     uint8_t b =
-        esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_notification_type);
+        esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_notification_type);
     switch ((Esp3dNotificationType)b) {
       case Esp3dNotificationType::none:
         ok_msg += "NONE";
@@ -93,7 +93,7 @@ void ESP3dCommands::ESP610(int cmd_params_pos, Esp3dMessage* msg) {
       ok_msg += ", AUTO: ";
     }
 
-    ok_msg += esp3dTFTsettings.readByte(
+    ok_msg += esp3dTftsettings.readByte(
                   Esp3dSettingIndex::esp3d_auto_notification) == 1
                   ? "YES"
                   : "NO";
@@ -103,7 +103,7 @@ void ESP3dCommands::ESP610(int cmd_params_pos, Esp3dMessage* msg) {
     } else {
       ok_msg += ", TS: ";
     }
-    ok_msg += esp3dTFTsettings.readString(
+    ok_msg += esp3dTftsettings.readString(
         Esp3dSettingIndex::esp3d_notification_token_setting, buffer,
         SIZE_OF_SETTING_NOFIFICATION_TS);
     if (json) {
@@ -137,7 +137,7 @@ void ESP3dCommands::ESP610(int cmd_params_pos, Esp3dMessage* msg) {
               error_msg = "Invalid type parameter";
             }
             if (!hasError) {
-              if (!esp3dTFTsettings.writeByte(settingIndex[i], val)) {
+              if (!esp3dTftsettings.writeByte(settingIndex[i], val)) {
                 hasError = true;
                 error_msg = "Set value failed";
               }
@@ -146,10 +146,10 @@ void ESP3dCommands::ESP610(int cmd_params_pos, Esp3dMessage* msg) {
           case Esp3dSettingIndex::esp3d_notification_token_1:
           case Esp3dSettingIndex::esp3d_notification_token_2:
           case Esp3dSettingIndex::esp3d_notification_token_setting:
-            if (esp3dTFTsettings.isValidStringSetting(tmpstr.c_str(),
+            if (esp3dTftsettings.isValidStringSetting(tmpstr.c_str(),
                                                       settingIndex[i])) {
               esp3d_log("Value %s is valid", tmpstr.c_str());
-              if (!esp3dTFTsettings.writeString(settingIndex[i],
+              if (!esp3dTftsettings.writeString(settingIndex[i],
                                                 tmpstr.c_str())) {
                 hasError = true;
                 error_msg = "Set value failed";
@@ -175,7 +175,7 @@ void ESP3dCommands::ESP610(int cmd_params_pos, Esp3dMessage* msg) {
               error_msg = "Invalid auto parameter";
             }
             if (!hasError) {
-              if (!esp3dTFTsettings.writeByte(settingIndex[i], val)) {
+              if (!esp3dTftsettings.writeByte(settingIndex[i], val)) {
                 hasError = true;
                 error_msg = "Set value failed";
               }

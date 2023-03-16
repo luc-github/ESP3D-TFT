@@ -24,10 +24,10 @@
 extern "C" {
 #endif
 
-class ESP3dTFTUi final {
+class Esp3dTftUi final {
  public:
-  ESP3dTFTUi();
-  ~ESP3dTFTUi();
+  Esp3dTftUi();
+  ~Esp3dTftUi();
   bool begin();
   void handle();
   bool end();
@@ -36,7 +36,7 @@ class ESP3dTFTUi final {
   bool _started;
 };
 
-extern ESP3dTFTUi esp3dTFTui;
+extern Esp3dTftUi esp3dTftui;
 
 #ifdef __cplusplus
 }  // extern "C"

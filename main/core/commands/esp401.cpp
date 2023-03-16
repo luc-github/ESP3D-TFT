@@ -33,7 +33,7 @@
 
 // Set EEPROM setting
 //[ESP401]P=<position> T=<type> V=<value> json=<no> pwd=<admin password>
-void ESP3dCommands::ESP401(int cmd_params_pos, Esp3dMessage* msg) {
+void Esp3dCommands::ESP401(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
 
@@ -71,7 +71,7 @@ void ESP3dCommands::ESP401(int cmd_params_pos, Esp3dMessage* msg) {
     Esp3dSettingIndex index_setting =
         (Esp3dSettingIndex)atoi(settingIndex.c_str());
     const Esp3dSettingDescription* settingPtr =
-        esp3dTFTsettings.getSettingPtr(index_setting);
+        esp3dTftsettings.getSettingPtr(index_setting);
     if (!settingPtr) {
       hasError = true;
       error_msg = "Unknown setting";
@@ -80,8 +80,8 @@ void ESP3dCommands::ESP401(int cmd_params_pos, Esp3dMessage* msg) {
         case 'B':
           if (settingPtr->type == Esp3dSettingType::byte_t) {
             valueb = (uint8_t)atoi(settingValue.c_str());
-            if (esp3dTFTsettings.isValidByteSetting(valueb, index_setting)) {
-              if (!esp3dTFTsettings.writeByte(index_setting, valueb)) {
+            if (esp3dTftsettings.isValidByteSetting(valueb, index_setting)) {
+              if (!esp3dTftsettings.writeByte(index_setting, valueb)) {
                 hasError = true;
                 error_msg = "Failed set value";
               }
@@ -97,9 +97,9 @@ void ESP3dCommands::ESP401(int cmd_params_pos, Esp3dMessage* msg) {
         case 'I':
           if (settingPtr->type == Esp3dSettingType::integer_t) {
             value32 = (uint32_t)atoi(settingValue.c_str());
-            if (esp3dTFTsettings.isValidIntegerSetting(value32,
+            if (esp3dTftsettings.isValidIntegerSetting(value32,
                                                        index_setting)) {
-              if (!esp3dTFTsettings.writeUint32(index_setting, value32)) {
+              if (!esp3dTftsettings.writeUint32(index_setting, value32)) {
                 hasError = true;
                 error_msg = "Failed set value";
               }
@@ -114,9 +114,9 @@ void ESP3dCommands::ESP401(int cmd_params_pos, Esp3dMessage* msg) {
           break;
         case 'S':
           if (settingPtr->type == Esp3dSettingType::string_t) {
-            if (esp3dTFTsettings.isValidStringSetting(settingValue.c_str(),
+            if (esp3dTftsettings.isValidStringSetting(settingValue.c_str(),
                                                       index_setting)) {
-              if (!esp3dTFTsettings.writeString(index_setting,
+              if (!esp3dTftsettings.writeString(index_setting,
                                                 settingValue.c_str())) {
                 hasError = true;
                 error_msg = "Failed set value";
@@ -133,9 +133,9 @@ void ESP3dCommands::ESP401(int cmd_params_pos, Esp3dMessage* msg) {
         case 'A':
 
           if (settingPtr->type == Esp3dSettingType ::ip) {
-            if (esp3dTFTsettings.isValidIPStringSetting(settingValue.c_str(),
+            if (esp3dTftsettings.isValidIPStringSetting(settingValue.c_str(),
                                                         index_setting)) {
-              if (!esp3dTFTsettings.writeIPString(index_setting,
+              if (!esp3dTftsettings.writeIPString(index_setting,
                                                   settingValue.c_str())) {
                 hasError = true;
                 error_msg = "Failed set value";
@@ -202,7 +202,7 @@ void ESP3dCommands::ESP401(int cmd_params_pos, Esp3dMessage* msg) {
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 
         case Esp3dSettingIndex::esp3d_target_firmware:
-          esp3dTFTstream.getTargetFirmware(true);
+          esp3dTftstream.getTargetFirmware(true);
           break;
         default:
           break;

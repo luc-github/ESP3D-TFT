@@ -26,7 +26,7 @@
 #define COMMAND_ID 115
 // Get/Set immediate Network (WiFi/BT/Ethernet) state which can be ON, OFF
 //[ESP115]<state> json=<no> pwd=<admin password>
-void ESP3dCommands::ESP115(int cmd_params_pos, Esp3dMessage* msg) {
+void Esp3dCommands::ESP115(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;
@@ -46,7 +46,7 @@ void ESP3dCommands::ESP115(int cmd_params_pos, Esp3dMessage* msg) {
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
   Esp3dRadioMode setting_radio_mode = static_cast<Esp3dRadioMode>(
-      esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_radio_mode));
+      esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_radio_mode));
   Esp3dRadioMode current_radio_mode = esp3dNetwork.getMode();
   if (tmpstr.length() == 0) {
     if (current_radio_mode == Esp3dRadioMode::off) {

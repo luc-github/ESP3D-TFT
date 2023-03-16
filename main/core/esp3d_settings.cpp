@@ -49,7 +49,7 @@
 #define STORAGE_NAME "ESP3D_TFT"
 #define SETTING_VERSION "ESP3D_TFT-V1.0.0"
 
-ESP3dSettings esp3dTFTsettings;
+Esp3dSettings esp3dTftsettings;
 
 const uint32_t SupportedBaudList[] = {9600,   19200,  38400,  57600,  74880,
                                       115200, 230400, 250000, 500000, 921600};
@@ -66,7 +66,7 @@ const uint8_t SupportedApChannelsSize =
     sizeof(SupportedApChannels) / sizeof(uint8_t);
 
 // value of settings, default value are all strings
-const Esp3dSettingDescription ESP3dSettingsData[] = {
+const Esp3dSettingDescription Esp3dSettingsData[] = {
     {Esp3dSettingIndex::esp3d_version, Esp3dSettingType::string_t,
      SIZE_OF_SETTING_VERSION, "Invalid data"},  // Version
     {Esp3dSettingIndex::esp3d_baud_rate, Esp3dSettingType::integer_t, 4,
@@ -151,7 +151,7 @@ const Esp3dSettingDescription ESP3dSettingsData[] = {
 #endif  // ESP3D_AUTHENTICATION_FEATURE
 };
 
-bool ESP3dSettings::isValidStringSetting(const char* value,
+bool Esp3dSettings::isValidStringSetting(const char* value,
                                          Esp3dSettingIndex settingElement) {
   const Esp3dSettingDescription* settingPtr = getSettingPtr(settingElement);
   if (!settingPtr) {
@@ -209,7 +209,7 @@ bool ESP3dSettings::isValidStringSetting(const char* value,
   return false;
 }
 
-bool ESP3dSettings::isValidIntegerSetting(uint32_t value,
+bool Esp3dSettings::isValidIntegerSetting(uint32_t value,
                                           Esp3dSettingIndex settingElement) {
   const Esp3dSettingDescription* settingPtr = getSettingPtr(settingElement);
   if (!settingPtr) {
@@ -247,7 +247,7 @@ bool ESP3dSettings::isValidIntegerSetting(uint32_t value,
   return false;
 }
 
-bool ESP3dSettings::isValidByteSetting(uint8_t value,
+bool Esp3dSettings::isValidByteSetting(uint8_t value,
                                        Esp3dSettingIndex settingElement) {
   const Esp3dSettingDescription* settingPtr = getSettingPtr(settingElement);
   if (!settingPtr) {
@@ -376,7 +376,7 @@ bool ESP3dSettings::isValidByteSetting(uint8_t value,
   }
   return false;
 }
-bool ESP3dSettings::isValidIPStringSetting(const char* value,
+bool Esp3dSettings::isValidIPStringSetting(const char* value,
                                            Esp3dSettingIndex settingElement) {
   const Esp3dSettingDescription* settingPtr = getSettingPtr(settingElement);
   if (!settingPtr) {
@@ -389,9 +389,9 @@ bool ESP3dSettings::isValidIPStringSetting(const char* value,
                           std::regex("^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$"));
 }
 
-bool ESP3dSettings::isValidSettingsNvs() {
+bool Esp3dSettings::isValidSettingsNvs() {
   char result[SIZE_OF_SETTING_VERSION + 1] = {0};
-  if (esp3dTFTsettings.readString(Esp3dSettingIndex::esp3d_version, result,
+  if (esp3dTftsettings.readString(Esp3dSettingIndex::esp3d_version, result,
                                   SIZE_OF_SETTING_VERSION + 1)) {
     if (strcmp(SETTING_VERSION, result) != 0) {
       esp3d_log_e("Expected %s but got %s", SETTING_VERSION, result);
@@ -405,7 +405,7 @@ bool ESP3dSettings::isValidSettingsNvs() {
   }
 }
 
-uint32_t ESP3dSettings::getDefaultIntegerSetting(
+uint32_t Esp3dSettings::getDefaultIntegerSetting(
     Esp3dSettingIndex settingElement) {
   const Esp3dSettingDescription* query = getSettingPtr(settingElement);
   if (query) {
@@ -413,7 +413,7 @@ uint32_t ESP3dSettings::getDefaultIntegerSetting(
   }
   return 0;
 }
-const char* ESP3dSettings::getDefaultStringSetting(
+const char* Esp3dSettings::getDefaultStringSetting(
     Esp3dSettingIndex settingElement) {
   const Esp3dSettingDescription* query = getSettingPtr(settingElement);
   if (query) {
@@ -421,7 +421,7 @@ const char* ESP3dSettings::getDefaultStringSetting(
   }
   return nullptr;
 }
-uint8_t ESP3dSettings::getDefaultByteSetting(Esp3dSettingIndex settingElement) {
+uint8_t Esp3dSettings::getDefaultByteSetting(Esp3dSettingIndex settingElement) {
   const Esp3dSettingDescription* query = getSettingPtr(settingElement);
   if (query) {
     return (uint8_t)std::stoul(std::string(query->default_val), NULL, 0);
@@ -429,7 +429,7 @@ uint8_t ESP3dSettings::getDefaultByteSetting(Esp3dSettingIndex settingElement) {
   return 0;
 }
 
-const char* ESP3dSettings::GetFirmwareTargetShortName(
+const char* Esp3dSettings::GetFirmwareTargetShortName(
     Esp3dTargetFirmware index) {
   switch (index) {
     case Esp3dTargetFirmware::grbl:
@@ -454,7 +454,7 @@ const char* ESP3dSettings::GetFirmwareTargetShortName(
   return "unknown";
 }
 
-bool ESP3dSettings::reset() {
+bool Esp3dSettings::reset() {
   esp3d_log("Resetting NVS");
   bool result = true;
   esp_err_t err;
@@ -477,7 +477,7 @@ bool ESP3dSettings::reset() {
   // behavior [-Waggressive-loop-optimizations] may be use a vector of enum
   // would solve also fortunaly this is to reset all settings so it is ok for
   // current situation and it avoid to create an array of enums
-  for (auto i : ESP3dSettingsData) {
+  for (auto i : Esp3dSettingsData) {
     Esp3dSettingIndex setting = i.index;
     const Esp3dSettingDescription* query = getSettingPtr(setting);
     if (query) {
@@ -485,7 +485,7 @@ bool ESP3dSettings::reset() {
                 query->default_val);
       switch (query->type) {
         case Esp3dSettingType::byte_t:
-          if (!ESP3dSettings::writeByte(
+          if (!Esp3dSettings::writeByte(
                   setting, (uint8_t)std::stoul(std::string(query->default_val),
                                                NULL, 0))) {
             esp3d_log_e("Error writing %s to settings %d", query->default_val,
@@ -494,14 +494,14 @@ bool ESP3dSettings::reset() {
           }
           break;
         case Esp3dSettingType::ip:
-          if (!ESP3dSettings::writeIPString(setting, query->default_val)) {
+          if (!Esp3dSettings::writeIPString(setting, query->default_val)) {
             esp3d_log_e("Error writing %s to settings %d", query->default_val,
                         static_cast<uint16_t>(setting));
             result = false;
           }
           break;
         case Esp3dSettingType::integer_t:
-          if (!ESP3dSettings::writeUint32(
+          if (!Esp3dSettings::writeUint32(
                   setting, (uint32_t)std::stoul(std::string(query->default_val),
                                                 NULL, 0))) {
             esp3d_log_e("Error writing %s to settings %d", query->default_val,
@@ -511,13 +511,13 @@ bool ESP3dSettings::reset() {
           break;
         case Esp3dSettingType::string_t:
           if (setting == Esp3dSettingIndex::esp3d_version) {
-            if (!ESP3dSettings::writeString(setting, SETTING_VERSION)) {
+            if (!Esp3dSettings::writeString(setting, SETTING_VERSION)) {
               esp3d_log_e("Error writing %s to settings %d", query->default_val,
                           static_cast<uint16_t>(setting));
               result = false;
             }
           } else {
-            if (!ESP3dSettings::writeString(setting, query->default_val)) {
+            if (!Esp3dSettings::writeString(setting, query->default_val)) {
               esp3d_log_e("Error writing %s to settings %d", query->default_val,
                           static_cast<uint16_t>(setting));
               result = false;
@@ -539,11 +539,11 @@ bool ESP3dSettings::reset() {
   return result;
 }
 
-ESP3dSettings::ESP3dSettings() {}
+Esp3dSettings::Esp3dSettings() {}
 
-ESP3dSettings::~ESP3dSettings() {}
+Esp3dSettings::~Esp3dSettings() {}
 
-uint8_t ESP3dSettings::readByte(Esp3dSettingIndex index, bool* haserror) {
+uint8_t Esp3dSettings::readByte(Esp3dSettingIndex index, bool* haserror) {
   uint8_t value = 0;
   const Esp3dSettingDescription* query = getSettingPtr(index);
   if (query) {
@@ -578,7 +578,7 @@ uint8_t ESP3dSettings::readByte(Esp3dSettingIndex index, bool* haserror) {
   return 0;
 }
 
-uint32_t ESP3dSettings::readUint32(Esp3dSettingIndex index, bool* haserror) {
+uint32_t Esp3dSettings::readUint32(Esp3dSettingIndex index, bool* haserror) {
   uint32_t value = 0;
   const Esp3dSettingDescription* query = getSettingPtr(index);
   if (query) {
@@ -621,7 +621,7 @@ uint32_t ESP3dSettings::readUint32(Esp3dSettingIndex index, bool* haserror) {
   return 0;
 }
 
-const char* ESP3dSettings::readIPString(Esp3dSettingIndex index,
+const char* Esp3dSettings::readIPString(Esp3dSettingIndex index,
                                         bool* haserror) {
   uint32_t ipInt = readUint32(index, haserror);
   std::string ipStr = IPUInt32toString(ipInt);
@@ -629,7 +629,7 @@ const char* ESP3dSettings::readIPString(Esp3dSettingIndex index,
   return IPUInt32toString(ipInt);
 }
 
-const char* ESP3dSettings::readString(Esp3dSettingIndex index, char* out_str,
+const char* Esp3dSettings::readString(Esp3dSettingIndex index, char* out_str,
                                       size_t len, bool* haserror) {
   const Esp3dSettingDescription* query = getSettingPtr(index);
   if (query) {
@@ -683,7 +683,7 @@ const char* ESP3dSettings::readString(Esp3dSettingIndex index, char* out_str,
   return "";
 }
 
-bool ESP3dSettings::writeByte(Esp3dSettingIndex index, const uint8_t value) {
+bool Esp3dSettings::writeByte(Esp3dSettingIndex index, const uint8_t value) {
   const Esp3dSettingDescription* query = getSettingPtr(index);
   if (query) {
     if (query->type == Esp3dSettingType::byte_t) {
@@ -703,7 +703,7 @@ bool ESP3dSettings::writeByte(Esp3dSettingIndex index, const uint8_t value) {
   return false;
 }
 
-bool ESP3dSettings::writeUint32(Esp3dSettingIndex index, const uint32_t value) {
+bool Esp3dSettings::writeUint32(Esp3dSettingIndex index, const uint32_t value) {
   const Esp3dSettingDescription* query = getSettingPtr(index);
   if (query) {
     if (query->type == Esp3dSettingType::integer_t ||
@@ -724,7 +724,7 @@ bool ESP3dSettings::writeUint32(Esp3dSettingIndex index, const uint32_t value) {
   return false;
 }
 
-bool ESP3dSettings::writeIPString(Esp3dSettingIndex index,
+bool Esp3dSettings::writeIPString(Esp3dSettingIndex index,
                                   const char* byte_buffer) {
   uint32_t ipInt = StringtoIPUInt32(byte_buffer);
   std::string ipStr = IPUInt32toString(ipInt);
@@ -734,7 +734,7 @@ bool ESP3dSettings::writeIPString(Esp3dSettingIndex index,
   return writeUint32(index, StringtoIPUInt32(byte_buffer));
 }
 
-bool ESP3dSettings::writeString(Esp3dSettingIndex index,
+bool Esp3dSettings::writeString(Esp3dSettingIndex index,
                                 const char* byte_buffer) {
   esp3d_log("write setting %d : (%d bytes) %s ", static_cast<uint16_t>(index),
             strlen(byte_buffer), byte_buffer);
@@ -765,7 +765,7 @@ bool ESP3dSettings::writeString(Esp3dSettingIndex index,
   return false;
 }
 
-const char* ESP3dSettings::IPUInt32toString(uint32_t ip_int) {
+const char* Esp3dSettings::IPUInt32toString(uint32_t ip_int) {
   ip_addr_t tmpip;
   tmpip.type = IPADDR_TYPE_V4;
   // convert uint32_t to ip_addr_t
@@ -774,7 +774,7 @@ const char* ESP3dSettings::IPUInt32toString(uint32_t ip_int) {
   return ip4addr_ntoa(&tmpip.u_addr.ip4);
 }
 
-uint32_t ESP3dSettings::StringtoIPUInt32(const char* s) {
+uint32_t Esp3dSettings::StringtoIPUInt32(const char* s) {
   ip_addr_t tmpip;
   esp3d_log("convert %s", s);
   tmpip.type = IPADDR_TYPE_V4;
@@ -784,11 +784,11 @@ uint32_t ESP3dSettings::StringtoIPUInt32(const char* s) {
   return ip4_addr_get_u32(&tmpip.u_addr.ip4);
 }
 
-const Esp3dSettingDescription* ESP3dSettings::getSettingPtr(
+const Esp3dSettingDescription* Esp3dSettings::getSettingPtr(
     const Esp3dSettingIndex index) {
-  for (uint16_t i = 0; i < sizeof(ESP3dSettingsData); i++) {
-    if (ESP3dSettingsData[i].index == index) {
-      return &ESP3dSettingsData[i];
+  for (uint16_t i = 0; i < sizeof(Esp3dSettingsData); i++) {
+    if (Esp3dSettingsData[i].index == index) {
+      return &Esp3dSettingsData[i];
     }
   }
   return nullptr;

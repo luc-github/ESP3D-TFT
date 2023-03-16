@@ -27,7 +27,7 @@
 #define COMMAND_ID 104
 // Set STA fallback mode state at boot which can be BT, CONFIG,  OFF
 //[ESP104]<state> json=<no> pwd=<admin password>
-void ESP3dCommands::ESP104(int cmd_params_pos, Esp3dMessage* msg) {
+void Esp3dCommands::ESP104(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;
@@ -49,7 +49,7 @@ void ESP3dCommands::ESP104(int cmd_params_pos, Esp3dMessage* msg) {
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
     byteValue =
-        esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_fallback_mode);
+        esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_fallback_mode);
     if (byteValue == (uint8_t)Esp3dRadioMode::bluetooth_serial) {
       ok_msg = "BT";
     } else if (byteValue == (uint8_t)Esp3dRadioMode::wifi_ap_config) {
@@ -71,12 +71,12 @@ void ESP3dCommands::ESP104(int cmd_params_pos, Esp3dMessage* msg) {
     }
     esp3d_log("got %s param for a value of %d, is valid %d", tmpstr.c_str(),
               byteValue,
-              esp3dTFTsettings.isValidByteSetting(
+              esp3dTftsettings.isValidByteSetting(
                   byteValue, Esp3dSettingIndex::esp3d_fallback_mode));
-    if (esp3dTFTsettings.isValidByteSetting(
+    if (esp3dTftsettings.isValidByteSetting(
             byteValue, Esp3dSettingIndex::esp3d_fallback_mode)) {
       esp3d_log("Value %d is valid", byteValue);
-      if (!esp3dTFTsettings.writeByte(Esp3dSettingIndex::esp3d_fallback_mode,
+      if (!esp3dTftsettings.writeByte(Esp3dSettingIndex::esp3d_fallback_mode,
                                       byteValue)) {
         hasError = true;
         error_msg = "Set value failed";

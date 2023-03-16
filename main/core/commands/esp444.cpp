@@ -31,7 +31,7 @@
 // Set ESP State
 //`cmd` can be  `RESTART` to restart board or `RESET` to reset all setting to
 // defaults values [ESP444]<cmd> json=<no> <pwd=admin>`
-void ESP3dCommands::ESP444(int cmd_params_pos, Esp3dMessage* msg) {
+void Esp3dCommands::ESP444(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;
@@ -52,7 +52,7 @@ void ESP3dCommands::ESP444(int cmd_params_pos, Esp3dMessage* msg) {
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   if (isReset) {
-    esp3dTFTsettings.reset();
+    esp3dTftsettings.reset();
     esp3d_log("Resetting settings");
   }
 

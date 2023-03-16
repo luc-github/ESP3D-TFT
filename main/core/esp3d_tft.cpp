@@ -51,11 +51,11 @@
  *  STATIC PROTOTYPES
  **********************/
 
-ESP3dTFT::ESP3dTFT() {}
+Esp3dTft::Esp3dTft() {}
 
-ESP3dTFT::~ESP3dTFT() {}
+Esp3dTft::~Esp3dTft() {}
 
-bool ESP3dTFT::begin() {
+bool Esp3dTft::begin() {
   // Generic board initialization
   std::string target = TFT_TARGET;
   esp3d_log("Starting ESP3D-TFT on %s ", target.c_str());
@@ -71,16 +71,16 @@ bool ESP3dTFT::begin() {
   // Specitic board initialization
   ESP_ERROR_CHECK(bsp_init());
 
-  if (esp3dTFTsettings.isValidSettingsNvs()) {
+  if (esp3dTftsettings.isValidSettingsNvs()) {
     esp3d_log("NVS is valid");
     char result[50] = {0};
-    if (esp3dTFTsettings.readString(Esp3dSettingIndex::esp3d_version, result,
+    if (esp3dTftsettings.readString(Esp3dSettingIndex::esp3d_version, result,
                                     50)) {
       esp3d_log("NVS Setting version is %s", result);
     }
   } else {
     esp3d_log_e("NVS is not valid, need resetting");
-    if (esp3dTFTsettings.reset()) {
+    if (esp3dTftsettings.reset()) {
       esp3d_log("Reset NVS done");
     } else {
       esp3d_log_e("Reset NVS failed");
@@ -102,7 +102,7 @@ bool ESP3dTFT::begin() {
 #endif  // ESP3D_SD_CARD_FEATURE
   bool success = true;
 #if ESP3D_DISPLAY_FEATURE
-  esp3dTFTui.begin();
+  esp3dTftui.begin();
 #endif  // ESP3D_DISPLAY_FEATURE
 #if ESP3D_UPDATE_FEATURE
   if (successSd) {
@@ -110,14 +110,14 @@ bool ESP3dTFT::begin() {
   }
 #endif  // ESP3D_UPDATE_FEATURE
   if (success) {
-    success = esp3dTFTstream.begin();
+    success = esp3dTftstream.begin();
   }
   if (success) {
-    success = esp3dTFTnetwork.begin();
+    success = esp3dTftnetwork.begin();
   }
   return success && successFs && successSd;
 }
 
-void ESP3dTFT::handle() {}
+void Esp3dTft::handle() {}
 
-bool ESP3dTFT::end() { return true; }
+bool Esp3dTft::end() { return true; }

@@ -27,9 +27,9 @@
 #include "esp3d_string.h"
 #include "http/esp3d_http_service.h"
 
-ESP3dWebUiService esp3dWsWebUiService;
+Esp3dWebUiService esp3dWsWebUiService;
 
-esp_err_t ESP3dWebUiService::onOpen(httpd_req_t *req) {
+esp_err_t Esp3dWebUiService::onOpen(httpd_req_t *req) {
   int currentFd = httpd_req_to_sockfd(req);
   std::string tmpstr;
   esp3d_log("New connection %d", currentFd);
@@ -71,14 +71,14 @@ esp_err_t ESP3dWebUiService::onOpen(httpd_req_t *req) {
   return ESP_OK;
 }
 
-void ESP3dWebUiService::process(Esp3dMessage *msg) {
+void Esp3dWebUiService::process(Esp3dMessage *msg) {
   // webui use bin for the stream
   esp3d_log("Processing message");
   BroadcastBin(msg->data, msg->size);
-  ESP3dClient::deleteMsg(msg);
+  Esp3dClient::deleteMsg(msg);
 }
 
-esp_err_t ESP3dWebUiService::pushNotification(const char *msg) {
+esp_err_t Esp3dWebUiService::pushNotification(const char *msg) {
   // webui use TXT for internal messages
   std::string tmp = "NOTIFICATION:";
   tmp += msg;
@@ -86,7 +86,7 @@ esp_err_t ESP3dWebUiService::pushNotification(const char *msg) {
   return BroadcastTxt(tmp.c_str());
 }
 
-esp_err_t ESP3dWebUiService::onMessage(httpd_req_t *req) {
+esp_err_t Esp3dWebUiService::onMessage(httpd_req_t *req) {
   httpd_ws_frame_t ws_pkt;
   uint8_t *buf = NULL;
   memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));

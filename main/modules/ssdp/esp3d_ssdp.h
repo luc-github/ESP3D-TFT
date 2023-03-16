@@ -25,10 +25,10 @@
 extern "C" {
 #endif
 
-class ESP3dssdp final {
+class Esp3dssdp final {
  public:
-  ESP3dssdp();
-  ~ESP3dssdp();
+  Esp3dssdp();
+  ~Esp3dssdp();
   bool begin();
   void handle();
   void end();
@@ -39,7 +39,7 @@ class ESP3dssdp final {
   bool _started;
 };
 
-extern ESP3dssdp esp3d_ssdp_service;
+extern Esp3dssdp esp3d_ssdp_service;
 #ifdef __cplusplus
 }  // extern "C"
 #endif

@@ -27,7 +27,7 @@
 #define COMMAND_ID 131
 // Get/Set Socket port
 //[ESP131]<port> json=<no> pwd=<admin password>
-void ESP3dCommands::ESP131(int cmd_params_pos, Esp3dMessage* msg) {
+void Esp3dCommands::ESP131(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;
@@ -49,18 +49,18 @@ void ESP3dCommands::ESP131(int cmd_params_pos, Esp3dMessage* msg) {
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
     intValue =
-        esp3dTFTsettings.readUint32(Esp3dSettingIndex::esp3d_socket_port);
+        esp3dTftsettings.readUint32(Esp3dSettingIndex::esp3d_socket_port);
     ok_msg = std::to_string(intValue);
   } else {
     intValue = atoi(tmpstr.c_str());
     esp3d_log("got %s param for a value of %ld, is valid %d", tmpstr.c_str(),
               intValue,
-              esp3dTFTsettings.isValidIntegerSetting(
+              esp3dTftsettings.isValidIntegerSetting(
                   intValue, Esp3dSettingIndex::esp3d_socket_port));
-    if (esp3dTFTsettings.isValidIntegerSetting(
+    if (esp3dTftsettings.isValidIntegerSetting(
             intValue, Esp3dSettingIndex::esp3d_socket_port)) {
       esp3d_log("Value %ld is valid", intValue);
-      if (!esp3dTFTsettings.writeUint32(Esp3dSettingIndex::esp3d_socket_port,
+      if (!esp3dTftsettings.writeUint32(Esp3dSettingIndex::esp3d_socket_port,
                                         intValue)) {
         hasError = true;
         error_msg = "Set value failed";

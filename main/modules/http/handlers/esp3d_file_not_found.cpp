@@ -26,7 +26,7 @@
 #endif  // ESP3D_SD_CARD_FEATURE
 #include "filesystem/esp3d_flash.h"
 
-esp_err_t ESP3dHttpService::file_not_found_handler(httpd_req_t *req,
+esp_err_t Esp3dHttpService::file_not_found_handler(httpd_req_t *req,
                                                    httpd_err_code_t err) {
 #if ESP3D_AUTHENTICATION_FEATURE
   Esp3dAuthenticationLevel authentication_level = getAuthenticationLevel(req);

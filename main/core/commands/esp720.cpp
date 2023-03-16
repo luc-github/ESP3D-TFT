@@ -31,7 +31,7 @@
 #define COMMAND_ID 720
 // List ESP3D Filesystem
 ///[ESP720]<Root> json=<no> pwd=<user/admin password>
-void ESP3dCommands::ESP720(int cmd_params_pos, Esp3dMessage *msg) {
+void Esp3dCommands::ESP720(int cmd_params_pos, Esp3dMessage *msg) {
   bool hasError = false;
   std::string error_msg = "Path inccorrect";
   std::string ok_msg = "ok";
@@ -49,7 +49,7 @@ void ESP3dCommands::ESP720(int cmd_params_pos, Esp3dMessage *msg) {
 #endif  // ESP3D_AUTHENTICATION_FEATURE
 
   Esp3dMessage msgInfo;
-  ESP3dClient::copyMsgInfos(&msgInfo, *msg);
+  Esp3dClient::copyMsgInfos(&msgInfo, *msg);
   tmpstr = get_clean_param(msg, cmd_params_pos);
 
   if (tmpstr.length() == 0) {
@@ -108,7 +108,7 @@ void ESP3dCommands::ESP720(int cmd_params_pos, Esp3dMessage *msg) {
         } else {
           continue;
         }
-        Esp3dMessage *newMsg = ESP3dClient::copyMsgInfos(msgInfo);
+        Esp3dMessage *newMsg = Esp3dClient::copyMsgInfos(msgInfo);
         newMsg->type = Esp3dMessageType::core;
         if (!dispatch(newMsg, ok_msg.c_str())) {
           esp3d_log_e("Error sending response to clients");
@@ -166,7 +166,7 @@ void ESP3dCommands::ESP720(int cmd_params_pos, Esp3dMessage *msg) {
             ok_msg += "\n";
           }
         }
-        Esp3dMessage *newMsg = ESP3dClient::copyMsgInfos(msgInfo);
+        Esp3dMessage *newMsg = Esp3dClient::copyMsgInfos(msgInfo);
         newMsg->type = Esp3dMessageType::core;
         if (!dispatch(newMsg, ok_msg.c_str())) {
           esp3d_log_e("Error sending response to clients");
@@ -201,7 +201,7 @@ void ESP3dCommands::ESP720(int cmd_params_pos, Esp3dMessage *msg) {
         ok_msg += esp3d_strings::formatBytes(freeSpace);
         ok_msg += "\n";
       }
-      Esp3dMessage *newMsg = ESP3dClient::copyMsgInfos(msgInfo);
+      Esp3dMessage *newMsg = Esp3dClient::copyMsgInfos(msgInfo);
       newMsg->type = Esp3dMessageType::tail;
       if (!dispatch(newMsg, ok_msg.c_str())) {
         esp3d_log_e("Error sending response to clients");

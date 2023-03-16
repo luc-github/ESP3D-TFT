@@ -47,7 +47,7 @@
 // #define FS_FILE "/esp3dfs.bin"
 #define CHUNK_BUFFER_SIZE 1024
 
-ESP3dUpdateService esp3dUpdateService;
+Esp3dUpdateService esp3dUpdateService;
 
 const char *protectedkeys[] = {"NOTIF_TOKEN1",   "NOTIF_TOKEN2",
                                "AP_Password",    "STA_Password",
@@ -272,11 +272,11 @@ const Esp3dSettingIndex SysboolKeysPos[] = {
     // ESP_SECURE_SERIAL
 };
 
-ESP3dUpdateService::ESP3dUpdateService() {}
+Esp3dUpdateService::Esp3dUpdateService() {}
 
-ESP3dUpdateService::~ESP3dUpdateService() {}
+Esp3dUpdateService::~Esp3dUpdateService() {}
 
-bool ESP3dUpdateService::canUpdate() {
+bool Esp3dUpdateService::canUpdate() {
   const esp_partition_t *running = esp_ota_get_running_partition();
   const esp_partition_t *update_partition =
       esp_ota_get_next_update_partition(NULL);
@@ -299,7 +299,7 @@ bool ESP3dUpdateService::canUpdate() {
   return true;
 }
 
-size_t ESP3dUpdateService::maxUpdateSize() {
+size_t Esp3dUpdateService::maxUpdateSize() {
   size_t max_size = 0;
   const esp_partition_t *update_partition =
       esp_ota_get_next_update_partition(NULL);
@@ -311,12 +311,12 @@ size_t ESP3dUpdateService::maxUpdateSize() {
   return max_size;
 }
 
-bool ESP3dUpdateService::begin() {
+bool Esp3dUpdateService::begin() {
   esp3d_log("Starting Update Service");
   bool restart = false;
   Esp3dState setting_check_update = Esp3dState::off;
 #if ESP3D_SD_CARD_FEATURE
-  setting_check_update = (Esp3dState)esp3dTFTsettings.readByte(
+  setting_check_update = (Esp3dState)esp3dTftsettings.readByte(
       Esp3dSettingIndex::esp3d_check_update_on_sd);
 #endif  // ESP3D_SD_CARD_FEATURE
 
@@ -373,9 +373,9 @@ bool ESP3dUpdateService::begin() {
   return true;
 }
 
-bool ESP3dUpdateService::updateConfig() {
+bool Esp3dUpdateService::updateConfig() {
   bool res = false;
-  ESP3dConfigFile updateConfig(CONFIG_FILE,
+  Esp3dConfigFile updateConfig(CONFIG_FILE,
                                esp3dUpdateService.processingFileFunction,
                                CONFIG_FILE_OK, protectedkeys);
   if (updateConfig.processFile()) {
@@ -392,7 +392,7 @@ bool ESP3dUpdateService::updateConfig() {
   return res;
 }
 #if ESP3D_SD_CARD_FEATURE
-bool ESP3dUpdateService::updateFW() {
+bool Esp3dUpdateService::updateFW() {
   bool isSuccess = true;
   char chunk[CHUNK_BUFFER_SIZE];
   esp_ota_handle_t update_handle = 0;
@@ -475,11 +475,11 @@ bool ESP3dUpdateService::updateFW() {
   return isSuccess;
 }
 #endif  // ESP3D_SD_CARD_FEATURE
-void ESP3dUpdateService::handle() {}
+void Esp3dUpdateService::handle() {}
 
-void ESP3dUpdateService::end() { esp3d_log("Stop Update Service"); }
+void Esp3dUpdateService::end() { esp3d_log("Stop Update Service"); }
 
-bool ESP3dUpdateService::processString(const char **keysval,
+bool Esp3dUpdateService::processString(const char **keysval,
                                        const Esp3dSettingIndex *keypos,
                                        const size_t size, const char *key,
                                        const char *value, char &T,
@@ -499,7 +499,7 @@ bool ESP3dUpdateService::processString(const char **keysval,
   return false;
 }
 
-bool ESP3dUpdateService::processInt(const char **keysval,
+bool Esp3dUpdateService::processInt(const char **keysval,
                                     const Esp3dSettingIndex *keypos,
                                     const size_t size, const char *key,
                                     const char *value, char &T,
@@ -517,7 +517,7 @@ bool ESP3dUpdateService::processInt(const char **keysval,
   return false;
 }
 
-bool ESP3dUpdateService::processBool(const char **keysval,
+bool Esp3dUpdateService::processBool(const char **keysval,
                                      const Esp3dSettingIndex *keypos,
                                      const size_t size, const char *key,
                                      const char *value, char &T,
@@ -546,7 +546,7 @@ bool ESP3dUpdateService::processBool(const char **keysval,
   return false;
 }
 
-bool ESP3dUpdateService::processingFileFunction(const char *section,
+bool Esp3dUpdateService::processingFileFunction(const char *section,
                                                 const char *key,
                                                 const char *value) {
   esp3d_log("Processing Section: %s, Key: %s, Value: %s", section, key, value);
@@ -750,29 +750,29 @@ bool ESP3dUpdateService::processingFileFunction(const char *section,
   if (P != Esp3dSettingIndex::unknown_index) {
     switch (T) {
       case 'S':
-        if (esp3dTFTsettings.isValidStringSetting(value, P)) {
-          res = esp3dTFTsettings.writeString(P, value);
+        if (esp3dTftsettings.isValidStringSetting(value, P)) {
+          res = esp3dTftsettings.writeString(P, value);
         } else {
           esp3d_log_e("Value \"%s\" is invalid", value);
         }
         break;
       case 'B':
-        if (esp3dTFTsettings.isValidByteSetting(b, P)) {
-          res = esp3dTFTsettings.writeByte(P, b);
+        if (esp3dTftsettings.isValidByteSetting(b, P)) {
+          res = esp3dTftsettings.writeByte(P, b);
         } else {
           esp3d_log_e("Value \"%d\" is invalid", b);
         }
         break;
       case 'I':
-        if (esp3dTFTsettings.isValidIntegerSetting(v, P)) {
-          res = esp3dTFTsettings.writeUint32(P, v);
+        if (esp3dTftsettings.isValidIntegerSetting(v, P)) {
+          res = esp3dTftsettings.writeUint32(P, v);
         } else {
           esp3d_log_e("Value \"%ld\" is invalid", v);
         }
         break;
       case 'A':
-        if (esp3dTFTsettings.isValidIPStringSetting(value, P)) {
-          res = esp3dTFTsettings.writeIPString(P, value);
+        if (esp3dTftsettings.isValidIPStringSetting(value, P)) {
+          res = esp3dTftsettings.writeIPString(P, value);
         } else {
           esp3d_log_e("Value \"%s\" is invalid", value);
         }

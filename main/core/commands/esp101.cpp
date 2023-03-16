@@ -26,7 +26,7 @@
 #define COMMAND_ID 101
 // STA Password
 //[ESP101]<Password> <NOPASSWORD> json=no pwd=<admin password>
-void ESP3dCommands::ESP101(int cmd_params_pos, Esp3dMessage* msg) {
+void Esp3dCommands::ESP101(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;
@@ -56,12 +56,12 @@ void ESP3dCommands::ESP101(int cmd_params_pos, Esp3dMessage* msg) {
     }
     esp3d_log("got %s param for a value of %s, is valid %d", tmpstr.c_str(),
               tmpstr.c_str(),
-              esp3dTFTsettings.isValidStringSetting(
+              esp3dTftsettings.isValidStringSetting(
                   tmpstr.c_str(), Esp3dSettingIndex::esp3d_sta_password));
-    if (esp3dTFTsettings.isValidStringSetting(
+    if (esp3dTftsettings.isValidStringSetting(
             tmpstr.c_str(), Esp3dSettingIndex::esp3d_sta_password)) {
       esp3d_log("Value %s is valid", tmpstr.c_str());
-      if (!esp3dTFTsettings.writeString(Esp3dSettingIndex::esp3d_sta_password,
+      if (!esp3dTftsettings.writeString(Esp3dSettingIndex::esp3d_sta_password,
                                         tmpstr.c_str())) {
         hasError = true;
         error_msg = "Set value failed";

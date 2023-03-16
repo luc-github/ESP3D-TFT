@@ -22,8 +22,7 @@
 #include "http/esp3d_http_service.h"
 #include "websocket/esp3d_ws_service.h"
 
-
-esp_err_t ESP3dHttpService::websocket_data_handler(httpd_req_t *req) {
+esp_err_t Esp3dHttpService::websocket_data_handler(httpd_req_t *req) {
   // No need authentication as handled by service itself
   // Delegate to websocket data service
   return esp3dWsDataService.http_handler(req);

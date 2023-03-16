@@ -28,7 +28,7 @@
 #include "http/esp3d_http_service.h"
 #include "ssdp/esp3d_ssdp.h"
 
-esp_err_t ESP3dHttpService::description_xml_handler(httpd_req_t *req) {
+esp_err_t Esp3dHttpService::description_xml_handler(httpd_req_t *req) {
   // No authentication for this URL
   esp3d_log("Uri: %s", req->uri);
   httpd_resp_set_type(req, "text/xml");

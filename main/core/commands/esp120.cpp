@@ -26,7 +26,7 @@
 #define COMMAND_ID 120
 // Get/Set HTTP state which can be ON, OFF
 //[ESP120]<state> json=<no> pwd=<admin password>
-void ESP3dCommands::ESP120(int cmd_params_pos, Esp3dMessage* msg) {
+void Esp3dCommands::ESP120(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;
@@ -46,7 +46,7 @@ void ESP3dCommands::ESP120(int cmd_params_pos, Esp3dMessage* msg) {
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
   Esp3dState setting_http_mode =
-      (Esp3dState)esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_http_on);
+      (Esp3dState)esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_http_on);
   if (tmpstr.length() == 0) {
     if (setting_http_mode == Esp3dState::off) {
       ok_msg = "OFF";
@@ -55,7 +55,7 @@ void ESP3dCommands::ESP120(int cmd_params_pos, Esp3dMessage* msg) {
     }
   } else {
     if (tmpstr == "OFF" || tmpstr == "ON") {
-      if (!esp3dTFTsettings.writeByte(Esp3dSettingIndex::esp3d_http_on,
+      if (!esp3dTftsettings.writeByte(Esp3dSettingIndex::esp3d_http_on,
                                       tmpstr == "OFF" ? 0 : 1)) {
         hasError = true;
         error_msg = "Set value failed";

@@ -26,7 +26,7 @@
 #define COMMAND_ID 103
 // Change STA IP/Mask/GW/DNS
 //[ESP103]IP=<IP> MSK=<IP> GW=<IP> DNS=<IP> json=no pwd=<admin password>
-void ESP3dCommands::ESP103(int cmd_params_pos, Esp3dMessage* msg) {
+void Esp3dCommands::ESP103(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;
@@ -59,28 +59,28 @@ void ESP3dCommands::ESP103(int cmd_params_pos, Esp3dMessage* msg) {
       ok_msg = "IP: ";
     }
     ok_msg +=
-        esp3dTFTsettings.readIPString(Esp3dSettingIndex::esp3d_sta_ip_static);
+        esp3dTftsettings.readIPString(Esp3dSettingIndex::esp3d_sta_ip_static);
     if (json) {
       ok_msg += "\",\"gw\":\"";
     } else {
       ok_msg += ", GW: ";
     }
     ok_msg +=
-        esp3dTFTsettings.readIPString(Esp3dSettingIndex::esp3d_sta_gw_static);
+        esp3dTftsettings.readIPString(Esp3dSettingIndex::esp3d_sta_gw_static);
     if (json) {
       ok_msg += "\",\"msk\":\"";
     } else {
       ok_msg += ", MSK: ";
     }
     ok_msg +=
-        esp3dTFTsettings.readIPString(Esp3dSettingIndex::esp3d_sta_mask_static);
+        esp3dTftsettings.readIPString(Esp3dSettingIndex::esp3d_sta_mask_static);
     if (json) {
       ok_msg += "\",\"dns\":\"";
     } else {
       ok_msg += ", DNS: ";
     }
     ok_msg +=
-        esp3dTFTsettings.readIPString(Esp3dSettingIndex::esp3d_sta_dns_static);
+        esp3dTftsettings.readIPString(Esp3dSettingIndex::esp3d_sta_dns_static);
     if (json) {
       ok_msg += "\"}";
     } else {
@@ -92,10 +92,10 @@ void ESP3dCommands::ESP103(int cmd_params_pos, Esp3dMessage* msg) {
       tmpstr = get_param(msg, cmd_params_pos, cmdList[i]);
       if (tmpstr.length() != 0) {
         hasParam = true;
-        if (esp3dTFTsettings.isValidIPStringSetting(tmpstr.c_str(),
+        if (esp3dTftsettings.isValidIPStringSetting(tmpstr.c_str(),
                                                     settingIndex[i])) {
           esp3d_log("Value %s is valid", tmpstr.c_str());
-          if (!esp3dTFTsettings.writeIPString(settingIndex[i],
+          if (!esp3dTftsettings.writeIPString(settingIndex[i],
                                               tmpstr.c_str())) {
             hasError = true;
             error_msg = "Set value failed";

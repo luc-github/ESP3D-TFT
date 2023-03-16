@@ -28,7 +28,7 @@
 
 // Get/Set SD card Speed factor 1 2 4 6 8 16 32
 //[ESP202]<factor> json=<no> pwd=<user/admin password>
-void ESP3dCommands::ESP202(int cmd_params_pos, Esp3dMessage* msg) {
+void Esp3dCommands::ESP202(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;
@@ -49,17 +49,17 @@ void ESP3dCommands::ESP202(int cmd_params_pos, Esp3dMessage* msg) {
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
     ok_msg = std::to_string(
-        esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_spi_divider));
+        esp3dTftsettings.readByte(Esp3dSettingIndex::esp3d_spi_divider));
   } else {
     uint8_t spidiv = atoi(tmpstr.c_str());
     esp3d_log("got %s param for a value of %d, is valid %d", tmpstr.c_str(),
               spidiv,
-              esp3dTFTsettings.isValidByteSetting(
+              esp3dTftsettings.isValidByteSetting(
                   spidiv, Esp3dSettingIndex::esp3d_spi_divider));
-    if (esp3dTFTsettings.isValidByteSetting(
+    if (esp3dTftsettings.isValidByteSetting(
             spidiv, Esp3dSettingIndex::esp3d_spi_divider)) {
       esp3d_log("Value %d is valid", spidiv);
-      if (!esp3dTFTsettings.writeByte(Esp3dSettingIndex::esp3d_spi_divider,
+      if (!esp3dTftsettings.writeByte(Esp3dSettingIndex::esp3d_spi_divider,
                                       spidiv)) {
         hasError = true;
         error_msg = "Set value failed";

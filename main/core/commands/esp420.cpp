@@ -66,7 +66,7 @@
 // Get ESP current status
 // output is JSON or plain text according parameter
 //[ESP420]json=<no>
-void ESP3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
+void Esp3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   msg->target = target;
@@ -157,7 +157,7 @@ void ESP3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
   }
 #if ESP3D_SD_CARD_FEATURE
   // SD updater
-  Esp3dState statesetting = (Esp3dState)esp3dTFTsettings.readByte(
+  Esp3dState statesetting = (Esp3dState)esp3dTftsettings.readByte(
       Esp3dSettingIndex::esp3d_check_update_on_sd);
   if (statesetting == Esp3dState::off) {
     tmpstr = "OFF";
@@ -192,7 +192,7 @@ void ESP3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
     }
     // Serial BaudRate
     uint32_t baud =
-        esp3dTFTsettings.readUint32(Esp3dSettingIndex::esp3d_baud_rate);
+        esp3dTftsettings.readUint32(Esp3dSettingIndex::esp3d_baud_rate);
     tmpstr = std::to_string(baud);
     if (!dispatchIdValue(json, "baud", tmpstr.c_str(), target, requestId)) {
       return;
@@ -203,7 +203,7 @@ void ESP3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
     if (!dispatchIdValue(json, "output", "usb port", target, requestId)) {
       return;
     }
-    uint32_t baud = esp3dTFTsettings.readUint32(
+    uint32_t baud = esp3dTftsettings.readUint32(
         Esp3dSettingIndex::esp3d_usb_serial_baud_rate);
     tmpstr = std::to_string(baud);
     if (!dispatchIdValue(json, "baud", tmpstr.c_str(), target, requestId)) {
@@ -230,10 +230,10 @@ void ESP3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
 
   // hostname
   const Esp3dSettingDescription *settingPtr =
-      esp3dTFTsettings.getSettingPtr(Esp3dSettingIndex::esp3d_hostname);
+      esp3dTftsettings.getSettingPtr(Esp3dSettingIndex::esp3d_hostname);
   if (settingPtr) {
     char out_str[(settingPtr->size) + 1] = {0};
-    tmpstr = esp3dTFTsettings.readString(Esp3dSettingIndex::esp3d_hostname,
+    tmpstr = esp3dTftsettings.readString(Esp3dSettingIndex::esp3d_hostname,
                                          out_str, settingPtr->size);
   } else {
     tmpstr = "Error!!";
