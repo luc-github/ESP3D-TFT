@@ -45,7 +45,7 @@ const char* pathToFileName(const char* path);
 #define LOG_NO_COLOR "\e[0;37m\e[0m"
 #endif
 
-#if ESP3D_TFT_LOG == 2
+#if ESP3D_TFT_LOG >1
 #define esp3d_log(format, ...)                                                 \
   esp_log_write(ESP_LOG_NONE, "[ESP3D-TFT]", "%s[%s:%u] %s(): " format "%s\n", \
                 LOG_COLOR_NORMAL, pathToFileName(__FILE__), __LINE__,          \
