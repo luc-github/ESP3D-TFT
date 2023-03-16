@@ -30,10 +30,10 @@
 extern "C" {
 #endif
 
-class Esp3DCommands {
+class ESP3dCommands {
  public:
-  Esp3DCommands();
-  ~Esp3DCommands();
+  ESP3dCommands();
+  ~ESP3dCommands();
   bool is_esp_command(uint8_t* sbuf, size_t len);
   void process(Esp3dMessage* msg);
   void execute_internal_command(int cmd, int cmd_params_pos, Esp3dMessage* msg);
@@ -163,7 +163,7 @@ class Esp3DCommands {
   Esp3dClientType _output_client;
 };
 
-extern Esp3DCommands esp3dCommands;
+extern ESP3dCommands esp3dCommands;
 
 #ifdef __cplusplus
 }  // extern "C"

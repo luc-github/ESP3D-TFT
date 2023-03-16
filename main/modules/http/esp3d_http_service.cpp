@@ -37,53 +37,53 @@
 #define CHUNK_BUFFER_SIZE STREAM_CHUNK_SIZE
 char chunk[CHUNK_BUFFER_SIZE];
 
-Esp3DHttpService esp3dHttpService;
+ESP3dHttpService esp3dHttpService;
 
-PostUploadContext Esp3DHttpService::_post_files_upload_ctx = {
+PostUploadContext ESP3dHttpService::_post_files_upload_ctx = {
     .writeFn =
         (esp_err_t(*)(const uint8_t *, size_t, Esp3dUploadState, const char *,
-                      size_t))(Esp3DHttpService::upload_to_flash_handler),
+                      size_t))(ESP3dHttpService::upload_to_flash_handler),
     .nextHandler =
-        (esp_err_t(*)(httpd_req_t *))(Esp3DHttpService::files_handler),
+        (esp_err_t(*)(httpd_req_t *))(ESP3dHttpService::files_handler),
     .packetReadSize = 4 * 1024,   // This may need to be defined in tasks_def.h
     .packetWriteSize = 4 * 1024,  // This may need to be defined in tasks_def.h
     .status = Esp3dUploadStatus::not_started,
     .args = {}};
 #if ESP3D_SD_CARD_FEATURE
-PostUploadContext Esp3DHttpService::_post_sdfiles_upload_ctx = {
+PostUploadContext ESP3dHttpService::_post_sdfiles_upload_ctx = {
     .writeFn =
         (esp_err_t(*)(const uint8_t *, size_t, Esp3dUploadState, const char *,
-                      size_t))(Esp3DHttpService::upload_to_sd_handler),
+                      size_t))(ESP3dHttpService::upload_to_sd_handler),
     .nextHandler =
-        (esp_err_t(*)(httpd_req_t *))(Esp3DHttpService::sdfiles_handler),
+        (esp_err_t(*)(httpd_req_t *))(ESP3dHttpService::sdfiles_handler),
     .packetReadSize = 4 * 1024,   // This may need to be defined in tasks_def.h
     .packetWriteSize = 4 * 1024,  // This may need to be defined in tasks_def.h
     .status = Esp3dUploadStatus::not_started,
     .args = {}};
 #endif  // ESP3D_SD_CARD_FEATURE
 #if ESP3D_UPDATE_FEATURE
-PostUploadContext Esp3DHttpService::_post_updatefw_upload_ctx = {
+PostUploadContext ESP3dHttpService::_post_updatefw_upload_ctx = {
     .writeFn =
         (esp_err_t(*)(const uint8_t *, size_t, Esp3dUploadState, const char *,
-                      size_t))(Esp3DHttpService::upload_to_updatefw_handler),
+                      size_t))(ESP3dHttpService::upload_to_updatefw_handler),
     .nextHandler =
-        (esp_err_t(*)(httpd_req_t *))(Esp3DHttpService::updatefw_handler),
+        (esp_err_t(*)(httpd_req_t *))(ESP3dHttpService::updatefw_handler),
     .packetReadSize = 1024,   // This may need to be defined in tasks_def.h
     .packetWriteSize = 1024,  // This may need to be defined in tasks_def.h
     .status = Esp3dUploadStatus::not_started,
     .args = {}};
 #endif  // ESP3D_UPDATE_FEATURE
 
-PostUploadContext Esp3DHttpService::_post_login_ctx = {
+PostUploadContext ESP3dHttpService::_post_login_ctx = {
     .writeFn = NULL,
     .nextHandler =
-        (esp_err_t(*)(httpd_req_t *))(Esp3DHttpService::login_handler),
+        (esp_err_t(*)(httpd_req_t *))(ESP3dHttpService::login_handler),
     .packetReadSize = 512,  // This may need to be defined in tasks_def.h
     .packetWriteSize = 0,   // This may need to be defined in tasks_def.h
     .status = Esp3dUploadStatus::not_started,
     .args = {}};
 
-void Esp3DHttpService::pushError(Esp3dUploadError errcode, const char *st) {
+void ESP3dHttpService::pushError(Esp3dUploadError errcode, const char *st) {
   std::string errmsg = "ERROR:" + std::to_string(static_cast<uint8_t>(errcode));
   errmsg += ":";
   errmsg += st;
@@ -92,17 +92,17 @@ void Esp3DHttpService::pushError(Esp3dUploadError errcode, const char *st) {
                                    strlen(errmsg.c_str()));
 }
 
-void Esp3DHttpService::push(esp3dSocketType socketType, int socketFd) {
+void ESP3dHttpService::push(esp3dSocketType socketType, int socketFd) {
   _sockets_list.push_back(std::make_pair(socketType, socketFd));
 }
 
-void Esp3DHttpService::pop(esp3dSocketType socketType, int socketFd) {
+void ESP3dHttpService::pop(esp3dSocketType socketType, int socketFd) {
   _sockets_list.remove_if([&](std::pair<esp3dSocketType, int> &p) {
     return p.first == socketType and p.second == socketFd;
   });
 }
 
-bool Esp3DHttpService::hasArg(httpd_req_t *req, const char *argname) {
+bool ESP3dHttpService::hasArg(httpd_req_t *req, const char *argname) {
   PostUploadContext *post_upload_ctx = (PostUploadContext *)req->user_ctx;
   if (post_upload_ctx) {
     for (auto itr = post_upload_ctx->args.begin();
@@ -116,7 +116,7 @@ bool Esp3DHttpService::hasArg(httpd_req_t *req, const char *argname) {
   return false;
 }
 
-const char *Esp3DHttpService::getArg(httpd_req_t *req, const char *argname) {
+const char *ESP3dHttpService::getArg(httpd_req_t *req, const char *argname) {
   PostUploadContext *post_upload_ctx = (PostUploadContext *)req->user_ctx;
   if (post_upload_ctx) {
     for (auto itr = post_upload_ctx->args.begin();
@@ -129,7 +129,7 @@ const char *Esp3DHttpService::getArg(httpd_req_t *req, const char *argname) {
   return "";
 }
 
-Esp3DHttpService::Esp3DHttpService() {
+ESP3dHttpService::ESP3dHttpService() {
   _started = false;
   _server = nullptr;
   _post_files_upload_ctx.status = Esp3dUploadStatus::not_started;
@@ -141,15 +141,15 @@ Esp3DHttpService::Esp3DHttpService() {
 #endif  // ESP3D_UPDATE_FEATURE
 }
 
-Esp3DHttpService::~Esp3DHttpService() { end(); }
+ESP3dHttpService::~ESP3dHttpService() { end(); }
 
-/*esp_err_t Esp3DHttpService::open_fn(httpd_handle_t hd, int socketFd)
+/*esp_err_t ESP3dHttpService::open_fn(httpd_handle_t hd, int socketFd)
 {
     esp3d_log("New client connection %d", socketFd);
     return ESP_OK;
 }*/
 
-void Esp3DHttpService::close_fn(httpd_handle_t hd, int socketFd) {
+void ESP3dHttpService::close_fn(httpd_handle_t hd, int socketFd) {
   esp3d_log("Client closing connection %d", socketFd);
   // each service should know if the socket is owned by  itself
   esp3dWsWebUiService.onClose(socketFd);
@@ -160,7 +160,7 @@ void Esp3DHttpService::close_fn(httpd_handle_t hd, int socketFd) {
   close(socketFd);
 }
 
-void Esp3DHttpService::onClose(int socketFd) {
+void ESP3dHttpService::onClose(int socketFd) {
 #if ESP3D_AUTHENTICATION_FEATURE
   esp3d_log_w("Closing client connection %d and all Esp3dClientType::webui",
               socketFd);
@@ -168,7 +168,7 @@ void Esp3DHttpService::onClose(int socketFd) {
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
 }
 
-bool Esp3DHttpService::begin() {
+bool ESP3dHttpService::begin() {
   esp3d_log("Starting Http Service");
 
   end();
@@ -385,9 +385,9 @@ bool Esp3DHttpService::begin() {
   return _started;
 }
 
-void Esp3DHttpService::handle() {}
+void ESP3dHttpService::handle() {}
 
-void Esp3DHttpService::end() {
+void ESP3dHttpService::end() {
   if (!_started && !_server) {
     return;
   }
@@ -425,7 +425,7 @@ void Esp3DHttpService::end() {
 #endif  // ESP3D_UPDATE_FEATURE
 }
 #if ESP3D_AUTHENTICATION_FEATURE
-char *Esp3DHttpService::generate_http_auth_basic_digest(const char *username,
+char *ESP3dHttpService::generate_http_auth_basic_digest(const char *username,
                                                         const char *password) {
   int out;
   char *user_info = NULL;
@@ -455,7 +455,7 @@ char *Esp3DHttpService::generate_http_auth_basic_digest(const char *username,
 }
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
 
-Esp3dAuthenticationLevel Esp3DHttpService::getAuthenticationLevel(
+Esp3dAuthenticationLevel ESP3dHttpService::getAuthenticationLevel(
     httpd_req_t *req) {
 #if ESP3D_AUTHENTICATION_FEATURE
   Esp3dAuthenticationLevel authentication_level =
@@ -718,7 +718,7 @@ Esp3dAuthenticationLevel Esp3DHttpService::getAuthenticationLevel(
   return Esp3dAuthenticationLevel::admin;
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
 }
-esp_err_t Esp3DHttpService::streamFile(const char *path, httpd_req_t *req) {
+esp_err_t ESP3dHttpService::streamFile(const char *path, httpd_req_t *req) {
   esp_err_t res = ESP_OK;
   if (!_started || !_server) {
     esp3d_log_e("Stream server is not ready");
@@ -817,7 +817,7 @@ esp_err_t Esp3DHttpService::streamFile(const char *path, httpd_req_t *req) {
   return res;
 }
 
-void Esp3DHttpService::process(Esp3dMessage *msg) {
+void ESP3dHttpService::process(Esp3dMessage *msg) {
   if (msg->request_id.http_request) {
     // esp3d_log("Msg type : %d", msg->type);
     if (httpd_resp_send_chunk(msg->request_id.http_request,
@@ -832,10 +832,10 @@ void Esp3DHttpService::process(Esp3dMessage *msg) {
       }
     }
   }
-  Esp3DClient::deleteMsg(msg);
+  ESP3dClient::deleteMsg(msg);
 }
 
-esp_err_t Esp3DHttpService::sendStringChunk(httpd_req_t *req, const char *str,
+esp_err_t ESP3dHttpService::sendStringChunk(httpd_req_t *req, const char *str,
                                             bool autoClose) {
   if (!str || httpd_resp_send_chunk(req, str, strlen(str)) != ESP_OK) {
     esp3d_log_e("String sending failed!");
@@ -847,7 +847,7 @@ esp_err_t Esp3DHttpService::sendStringChunk(httpd_req_t *req, const char *str,
   return ESP_OK;
 }
 
-esp_err_t Esp3DHttpService::sendBinaryChunk(httpd_req_t *req,
+esp_err_t ESP3dHttpService::sendBinaryChunk(httpd_req_t *req,
                                             const uint8_t *data, size_t len,
                                             bool autoClose) {
   if (!data || httpd_resp_send_chunk(req, (const char *)data, len) != ESP_OK) {
@@ -860,7 +860,7 @@ esp_err_t Esp3DHttpService::sendBinaryChunk(httpd_req_t *req,
   return ESP_OK;
 }
 
-const char *Esp3DHttpService::getBoundaryString(httpd_req_t *req) {
+const char *ESP3dHttpService::getBoundaryString(httpd_req_t *req) {
   static char *boundaryStr = nullptr;
   if (boundaryStr) {
     free(boundaryStr);

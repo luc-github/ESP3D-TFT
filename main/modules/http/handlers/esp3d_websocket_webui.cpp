@@ -17,15 +17,12 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
-#include "http/esp3d_http_service.h"
 #include "esp3d_log.h"
+#include "http/esp3d_http_service.h"
 #include "websocket/esp3d_webui_service.h"
 
-
-esp_err_t Esp3DHttpService::websocket_webui_handler(httpd_req_t *req)
-{
-    //No need authentication as handled by service itself
-    //Delegate to websocket webui service
-    return esp3dWsWebUiService.http_handler(req);
+esp_err_t ESP3dHttpService::websocket_webui_handler(httpd_req_t *req) {
+  // No need authentication as handled by service itself
+  // Delegate to websocket webui service
+  return esp3dWsWebUiService.http_handler(req);
 }

@@ -50,10 +50,10 @@ enum class Esp3dRadioMode : uint8_t {
   bluetooth_serial = 4
 };
 
-class Esp3DNetwork final {
+class ESP3dNetwork final {
  public:
-  Esp3DNetwork();
-  ~Esp3DNetwork();
+  ESP3dNetwork();
+  ~ESP3dNetwork();
   bool begin();
   void handle();
   void end();
@@ -102,7 +102,7 @@ class Esp3DNetwork final {
   const char* getMac(esp_mac_type_t type);
 };
 
-extern Esp3DNetwork esp3dNetwork;
+extern ESP3dNetwork esp3dNetwork;
 #ifdef __cplusplus
 }  // extern "C"
 #endif

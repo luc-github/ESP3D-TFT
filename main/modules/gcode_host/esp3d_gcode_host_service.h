@@ -50,10 +50,10 @@ struct Esp3dScript {
   FILE* fileScript = nullptr;
 };
 
-class Esp3DGCodeHostService : public Esp3DClient {
+class ESP3dGCodeHostService : public ESP3dClient {
  public:
-  Esp3DGCodeHostService();
-  ~Esp3DGCodeHostService();
+  ESP3dGCodeHostService();
+  ~ESP3dGCodeHostService();
   bool begin();
   void handle();
   void end();
@@ -87,7 +87,7 @@ class Esp3DGCodeHostService : public Esp3DClient {
   Esp3dScript* _current_script;
 };
 
-extern Esp3DGCodeHostService gcodeHostService;
+extern ESP3dGCodeHostService gcodeHostService;
 
 #ifdef __cplusplus
 }  // extern "C"

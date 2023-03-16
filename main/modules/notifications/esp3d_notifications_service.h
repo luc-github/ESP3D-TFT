@@ -52,10 +52,10 @@ enum class Esp3dNotificationType : uint8_t {
   ifttt
 };
 
-class Esp3DNotificationsService final {
+class ESP3dNotificationsService final {
  public:
-  Esp3DNotificationsService();
-  ~Esp3DNotificationsService();
+  ESP3dNotificationsService();
+  ~ESP3dNotificationsService();
   bool begin(bool sendAutoNotificationMsg = false);
   void handle();
   void end();
@@ -92,7 +92,7 @@ class Esp3DNotificationsService final {
   bool getEmailInformationsFromSettings();
 };
 
-extern Esp3DNotificationsService esp3dNotificationsService;
+extern ESP3dNotificationsService esp3dNotificationsService;
 #ifdef __cplusplus
 }  // extern "C"
 #endif

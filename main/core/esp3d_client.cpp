@@ -31,7 +31,7 @@
 int32_t msg_counting = 0;
 #endif  // ESP3D_TFT_LOG
 
-Esp3DClient::Esp3DClient() {
+ESP3dClient::ESP3dClient() {
   _rx_size = 0;
   _tx_size = 0;
   _rx_max_size = 1024;
@@ -39,7 +39,7 @@ Esp3DClient::Esp3DClient() {
   _rx_mutex = nullptr;
   _tx_mutex = nullptr;
 }
-bool Esp3DClient::clearRxQueue() {
+bool ESP3dClient::clearRxQueue() {
   while (!_rx_queue.empty()) {
     deleteMsg(popRx());
   }
@@ -47,20 +47,20 @@ bool Esp3DClient::clearRxQueue() {
   return true;
 }
 
-Esp3dMessage* Esp3DClient::popRx() {
+Esp3dMessage* ESP3dClient::popRx() {
   Esp3dMessage* msg = _rx_queue.front();
   _rx_size -= msg->size;
   _rx_queue.pop_front();
   return msg;
 }
-Esp3dMessage* Esp3DClient::popTx() {
+Esp3dMessage* ESP3dClient::popTx() {
   Esp3dMessage* msg = _tx_queue.front();
   _tx_size -= msg->size;
   _tx_queue.pop_front();
   return msg;
 }
 
-void Esp3DClient::deleteMsg(Esp3dMessage* msg) {
+void ESP3dClient::deleteMsg(Esp3dMessage* msg) {
   if (msg) {
     // esp3d_log("Deletion origin: %d, Target: %d, size: %d  : Now we have %ld
     // msg", msg->origin, msg->target, msg->size, --msg_counting);
@@ -70,7 +70,7 @@ void Esp3DClient::deleteMsg(Esp3dMessage* msg) {
   }
 }
 
-bool Esp3DClient::clearTxQueue() {
+bool ESP3dClient::clearTxQueue() {
   while (!_tx_queue.empty()) {
     deleteMsg(popTx());
   }
@@ -78,12 +78,12 @@ bool Esp3DClient::clearTxQueue() {
   _tx_size = 0;
   return true;
 }
-Esp3DClient::~Esp3DClient() {
+ESP3dClient::~ESP3dClient() {
   clearTxQueue();
   clearRxQueue();
 }
 
-bool Esp3DClient::addRxData(Esp3dMessage* msg) {
+bool ESP3dClient::addRxData(Esp3dMessage* msg) {
   bool res = false;
   if (_rx_mutex) {
     if (pthread_mutex_lock(_rx_mutex) == 0) {
@@ -97,7 +97,7 @@ bool Esp3DClient::addRxData(Esp3dMessage* msg) {
   }
   return res;
 }
-bool Esp3DClient::addTxData(Esp3dMessage* msg) {
+bool ESP3dClient::addTxData(Esp3dMessage* msg) {
   bool res = false;
   if (_tx_mutex) {
     if (pthread_mutex_lock(_tx_mutex) == 0) {
@@ -116,7 +116,7 @@ bool Esp3DClient::addTxData(Esp3dMessage* msg) {
   }
   return res;
 }
-bool Esp3DClient::addFrontTxData(Esp3dMessage* msg) {
+bool ESP3dClient::addFrontTxData(Esp3dMessage* msg) {
   bool res = false;
   if (_tx_mutex) {
     if (pthread_mutex_lock(_tx_mutex) == 0) {
@@ -131,7 +131,7 @@ bool Esp3DClient::addFrontTxData(Esp3dMessage* msg) {
   return res;
 }
 
-Esp3dMessage* Esp3DClient::newMsg() {
+Esp3dMessage* ESP3dClient::newMsg() {
   Esp3dMessage* newMsgPtr = (Esp3dMessage*)malloc(sizeof(Esp3dMessage));
   if (newMsgPtr) {
     // esp3d_log("Creation : Now we have %ld msg", ++msg_counting);
@@ -146,7 +146,7 @@ Esp3dMessage* Esp3DClient::newMsg() {
   return newMsgPtr;
 }
 
-Esp3dMessage* Esp3DClient::newMsg(Esp3dRequest requestId) {
+Esp3dMessage* ESP3dClient::newMsg(Esp3dRequest requestId) {
   Esp3dMessage* newMsgPtr = newMsg();
   if (newMsgPtr) {
     newMsgPtr->origin = Esp3dClientType::command;
@@ -155,7 +155,7 @@ Esp3dMessage* Esp3DClient::newMsg(Esp3dRequest requestId) {
   return newMsgPtr;
 }
 
-bool Esp3DClient::copyMsgInfos(Esp3dMessage* newMsgPtr, Esp3dMessage msg) {
+bool ESP3dClient::copyMsgInfos(Esp3dMessage* newMsgPtr, Esp3dMessage msg) {
   if (!newMsgPtr) {
     return false;
   }
@@ -167,7 +167,7 @@ bool Esp3DClient::copyMsgInfos(Esp3dMessage* newMsgPtr, Esp3dMessage msg) {
   return true;
 }
 
-Esp3dMessage* Esp3DClient::copyMsgInfos(Esp3dMessage msg) {
+Esp3dMessage* ESP3dClient::copyMsgInfos(Esp3dMessage msg) {
   Esp3dMessage* newMsgPtr = newMsg();
   if (newMsgPtr) {
     copyMsgInfos(newMsgPtr, msg);
@@ -175,7 +175,7 @@ Esp3dMessage* Esp3DClient::copyMsgInfos(Esp3dMessage msg) {
   return newMsgPtr;
 }
 
-Esp3dMessage* Esp3DClient::copyMsg(Esp3dMessage msg) {
+Esp3dMessage* ESP3dClient::copyMsg(Esp3dMessage msg) {
   Esp3dMessage* newMsgPtr = newMsg(msg.origin, msg.target, msg.data, msg.size,
                                    msg.authentication_level);
   if (newMsgPtr) {
@@ -185,7 +185,7 @@ Esp3dMessage* Esp3DClient::copyMsg(Esp3dMessage msg) {
   return newMsgPtr;
 }
 
-Esp3dMessage* Esp3DClient::newMsg(
+Esp3dMessage* ESP3dClient::newMsg(
     Esp3dClientType origin, Esp3dClientType target, const uint8_t* data,
     size_t length, Esp3dAuthenticationLevel authentication_level) {
   Esp3dMessage* newMsgPtr = newMsg(origin, target, authentication_level);
@@ -198,7 +198,7 @@ Esp3dMessage* Esp3DClient::newMsg(
   return newMsgPtr;
 }
 
-Esp3dMessage* Esp3DClient::newMsg(
+Esp3dMessage* ESP3dClient::newMsg(
     Esp3dClientType origin, Esp3dClientType target,
     Esp3dAuthenticationLevel authentication_level) {
   Esp3dMessage* newMsgPtr = newMsg();
@@ -210,7 +210,7 @@ Esp3dMessage* Esp3DClient::newMsg(
   return newMsgPtr;
 }
 
-bool Esp3DClient::setDataContent(Esp3dMessage* msg, const uint8_t* data,
+bool ESP3dClient::setDataContent(Esp3dMessage* msg, const uint8_t* data,
                                  size_t length) {
   if (!msg) {
     esp3d_log_e("no valid msg container");

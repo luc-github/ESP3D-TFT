@@ -17,20 +17,19 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
-#include "http/esp3d_http_service.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "http/esp3d_http_service.h"
 
-esp_err_t Esp3DHttpService::updatefw_handler(httpd_req_t *req)
-{
-    //No need Authentication as already handled in multipart_parser
-    esp3d_log("Uri: %s", req->uri);
-    httpd_resp_sendstr(req, "Update firmware done restarting");
-    vTaskDelay(pdMS_TO_TICKS(1000));
-    esp_restart();
-    return ESP_OK;
+
+esp_err_t ESP3dHttpService::updatefw_handler(httpd_req_t *req) {
+  // No need Authentication as already handled in multipart_parser
+  esp3d_log("Uri: %s", req->uri);
+  httpd_resp_sendstr(req, "Update firmware done restarting");
+  vTaskDelay(pdMS_TO_TICKS(1000));
+  esp_restart();
+  return ESP_OK;
 }

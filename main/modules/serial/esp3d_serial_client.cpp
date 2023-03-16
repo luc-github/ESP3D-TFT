@@ -31,11 +31,11 @@
 #include "freertos/task.h"
 #include "serial_def.h"
 
-Esp3DSerialClient serialClient;
+ESP3dSerialClient serialClient;
 
 #define RX_FLUSH_TIME_OUT 1500  // milliseconds timeout
 
-void Esp3DSerialClient::readSerial() {
+void ESP3dSerialClient::readSerial() {
   static uint64_t startTimeout = 0;  // milliseconds
   int len = uart_read_bytes(ESP3D_SERIAL_PORT, _data,
                             (ESP3D_SERIAL_RX_BUFFER_SIZE - 1),
@@ -86,16 +86,16 @@ static void esp3d_serial_rx_task(void *pvParameter) {
   vTaskDelete(NULL);
 }
 
-Esp3DSerialClient::Esp3DSerialClient() {
+ESP3dSerialClient::ESP3dSerialClient() {
   _started = false;
   _xHandle = NULL;
   _data = NULL;
   _buffer = NULL;
   _bufferPos = 0;
 }
-Esp3DSerialClient::~Esp3DSerialClient() { end(); }
+ESP3dSerialClient::~ESP3dSerialClient() { end(); }
 
-void Esp3DSerialClient::process(Esp3dMessage *msg) {
+void ESP3dSerialClient::process(Esp3dMessage *msg) {
   esp3d_log("Add message to queue");
   if (!addTxData(msg)) {
     flush();
@@ -108,10 +108,10 @@ void Esp3DSerialClient::process(Esp3dMessage *msg) {
   }
 }
 
-bool Esp3DSerialClient::isEndChar(uint8_t ch) {
+bool ESP3dSerialClient::isEndChar(uint8_t ch) {
   return ((char)ch == '\n' || (char)ch == '\r');
 }
-bool Esp3DSerialClient::begin() {
+bool ESP3dSerialClient::begin() {
   end();
 
   _data = (uint8_t *)malloc(ESP3D_SERIAL_RX_BUFFER_SIZE);
@@ -187,17 +187,17 @@ bool Esp3DSerialClient::begin() {
   }
 }
 
-bool Esp3DSerialClient::pushMsgToRxQueue(const uint8_t *msg, size_t size) {
+bool ESP3dSerialClient::pushMsgToRxQueue(const uint8_t *msg, size_t size) {
   Esp3dMessage *newMsgPtr = newMsg();
   if (newMsgPtr) {
-    if (Esp3DClient::setDataContent(newMsgPtr, msg, size)) {
+    if (ESP3dClient::setDataContent(newMsgPtr, msg, size)) {
 #if ESP3D_DISABLE_SERIAL_AUTHENTICATION_FEATURE
       newMsgPtr->authentication_level = Esp3dAuthenticationLevel::admin;
 #endif  // ESP3D_DISABLE_SERIAL_AUTHENTICATION
       newMsgPtr->origin = Esp3dClientType::serial;
       if (!addRxData(newMsgPtr)) {
         // delete message as cannot be added to the queue
-        Esp3DClient::deleteMsg(newMsgPtr);
+        ESP3dClient::deleteMsg(newMsgPtr);
         esp3d_log_e("Failed to add message to rx queue");
         return false;
       }
@@ -214,7 +214,7 @@ bool Esp3DSerialClient::pushMsgToRxQueue(const uint8_t *msg, size_t size) {
   return true;
 }
 
-void Esp3DSerialClient::handle() {
+void ESP3dSerialClient::handle() {
   if (_started) {
     if (getRxMsgsCount() > 0) {
       Esp3dMessage *msg = popRx();
@@ -235,7 +235,7 @@ void Esp3DSerialClient::handle() {
   }
 }
 
-void Esp3DSerialClient::flush() {
+void ESP3dSerialClient::flush() {
   uint8_t loopCount = 10;
   while (loopCount && getTxMsgsCount() > 0) {
     // esp3d_log("flushing Tx messages");
@@ -245,7 +245,7 @@ void Esp3DSerialClient::flush() {
   }
 }
 
-void Esp3DSerialClient::end() {
+void ESP3dSerialClient::end() {
   if (_started) {
     flush();
     _started = false;

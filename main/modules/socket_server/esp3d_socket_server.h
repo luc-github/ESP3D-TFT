@@ -42,7 +42,7 @@ struct Esp3dSocketInfos {
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
 };
 
-class ESP3DSocketServer : public Esp3DClient {
+class ESP3DSocketServer : public ESP3dClient {
  public:
   ESP3DSocketServer();
   ~ESP3DSocketServer();

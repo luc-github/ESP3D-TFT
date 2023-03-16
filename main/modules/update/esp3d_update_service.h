@@ -27,10 +27,10 @@
 extern "C" {
 #endif
 
-class Esp3DUpdateService final {
+class ESP3dUpdateService final {
  public:
-  Esp3DUpdateService();
-  ~Esp3DUpdateService();
+  ESP3dUpdateService();
+  ~ESP3dUpdateService();
   bool begin();
   void handle();
   void end();
@@ -58,7 +58,7 @@ class Esp3DUpdateService final {
                           char& T, Esp3dSettingIndex& P, uint8_t& b);
 };
 
-extern Esp3DUpdateService esp3dUpdateService;
+extern ESP3dUpdateService esp3dUpdateService;
 #ifdef __cplusplus
 }  // extern "C"
 #endif

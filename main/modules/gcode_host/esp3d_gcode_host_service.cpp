@@ -30,7 +30,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-Esp3DGCodeHostService gcodeHostService;
+ESP3dGCodeHostService gcodeHostService;
 
 #define RX_FLUSH_TIME_OUT 1500  // milliseconds timeout
 #define ESP3D_GCODE_HOST_TASK_SIZE 4096
@@ -48,32 +48,32 @@ static void esp3d_gcode_host_task(void* pvParameter) {
   vTaskDelete(NULL);
 }
 
-bool Esp3DGCodeHostService::processScript(const char* script,
+bool ESP3dGCodeHostService::processScript(const char* script,
                                           Esp3dAuthenticationLevel auth_type) {
   esp3d_log("Processing script: %s,  with authentication level=%d", script,
             static_cast<uint8_t>(auth_type));
 
   return false;
 }
-bool Esp3DGCodeHostService::abort() { return false; }
-bool Esp3DGCodeHostService::pause() { return false; }
-bool Esp3DGCodeHostService::resume() { return false; }
-bool Esp3DGCodeHostService::isAck(const char* cmd) { return false; }
-bool Esp3DGCodeHostService::isCommand() { return false; }
-bool Esp3DGCodeHostService::isAckNeeded() { return false; }
-bool Esp3DGCodeHostService::startStream() { return false; }
-bool Esp3DGCodeHostService::processCommand() { return false; }
-bool Esp3DGCodeHostService::readNextCommand() { return false; }
+bool ESP3dGCodeHostService::abort() { return false; }
+bool ESP3dGCodeHostService::pause() { return false; }
+bool ESP3dGCodeHostService::resume() { return false; }
+bool ESP3dGCodeHostService::isAck(const char* cmd) { return false; }
+bool ESP3dGCodeHostService::isCommand() { return false; }
+bool ESP3dGCodeHostService::isAckNeeded() { return false; }
+bool ESP3dGCodeHostService::startStream() { return false; }
+bool ESP3dGCodeHostService::processCommand() { return false; }
+bool ESP3dGCodeHostService::readNextCommand() { return false; }
 
-Esp3dGcodeHostState Esp3DGCodeHostService::getState() {
+Esp3dGcodeHostState ESP3dGCodeHostService::getState() {
   return Esp3dGcodeHostState::no_stream;
 }
 
-Esp3dGcodeHostError Esp3DGCodeHostService::getErrorNum() {
+Esp3dGcodeHostError ESP3dGCodeHostService::getErrorNum() {
   return Esp3dGcodeHostError::no_error;
 }
 
-Esp3dScript* Esp3DGCodeHostService::getCurrentScript() {
+Esp3dScript* ESP3dGCodeHostService::getCurrentScript() {
   // get first not command
   for (auto script = _scripts.begin(); script != _scripts.end(); ++script) {
     if (script->type != Esp3dGcodeHostScriptType::single_command) {
@@ -83,16 +83,16 @@ Esp3dScript* Esp3DGCodeHostService::getCurrentScript() {
   return nullptr;
 }
 
-bool Esp3DGCodeHostService::endStream() { return false; }
+bool ESP3dGCodeHostService::endStream() { return false; }
 
-Esp3DGCodeHostService::Esp3DGCodeHostService() {
+ESP3dGCodeHostService::ESP3dGCodeHostService() {
   _started = false;
   _xHandle = NULL;
   _current_script = NULL;
 }
-Esp3DGCodeHostService::~Esp3DGCodeHostService() { end(); }
+ESP3dGCodeHostService::~ESP3dGCodeHostService() { end(); }
 
-void Esp3DGCodeHostService::process(Esp3dMessage* msg) {
+void ESP3dGCodeHostService::process(Esp3dMessage* msg) {
   esp3d_log("Add message to queue");
   if (!addTxData(msg)) {
     flush();
@@ -105,10 +105,10 @@ void Esp3DGCodeHostService::process(Esp3dMessage* msg) {
   }
 }
 
-bool Esp3DGCodeHostService::isEndChar(uint8_t ch) {
+bool ESP3dGCodeHostService::isEndChar(uint8_t ch) {
   return ((char)ch == '\n' || (char)ch == '\r');
 }
-bool Esp3DGCodeHostService::begin() {
+bool ESP3dGCodeHostService::begin() {
   end();
   if (pthread_mutex_init(&_rx_mutex, NULL) != 0) {
     esp3d_log_e("Mutex creation for rx failed");
@@ -141,15 +141,15 @@ bool Esp3DGCodeHostService::begin() {
   }
 }
 
-bool Esp3DGCodeHostService::pushMsgToRxQueue(const uint8_t* msg, size_t size) {
+bool ESP3dGCodeHostService::pushMsgToRxQueue(const uint8_t* msg, size_t size) {
   Esp3dMessage* newMsgPtr = newMsg();
   if (newMsgPtr) {
-    if (Esp3DClient::setDataContent(newMsgPtr, msg, size)) {
+    if (ESP3dClient::setDataContent(newMsgPtr, msg, size)) {
       newMsgPtr->authentication_level = Esp3dAuthenticationLevel::user;
       newMsgPtr->origin = Esp3dClientType::stream;
       if (!addRxData(newMsgPtr)) {
         // delete message as cannot be added to the queue
-        Esp3DClient::deleteMsg(newMsgPtr);
+        ESP3dClient::deleteMsg(newMsgPtr);
         esp3d_log_e("Failed to add message to rx queue");
         return false;
       }
@@ -166,7 +166,7 @@ bool Esp3DGCodeHostService::pushMsgToRxQueue(const uint8_t* msg, size_t size) {
   return true;
 }
 
-Esp3dGcodeHostScriptType Esp3DGCodeHostService::getScriptType(
+Esp3dGcodeHostScriptType ESP3dGCodeHostService::getScriptType(
     const char* script) {
   if (script[0] == '/') {
     if (strstr(script, "/sd/") == script) {
@@ -186,7 +186,7 @@ Esp3dGcodeHostScriptType Esp3DGCodeHostService::getScriptType(
   }
 }
 
-void Esp3DGCodeHostService::handle() {
+void ESP3dGCodeHostService::handle() {
   if (_started) {
     // to allow to handle GCode commands when processing SD/script
     for (auto script : _scripts) {
@@ -245,7 +245,7 @@ void Esp3DGCodeHostService::handle() {
   }
 }
 
-void Esp3DGCodeHostService::flush() {
+void ESP3dGCodeHostService::flush() {
   uint8_t loopCount = 10;
   while (loopCount && getTxMsgsCount() > 0) {
     // esp3d_log("flushing Tx messages");
@@ -254,7 +254,7 @@ void Esp3DGCodeHostService::flush() {
   }
 }
 
-void Esp3DGCodeHostService::end() {
+void ESP3dGCodeHostService::end() {
   if (_started) {
     flush();
     _started = false;

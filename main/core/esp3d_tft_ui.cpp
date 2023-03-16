@@ -41,7 +41,7 @@
  *  STATIC PROTOTYPES
  **********************/
 
-Esp3DTFTUi esp3dTFTui;
+ESP3dTFTUi esp3dTFTui;
 
 static void lv_tick_task(void *arg);
 static void guiTask(void *pvParameter);
@@ -202,11 +202,11 @@ static void guiTask(void *pvParameter) {
   vTaskDelete(NULL);
 }
 
-Esp3DTFTUi::Esp3DTFTUi() {}
+ESP3dTFTUi::ESP3dTFTUi() {}
 
-Esp3DTFTUi::~Esp3DTFTUi() {}
+ESP3dTFTUi::~ESP3dTFTUi() {}
 
-bool Esp3DTFTUi::begin() {
+bool ESP3dTFTUi::begin() {
   // Ui creation
   TaskHandle_t xHandle = NULL;
   BaseType_t res = xTaskCreatePinnedToCore(guiTask, "tftUI", STACKDEPTH, NULL,
@@ -220,6 +220,6 @@ bool Esp3DTFTUi::begin() {
   }
 }
 
-void Esp3DTFTUi::handle() {}
+void ESP3dTFTUi::handle() {}
 
-bool Esp3DTFTUi::end() { return true; }
+bool ESP3dTFTUi::end() { return true; }

@@ -26,7 +26,7 @@
 #define COMMAND_ID 105
 // AP SSID
 //[ESP105]<SSID> json=no pwd=<admin password>
-void Esp3DCommands::ESP105(int cmd_params_pos, Esp3dMessage* msg) {
+void ESP3dCommands::ESP105(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;

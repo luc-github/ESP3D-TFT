@@ -23,7 +23,7 @@
 #include "esp_ota_ops.h"
 #include "http/esp3d_http_service.h"
 
-esp_err_t Esp3DHttpService::upload_to_updatefw_handler(
+esp_err_t ESP3dHttpService::upload_to_updatefw_handler(
     const uint8_t *data, size_t datasize, Esp3dUploadState file_upload_state,
     const char *filename, size_t filesize) {
   // No need Authentication as already handled in multipart_parser

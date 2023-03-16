@@ -25,7 +25,7 @@
 #define SERVER_URL "https://api.telegram.org"
 #define SERVER_PORT 443
 
-bool Esp3DNotificationsService::sendTelegramMSG(const char* title,
+bool ESP3dNotificationsService::sendTelegramMSG(const char* title,
                                                 const char* message) {
   if (_token1.length() == 0 || _token2.length() == 0) {
     esp3d_log_e("Some token is missing");

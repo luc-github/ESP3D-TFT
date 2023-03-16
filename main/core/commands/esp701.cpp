@@ -27,7 +27,7 @@
 
 // Query and Control ESP700 stream
 //[ESP701]action=<PAUSE/RESUME/ABORT> json=<no> pwd=<admin/user password>`
-void Esp3DCommands::ESP701(int cmd_params_pos, Esp3dMessage* msg) {
+void ESP3dCommands::ESP701(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;

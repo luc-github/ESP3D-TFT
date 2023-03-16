@@ -28,7 +28,7 @@
 // output is JSON or plain text according parameter
 //[ESP100]<SSID> json=<no> pwd=<admin password for set/get & user password to
 // get>
-void Esp3DCommands::ESP100(int cmd_params_pos, Esp3dMessage* msg) {
+void ESP3dCommands::ESP100(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;

@@ -88,10 +88,10 @@ struct PostUploadContext {
   std::list<std::pair<std::string, std::string>> args;
 };
 
-class Esp3DHttpService final {
+class ESP3dHttpService final {
  public:
-  Esp3DHttpService();
-  ~Esp3DHttpService();
+  ESP3dHttpService();
+  ~ESP3dHttpService();
   bool begin();
   void handle();
   void end();
@@ -170,7 +170,7 @@ class Esp3DHttpService final {
   std::list<std::pair<esp3dSocketType, int>> _sockets_list;
 };
 
-extern Esp3DHttpService esp3dHttpService;
+extern ESP3dHttpService esp3dHttpService;
 #ifdef __cplusplus
 }  // extern "C"
 #endif

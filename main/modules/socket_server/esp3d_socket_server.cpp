@@ -437,7 +437,7 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
   esp3d_log("Pushing `%s` %d", msg, size);
   Esp3dMessage *newMsgPtr = newMsg();
   if (newMsgPtr) {
-    if (Esp3DClient::setDataContent(newMsgPtr, msg, size)) {
+    if (ESP3dClient::setDataContent(newMsgPtr, msg, size)) {
       newMsgPtr->origin = Esp3dClientType::telnet;
       newMsgPtr->authentication_level = authentication_level;
       newMsgPtr->target = esp3dCommands.getOutputClient();
@@ -445,7 +445,7 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
       newMsgPtr->request_id.id = client->socket_id;
       if (!addRxData(newMsgPtr)) {
         // delete message as cannot be added to the queue
-        Esp3DClient::deleteMsg(newMsgPtr);
+        ESP3dClient::deleteMsg(newMsgPtr);
         esp3d_log_e("Failed to add message to rx queue");
         return false;
       }

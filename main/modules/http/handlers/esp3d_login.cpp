@@ -28,7 +28,7 @@
 #include "http/esp3d_http_service.h"
 #include "network/esp3d_network.h"
 
-esp_err_t Esp3DHttpService::login_handler(httpd_req_t *req) {
+esp_err_t ESP3dHttpService::login_handler(httpd_req_t *req) {
   esp3d_log("Uri: %s", req->uri);
 #if ESP3D_AUTHENTICATION_FEATURE
   std::string tmpstr;

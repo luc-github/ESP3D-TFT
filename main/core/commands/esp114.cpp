@@ -27,7 +27,7 @@
 #define COMMAND_ID 114
 // Get/Set Boot radio state which can be ON, OFF
 //[ESP114]<state> json=<no> pwd=<user/admin password>
-void Esp3DCommands::ESP114(int cmd_params_pos, Esp3dMessage* msg) {
+void ESP3dCommands::ESP114(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;

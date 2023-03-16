@@ -28,16 +28,16 @@
 #define ESP3D_MDNS_SERVICE_PROTO "_tcp"
 #define ESP3D_CODE_BASE "ESP3D-TFT"
 
-Esp3DmDNS esp3dmDNS;
+ESP3dmDNS esp3dmDNS;
 
-Esp3DmDNS::Esp3DmDNS() {
+ESP3dmDNS::ESP3dmDNS() {
   _started = false;
   _scanResults = NULL;
   _currentresult = NULL;
   _count = 0;
 }
 
-mdns_result_t *Esp3DmDNS::getRecord(int pos) {
+mdns_result_t *ESP3dmDNS::getRecord(int pos) {
   if (!_started || pos < -1 || pos >= _count) {
     return NULL;
   }
@@ -64,7 +64,7 @@ mdns_result_t *Esp3DmDNS::getRecord(int pos) {
   return NULL;
 }
 
-uint16_t Esp3DmDNS::servicesScan() {
+uint16_t ESP3dmDNS::servicesScan() {
   freeServiceScan();
   _count = 0;
   esp_err_t err =
@@ -89,7 +89,7 @@ uint16_t Esp3DmDNS::servicesScan() {
   return count;
   return count;
 }
-void Esp3DmDNS::freeServiceScan() {
+void ESP3dmDNS::freeServiceScan() {
   _currentresult = NULL;
   _count = 0;
   if (_scanResults) {
@@ -98,9 +98,9 @@ void Esp3DmDNS::freeServiceScan() {
   }
 }
 
-Esp3DmDNS::~Esp3DmDNS() { end(); }
+ESP3dmDNS::~ESP3dmDNS() { end(); }
 
-bool Esp3DmDNS::begin() {
+bool ESP3dmDNS::begin() {
   if (_started) {
     end();
   }
@@ -143,9 +143,9 @@ bool Esp3DmDNS::begin() {
   return _started;
 }
 
-void Esp3DmDNS::handle() {}
+void ESP3dmDNS::handle() {}
 
-void Esp3DmDNS::end() {
+void ESP3dmDNS::end() {
   _count = 0;
   freeServiceScan();
   if (_started) {

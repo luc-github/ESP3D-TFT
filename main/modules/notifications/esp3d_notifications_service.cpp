@@ -29,13 +29,13 @@
 #include "websocket/esp3d_webui_service.h"
 #endif  // ESP3D_HTTP_FEATURE
 
-Esp3DNotificationsService esp3dNotificationsService;
+ESP3dNotificationsService esp3dNotificationsService;
 
-Esp3DNotificationsService::Esp3DNotificationsService() { end(); }
+ESP3dNotificationsService::ESP3dNotificationsService() { end(); }
 
-Esp3DNotificationsService::~Esp3DNotificationsService() {}
+ESP3dNotificationsService::~ESP3dNotificationsService() {}
 
-bool Esp3DNotificationsService::begin(bool sendAutoNotificationMsg) {
+bool ESP3dNotificationsService::begin(bool sendAutoNotificationMsg) {
   esp3d_log("Start notification service");
   bool res = true;
   char buffer[SIZE_OF_SETTING_NOFIFICATION_T1];
@@ -105,9 +105,9 @@ bool Esp3DNotificationsService::begin(bool sendAutoNotificationMsg) {
   }
   return _started;
 }
-void Esp3DNotificationsService::handle() {}
+void ESP3dNotificationsService::handle() {}
 
-void Esp3DNotificationsService::end() {
+void ESP3dNotificationsService::end() {
   _started = false;
   _autonotification = false;
   _notificationType = Esp3dNotificationType::none;
@@ -120,7 +120,7 @@ void Esp3DNotificationsService::end() {
   _lastError = Esp3dNotificationError::no_error;
 }
 
-bool Esp3DNotificationsService::sendMSG(const char* title,
+bool ESP3dNotificationsService::sendMSG(const char* title,
                                         const char* message) {
   std::string formated_message = message;
   std::string formated_title = title;
@@ -175,7 +175,7 @@ bool Esp3DNotificationsService::sendMSG(const char* title,
   return true;
 }
 
-const char* Esp3DNotificationsService::getTypeString() {
+const char* ESP3dNotificationsService::getTypeString() {
   switch (_notificationType) {
     case Esp3dNotificationType::pushover:
       return "pushover";
@@ -193,7 +193,7 @@ const char* Esp3DNotificationsService::getTypeString() {
   return "none";
 }
 
-bool Esp3DNotificationsService::sendAutoNotification(const char* msg) {
+bool ESP3dNotificationsService::sendAutoNotification(const char* msg) {
   if (_autonotification && _started) {
     return sendMSG(ESP3D_NOTIFICATION_TITLE, msg);
   }

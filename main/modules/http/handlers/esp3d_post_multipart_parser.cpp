@@ -41,7 +41,7 @@ enum class Esp3dParseState : uint8_t {
   data_file
 };
 
-esp_err_t Esp3DHttpService::post_multipart_handler(httpd_req_t *req) {
+esp_err_t ESP3dHttpService::post_multipart_handler(httpd_req_t *req) {
   esp3d_log("Post Data %d on : %s", req->content_len, req->uri);
 
 #if ESP3D_AUTHENTICATION_FEATURE

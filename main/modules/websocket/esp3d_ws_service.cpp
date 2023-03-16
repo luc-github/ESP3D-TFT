@@ -34,7 +34,7 @@
 #include "tasks_def.h"
 
 #if ESP3D_WS_SERVICE_FEATURE
-Esp3DWsService esp3dWsDataService;
+ESP3dWsService esp3dWsDataService;
 #endif  // ESP3D_WS_SERVICE_FEATURE
 
 #if ESP3D_AUTHENTICATION_FEATURE
@@ -50,7 +50,7 @@ Esp3DWsService esp3dWsDataService;
 #define FREE_SOCKET_HANDLE -1
 #define SOCKET_ERROR -1
 
-int Esp3DWsService::getFreeClientIndex() {
+int ESP3dWsService::getFreeClientIndex() {
   for (uint i = 0; i < _max_clients; i++) {
     if (_clients[i].socket_id == FREE_SOCKET_HANDLE) {
       return i;
@@ -58,7 +58,7 @@ int Esp3DWsService::getFreeClientIndex() {
   }
   return NO_FREE_SOCKET_HANDLE;
 }
-uint Esp3DWsService::clientsConnected() {
+uint ESP3dWsService::clientsConnected() {
   uint count = 0;
   for (uint i = 0; i < _max_clients; i++) {
     if (_clients[i].socket_id != FREE_SOCKET_HANDLE) {
@@ -69,7 +69,7 @@ uint Esp3DWsService::clientsConnected() {
   return count;
 }
 
-Esp3dWebSocketInfos *Esp3DWsService::getClientInfosFromSocketId(int socketId) {
+Esp3dWebSocketInfos *ESP3dWsService::getClientInfosFromSocketId(int socketId) {
   for (uint index = 0; index < _max_clients; index++) {
     if (_clients[index].socket_id == socketId) {
       return &_clients[index];
@@ -79,7 +79,7 @@ Esp3dWebSocketInfos *Esp3DWsService::getClientInfosFromSocketId(int socketId) {
   return nullptr;
 }
 
-Esp3dWebSocketInfos *Esp3DWsService::getClientInfos(uint index) {
+Esp3dWebSocketInfos *ESP3dWsService::getClientInfos(uint index) {
   if (index < _max_clients) {
     if (_clients[index].socket_id != FREE_SOCKET_HANDLE) {
       return &_clients[index];
@@ -88,7 +88,7 @@ Esp3dWebSocketInfos *Esp3DWsService::getClientInfos(uint index) {
   return nullptr;
 }
 
-bool Esp3DWsService::closeClient(int socketId) {
+bool ESP3dWsService::closeClient(int socketId) {
   if (!_started || !_server) {
     esp3d_log_e("Not started or not server");
     return false;
@@ -98,7 +98,7 @@ bool Esp3DWsService::closeClient(int socketId) {
   return true;
 }
 
-void Esp3DWsService::closeClients() {
+void ESP3dWsService::closeClients() {
   if (!_started || !_server) {
     esp3d_log_e("Not started or not server");
     return;
@@ -111,7 +111,7 @@ void Esp3DWsService::closeClients() {
   }
 }
 
-bool Esp3DWsService::addClient(int socketid) {
+bool ESP3dWsService::addClient(int socketid) {
   int freeIndex = getFreeClientIndex();
   if (freeIndex == NO_FREE_SOCKET_HANDLE) {
     esp3d_log_e("No free slot for new connection, rejects connection");
@@ -140,7 +140,7 @@ bool Esp3DWsService::addClient(int socketid) {
   return true;
 }
 
-Esp3DWsService::Esp3DWsService() {
+ESP3dWsService::ESP3dWsService() {
   _started = false;
   _server = nullptr;
   _max_clients = 0;
@@ -148,7 +148,7 @@ Esp3DWsService::Esp3DWsService() {
   _type = esp3dSocketType::unknown;
 }
 
-void Esp3DWsService::end() {
+void ESP3dWsService::end() {
   if (!_started) {
     return;
   }
@@ -169,9 +169,9 @@ void Esp3DWsService::end() {
   _type = esp3dSocketType::unknown;
 }
 
-Esp3DWsService::~Esp3DWsService() { end(); }
+ESP3dWsService::~ESP3dWsService() { end(); }
 
-bool Esp3DWsService::begin(Esp3dWebSocketConfig *config) {
+bool ESP3dWsService::begin(Esp3dWebSocketConfig *config) {
   esp3d_log("Starting Ws Service");
   end();
   _server = config->server_handle;
@@ -210,9 +210,9 @@ bool Esp3DWsService::begin(Esp3dWebSocketConfig *config) {
   return _started;
 }
 
-void Esp3DWsService::handle() {}
+void ESP3dWsService::handle() {}
 
-esp_err_t Esp3DWsService::onOpen(httpd_req_t *req) {
+esp_err_t ESP3dWsService::onOpen(httpd_req_t *req) {
   int currentFd = httpd_req_to_sockfd(req);
   if (!addClient(currentFd)) {
     esp3d_log_e("Failed to add client");
@@ -222,11 +222,11 @@ esp_err_t Esp3DWsService::onOpen(httpd_req_t *req) {
   return ESP_OK;
 }
 
-bool Esp3DWsService::isEndChar(uint8_t ch) {
+bool ESP3dWsService::isEndChar(uint8_t ch) {
   return ((char)ch == '\n' || (char)ch == '\r');
 }
 
-esp_err_t Esp3DWsService::onMessage(httpd_req_t *req) {
+esp_err_t ESP3dWsService::onMessage(httpd_req_t *req) {
   httpd_ws_frame_t ws_pkt;
   uint8_t *buf = NULL;
   memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
@@ -295,7 +295,7 @@ esp_err_t Esp3DWsService::onMessage(httpd_req_t *req) {
   return ESP_OK;
 }
 
-bool Esp3DWsService::pushMsgToRxQueue(int socketId, const uint8_t *msg,
+bool ESP3dWsService::pushMsgToRxQueue(int socketId, const uint8_t *msg,
                                       size_t size) {
   esp3d_log("Pushing `%s` %d", msg, size);
   Esp3dWebSocketInfos *client = getClientInfosFromSocketId(socketId);
@@ -348,9 +348,9 @@ bool Esp3DWsService::pushMsgToRxQueue(int socketId, const uint8_t *msg,
   authentication_level = Esp3dAuthenticationLevel::admin;
 #endif  // ESP3D_AUTHENTICATION_FEATURE
 
-  Esp3dMessage *newMsgPtr = Esp3DClient::newMsg();
+  Esp3dMessage *newMsgPtr = ESP3dClient::newMsg();
   if (newMsgPtr) {
-    if (Esp3DClient::setDataContent(newMsgPtr, msg, size)) {
+    if (ESP3dClient::setDataContent(newMsgPtr, msg, size)) {
       newMsgPtr->authentication_level = authentication_level;
       newMsgPtr->origin = Esp3dClientType::websocket;
       newMsgPtr->target = esp3dCommands.getOutputClient();
@@ -373,7 +373,7 @@ bool Esp3DWsService::pushMsgToRxQueue(int socketId, const uint8_t *msg,
   return true;
 }
 
-esp_err_t Esp3DWsService::onClose(int fd) {
+esp_err_t ESP3dWsService::onClose(int fd) {
   for (uint i = 0; i < _max_clients; i++) {
     if (_clients[i].socket_id == fd) {
 #if ESP3D_AUTHENTICATION_FEATURE
@@ -389,7 +389,7 @@ esp_err_t Esp3DWsService::onClose(int fd) {
   return ESP_FAIL;
 }
 
-void Esp3DWsService::process(Esp3dMessage *msg) {
+void ESP3dWsService::process(Esp3dMessage *msg) {
   esp3d_log("Processing message");
   // Broadcast ?
   if (msg->request_id.id == 0) {
@@ -397,10 +397,10 @@ void Esp3DWsService::process(Esp3dMessage *msg) {
   } else {
     pushMsgTxt(msg->request_id.id, msg->data, msg->size);
   }
-  Esp3DClient::deleteMsg(msg);
+  ESP3dClient::deleteMsg(msg);
 }
 
-esp_err_t Esp3DWsService::http_handler(httpd_req_t *req) {
+esp_err_t ESP3dWsService::http_handler(httpd_req_t *req) {
   if (!_started) {
     return ESP_FAIL;
   }
@@ -412,11 +412,11 @@ esp_err_t Esp3DWsService::http_handler(httpd_req_t *req) {
   return onMessage(req);
 }
 
-esp_err_t Esp3DWsService::pushMsgTxt(int fd, const char *msg) {
+esp_err_t ESP3dWsService::pushMsgTxt(int fd, const char *msg) {
   return pushMsgTxt(fd, (uint8_t *)msg, strlen(msg));
 }
 
-esp_err_t Esp3DWsService::pushMsgTxt(int fd, uint8_t *msg, size_t len) {
+esp_err_t ESP3dWsService::pushMsgTxt(int fd, uint8_t *msg, size_t len) {
   if (!_started || fd == -1) {
     return ESP_FAIL;
   }
@@ -432,7 +432,7 @@ esp_err_t Esp3DWsService::pushMsgTxt(int fd, uint8_t *msg, size_t len) {
   return res;
 }
 
-esp_err_t Esp3DWsService::pushMsgBin(int fd, uint8_t *msg, size_t len) {
+esp_err_t ESP3dWsService::pushMsgBin(int fd, uint8_t *msg, size_t len) {
   if (!_started) {
     return ESP_FAIL;
   }
@@ -448,11 +448,11 @@ esp_err_t Esp3DWsService::pushMsgBin(int fd, uint8_t *msg, size_t len) {
   return res;
 }
 
-esp_err_t Esp3DWsService::BroadcastTxt(const char *msg, int ignore) {
+esp_err_t ESP3dWsService::BroadcastTxt(const char *msg, int ignore) {
   return BroadcastTxt((uint8_t *)msg, strlen(msg), ignore);
 }
 
-esp_err_t Esp3DWsService::BroadcastTxt(uint8_t *msg, size_t len, int ignore) {
+esp_err_t ESP3dWsService::BroadcastTxt(uint8_t *msg, size_t len, int ignore) {
   if (!_started) {
     return ESP_FAIL;
   }
@@ -465,7 +465,7 @@ esp_err_t Esp3DWsService::BroadcastTxt(uint8_t *msg, size_t len, int ignore) {
   return ESP_OK;
 }
 
-esp_err_t Esp3DWsService::BroadcastBin(uint8_t *msg, size_t len, int ignore) {
+esp_err_t ESP3dWsService::BroadcastBin(uint8_t *msg, size_t len, int ignore) {
   if (!_started) {
     return ESP_FAIL;
   }

@@ -26,7 +26,7 @@
 #define COMMAND_ID 402
 // Get/Set Check update at boot state which can be ON, OFF
 //[ESP402]<state> json=<no> pwd=<admin password>
-void Esp3DCommands::ESP402(int cmd_params_pos, Esp3dMessage* msg) {
+void ESP3dCommands::ESP402(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;

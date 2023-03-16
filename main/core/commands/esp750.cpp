@@ -27,7 +27,7 @@
 // Action on SD Filesystem
 // rmdir / remove / mkdir / exists /create
 //[ESP750]<Action>=<path> json=<no> pwd=<admin password>
-void Esp3DCommands::ESP750(int cmd_params_pos, Esp3dMessage* msg) {
+void ESP3dCommands::ESP750(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;

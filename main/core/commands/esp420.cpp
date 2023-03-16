@@ -66,7 +66,7 @@
 // Get ESP current status
 // output is JSON or plain text according parameter
 //[ESP420]json=<no>
-void Esp3DCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
+void ESP3dCommands::ESP420(int cmd_params_pos, Esp3dMessage *msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   msg->target = target;

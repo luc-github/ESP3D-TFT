@@ -27,15 +27,15 @@
 #include "ssdp.h"
 #include "ssdp/customizations.h"
 
-Esp3Dssdp esp3d_ssdp_service;
+ESP3dssdp esp3d_ssdp_service;
 
-Esp3Dssdp::Esp3Dssdp() { _started = false; }
+ESP3dssdp::ESP3dssdp() { _started = false; }
 
-Esp3Dssdp::~Esp3Dssdp() { end(); }
+ESP3dssdp::~ESP3dssdp() { end(); }
 
-const char *Esp3Dssdp::get_schema() { return get_ssdp_schema_str(); }
+const char *ESP3dssdp::get_schema() { return get_ssdp_schema_str(); }
 
-bool Esp3Dssdp::begin() {
+bool ESP3dssdp::begin() {
   if (_started) {
     end();
   }
@@ -99,9 +99,9 @@ bool Esp3Dssdp::begin() {
   return _started;
 }
 
-void Esp3Dssdp::handle() {}
+void ESP3dssdp::handle() {}
 
-void Esp3Dssdp::end() {
+void ESP3dssdp::end() {
   ssdp_stop();
   _started = false;
 }

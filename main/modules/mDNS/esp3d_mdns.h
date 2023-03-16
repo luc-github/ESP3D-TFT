@@ -20,39 +20,35 @@
 
 #pragma once
 #include <stdio.h>
+
 #include "mdns.h"
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-class Esp3DmDNS final
-{
-public:
-    Esp3DmDNS();
-    ~Esp3DmDNS();
-    bool begin();
-    void handle();
-    void end();
-    bool started()
-    {
-        return _started;
-    };
-    uint16_t getCount()
-    {
-        return _count;
-    }
-    uint16_t servicesScan();
-    mdns_result_t * getRecord(int pos = -1);
-    void freeServiceScan();
-private:
-    bool _started;
-    mdns_result_t *_currentresult;
-    mdns_result_t *_scanResults;
-    uint16_t _count;
+class ESP3dmDNS final {
+ public:
+  ESP3dmDNS();
+  ~ESP3dmDNS();
+  bool begin();
+  void handle();
+  void end();
+  bool started() { return _started; };
+  uint16_t getCount() { return _count; }
+  uint16_t servicesScan();
+  mdns_result_t *getRecord(int pos = -1);
+  void freeServiceScan();
+
+ private:
+  bool _started;
+  mdns_result_t *_currentresult;
+  mdns_result_t *_scanResults;
+  uint16_t _count;
 };
 
-extern Esp3DmDNS esp3dmDNS;
+extern ESP3dmDNS esp3dmDNS;
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif

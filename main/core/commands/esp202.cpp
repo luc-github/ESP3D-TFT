@@ -28,7 +28,7 @@
 
 // Get/Set SD card Speed factor 1 2 4 6 8 16 32
 //[ESP202]<factor> json=<no> pwd=<user/admin password>
-void Esp3DCommands::ESP202(int cmd_params_pos, Esp3dMessage* msg) {
+void ESP3dCommands::ESP202(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;

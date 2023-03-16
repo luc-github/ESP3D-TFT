@@ -27,7 +27,7 @@
 
 // Format ESP Filesystem
 //[ESP710]FORMATFS json=<no> pwd=<admin password>
-void Esp3DCommands::ESP710(int cmd_params_pos, Esp3dMessage* msg) {
+void ESP3dCommands::ESP710(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;
@@ -49,7 +49,7 @@ void Esp3DCommands::ESP710(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dMessage* endMsg = nullptr;
   if (needFormat) {
     ok_msg = "Starting formating...";
-    endMsg = Esp3DClient::copyMsgInfos(*msg);
+    endMsg = ESP3dClient::copyMsgInfos(*msg);
   } else {
     hasError = true;
   }
@@ -60,7 +60,7 @@ void Esp3DCommands::ESP710(int cmd_params_pos, Esp3dMessage* msg) {
       esp3d_log_e("Error sending response to clients");
     }
   } else {
-    Esp3DClient::deleteMsg(msg);
+    ESP3dClient::deleteMsg(msg);
   }
   if (!hasError) {
     flush();

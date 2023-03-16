@@ -27,7 +27,7 @@
 #define COMMAND_ID 121
 // Get/Set HTTP port
 //[ESP121]<port> json=<no> pwd=<admin password>
-void Esp3DCommands::ESP121(int cmd_params_pos, Esp3dMessage* msg) {
+void ESP3dCommands::ESP121(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;

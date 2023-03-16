@@ -26,7 +26,7 @@
 #define COMMAND_ID 115
 // Get/Set immediate Network (WiFi/BT/Ethernet) state which can be ON, OFF
 //[ESP115]<state> json=<no> pwd=<admin password>
-void Esp3DCommands::ESP115(int cmd_params_pos, Esp3dMessage* msg) {
+void ESP3dCommands::ESP115(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;

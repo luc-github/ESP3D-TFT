@@ -21,32 +21,26 @@
 #pragma once
 #include <stdio.h>
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+class ESP3dNetworkServices final {
+ public:
+  ESP3dNetworkServices();
+  ~ESP3dNetworkServices();
+  bool begin();
+  void handle();
+  void end();
 
-class Esp3DNetworkServices final
-{
-public:
-    Esp3DNetworkServices();
-    ~Esp3DNetworkServices();
-    bool begin();
-    void handle();
-    void end();
+  bool started() { return _started; };
 
-    bool started()
-    {
-        return _started;
-    };
-
-private:
-    bool _started;
+ private:
+  bool _started;
 };
 #if ESP3D_WIFI_FEATURE
-extern Esp3DNetworkServices esp3dNetworkServices;
-#endif // ESP3D_WIFI_FEATURE
+extern ESP3dNetworkServices esp3dNetworkServices;
+#endif  // ESP3D_WIFI_FEATURE
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif

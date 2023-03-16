@@ -18,25 +18,27 @@
 */
 #if ESP3D_AUTHENTICATION_FEATURE
 
-#include "http/esp3d_http_service.h"
 #include <stdio.h>
-#include "esp_wifi.h"
+
 #include "esp3d_log.h"
 #include "esp3d_string.h"
+#include "esp_wifi.h"
+#include "http/esp3d_http_service.h"
 
-#define HTTPD_401      "401 UNAUTHORIZED"           /*!< HTTP Response 401 */
-#define HTTPD_401_RESPONSE "{\"status\":\"disconnected\",\"authentication_lvl\":\"guest\"}"
-esp_err_t Esp3DHttpService::not_authenticated_handler(httpd_req_t *req)
-{
-    int socketId = httpd_req_to_sockfd(req);
-    esp3d_log("Uri: %s, socket: %d", req->uri,socketId );
-    esp3dHttpService.onClose(socketId);
-    httpd_resp_set_hdr(req, "Set-Cookie", "ESPSESSIONID=0");
-    httpd_resp_set_hdr(req, "Cache-Control","no-cache");
-    httpd_resp_set_type(req, "application/json");
-    httpd_resp_set_status(req, HTTPD_401);
-    httpd_resp_send(req, HTTPD_401_RESPONSE, strlen(HTTPD_401_RESPONSE));
-    return ESP_OK;
+
+#define HTTPD_401 "401 UNAUTHORIZED" /*!< HTTP Response 401 */
+#define HTTPD_401_RESPONSE \
+  "{\"status\":\"disconnected\",\"authentication_lvl\":\"guest\"}"
+esp_err_t ESP3dHttpService::not_authenticated_handler(httpd_req_t *req) {
+  int socketId = httpd_req_to_sockfd(req);
+  esp3d_log("Uri: %s, socket: %d", req->uri, socketId);
+  esp3dHttpService.onClose(socketId);
+  httpd_resp_set_hdr(req, "Set-Cookie", "ESPSESSIONID=0");
+  httpd_resp_set_hdr(req, "Cache-Control", "no-cache");
+  httpd_resp_set_type(req, "application/json");
+  httpd_resp_set_status(req, HTTPD_401);
+  httpd_resp_send(req, HTTPD_401_RESPONSE, strlen(HTTPD_401_RESPONSE));
+  return ESP_OK;
 }
 
-#endif //#if ESP3D_AUTHENTICATION_FEATURE
+#endif  // #if ESP3D_AUTHENTICATION_FEATURE

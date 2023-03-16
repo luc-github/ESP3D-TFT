@@ -27,7 +27,7 @@
 #define COMMAND_ID 130
 // Get/Set Socket state which can be ON, OFF
 //[ESP130]<state> json=<no> pwd=<admin password>
-void Esp3DCommands::ESP130(int cmd_params_pos, Esp3dMessage* msg) {
+void ESP3dCommands::ESP130(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;

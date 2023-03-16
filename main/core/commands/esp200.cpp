@@ -26,7 +26,7 @@
 #define COMMAND_ID 200
 // Get SD Card Status
 //[ESP200]<RELEASE> <REFRESH> pwd=<user/admin password>
-void Esp3DCommands::ESP200(int cmd_params_pos, Esp3dMessage* msg) {
+void ESP3dCommands::ESP200(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;

@@ -47,7 +47,7 @@
 // #define FS_FILE "/esp3dfs.bin"
 #define CHUNK_BUFFER_SIZE 1024
 
-Esp3DUpdateService esp3dUpdateService;
+ESP3dUpdateService esp3dUpdateService;
 
 const char *protectedkeys[] = {"NOTIF_TOKEN1",   "NOTIF_TOKEN2",
                                "AP_Password",    "STA_Password",
@@ -272,11 +272,11 @@ const Esp3dSettingIndex SysboolKeysPos[] = {
     // ESP_SECURE_SERIAL
 };
 
-Esp3DUpdateService::Esp3DUpdateService() {}
+ESP3dUpdateService::ESP3dUpdateService() {}
 
-Esp3DUpdateService::~Esp3DUpdateService() {}
+ESP3dUpdateService::~ESP3dUpdateService() {}
 
-bool Esp3DUpdateService::canUpdate() {
+bool ESP3dUpdateService::canUpdate() {
   const esp_partition_t *running = esp_ota_get_running_partition();
   const esp_partition_t *update_partition =
       esp_ota_get_next_update_partition(NULL);
@@ -299,7 +299,7 @@ bool Esp3DUpdateService::canUpdate() {
   return true;
 }
 
-size_t Esp3DUpdateService::maxUpdateSize() {
+size_t ESP3dUpdateService::maxUpdateSize() {
   size_t max_size = 0;
   const esp_partition_t *update_partition =
       esp_ota_get_next_update_partition(NULL);
@@ -311,7 +311,7 @@ size_t Esp3DUpdateService::maxUpdateSize() {
   return max_size;
 }
 
-bool Esp3DUpdateService::begin() {
+bool ESP3dUpdateService::begin() {
   esp3d_log("Starting Update Service");
   bool restart = false;
   Esp3dState setting_check_update = Esp3dState::off;
@@ -373,9 +373,9 @@ bool Esp3DUpdateService::begin() {
   return true;
 }
 
-bool Esp3DUpdateService::updateConfig() {
+bool ESP3dUpdateService::updateConfig() {
   bool res = false;
-  Esp3DConfigFile updateConfig(CONFIG_FILE,
+  ESP3dConfigFile updateConfig(CONFIG_FILE,
                                esp3dUpdateService.processingFileFunction,
                                CONFIG_FILE_OK, protectedkeys);
   if (updateConfig.processFile()) {
@@ -392,7 +392,7 @@ bool Esp3DUpdateService::updateConfig() {
   return res;
 }
 #if ESP3D_SD_CARD_FEATURE
-bool Esp3DUpdateService::updateFW() {
+bool ESP3dUpdateService::updateFW() {
   bool isSuccess = true;
   char chunk[CHUNK_BUFFER_SIZE];
   esp_ota_handle_t update_handle = 0;
@@ -475,11 +475,11 @@ bool Esp3DUpdateService::updateFW() {
   return isSuccess;
 }
 #endif  // ESP3D_SD_CARD_FEATURE
-void Esp3DUpdateService::handle() {}
+void ESP3dUpdateService::handle() {}
 
-void Esp3DUpdateService::end() { esp3d_log("Stop Update Service"); }
+void ESP3dUpdateService::end() { esp3d_log("Stop Update Service"); }
 
-bool Esp3DUpdateService::processString(const char **keysval,
+bool ESP3dUpdateService::processString(const char **keysval,
                                        const Esp3dSettingIndex *keypos,
                                        const size_t size, const char *key,
                                        const char *value, char &T,
@@ -499,7 +499,7 @@ bool Esp3DUpdateService::processString(const char **keysval,
   return false;
 }
 
-bool Esp3DUpdateService::processInt(const char **keysval,
+bool ESP3dUpdateService::processInt(const char **keysval,
                                     const Esp3dSettingIndex *keypos,
                                     const size_t size, const char *key,
                                     const char *value, char &T,
@@ -517,7 +517,7 @@ bool Esp3DUpdateService::processInt(const char **keysval,
   return false;
 }
 
-bool Esp3DUpdateService::processBool(const char **keysval,
+bool ESP3dUpdateService::processBool(const char **keysval,
                                      const Esp3dSettingIndex *keypos,
                                      const size_t size, const char *key,
                                      const char *value, char &T,
@@ -546,7 +546,7 @@ bool Esp3DUpdateService::processBool(const char **keysval,
   return false;
 }
 
-bool Esp3DUpdateService::processingFileFunction(const char *section,
+bool ESP3dUpdateService::processingFileFunction(const char *section,
                                                 const char *key,
                                                 const char *value) {
   esp3d_log("Processing Section: %s, Key: %s, Value: %s", section, key, value);

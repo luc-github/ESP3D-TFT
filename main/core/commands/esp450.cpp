@@ -35,7 +35,7 @@
 // Get available ESP3D list
 // output is JSON or plain text according parameter
 //[ESP450]json=<no> <pwd=admin/user>
-void Esp3DCommands::ESP450(int cmd_params_pos, Esp3dMessage* msg) {
+void ESP3dCommands::ESP450(int cmd_params_pos, Esp3dMessage* msg) {
   Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   msg->target = target;

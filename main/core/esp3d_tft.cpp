@@ -51,11 +51,11 @@
  *  STATIC PROTOTYPES
  **********************/
 
-Esp3DTFT::Esp3DTFT() {}
+ESP3dTFT::ESP3dTFT() {}
 
-Esp3DTFT::~Esp3DTFT() {}
+ESP3dTFT::~ESP3dTFT() {}
 
-bool Esp3DTFT::begin() {
+bool ESP3dTFT::begin() {
   // Generic board initialization
   std::string target = TFT_TARGET;
   esp3d_log("Starting ESP3D-TFT on %s ", target.c_str());
@@ -118,6 +118,6 @@ bool Esp3DTFT::begin() {
   return success && successFs && successSd;
 }
 
-void Esp3DTFT::handle() {}
+void ESP3dTFT::handle() {}
 
-bool Esp3DTFT::end() { return true; }
+bool ESP3dTFT::end() { return true; }

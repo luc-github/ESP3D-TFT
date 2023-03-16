@@ -33,10 +33,10 @@
 extern "C" {
 #endif
 
-class Esp3DAuthenticationService final {
+class ESP3dAuthenticationService final {
  public:
-  Esp3DAuthenticationService();
-  ~Esp3DAuthenticationService();
+  ESP3dAuthenticationService();
+  ~ESP3dAuthenticationService();
   Esp3dAuthenticationLevel getAuthenticatedLevel(const char *pwd = nullptr);
   bool begin();
   void handle();
@@ -82,7 +82,7 @@ class Esp3DAuthenticationService final {
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
 };
 
-extern Esp3DAuthenticationService esp3dAuthenthicationService;
+extern ESP3dAuthenticationService esp3dAuthenthicationService;
 
 #ifdef __cplusplus
 }  // extern "C"

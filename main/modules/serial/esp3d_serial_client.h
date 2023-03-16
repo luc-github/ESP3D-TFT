@@ -29,10 +29,10 @@
 extern "C" {
 #endif
 
-class Esp3DSerialClient : public Esp3DClient {
+class ESP3dSerialClient : public ESP3dClient {
  public:
-  Esp3DSerialClient();
-  ~Esp3DSerialClient();
+  ESP3dSerialClient();
+  ~ESP3dSerialClient();
   bool begin();
   void handle();
   void end();
@@ -53,7 +53,7 @@ class Esp3DSerialClient : public Esp3DClient {
   size_t _bufferPos;
 };
 
-extern Esp3DSerialClient serialClient;
+extern ESP3dSerialClient serialClient;
 
 #ifdef __cplusplus
 }  // extern "C"

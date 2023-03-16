@@ -33,7 +33,7 @@
 #include "esp3d_settings.h"
 #include "esp3d_string.h"
 
-Esp3DNetwork esp3dNetwork;
+ESP3dNetwork esp3dNetwork;
 
 /* The event group allows multiple bits for each event, but we only care about
  * two events:
@@ -122,7 +122,7 @@ static void wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
   }
 }
 
-const char* Esp3DNetwork::getLocalIpString() {
+const char* ESP3dNetwork::getLocalIpString() {
   static std::string tmpstr;
   Esp3dIpInfos ipInfo;
   if (esp3dNetwork.getLocalIp(&ipInfo)) {
@@ -133,7 +133,7 @@ const char* Esp3DNetwork::getLocalIpString() {
   return tmpstr.c_str();
 }
 
-bool Esp3DNetwork::getLocalIp(Esp3dIpInfos* ipInfo) {
+bool ESP3dNetwork::getLocalIp(Esp3dIpInfos* ipInfo) {
   if (!ipInfo) {
     return false;
   }
@@ -176,7 +176,7 @@ bool Esp3DNetwork::getLocalIp(Esp3dIpInfos* ipInfo) {
 
 #endif  // ESP3D_WIFI_FEATURE
 
-Esp3DNetwork::Esp3DNetwork() {
+ESP3dNetwork::ESP3dNetwork() {
   _current_radio_mode = Esp3dRadioMode::off;
 #if ESP3D_WIFI_FEATURE
   _wifiApPtr = nullptr;
@@ -186,9 +186,9 @@ Esp3DNetwork::Esp3DNetwork() {
   _started = false;
 }
 
-Esp3DNetwork::~Esp3DNetwork() {}
+ESP3dNetwork::~ESP3dNetwork() {}
 
-bool Esp3DNetwork::begin() {
+bool ESP3dNetwork::begin() {
   static bool bootDone = false;
   esp3d_log("Free mem %ld", esp_get_minimum_free_heap_size());
   if (!bootDone) {
@@ -211,7 +211,7 @@ bool Esp3DNetwork::begin() {
   return _started;
 }
 
-void Esp3DNetwork::handle() {
+void ESP3dNetwork::handle() {
 #if ESP3D_WIFI_FEATURE
   if (_current_radio_mode == Esp3dRadioMode::wifi_sta &&
       (xEventGroupGetBits(_s_wifi_event_group) & WIFI_STA_LOST_IP)) {
@@ -222,26 +222,26 @@ void Esp3DNetwork::handle() {
 #endif  // ESP3D_WIFI_FEATURE
 }
 
-void Esp3DNetwork::end() {
+void ESP3dNetwork::end() {
   _started = false;
 #if ESP3D_WIFI_FEATURE
   _useStaticIp = false;
 #endif  // ESP3D_WIFI_FEATURE
 }
 #if ESP3D_WIFI_FEATURE
-const char* Esp3DNetwork::getAPMac() { return getMac(ESP_MAC_WIFI_SOFTAP); }
-const char* Esp3DNetwork::getSTAMac() { return getMac(ESP_MAC_WIFI_STA); }
+const char* ESP3dNetwork::getAPMac() { return getMac(ESP_MAC_WIFI_SOFTAP); }
+const char* ESP3dNetwork::getSTAMac() { return getMac(ESP_MAC_WIFI_STA); }
 #endif  // ESP3D_WIFI_FEATURE
-const char* Esp3DNetwork::getBTMac() { return getMac(ESP_MAC_BT); }
+const char* ESP3dNetwork::getBTMac() { return getMac(ESP_MAC_BT); }
 
-const char* Esp3DNetwork::getMacAddress(uint8_t mac[6]) {
+const char* ESP3dNetwork::getMacAddress(uint8_t mac[6]) {
   static char mac_addr[18] = {0};
   sprintf(mac_addr, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2],
           mac[3], mac[4], mac[5]);
   return mac_addr;
 }
 
-const char* Esp3DNetwork::getMac(esp_mac_type_t type) {
+const char* ESP3dNetwork::getMac(esp_mac_type_t type) {
   uint8_t mac[6];
   if (ESP_OK != esp_read_mac(mac, type)) {
     memset(mac, 0, 6);
@@ -249,7 +249,7 @@ const char* Esp3DNetwork::getMac(esp_mac_type_t type) {
   return getMacAddress(mac);
 }
 
-const char* Esp3DNetwork::getModeStr(Esp3dRadioMode mode) {
+const char* ESP3dNetwork::getModeStr(Esp3dRadioMode mode) {
   switch (mode) {
     case Esp3dRadioMode::off:
       return "No Radio";
@@ -269,7 +269,7 @@ const char* Esp3DNetwork::getModeStr(Esp3dRadioMode mode) {
   return "Unknown";
 }
 #if ESP3D_WIFI_FEATURE
-bool Esp3DNetwork::startStaMode() {
+bool ESP3dNetwork::startStaMode() {
   bool connected = false;
   char ssid_str[33] = {0};
   char ssid_pwd_str[32] = {0};
@@ -431,7 +431,7 @@ bool Esp3DNetwork::startStaMode() {
   return connected;
 }
 
-int32_t Esp3DNetwork::getSignal(int32_t RSSI, bool filter) {
+int32_t ESP3dNetwork::getSignal(int32_t RSSI, bool filter) {
   if (RSSI < MIN_RSSI && filter) {
     return 0;
   }
@@ -444,7 +444,7 @@ int32_t Esp3DNetwork::getSignal(int32_t RSSI, bool filter) {
   return (2 * (RSSI + 100));
 }
 
-bool Esp3DNetwork::startApMode(bool configMode) {
+bool ESP3dNetwork::startApMode(bool configMode) {
   bool success = false;
   char ssid_str[33] = {0};
   char ssid_pwd_str[32] = {0};
@@ -569,7 +569,7 @@ bool Esp3DNetwork::startApMode(bool configMode) {
 
 #endif  // ESP3D_WIFI_FEATURE
 
-bool Esp3DNetwork::startNoRadioMode() {
+bool ESP3dNetwork::startNoRadioMode() {
   esp3d_log("Start No Radio Mode");
   std::string stmp = "Radio is off\n";
   _current_radio_mode = Esp3dRadioMode::off;
@@ -580,25 +580,25 @@ bool Esp3DNetwork::startNoRadioMode() {
   return true;
 }
 
-bool Esp3DNetwork::stopNoRadioMode() {
+bool ESP3dNetwork::stopNoRadioMode() {
   esp3d_log("Stop No Radio Mode");
   return true;
 }
 
-bool Esp3DNetwork::startBtMode() {
+bool ESP3dNetwork::startBtMode() {
   esp3d_log("Init BT Mode");
   _current_radio_mode = Esp3dRadioMode::bluetooth_serial;
   return false;
 }
 
 #if ESP3D_WIFI_FEATURE
-bool Esp3DNetwork::startConfigMode() {
+bool ESP3dNetwork::startConfigMode() {
   esp3d_log("Init Config Mode");
   bool res = startApMode(true);
   _current_radio_mode = Esp3dRadioMode::wifi_ap_config;
   return res;
 }
-bool Esp3DNetwork::stopStaMode() {
+bool ESP3dNetwork::stopStaMode() {
   if (!(_current_radio_mode == Esp3dRadioMode::wifi_sta)) {
     return false;
   }
@@ -639,7 +639,7 @@ bool Esp3DNetwork::stopStaMode() {
   return true;
 }
 
-bool Esp3DNetwork::stopApMode() {
+bool ESP3dNetwork::stopApMode() {
   if (!(_current_radio_mode == Esp3dRadioMode::wifi_ap_config ||
         _current_radio_mode == Esp3dRadioMode::wifi_ap)) {
     return false;
@@ -669,7 +669,7 @@ bool Esp3DNetwork::stopApMode() {
   _current_radio_mode = Esp3dRadioMode::off;
   return true;
 }
-bool Esp3DNetwork::stopConfigMode() {
+bool ESP3dNetwork::stopConfigMode() {
   esp3d_log("Stop Config Mode");
 
   esp3dNetworkServices.end();
@@ -678,12 +678,12 @@ bool Esp3DNetwork::stopConfigMode() {
 }
 #endif  // ESP3D_WIFI_FEATURE
 
-bool Esp3DNetwork::stopBtMode() {
+bool ESP3dNetwork::stopBtMode() {
   esp3d_log("Stop BT Mode");
   return false;
 }
 
-bool Esp3DNetwork::setMode(Esp3dRadioMode mode, bool restart) {
+bool ESP3dNetwork::setMode(Esp3dRadioMode mode, bool restart) {
   esp3d_log("Current mode is %d, and ask for %d",
             static_cast<uint8_t>(_current_radio_mode),
             static_cast<uint8_t>(mode));

@@ -25,25 +25,21 @@
 extern "C" {
 #endif
 
-class Esp3Dssdp final
-{
-public:
-    Esp3Dssdp();
-    ~Esp3Dssdp();
-    bool begin();
-    void handle();
-    void end();
-    const char * get_schema();
-    bool started()
-    {
-        return _started;
-    };
+class ESP3dssdp final {
+ public:
+  ESP3dssdp();
+  ~ESP3dssdp();
+  bool begin();
+  void handle();
+  void end();
+  const char* get_schema();
+  bool started() { return _started; };
 
-private:
-    bool _started;
+ private:
+  bool _started;
 };
 
-extern Esp3Dssdp esp3d_ssdp_service;
+extern ESP3dssdp esp3d_ssdp_service;
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif

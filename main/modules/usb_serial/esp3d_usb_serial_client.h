@@ -35,10 +35,10 @@
 extern "C" {
 #endif
 
-class Esp3DUsbSerialClient : public Esp3DClient {
+class ESP3dUsbSerialClient : public ESP3dClient {
  public:
-  Esp3DUsbSerialClient();
-  ~Esp3DUsbSerialClient();
+  ESP3dUsbSerialClient();
+  ~ESP3dUsbSerialClient();
   bool begin();
   void handle();
   void end();
@@ -68,7 +68,7 @@ class Esp3DUsbSerialClient : public Esp3DClient {
   std::unique_ptr<CdcAcmDevice> _vcp;
 };
 
-extern Esp3DUsbSerialClient usbSerialClient;
+extern ESP3dUsbSerialClient usbSerialClient;
 
 #ifdef __cplusplus
 }  // extern "C"
