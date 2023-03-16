@@ -137,8 +137,8 @@ Esp3dMessage* Esp3DClient::newMsg() {
     // esp3d_log("Creation : Now we have %ld msg", ++msg_counting);
     newMsgPtr->data = nullptr;
     newMsgPtr->size = 0;
-    newMsgPtr->origin = Esp3dClient::no_client;
-    newMsgPtr->target = Esp3dClient::all_clients;
+    newMsgPtr->origin = Esp3dClientType::no_client;
+    newMsgPtr->target = Esp3dClientType::all_clients;
     newMsgPtr->authentication_level = Esp3dAuthenticationLevel::guest;
     newMsgPtr->request_id.id = esp_timer_get_time();
     newMsgPtr->type = Esp3dMessageType::head;
@@ -149,7 +149,7 @@ Esp3dMessage* Esp3DClient::newMsg() {
 Esp3dMessage* Esp3DClient::newMsg(Esp3dRequest requestId) {
   Esp3dMessage* newMsgPtr = newMsg();
   if (newMsgPtr) {
-    newMsgPtr->origin = Esp3dClient::command;
+    newMsgPtr->origin = Esp3dClientType::command;
     newMsgPtr->request_id = requestId;
   }
   return newMsgPtr;
@@ -186,8 +186,8 @@ Esp3dMessage* Esp3DClient::copyMsg(Esp3dMessage msg) {
 }
 
 Esp3dMessage* Esp3DClient::newMsg(
-    Esp3dClient origin, Esp3dClient target, const uint8_t* data, size_t length,
-    Esp3dAuthenticationLevel authentication_level) {
+    Esp3dClientType origin, Esp3dClientType target, const uint8_t* data,
+    size_t length, Esp3dAuthenticationLevel authentication_level) {
   Esp3dMessage* newMsgPtr = newMsg(origin, target, authentication_level);
   if (newMsgPtr) {
     if (!setDataContent(newMsgPtr, data, length)) {
@@ -199,7 +199,7 @@ Esp3dMessage* Esp3DClient::newMsg(
 }
 
 Esp3dMessage* Esp3DClient::newMsg(
-    Esp3dClient origin, Esp3dClient target,
+    Esp3dClientType origin, Esp3dClientType target,
     Esp3dAuthenticationLevel authentication_level) {
   Esp3dMessage* newMsgPtr = newMsg();
   if (newMsgPtr) {

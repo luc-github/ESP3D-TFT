@@ -104,13 +104,13 @@ bool Esp3DTFTStream::begin() {
 #endif  // ESP3D_TFT_LOG
     getTargetFirmware(true);
 
-    if (esp3dCommands.getOutputClient(true) == Esp3dClient::serial) {
+    if (esp3dCommands.getOutputClient(true) == Esp3dClientType::serial) {
       if (serialClient.begin()) {
         return true;
       }
     }
 #if ESP3D_USB_SERIAL_FEATURE
-    else if (esp3dCommands.getOutputClient() == Esp3dClient::usb_serial) {
+    else if (esp3dCommands.getOutputClient() == Esp3dClientType::usb_serial) {
       if (usbSerialClient.begin()) {
         return true;
       }

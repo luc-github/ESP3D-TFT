@@ -39,7 +39,7 @@ void Esp3DCommands::ESP720(int cmd_params_pos, Esp3dMessage *msg) {
   std::string tmpstr;
   // prepare answer msg
   msg->target = msg->origin;
-  msg->origin = Esp3dClient::command;
+  msg->origin = Esp3dClientType::command;
 #if ESP3D_AUTHENTICATION_FEATURE
   if (msg->authentication_level == Esp3dAuthenticationLevel::guest) {
     msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;

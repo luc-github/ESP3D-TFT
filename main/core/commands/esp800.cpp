@@ -42,10 +42,10 @@
 // output is JSON or plain text according parameter
 //[ESP800]json=<no> <time=YYYY-MM-DDTHH:mm:ss> <version=3.0.0-a11> <setup=0/1>
 void Esp3DCommands::ESP800(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClient target = msg->origin;
+  Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   msg->target = target;
-  msg->origin = Esp3dClient::command;
+  msg->origin = Esp3dClientType::command;
   std::string timeparam = get_param(msg, cmd_params_pos, "time=");
   std::string setupparam = get_param(msg, cmd_params_pos, "setup=");
   bool json = hasTag(msg, cmd_params_pos, "json");

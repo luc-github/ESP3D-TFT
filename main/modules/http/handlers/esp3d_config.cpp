@@ -33,7 +33,7 @@ esp_err_t Esp3DHttpService::config_handler(httpd_req_t *req) {
   }
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
   Esp3dMessage *newMsgPtr =
-      Esp3DClient::newMsg(Esp3dClient::webui, Esp3dClient::command,
+      Esp3DClient::newMsg(Esp3dClientType::webui, Esp3dClientType::command,
                           (const uint8_t *)"[ESP420]addPreTag",
                           strlen("[ESP420]addPreTag"), authentication_level);
   if (newMsgPtr) {

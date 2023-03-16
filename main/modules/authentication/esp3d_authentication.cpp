@@ -106,7 +106,7 @@ const char *Esp3DAuthenticationService::create_session_id(
 bool Esp3DAuthenticationService::createRecord(const char *sessionId,
                                               int socketId,
                                               Esp3dAuthenticationLevel level,
-                                              Esp3dClient client_type) {
+                                              Esp3dClientType client_type) {
   if (strlen(sessionId) == 0) {
     return false;
   }
@@ -143,7 +143,7 @@ bool Esp3DAuthenticationService::clearSession(const char *sessionId) {
   return false;
 }
 
-void Esp3DAuthenticationService::clearSessions(Esp3dClient client_type) {
+void Esp3DAuthenticationService::clearSessions(Esp3dClientType client_type) {
   esp3d_log("Clear all sessions %d", static_cast<uint8_t>(client_type));
   for (auto session = _sessions.begin(); session != _sessions.end();
        ++session) {
@@ -167,7 +167,7 @@ Esp3dAuthenticationRecord *Esp3DAuthenticationService::getRecord(
 }
 
 Esp3dAuthenticationRecord *Esp3DAuthenticationService::getRecord(
-    int socketId, Esp3dClient client_type) {
+    int socketId, Esp3dClientType client_type) {
   for (auto session = _sessions.begin(); session != _sessions.end();
        ++session) {
     if ((socketId == -1 || session->socket_id == socketId) &&
@@ -181,7 +181,8 @@ Esp3dAuthenticationRecord *Esp3DAuthenticationService::getRecord(
 }
 
 bool Esp3DAuthenticationService::updateRecord(
-    int socketId, Esp3dClient client_type, Esp3dAuthenticationLevel newlevel) {
+    int socketId, Esp3dClientType client_type,
+    Esp3dAuthenticationLevel newlevel) {
   for (auto session = _sessions.begin(); session != _sessions.end();
        ++session) {
     if (session->client_type == client_type && session->socket_id == socketId) {
@@ -192,7 +193,7 @@ bool Esp3DAuthenticationService::updateRecord(
   return false;
 }
 
-uint8_t Esp3DAuthenticationService::activeSessionsCount(Esp3dClient type) {
+uint8_t Esp3DAuthenticationService::activeSessionsCount(Esp3dClientType type) {
   uint8_t count = 0;
   for (auto session = _sessions.begin(); session != _sessions.end();
        ++session) {

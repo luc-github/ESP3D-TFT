@@ -255,7 +255,7 @@ bool Esp3DUsbSerialClient::pushMsgToRxQueue(const uint8_t *msg, size_t size) {
 #if ESP3D_DISABLE_SERIAL_AUTHENTICATION_FEATURE
       newMsgPtr->authentication_level = Esp3dAuthenticationLevel::admin;
 #endif  // ESP3D_DISABLE_SERIAL_AUTHENTICATION
-      newMsgPtr->origin = Esp3dClient::serial;
+      newMsgPtr->origin = Esp3dClientType::serial;
       if (!addRxData(newMsgPtr)) {
         // delete message as cannot be added to the queue
         Esp3DClient::deleteMsg(newMsgPtr);

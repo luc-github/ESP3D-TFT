@@ -734,9 +734,9 @@ bool Esp3DUpdateService::processingFileFunction(const char *section,
         P = Esp3dSettingIndex::esp3d_output_client;
         done = true;
         if (strcasecmp("USB", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dClient::usb_serial);
+          b = static_cast<uint8_t>(Esp3dClientType::usb_serial);
         } else if (strcasecmp("SERIAL", value) == 0) {
-          b = static_cast<uint8_t>(Esp3dClient::serial);
+          b = static_cast<uint8_t>(Esp3dClientType::serial);
         } else {
           P = Esp3dSettingIndex::unknown_index;  // invalid value
         }

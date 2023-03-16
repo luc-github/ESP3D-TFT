@@ -39,7 +39,7 @@
 
 Esp3DCommands esp3dCommands;
 
-Esp3DCommands::Esp3DCommands() { _output_client = Esp3dClient::serial; }
+Esp3DCommands::Esp3DCommands() { _output_client = Esp3dClientType::serial; }
 Esp3DCommands::~Esp3DCommands() {}
 bool Esp3DCommands::is_esp_command(uint8_t* sbuf, size_t len) {
   if (len < 5) {
@@ -121,7 +121,7 @@ bool Esp3DCommands::dispatchSetting(bool json, const char* filter,
                                     const char** optionLabels, uint32_t maxsize,
                                     uint32_t minsize, uint32_t minsize2,
                                     uint8_t precision, const char* unit,
-                                    bool needRestart, Esp3dClient target,
+                                    bool needRestart, Esp3dClientType target,
                                     Esp3dRequest requestId, bool isFirst) {
   std::string tmpstr;
   std::string value;
@@ -271,7 +271,7 @@ bool Esp3DCommands::dispatchAuthenticationError(Esp3dMessage* msg, uint cmdid,
   }
   msg->authentication_level = Esp3dAuthenticationLevel::not_authenticated;
 #if ESP3D_HTTP_FEATURE
-  if (msg->target == Esp3dClient::webui && msg->request_id.http_request) {
+  if (msg->target == Esp3dClientType::webui && msg->request_id.http_request) {
     httpd_resp_set_status(msg->request_id.http_request, "401 UNAUTHORIZED");
   }
 #endif  // ESP3D_HTTP_FEATURE
@@ -322,7 +322,7 @@ bool Esp3DCommands::dispatchAnswer(Esp3dMessage* msg, uint cmdid, bool json,
 }
 
 bool Esp3DCommands::dispatchKeyValue(bool json, const char* key,
-                                     const char* value, Esp3dClient target,
+                                     const char* value, Esp3dClientType target,
                                      Esp3dRequest requestId, bool nested,
                                      bool isFirst) {
   std::string tmpstr = "";
@@ -354,7 +354,7 @@ bool Esp3DCommands::dispatchKeyValue(bool json, const char* key,
 }
 
 bool Esp3DCommands::dispatchIdValue(bool json, const char* Id,
-                                    const char* value, Esp3dClient target,
+                                    const char* value, Esp3dClientType target,
                                     Esp3dRequest requestId, bool isFirst) {
   std::string tmpstr = "";
   if (json) {
@@ -378,9 +378,9 @@ bool Esp3DCommands::dispatchIdValue(bool json, const char* Id,
   return dispatch(tmpstr.c_str(), target, requestId, Esp3dMessageType::core);
 }
 
-bool Esp3DCommands::dispatch(const char* sbuf, Esp3dClient target,
+bool Esp3DCommands::dispatch(const char* sbuf, Esp3dClientType target,
                              Esp3dRequest requestId, Esp3dMessageType type,
-                             Esp3dClient origin,
+                             Esp3dClientType origin,
                              Esp3dAuthenticationLevel authentication_level) {
   Esp3dMessage* newMsgPtr = Esp3DClient::newMsg(origin, target);
   if (newMsgPtr) {
@@ -423,7 +423,7 @@ bool Esp3DCommands::dispatch(Esp3dMessage* msg) {
   // TODO check add is successful
   switch (msg->target) {
 #if ESP3D_HTTP_FEATURE
-    case Esp3dClient::webui:
+    case Esp3dClientType::webui:
       if (esp3dHttpService.started()) {
         esp3dHttpService.process(msg);
       } else {
@@ -432,7 +432,7 @@ bool Esp3DCommands::dispatch(Esp3dMessage* msg) {
                     msg->size);
       }
       break;
-    case Esp3dClient::webui_websocket:
+    case Esp3dClientType::webui_websocket:
       if (esp3dWsWebUiService.started()) {
         esp3dWsWebUiService.process(msg);
       } else {
@@ -442,7 +442,7 @@ bool Esp3DCommands::dispatch(Esp3dMessage* msg) {
       }
       break;
 #if ESP3D_WS_SERVICE_FEATURE
-    case Esp3dClient::websocket:
+    case Esp3dClientType::websocket:
       if (esp3dWsDataService.started()) {
         esp3dWsDataService.process(msg);
       } else {
@@ -454,7 +454,7 @@ bool Esp3DCommands::dispatch(Esp3dMessage* msg) {
 #endif  // ESP3D_WS_SERVICE_FEATURE
 #endif  // ESP3D_HTTP_FEATURE
 #if ESP3D_TELNET_FEATURE
-    case Esp3dClient::telnet:
+    case Esp3dClientType::telnet:
       if (esp3dSocketServer.started()) {
         esp3dSocketServer.process(msg);
       } else {
@@ -465,7 +465,7 @@ bool Esp3DCommands::dispatch(Esp3dMessage* msg) {
       break;
 #endif  // ESP3D_TELNET_FEATURE
 
-    case Esp3dClient::serial:
+    case Esp3dClientType::serial:
       esp3d_log("Serial client got message");
       if (serialClient.started()) {
         serialClient.process(msg);
@@ -475,7 +475,7 @@ bool Esp3DCommands::dispatch(Esp3dMessage* msg) {
       }
       break;
 #if ESP3D_USB_SERIAL_FEATURE
-    case Esp3dClient::usb_serial:
+    case Esp3dClientType::usb_serial:
       esp3d_log("USB Serial client got message");
       if (usbSerialClient.started()) {
         esp3d_log("USB Serial process message");
@@ -488,20 +488,20 @@ bool Esp3DCommands::dispatch(Esp3dMessage* msg) {
       break;
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
 
-    case Esp3dClient::all_clients:
+    case Esp3dClientType::all_clients:
       // msg need to be duplicate for each target
       // Do not broadcast to printer output
       // printer may receive unwhished messages
-      /* //Esp3dClient::serial
-       if (msg->origin!=Esp3dClient::serial) {
-           if (msg->target==Esp3dClient::all_clients) {
+      /* //Esp3dClientType::serial
+       if (msg->origin!=Esp3dClientType::serial) {
+           if (msg->target==Esp3dClientType::all_clients) {
                //become the reference message
-               msg->target=Esp3dClient::serial;
+               msg->target=Esp3dClientType::serial;
            } else {
                //duplicate message because current is  already pending
                Esp3dMessage * copy_msg = Esp3DClient::copyMsg(*msg);
                if (copy_msg) {
-                   copy_msg->target = Esp3dClient::serial;
+                   copy_msg->target = Esp3dClientType::serial;
                    dispatch(copy_msg);
                } else {
                    esp3d_log_e("Cannot duplicate message for Serial");
@@ -510,16 +510,16 @@ bool Esp3DCommands::dispatch(Esp3dMessage* msg) {
        }*/
       /*
       #if ESP3D_USB_SERIAL_FEATURE
-      //Esp3dClient::usb_serial
-      if (msg->origin!=Esp3dClient::usb_serial) {
-          if (msg->target==Esp3dClient::all_clients) {
+      //Esp3dClientType::usb_serial
+      if (msg->origin!=Esp3dClientType::usb_serial) {
+          if (msg->target==Esp3dClientType::all_clients) {
               //become the reference message
-              msg->target=Esp3dClient::usb_serial;
+              msg->target=Esp3dClientType::usb_serial;
           } else {
               //duplicate message because current is  already pending
               Esp3dMessage * copy_msg = Esp3DClient::copyMsg(*msg);
               if (copy_msg) {
-                  copy_msg->target = Esp3dClient::usb_serial;
+                  copy_msg->target = Esp3dClientType::usb_serial;
                   dispatch(copy_msg);
               } else {
                   esp3d_log_e("Cannot duplicate message for USB Serial");
@@ -528,16 +528,16 @@ bool Esp3DCommands::dispatch(Esp3dMessage* msg) {
       }
       #endif //#if ESP3D_USB_SERIAL_FEATURE*/
 #if ESP3D_HTTP_FEATURE
-      // Esp3dClient::webui_websocket
-      if (msg->origin != Esp3dClient::webui_websocket) {
-        if (msg->target == Esp3dClient::all_clients) {
+      // Esp3dClientType::webui_websocket
+      if (msg->origin != Esp3dClientType::webui_websocket) {
+        if (msg->target == Esp3dClientType::all_clients) {
           // become the reference message
-          msg->target = Esp3dClient::webui_websocket;
+          msg->target = Esp3dClientType::webui_websocket;
         } else {
           // duplicate message because current is  already pending
           Esp3dMessage* copy_msg = Esp3DClient::copyMsg(*msg);
           if (copy_msg) {
-            copy_msg->target = Esp3dClient::webui_websocket;
+            copy_msg->target = Esp3dClientType::webui_websocket;
             dispatch(copy_msg);
           } else {
             esp3d_log_e("Cannot duplicate message for Websocket");
@@ -545,17 +545,17 @@ bool Esp3DCommands::dispatch(Esp3dMessage* msg) {
         }
       }
 #if ESP3D_WS_SERVICE_FEATURE
-      // Esp3dClient::websocket
-      if (msg->origin != Esp3dClient::websocket) {
+      // Esp3dClientType::websocket
+      if (msg->origin != Esp3dClientType::websocket) {
         msg->request_id.id = 0;
-        if (msg->target == Esp3dClient::all_clients) {
+        if (msg->target == Esp3dClientType::all_clients) {
           // become the reference message
-          msg->target = Esp3dClient::websocket;
+          msg->target = Esp3dClientType::websocket;
         } else {
           // duplicate message because current is  already pending
           Esp3dMessage* copy_msg = Esp3DClient::copyMsg(*msg);
           if (copy_msg) {
-            copy_msg->target = Esp3dClient::websocket;
+            copy_msg->target = Esp3dClientType::websocket;
             dispatch(copy_msg);
           } else {
             esp3d_log_e("Cannot duplicate message for Websocket");
@@ -565,17 +565,17 @@ bool Esp3DCommands::dispatch(Esp3dMessage* msg) {
 #endif  // ESP3D_WS_SERVICE_FEATURE
 #endif  // #if ESP3D_HTTP_FEATURE
 #if ESP3D_TELNET_FEATURE
-      // Esp3dClient::telnet
-      if (msg->origin != Esp3dClient::telnet) {
+      // Esp3dClientType::telnet
+      if (msg->origin != Esp3dClientType::telnet) {
         msg->request_id.id = 0;
-        if (msg->target == Esp3dClient::all_clients) {
+        if (msg->target == Esp3dClientType::all_clients) {
           // become the reference message
-          msg->target = Esp3dClient::telnet;
+          msg->target = Esp3dClientType::telnet;
         } else {
           // duplicate message because current is  already pending
           Esp3dMessage* copy_msg = Esp3DClient::copyMsg(*msg);
           if (copy_msg) {
-            copy_msg->target = Esp3dClient::telnet;
+            copy_msg->target = Esp3dClientType::telnet;
             dispatch(copy_msg);
           } else {
             esp3d_log_e("Cannot duplicate message for Websocket");
@@ -584,7 +584,7 @@ bool Esp3DCommands::dispatch(Esp3dMessage* msg) {
       }
 #endif  // ESP3D_TELNET_FEATURE
         // Send pending if any or cancel message is no client did handle it
-      if (msg->target == Esp3dClient::all_clients) {
+      if (msg->target == Esp3dClientType::all_clients) {
         sendOk = false;
       } else {
         return dispatch(msg);
@@ -779,7 +779,7 @@ void Esp3DCommands::execute_internal_command(int cmd, int cmd_params_pos,
     }
   }
 #if ESP3D_DISABLE_SERIAL_AUTHENTICATION_FEATURE
-  if (msg->origin == Esp3dClient::serial) {
+  if (msg->origin == Esp3dClientType::serial) {
     msg->authentication_level = Esp3dAuthenticationLevel::admin;
   }
 #endif  // ESP3D_DISABLE_SERIAL_AUTHENTICATION_FEATURE
@@ -1005,21 +1005,21 @@ bool Esp3DCommands::formatCommand(char* cmd, size_t len) {
   return false;
 }
 
-Esp3dClient Esp3DCommands::getOutputClient(bool fromSettings) {
+Esp3dClientType Esp3DCommands::getOutputClient(bool fromSettings) {
   if (fromSettings) {
-    _output_client = Esp3dClient::serial;
+    _output_client = Esp3dClientType::serial;
 #if ESP3D_USB_SERIAL_FEATURE
     uint8_t value =
         esp3dTFTsettings.readByte(Esp3dSettingIndex::esp3d_output_client);
-    switch ((Esp3dClient)value) {
-      case Esp3dClient::serial:
-        _output_client = Esp3dClient::serial;
+    switch ((Esp3dClientType)value) {
+      case Esp3dClientType::serial:
+        _output_client = Esp3dClientType::serial;
         break;
-      case Esp3dClient::usb_serial:
-        _output_client = Esp3dClient::usb_serial;
+      case Esp3dClientType::usb_serial:
+        _output_client = Esp3dClientType::usb_serial;
         break;
       default:
-        _output_client = Esp3dClient::serial;
+        _output_client = Esp3dClientType::serial;
         break;
     }
 #endif  // #if ESP3D_USB_SERIAL_FEATURE

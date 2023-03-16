@@ -35,7 +35,7 @@ extern "C" {
 struct Esp3dAuthenticationRecord {
   Esp3dAuthenticationLevel level;
   int socket_id;
-  Esp3dClient client_type;
+  Esp3dClientType client_type;
   char session_id[25];
   int64_t last_time;
 };

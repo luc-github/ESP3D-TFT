@@ -40,23 +40,25 @@ class Esp3DCommands {
   bool dispatchAnswer(Esp3dMessage* msg, uint cmdid, bool json, bool hasError,
                       const char* answerMsg);
   bool dispatchIdValue(bool json, const char* Id, const char* value,
-                       Esp3dClient target, Esp3dRequest requestId,
+                       Esp3dClientType target, Esp3dRequest requestId,
                        bool isFirst = false);
   bool dispatchKeyValue(bool json, const char* key, const char* value,
-                        Esp3dClient target, Esp3dRequest requestId,
+                        Esp3dClientType target, Esp3dRequest requestId,
                         bool nested = false, bool isFirst = false);
   bool dispatchSetting(bool json, const char* filter, Esp3dSettingIndex index,
                        const char* help, const char** optionValues,
                        const char** optionLabels, uint32_t maxsize,
                        uint32_t minsize, uint32_t minsize2, uint8_t precision,
-                       const char* unit, bool needRestart, Esp3dClient target,
-                       Esp3dRequest requestId, bool isFirst = false);
+                       const char* unit, bool needRestart,
+                       Esp3dClientType target, Esp3dRequest requestId,
+                       bool isFirst = false);
   bool dispatch(Esp3dMessage* msg);
   bool dispatch(Esp3dMessage* msg, uint8_t* sbuf, size_t len);
   bool dispatch(Esp3dMessage* msg, const char* sbuf);
-  bool dispatch(const char* sbuf, Esp3dClient target, Esp3dRequest requestId,
+  bool dispatch(const char* sbuf, Esp3dClientType target,
+                Esp3dRequest requestId,
                 Esp3dMessageType type = Esp3dMessageType::head,
-                Esp3dClient origin = Esp3dClient::command,
+                Esp3dClientType origin = Esp3dClientType::command,
                 Esp3dAuthenticationLevel authentication_level =
                     Esp3dAuthenticationLevel::guest);
   bool dispatchAuthenticationError(Esp3dMessage* msg, uint cmdid, bool json);
@@ -152,13 +154,13 @@ class Esp3DCommands {
   bool has_param(Esp3dMessage* msg, uint start);
   bool hasTag(Esp3dMessage* msg, uint start, const char* label);
   void flush();
-  Esp3dClient getOutputClient(bool fromSettings = false);
-  void setOutputClient(Esp3dClient output_client) {
+  Esp3dClientType getOutputClient(bool fromSettings = false);
+  void setOutputClient(Esp3dClientType output_client) {
     _output_client = output_client;
   }
 
  private:
-  Esp3dClient _output_client;
+  Esp3dClientType _output_client;
 };
 
 extern Esp3DCommands esp3dCommands;

@@ -43,8 +43,8 @@ enum class Esp3dMessageType : uint8_t { head, core, tail, unique };
 struct Esp3dMessage {
   uint8_t *data;
   size_t size;
-  Esp3dClient origin;
-  Esp3dClient target;
+  Esp3dClientType origin;
+  Esp3dClientType target;
   Esp3dAuthenticationLevel authentication_level;
   Esp3dRequest request_id;
   Esp3dMessageType type;
@@ -77,10 +77,10 @@ class Esp3DClient {
   static bool copyMsgInfos(Esp3dMessage *newMsgPtr, Esp3dMessage msg);
   static Esp3dMessage *newMsg();
   static Esp3dMessage *newMsg(Esp3dRequest requestId);
-  static Esp3dMessage *newMsg(Esp3dClient origin, Esp3dClient target,
+  static Esp3dMessage *newMsg(Esp3dClientType origin, Esp3dClientType target,
                               Esp3dAuthenticationLevel authentication_level =
                                   Esp3dAuthenticationLevel::guest);
-  static Esp3dMessage *newMsg(Esp3dClient origin, Esp3dClient target,
+  static Esp3dMessage *newMsg(Esp3dClientType origin, Esp3dClientType target,
                               const uint8_t *data, size_t length,
                               Esp3dAuthenticationLevel authentication_level =
                                   Esp3dAuthenticationLevel::guest);

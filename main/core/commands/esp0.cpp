@@ -186,10 +186,10 @@ const uint cmdlist[] = {
 // ESP3D Help
 //[ESP0] or [ESP]<command>
 void Esp3DCommands::ESP0(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClient target = msg->origin;
+  Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   msg->target = target;
-  msg->origin = Esp3dClient::command;
+  msg->origin = Esp3dClientType::command;
   std::string tmpstr;
   const uint cmdNb = sizeof(help) / sizeof(char*);
   const uint cmdlistNb = sizeof(cmdlist) / sizeof(uint);

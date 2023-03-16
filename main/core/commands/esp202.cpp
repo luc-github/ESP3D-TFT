@@ -29,11 +29,11 @@
 // Get/Set SD card Speed factor 1 2 4 6 8 16 32
 //[ESP202]<factor> json=<no> pwd=<user/admin password>
 void Esp3DCommands::ESP202(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClient target = msg->origin;
+  Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClient::command;
+  msg->origin = Esp3dClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";

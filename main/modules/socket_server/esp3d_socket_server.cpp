@@ -414,7 +414,7 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
     // 3 -  add session id to _sessions list
     if (!esp3dAuthenthicationService.createRecord(
             client->session_id, client->socket_id, authentication_level,
-            Esp3dClient::telnet)) {
+            Esp3dClientType::telnet)) {
       esp3d_log("Authentication error, rejected.");
       sendToSocket(client->socket_id, ERROR_MSG, strlen(ERROR_MSG));
       return false;
@@ -438,7 +438,7 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
   Esp3dMessage *newMsgPtr = newMsg();
   if (newMsgPtr) {
     if (Esp3DClient::setDataContent(newMsgPtr, msg, size)) {
-      newMsgPtr->origin = Esp3dClient::telnet;
+      newMsgPtr->origin = Esp3dClientType::telnet;
       newMsgPtr->authentication_level = authentication_level;
       newMsgPtr->target = esp3dCommands.getOutputClient();
       newMsgPtr->type = Esp3dMessageType::unique;

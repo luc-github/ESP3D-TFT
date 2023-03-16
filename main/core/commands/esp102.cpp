@@ -28,11 +28,11 @@
 // Change STA IP mode (DHCP/STATIC)
 //[ESP102]<mode> json=no pwd=<admin password>
 void Esp3DCommands::ESP102(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClient target = msg->origin;
+  Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClient::command;
+  msg->origin = Esp3dClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";

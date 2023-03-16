@@ -26,7 +26,7 @@
 extern "C" {
 #endif
 
-enum class Esp3dClient : uint8_t {
+enum class Esp3dClientType : uint8_t {
   no_client = 0,
   serial = 1,
   usb_serial = 2,

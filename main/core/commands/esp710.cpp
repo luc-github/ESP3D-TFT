@@ -28,11 +28,11 @@
 // Format ESP Filesystem
 //[ESP710]FORMATFS json=<no> pwd=<admin password>
 void Esp3DCommands::ESP710(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClient target = msg->origin;
+  Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClient::command;
+  msg->origin = Esp3dClientType::command;
   bool hasError = false;
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "Format successful";

@@ -32,11 +32,11 @@
 //`cmd` can be  `RESTART` to restart board or `RESET` to reset all setting to
 // defaults values [ESP444]<cmd> json=<no> <pwd=admin>`
 void Esp3DCommands::ESP444(int cmd_params_pos, Esp3dMessage* msg) {
-  Esp3dClient target = msg->origin;
+  Esp3dClientType target = msg->origin;
   Esp3dRequest requestId = msg->request_id;
   (void)requestId;
   msg->target = target;
-  msg->origin = Esp3dClient::command;
+  msg->origin = Esp3dClientType::command;
   bool json = hasTag(msg, cmd_params_pos, "json");
   std::string tmpstr;
   bool isRestart = hasTag(msg, cmd_params_pos, "RESTART");
