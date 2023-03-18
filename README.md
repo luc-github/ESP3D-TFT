@@ -45,26 +45,30 @@ The reference boards I have bought :
 			   - littlefs/ -...  
 			   - SSDP_IDF / -...  
 			   - mdns/ -...  
-	     - main/ - core/ - esp3d_tft.cpp   
-			     - includes/ - esp3d_tft.h   
-					 - CMakeLists.txt
-					 - components.mk
-					 - main.cpp
-					 - version.h
-             - targets/ - ESP32_2432S028R/ - components/ - sdkconfig
-				                         - partitions.csv
-							 - lvgl/ - CMakeLists.txt
-							         - components.mk
-							         - lv_conf.h
-							 - lcd/ - CMakeLists.txt
-							        - components.mk
-							        - ...
-							 - touch/ - CMakeLists.txt
-							          - components.mk
-								  - ...
-			- ESP32_ROTRICS_DEXARM35/ -...
-			- ESP32S3_HMI43V3/ -...
-			- ESP32S3_ZXD50CE02S_USRC_4832/ -...
+	         - main/ - core/ - esp3d_tft.cpp   
+					 - includes/ - esp3d_tft.h   
+						- CMakeLists.txt
+						- components.mk
+						- main.cpp
+						- version.h
+             - hardware/ - ESP32_2432S028R/ - sdkconfig
+				                            - partitions.csv
+											- components/lcd/ - CMakeLists.txt
+													- components.mk
+													- ...
+											- components/touch/ - CMakeLists.txt
+													- components.mk
+												- ...
+						- ESP32_ROTRICS_DEXARM35/ -...
+						- ESP32S3_HMI43V3/ -...
+						- ESP32S3_ZXD50CE02S_USRC_4832/ -...
+			- ui/ - res800_600/
+				  - res 480_320/
+				  - res320_240/
+		    - target/ - cnc/ - grbl/
+			          - 3dprinter/ - repetier
+					               - marlin
+								   - smooothieware
 ```
 ## Todo
 
