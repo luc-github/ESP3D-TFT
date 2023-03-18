@@ -55,7 +55,7 @@ void ESP3DCommands::ESP700(int cmd_params_pos, ESP3DMessage* msg) {
       if (!gcodeHostService.processScript(tmpstr.c_str(),
                                           msg->authentication_level)) {
         hasError = false;
-        error_msg = "Invalid parameters";
+        error_msg = "Error processing script";
         esp3d_log_e("Error processing script");
       }
     } else {
