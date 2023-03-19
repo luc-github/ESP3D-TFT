@@ -62,13 +62,12 @@ The reference boards I have bought :
 						- ESP32_ROTRICS_DEXARM35/ -...
 						- ESP32S3_HMI43V3/ -...
 						- ESP32S3_ZXD50CE02S_USRC_4832/ -...
-			- ui/ - res800_600/
-				  - res 480_320/
-				  - res320_240/
 		    - target/ - cnc/ - grbl/
 			          - 3dprinter/ - repetier
 					               - marlin
-								   - smooothieware
+								   - smooothieware/ - ui/ 	- res800_600/
+				  										  	- res 480_320/
+				  											- res320_240/ 
 ```
 ## Todo
 
