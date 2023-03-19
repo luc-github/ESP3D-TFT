@@ -20,7 +20,7 @@
 
 #include "sd_def.h"
 
-#if defined(ESP3D_SD_IS_SPI) && ESP3D_SD_IS_SPI
+#if ESP3D_SD_IS_SPI
 #include <string.h>
 #include <sys/unistd.h>
 

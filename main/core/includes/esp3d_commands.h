@@ -25,6 +25,9 @@
 #include "authentication/esp3d_authentication.h"
 #include "esp3d_client.h"
 #include "esp3d_settings.h"
+#if ESP3D_SD_CARD_FEATURE
+#include "sd_def.h"
+#endif  // ESP3D_SD_CARD_FEATURE
 
 #ifdef __cplusplus
 extern "C" {
@@ -97,9 +100,9 @@ class ESP3DCommands {
 #endif  // ESP3D_HTTP_FEATURE
 #if ESP3D_SD_CARD_FEATURE
   void ESP200(int cmd_params_pos, ESP3DMessage* msg);
-#if ESP3D_SD_FEATURE_IS_SPI
+#if ESP3D_SD_IS_SPI
   void ESP202(int cmd_params_pos, ESP3DMessage* msg);
-#endif  // ESP3D_SD_FEATURE_IS_SPI
+#endif  // ESP3D_SD_IS_SPI
 #endif  // ESP3D_SD_CARD_FEATURE
   void ESP400(int cmd_params_pos, ESP3DMessage* msg);
   void ESP401(int cmd_params_pos, ESP3DMessage* msg);

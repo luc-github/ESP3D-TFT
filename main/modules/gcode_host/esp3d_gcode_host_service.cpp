@@ -52,6 +52,28 @@ bool ESP3DGCodeHostService::processScript(const char* script,
                                           ESP3DAuthenticationLevel auth_type) {
   esp3d_log("Processing script: %s,  with authentication level=%d", script,
             static_cast<uint8_t>(auth_type));
+  ESP3DScript newscript;
+  newscript.type = getScriptType(script);
+  switch (newscript.type) {
+    case ESP3DGcodeHostScriptType::single_command:
+      // TODO
+      break;
+    case ESP3DGcodeHostScriptType::multiple_commands:
+      // TODO
+      break;
+    case ESP3DGcodeHostScriptType::filesystem:
+      // TODO:
+      // 1 - check if not already processing file
+      // 2 - check if file exists and can be opened
+      // 3 - add file information if exists (name, )
+      // 4 - add element script to processing list
+      // 5 - return success
+      break;
+    case ESP3DGcodeHostScriptType::sd_card:
+      break;
+    default:
+      break;
+  }
 
   return false;
 }
