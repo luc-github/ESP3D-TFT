@@ -16,7 +16,7 @@ if(WIFI_SERVICE)
     endif()
 
     if(MDNS_SERVICE)
-        list(APPEND SOURCES "modules/mDNS")
+        list(APPEND SOURCES "modules/mdns")
     endif()
 
     if(WEB_SERVICES)
