@@ -28,7 +28,7 @@
 #include "esp3d_string.h"
 #include "esp3d_version.h"
 #include "esp_netif_ip_addr.h"
-#include "mDNS/esp3d_mdns.h"
+#include "mdns/esp3d_mdns.h"
 #include "network/esp3d_network.h"
 
 #define COMMAND_ID 450

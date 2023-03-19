@@ -32,7 +32,7 @@
 #include "notifications/esp3d_notifications_service.h"
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 #if ESP3D_MDNS_FEATURE
-#include "mDNS/esp3d_mdns.h"
+#include "mdns/esp3d_mdns.h"
 #endif  // ESP3D_MDNS_FEATURE
 #if ESP3D_SSDP_FEATURE
 #include "ssdp/esp3d_ssdp.h"
