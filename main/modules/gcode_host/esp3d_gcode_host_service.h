@@ -67,7 +67,8 @@ class ESP3DGCodeHostService : public ESP3DClient {
   bool resume();
   ESP3DGcodeHostState getState();
   ESP3DGcodeHostError getErrorNum();
-  ESP3DScript* getCurrentScript();
+  ESP3DScript* getCurrentScript(
+      ESP3DGcodeHostScriptType type = ESP3DGcodeHostScriptType::active);
 
  private:
   bool isAck(const char* cmd);

@@ -50,6 +50,7 @@ enum class ESP3DGcodeHostState : uint8_t {
   wait,
   next_state,
   undefined,
+  processing,
 };
 
 enum class ESP3DGcodeHostError : uint8_t {
@@ -72,8 +73,10 @@ enum class ESP3DGcodeHostError : uint8_t {
 enum class ESP3DGcodeHostScriptType : uint8_t {
   single_command,
   multiple_commands,
+  file_commands,
   filesystem,
   sd_card,
+  active,
   unknown
 };
 

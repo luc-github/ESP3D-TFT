@@ -119,10 +119,10 @@ void ESP3DCommands::ESP701(int cmd_params_pos, ESP3DMessage* msg) {
       if (!gcodeHostService.abort()) {
         hasError = true;
         error_msg = "Failed to abort";
-      } else {
-        hasError = true;
-        error_msg = "Invalid parameters";
       }
+    } else {
+      hasError = true;
+      error_msg = "Invalid parameters";
     }
   }
   if (!dispatchAnswer(msg, COMMAND_ID, json, hasError,
