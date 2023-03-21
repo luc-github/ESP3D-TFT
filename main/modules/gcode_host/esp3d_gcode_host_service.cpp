@@ -134,9 +134,10 @@ ESP3DScript* ESP3DGCodeHostService::getCurrentScript(
   esp3d_log("There are currently %d scripts", _scripts.size());
   for (auto script = _scripts.begin(); script != _scripts.end(); ++script) {
     esp3d_log("Script type: %d", static_cast<uint8_t>(script->type));
-    if ((type == ESP3DGcodeHostScriptType::filesystem && (typescript->type ==
-            ESP3DGcodeHostScriptType::sd_card ||
-        script->type == ESP3DGcodeHostScriptType::files) ||(type == typescript->type)) {
+    if ((type == ESP3DGcodeHostScriptType::filesystem &&
+         (script->type == ESP3DGcodeHostScriptType::sd_card ||
+          script->type == ESP3DGcodeHostScriptType::filesystem)) ||
+        (type == script->type)) {
       return &(*script);
     }
   }
@@ -270,7 +271,7 @@ void ESP3DGCodeHostService::handle() {
     // to allow to handle GCode commands when processing SD/script
     for (auto script = _scripts.begin(); script != _scripts.end(); ++script) {
       bool processing = true;
-      _current_script = script;
+      _current_script = &(*script);
       while (processing) {
         switch (script->state) {
           case ESP3DGcodeHostState::start:
