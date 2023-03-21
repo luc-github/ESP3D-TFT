@@ -30,6 +30,10 @@
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 
+
+#define isEndLine(ch) ((char)ch == '\n' || (char)ch == '\r')
+#define isWhiteSpace(ch) ((char)ch =='\n' || (char)ch =='\r' || (char)ch == ' ')
+
 #ifdef __cplusplus
 extern "C" {
 #endif

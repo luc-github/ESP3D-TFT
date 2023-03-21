@@ -17,7 +17,8 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#if ESP3D_GCODE_HOST_FEATURE
+//#define ESP3D_GCODE_HOST_FEATURE
+#ifdef ESP3D_GCODE_HOST_FEATURE
 #include "esp3d_gcode_host_service.h"
 
 #include <stdio.h>
@@ -27,7 +28,7 @@
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
 #include "filesystem/esp3d_flash.h"
-#if ESP3D_SD_CARD_FEATURE
+#ifdef ESP3D_SD_CARD_FEATURE
 #include "filesystem/esp3d_sd.h"
 #endif  // ESP3D_SD_CARD_FEATURE
 #include "freertos/FreeRTOS.h"
@@ -167,9 +168,12 @@ void ESP3DGCodeHostService::process(ESP3DMessage* msg) {
   }
 }
 
+//Best to replace with isEL() macro for performance
 bool ESP3DGCodeHostService::isEndChar(uint8_t ch) {
-  return ((char)ch == '\n' || (char)ch == '\r');
+  //return ((char)ch == '\n' || (char)ch == '\r');
+  return (isEndLine(ch));
 }
+
 bool ESP3DGCodeHostService::begin() {
   end();
   if (pthread_mutex_init(&_rx_mutex, NULL) != 0) {
@@ -228,8 +232,7 @@ bool ESP3DGCodeHostService::pushMsgToRxQueue(const uint8_t* msg, size_t size) {
   return true;
 }
 
-ESP3DGcodeHostScriptType ESP3DGCodeHostService::getScriptType(
-    const char* script) {
+ESP3DGcodeHostScriptType ESP3DGCodeHostService::getScriptType(const char* script) {
   if (script[0] == '/') {
     if (strstr(script, "/sd/") == script) {
 #if ESP3D_SD_CARD_FEATURE
