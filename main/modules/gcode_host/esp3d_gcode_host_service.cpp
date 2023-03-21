@@ -17,6 +17,7 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#if ESP3D_GCODE_HOST_FEATURE
 #include "esp3d_gcode_host_service.h"
 
 #include <stdio.h>
@@ -26,7 +27,9 @@
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
 #include "filesystem/esp3d_flash.h"
+#if ESP3D_SD_CARD_FEATURE
 #include "filesystem/esp3d_sd.h"
+#endif  // ESP3D_SD_CARD_FEATURE
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
@@ -54,22 +57,24 @@ bool ESP3DGCodeHostService::processScript(const char* script,
             static_cast<uint8_t>(auth_type));
   ESP3DScript newscript;
   newscript.type = getScriptType(script);
+  newscript.id = esp3d_hal::millis();
+  newscript.auth_type = auth_type;
+  esp3d_log("Script type: %d", static_cast<uint8_t>(newscript.type));
   switch (newscript.type) {
     case ESP3DGcodeHostScriptType::single_command:
-      // TODO
-      break;
     case ESP3DGcodeHostScriptType::multiple_commands:
-      // TODO
+      newscript.script = script;
+      _scripts.push_back(newscript);
       break;
-    case ESP3DGcodeHostScriptType::filesystem:
-      // TODO:
-      // 1 - check if not already processing file
-      // 2 - check if file exists and can be opened
-      // 3 - add file information if exists (name, )
-      // 4 - add element script to processing list
-      // 5 - return success
-      break;
+#if ESP3D_SD_CARD_FEATURE
     case ESP3DGcodeHostScriptType::sd_card:
+#endif  // ESP3D_SD_CARD_FEATURE
+    case ESP3DGcodeHostScriptType::filesystem:
+      // only one FS/SD script at once is allowed
+      if (getCurrentScript() != nullptr) return false;
+      newscript.script = script;
+      _scripts.push_back(newscript);
+      return true;
       break;
     default:
       break;
@@ -98,7 +103,8 @@ ESP3DGcodeHostError ESP3DGCodeHostService::getErrorNum() {
 ESP3DScript* ESP3DGCodeHostService::getCurrentScript() {
   // get first not command
   for (auto script = _scripts.begin(); script != _scripts.end(); ++script) {
-    if (script->type != ESP3DGcodeHostScriptType::single_command) {
+    if (script->type != ESP3DGcodeHostScriptType::single_command &&
+        script->type != ESP3DGcodeHostScriptType::multiple_commands) {
       return &(*script);
     }
   }
@@ -192,7 +198,11 @@ ESP3DGcodeHostScriptType ESP3DGCodeHostService::getScriptType(
     const char* script) {
   if (script[0] == '/') {
     if (strstr(script, "/sd/") == script) {
+#if ESP3D_SD_CARD_FEATURE
       return ESP3DGcodeHostScriptType::sd_card;
+#else
+      return ESP3DGcodeHostScriptType::filesystem;
+#endif  // ESP3D_SD_CARD_FEATURE
     } else {
       return ESP3DGcodeHostScriptType::filesystem;
     }
@@ -211,13 +221,18 @@ ESP3DGcodeHostScriptType ESP3DGCodeHostService::getScriptType(
 void ESP3DGCodeHostService::handle() {
   if (_started) {
     // to allow to handle GCode commands when processing SD/script
-    for (auto script : _scripts) {
+    for (auto script = _scripts.begin(); script != _scripts.end(); ++script) {
       bool processing = true;
       while (processing) {
-        switch (script.state) {
+        switch (script->state) {
           case ESP3DGcodeHostState::start:
+            esp3d_log("Processing script: %s", script->script.c_str());
+            script->state = ESP3DGcodeHostState::end;
             break;
           case ESP3DGcodeHostState::end:
+            esp3d_log("Ending script: %s", script->script.c_str());
+            _scripts.erase(script++);
+            processing = false;
             break;
           case ESP3DGcodeHostState::read_line:
             break;
@@ -245,6 +260,7 @@ void ESP3DGCodeHostService::handle() {
             processing = false;
             break;
         }
+        esp3d_hal::wait(10);
       }
     }
 
@@ -299,3 +315,4 @@ void ESP3DGCodeHostService::end() {
   _current_script = NULL;
   _scripts.clear();
 }
+#endif  // ESP3D_GCODE_HOST_FEATURE

@@ -35,12 +35,12 @@ extern "C" {
 #endif
 
 struct ESP3DScript {
-  uint8_t id = 0;
+  uint64_t id = 0;
   std::string script;
   std::string current_command;
   ESP3DGcodeHostScriptType type = ESP3DGcodeHostScriptType::unknown;
-  ESP3DGcodeHostState state = ESP3DGcodeHostState::no_stream;
-  ESP3DGcodeHostState next_state = ESP3DGcodeHostState::no_stream;
+  ESP3DGcodeHostState state = ESP3DGcodeHostState::start;
+  ESP3DGcodeHostState next_state = ESP3DGcodeHostState::undefined;
   ESP3DGcodeHostWait wait_state = ESP3DGcodeHostWait::no_wait;
   ESP3DGcodeHostError error = ESP3DGcodeHostError::no_error;
   ESP3DAuthenticationLevel auth_type = ESP3DAuthenticationLevel::guest;

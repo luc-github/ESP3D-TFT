@@ -49,6 +49,7 @@ enum class ESP3DGcodeHostState : uint8_t {
   abort,
   wait,
   next_state,
+  undefined,
 };
 
 enum class ESP3DGcodeHostError : uint8_t {
