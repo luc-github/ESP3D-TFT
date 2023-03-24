@@ -46,8 +46,6 @@ class ESP3DSerialClient : public ESP3DClient {
  private:
   TaskHandle_t _xHandle;
   bool _started;
-  pthread_mutex_t _tx_mutex;
-  pthread_mutex_t _rx_mutex;
   uint8_t* _data;
   uint8_t* _buffer;
   size_t _bufferPos;

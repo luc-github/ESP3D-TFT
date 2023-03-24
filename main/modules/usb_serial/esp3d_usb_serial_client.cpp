@@ -207,17 +207,7 @@ bool ESP3DUsbSerialClient::begin() {
     esp3d_log_e("Semaphore creation failed");
     return false;
   }
-  if (pthread_mutex_init(&_rx_mutex, NULL) != 0) {
-    esp3d_log_e("Mutex creation for rx failed");
-    return false;
-  }
-  setRxMutex(&_rx_mutex);
-
-  if (pthread_mutex_init(&_tx_mutex, NULL) != 0) {
-    esp3d_log_e("Mutex creation for tx failed");
-    return false;
-  }
-  setTxMutex(&_tx_mutex);
+  mutexInit();
   // load baudrate
   _baudrate = esp3dTftsettings.readUint32(
       ESP3DSettingIndex::esp3d_usb_serial_baud_rate);
@@ -316,12 +306,7 @@ void ESP3DUsbSerialClient::end() {
     esp3d_log("Clearing queue Tx messages");
     clearTxQueue();
     vTaskDelay(pdMS_TO_TICKS(1000));
-    if (pthread_mutex_destroy(&_tx_mutex) != 0) {
-      esp3d_log_w("Mutex destruction for tx failed");
-    }
-    if (pthread_mutex_destroy(&_rx_mutex) != 0) {
-      esp3d_log_w("Mutex destruction for rx failed");
-    }
+    mutexDestroy();
     esp3d_log("Uninstalling USB Serial drivers");
     setConnected(false);
     vSemaphoreDelete(_device_disconnected_sem);

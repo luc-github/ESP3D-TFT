@@ -63,6 +63,7 @@ void ESP3DSerialClient::readSerial() {
   // if no data during a while then send them
   if (esp3d_hal::millis() - startTimeout > (RX_FLUSH_TIME_OUT) &&
       _bufferPos > 0) {
+      esp3d_log_e("Transmission received without end char");
     if (!serialClient.pushMsgToRxQueue(_buffer, _bufferPos)) {
       // send error
       esp3d_log_e("Push Message to rx queue failed");
@@ -95,7 +96,7 @@ ESP3DSerialClient::ESP3DSerialClient() {
 }
 ESP3DSerialClient::~ESP3DSerialClient() { end(); }
 
-void ESP3DSerialClient::process(ESP3DMessage *msg) {
+void ESP3DSerialClient::process(ESP3DMessage *msg) { //shouldn't be used with gcodehost - Serial client only handles RX from serial port.
   esp3d_log("Add message to queue");
   if (!addTxData(msg)) {
     flush();
@@ -108,9 +109,10 @@ void ESP3DSerialClient::process(ESP3DMessage *msg) {
   }
 }
 
-bool ESP3DSerialClient::isEndChar(uint8_t ch) {
+inline bool ESP3DSerialClient::isEndChar(uint8_t ch) {
   return ((char)ch == '\n' || (char)ch == '\r');
 }
+
 bool ESP3DSerialClient::begin() {
   end();
 
@@ -125,18 +127,7 @@ bool ESP3DSerialClient::begin() {
     esp3d_log_e("Failed to allocate memory for buffer");
     return false;
   }
-
-  if (pthread_mutex_init(&_rx_mutex, NULL) != 0) {
-    esp3d_log_e("Mutex creation for rx failed");
-    return false;
-  }
-  setRxMutex(&_rx_mutex);
-
-  if (pthread_mutex_init(&_tx_mutex, NULL) != 0) {
-    esp3d_log_e("Mutex creation for tx failed");
-    return false;
-  }
-  setTxMutex(&_tx_mutex);
+  mutexInit();
   // load baudrate
   uint32_t baudrate =
       esp3dTftsettings.readUint32(ESP3DSettingIndex::esp3d_baud_rate);
@@ -254,12 +245,7 @@ void ESP3DSerialClient::end() {
     esp3d_log("Clearing queue Tx messages");
     clearTxQueue();
     vTaskDelay(pdMS_TO_TICKS(1000));
-    if (pthread_mutex_destroy(&_tx_mutex) != 0) {
-      esp3d_log_w("Mutex destruction for tx failed");
-    }
-    if (pthread_mutex_destroy(&_rx_mutex) != 0) {
-      esp3d_log_w("Mutex destruction for rx failed");
-    }
+    mutexDestroy();
     esp3d_log("Uninstalling Serial drivers");
     if (uart_is_driver_installed(ESP3D_SERIAL_PORT) &&
         uart_driver_delete(ESP3D_SERIAL_PORT) != ESP_OK) {

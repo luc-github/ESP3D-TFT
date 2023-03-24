@@ -48,6 +48,7 @@ struct ESP3DMessage {
   ESP3DAuthenticationLevel authentication_level;
   ESP3DRequest request_id;
   ESP3DMessageType type;
+  
 };
 
 class ESP3DClient {
@@ -66,8 +67,8 @@ class ESP3DClient {
   ESP3DMessage *popTx();
   static void deleteMsg(ESP3DMessage *msg);
   bool addFrontTxData(ESP3DMessage *msg);
-  void setRxMutex(pthread_mutex_t *mutex) { _rx_mutex = mutex; };
-  void setTxMutex(pthread_mutex_t *mutex) { _tx_mutex = mutex; };
+  bool mutexInit();
+  bool mutexDestroy();
   bool clearRxQueue();
   bool clearTxQueue();
   size_t getRxMsgsCount() { return _rx_queue.size(); }
@@ -94,8 +95,8 @@ class ESP3DClient {
   size_t _tx_size;
   size_t _rx_max_size;
   size_t _tx_max_size;
-  pthread_mutex_t *_rx_mutex;
-  pthread_mutex_t *_tx_mutex;
+  pthread_mutex_t _rx_mutex;
+  pthread_mutex_t _tx_mutex;
 };
 
 #ifdef __cplusplus

@@ -70,8 +70,6 @@ class ESP3DSocketServer : public ESP3DClient {
   int _listen_socket;
   bool _started;
   uint32_t _port;
-  pthread_mutex_t _tx_mutex;
-  pthread_mutex_t _rx_mutex;
   TaskHandle_t _xHandle;
   char** _buffer;
   char* _data;
