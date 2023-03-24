@@ -48,6 +48,7 @@ bool ESP3DClient::mutexInit() {
     esp3d_log_e("Mutex creation for tx failed");
     return false;
   }
+  return true;
 }
 
 bool ESP3DClient::mutexDestroy() {
@@ -60,6 +61,7 @@ bool ESP3DClient::mutexDestroy() {
     esp3d_log_e("Mutex destruction for tx failed");
     return false;
   }
+  return true;
 }
 
 bool ESP3DClient::clearRxQueue() {
