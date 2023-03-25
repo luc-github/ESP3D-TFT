@@ -35,6 +35,9 @@
 #include "sd_def.h"
 #endif  // ESP3D_SD_CARD_FEATURE
 #include <stdio.h>
+#if ESP3D_GCODE_HOST_FEATURE
+#include "gcode_host/esp3d_gcode_host_service.h"
+#endif // ESP3D_GCODE_HOST_FEATURE
 
 #include <string>
 
@@ -467,6 +470,16 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
       }
       break;
 #endif  // ESP3D_TELNET_FEATURE
+#if ESP3D_GCODE_HOST_FEATURE
+    case ESP3DClientType::stream:
+      if (gcodeHostService.started()) {
+        gcodeHostService.process(msg);
+      } else {
+        sendOk = false;
+        esp3d_log_w("gcodeHostService not started for message size  %d", msg->size);
+      }
+      break;
+#endif // ESP3D_GCODE_HOST_FEATURE
 
     case ESP3DClientType::serial:
       esp3d_log("Serial client got message");
