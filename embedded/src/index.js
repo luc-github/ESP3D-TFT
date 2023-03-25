@@ -118,9 +118,10 @@ window.onload = function () {
     loginUser = user;
     let password = document.getElementById("passwordInput").value.trim();
     let url = new URL("http://" + window.location.host + "/login");
-    url.searchParams.append("USER", user);
-    url.searchParams.append("PASSWORD", password);
-    url.searchParams.append("SUBMIT", "yes");
+    let formData = new FormData();
+    formData.append("USER", user);
+   formData.append("PASSWORD", password);
+    formData.append("SUBMIT", "yes");
     let xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
       if (xmlhttp.readyState == 4) {
@@ -138,8 +139,8 @@ window.onload = function () {
         }
       }
     };
-    xmlhttp.open("GET", url, true);
-    xmlhttp.send();
+    xmlhttp.open("POST", url, true);
+    xmlhttp.send(formData);
     document.getElementById("passwordInput").value = "";
   });
 
@@ -317,6 +318,9 @@ function processFWJson(text) {
     return;
   }
   json = json.data;
+  if (json.Authentication == "Enabled") {
+    loginLink.classList.remove("hide");
+  }
   if (json.FWVersion) {
     let verLink = document.getElementById("verLink");
     verLink.innerHTML = "v" + json.FWVersion;

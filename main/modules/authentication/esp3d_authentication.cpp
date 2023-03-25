@@ -66,6 +66,8 @@ void ESP3DAuthenticationService::end() {
 }
 bool ESP3DAuthenticationService::isAdmin(const char *pwd) {
 #if ESP3D_AUTHENTICATION_FEATURE
+  esp3d_log("Checking %s with %s = %s", pwd, _admin_pwd.c_str(),
+            _admin_pwd == pwd ? "true" : "false");
   return _admin_pwd == pwd;
 #else
   return true;
@@ -73,6 +75,8 @@ bool ESP3DAuthenticationService::isAdmin(const char *pwd) {
 }
 bool ESP3DAuthenticationService::isUser(const char *pwd) {
 #if ESP3D_AUTHENTICATION_FEATURE
+  esp3d_log("Checking %s with %s = %s", pwd, _user_pwd.c_str(),
+            _user_pwd == pwd ? "true" : "false");
   return _user_pwd == pwd;
 #else
   return true;
