@@ -96,7 +96,7 @@ esp_err_t st7796_init(lv_disp_drv_t  * disp_drv){
             DISP_D04_PIN, DISP_D05_PIN, DISP_D06_PIN, DISP_D07_PIN
         },
         .bus_width = DISP_BITS_WIDTH,
-        .max_transfer_bytes = DISP_HOR_RES_MAX * 40 * sizeof(uint16_t),  
+        .max_transfer_bytes = DISP_HOR_RES_MAX * (DISP_VER_RES_MAX /10) * sizeof(uint16_t),  
         .psram_trans_align = 64, // could be 16 32 64
         .sram_trans_align = 4 // no idea of the alignment use sample one
     };
