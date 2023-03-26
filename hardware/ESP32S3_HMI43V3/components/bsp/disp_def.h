@@ -18,7 +18,7 @@ extern "C" {
 #endif
 
 // 1/10
-#define DISP_BUF_SIZE (DISP_HOR_RES_MAX * 48)
+#define DISP_BUF_SIZE (DISP_HOR_RES_MAX * (DISP_VER_RES_MAX / 10))
 
 #define DISP_BITS_WIDTH (16)
 #define DISP_CMD_BITS_WIDTH (16)

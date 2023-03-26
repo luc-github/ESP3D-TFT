@@ -133,7 +133,7 @@ esp_err_t rm68120_init(lv_disp_drv_t  * disp_drv){
             DISP_D12_PIN, DISP_D13_PIN, DISP_D14_PIN, DISP_D15_PIN,
         },
         .bus_width = DISP_BITS_WIDTH,
-        .max_transfer_bytes = DISP_HOR_RES_MAX * 40 * sizeof(uint16_t) ,
+        .max_transfer_bytes = DISP_HOR_RES_MAX * (DISP_VER_RES_MAX / 10)* sizeof(uint16_t) ,
         .psram_trans_align = 64,
         .sram_trans_align = 4, 
     };
