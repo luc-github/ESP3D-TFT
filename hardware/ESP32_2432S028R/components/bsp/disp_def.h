@@ -11,7 +11,7 @@ extern "C" {
 #define DISP_VER_RES_MAX 240
 
 // 1/10
-#define DISP_BUF_SIZE (DISP_HOR_RES_MAX * 24)
+#define DISP_BUF_SIZE (DISP_HOR_RES_MAX * (DISP_VER_RES_MAX / 10))
 
 #define ILI9341_DC 2             // GPIO 2
 #define ILI9341_USE_RST 1        // Flag
