@@ -24,6 +24,9 @@ lv_obj_set_style_bg_opa(ui_Screen1, LV_OPA_COVER, LV_PART_MAIN);
 lv_disp_load_scr(ui_Screen1);
 ```
 
+## Alignement 
+<img src="https://raw.githubusercontent.com/luc-github/ESP3D-TFT/main/UI/align.png"/>
+
 ## Label
 https://docs.lvgl.io/master/widgets/label.html
 The label need a style to define the properties:
@@ -264,5 +267,3 @@ https://www.youtube.com/watch?v=MHwLLJC9wUw
 2 - Download a WOFF or TTF 
 https://fontawesome.com/ or github
 Use 6.4.0 free
-
-|road-spike| e565| 
