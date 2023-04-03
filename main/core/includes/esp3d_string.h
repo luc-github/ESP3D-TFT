@@ -20,28 +20,30 @@
 
 #pragma once
 #include <stdio.h>
+
 #include <string>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-namespace esp3d_strings
-{
-//TODO:
-//some functions do internal change and others do copy of original string and modify it
-//need to review for consistency  or allows both copy and insite of string
-//TBD
-const char * str_replace(const char* currentstr, const char* oldsubstr, const char * newsubstr);
-const char * str_trim(const char * str);
-void  str_toUpperCase(std::string * str);
-void  str_toLowerCase(std::string * str);
-bool endsWith(const char * str, const char *  endpart);
-bool startsWith(const char * str, const char * startPart);
-int find(const char * str, const char *subStr, size_t start=0);
-const char * formatBytes (uint64_t bytes);
-const char*  urlDecode(const char * text);
-const char* getContentType (const char* filename);
-}
+namespace esp3d_strings {
+// TODO:
+// some functions do internal change and others do copy of original string and
+// modify it need to review for consistency  or allows both copy and insite of
+// string TBD
+const char* str_replace(const char* currentstr, const char* oldsubstr,
+                        const char* newsubstr);
+const char* str_trim(const char* str);
+void str_toUpperCase(std::string* str);
+void str_toLowerCase(std::string* str);
+bool endsWith(const char* str, const char* endpart);
+bool startsWith(const char* str, const char* startPart);
+int find(const char* str, const char* subStr, size_t start = 0);
+const char* formatBytes(uint64_t bytes);
+const char* urlDecode(const char* text);
+const char* getContentType(const char* filename);
+}  // namespace esp3d_strings
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif

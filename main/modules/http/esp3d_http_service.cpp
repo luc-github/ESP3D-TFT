@@ -495,6 +495,8 @@ ESP3DAuthenticationLevel ESP3DHttpService::getAuthenticationLevel(
         esp3dHttpService.hasArg(req, "USER") &&
         esp3dHttpService.hasArg(req, "PASSWORD")) {
       std::string tmpstr = esp3dHttpService.getArg(req, "SUBMIT");
+      esp3d_strings::str_toUpperCase(&tmpstr);
+      esp3d_log("SUBMIT is %s", tmpstr.c_str());
       if (tmpstr == "YES") {
         esp3dHttpService.onClose(socketId);
         tmpstr = esp3dHttpService.getArg(req, "USER");
@@ -511,8 +513,17 @@ ESP3DAuthenticationLevel ESP3DHttpService::getAuthenticationLevel(
             authentication_level = ESP3DAuthenticationLevel::admin;
           }
         }
+      } else {
+        esp3d_log("SUBMIT is not YES");
       }
+    } else {
+      esp3d_log("Missing parameters: SUBMIT:%s , USER:%s, PASSWORD:%s",
+                esp3dHttpService.hasArg(req, "SUBMIT") ? "YES" : "NO",
+                esp3dHttpService.hasArg(req, "USER") ? "YES" : "NO",
+                esp3dHttpService.hasArg(req, "PASSWORD") ? "YES" : "NO");
     }
+  } else {
+    esp3d_log("No post_upload_ctx");
   }
   // if authentication_level is still ESP3DAuthenticationLevel::guest
   // 2 - check Autorization

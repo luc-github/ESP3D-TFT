@@ -74,8 +74,8 @@ The reference boards I have bought :
 Everything, code from scratch or almost
 * Design UI (Flow + icon)
 * Code UI / navigation 
-* Add WiFi features
-* Add Streaming Features
+* Add WiFi features :+1:
+* Add Streaming Features :ongoing:
 * TBD... 
 
 ## Chat
