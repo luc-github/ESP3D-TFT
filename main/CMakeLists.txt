@@ -23,7 +23,7 @@ if(WIFI_SERVICE)
         list(APPEND SOURCES "modules/http")
         list(APPEND SOURCES "modules/http/handlers")
         list(APPEND SOURCES "modules/websocket")
-        set(EMBEDDEDFILES "embedded/favicon.ico.gz" "embedded/index.html.gz")
+        set(WEBEMBEDDEDFILES "embedded/favicon.ico.gz" "embedded/index.html.gz")
     endif()
 
     if(TELNET_SERVICE)
@@ -51,13 +51,18 @@ if(GCODE_HOST_SERVICE)
     list(APPEND SOURCES "modules/gcode_host")
 endif()
 
+ if(TFT_UI_SERVICE)
+    
+endif()
+
 set(INCLUDES .
     core/includes
     modules)
 idf_component_register(SRC_DIRS ${SOURCES}
     INCLUDE_DIRS ${INCLUDES}
-    EMBED_FILES ${EMBEDDEDFILES})
+    EMBED_FILES ${WEBEMBEDDEDFILES}  ${UIEMBEDDEDFILES})
 
+unset(TFT_UI_SERVICE CACHE)
 unset(WIFI_SERVICE CACHE)
 unset(SSDP_SERVICE CACHE)
 unset(MDNS_SERVICE CACHE)

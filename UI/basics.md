@@ -267,3 +267,31 @@ https://www.youtube.com/watch?v=MHwLLJC9wUw
 2 - Download a WOFF or TTF 
 https://fontawesome.com/ or github
 Use 6.4.0 free
+
+## Image
+Adding image is a mitigattion between image size / image quality / decoding / speed 
+### Using predecoded image
+1 - Use Online/Offline decoder
+  https://lvgl.io/tools/imageconverter
+  
+  will generate a C file, the size described in struc is the size added to your FW
+  ```
+  const lv_img_dsc_t logo_800_480_BW = {
+  .header.cf = LV_IMG_CF_INDEXED_4BIT,
+  .header.always_zero = 0,
+  .header.reserved = 0,
+  .header.w = 603,
+  .header.h = 450,
+  .data_size = 135964,
+  .data = logo_800_480_BW_map,
+};
+  ```
+  Here ~+135KB
+
+  In the file using the image add:
+  `LV_IMG_DECLARE(logo_800_480_BW);`
+  then  use the image:
+  ```
+  lv_obj_t *logo = lv_img_create(lv_scr_act());
+  lv_img_set_src(logo, &logo_800_480_BW);
+  ```

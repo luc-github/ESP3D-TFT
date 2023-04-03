@@ -36,6 +36,7 @@
 #define STACKDEPTH NETWORK_STACK_DEPTH
 #define TASKPRIORITY 0
 #define TASKCORE 1
+LV_IMG_DECLARE(logo_800_480_BW);
 
 /**********************
  *  STATIC PROTOTYPES
@@ -105,6 +106,12 @@ static void style_init(void) {
 }
 
 static void create_application(void) {
+  lv_obj_t *ui_Screen1 = lv_scr_act();
+  lv_obj_set_style_bg_color(ui_Screen1, lv_color_hex(0x000000), LV_PART_MAIN);
+  lv_obj_t *logo = lv_img_create(ui_Screen1);
+  lv_obj_center(logo);
+  lv_img_set_src(logo, &logo_800_480_BW);
+  return;
   /*Initialize the style*/
   style_init();
 
