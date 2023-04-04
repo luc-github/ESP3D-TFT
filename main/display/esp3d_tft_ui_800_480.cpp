@@ -23,6 +23,7 @@
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "lvgl.h"
+#include "version.h"
 
 LV_IMG_DECLARE(logo_800_480_BW);
 #define LV_TICK_PERIOD_MS 10
@@ -185,7 +186,16 @@ void splash_screen() {
   lv_obj_t *ui_Screen = lv_obj_create(NULL);
   lv_obj_set_style_bg_color(ui_Screen, lv_color_hex(0x000000), LV_PART_MAIN);
   lv_obj_t *logo = lv_img_create(ui_Screen);
+  lv_obj_t *label = lv_label_create(ui_Screen);
+  lv_label_set_text(label, ESP3D_TFT_VERSION);
+  static lv_style_t style_text;
+  lv_style_init(&style_text);
+  lv_style_set_text_opa(&style_text, LV_OPA_COVER);
+  lv_style_set_text_color(&style_text, lv_color_hex(0xFFFFFF));
+  lv_obj_add_style(label, &style_text, LV_PART_MAIN);
+  // lv_style_set_text_font(&style_text, &lv_font_montserrat_12);
   lv_obj_center(logo);
+  lv_obj_align_to(label, logo, LV_ALIGN_OUT_BOTTOM_MID, 0, 120);
   lv_img_set_src(logo, &logo_800_480_BW);
   lv_scr_load_anim(ui_Screen, LV_SCR_LOAD_ANIM_FADE_IN, 1000, 0, true);
   boot_timer = lv_timer_create(splash_out_timer_cb, 1000, NULL);
