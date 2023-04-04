@@ -24,6 +24,21 @@ lv_obj_set_style_bg_opa(ui_Screen1, LV_OPA_COVER, LV_PART_MAIN);
 lv_disp_load_scr(ui_Screen1);
 ```
 
+## Screen
+https://docs.lvgl.io/master/overview/object.html#screens
+ * To get the currently active screen, use `lv_scr_act()`
+ * To load a new screen, use `lv_scr_load(scr1)` 
+ * To load a new screen with some animation, use `lv_scr_load_anim(newscr, transition_type, time, delay, auto_del)`   
+ where transition type can be:  
+    - `LV_SCR_LOAD_ANIM_NONE` Switch immediately after `delay` in milliseconds
+    - `LV_SCR_LOAD_ANIM_OVER_LEFT/RIGHT/TOP/BOTTOM` Move the new screen over the current towards the given direction  
+    - `LV_SCR_LOAD_ANIM_OUT_LEFT/RIGHT/TOP/BOTTOM` Move out the old screen over the current towards the given direction  
+    - `LV_SCR_LOAD_ANIM_MOVE_LEFT/RIGHT/TOP/BOTTOM` Move both the current and new screens towards the given direction  
+    - `LV_SCR_LOAD_ANIM_FADE_IN/OUT` Fade the new screen over the old screen, or vice versa   
+
+    The parameter `time` is the animation duration   
+    Setting `auto_del` to true will automatically delete the old screen when the animation is finished
+
 ## Alignement 
 <img src="https://raw.githubusercontent.com/luc-github/ESP3D-TFT/main/UI/align.png"/>
 
@@ -251,6 +266,11 @@ https://docs.lvgl.io/master/layouts/flex.html
 
 ### Grid
 https://docs.lvgl.io/master/layouts/grid.html
+
+## Timer
+https://docs.lvgl.io/master/overview/timer.html
+
+
 
 
 ## Build a font

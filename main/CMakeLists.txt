@@ -52,7 +52,7 @@ if(GCODE_HOST_SERVICE)
 endif()
 
  if(TFT_UI_SERVICE)
-    
+    list(APPEND SOURCES "display")
 endif()
 
 set(INCLUDES .
