@@ -31,173 +31,180 @@ LV_IMG_DECLARE(logo_800_480_BW);
  *  STATIC PROTOTYPES
  **********************/
 static lv_timer_t *boot_timer = NULL;
-static lv_style_t style_btn;
-static lv_style_t style_btn_pressed;
-static lv_style_t style_btn_red;
-static lv_obj_t *labelSlider;
+lv_obj_t *status_label = NULL;
 
-static void button_event_cb(lv_event_t *e) {}
-
-static void slider_event_cb(lv_event_t *e) {
-  lv_obj_t *slider = lv_event_get_target(e);
-
-  /*Refresh the text*/
-  lv_label_set_text_fmt(labelSlider, "%" LV_PRId32,
-                        lv_slider_get_value(slider));
-  lv_obj_align_to(labelSlider, slider, LV_ALIGN_OUT_TOP_MID, 0,
-                  -15); /*Align top of the slider*/
-}
-
-static lv_color_t darken(const lv_color_filter_dsc_t *dsc, lv_color_t color,
-                         lv_opa_t opa) {
-  LV_UNUSED(dsc);
-  return lv_color_darken(color, opa);
-}
-
-static void style_init(void) {
-  /*Create a simple button style*/
-  lv_style_init(&style_btn);
-  lv_style_set_radius(&style_btn, 10);
-  lv_style_set_bg_opa(&style_btn, LV_OPA_COVER);
-  lv_style_set_bg_color(&style_btn, lv_palette_lighten(LV_PALETTE_GREY, 3));
-  lv_style_set_bg_grad_color(&style_btn, lv_palette_main(LV_PALETTE_GREY));
-  lv_style_set_bg_grad_dir(&style_btn, LV_GRAD_DIR_VER);
-
-  lv_style_set_border_color(&style_btn, lv_color_black());
-  lv_style_set_border_opa(&style_btn, LV_OPA_20);
-  lv_style_set_border_width(&style_btn, 2);
-
-  lv_style_set_text_color(&style_btn, lv_color_black());
-
-  /*Create a style for the pressed state.
-   *Use a color filter to simply modify all colors in this state*/
-  static lv_color_filter_dsc_t color_filter;
-  lv_color_filter_dsc_init(&color_filter, darken);
-  lv_style_init(&style_btn_pressed);
-  lv_style_set_color_filter_dsc(&style_btn_pressed, &color_filter);
-  lv_style_set_color_filter_opa(&style_btn_pressed, LV_OPA_20);
-
-  /*Create a red style. Change only some colors.*/
-  lv_style_init(&style_btn_red);
-  lv_style_set_bg_color(&style_btn_red, lv_palette_main(LV_PALETTE_RED));
-  lv_style_set_bg_grad_color(&style_btn_red,
-                             lv_palette_lighten(LV_PALETTE_RED, 3));
-}
+#define STATUS_BAR_HEIGHT_RADIUS 10
+#define STATUS_BAR_H_PAD 10
+#define STATUS_BAR_V_PAD 4
 
 void main_screen() {
-  lv_obj_t *ui_Screen1 = lv_obj_create(NULL);
-  lv_obj_set_style_bg_color(ui_Screen1, lv_color_hex(0x000000), LV_PART_MAIN);
-  /*Initialize the style*/
-  style_init();
+  // Create style for status bar
+  static lv_style_t style_status_bar;
+  // Create style for main screen container
+  static lv_style_t style_container_main_screen;
+  // Create style for buttons line container
+  static lv_style_t style_buttons_container;
+  // Create style for buttons
+  static lv_style_t style_button;
 
-  /*Create a button and use the new styles*/
-  lv_obj_t *btn = lv_btn_create(ui_Screen1);
-  /* Remove the styles coming from the theme
-   * Note that size and position are also stored as style properties
-   * so lv_obj_remove_style_all will remove the set size and position too */
-  lv_obj_remove_style_all(btn);
-  lv_obj_set_pos(btn, 10, 10);
-  lv_obj_set_size(btn, 120, 50);
-  lv_obj_add_style(btn, &style_btn, 0);
-  lv_obj_add_style(btn, &style_btn_pressed, LV_STATE_PRESSED);
+  // Screen creation
+  lv_obj_t *ui_main_screen = lv_obj_create(NULL);
+  // Apply background color
+  lv_obj_set_style_bg_color(ui_main_screen, lv_color_hex(0x000000),
+                            LV_PART_MAIN);
+  lv_obj_clear_flag(ui_main_screen, LV_OBJ_FLAG_SCROLLABLE);
+  // Create style for status bar
+  lv_style_init(&style_status_bar);
+  lv_style_set_text_opa(&style_status_bar, LV_OPA_COVER);
+  lv_style_set_text_color(&style_status_bar, lv_color_hex(0x000000));
+  lv_style_set_bg_opa(&style_status_bar, LV_OPA_COVER);
+  lv_style_set_bg_color(&style_status_bar, lv_color_hex(0xFFFFFF));
+  lv_style_set_radius(&style_status_bar, STATUS_BAR_HEIGHT_RADIUS);
+  lv_style_set_pad_hor(&style_status_bar, STATUS_BAR_H_PAD);
+  lv_style_set_pad_ver(&style_status_bar, STATUS_BAR_V_PAD);
 
-  /*Add a label to the button*/
-  lv_obj_t *label = lv_label_create(btn);
-  lv_label_set_text(label, "Button");
-  lv_obj_center(label);
-  lv_obj_add_event_cb(btn, button_event_cb, LV_EVENT_CLICKED, NULL);
+  // Create style for main screen container
+  lv_style_init(&style_container_main_screen);
+  // the container will be flex column
+  lv_style_set_layout(&style_container_main_screen, LV_LAYOUT_FLEX);
+  lv_style_set_flex_flow(&style_container_main_screen, LV_FLEX_FLOW_COLUMN);
+  lv_style_set_flex_main_place(&style_container_main_screen,
+                               LV_FLEX_ALIGN_SPACE_EVENLY);
 
-  /*Create another button and use the red style too*/
-  lv_obj_t *btn2 = lv_btn_create(ui_Screen1);
-  lv_obj_remove_style_all(btn2); /*Remove the styles coming from the theme*/
-  lv_obj_set_pos(btn2, 10, 80);
-  lv_obj_set_size(btn2, 120, 50);
-  lv_obj_add_style(btn2, &style_btn, 0);
-  lv_obj_add_style(btn2, &style_btn_red, 0);
-  lv_obj_add_style(btn2, &style_btn_pressed, LV_STATE_PRESSED);
-  lv_obj_set_style_radius(btn2, LV_RADIUS_CIRCLE, 0); /*Add a local style too*/
+  // Create style for main screen buttons line
+  lv_style_init(&style_buttons_container);
+  // the container will be flex row
+  lv_style_set_layout(&style_buttons_container, LV_LAYOUT_FLEX);
+  lv_style_set_flex_flow(&style_buttons_container, LV_FLEX_FLOW_ROW);
+  lv_style_set_flex_main_place(&style_buttons_container,
+                               LV_FLEX_ALIGN_SPACE_EVENLY);
 
-  label = lv_label_create(btn2);
-  lv_label_set_text(label, "Button 2");
-  lv_obj_center(label);
-  lv_obj_align_to(btn2, btn, LV_ALIGN_LEFT_MID, 140, 0);
+  // Create status bar object
+  if (status_label) {
+    lv_obj_del(status_label);
+    status_label = NULL;
+  }
+  status_label = lv_label_create(ui_main_screen);
+  lv_label_set_text(status_label, "ESP3D-TFT" ESP3D_TFT_VERSION);
+  lv_obj_set_width(status_label, LV_HOR_RES);
+  lv_label_set_long_mode(status_label, LV_LABEL_LONG_SCROLL_CIRCULAR);
+  // Apply style to status bar
+  lv_obj_add_style(status_label, &style_status_bar, LV_PART_MAIN);
+  // create container for main screen buttons
+  lv_obj_t *ui_container_main_screen = lv_obj_create(ui_main_screen);
 
-  lv_obj_t *slider = lv_slider_create(ui_Screen1);
-  lv_obj_set_width(slider, 200); /*Set the width*/
+  // remove all styles from the container object
+  lv_obj_remove_style_all(ui_container_main_screen);
+  lv_obj_clear_flag(ui_container_main_screen, LV_OBJ_FLAG_SCROLLABLE);
+  lv_obj_add_style(ui_container_main_screen, &style_container_main_screen,
+                   LV_PART_MAIN);
+  lv_obj_set_style_pad_left(ui_container_main_screen, 0, LV_PART_MAIN);
+  lv_obj_set_style_pad_right(ui_container_main_screen, 0, LV_PART_MAIN);
+  lv_obj_set_style_pad_top(ui_container_main_screen, 0, LV_PART_MAIN);
+  lv_obj_set_style_pad_bottom(ui_container_main_screen, 0, LV_PART_MAIN);
+  lv_obj_set_style_pad_row(ui_container_main_screen, 0, LV_PART_MAIN);
+  lv_obj_set_style_pad_column(ui_container_main_screen, 0, LV_PART_MAIN);
 
-  lv_obj_center(slider);
-  lv_obj_add_event_cb(slider, slider_event_cb, LV_EVENT_VALUE_CHANGED,
-                      NULL); /*Assign an event function*/
+  // Set container size
+  lv_obj_set_size(
+      ui_container_main_screen, LV_HOR_RES,
+      LV_VER_RES - lv_obj_get_height(status_label) - (2 * STATUS_BAR_V_PAD));
 
-  /*Create a label above the slider*/
-  labelSlider = lv_label_create(ui_Screen1);
-  lv_label_set_text(labelSlider, "0");
-  lv_obj_align_to(labelSlider, slider, LV_ALIGN_OUT_TOP_MID, 0,
-                  -15); /*Align top of the slider*/
+  // Align container under status bar
+  lv_obj_align_to(ui_container_main_screen, status_label,
+                  LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+  // create container for main screen buttons Line 1
+  lv_obj_t *line1_buttons_container = lv_obj_create(ui_container_main_screen);
+  // remove all styles from the container object
+  lv_obj_remove_style_all(line1_buttons_container);
 
-  lv_obj_t *btnTheme;
-  lv_obj_t *labelTheme;
+  // Apply style to buttons line container 1
+  lv_style_set_bg_color(&style_buttons_container, lv_color_hex(0xFF0000));
+  lv_style_set_bg_opa(&style_buttons_container, LV_OPA_COVER);
+  lv_obj_add_style(line1_buttons_container, &style_buttons_container,
+                   LV_PART_MAIN);
+  // use all space as width
+  lv_obj_set_width(line1_buttons_container, LV_HOR_RES);
+  // use all space as height
+  lv_obj_set_height(line1_buttons_container, lv_pct(100));
 
-  btnTheme = lv_btn_create(ui_Screen1);
-  labelTheme = lv_label_create(btnTheme);
-  lv_label_set_text(labelTheme, "Original theme");
-  lv_obj_center(labelTheme);
+  // create container for main screen buttons Line 2
+  lv_obj_t *line2_buttons_container = lv_obj_create(ui_container_main_screen);
+  // remove all styles from the container object
+  lv_obj_remove_style_all(line2_buttons_container);
+  lv_obj_add_style(line2_buttons_container, &style_buttons_container,
+                   LV_PART_MAIN);
+  // use all space as width
+  lv_obj_set_width(line2_buttons_container, LV_HOR_RES);
+  // use all space as height
+  lv_obj_set_height(line2_buttons_container, lv_pct(100));
 
-  lv_obj_align_to(btnTheme, slider, LV_ALIGN_OUT_BOTTOM_MID, 0,
-                  15); /*Align top of the slider*/
-  lv_scr_load(ui_Screen1);
-  // lv_scr_load_anim(ui_Screen1, LV_SCR_LOAD_ANIM_FADE_IN, 2000, 100, true);
+  // create container for main screen buttons Line 3
+  lv_obj_t *line3_buttons_container = lv_obj_create(ui_container_main_screen);
+  // remove all styles from the container object
+  lv_obj_remove_style_all(line3_buttons_container);
+  lv_obj_add_style(line3_buttons_container, &style_buttons_container,
+                   LV_PART_MAIN);
+  // use all space as width
+  lv_obj_set_width(line1_buttons_container, LV_HOR_RES);
+  // use all space as height
+  lv_obj_set_height(line1_buttons_container, lv_pct(100));
+  // Display new screen and delete old one
+  lv_obj_t *ui_current_screen = lv_scr_act();
+  lv_scr_load(ui_main_screen);
+  lv_obj_del(ui_current_screen);
 }
 void splash_screen();
 
 void splash_in_timer_cb(lv_timer_t *timer) {
+  // If timer is not null, delete it to avoid multiple call
   if (boot_timer) {
     lv_timer_del(boot_timer);
     boot_timer = NULL;
   }
+  // Call splash screen
   splash_screen();
 }
 
 void main_screen_timer_cb(lv_timer_t *timer) {
+  // If timer is not null, delete it to avoid multiple call
   if (boot_timer) {
     lv_timer_del(boot_timer);
     boot_timer = NULL;
   }
+  // Call main screen
   main_screen();
-}
-
-void splash_out_timer_cb(lv_timer_t *timer) {
-  if (boot_timer) {
-    lv_timer_del(boot_timer);
-    boot_timer = NULL;
-  }
-  lv_obj_t *ui_Screen = lv_obj_create(NULL);
-  lv_obj_set_style_bg_color(ui_Screen, lv_color_hex(0x000000), LV_PART_MAIN);
-  lv_scr_load_anim(ui_Screen, LV_SCR_LOAD_ANIM_FADE_IN, 2000, 100, true);
-  boot_timer = lv_timer_create(main_screen_timer_cb, 2000, NULL);
 }
 
 void boot_screen() {
   lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_PART_MAIN);
-  boot_timer = lv_timer_create(splash_in_timer_cb, 100, NULL);
+  boot_timer = lv_timer_create(splash_in_timer_cb, 10, NULL);
 }
 
 void splash_screen() {
-  lv_obj_t *ui_Screen = lv_obj_create(NULL);
-  lv_obj_set_style_bg_color(ui_Screen, lv_color_hex(0x000000), LV_PART_MAIN);
+  // Create style for version text
+  static lv_style_t style_version_text;
+  // Gey active screen
+  lv_obj_t *ui_Screen = lv_scr_act();
+  // Create logo object
   lv_obj_t *logo = lv_img_create(ui_Screen);
-  lv_obj_t *label = lv_label_create(ui_Screen);
-  lv_label_set_text(label, ESP3D_TFT_VERSION);
-  static lv_style_t style_text;
-  lv_style_init(&style_text);
-  lv_style_set_text_opa(&style_text, LV_OPA_COVER);
-  lv_style_set_text_color(&style_text, lv_color_hex(0xFFFFFF));
-  lv_obj_add_style(label, &style_text, LV_PART_MAIN);
-  // lv_style_set_text_font(&style_text, &lv_font_montserrat_12);
-  lv_obj_center(logo);
-  lv_obj_align_to(label, logo, LV_ALIGN_OUT_BOTTOM_MID, 0, 120);
+  // Set logo image
   lv_img_set_src(logo, &logo_800_480_BW);
-  lv_scr_load_anim(ui_Screen, LV_SCR_LOAD_ANIM_FADE_IN, 1000, 0, true);
-  boot_timer = lv_timer_create(splash_out_timer_cb, 1000, NULL);
+  // Create version text object
+  lv_obj_t *label = lv_label_create(ui_Screen);
+  // Set version text
+  lv_label_set_text(label, "V" ESP3D_TFT_VERSION);
+  // Create style for version text
+  lv_style_init(&style_version_text);
+  lv_style_set_text_opa(&style_version_text, LV_OPA_COVER);
+  lv_style_set_text_color(&style_version_text, lv_color_hex(0xFFFFFF));
+  // Apply style to version text
+  lv_obj_add_style(label, &style_version_text, LV_PART_MAIN);
+  // align object in screen
+  lv_obj_center(logo);
+  lv_obj_align(label, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
+  // Set timer to switch to main screen
+  boot_timer = lv_timer_create(main_screen_timer_cb, 2000, NULL);
 }
+
 void create_application(void) { boot_screen(); }

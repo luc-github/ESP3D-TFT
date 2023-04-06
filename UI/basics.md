@@ -24,6 +24,9 @@ lv_obj_set_style_bg_opa(ui_Screen1, LV_OPA_COVER, LV_PART_MAIN);
 lv_disp_load_scr(ui_Screen1);
 ```
 
+Note: object may have default style depemdeing on previous object created, when adding style you may need to clear existing object style to be sure extra style not defined in new style is not present, use:
+`lv_obj_remove_style_all(object);`
+
 ## Screen
 https://docs.lvgl.io/master/overview/object.html#screens
  * To get the currently active screen, use `lv_scr_act()`
@@ -38,9 +41,17 @@ https://docs.lvgl.io/master/overview/object.html#screens
 
     The parameter `time` is the animation duration   
     Setting `auto_del` to true will automatically delete the old screen when the animation is finished
+* Make screen not scrollable
+Because any object become automaticaly scrollable if anything is displayed out of area, need to clear the flag using:   
+`lv_obj_clear_flag(new_screen, LV_OBJ_FLAG_SCROLLABLE);`
 
 ## Alignement 
 <img src="https://raw.githubusercontent.com/luc-github/ESP3D-TFT/main/UI/align.png"/>
+
+### Size
+Constantes about resolution: `LV_HOR_RES` / `LV_VER_RES`
+Object size in pixels: `lv_obj_get_height(object);` /  `lv_obj_get_width(object);` 
+Note: be sure style is already applied to get correct values.
 
 ## Label
 https://docs.lvgl.io/master/widgets/label.html
