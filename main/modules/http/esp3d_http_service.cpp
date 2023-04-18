@@ -346,14 +346,14 @@ bool ESP3DHttpService::begin() {
     httpd_register_uri_handler(_server, &websocket_webui_handler_config);
 #if ESP3D_WS_SERVICE_FEATURE
     const httpd_uri_t websocket_data_handler_config = {
-        .uri = "/wsdata",
+        .uri = ESP3D_WS_DATA_URL,
         .method = HTTP_GET,
         .handler = (esp_err_t(*)(httpd_req_t *))(
             esp3dHttpService.websocket_data_handler),
         .user_ctx = nullptr,
         .is_websocket = true,
         .handle_ws_control_frames = false,
-        .supported_subprotocol = "arduino"};
+        .supported_subprotocol = ESP3D_WS_DATA_SUBPROTOCOL};
     httpd_register_uri_handler(_server, &websocket_data_handler_config);
 #endif  // ESP3D_WS_SERVICE_FEATURE
 
@@ -396,7 +396,7 @@ void ESP3DHttpService::end() {
     esp3dWsWebUiService.end();
 #if ESP3D_WS_SERVICE_FEATURE
     esp3dWsDataService.end();
-    httpd_unregister_uri(_server, "/wsdata");
+    httpd_unregister_uri(_server, ESP3D_WS_DATA_URL);
 #endif  // ESP3D_WS_SERVICE_FEATURE
     httpd_unregister_uri(_server, "/favicon.ico");
     httpd_unregister_uri(_server, "/command");
