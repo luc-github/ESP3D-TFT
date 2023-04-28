@@ -61,7 +61,7 @@ add_compile_options(-DLV_LVGL_H_INCLUDE_SIMPLE=1)
 # All  = 2
 # Error only = 1
 # Disabled = 0
-add_compile_options(-DESP3D_TFT_LOG=2)
+add_compile_options(-DESP3D_TFT_LOG=0)
 # Disable ANSI color to fit some serial terminals 
 add_compile_options(-DDISABLE_COLOR_LOG=1)
 

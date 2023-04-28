@@ -26,6 +26,9 @@
 #include "http/esp3d_http_service.h"
 #include "lwip/sockets.h"
 
+#define ESP3D_WS_DATA_URL "/wsdata"
+#define ESP3D_WS_DATA_SUBPROTOCOL "arduino"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

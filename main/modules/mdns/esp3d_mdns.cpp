@@ -24,6 +24,10 @@
 #include "esp3d_version.h"
 #include "network/esp3d_network.h"
 
+#if ESP3D_WS_SERVICE_FEATURE
+#include "websocket/esp3d_ws_service.h"
+#endif  // ESP3D_WS_SERVICE_FEATURE
+
 #define ESP3D_MDNS_SERVICE_NAME "_esp3d"
 #define ESP3D_MDNS_SERVICE_PROTO "_tcp"
 #define ESP3D_CODE_BASE "ESP3D-TFT"
@@ -132,7 +136,30 @@ bool ESP3DmDNS::begin() {
 #endif  // ESP3D_HTTP_FEATURE
   err = mdns_service_add(esp3dNetwork.getHostName(), ESP3D_MDNS_SERVICE_NAME,
                          ESP3D_MDNS_SERVICE_PROTO, httpPort, serviceTxtData, 2);
-  // TODO: add other protocols : e.g: telnet
+#if ESP3D_HTTP_FEATURE
+  if (err == ESP_OK) {
+    err = mdns_service_add(esp3dNetwork.getHostName(), "_http",
+                           ESP3D_MDNS_SERVICE_PROTO, httpPort, NULL, 0);
+  }
+#endif  // ESP3D_HTTP_FEATURE
+#if ESP3D_TELNET_FEATURE
+  if (err == ESP_OK) {
+    uint32_t telnetPort =
+        esp3dTftsettings.readUint32(ESP3DSettingIndex::esp3d_socket_port);
+    err = mdns_service_add(esp3dNetwork.getHostName(), "_telnet",
+                           ESP3D_MDNS_SERVICE_PROTO, telnetPort, NULL, 0);
+  }
+#endif  // ESP3D_TELNET_FEATURE
+#if ESP3D_WS_SERVICE_FEATURE
+  if (err == ESP_OK) {
+    mdns_txt_item_t serviceTxtData[2] = {
+        {"uri", ESP3D_WS_DATA_URL}, {"subprotocol", ESP3D_WS_DATA_SUBPROTOCOL}};
+    err =
+        mdns_service_add(esp3dNetwork.getHostName(), "_websocket",
+                         ESP3D_MDNS_SERVICE_PROTO, httpPort, serviceTxtData, 2);
+  }
+#endif  // ESP3D_WS_SERVICE_FEATURE
+
   if (err != ESP_OK) {
     mdns_free();
     esp3d_log_e("Failed to add instance");

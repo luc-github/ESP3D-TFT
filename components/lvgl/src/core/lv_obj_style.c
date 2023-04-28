@@ -68,11 +68,6 @@ static bool style_refr = true;
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_obj_remove_style_all(struct _lv_obj_t * obj)
-{
-    lv_obj_remove_style(obj, NULL, LV_PART_ANY | LV_STATE_ANY);
-}
-
 void _lv_obj_style_init(void)
 {
     _lv_ll_init(&LV_GC_ROOT(_lv_obj_style_trans_ll), sizeof(trans_t));
@@ -154,6 +149,12 @@ void lv_obj_remove_style(lv_obj_t * obj, lv_style_t * style, lv_style_selector_t
         lv_obj_refresh_style(obj, part, prop);
     }
 }
+
+void lv_obj_remove_style_all(struct _lv_obj_t * obj)
+{
+    lv_obj_remove_style(obj, NULL, LV_PART_ANY | LV_STATE_ANY);
+}
+
 
 void lv_obj_report_style_change(lv_style_t * style)
 {
@@ -319,7 +320,12 @@ bool lv_obj_remove_local_style_prop(lv_obj_t * obj, lv_style_prop_t prop, lv_sty
     /*The style is not found*/
     if(i == obj->style_cnt) return false;
 
-    return lv_style_remove_prop(obj->styles[i].style, prop);
+    lv_res_t res = lv_style_remove_prop(obj->styles[i].style, prop);
+    if(res == LV_RES_OK) {
+        lv_obj_refresh_style(obj, selector, prop);
+    }
+
+    return res;
 }
 
 void _lv_obj_style_create_transition(lv_obj_t * obj, lv_part_t part, lv_state_t prev_state, lv_state_t new_state,

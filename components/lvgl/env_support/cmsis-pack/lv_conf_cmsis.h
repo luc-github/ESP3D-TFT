@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v8.3.0
+ * Configuration file for v8.3.4
  */
 
 /* clang-format off */
@@ -82,19 +82,17 @@
     #define LV_TICK_CUSTOM 1
     #if LV_TICK_CUSTOM
         extern uint32_t SystemCoreClock;
-        #define LV_TICK_CUSTOM_INCLUDE             "perf_counter.h"
-
-        #if __PER_COUNTER_VER__ < 10902ul
-            #define LV_TICK_CUSTOM_SYS_TIME_EXPR    ((uint32_t)get_system_ticks() / (SystemCoreClock / 1000ul))
-        #else
-            #define LV_TICK_CUSTOM_SYS_TIME_EXPR    get_system_ms()
-        #endif
+        #define LV_TICK_CUSTOM_INCLUDE          "perf_counter.h"
+        #define LV_TICK_CUSTOM_SYS_TIME_EXPR    get_system_ms()
     #endif   /*LV_TICK_CUSTOM*/
 #else
     #define LV_TICK_CUSTOM 0
     #if LV_TICK_CUSTOM
         #define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
         #define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
+        /*If using lvgl as ESP32 component*/
+        // #define LV_TICK_CUSTOM_INCLUDE "esp_timer.h"
+        // #define LV_TICK_CUSTOM_SYS_TIME_EXPR ((esp_timer_get_time() / 1000LL))
     #endif   /*LV_TICK_CUSTOM*/
 #endif       /*__PERF_COUNTER__*/
 
@@ -227,11 +225,11 @@
     *LV_LOG_LEVEL_ERROR       Only critical issue, when the system may fail
     *LV_LOG_LEVEL_USER        Only logs added by the user
     *LV_LOG_LEVEL_NONE        Do not log anything*/
-    #define LV_LOG_LEVEL LV_LOG_LEVEL_WARN
+    #define LV_LOG_LEVEL LV_LOG_LEVEL_USER
 
     /*1: Print the log with 'printf';
     *0: User need to register a callback with `lv_log_register_print_cb()`*/
-    #define LV_LOG_PRINTF 0
+    #define LV_LOG_PRINTF 1
 
     /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
     #define LV_LOG_TRACE_MEM        1
@@ -350,9 +348,9 @@
  *https://fonts.google.com/specimen/Montserrat*/
 #define LV_FONT_MONTSERRAT_8  0
 #define LV_FONT_MONTSERRAT_10 0
-#define LV_FONT_MONTSERRAT_12 0
+#define LV_FONT_MONTSERRAT_12 1
 #define LV_FONT_MONTSERRAT_14 1
-#define LV_FONT_MONTSERRAT_16 0
+#define LV_FONT_MONTSERRAT_16 1
 #define LV_FONT_MONTSERRAT_18 0
 #define LV_FONT_MONTSERRAT_20 0
 #define LV_FONT_MONTSERRAT_22 0
