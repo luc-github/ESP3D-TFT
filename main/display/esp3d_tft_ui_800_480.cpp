@@ -79,6 +79,9 @@ void main_screen() {
   lv_style_set_flex_main_place(&style_buttons_container,
                                LV_FLEX_ALIGN_SPACE_EVENLY);
 
+  // Create style for buttons
+  lv_style_init(&style_button);
+
   // Create status bar object
   if (status_label) {
     lv_obj_del(status_label);
@@ -95,7 +98,7 @@ void main_screen() {
 
   // remove all styles from the container object
   lv_obj_remove_style_all(ui_container_main_screen);
-  lv_obj_clear_flag(ui_container_main_screen, LV_OBJ_FLAG_SCROLLABLE);
+  // lv_obj_clear_flag(ui_container_main_screen, LV_OBJ_FLAG_SCROLLABLE);
   lv_obj_add_style(ui_container_main_screen, &style_container_main_screen,
                    LV_PART_MAIN);
   lv_obj_set_style_pad_left(ui_container_main_screen, 0, LV_PART_MAIN);
@@ -113,42 +116,75 @@ void main_screen() {
   // Align container under status bar
   lv_obj_align_to(ui_container_main_screen, status_label,
                   LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+
   // create container for main screen buttons Line 1
   lv_obj_t *line1_buttons_container = lv_obj_create(ui_container_main_screen);
   // remove all styles from the container object
   lv_obj_remove_style_all(line1_buttons_container);
-
-  // Apply style to buttons line container 1
   lv_style_set_bg_color(&style_buttons_container, lv_color_hex(0xFF0000));
   lv_style_set_bg_opa(&style_buttons_container, LV_OPA_COVER);
+  lv_style_set_radius(&style_buttons_container, STATUS_BAR_HEIGHT_RADIUS);
   lv_obj_add_style(line1_buttons_container, &style_buttons_container,
                    LV_PART_MAIN);
   // use all space as width
   lv_obj_set_width(line1_buttons_container, LV_HOR_RES);
   // use all space as height
-  lv_obj_set_height(line1_buttons_container, lv_pct(100));
+  lv_obj_set_height(line1_buttons_container, LV_SIZE_CONTENT);
 
-  // create container for main screen buttons Line 2
-  lv_obj_t *line2_buttons_container = lv_obj_create(ui_container_main_screen);
-  // remove all styles from the container object
-  lv_obj_remove_style_all(line2_buttons_container);
-  lv_obj_add_style(line2_buttons_container, &style_buttons_container,
-                   LV_PART_MAIN);
-  // use all space as width
-  lv_obj_set_width(line2_buttons_container, LV_HOR_RES);
-  // use all space as height
-  lv_obj_set_height(line2_buttons_container, lv_pct(100));
+  // Add buttons to line 1
+  lv_obj_t *btn1 = lv_btn_create(line1_buttons_container);
+  lv_obj_t *label1 = lv_label_create(btn1);
+  lv_label_set_text(label1, "200\n200\n" LV_SYMBOL_BLUETOOTH);
+  lv_obj_set_align(label1, LV_ALIGN_CENTER);
+  lv_obj_set_style_text_align(label1, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+  lv_obj_t *btn2 = lv_btn_create(line1_buttons_container);
+  lv_obj_t *label2 = lv_label_create(btn2);
+  lv_label_set_text(label2, "60\n60\n" LV_SYMBOL_BLUETOOTH);
+  lv_obj_set_style_text_align(label2, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+  lv_obj_center(label2);
+  /*
+    // create container for main screen buttons Line 2
+    lv_obj_t *line2_buttons_container = lv_obj_create(ui_container_main_screen);
+    // remove all styles from the container object
+    lv_obj_remove_style_all(line2_buttons_container);
+    lv_obj_add_style(line2_buttons_container, &style_buttons_container,
+                     LV_PART_MAIN);
+    // use all space as width
+    lv_obj_set_width(line2_buttons_container, LV_HOR_RES);
+    // use all space as height
+    lv_obj_set_height(line2_buttons_container, lv_pct(100));
+  */
+  // Add buttons to line 2
+  /*lv_obj_t *btn1_2 = lv_btn_create(line2_buttons_container);
+  lv_obj_t *label1_2 = lv_label_create(btn1_2);
+  lv_label_set_text(label1_2, "200\n200\n" LV_SYMBOL_BLUETOOTH);
+  lv_obj_center(label1_2);
+  lv_obj_t *btn2_2 = lv_btn_create(line2_buttons_container);
+  lv_obj_t *label2_2 = lv_label_create(btn2_2);
+  lv_label_set_text(label2_2, "60\n60\n" LV_SYMBOL_BLUETOOTH);
+  lv_obj_center(label2_2);*/
+  /*
+    // create container for main screen buttons Line 3
+    lv_obj_t *line3_buttons_container = lv_obj_create(ui_container_main_screen);
+    // remove all styles from the container object
+    lv_obj_remove_style_all(line3_buttons_container);
+    lv_obj_add_style(line3_buttons_container, &style_buttons_container,
+                     LV_PART_MAIN);
+    // use all space as width
+    lv_obj_set_width(line3_buttons_container, LV_HOR_RES);
+    // use all space as height
+    lv_obj_set_height(line3_buttons_container, lv_pct(100));
+  */
+  // Add buttons to line 3
+  /*lv_obj_t *btn1_3 = lv_btn_create(line3_buttons_container);
+  lv_obj_t *label1_3 = lv_label_create(btn1_3);
+  lv_label_set_text(label1_3, LV_SYMBOL_SETTINGS);
+  lv_obj_center(label1_3);
+  lv_obj_t *btn2_3 = lv_btn_create(line3_buttons_container);
+  lv_obj_t *label2_3 = lv_label_create(btn2_3);
+  lv_label_set_text(label2_3, LV_SYMBOL_WIFI);
+  lv_obj_center(label2_3);*/
 
-  // create container for main screen buttons Line 3
-  lv_obj_t *line3_buttons_container = lv_obj_create(ui_container_main_screen);
-  // remove all styles from the container object
-  lv_obj_remove_style_all(line3_buttons_container);
-  lv_obj_add_style(line3_buttons_container, &style_buttons_container,
-                   LV_PART_MAIN);
-  // use all space as width
-  lv_obj_set_width(line1_buttons_container, LV_HOR_RES);
-  // use all space as height
-  lv_obj_set_height(line1_buttons_container, lv_pct(100));
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_main_screen);
@@ -184,7 +220,7 @@ void boot_screen() {
 void splash_screen() {
   // Create style for version text
   static lv_style_t style_version_text;
-  // Gey active screen
+  // Get active screen
   lv_obj_t *ui_Screen = lv_scr_act();
   // Create logo object
   lv_obj_t *logo = lv_img_create(ui_Screen);

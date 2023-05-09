@@ -1,10 +1,19 @@
 # #######################################
-# Select the target
+# Select the targeted hardware
 # #######################################
 OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R 2.8inches" OFF)
 OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" ON)
 OPTION(ESP32_ROTRICS_DEXARM35 "TFT TARGET is ESP32 Rotrics DexArm 3.5inches" OFF)
 OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-SRC-4832 3.5inches" OFF)
+
+# #######################################
+# Select the targeted firmware
+# #######################################
+OPTION(TARGET_FW_MARLIN "Marlin firmware" ON)
+OPTION(TARGET_FW_REPETIER "Repetier firmware" OFF)
+OPTION(TARGET_FW_SMOOTHIEWARE "Smoothieware firmware" OFF)
+OPTION(TARGET_FW_GRBL "GRBL firmware" OFF)
+
 
 # #######################################
 # Select the Options
@@ -31,6 +40,7 @@ OPTION(GCODE_HOST_SERVICE "GCode Streaming service" ON)
 cmake_minimum_required(VERSION 3.12.4)
 set(CMAKE_CXX_STANDARD 20)
 
+
 if(ESP32_2432S028R)
     set(SDKCONFIG hardware/ESP32_2432S028R/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32_2432S028R/components)
@@ -46,10 +56,27 @@ elseif(ESP32S3_ZX3D50CE02S_USRC_4832)
 else()
     message(FATAL_ERROR
         "\n"
-        "No target defined, please define a target in CMakeLists.txt"
+        "No hardware target defined, please define a target in CMakeLists.txt"
         "\n"
         "Now cmake will exit")
 endif()
+
+if(TARGET_FW_MARLIN)
+    #TODO
+elseif(TARGET_FW_REPETIER)
+    #TODO
+elseif(TARGET_FW_SMOOTHIEWARE)
+    #TODO
+elseif(TARGET_FW_GRBL)
+    #TODO
+else()
+    message(FATAL_ERROR
+        "\n"
+        "No firmware target defined, please define a target in CMakeLists.txt"
+        "\n"
+        "Now cmake will exit")
+endif()
+
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
