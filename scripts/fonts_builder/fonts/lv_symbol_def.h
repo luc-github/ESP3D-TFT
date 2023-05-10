@@ -26,9 +26,9 @@ extern "C" {
       61516,61639,61664,61671,63343,61942,61475,62172,
       61517,61931,61553,61563,61787,61724,62810,63426,
       61618,61559,61560,61523,61524,61728,63012,61867,
-      63587,62603,63275,61829,61573,62973,58552,62683,
-      58557,61442,62679,62156,61758,61842,58563,62099,
-      62087
+      63587,62603,63275,61829,61531,62973,58552,62683,
+      58557,61442,62679,62156,61758,61842,58563,62437,
+      62099,62087
 */
 
 /* These symbols can be prefined in the lv_conf.h file.
@@ -36,263 +36,267 @@ extern "C" {
 
 */
 #if !defined LV_SYMBOL_HEAT_BED
-#if define LV_SYMBOL_HEAT_BED           "\xEE\x95\xA8" /*58728, 0xE568*/
+#define LV_SYMBOL_HEAT_BED           "\xEE\x95\xA8" /*58728, 0xE568*/
 #endif
 
 #if !defined LV_SYMBOL_EXTRUDER
-#if define LV_SYMBOL_EXTRUDER           "\xEF\x8B\x89" /*62153, 0xF2C9*/
+#define LV_SYMBOL_EXTRUDER           "\xEF\x8B\x89" /*62153, 0xF2C9*/
 #endif
 
 #if !defined LV_SYMBOL_LIST
-#if define LV_SYMBOL_LIST           "\xEF\x83\x8A" /*61642, 0xF0CA*/
+#define LV_SYMBOL_LIST           "\xEF\x83\x8A" /*61642, 0xF0CA*/
 #endif
 
 #if !defined LV_SYMBOL_NETWORK
-#if define LV_SYMBOL_NETWORK           "\xEF\x9B\xBF" /*63231, 0xF6FF*/
+#define LV_SYMBOL_NETWORK           "\xEF\x9B\xBF" /*63231, 0xF6FF*/
 #endif
 
 #if !defined LV_SYMBOL_STATION_MODE
-#if define LV_SYMBOL_STATION_MODE           "\xEF\x80\x92" /*61458, 0xF012*/
+#define LV_SYMBOL_STATION_MODE           "\xEF\x80\x92" /*61458, 0xF012*/
 #endif
 
 #if !defined LV_SYMBOL_ACCESS_POINT
-#if define LV_SYMBOL_ACCESS_POINT           "\xEF\x94\x99" /*62745, 0xF519*/
+#define LV_SYMBOL_ACCESS_POINT           "\xEF\x94\x99" /*62745, 0xF519*/
 #endif
 
 #if !defined LV_SYMBOL_OK
-#if define LV_SYMBOL_OK           "\xEF\x80\x8C" /*61452, 0xF00C*/
+#define LV_SYMBOL_OK           "\xEF\x80\x8C" /*61452, 0xF00C*/
 #endif
 
 #if !defined LV_SYMBOL_PROBE_CHECK
-#if define LV_SYMBOL_PROBE_CHECK           "\xEE\x96\x96" /*58774, 0xE596*/
+#define LV_SYMBOL_PROBE_CHECK           "\xEE\x96\x96" /*58774, 0xE596*/
 #endif
 
 #if !defined LV_SYMBOL_CLOSE
-#if define LV_SYMBOL_CLOSE           "\xEF\x80\x8D" /*61453, 0xF00D*/
+#define LV_SYMBOL_CLOSE           "\xEF\x80\x8D" /*61453, 0xF00D*/
 #endif
 
 #if !defined LV_SYMBOL_POWER
-#if define LV_SYMBOL_POWER           "\xEF\x80\x91" /*61457, 0xF011*/
+#define LV_SYMBOL_POWER           "\xEF\x80\x91" /*61457, 0xF011*/
 #endif
 
 #if !defined LV_SYMBOL_VOLUME_HIGH
-#if define LV_SYMBOL_VOLUME_HIGH           "\xEF\x80\xA8" /*61480, 0xF028*/
+#define LV_SYMBOL_VOLUME_HIGH           "\xEF\x80\xA8" /*61480, 0xF028*/
 #endif
 
 #if !defined LV_SYMBOL_VOLUME_LOW
-#if define LV_SYMBOL_VOLUME_LOW           "\xEF\x80\xA7" /*61479, 0xF027*/
+#define LV_SYMBOL_VOLUME_LOW           "\xEF\x80\xA7" /*61479, 0xF027*/
 #endif
 
 #if !defined LV_SYMBOL_VOLUME_OFF
-#if define LV_SYMBOL_VOLUME_OFF           "\xEF\x9A\xA9" /*63145, 0xF6A9*/
+#define LV_SYMBOL_VOLUME_OFF           "\xEF\x9A\xA9" /*63145, 0xF6A9*/
 #endif
 
 #if !defined LV_SYMBOL_SETTINGS
-#if define LV_SYMBOL_SETTINGS           "\xEF\x80\x93" /*61459, 0xF013*/
+#define LV_SYMBOL_SETTINGS           "\xEF\x80\x93" /*61459, 0xF013*/
 #endif
 
 #if !defined LV_SYMBOL_SETTINGS_2
-#if define LV_SYMBOL_SETTINGS_2           "\xEF\x87\x9E" /*61918, 0xF1DE*/
+#define LV_SYMBOL_SETTINGS_2           "\xEF\x87\x9E" /*61918, 0xF1DE*/
 #endif
 
 #if !defined LV_SYMBOL_SETTINGS_3
-#if define LV_SYMBOL_SETTINGS_3           "\xEF\x9F\x99" /*63449, 0xF7D9*/
+#define LV_SYMBOL_SETTINGS_3           "\xEF\x9F\x99" /*63449, 0xF7D9*/
 #endif
 
 #if !defined LV_SYMBOL_TRASH
-#if define LV_SYMBOL_TRASH           "\xEF\x8B\xAD" /*62189, 0xF2ED*/
+#define LV_SYMBOL_TRASH           "\xEF\x8B\xAD" /*62189, 0xF2ED*/
 #endif
 
 #if !defined LV_SYMBOL_HOME
-#if define LV_SYMBOL_HOME           "\xEE\x8E\xAF" /*58287, 0xE3AF*/
+#define LV_SYMBOL_HOME           "\xEE\x8E\xAF" /*58287, 0xE3AF*/
 #endif
 
 #if !defined LV_SYMBOL_DOWNLOAD
-#if define LV_SYMBOL_DOWNLOAD           "\xEF\x80\x99" /*61465, 0xF019*/
+#define LV_SYMBOL_DOWNLOAD           "\xEF\x80\x99" /*61465, 0xF019*/
 #endif
 
 #if !defined LV_SYMBOL_REFRESH
-#if define LV_SYMBOL_REFRESH           "\xEF\x80\xA1" /*61473, 0xF021*/
+#define LV_SYMBOL_REFRESH           "\xEF\x80\xA1" /*61473, 0xF021*/
 #endif
 
 #if !defined LV_SYMBOL_EDIT
-#if define LV_SYMBOL_EDIT           "\xEF\x8C\x84" /*62212, 0xF304*/
+#define LV_SYMBOL_EDIT           "\xEF\x8C\x84" /*62212, 0xF304*/
 #endif
 
 #if !defined LV_SYMBOL_PREVIOUS
-#if define LV_SYMBOL_PREVIOUS           "\xEF\x81\x88" /*61512, 0xF048*/
+#define LV_SYMBOL_PREVIOUS           "\xEF\x81\x88" /*61512, 0xF048*/
 #endif
 
 #if !defined LV_SYMBOL_NEXT
-#if define LV_SYMBOL_NEXT           "\xEF\x81\x91" /*61521, 0xF051*/
+#define LV_SYMBOL_NEXT           "\xEF\x81\x91" /*61521, 0xF051*/
 #endif
 
 #if !defined LV_SYMBOL_PLAY
-#if define LV_SYMBOL_PLAY           "\xEF\x81\x8B" /*61515, 0xF04B*/
+#define LV_SYMBOL_PLAY           "\xEF\x81\x8B" /*61515, 0xF04B*/
 #endif
 
 #if !defined LV_SYMBOL_PAUSE
-#if define LV_SYMBOL_PAUSE           "\xEF\x81\x8C" /*61516, 0xF04C*/
+#define LV_SYMBOL_PAUSE           "\xEF\x81\x8C" /*61516, 0xF04C*/
 #endif
 
 #if !defined LV_SYMBOL_SAVE
-#if define LV_SYMBOL_SAVE           "\xEF\x83\x87" /*61639, 0xF0C7*/
+#define LV_SYMBOL_SAVE           "\xEF\x83\x87" /*61639, 0xF0C7*/
 #endif
 
 #if !defined LV_SYMBOL_MESSAGE
-#if define LV_SYMBOL_MESSAGE           "\xEF\x83\xA0" /*61664, 0xF0E0*/
+#define LV_SYMBOL_MESSAGE           "\xEF\x83\xA0" /*61664, 0xF0E0*/
 #endif
 
 #if !defined LV_SYMBOL_LASER
-#if define LV_SYMBOL_LASER           "\xEF\x83\xA7" /*61671, 0xF0E7*/
+#define LV_SYMBOL_LASER           "\xEF\x83\xA7" /*61671, 0xF0E7*/
 #endif
 
 #if !defined LV_SYMBOL_VACCUM
-#if define LV_SYMBOL_VACCUM           "\xEF\x9D\xAF" /*63343, 0xF76F*/
+#define LV_SYMBOL_VACCUM           "\xEF\x9D\xAF" /*63343, 0xF76F*/
 #endif
 
 #if !defined LV_SYMBOL_DISABLE_ALERT
-#if define LV_SYMBOL_DISABLE_ALERT           "\xEF\x87\xB6" /*61942, 0xF1F6*/
+#define LV_SYMBOL_DISABLE_ALERT           "\xEF\x87\xB6" /*61942, 0xF1F6*/
 #endif
 
 #if !defined LV_SYMBOL_LOCK
-#if define LV_SYMBOL_LOCK           "\xEF\x80\xA3" /*61475, 0xF023*/
+#define LV_SYMBOL_LOCK           "\xEF\x80\xA3" /*61475, 0xF023*/
 #endif
 
 #if !defined LV_SYMBOL_COOLANT
-#if define LV_SYMBOL_COOLANT           "\xEF\x8B\x9C" /*62172, 0xF2DC*/
+#define LV_SYMBOL_COOLANT           "\xEF\x8B\x9C" /*62172, 0xF2DC*/
 #endif
 
 #if !defined LV_SYMBOL_STOP
-#if define LV_SYMBOL_STOP           "\xEF\x81\x8D" /*61517, 0xF04D*/
+#define LV_SYMBOL_STOP           "\xEF\x81\x8D" /*61517, 0xF04D*/
 #endif
 
 #if !defined LV_SYMBOL_WIFI
-#if define LV_SYMBOL_WIFI           "\xEF\x87\xAB" /*61931, 0xF1EB*/
+#define LV_SYMBOL_WIFI           "\xEF\x87\xAB" /*61931, 0xF1EB*/
 #endif
 
 #if !defined LV_SYMBOL_WARNING
-#if define LV_SYMBOL_WARNING           "\xEF\x81\xB1" /*61553, 0xF071*/
+#define LV_SYMBOL_WARNING           "\xEF\x81\xB1" /*61553, 0xF071*/
 #endif
 
 #if !defined LV_SYMBOL_FOLDER
-#if define LV_SYMBOL_FOLDER           "\xEF\x81\xBB" /*61563, 0xF07B*/
+#define LV_SYMBOL_FOLDER           "\xEF\x81\xBB" /*61563, 0xF07B*/
 #endif
 
 #if !defined LV_SYMBOL_FILE
-#if define LV_SYMBOL_FILE           "\xEF\x85\x9B" /*61787, 0xF15B*/
+#define LV_SYMBOL_FILE           "\xEF\x85\x9B" /*61787, 0xF15B*/
 #endif
 
 #if !defined LV_SYMBOL_KEYBOARD
-#if define LV_SYMBOL_KEYBOARD           "\xEF\x84\x9C" /*61724, 0xF11C*/
+#define LV_SYMBOL_KEYBOARD           "\xEF\x84\x9C" /*61724, 0xF11C*/
 #endif
 
 #if !defined LV_SYMBOL_BACKSPACE
-#if define LV_SYMBOL_BACKSPACE           "\xEF\x95\x9A" /*62810, 0xF55A*/
+#define LV_SYMBOL_BACKSPACE           "\xEF\x95\x9A" /*62810, 0xF55A*/
 #endif
 
 #if !defined LV_SYMBOL_SD_CARD
-#if define LV_SYMBOL_SD_CARD           "\xEF\x9F\x82" /*63426, 0xF7C2*/
+#define LV_SYMBOL_SD_CARD           "\xEF\x9F\x82" /*63426, 0xF7C2*/
 #endif
 
 #if !defined LV_SYMBOL_JOG
-#if define LV_SYMBOL_JOG           "\xEF\x82\xB2" /*61618, 0xF0B2*/
+#define LV_SYMBOL_JOG           "\xEF\x82\xB2" /*61618, 0xF0B2*/
 #endif
 
 #if !defined LV_SYMBOL_UP
-#if define LV_SYMBOL_UP           "\xEF\x81\xB7" /*61559, 0xF077*/
+#define LV_SYMBOL_UP           "\xEF\x81\xB7" /*61559, 0xF077*/
 #endif
 
 #if !defined LV_SYMBOL_DOWN
-#if define LV_SYMBOL_DOWN           "\xEF\x81\xB8" /*61560, 0xF078*/
+#define LV_SYMBOL_DOWN           "\xEF\x81\xB8" /*61560, 0xF078*/
 #endif
 
 #if !defined LV_SYMBOL_LEFT
-#if define LV_SYMBOL_LEFT           "\xEF\x81\x93" /*61523, 0xF053*/
+#define LV_SYMBOL_LEFT           "\xEF\x81\x93" /*61523, 0xF053*/
 #endif
 
 #if !defined LV_SYMBOL_RIGHT
-#if define LV_SYMBOL_RIGHT           "\xEF\x81\x94" /*61524, 0xF054*/
+#define LV_SYMBOL_RIGHT           "\xEF\x81\x94" /*61524, 0xF054*/
 #endif
 
 #if !defined LV_SYMBOL_COMMAND
-#if define LV_SYMBOL_COMMAND           "\xEF\x84\xA0" /*61728, 0xF120*/
+#define LV_SYMBOL_COMMAND           "\xEF\x84\xA0" /*61728, 0xF120*/
 #endif
 
 #if !defined LV_SYMBOL_GAUGE
-#if define LV_SYMBOL_GAUGE           "\xEF\x98\xA4" /*63012, 0xF624*/
+#define LV_SYMBOL_GAUGE           "\xEF\x98\xA4" /*63012, 0xF624*/
 #endif
 
 #if !defined LV_SYMBOL_LANGUAGE
-#if define LV_SYMBOL_LANGUAGE           "\xEF\x86\xAB" /*61867, 0xF1AB*/
+#define LV_SYMBOL_LANGUAGE           "\xEF\x86\xAB" /*61867, 0xF1AB*/
 #endif
 
 #if !defined LV_SYMBOL_FAN
-#if define LV_SYMBOL_FAN           "\xEF\xA1\xA3" /*63587, 0xF863*/
+#define LV_SYMBOL_FAN           "\xEF\xA1\xA3" /*63587, 0xF863*/
 #endif
 
 #if !defined LV_SYMBOL_SPEED_
-#if define LV_SYMBOL_SPEED_           "\xEF\x92\x8B" /*62603, 0xF48B*/
+#define LV_SYMBOL_SPEED_           "\xEF\x92\x8B" /*62603, 0xF48B*/
 #endif
 
 #if !defined LV_SYMBOL_WIZARD
-#if define LV_SYMBOL_WIZARD           "\xEF\x9C\xAB" /*63275, 0xF72B*/
+#define LV_SYMBOL_WIZARD           "\xEF\x9C\xAB" /*63275, 0xF72B*/
 #endif
 
 #if !defined LV_SYMBOL_LIGHT
-#if define LV_SYMBOL_LIGHT           "\xEF\x86\x85" /*61829, 0xF185*/
+#define LV_SYMBOL_LIGHT           "\xEF\x86\x85" /*61829, 0xF185*/
 #endif
 
 #if !defined LV_SYMBOL_CENTER
-#if define LV_SYMBOL_CENTER           "\xEF\x82\x85" /*61573, 0xF085*/
+#define LV_SYMBOL_CENTER           "\xEF\x81\x9B" /*61531, 0xF05B*/
 #endif
 
 #if !defined LV_SYMBOL_LAYERS
-#if define LV_SYMBOL_LAYERS           "\xEF\x97\xBD" /*62973, 0xF5FD*/
+#define LV_SYMBOL_LAYERS           "\xEF\x97\xBD" /*62973, 0xF5FD*/
 #endif
 
 #if !defined LV_SYMBOL_LEVELING
-#if define LV_SYMBOL_LEVELING           "\xEE\x92\xB8" /*58552, 0xE4B8*/
+#define LV_SYMBOL_LEVELING           "\xEE\x92\xB8" /*58552, 0xE4B8*/
 #endif
 
 #if !defined LV_SYMBOL_FILAMENT
-#if define LV_SYMBOL_FILAMENT           "\xEF\x93\x9B" /*62683, 0xF4DB*/
+#define LV_SYMBOL_FILAMENT           "\xEF\x93\x9B" /*62683, 0xF4DB*/
 #endif
 
-#if !defined LV_SYMBOL_CENTER
-#if define LV_SYMBOL_CENTER           "\xEE\x92\xBD" /*58557, 0xE4BD*/
+#if !defined LV_SYMBOL_CENTER2
+#define LV_SYMBOL_CENTER2           "\xEE\x92\xBD" /*58557, 0xE4BD*/
 #endif
 
 #if !defined LV_SYMBOL_SEARCH
-#if define LV_SYMBOL_SEARCH           "\xEF\x80\x82" /*61442, 0xF002*/
+#define LV_SYMBOL_SEARCH           "\xEF\x80\x82" /*61442, 0xF002*/
 #endif
 
 #if !defined LV_SYMBOL_FILAMENT_SENSOR
-#if define LV_SYMBOL_FILAMENT_SENSOR           "\xEF\x93\x97" /*62679, 0xF4D7*/
+#define LV_SYMBOL_FILAMENT_SENSOR           "\xEF\x93\x97" /*62679, 0xF4D7*/
 #endif
 
 #if !defined LV_SYMBOL_MIST
-#if define LV_SYMBOL_MIST           "\xEF\x8B\x8C" /*62156, 0xF2CC*/
+#define LV_SYMBOL_MIST           "\xEF\x8B\x8C" /*62156, 0xF2CC*/
 #endif
 
 #if !defined LV_SYMBOL_UNLOCK
-#if define LV_SYMBOL_UNLOCK           "\xEF\x84\xBE" /*61758, 0xF13E*/
+#define LV_SYMBOL_UNLOCK           "\xEF\x84\xBE" /*61758, 0xF13E*/
 #endif
 
 #if !defined LV_SYMBOL_LASER_2
-#if define LV_SYMBOL_LASER_2           "\xEF\x86\x92" /*61842, 0xF192*/
+#define LV_SYMBOL_LASER_2           "\xEF\x86\x92" /*61842, 0xF192*/
 #endif
 
 #if !defined LV_SYMBOL_MILLING
-#if define LV_SYMBOL_MILLING           "\xEE\x93\x83" /*58563, 0xE4C3*/
+#define LV_SYMBOL_MILLING           "\xEE\x93\x83" /*58563, 0xE4C3*/
+#endif
+
+#if !defined LV_SYMBOL_NEW_LINE
+#define LV_SYMBOL_NEW_LINE           "\xEF\x8F\xA5" /*62437, 0xF3E5*/
 #endif
 
 #if !defined LV_SYMBOL_BLUETOOTH
-#if define LV_SYMBOL_BLUETOOTH           "\xEF\x8A\x93" /*62099, 0xF293*/
+#define LV_SYMBOL_BLUETOOTH           "\xEF\x8A\x93" /*62099, 0xF293*/
 #endif
 
 #if !defined LV_SYMBOL_USB
-#if define LV_SYMBOL_USB           "\xEF\x8A\x87" /*62087, 0xF287*/
+#define LV_SYMBOL_USB           "\xEF\x8A\x87" /*62087, 0xF287*/
 #endif
 
 #if !defined LV_SYMBOL_DUMMY
@@ -300,8 +304,8 @@ extern "C" {
 #define LV_SYMBOL_DUMMY           "\xEF\xA3\xBF"
 #endif
 
-/*
-enum {    _LV_STR_SYMBOL_HEAT_BED,
+enum {
+    _LV_STR_SYMBOL_HEAT_BED,
     _LV_STR_SYMBOL_EXTRUDER,
     _LV_STR_SYMBOL_LIST,
     _LV_STR_SYMBOL_NETWORK,
@@ -357,13 +361,14 @@ enum {    _LV_STR_SYMBOL_HEAT_BED,
     _LV_STR_SYMBOL_LAYERS,
     _LV_STR_SYMBOL_LEVELING,
     _LV_STR_SYMBOL_FILAMENT,
-    _LV_STR_SYMBOL_CENTER,
+    _LV_STR_SYMBOL_CENTER2,
     _LV_STR_SYMBOL_SEARCH,
     _LV_STR_SYMBOL_FILAMENT_SENSOR,
     _LV_STR_SYMBOL_MIST,
     _LV_STR_SYMBOL_UNLOCK,
     _LV_STR_SYMBOL_LASER_2,
     _LV_STR_SYMBOL_MILLING,
+    _LV_STR_SYMBOL_NEW_LINE,
     _LV_STR_SYMBOL_BLUETOOTH,
     _LV_STR_SYMBOL_USB,
     _LV_STR_SYMBOL_DUMMY,

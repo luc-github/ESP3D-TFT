@@ -88,7 +88,7 @@ void main_screen() {
     status_label = NULL;
   }
   status_label = lv_label_create(ui_main_screen);
-  lv_label_set_text(status_label, "ESP3D-TFT" ESP3D_TFT_VERSION);
+  lv_label_set_text(status_label, "ESP3D-TFT " ESP3D_TFT_VERSION);
   lv_obj_set_width(status_label, LV_HOR_RES);
   lv_label_set_long_mode(status_label, LV_LABEL_LONG_SCROLL_CIRCULAR);
   // Apply style to status bar
@@ -134,12 +134,12 @@ void main_screen() {
   // Add buttons to line 1
   lv_obj_t *btn1 = lv_btn_create(line1_buttons_container);
   lv_obj_t *label1 = lv_label_create(btn1);
-  lv_label_set_text(label1, "200\n200\n" LV_SYMBOL_BLUETOOTH);
+  lv_label_set_text(label1, "200\n200\n" LV_SYMBOL_WIZARD);
   lv_obj_set_align(label1, LV_ALIGN_CENTER);
   lv_obj_set_style_text_align(label1, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
   lv_obj_t *btn2 = lv_btn_create(line1_buttons_container);
   lv_obj_t *label2 = lv_label_create(btn2);
-  lv_label_set_text(label2, "60\n60\n" LV_SYMBOL_BLUETOOTH);
+  lv_label_set_text(label2, "60\n60\n" LV_SYMBOL_LANGUAGE);
   lv_obj_set_style_text_align(label2, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
   lv_obj_center(label2);
   /*

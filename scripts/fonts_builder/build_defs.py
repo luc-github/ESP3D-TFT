@@ -55,17 +55,18 @@ symbols_array = [
 [0xf48b,'SPEED_'],
 [0xf72b,'WIZARD'],
 [0xf185,'LIGHT'],
-[0xf085,'CENTER'],
+[0xf05b,'CENTER'],
 [0xf5fd,'LAYERS'],
 [0xe4b8,'LEVELING'],
 [0xf4db,'FILAMENT'],
-[0xe4bd,'CENTER'],
+[0xe4bd,'CENTER2'],
 [0xf002,'SEARCH'],
 [0xf4d7,'FILAMENT_SENSOR'],
 [0xf2cc,'MIST'],
 [0xf13e,'UNLOCK'],
 [0xf192,'LASER_2'],
 [0xe4c3,'MILLING'],
+[0xf3e5,'NEW_LINE'],
 [0xf293,'BLUETOOTH'],
 [0xf287,'USB']
 ]
@@ -105,8 +106,7 @@ enum_file_part1 = "#if !defined LV_SYMBOL_DUMMY\n" \
 "#define LV_SYMBOL_DUMMY           \"\\xEF\\xA3\\xBF\"\n" \
 "#endif\n" \
 "\n" \
-"/*\n" \
-"enum {"
+"enum {\n"
 
 enum_file_part2="    _LV_STR_SYMBOL_DUMMY,\n};\n"
 
@@ -141,7 +141,7 @@ f.write(header_file2)
 for item in symbols_array:
   c = chr(item[0])
   f.write("#if !defined LV_SYMBOL_"+ item[1] + "\n")
-  f.write("#if define LV_SYMBOL_"+ item[1] + "           \"")
+  f.write("#define LV_SYMBOL_"+ item[1] + "           \"")
   s =str(c.encode('utf8')).upper().replace("X","x")
   s = s.replace("B'\\","\\").replace("'","")
   f.write(s)
@@ -160,5 +160,5 @@ f.write(footer_file)
 f.close()
 
 #open and read the file after the overwriting:
-f = open("lv_symbol_def.h", "r")
+f = open(output_file, "r")
 print(f.read())
