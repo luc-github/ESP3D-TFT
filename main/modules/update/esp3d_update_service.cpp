@@ -40,7 +40,7 @@
 #include "notifications/esp3d_notifications_service.h"
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 
-#include "esp3d_config_file.h"
+#include "config_file/esp3d_config_file.h"
 
 #define CONFIG_FILE "/esp3dcnf.ini"
 #define CONFIG_FILE_OK "/esp3dcnf.ok"
@@ -377,12 +377,12 @@ bool ESP3DUpdateService::begin() {
 
 bool ESP3DUpdateService::updateConfig() {
   bool res = false;
-  ESP3DConfigFile updateConfig(CONFIG_FILE,
-                               esp3dUpdateService.processingFileFunction,
-                               CONFIG_FILE_OK, protectedkeys);
-  if (updateConfig.processFile()) {
+  ESP3DConfigFile updateConfiguration(CONFIG_FILE,
+                                      esp3dUpdateService.processingFileFunction,
+                                      CONFIG_FILE_OK, protectedkeys);
+  if (updateConfiguration.processFile()) {
     esp3d_log("Processing ini file done");
-    if (updateConfig.revokeFile()) {
+    if (updateConfiguration.revokeFile()) {
       esp3d_log("Revoking ini file done");
       res = true;
     } else {

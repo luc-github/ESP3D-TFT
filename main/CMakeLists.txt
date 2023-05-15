@@ -8,6 +8,7 @@ set(SOURCES .
     modules/filesystem
     modules/filesystem/flash
     modules/usb_serial
+    modules/config_file
 )
 
 if(WIFI_SERVICE)
