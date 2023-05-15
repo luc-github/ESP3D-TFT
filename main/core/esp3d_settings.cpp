@@ -187,6 +187,8 @@ bool ESP3DSettings::isValidStringSetting(const char* value,
           (len >= 8 &&
            len <= SIZE_OF_SETTING_SSID_PWD));  // any string from 8 to 64 or 0
 #endif                                         // ESP3D_WIFI_FEATURE
+    case ESP3DSettingIndex::esp3d_ui_language:
+      return len <= SIZE_OF_UI_LANGUAGE;
     case ESP3DSettingIndex::esp3d_hostname:
       esp3d_log("Checking hostname validity");
       return std::regex_match(
