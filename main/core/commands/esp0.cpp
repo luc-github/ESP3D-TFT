@@ -87,6 +87,7 @@ const char* help[] = {
 #if ESP3D_MDNS_FEATURE
     "[ESP450]display ESP3D list on network",
 #endif  // #if ESP3D_MDNS_FEATURE
+    "[ESP450](language code) - display/set UI language code",
 #if ESP3D_AUTHENTICATION_FEATURE
     "[ESP500] - set get connection status",
     "[ESP510](timeout) - display/set session timeout",

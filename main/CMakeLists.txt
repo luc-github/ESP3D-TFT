@@ -9,6 +9,7 @@ set(SOURCES .
     modules/filesystem/flash
     modules/usb_serial
     modules/config_file
+    modules/translations
 )
 
 if(WIFI_SERVICE)

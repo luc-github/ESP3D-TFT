@@ -29,6 +29,7 @@ extern "C" {
 #define SIZE_OF_SETTING_SSID_ID 32
 #define SIZE_OF_SETTING_SSID_PWD 64
 #define SIZE_OF_SETTING_HOSTNAME 32
+#define SIZE_OF_UI_LANGUAGE 7
 #if ESP3D_NOTIFICATIONS_FEATURE
 #define SIZE_OF_SETTING_NOFIFICATION_T1 64
 #define SIZE_OF_SETTING_NOFIFICATION_T2 64
@@ -75,6 +76,7 @@ enum class ESP3DSettingIndex : uint16_t {
   esp3d_admin_password,
   esp3d_user_password,
   esp3d_session_timeout,
+  esp3d_ui_language,
   unknown_index
 };
 

@@ -21,10 +21,7 @@
 
 #include "esp3d_log.h"
 #include "esp3d_string.h"
-
-#if ESP3D_SD_CARD_FEATURE
-#include "filesystem/esp3d_sd.h"
-#endif  // ESP3D_SD_CARD_FEATURE
+#include "filesystem/esp3d_globalfs.h"
 
 #define LINE_MAX_SIZE 255
 #define SECTION_MAX_SIZE 10
@@ -43,13 +40,12 @@ ESP3DConfigFile::ESP3DConfigFile(const char* path, processingFunction_t fn,
 }
 
 bool ESP3DConfigFile::processFile() {
-#if ESP3D_SD_CARD_FEATURE
   bool res = true;
   if (!_filename.length()) {
     esp3d_log_e("No filename provided");
     return false;
   }
-  FILE* rFile = sd.open(_filename.c_str(), "r");
+  FILE* rFile = globalFs.open(_filename.c_str(), "r");
   if (rFile) {
     bool processing = true;
     char line[LINE_MAX_SIZE + 1];
@@ -97,10 +93,10 @@ bool ESP3DConfigFile::processFile() {
       }
 
     } while (readCount > 0);
-    sd.close(rFile);
+    globalFs.close(rFile, _filename.c_str());
     return res;
   }
-#endif  // ESP3D_SD_CARD_FEATURE
+
   esp3d_log_e("Cannot open ini file");
   return false;
 }
@@ -203,25 +199,24 @@ bool ESP3DConfigFile::revokeFile() {
     esp3d_log_e("No scrambled filename provided");
     return false;
   }
-#if ESP3D_SD_CARD_FEATURE
   // if CONFIG_FILE_OK already exists,  rename it to CONFIG_FILE_OKXX
-  if (sd.exists(_scrambledFilename.c_str())) {
+  if (globalFs.exists(_scrambledFilename.c_str())) {
     std::string filename = _scrambledFilename;
     uint8_t n = 1;
     // find proper name
-    while (sd.exists(filename.c_str())) {
+    while (globalFs.exists(filename.c_str())) {
       filename = _scrambledFilename + std::to_string(n++);
     }
     // rename CONFIG_FILE_OK to CONFIG_FILE_OKXX
-    if (!sd.rename(_scrambledFilename.c_str(), filename.c_str())) {
+    if (!globalFs.rename(_scrambledFilename.c_str(), filename.c_str())) {
       esp3d_log_e("Failed to rename %s", _scrambledFilename.c_str());
       // to avoid dead loop
       return false;
     }
   }
 
-  FILE* wFile = sd.open(_scrambledFilename.c_str(), "w");
-  FILE* rFile = sd.open(_filename.c_str(), "r");
+  FILE* wFile = globalFs.open(_scrambledFilename.c_str(), "w");
+  FILE* rFile = globalFs.open(_filename.c_str(), "r");
   if (wFile && rFile) {
     char line[LINE_MAX_SIZE + 1];
     uint8_t pos = 0;
@@ -254,14 +249,14 @@ bool ESP3DConfigFile::revokeFile() {
             }
             if (fwrite(stmp, strlen(stmp), 1, wFile) != 1) {
               esp3d_log_e("Error cannot writing data on flash filesystem");
-              sd.close(wFile);
-              sd.close(rFile);
+              globalFs.close(wFile, _scrambledFilename.c_str());
+              globalFs.close(rFile, _filename.c_str());
               return false;
             }
             if (fwrite("\r\n", 2, 1, wFile) != 1) {
               esp3d_log_e("Error cannot writing data on flash filesystem");
-              sd.close(wFile);
-              sd.close(rFile);
+              globalFs.close(wFile, _scrambledFilename.c_str());
+              globalFs.close(rFile, _filename.c_str());
               return false;
             }
           }
@@ -270,17 +265,16 @@ bool ESP3DConfigFile::revokeFile() {
         }
       }
     } while (readCount > 0);
-    sd.close(wFile);
-    sd.close(rFile);
-    if (!sd.remove(_filename.c_str())) {
+    globalFs.close(wFile, _scrambledFilename.c_str());
+    globalFs.close(rFile, _filename.c_str());
+    if (!globalFs.remove(_filename.c_str())) {
       esp3d_log_e("Failed to remove %s", _filename.c_str());
       return false;
     }
     return true;
   }
-  sd.close(wFile);
-  sd.close(rFile);
-#endif  // ESP3D_SD_CARD_FEATURE
+  globalFs.close(wFile, _scrambledFilename.c_str());
+  globalFs.close(rFile, _filename.c_str());
   esp3d_log_e("Cannot open / create revoked file");
   return false;
 }

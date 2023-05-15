@@ -119,7 +119,7 @@ class ESP3DCommands {
 #if ESP3D_MDNS_FEATURE
   void ESP450(int cmd_params_pos, ESP3DMessage* msg);
 #endif  // ESP3D_MDNS_FEATURE
-
+  void ESP460(int cmd_params_pos, ESP3DMessage* msg);
 #if ESP3D_AUTHENTICATION_FEATURE
   void ESP500(int cmd_params_pos, ESP3DMessage* msg);
   void ESP510(int cmd_params_pos, ESP3DMessage* msg);

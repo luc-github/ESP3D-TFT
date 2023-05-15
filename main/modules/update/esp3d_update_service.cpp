@@ -1,5 +1,5 @@
 /*
-  esp3d_network
+  esp3d_update_service
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
   This code is free software; you can redistribute it and/or
@@ -377,9 +377,9 @@ bool ESP3DUpdateService::begin() {
 
 bool ESP3DUpdateService::updateConfig() {
   bool res = false;
-  ESP3DConfigFile updateConfiguration(CONFIG_FILE,
-                                      esp3dUpdateService.processingFileFunction,
-                                      CONFIG_FILE_OK, protectedkeys);
+  ESP3DConfigFile updateConfiguration(
+      ESP3D_SD_FS_HEADER CONFIG_FILE, esp3dUpdateService.processingFileFunction,
+      ESP3D_SD_FS_HEADER CONFIG_FILE_OK, protectedkeys);
   if (updateConfiguration.processFile()) {
     esp3d_log("Processing ini file done");
     if (updateConfiguration.revokeFile()) {

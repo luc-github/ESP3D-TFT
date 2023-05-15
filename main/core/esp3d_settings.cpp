@@ -74,6 +74,9 @@ const ESP3DSettingDescription ESP3DSettingsData[] = {
      SIZE_OF_SETTING_VERSION, "Invalid data"},  // Version
     {ESP3DSettingIndex::esp3d_baud_rate, ESP3DSettingType::integer_t, 4,
      ESP3D_SERIAL_BAUDRATE},  // BaudRate
+    {ESP3DSettingIndex::esp3d_ui_language, ESP3DSettingType::string_t,
+     SIZE_OF_UI_LANGUAGE, "en"},  // Version
+
 #if ESP3D_USB_SERIAL_FEATURE
     {ESP3DSettingIndex::esp3d_usb_serial_baud_rate, ESP3DSettingType::integer_t,
      4, ESP3D_USB_SERIAL_BAUDRATE},  // BaudRate
