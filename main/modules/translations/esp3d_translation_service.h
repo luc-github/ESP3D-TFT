@@ -30,7 +30,12 @@
 extern "C" {
 #endif
 
-enum class ESP3DLabel : uint16_t { version = 0, update, unknown_index };
+enum class ESP3DLabel : uint16_t {
+  language = 0,
+  update,
+  version,
+  unknown_index
+};
 
 class ESP3DTranslationService final {
  public:
@@ -39,10 +44,11 @@ class ESP3DTranslationService final {
   bool begin();
   bool update(const char *language);
   void handle();
-  char *translate(const char *text);
+  const char *translate(ESP3DLabel label, ...);
   void end();
   static bool processingFileFunction(const char *section, const char *key,
                                      const char *value);
+  bool updateTranslation(const char *text, ESP3DLabel label);
 
  private:
   std::map<ESP3DLabel, std::string> _translations;

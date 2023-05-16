@@ -21,16 +21,20 @@
 
 #include <cstdlib>
 #include <map>
+#include <ranges>
 
 #include "config_file/esp3d_config_file.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "filesystem/esp3d_flash.h"
 
-#define LANGUAGE_PACK "/lang_XX.lng"
-#define DEFAULT_LANGUAGE "en"
-#define DEFAULT_LANGUAGE_PACK "/lang_en.lng"
-#define LANGUAGE_SECION "language"
+#define LANGUAGE_PACK_HEAD "ui_"
+#define LANGUAGE_PACK_TAIL ".lng"
+#define DEFAULT_LANGUAGE "default"
+#define DEFAULT_LANGUAGE_PACK \
+  LANGUAGE_PACK_HEAD DEFAULT_LANGUAGE LANGUAGE_PACK_TAIL
+#define LANGUAGE_SECION "translations"
+#define INFO_SECION "info"
 
 #define CHUNK_BUFFER_SIZE 1024
 
@@ -42,63 +46,139 @@ ESP3DTranslationService::~ESP3DTranslationService() {}
 
 bool ESP3DTranslationService::begin() {
   esp3d_log("Starting Translation Service");
-  _translations = {{ESP3DLabel::version, "Version"},
-                   {ESP3DLabel::update, "Update"}};
-  // std::map<ESP3DLabel, std::string>::iterator it;
-  /*
-  auto it = _translations.find(ESP3DLabel::version);
-  if (it != _translations.end()) {
-    std::string version = it->second;
-  }*/
-  /*
-   for(auto x: _translations)
-   {
-      cout << x.first << "->" <<
-              x.second <<endl;
-   }
-  */
-  std::string filename = ESP3D_FLASH_FS_HEADER;
-  filename += DEFAULT_LANGUAGE_PACK;
+  _translations.clear();
+  _translations = {{ESP3DLabel::language, "English"},
+                   {ESP3DLabel::update, "Update"},
+                   {ESP3DLabel::version, "Version"}};
+
+  std::string filename = DEFAULT_LANGUAGE_PACK;
   // TODO read setting language value
+  const ESP3DSettingDescription *settingPtr =
+      esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_ui_language);
+  if (settingPtr) {
+    char out_str[(settingPtr->size) + 1] = {0};
+    std::string language = esp3dTftsettings.readString(
+        ESP3DSettingIndex::esp3d_ui_language, out_str, settingPtr->size);
+    filename = LANGUAGE_PACK_HEAD;
+    filename += language;
+    filename += LANGUAGE_PACK_TAIL;
+  }
+  std::string language;
+  if (filename == DEFAULT_LANGUAGE_PACK) {
+    esp3d_log("Using default language pack: %s",
+              translate(ESP3DLabel::language, 123));
+    return true;
+  }
+  esp3d_log("Using language pack: %s over %s", filename.c_str(),
+            DEFAULT_LANGUAGE_PACK);
   if (flashFs.accessFS()) {
     if (flashFs.exists(filename.c_str())) {
-      return true;
+      filename = ESP3D_FLASH_FS_HEADER + filename;
+      ESP3DConfigFile updateTranslations(
+          filename.c_str(), esp3dTranslationService.processingFileFunction);
+      if (updateTranslations.processFile()) {
+        esp3d_log("Processing language pack, done: %s",
+                  translate(ESP3DLabel::language, 123));
+        return true;
+      } else {
+        esp3d_log_e("Processing language pack, failed");
+      }
+
+    } else {
+      esp3d_log_e("Cannot find the language file: %s", filename.c_str());
     }
+  } else {
+    esp3d_log_e("Cannot access local fs");
   }
   return false;
 }
 
 bool ESP3DTranslationService::update(const char *language) { return begin(); }
-void ESP3DTranslationService::handle() {}
-char *ESP3DTranslationService::translate(const char *text) { return nullptr; }
 
-/*bool ESP3DTranslationService::updateConfig() {
-  bool res = false;
-  ESP3DConfigFile updateConfiguration(CONFIG_FILE,
-                                      esp3dUpdateService.processingFileFunction,
-                                      CONFIG_FILE_OK, protectedkeys);
-  if (updateConfiguration.processFile()) {
-    esp3d_log("Processing ini file done");
-    if (updateConfiguration.revokeFile()) {
-      esp3d_log("Revoking ini file done");
-      res = true;
-    } else {
-      esp3d_log_e("Revoking ini file failed");
+void ESP3DTranslationService::handle() {}
+
+const char *ESP3DTranslationService::translate(ESP3DLabel label, ...) {
+  static std::string responseString;
+  responseString.clear();
+  auto it = _translations.find(label);
+  if (it != _translations.end()) {
+    esp3d_log("Key index: %d is found in translation and text is %s",
+              static_cast<uint16_t>(label), it->second.c_str());
+    char localBuffer[64] = {0};
+    char *buffer = localBuffer;
+    va_list args;
+    va_list copy;
+    // Disable warning for va_start
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvarargs"
+    va_start(args, (char *)(it->second.c_str()));
+#pragma GCC diagnostic pop
+    va_copy(copy, args);
+    size_t len = vsnprintf(NULL, 0, it->second.c_str(), args);
+    va_end(copy);
+    if (len >= sizeof(localBuffer)) {
+      buffer = (char *)malloc(sizeof(char) * (len + 1));
+      if (buffer == nullptr) {
+        esp3d_log_e("Cannot allocate memory for translation");
+        return nullptr;
+      }
     }
-  } else {
-    esp3d_log_e("Processing ini file failed");
+    len = vsnprintf(buffer, len + 1, it->second.c_str(), args);
+    responseString = buffer;
+    va_end(args);
+    if (buffer != localBuffer) {
+      free(buffer);
+    }
+    return responseString.c_str();
   }
-  return res;
-}*/
+
+  return nullptr;
+}
 
 void ESP3DTranslationService::end() { esp3d_log("Stop Translation Service"); }
+
+bool ESP3DTranslationService::updateTranslation(const char *text,
+                                                ESP3DLabel label) {
+  auto it = _translations.find(static_cast<ESP3DLabel>(label));
+  if (it != _translations.end()) {
+    esp3d_log("Key index: %d is found in translation and updated to %s",
+              static_cast<uint16_t>(label), text);
+    it->second = text;
+
+    return true;
+  } else {
+    esp3d_log_e("Key index: %d is not found in translation",
+                static_cast<uint16_t>(label));
+    return false;
+  }
+}
 
 bool ESP3DTranslationService::processingFileFunction(const char *section,
                                                      const char *key,
                                                      const char *value) {
-  esp3d_log("Processing Section: %s, Key: %s, Value: %s", section, key, value);
   if (strcasecmp(section, LANGUAGE_SECION) == 0) {
     // TODO Update reference language array
+    esp3d_log("Processing Section: %s, Key: %s, Value: %s", section, key,
+              value);
+    if (strlen(value) >= 3) {
+      uint16_t keyIndex = atoi(&key[2]);
+      if (keyIndex >= static_cast<uint16_t>(ESP3DLabel::unknown_index)) {
+        esp3d_log_e("Key index: %d is invalid", keyIndex);
+        return false;
+      }
+      esp3d_log("Key index: %d is valid ", keyIndex);
+      return esp3dTranslationService.updateTranslation(
+          value, static_cast<ESP3DLabel>(keyIndex));
+    } else {
+      esp3d_log_e("Key index: %s is invalid", key);
+      return false;
+    }
+  } else {
+    if (strcasecmp(section, INFO_SECION) == 0) {
+      esp3d_log_e("Section: %s is ignored", section);
+      return true;
+    }
+    esp3d_log_e("Section: %s is invalid", section);
     return true;
   }
   return false;

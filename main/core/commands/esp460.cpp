@@ -21,6 +21,7 @@
 #include "esp3d_commands.h"
 #include "esp3d_settings.h"
 #include "esp3d_string.h"
+#include "translations/esp3d_translation_service.h"
 
 #define COMMAND_ID 460
 // Get/Set UI language
@@ -68,6 +69,8 @@ void ESP3DCommands::ESP460(int cmd_params_pos, ESP3DMessage* msg) {
                                         tmpstr.c_str())) {
         hasError = true;
         error_msg = "Set value failed";
+      } else {
+        esp3dTranslationService.begin();
       }
     } else {
       hasError = true;

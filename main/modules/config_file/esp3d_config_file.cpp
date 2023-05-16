@@ -24,7 +24,7 @@
 #include "filesystem/esp3d_globalfs.h"
 
 #define LINE_MAX_SIZE 255
-#define SECTION_MAX_SIZE 10
+#define SECTION_MAX_SIZE 30
 #define KEY_MAX_SIZE 30
 #define VALUE_MAX_SIZE 128
 

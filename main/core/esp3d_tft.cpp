@@ -37,7 +37,9 @@
 #include "freertos/semphr.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
+#include "translations/esp3d_translation_service.h"
 #include "version.h"
+
 
 #if ESP3D_SD_CARD_FEATURE
 #include "filesystem/esp3d_sd.h"
@@ -102,6 +104,7 @@ bool ESP3DTft::begin() {
 #endif  // ESP3D_SD_CARD_FEATURE
   bool success = true;
 #if ESP3D_DISPLAY_FEATURE
+  esp3dTranslationService.begin();
   esp3dTftui.begin();
 #endif  // ESP3D_DISPLAY_FEATURE
 #if ESP3D_UPDATE_FEATURE

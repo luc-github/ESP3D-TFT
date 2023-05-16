@@ -18,7 +18,7 @@ OPTION(TARGET_FW_GRBL "GRBL firmware" OFF)
 # #######################################
 # Select the Options
 # #######################################
-OPTION(ESP3D_AUTHENTICATION "Authentication on all clients" ON)
+OPTION(ESP3D_AUTHENTICATION "Authentication on all clients" OFF)
 OPTION(DISABLE_SERIAL_AUTHENTICATION "Disable Serial Authentication" ON)
 OPTION(TIMESTAMP_ON_FILES "Time on file" OFF)
 OPTION(SSDP_SERVICE "SSDP service" ON)
@@ -88,7 +88,7 @@ add_compile_options(-DLV_LVGL_H_INCLUDE_SIMPLE=1)
 # All  = 2
 # Error only = 1
 # Disabled = 0
-add_compile_options(-DESP3D_TFT_LOG=0)
+add_compile_options(-DESP3D_TFT_LOG=2)
 # Disable ANSI color to fit some serial terminals 
 add_compile_options(-DDISABLE_COLOR_LOG=1)
 
