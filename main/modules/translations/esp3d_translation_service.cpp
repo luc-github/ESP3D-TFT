@@ -43,7 +43,11 @@ ESP3DTranslationService esp3dTranslationService;
 ESP3DTranslationService::ESP3DTranslationService() {}
 
 ESP3DTranslationService::~ESP3DTranslationService() {}
-
+const char *ESP3DTranslationService::getEntry(ESP3DLabel label) {
+  static std::string response;
+  response = "l_" + std::to_string(static_cast<uint16_t>(label));
+  return response.c_str();
+}
 bool ESP3DTranslationService::begin() {
   esp3d_log("Starting Translation Service");
   _translations.clear();
@@ -66,7 +70,7 @@ bool ESP3DTranslationService::begin() {
   std::string language;
   if (filename == DEFAULT_LANGUAGE_PACK) {
     esp3d_log("Using default language pack: %s",
-              translate(ESP3DLabel::language, 123));
+              translate(ESP3DLabel::language));
     return true;
   }
   esp3d_log("Using language pack: %s over %s", filename.c_str(),
@@ -78,7 +82,18 @@ bool ESP3DTranslationService::begin() {
           filename.c_str(), esp3dTranslationService.processingFileFunction);
       if (updateTranslations.processFile()) {
         esp3d_log("Processing language pack, done: %s",
-                  translate(ESP3DLabel::language, 123));
+                  translate(ESP3DLabel::language));
+        ESP3DConfigFile getTranslation(filename.c_str());
+        char result[255] = {0};
+        if (getTranslation.processFile(
+                "translations",
+                esp3dTranslationService.getEntry(ESP3DLabel::language), result,
+                sizeof(result))) {
+          language = result;
+          esp3d_log("Processed language pack, language: %s", language.c_str());
+        } else {
+          esp3d_log_e("Cannot find language in language pack");
+        }
         return true;
       } else {
         esp3d_log_e("Processing language pack, failed");

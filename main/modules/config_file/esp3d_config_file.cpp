@@ -39,7 +39,9 @@ ESP3DConfigFile::ESP3DConfigFile(const char* path, processingFunction_t fn,
   _pfunction = fn;
 }
 
-bool ESP3DConfigFile::processFile() {
+bool ESP3DConfigFile::processFile(const char* section_request,
+                                  const char* key_request, char* value_found,
+                                  size_t max_size) {
   bool res = true;
   if (!_filename.length()) {
     esp3d_log_e("No filename provided");
@@ -81,6 +83,15 @@ bool ESP3DConfigFile::processFile() {
                   if (_pfunction) {
                     if (!_pfunction(section, key, getValue(stmp))) {
                       res = false;
+                    }
+                  } else {
+                    if (section_request && key_request && value_found) {
+                      if (strcmp(section, section_request) == 0 &&
+                          strcmp(key, key_request) == 0) {
+                        strncpy(value_found, getValue(stmp), max_size);
+                        readCount = 0;
+                        break;
+                      }
                     }
                   }
                 }

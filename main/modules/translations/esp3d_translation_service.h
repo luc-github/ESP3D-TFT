@@ -49,6 +49,7 @@ class ESP3DTranslationService final {
   static bool processingFileFunction(const char *section, const char *key,
                                      const char *value);
   bool updateTranslation(const char *text, ESP3DLabel label);
+  const char *getEntry(ESP3DLabel label);
 
  private:
   std::map<ESP3DLabel, std::string> _translations;

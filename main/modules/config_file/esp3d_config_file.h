@@ -33,7 +33,7 @@ typedef std::function<bool(const char *, const char *, const char *)>
 
 class ESP3DConfigFile final {
  public:
-  ESP3DConfigFile(const char *path, processingFunction_t fn,
+  ESP3DConfigFile(const char *path, processingFunction_t fn = nullptr,
                   const char *scrambledpath = nullptr,
                   const char **protectedkeys = nullptr);
   ~ESP3DConfigFile();
@@ -44,7 +44,9 @@ class ESP3DConfigFile final {
   char *getSectionName(char *line);
   char *getKeyName(char *line);
   char *getValue(char *line);
-  bool processFile();
+  bool processFile(const char *section_request = nullptr,
+                   const char *key_request = nullptr,
+                   char *value_found = nullptr, size_t max_size = 0);
   bool revokeFile();
 
  private:
