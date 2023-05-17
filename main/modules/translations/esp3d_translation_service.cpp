@@ -24,6 +24,7 @@
 #include <ranges>
 
 #include "config_file/esp3d_config_file.h"
+#include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "filesystem/esp3d_flash.h"
@@ -31,6 +32,7 @@
 #define LANGUAGE_PACK_HEAD "ui_"
 #define LANGUAGE_PACK_TAIL ".lng"
 #define DEFAULT_LANGUAGE "default"
+#define DEFAULT_LANGUAGE_LABEL "English (default)"
 #define DEFAULT_LANGUAGE_PACK \
   LANGUAGE_PACK_HEAD DEFAULT_LANGUAGE LANGUAGE_PACK_TAIL
 #define LANGUAGE_SECION "translations"
@@ -40,15 +42,19 @@
 
 ESP3DTranslationService esp3dTranslationService;
 
-ESP3DTranslationService::ESP3DTranslationService() {}
+ESP3DTranslationService::ESP3DTranslationService() { _started = false; }
 
-ESP3DTranslationService::~ESP3DTranslationService() {}
+ESP3DTranslationService::~ESP3DTranslationService() { _started = false; }
+
 const char *ESP3DTranslationService::getEntry(ESP3DLabel label) {
+  if (!_started) return "???";
   static std::string response;
   response = "l_" + std::to_string(static_cast<uint16_t>(label));
   return response.c_str();
 }
+
 bool ESP3DTranslationService::begin() {
+  _started = false;
   esp3d_log("Starting Translation Service");
   _translations.clear();
   _translations = {{ESP3DLabel::language, "English"},
@@ -56,6 +62,7 @@ bool ESP3DTranslationService::begin() {
                    {ESP3DLabel::version, "Version"}};
 
   std::string filename = DEFAULT_LANGUAGE_PACK;
+  _languageCode = DEFAULT_LANGUAGE;
   // TODO read setting language value
   const ESP3DSettingDescription *settingPtr =
       esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_ui_language);
@@ -66,12 +73,14 @@ bool ESP3DTranslationService::begin() {
     filename = LANGUAGE_PACK_HEAD;
     filename += language;
     filename += LANGUAGE_PACK_TAIL;
+    _languageCode = language;
   }
   std::string language;
   if (filename == DEFAULT_LANGUAGE_PACK) {
     esp3d_log("Using default language pack: %s",
               translate(ESP3DLabel::language));
-    return true;
+    _started = true;
+    return _started;
   }
   esp3d_log("Using language pack: %s over %s", filename.c_str(),
             DEFAULT_LANGUAGE_PACK);
@@ -83,18 +92,8 @@ bool ESP3DTranslationService::begin() {
       if (updateTranslations.processFile()) {
         esp3d_log("Processing language pack, done: %s",
                   translate(ESP3DLabel::language));
-        ESP3DConfigFile getTranslation(filename.c_str());
-        char result[255] = {0};
-        if (getTranslation.processFile(
-                "translations",
-                esp3dTranslationService.getEntry(ESP3DLabel::language), result,
-                sizeof(result))) {
-          language = result;
-          esp3d_log("Processed language pack, language: %s", language.c_str());
-        } else {
-          esp3d_log_e("Cannot find language in language pack");
-        }
-        return true;
+        flashFs.releaseFS();
+        _started = true;
       } else {
         esp3d_log_e("Processing language pack, failed");
       }
@@ -102,19 +101,87 @@ bool ESP3DTranslationService::begin() {
     } else {
       esp3d_log_e("Cannot find the language file: %s", filename.c_str());
     }
+    flashFs.releaseFS();
   } else {
     esp3d_log_e("Cannot access local fs");
   }
-  return false;
+  if (!_started) {
+    esp3d_log_e("Translation Service not started");
+  }
+  return _started;
 }
 
-bool ESP3DTranslationService::update(const char *language) { return begin(); }
+std::vector<std::string> ESP3DTranslationService::getLanguagesLabels() {
+  return _labels;
+}
+
+std::vector<std::string> ESP3DTranslationService::getLanguagesValues() {
+  return _values;
+}
+
+uint16_t ESP3DTranslationService::getLanguagesList() {
+  if (!_started) {
+    return 0;
+  }
+  uint16_t count = 1;
+  _values.clear();
+  _labels.clear();
+  _values.push_back(DEFAULT_LANGUAGE);
+  _labels.push_back(DEFAULT_LANGUAGE_LABEL);
+
+  if (flashFs.accessFS()) {
+    DIR *dir = flashFs.opendir("/");
+    if (dir) {
+      struct dirent *entry;
+      while ((entry = flashFs.readdir(dir)) != NULL) {
+        if (entry->d_type == DT_DIR) {
+          continue;
+        } else {
+          if (esp3d_strings::startsWith(entry->d_name, LANGUAGE_PACK_HEAD) &&
+              esp3d_strings::endsWith(entry->d_name, LANGUAGE_PACK_TAIL)) {
+            esp3d_log("Found file: %s", entry->d_name);
+            std::string languageCode = entry->d_name;
+            languageCode.erase(0, strlen(LANGUAGE_PACK_HEAD));
+            languageCode.erase(
+                languageCode.length() - strlen(LANGUAGE_PACK_TAIL),
+                strlen(LANGUAGE_PACK_TAIL));
+            std::string filename = ESP3D_FLASH_FS_HEADER;
+            filename += entry->d_name;
+            ESP3DConfigFile getLanguage(filename.c_str());
+            char tmpstr[255] = {0};
+            if (getLanguage.processFile(LANGUAGE_SECION,
+                                        getEntry(ESP3DLabel::language), tmpstr,
+                                        sizeof(tmpstr))) {
+              if (strlen(tmpstr) > 0) {
+                esp3d_log("Found file: %s, code: %s, language:%s",
+                          entry->d_name, languageCode.c_str(), tmpstr);
+                _values.push_back(languageCode);
+                _labels.push_back(tmpstr);
+                count++;
+                esp3d_log("entry: %d, Found file: %s, code: %s, language:%s",
+                          count, entry->d_name, _values[count - 1].c_str(),
+                          _labels[count - 1].c_str());
+              }
+            }
+          }
+        }
+        esp3d_hal::wait(0);
+      }
+      flashFs.closedir(dir);
+    }
+    flashFs.releaseFS();
+  }
+  return count;
+}
 
 void ESP3DTranslationService::handle() {}
 
 const char *ESP3DTranslationService::translate(ESP3DLabel label, ...) {
   static std::string responseString;
   responseString.clear();
+  if (!_started) {
+    return "???";
+  }
   auto it = _translations.find(label);
   if (it != _translations.end()) {
     esp3d_log("Key index: %d is found in translation and text is %s",

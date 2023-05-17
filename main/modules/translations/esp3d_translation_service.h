@@ -22,6 +22,7 @@
 #include <stdio.h>
 
 #include <map>
+#include <vector>
 
 #include "esp3d_settings.h"
 #include "esp3d_string.h"
@@ -42,17 +43,25 @@ class ESP3DTranslationService final {
   ESP3DTranslationService();
   ~ESP3DTranslationService();
   bool begin();
-  bool update(const char *language);
   void handle();
   const char *translate(ESP3DLabel label, ...);
+  uint16_t getLanguagesList();
+  std::vector<std::string> getLanguagesLabels();
+  std::vector<std::string> getLanguagesValues();
   void end();
   static bool processingFileFunction(const char *section, const char *key,
                                      const char *value);
   bool updateTranslation(const char *text, ESP3DLabel label);
   const char *getEntry(ESP3DLabel label);
+  const char *getLanguageCode() { return _languageCode.c_str(); }
+  bool started() { return _started; }
 
  private:
+  bool _started;
   std::map<ESP3DLabel, std::string> _translations;
+  std::string _languageCode;
+  std::vector<std::string> _values;
+  std::vector<std::string> _labels;
 };
 
 extern ESP3DTranslationService esp3dTranslationService;

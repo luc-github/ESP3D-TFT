@@ -29,6 +29,7 @@
 
 #endif  // ESP3D_WIFI_FEATURE
 #include "esp3d_commands.h"
+#include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
 #include "esp3d_string.h"
@@ -89,8 +90,9 @@ static void wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
     }
   } else if (event_base == WIFI_EVENT &&
              event_id == WIFI_EVENT_STA_DISCONNECTED) {
+    esp3d_log_e("Disconnected");
     if (s_retry_num < ESP3D_STA_MAXIMUM_RETRY) {
-      esp3d_log("retry to connect to the AP %d", s_retry_num);
+      esp3d_log_e("retry to connect to the AP %d", s_retry_num);
       esp_err_t res = esp_wifi_connect();
       s_retry_num++;
       if (res == ESP_OK) {
@@ -271,6 +273,8 @@ const char* ESP3DNetwork::getModeStr(ESP3DRadioMode mode) {
 #if ESP3D_WIFI_FEATURE
 bool ESP3DNetwork::startStaMode() {
   bool connected = false;
+  esp_event_handler_instance_t instance_any_id;
+  esp_event_handler_instance_t instance_got_ip;
   char ssid_str[33] = {0};
   char ssid_pwd_str[32] = {0};
   if (_s_wifi_event_group) {
@@ -304,9 +308,11 @@ bool ESP3DNetwork::startStaMode() {
   esp3d_log("Register wifi handler");
 
   ESP_ERROR_CHECK(esp_event_handler_instance_register(
-      WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_sta_event_handler, NULL, NULL));
+      WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_sta_event_handler, NULL,
+      &instance_any_id));
   ESP_ERROR_CHECK(esp_event_handler_instance_register(
-      IP_EVENT, ESP_EVENT_ANY_ID, &wifi_sta_event_handler, NULL, NULL));
+      IP_EVENT, ESP_EVENT_ANY_ID, &wifi_sta_event_handler, NULL,
+      &instance_got_ip));
   esp3d_log("Configure STA settings");
   esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_sta_ssid, ssid_str, 33);
   esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_sta_password,

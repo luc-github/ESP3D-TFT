@@ -38,6 +38,7 @@
 #include "rom/ets_sys.h"
 #include "sdkconfig.h"
 #include "spi_flash_mmap.h"
+#include "translations/esp3d_translation_service.h"
 
 #if ESP3D_HTTP_FEATURE
 #include "http/esp3d_http_service.h"
@@ -530,6 +531,15 @@ void ESP3DCommands::ESP420(int cmd_params_pos, ESP3DMessage *msg) {
     return;
   }
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
+        // UI language
+  tmpstr = esp3dTranslationService.translate(ESP3DLabel::language);
+  tmpstr += " (";
+  tmpstr += esp3dTranslationService.getLanguageCode();
+  tmpstr += ")";
+  if (!dispatchIdValue(json, "language", tmpstr.c_str(), target, requestId)) {
+    return;
+  }
+
   // end of list
   if (json) {
     if (!dispatch("]}", target, requestId, ESP3DMessageType::tail)) {
