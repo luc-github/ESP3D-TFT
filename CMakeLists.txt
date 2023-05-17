@@ -2,9 +2,13 @@
 # Select the targeted hardware
 # #######################################
 OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R 2.8inches" OFF)
-OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" ON)
+OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" OFF)
 OPTION(ESP32_ROTRICS_DEXARM35 "TFT TARGET is ESP32 Rotrics DexArm 3.5inches" OFF)
 OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-SRC-4832 3.5inches" OFF)
+OPTION(ESP32S3_FREENOVE_1_1 "HARDWARE TARGET is ESP32S3 Freenove v1.1" ON)
+OPTION(ESP32S3_ESP32S3_CUSTOM "HARDWARE TARGET is ESP32S3 custom board" OFF)
+OPTION(ESP32S3_ESP32_CUSTOM "HARDWARE TARGET is ESP32 custom board" OFF)
+
 
 # #######################################
 # Select the targeted firmware
@@ -53,6 +57,15 @@ elseif(ESP32_ROTRICS_DEXARM35)
 elseif(ESP32S3_ZX3D50CE02S_USRC_4832)
     set(SDKCONFIG hardware/ESP32S3_ZX3D50CE02S_USRC_4832/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_ZX3D50CE02S_USRC_4832/components)
+elseif(ESP32S3_FREENOVE_1_1)
+    set(SDKCONFIG hardware/ESP32S3_FREENOVE_1_1/sdkconfig)
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_FREENOVE_1_1/components)
+elseif(ESP32S3_CUSTOM)
+    set(SDKCONFIG hardware/ESP32S3_CUSTOM/sdkconfig)
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_CUSTOM/components)
+elseif(ESP32_CUSTOM)
+    set(SDKCONFIG hardware/ESP32_CUSTOM/sdkconfig)
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_CUSTOM/components)
 else()
     message(FATAL_ERROR
         "\n"
@@ -176,6 +189,20 @@ elseif(ESP32S3_ZX3D50CE02S_USRC_4832)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_ZX3D50CE02S_USRC_4832/components)
     set(TFT_TARGET "ESP32S3_ZX3D50CE02S_USRC_4832")
     add_compile_options(-DESP3D_USB_SERIAL_FEATURE=1)
+elseif(ESP32S3_FREENOVE_1_1)
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32S3_FREENOVE_1_1/components/bsp")
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_FREENOVE_1_1/components)
+    set(TFT_TARGET "ESP32S3_FREENOVE_1_1")
+    add_compile_options(-DESP3D_USB_SERIAL_FEATURE=1)
+elseif(ESP32S3_CUSTOM)
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32S3_CUSTOM/components/bsp")
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_CUSTOM/components)
+    set(TFT_TARGET "ESP32S3_CUSTOM")
+    add_compile_options(-DESP3D_USB_SERIAL_FEATURE=1)
+elseif(ESP32_CUSTOM)
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32_CUSTOM/components/bsp")
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32_CUSTOM/components)
+    set(TFT_TARGET "ESP32_CUSTOM")
 endif()
 
 # Add entry point for customizations headers
