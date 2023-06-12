@@ -88,7 +88,8 @@ void main_screen() {
     status_label = NULL;
   }
   status_label = lv_label_create(ui_main_screen);
-  lv_label_set_text(status_label, "ESP3D-TFT " ESP3D_TFT_VERSION);
+  lv_label_set_text(status_label,
+                    "ESP3D-TFT " ESP3D_TFT_VERSION " " __DATE__ " " __TIME__);
   lv_obj_set_width(status_label, LV_HOR_RES);
   lv_label_set_long_mode(status_label, LV_LABEL_LONG_SCROLL_CIRCULAR);
   // Apply style to status bar
