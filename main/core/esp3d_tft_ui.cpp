@@ -37,7 +37,6 @@
 #define STACKDEPTH NETWORK_STACK_DEPTH
 #define TASKPRIORITY 0
 #define TASKCORE 1
-LV_IMG_DECLARE(logo_800_480_BW);
 
 /**********************
  *  STATIC PROTOTYPES

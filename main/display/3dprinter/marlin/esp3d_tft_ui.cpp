@@ -25,7 +25,7 @@
 #include "lvgl.h"
 #include "version.h"
 
-LV_IMG_DECLARE(logo_800_480_BW);
+LV_IMG_DECLARE(logo_esp3d_tft);
 #define LV_TICK_PERIOD_MS 10
 /**********************
  *  STATIC PROTOTYPES
@@ -226,7 +226,7 @@ void splash_screen() {
   // Create logo object
   lv_obj_t *logo = lv_img_create(ui_Screen);
   // Set logo image
-  lv_img_set_src(logo, &logo_800_480_BW);
+  lv_img_set_src(logo, &logo_esp3d_tft);
   // Create version text object
   lv_obj_t *label = lv_label_create(ui_Screen);
   // Set version text

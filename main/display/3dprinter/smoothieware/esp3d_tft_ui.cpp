@@ -25,7 +25,7 @@
 #include "lvgl.h"
 #include "version.h"
 
-LV_IMG_DECLARE(logo_800_480_BW);
+LV_IMG_DECLARE(logo_esp3d_tft);
 #define LV_TICK_PERIOD_MS 10
 /**********************
  *  STATIC PROTOTYPES
@@ -88,7 +88,8 @@ void main_screen() {
     status_label = NULL;
   }
   status_label = lv_label_create(ui_main_screen);
-  lv_label_set_text(status_label, "ESP3D-TFT " ESP3D_TFT_VERSION);
+  lv_label_set_text(status_label,
+                    "ESP3D-TFT " ESP3D_TFT_VERSION " " __DATE__ " " __TIME__);
   lv_obj_set_width(status_label, LV_HOR_RES);
   lv_label_set_long_mode(status_label, LV_LABEL_LONG_SCROLL_CIRCULAR);
   // Apply style to status bar
@@ -225,7 +226,7 @@ void splash_screen() {
   // Create logo object
   lv_obj_t *logo = lv_img_create(ui_Screen);
   // Set logo image
-  lv_img_set_src(logo, &logo_800_480_BW);
+  lv_img_set_src(logo, &logo_esp3d_tft);
   // Create version text object
   lv_obj_t *label = lv_label_create(ui_Screen);
   // Set version text
