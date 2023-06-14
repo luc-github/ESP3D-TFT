@@ -17,11 +17,27 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
+#include <string>
+
 #include "esp3d_log.h"
+#include "lvgl.h"
+
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-void boot_screen();
 
-void create_application(void) { boot_screen(); }
+void empty_screen() {
+  // Screen creation
+  lv_obj_t *ui_this_screen = lv_obj_create(NULL);
+  // Apply background color
+  lv_obj_set_style_bg_color(ui_this_screen, lv_color_hex(0x000000),
+                            LV_PART_MAIN);
+  lv_obj_clear_flag(ui_this_screen, LV_OBJ_FLAG_SCROLLABLE);
+
+  // Display new screen and delete old one
+  lv_obj_t *ui_current_screen = lv_scr_act();
+  lv_scr_load(ui_this_screen);
+  lv_obj_del(ui_current_screen);
+}

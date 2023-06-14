@@ -29,6 +29,9 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+lv_obj_t *status_label = NULL;
+// Create style for status bar
+lv_style_t style_status_bar;
 // Create style for main screen container
 lv_style_t style_container_main_screen;
 // Create style for buttons line container
@@ -36,9 +39,9 @@ lv_style_t style_buttons_container;
 // Create style for buttons
 lv_style_t style_button;
 
-lv_obj_t *status_bar(lv_obj_t *screen, lv_obj_t *page_container);
+#define STATUS_BAR_HEIGHT_RADIUS 10
+#define STATUS_BAR_H_PAD 10
 #define STATUS_BAR_V_PAD 4
-#define BUTTON_RADIUS 10
 
 void main_screen() {
   // Screen creation
@@ -47,6 +50,15 @@ void main_screen() {
   lv_obj_set_style_bg_color(ui_main_screen, lv_color_hex(0x000000),
                             LV_PART_MAIN);
   lv_obj_clear_flag(ui_main_screen, LV_OBJ_FLAG_SCROLLABLE);
+  // Create style for status bar
+  lv_style_init(&style_status_bar);
+  lv_style_set_text_opa(&style_status_bar, LV_OPA_COVER);
+  lv_style_set_text_color(&style_status_bar, lv_color_hex(0x000000));
+  lv_style_set_bg_opa(&style_status_bar, LV_OPA_COVER);
+  lv_style_set_bg_color(&style_status_bar, lv_color_hex(0xFFFFFF));
+  lv_style_set_radius(&style_status_bar, STATUS_BAR_HEIGHT_RADIUS);
+  lv_style_set_pad_hor(&style_status_bar, STATUS_BAR_H_PAD);
+  lv_style_set_pad_ver(&style_status_bar, STATUS_BAR_V_PAD);
 
   // Create style for main screen container
   lv_style_init(&style_container_main_screen);
@@ -67,6 +79,18 @@ void main_screen() {
   // Create style for buttons
   lv_style_init(&style_button);
 
+  // Create status bar object
+  if (status_label) {
+    lv_obj_del(status_label);
+    status_label = NULL;
+  }
+  status_label = lv_label_create(ui_main_screen);
+  lv_label_set_text(status_label,
+                    "ESP3D-TFT " ESP3D_TFT_VERSION " " __DATE__ " " __TIME__);
+  lv_obj_set_width(status_label, LV_HOR_RES);
+  lv_label_set_long_mode(status_label, LV_LABEL_LONG_SCROLL_CIRCULAR);
+  // Apply style to status bar
+  lv_obj_add_style(status_label, &style_status_bar, LV_PART_MAIN);
   // create container for main screen buttons
   lv_obj_t *ui_container_main_screen = lv_obj_create(ui_main_screen);
 
@@ -81,8 +105,6 @@ void main_screen() {
   lv_obj_set_style_pad_bottom(ui_container_main_screen, 0, LV_PART_MAIN);
   lv_obj_set_style_pad_row(ui_container_main_screen, 0, LV_PART_MAIN);
   lv_obj_set_style_pad_column(ui_container_main_screen, 0, LV_PART_MAIN);
-
-  lv_obj_t *status_label = status_bar(ui_main_screen, ui_container_main_screen);
 
   // Set container size
   lv_obj_set_size(
@@ -99,7 +121,7 @@ void main_screen() {
   lv_obj_remove_style_all(line1_buttons_container);
   lv_style_set_bg_color(&style_buttons_container, lv_color_hex(0xFF0000));
   lv_style_set_bg_opa(&style_buttons_container, LV_OPA_COVER);
-  lv_style_set_radius(&style_buttons_container, BUTTON_RADIUS);
+  lv_style_set_radius(&style_buttons_container, STATUS_BAR_HEIGHT_RADIUS);
   lv_obj_add_style(line1_buttons_container, &style_buttons_container,
                    LV_PART_MAIN);
   // use all space as width
