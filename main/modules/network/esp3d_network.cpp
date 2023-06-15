@@ -33,6 +33,7 @@
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
 #include "esp3d_string.h"
+#include "esp3d_values.h"
 
 ESP3DNetwork esp3dNetwork;
 
@@ -127,7 +128,7 @@ static void wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
 const char* ESP3DNetwork::getLocalIpString() {
   static std::string tmpstr;
   ESP3DIpInfos ipInfo;
-  if (esp3dNetwork.getLocalIp(&ipInfo)) {
+  if (getLocalIp(&ipInfo)) {
     tmpstr = ip4addr_ntoa((const ip4_addr_t*)&(ipInfo.ip_info.ip));
   } else {
     tmpstr = "0.0.0.0";
@@ -412,7 +413,6 @@ bool ESP3DNetwork::startStaMode() {
     esp_netif_ip_info_t ip_info;
     if (ESP_OK == esp_netif_get_ip_info(_wifiStaPtr, &ip_info)) {
       stmp = ip4addr_ntoa((const ip4_addr_t*)&ip_info.ip);
-      stmp += "\n";
       connected = true;
     }
   } else if (bits & WIFI_FAIL_BIT) {
@@ -426,7 +426,12 @@ bool ESP3DNetwork::startStaMode() {
   if (!connected) {
     stmp = "Connect to ";
     stmp += ssid_str;
-    stmp += " failed\n";
+    stmp += " failed";
+  }
+  esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
+                                  stmp.c_str());
+  if (stmp.length() > 0) {
+    stmp += "\n";
   }
   esp3dCommands.dispatch(stmp.c_str(), ESP3DClientType::all_clients, requestId,
                          ESP3DMessageType::unique, ESP3DClientType::system,
