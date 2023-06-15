@@ -70,6 +70,9 @@ const char* help[] = {
     "[ESP202](factor) - display / set  SD Card  SD card Speed divider factor "
     "(1 2 4 6 8 16 32)",
 #endif  // ESP3D_SD_IS_SPI
+#if ESP3D_DISPLAY_FEATURE
+    "[ESP214](Text) - Output to esp screen status",
+#endif  // ESP3D_DISPLAY_FEATURE
 #endif  // ESP3D_SD_CARD_FEATURE
     "[ESP400] - display ESP3D settings",
     "[ESP401]P=(position) T=(type) V=(value) - Set specific setting",
@@ -151,7 +154,9 @@ const uint cmdlist[] = {
 #if ESP3D_SD_IS_SPI
     202,
 #endif  // ESP3D_SD_IS_SPI
-
+#if ESP3D_DISPLAY_FEATURE
+    214,
+#endif  // ESP3D_DISPLAY_FEATURE
 #endif  // ESP3D_SD_CARD_FEATURE
 
     400, 401,

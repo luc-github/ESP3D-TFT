@@ -22,8 +22,10 @@
 #pragma once
 #include <stdio.h>
 
+#include <functional>
 #include <list>
 #include <string>
+
 #if ESP3D_DISPLAY_FEATURE
 #include "lvgl.h"
 #endif  // ESP3D_DISPLAY_FEATURE
@@ -33,7 +35,11 @@ extern "C" {
 #endif
 
 // this list depend of target feature
-enum class ESP3DValuesIndex : uint16_t { current_ip, unknown_index };
+enum class ESP3DValuesIndex : uint16_t {
+  status_bar_label,
+  current_ip,
+  unknown_index
+};
 
 enum class ESP3DValuesType : uint8_t {
   unknown = 0,
@@ -43,13 +49,24 @@ enum class ESP3DValuesType : uint8_t {
   float_t,
 };
 
+enum class ESP3DValuesCbAction : uint8_t {
+  Add = 0,
+  Delete,
+  Clear,
+  Update,
+};
+
+typedef std::function<bool(ESP3DValuesIndex, const char*, ESP3DValuesCbAction)>
+    callbackFunction_t;
+
 struct ESP3DValuesDescription {
   ESP3DValuesIndex index = ESP3DValuesIndex::unknown_index;
   ESP3DValuesType type = ESP3DValuesType::unknown;
   size_t size = 0;
   std::string value = "";
+  callbackFunction_t callbackFn = nullptr;
 #if ESP3D_DISPLAY_FEATURE
-  lv_obj_t* label = nullptr;
+  mutable lv_obj_t* label = nullptr;
 #endif  // ESP3D_DISPLAY_FEATURE
 };
 
@@ -57,6 +74,8 @@ class ESP3DValues final {
  public:
   ESP3DValues();
   ~ESP3DValues();
+  bool intialize();
+  void clear();
   const ESP3DValuesDescription* get_description(ESP3DValuesIndex index);
   uint8_t get_byte_value(ESP3DValuesIndex index);
   int get_integer_value(ESP3DValuesIndex index);

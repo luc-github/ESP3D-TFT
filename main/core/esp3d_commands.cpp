@@ -872,7 +872,11 @@ void ESP3DCommands::execute_internal_command(int cmd, int cmd_params_pos,
       break;
 #endif  // ESP3D_SD_IS_SPI
 #endif  // ESP3D_SD_CARD_FEATURE
-
+#if ESP3D_DISPLAY_FEATURE
+    case 214:
+      ESP214(cmd_params_pos, msg);
+      break;
+#endif  // ESP3D_DISPLAY_FEATURE
     case 400:
       ESP400(cmd_params_pos, msg);
       break;

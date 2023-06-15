@@ -22,56 +22,22 @@
 
 #include "esp3d_log.h"
 #include "esp3d_string.h"
+#include "esp3d_version.h"
 
-ESP3DValues esp3dTftValues;
+bool ESP3DValues::intialize() {
+  clear();
+  // status bar label
 
-// value of settings, storage values are all strings because it is easier to
-// display
-
-ESP3DValues::ESP3DValues() {
-  _values.clear();
   _values.push_back(
-      {ESP3DValuesIndex::current_ip, ESP3DValuesType::string_t, 16, ""});
-}
-ESP3DValues::~ESP3DValues() { _values.clear(); }
-const ESP3DValuesDescription* ESP3DValues::get_description(
-    ESP3DValuesIndex index) {
-  for (auto element = _values.begin(); element != _values.end(); ++element) {
-    if (element->index == index) return &(*element);
-  }
-  return nullptr;
-}
-uint8_t ESP3DValues::get_byte_value(ESP3DValuesIndex index) { return 0; }
-int ESP3DValues::get_integer_value(ESP3DValuesIndex index) { return 0; }
-const char* ESP3DValues::get_string_value(ESP3DValuesIndex index) {
-  const ESP3DValuesDescription* e = get_description(index);
-  if (e == nullptr) return nullptr;
-  return e->value.c_str();
-  return nullptr;
-}
-float ESP3DValues::ESP3DValues::get_float_value(ESP3DValuesIndex index) {
-  return 0.0;
-}
-bool ESP3DValues::set_byte_value(ESP3DValuesIndex index, uint8_t value) {
-  return false;
-}
-bool ESP3DValues::set_integer_value(ESP3DValuesIndex index, int value) {
-  return false;
-}
-bool ESP3DValues::set_string_value(ESP3DValuesIndex index, const char* value) {
-  for (auto element = _values.begin(); element != _values.end(); ++element) {
-    if (element->index == index) {
-      element->value = value;
-#if ESP3D_DISPLAY_FEATURE
-      if (element->label) {
-        lv_label_set_text(element->label, value);
-      }
-#endif  // ESP3D_DISPLAY_FEATURE
-      return true;
-    }
-  }
-  return false;
-}
-bool ESP3DValues::set_float_value(ESP3DValuesIndex index, float value) {
-  return false;
+      {ESP3DValuesIndex::status_bar_label, ESP3DValuesType::string_t, 200,
+       "ESP3D-TFT " ESP3D_TFT_VERSION " " __DATE__ " " __TIME__, nullptr});
+  // current ip
+  _values.push_back({
+      ESP3DValuesIndex::current_ip,
+      ESP3DValuesType::string_t,
+      16,
+      "",
+      nullptr,
+  });
+  return _values.size() == 2;
 }

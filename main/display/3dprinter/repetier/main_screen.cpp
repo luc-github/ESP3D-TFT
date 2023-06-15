@@ -37,11 +37,12 @@ lv_style_t style_buttons_container;
 lv_style_t style_button;
 
 lv_obj_t *status_bar(lv_obj_t *screen, lv_obj_t *page_container);
-#define STATUS_BAR_V_PAD 4
+size_t status_bar_height();
 #define BUTTON_RADIUS 10
 
 void main_screen() {
   // Screen creation
+  esp3d_log_e("Main screen creation");
   lv_obj_t *ui_main_screen = lv_obj_create(NULL);
   // Apply background color
   lv_obj_set_style_bg_color(ui_main_screen, lv_color_hex(0x000000),
@@ -83,11 +84,10 @@ void main_screen() {
   lv_obj_set_style_pad_column(ui_container_main_screen, 0, LV_PART_MAIN);
 
   lv_obj_t *status_label = status_bar(ui_main_screen, ui_container_main_screen);
-
+  esp3d_log_e("get status_bar: %d", (int)status_label);
   // Set container size
-  lv_obj_set_size(
-      ui_container_main_screen, LV_HOR_RES,
-      LV_VER_RES - lv_obj_get_height(status_label) - (2 * STATUS_BAR_V_PAD));
+  lv_obj_set_size(ui_container_main_screen, LV_HOR_RES,
+                  LV_VER_RES - status_bar_height());
 
   // Align container under status bar
   lv_obj_align_to(ui_container_main_screen, status_label,

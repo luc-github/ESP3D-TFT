@@ -104,6 +104,9 @@ class ESP3DCommands {
   void ESP202(int cmd_params_pos, ESP3DMessage* msg);
 #endif  // ESP3D_SD_IS_SPI
 #endif  // ESP3D_SD_CARD_FEATURE
+#if ESP3D_DISPLAY_FEATURE
+  void ESP214(int cmd_params_pos, ESP3DMessage* msg);
+#endif  // ESP3D_DISPLAY_FEATURE
   void ESP400(int cmd_params_pos, ESP3DMessage* msg);
   void ESP401(int cmd_params_pos, ESP3DMessage* msg);
 #if ESP3D_SD_CARD_FEATURE
