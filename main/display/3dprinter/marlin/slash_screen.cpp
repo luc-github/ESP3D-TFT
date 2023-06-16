@@ -22,8 +22,10 @@
 
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
+#include "esp3d_tft_ui.h"
 #include "lvgl.h"
 #include "version.h"
+
 
 LV_IMG_DECLARE(logo_esp3d_tft);
 
@@ -62,6 +64,7 @@ void boot_screen() {
 }
 
 void splash_screen() {
+  esp3dTftui.set_current_screen(ESP3DScreenType::splash);
   // Get active screen
   lv_obj_t *ui_Screen = lv_scr_act();
   // Create logo object

@@ -23,14 +23,17 @@
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_version.h"
+bool status_list_cb(ESP3DValuesIndex index, const char *value,
+                    ESP3DValuesCbAction action);
 
 bool ESP3DValues::intialize() {
   clear();
   // status bar label
 
-  _values.push_back(
-      {ESP3DValuesIndex::status_bar_label, ESP3DValuesType::string_t, 200,
-       "ESP3D-TFT " ESP3D_TFT_VERSION " " __DATE__ " " __TIME__, nullptr});
+  _values.push_back({ESP3DValuesIndex::status_bar_label,
+                     ESP3DValuesType::string_t, 200,
+                     "ESP3D-TFT " ESP3D_TFT_VERSION " " __DATE__ " " __TIME__,
+                     status_list_cb});
   // current ip
   _values.push_back({
       ESP3DValuesIndex::current_ip,

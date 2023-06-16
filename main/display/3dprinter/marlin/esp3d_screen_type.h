@@ -1,5 +1,5 @@
 /*
-  esp3d_tft
+  esp3d_screens_type.h - ESP3D screens type definition
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -18,30 +18,16 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <string>
+#pragma once
 
-#include "esp3d_hal.h"
-#include "esp3d_log.h"
-#include "lvgl.h"
+#include <stdio.h>
 
-/**********************
- *  STATIC PROTOTYPES
- **********************/
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void empty_screen() {
-  // Screen creation
-  esp3d_log("Main screen creation");
-  lv_obj_t *ui_new_screen = lv_obj_create(NULL);
-  // Apply background color
-  lv_obj_set_style_bg_color(ui_new_screen, lv_color_hex(0x000000),
-                            LV_PART_MAIN);
-  lv_obj_clear_flag(ui_new_screen, LV_OBJ_FLAG_SCROLLABLE);
-  // Fill screen content
+enum class ESP3DScreenType : uint8_t { none = 0, splash, main, status_list };
 
-  // TODO: Add your code here
-
-  // Display new screen and delete old one
-  lv_obj_t *ui_current_screen = lv_scr_act();
-  lv_scr_load(ui_new_screen);
-  lv_obj_del(ui_current_screen);
-}
+#ifdef __cplusplus
+}  // extern "C"
+#endif

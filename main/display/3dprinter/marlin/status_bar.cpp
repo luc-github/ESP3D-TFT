@@ -32,6 +32,8 @@ lv_obj_t *status_bar_container = NULL;
 //  Create style for status bar
 lv_style_t style_status_bar;
 
+void status_screen();
+
 #define STATUS_BAR_HEIGHT_RADIUS 10
 #define STATUS_BAR_H_PAD 10
 #define STATUS_BAR_V_PAD 4
@@ -41,8 +43,7 @@ static void event_handler_status_list(lv_event_t *e) {
 
   if (code == LV_EVENT_CLICKED) {
     esp3d_log("Clicked");
-  } else if (code == LV_EVENT_VALUE_CHANGED) {
-    esp3d_log("Toggled");
+    status_screen();
   }
 }
 
@@ -67,9 +68,7 @@ lv_obj_t *status_bar(lv_obj_t *screen, lv_obj_t *page_container) {
   } else  // Create status bar object
   {
     esp3d_log("status_bar: label is not null, delete it");
-    lv_obj_del(status_bar_desc->label);
     status_bar_desc->label = NULL;
-    lv_obj_del(status_bar_container);
     status_bar_container = NULL;
   }
   status_bar_container = lv_obj_create(screen);

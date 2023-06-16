@@ -22,8 +22,8 @@
 
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
+#include "esp3d_tft_ui.h"
 #include "lvgl.h"
-#include "version.h"
 
 #define LV_TICK_PERIOD_MS 10
 /**********************
@@ -40,6 +40,7 @@ lv_obj_t *status_bar(lv_obj_t *screen, lv_obj_t *page_container);
 #define BUTTON_RADIUS 10
 
 void main_screen() {
+  esp3dTftui.set_current_screen(ESP3DScreenType::main);
   // Screen creation
   esp3d_log("Main screen creation");
   lv_obj_t *ui_main_screen = lv_obj_create(NULL);

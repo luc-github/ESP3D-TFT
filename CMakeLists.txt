@@ -75,13 +75,21 @@ else()
 endif()
 
 if(TARGET_FW_MARLIN)
-    #TODO
+    if(TFT_UI_SERVICE)
+        add_compile_options("-I${CMAKE_SOURCE_DIR}/main/display/3dprinter/marlin")
+    endif()
 elseif(TARGET_FW_REPETIER)
-    #TODO
+     if(TFT_UI_SERVICE)
+        add_compile_options("-I${CMAKE_SOURCE_DIR}/main/display/3dprinter/repetier")
+    endif()
 elseif(TARGET_FW_SMOOTHIEWARE)
-    #TODO
+     if(TFT_UI_SERVICE)
+        add_compile_options("-I${CMAKE_SOURCE_DIR}/main/display/3dprinter/smoothiware")
+    endif()
 elseif(TARGET_FW_GRBL)
-    #TODO
+     if(TFT_UI_SERVICE)
+        add_compile_options("-I${CMAKE_SOURCE_DIR}/main/display/cnc/grbl")
+    endif()
 else()
     message(FATAL_ERROR
         "\n"

@@ -20,6 +20,9 @@
 
 #pragma once
 #include <stdio.h>
+
+#include "esp3d_screen_type.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -31,8 +34,11 @@ class ESP3DTftUi final {
   bool begin();
   void handle();
   bool end();
+  void set_current_screen(ESP3DScreenType screen) { _current_screen = screen; }
+  ESP3DScreenType get_current_screen() { return _current_screen; }
 
  private:
+  ESP3DScreenType _current_screen = ESP3DScreenType::splash;
   bool _started;
 };
 
