@@ -190,7 +190,7 @@ void ft5x06_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
         last_y = ((dataArray[2] & 0x0f) << 8) + dataArray[3];
 #endif
 
-        esp3d_log("X %d y %d", last_x, last_y);
+        //esp3d_log("X %d y %d", last_x, last_y);
     } else {
         data->state = LV_INDEV_STATE_REL;
     }

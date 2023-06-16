@@ -28,7 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-// lv_obj_t *status_label = NULL;
+lv_obj_t *status_bar_container = NULL;
 //  Create style for status bar
 lv_style_t style_status_bar;
 
@@ -36,11 +36,14 @@ lv_style_t style_status_bar;
 #define STATUS_BAR_H_PAD 10
 #define STATUS_BAR_V_PAD 4
 
-size_t status_bar_height() {
-  const ESP3DValuesDescription *status_bar_desc =
-      esp3dTftValues.get_description(ESP3DValuesIndex::status_bar_label);
-  esp3d_log("status_bar size: label is %d", (int)(status_bar_desc->label));
-  return STATUS_BAR_V_PAD * 2 + lv_obj_get_height(status_bar_desc->label);
+static void event_handler_status_list(lv_event_t *e) {
+  lv_event_code_t code = lv_event_get_code(e);
+
+  if (code == LV_EVENT_CLICKED) {
+    esp3d_log("Clicked");
+  } else if (code == LV_EVENT_VALUE_CHANGED) {
+    esp3d_log("Toggled");
+  }
 }
 
 lv_obj_t *status_bar(lv_obj_t *screen, lv_obj_t *page_container) {
@@ -64,15 +67,23 @@ lv_obj_t *status_bar(lv_obj_t *screen, lv_obj_t *page_container) {
   } else  // Create status bar object
   {
     esp3d_log("status_bar: label is not null, delete it");
-    lv_obj_del((lv_obj_t *)(status_bar_desc->label));
+    lv_obj_del(status_bar_desc->label);
     status_bar_desc->label = NULL;
+    lv_obj_del(status_bar_container);
+    status_bar_container = NULL;
   }
-  status_bar_desc->label = lv_label_create(screen);
-  esp3d_log("status_bar: label is now %d", (int)(status_bar_desc->label));
+  status_bar_container = lv_obj_create(screen);
+  status_bar_desc->label = lv_label_create(status_bar_container);
   lv_label_set_text(status_bar_desc->label, status_bar_desc->value.c_str());
-  lv_obj_set_width(status_bar_desc->label, LV_HOR_RES);
   lv_label_set_long_mode(status_bar_desc->label, LV_LABEL_LONG_SCROLL_CIRCULAR);
   // Apply style to status bar
   lv_obj_add_style(status_bar_desc->label, &style_status_bar, LV_PART_MAIN);
-  return (status_bar_desc->label);
+  lv_obj_remove_style_all(status_bar_container);
+  lv_obj_set_width(status_bar_desc->label, LV_HOR_RES);
+  lv_obj_set_align(status_bar_desc->label, LV_ALIGN_CENTER);
+  lv_obj_set_width(status_bar_container, LV_HOR_RES);
+  lv_obj_set_height(status_bar_container, LV_SIZE_CONTENT);
+  lv_obj_add_event_cb(status_bar_container, event_handler_status_list,
+                      LV_EVENT_CLICKED, NULL);
+  return (status_bar_container);
 }

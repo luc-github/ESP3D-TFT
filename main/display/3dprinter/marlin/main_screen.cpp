@@ -37,7 +37,6 @@ lv_style_t style_buttons_container;
 lv_style_t style_button;
 
 lv_obj_t *status_bar(lv_obj_t *screen, lv_obj_t *page_container);
-size_t status_bar_height();
 #define BUTTON_RADIUS 10
 
 void main_screen() {
@@ -83,14 +82,14 @@ void main_screen() {
   lv_obj_set_style_pad_row(ui_container_main_screen, 0, LV_PART_MAIN);
   lv_obj_set_style_pad_column(ui_container_main_screen, 0, LV_PART_MAIN);
 
-  lv_obj_t *status_label = status_bar(ui_main_screen, ui_container_main_screen);
-  esp3d_log("get status_bar: %d", (int)status_label);
+  lv_obj_t *status_bar_container =
+      status_bar(ui_main_screen, ui_container_main_screen);
   // Set container size
   lv_obj_set_size(ui_container_main_screen, LV_HOR_RES,
-                  LV_VER_RES - status_bar_height());
+                  LV_VER_RES - lv_obj_get_height(status_bar_container));
 
   // Align container under status bar
-  lv_obj_align_to(ui_container_main_screen, status_label,
+  lv_obj_align_to(ui_container_main_screen, status_bar_container,
                   LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
 
   // create container for main screen buttons Line 1
