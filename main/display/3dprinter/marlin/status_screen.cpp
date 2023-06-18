@@ -23,9 +23,9 @@
 
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
+#include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "esp3d_values.h"
-#include "lvgl.h"
 
 /**********************
  *  STATIC PROTOTYPES
@@ -34,9 +34,21 @@
 lv_style_t style_button_back;
 std::list<std::string> ui_status_screen_list;
 lv_obj_t *status_list = nullptr;
+lv_timer_t *delay_timer = NULL;
+
 #define MAX_STATUS_SCREEN_LIST 10
 void main_screen();
 void status_screen();
+
+void delay_timer_cb(lv_timer_t *timer) {
+  // If timer is not null, delete it to avoid multiple call
+  if (delay_timer) {
+    lv_timer_del(delay_timer);
+    delay_timer = NULL;
+  }
+  // Call main screen
+  main_screen();
+}
 
 bool status_list_cb(ESP3DValuesIndex index, const char *value,
                     ESP3DValuesCbAction action) {
@@ -61,8 +73,10 @@ bool status_list_cb(ESP3DValuesIndex index, const char *value,
 static void event_handler_button_back(lv_event_t *e) {
   lv_event_code_t code = lv_event_get_code(e);
   if (code == LV_EVENT_CLICKED) {
-    esp3d_log("Clicked");
-    main_screen();
+    if (!delay_timer) {
+      esp3d_log("Clicked");
+      delay_timer = lv_timer_create(delay_timer_cb, 300, NULL);
+    }
   }
 }
 #define STATUS_SCREEN_H_PAD 10
@@ -81,9 +95,8 @@ void status_screen() {
     status_bar_desc->label = nullptr;
   }
   // Apply background color
-  lv_obj_set_style_bg_color(ui_status_screen, lv_color_hex(0x000000),
-                            LV_PART_MAIN);
-  lv_obj_clear_flag(ui_status_screen, LV_OBJ_FLAG_SCROLLABLE);
+  apply_style(ui_status_screen, ESP3DStyleType::main_bg);
+
   // Fill screen content
   lv_obj_set_style_pad_right(ui_status_screen, STATUS_SCREEN_V_PAD,
                              LV_PART_MAIN);
@@ -102,6 +115,7 @@ void status_screen() {
   }
 
   lv_obj_t *btn_back = lv_btn_create(ui_status_screen);
+  apply_style(btn_back, ESP3DStyleType::button);
   lv_obj_t *label_btn_back = lv_label_create(btn_back);
   lv_label_set_text(label_btn_back, LV_SYMBOL_NEW_LINE);
   lv_obj_set_align(label_btn_back, LV_ALIGN_CENTER);

@@ -22,6 +22,7 @@
 
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
+#include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "lvgl.h"
 
@@ -44,18 +45,19 @@ void main_screen() {
   // Screen creation
   esp3d_log("Main screen creation");
   lv_obj_t *ui_main_screen = lv_obj_create(NULL);
-  // Apply background color
-  lv_obj_set_style_bg_color(ui_main_screen, lv_color_hex(0x000000),
-                            LV_PART_MAIN);
-  lv_obj_clear_flag(ui_main_screen, LV_OBJ_FLAG_SCROLLABLE);
+  apply_style(ui_main_screen, ESP3DStyleType::main_bg);
+  //  Apply background color
+  // lv_obj_set_style_bg_color(ui_main_screen,
+  // lv_color_hex(0x000000),LV_PART_MAIN); lv_obj_clear_flag(ui_main_screen,
+  // LV_OBJ_FLAG_SCROLLABLE);
 
   // Create style for main screen container
   lv_style_init(&style_container_main_screen);
   // the container will be flex column
-  lv_style_set_layout(&style_container_main_screen, LV_LAYOUT_FLEX);
+  /*lv_style_set_layout(&style_container_main_screen, LV_LAYOUT_FLEX);
   lv_style_set_flex_flow(&style_container_main_screen, LV_FLEX_FLOW_COLUMN);
   lv_style_set_flex_main_place(&style_container_main_screen,
-                               LV_FLEX_ALIGN_SPACE_EVENLY);
+                               LV_FLEX_ALIGN_SPACE_EVENLY);*/
 
   // Create style for main screen buttons line
   lv_style_init(&style_buttons_container);
@@ -92,32 +94,42 @@ void main_screen() {
   // Align container under status bar
   lv_obj_align_to(ui_container_main_screen, status_bar_container,
                   LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+  //**********************************
+  lv_obj_t *btn1 = lv_btn_create(ui_main_screen);
+  apply_style(btn1, ESP3DStyleType::button);
+  lv_obj_set_size(btn1, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+  lv_obj_center(btn1);
+  lv_obj_t *label = lv_label_create(btn1);
+  lv_label_set_text(label, "Button");
+  lv_obj_center(label);
+  //**********************************
 
-  // create container for main screen buttons Line 1
-  lv_obj_t *line1_buttons_container = lv_obj_create(ui_container_main_screen);
-  // remove all styles from the container object
-  lv_obj_remove_style_all(line1_buttons_container);
-  lv_style_set_bg_color(&style_buttons_container, lv_color_hex(0xFF0000));
-  lv_style_set_bg_opa(&style_buttons_container, LV_OPA_COVER);
-  lv_style_set_radius(&style_buttons_container, BUTTON_RADIUS);
-  lv_obj_add_style(line1_buttons_container, &style_buttons_container,
-                   LV_PART_MAIN);
-  // use all space as width
-  lv_obj_set_width(line1_buttons_container, LV_HOR_RES);
-  // use all space as height
-  lv_obj_set_height(line1_buttons_container, LV_SIZE_CONTENT);
+  /*  // create container for main screen buttons Line 1
+    lv_obj_t *line1_buttons_container = lv_obj_create(ui_container_main_screen);
+    // remove all styles from the container object
+    lv_obj_remove_style_all(line1_buttons_container);
+    lv_style_set_bg_color(&style_buttons_container, lv_color_hex(0x000000));
+    lv_style_set_bg_opa(&style_buttons_container, LV_OPA_COVER);
+    lv_style_set_radius(&style_buttons_container, BUTTON_RADIUS);
+    lv_obj_add_style(line1_buttons_container, &style_buttons_container,
+                     LV_PART_MAIN);
+    // use all space as width
+    lv_obj_set_width(line1_buttons_container, LV_HOR_RES);
+    // use all space as height
+    lv_obj_set_height(line1_buttons_container, LV_SIZE_CONTENT);
 
-  // Add buttons to line 1
-  lv_obj_t *btn1 = lv_btn_create(line1_buttons_container);
-  lv_obj_t *label1 = lv_label_create(btn1);
-  lv_label_set_text(label1, "200\n200\n" LV_SYMBOL_WIZARD);
-  lv_obj_set_align(label1, LV_ALIGN_CENTER);
-  lv_obj_set_style_text_align(label1, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
-  lv_obj_t *btn2 = lv_btn_create(line1_buttons_container);
-  lv_obj_t *label2 = lv_label_create(btn2);
-  lv_label_set_text(label2, "60\n60\n" LV_SYMBOL_LANGUAGE);
-  lv_obj_set_style_text_align(label2, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
-  lv_obj_center(label2);
+    // Add buttons to line 1
+    lv_obj_t *btn1 = lv_btn_create(line1_buttons_container);
+    lv_obj_t *label1 = lv_label_create(btn1);
+    lv_label_set_text(label1, "200\n200\n" LV_SYMBOL_WIZARD);
+    lv_obj_set_align(label1, LV_ALIGN_CENTER);
+    lv_obj_set_style_text_align(label1, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+    lv_obj_t *btn2 = lv_btn_create(line1_buttons_container);
+    lv_obj_t *label2 = lv_label_create(btn2);
+    lv_label_set_text(label2, "60\n60\n" LV_SYMBOL_LANGUAGE);
+    lv_obj_set_style_text_align(label2, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
+    lv_obj_center(label2);*/
+
   /*
     // create container for main screen buttons Line 2
     lv_obj_t *line2_buttons_container = lv_obj_create(ui_container_main_screen);
