@@ -28,7 +28,17 @@
 extern "C" {
 #endif
 
-enum class ESP3DStyleType : uint8_t { default_style = 0, main_bg, button };
+enum class ESP3DStyleType : uint8_t {
+  default_style = 0,
+  main_bg,
+  button,
+  embedded_button,
+  row_container,
+  col_container,
+  status_bar,
+  status_list,
+  bg_label
+};
 
 extern bool init_styles();
 

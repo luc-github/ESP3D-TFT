@@ -40,16 +40,6 @@ lv_timer_t *delay_timer = NULL;
 void main_screen();
 void status_screen();
 
-void delay_timer_cb(lv_timer_t *timer) {
-  // If timer is not null, delete it to avoid multiple call
-  if (delay_timer) {
-    lv_timer_del(delay_timer);
-    delay_timer = NULL;
-  }
-  // Call main screen
-  main_screen();
-}
-
 bool status_list_cb(ESP3DValuesIndex index, const char *value,
                     ESP3DValuesCbAction action) {
   if (action == ESP3DValuesCbAction::Add ||
@@ -75,12 +65,11 @@ static void event_handler_button_back(lv_event_t *e) {
   if (code == LV_EVENT_CLICKED) {
     if (!delay_timer) {
       esp3d_log("Clicked");
-      delay_timer = lv_timer_create(delay_timer_cb, 300, NULL);
+      main_screen();
     }
   }
 }
-#define STATUS_SCREEN_H_PAD 10
-#define STATUS_SCREEN_V_PAD 10
+
 void status_screen() {
   esp3dTftui.set_current_screen(ESP3DScreenType::status_list);
   // Screen creation
@@ -96,36 +85,31 @@ void status_screen() {
   }
   // Apply background color
   apply_style(ui_status_screen, ESP3DStyleType::main_bg);
+  // Create screen container
+  lv_obj_t *ui_status_screen_container = lv_obj_create(ui_status_screen);
+  apply_style(ui_status_screen_container, ESP3DStyleType::col_container);
+  lv_obj_set_height(ui_status_screen_container, LV_VER_RES);
+  lv_obj_set_width(ui_status_screen_container, LV_HOR_RES);
 
-  // Fill screen content
-  lv_obj_set_style_pad_right(ui_status_screen, STATUS_SCREEN_V_PAD,
-                             LV_PART_MAIN);
-  lv_obj_set_style_pad_bottom(ui_status_screen, STATUS_SCREEN_H_PAD,
-                              LV_PART_MAIN);
-  lv_obj_set_style_pad_left(ui_status_screen, STATUS_SCREEN_V_PAD,
-                            LV_PART_MAIN);
-  lv_obj_set_style_pad_top(ui_status_screen, STATUS_SCREEN_H_PAD, LV_PART_MAIN);
-
-  // TODO: Add your code here
-
-  status_list = lv_list_create(ui_status_screen);
-  lv_obj_set_align(status_list, LV_ALIGN_TOP_LEFT);
+  status_list = lv_list_create(ui_status_screen_container);
+  apply_style(status_list, ESP3DStyleType::status_list);
+  lv_obj_set_align(status_list, LV_ALIGN_TOP_MID);
   for (auto &line : ui_status_screen_list) {
     lv_list_add_btn(status_list, "", line.c_str());
   }
 
-  lv_obj_t *btn_back = lv_btn_create(ui_status_screen);
-  apply_style(btn_back, ESP3DStyleType::button);
+  lv_obj_t *btn_back = lv_btn_create(ui_status_screen_container);
+  apply_style(btn_back, ESP3DStyleType::embedded_button);
+  lv_obj_set_width(btn_back, LV_HOR_RES);
   lv_obj_t *label_btn_back = lv_label_create(btn_back);
-  lv_label_set_text(label_btn_back, LV_SYMBOL_NEW_LINE);
+  lv_label_set_text(label_btn_back, LV_SYMBOL_UP);
   lv_obj_set_align(label_btn_back, LV_ALIGN_CENTER);
-  lv_obj_set_align(btn_back, LV_ALIGN_BOTTOM_RIGHT);
+  lv_obj_set_align(btn_back, LV_ALIGN_BOTTOM_MID);
   lv_obj_add_event_cb(btn_back, event_handler_button_back, LV_EVENT_CLICKED,
                       NULL);
   lv_obj_update_layout(btn_back);
-  lv_obj_set_height(status_list, LV_VER_RES - (STATUS_SCREEN_V_PAD * 2));
-  lv_obj_set_width(status_list, LV_HOR_RES - (STATUS_SCREEN_H_PAD * 3) -
-                                    lv_obj_get_width(btn_back));
+  lv_obj_set_height(status_list, LV_VER_RES - lv_obj_get_height(btn_back));
+  lv_obj_set_width(status_list, LV_HOR_RES);
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_status_screen);

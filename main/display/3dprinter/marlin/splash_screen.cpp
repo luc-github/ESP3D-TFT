@@ -22,10 +22,9 @@
 
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
+#include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
-#include "lvgl.h"
 #include "version.h"
-
 
 LV_IMG_DECLARE(logo_esp3d_tft);
 
@@ -33,7 +32,6 @@ LV_IMG_DECLARE(logo_esp3d_tft);
  *  STATIC PROTOTYPES
  **********************/
 lv_timer_t *boot_timer = NULL;
-lv_style_t style_version_text;
 
 void main_screen();
 void splash_screen();
@@ -59,7 +57,7 @@ void main_screen_timer_cb(lv_timer_t *timer) {
 }
 
 void boot_screen() {
-  lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x000000), LV_PART_MAIN);
+  apply_style(lv_scr_act(), ESP3DStyleType::main_bg);
   boot_timer = lv_timer_create(splash_in_timer_cb, 10, NULL);
 }
 
@@ -75,12 +73,7 @@ void splash_screen() {
   lv_obj_t *label = lv_label_create(ui_Screen);
   // Set version text
   lv_label_set_text(label, "V" ESP3D_TFT_VERSION);
-  // Create style for version text
-  lv_style_init(&style_version_text);
-  lv_style_set_text_opa(&style_version_text, LV_OPA_COVER);
-  lv_style_set_text_color(&style_version_text, lv_color_hex(0xFFFFFF));
-  // Apply style to version text
-  lv_obj_add_style(label, &style_version_text, LV_PART_MAIN);
+  apply_style(label, ESP3DStyleType::bg_label);
   // align object in screen
   lv_obj_center(logo);
   lv_obj_align(label, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
