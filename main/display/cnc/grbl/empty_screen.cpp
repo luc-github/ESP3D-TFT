@@ -17,14 +17,31 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
+#include <string>
+
+#include "esp3d_hal.h"
 #include "esp3d_log.h"
-#include "esp3d_styles.h"
+#include "lvgl.h"
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-void boot_screen();
 
-void create_application(void) {
-  init_styles();
-  boot_screen();
+void empty_screen() {
+  // Screen creation
+  esp3d_log("Main screen creation");
+  lv_obj_t *ui_new_screen = lv_obj_create(NULL);
+  // Apply background color
+  lv_obj_set_style_bg_color(ui_new_screen, lv_color_hex(0x000000),
+                            LV_PART_MAIN);
+  lv_obj_clear_flag(ui_new_screen, LV_OBJ_FLAG_SCROLLABLE);
+  // Fill screen content
+
+  // TODO: Add your code here
+
+  // Display new screen and delete old one
+  lv_obj_t *ui_current_screen = lv_scr_act();
+  lv_scr_load(ui_new_screen);
+  lv_obj_del(ui_current_screen);
 }

@@ -1,5 +1,5 @@
 /*
-  esp3d_tft
+  esp3d_styles.h - ESP3D screens styles definition
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -17,14 +17,33 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include "esp3d_log.h"
-#include "esp3d_styles.h"
-/**********************
- *  STATIC PROTOTYPES
- **********************/
-void boot_screen();
 
-void create_application(void) {
-  init_styles();
-  boot_screen();
-}
+#pragma once
+
+#include <stdio.h>
+
+#include "lvgl.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+enum class ESP3DStyleType : uint8_t {
+  default_style = 0,
+  main_bg,
+  button,
+  embedded_button,
+  row_container,
+  col_container,
+  status_bar,
+  status_list,
+  bg_label
+};
+
+extern bool init_styles();
+
+extern bool apply_style(lv_obj_t* obj, ESP3DStyleType type);
+
+#ifdef __cplusplus
+}  // extern "C"
+#endif

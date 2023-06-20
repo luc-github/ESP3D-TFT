@@ -1,5 +1,5 @@
 /*
-  esp3d_tft
+  esp3d_styles_res.h - ESP3D screens styles definition
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -17,14 +17,27 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include "esp3d_log.h"
-#include "esp3d_styles.h"
-/**********************
- *  STATIC PROTOTYPES
- **********************/
-void boot_screen();
 
-void create_application(void) {
-  init_styles();
-  boot_screen();
-}
+#pragma once
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define CURRENT_STATUS_BAR_RADIUS 10
+#define CURRENT_STATUS_BAR_H_PAD 10
+#define CURRENT_STATUS_BAR_V_PAD 4
+#define CURRENT_STATUS_BAR_BORDER_VALUE 2
+
+#define CURRENT_BUTTON_RADIUS_VALUE 10
+#define CURRENT_BUTTON_BORDER_VALUE 2
+
+#define CURRENT_BUTTON_COLOR_PRESSED_OUTLINE 30
+#define CURRENT_BUTTON_COLOR_PRESSED_SHADOW_OFFSET 3
+#define CURRENT_BUTTON_PAD 10
+
+#define CURRENT_CONTAINER_RADIUS 10
+
+#ifdef __cplusplus
+}  // extern "C"
+#endif

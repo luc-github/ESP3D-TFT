@@ -1,5 +1,5 @@
 /*
-  esp3d_tft
+  esp3d_screens_type.h - ESP3D screens type definition
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -17,14 +17,17 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include "esp3d_log.h"
-#include "esp3d_styles.h"
-/**********************
- *  STATIC PROTOTYPES
- **********************/
-void boot_screen();
 
-void create_application(void) {
-  init_styles();
-  boot_screen();
-}
+#pragma once
+
+#include <stdio.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+enum class ESP3DScreenType : uint8_t { none = 0, splash, main, status_list };
+
+#ifdef __cplusplus
+}  // extern "C"
+#endif
