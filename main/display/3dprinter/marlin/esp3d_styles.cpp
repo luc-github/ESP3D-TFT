@@ -228,7 +228,7 @@ bool init_styles() {
 }
 
 bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
-  if (type != ESP3DStyleType::main_bg) {
+  if (type != ESP3DStyleType::main_bg && type != ESP3DStyleType::status_list) {
     lv_obj_remove_style_all(obj); /*Remove the style coming from the
     // theme*/
   }

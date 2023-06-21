@@ -22,7 +22,6 @@
 
 #include "esp3d_log.h"
 #include "esp3d_string.h"
-#include "esp3d_version.h"
 
 ESP3DValues esp3dTftValues;
 

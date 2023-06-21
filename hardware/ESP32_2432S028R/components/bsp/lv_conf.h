@@ -236,14 +236,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #define LV_LOG_PRINTF 0
 
 /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
-#define LV_LOG_TRACE_MEM        1
-#define LV_LOG_TRACE_TIMER      1
-#define LV_LOG_TRACE_INDEV      1
-#define LV_LOG_TRACE_DISP_REFR  1
-#define LV_LOG_TRACE_EVENT      1
-#define LV_LOG_TRACE_OBJ_CREATE 1
-#define LV_LOG_TRACE_LAYOUT     1
-#define LV_LOG_TRACE_ANIM       1
+#define LV_LOG_TRACE_MEM        0
+#define LV_LOG_TRACE_TIMER      0
+#define LV_LOG_TRACE_INDEV      0
+#define LV_LOG_TRACE_DISP_REFR  0
+#define LV_LOG_TRACE_EVENT      0
+#define LV_LOG_TRACE_OBJ_CREATE 0
+#define LV_LOG_TRACE_LAYOUT     0
+#define LV_LOG_TRACE_ANIM       0
 
 #endif  /*LV_USE_LOG*/
 
@@ -268,14 +268,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  *-----------*/
 
 /*1: Show CPU usage and FPS count*/
-#define LV_USE_PERF_MONITOR 1
+#define LV_USE_PERF_MONITOR 0
 #if LV_USE_PERF_MONITOR
 #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
 #endif
 
 /*1: Show the used memory and the memory fragmentation
  * Requires LV_MEM_CUSTOM = 0*/
-#define LV_USE_MEM_MONITOR 1
+#define LV_USE_MEM_MONITOR 0
 #if LV_USE_MEM_MONITOR
 #define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
 #endif

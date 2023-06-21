@@ -30,11 +30,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-// Create style for buttons
-lv_style_t style_button_back;
 std::list<std::string> ui_status_screen_list;
-lv_obj_t *status_list = nullptr;
-lv_timer_t *delay_timer = NULL;
 
 #define MAX_STATUS_SCREEN_LIST 10
 void main_screen();
@@ -44,17 +40,26 @@ bool status_list_cb(ESP3DValuesIndex index, const char *value,
                     ESP3DValuesCbAction action) {
   if (action == ESP3DValuesCbAction::Add ||
       action == ESP3DValuesCbAction::Update) {
-    esp3d_log("status_list_cb: %d", (int)status_list);
+    esp3d_log("status_list_cb size is %d", ui_status_screen_list.size());
     if (ui_status_screen_list.size() > MAX_STATUS_SCREEN_LIST) {
+      esp3d_log("status_list size %d pop", ui_status_screen_list.size());
       ui_status_screen_list.pop_back();
     }
+
     ui_status_screen_list.push_front(value);
+    esp3d_log("status_list pushing %s now size is %d", value,
+              ui_status_screen_list.size());
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::status_list) {
+      esp3d_log("Refreshibng status screen");
       status_screen();
+    } else {
+      esp3d_log("No refreshe needed");
     }
   } else if (action == ESP3DValuesCbAction::Clear) {
     ui_status_screen_list.clear();
+    esp3d_log("status_list clear");
   } else {
+    esp3d_log_e("status_list unknown action %d", (int)action);
     return false;
   }
   return true;
@@ -63,10 +68,8 @@ bool status_list_cb(ESP3DValuesIndex index, const char *value,
 static void event_handler_button_back(lv_event_t *e) {
   lv_event_code_t code = lv_event_get_code(e);
   if (code == LV_EVENT_CLICKED) {
-    if (!delay_timer) {
-      esp3d_log("Clicked");
-      main_screen();
-    }
+    esp3d_log("Clicked");
+    main_screen();
   }
 }
 
@@ -91,11 +94,12 @@ void status_screen() {
   lv_obj_set_height(ui_status_screen_container, LV_VER_RES);
   lv_obj_set_width(ui_status_screen_container, LV_HOR_RES);
 
-  status_list = lv_list_create(ui_status_screen_container);
-  apply_style(status_list, ESP3DStyleType::status_list);
-  lv_obj_set_align(status_list, LV_ALIGN_TOP_MID);
+  lv_obj_t *ui_status_list_ctl = lv_list_create(ui_status_screen_container);
+  apply_style(ui_status_list_ctl, ESP3DStyleType::status_list);
+  lv_obj_set_align(ui_status_list_ctl, LV_ALIGN_TOP_MID);
+  esp3d_log("status_list size is %d", ui_status_screen_list.size());
   for (auto &line : ui_status_screen_list) {
-    lv_list_add_btn(status_list, "", line.c_str());
+    lv_list_add_btn(ui_status_list_ctl, "", line.c_str());
   }
 
   lv_obj_t *btn_back = lv_btn_create(ui_status_screen_container);
@@ -108,8 +112,9 @@ void status_screen() {
   lv_obj_add_event_cb(btn_back, event_handler_button_back, LV_EVENT_CLICKED,
                       NULL);
   lv_obj_update_layout(btn_back);
-  lv_obj_set_height(status_list, LV_VER_RES - lv_obj_get_height(btn_back));
-  lv_obj_set_width(status_list, LV_HOR_RES);
+  lv_obj_set_height(ui_status_list_ctl,
+                    LV_VER_RES - lv_obj_get_height(btn_back));
+  lv_obj_set_width(ui_status_list_ctl, LV_HOR_RES);
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_status_screen);
