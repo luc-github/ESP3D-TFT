@@ -30,9 +30,9 @@
 #define CURRENT_STATUS_BAR_TEXT_COLOR lv_color_hex(0x000000)
 #define CURRENT_STATUS_BAR_BG_COLOR lv_color_hex(0xFFFFFF)
 
-#define CURRENT_STATUS_BAR_BORDER_COLOR lv_palette_main(LV_PALETTE_BLUE)
+#define CURRENT_STATUS_BAR_BORDER_COLOR lv_palette_main(LV_PALETTE_GREY)
 
-#define CURRENT_BUTTON_COLOR_PALETTE LV_PALETTE_BLUE
+#define CURRENT_BUTTON_COLOR_PALETTE LV_PALETTE_GREY
 #define CURRENT_BUTTON_COLOR_PALETTE_DARKEN 2
 
 #define CURRENT_BUTTON_BORDER_COLOR lv_palette_main(LV_PALETTE_GREY)
@@ -59,6 +59,17 @@ lv_style_t style_col_container_default;
 lv_style_t style_row_container_default;
 
 bool init_styles() {
+  /*
+  lv_theme_t* th = lv_theme_default_init(
+      display, //Use the DPI, size, etc from this display
+      LV_COLOR_PALETTE_BLUE,
+      LV_COLOR_PALETTE_CYAN, //Primary and secondary palette
+      false,                 //Light or dark mode
+      &lv_font_montserrat_10, &lv_font_montserrat_14,
+      &lv_font_montserrat_18); //Small, normal, large fonts
+
+  lv_disp_set_theme(display, th); //Assign the theme to the display
+  */
   /*
   Main background
   */
@@ -124,7 +135,7 @@ bool init_styles() {
 
   /*Add a large outline when pressed*/
   lv_style_set_outline_width(&style_btn_pressed,
-                             CURRENT_BUTTON_COLOR_PRESSED_OUTLINE);
+                             CURRENT_BUTTON_PRESSED_OUTLINE);
   lv_style_set_outline_opa(&style_btn_pressed, LV_OPA_TRANSP);
 
   lv_style_set_shadow_ofs_y(&style_btn_pressed,
@@ -262,11 +273,17 @@ bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
     case ESP3DStyleType::row_container:
       lv_obj_add_style(obj, &style_row_container_default, LV_STATE_DEFAULT);
       lv_obj_set_style_clip_corner(obj, true, 0);
+      lv_obj_set_style_pad_column(obj, CURRENT_BUTTON_PRESSED_OUTLINE,
+                                  LV_PART_MAIN);
       break;
 
     case ESP3DStyleType::col_container:
       lv_obj_add_style(obj, &style_col_container_default, LV_STATE_DEFAULT);
       lv_obj_set_style_clip_corner(obj, true, 0);
+      lv_obj_set_style_pad_top(obj, CURRENT_BUTTON_PRESSED_OUTLINE,
+                               LV_PART_MAIN);
+      lv_obj_set_style_pad_bottom(obj, CURRENT_BUTTON_PRESSED_OUTLINE,
+                                  LV_PART_MAIN);
       break;
 
     case ESP3DStyleType::status_list:
@@ -276,5 +293,14 @@ bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
     default:
       return false;
   }
+  return true;
+}
+
+bool apply_outline_pad(lv_obj_t* obj) {
+  lv_obj_set_style_pad_left(obj, CURRENT_BUTTON_PRESSED_OUTLINE, LV_PART_MAIN);
+  lv_obj_set_style_pad_right(obj, CURRENT_BUTTON_PRESSED_OUTLINE, LV_PART_MAIN);
+  lv_obj_set_style_pad_top(obj, CURRENT_BUTTON_PRESSED_OUTLINE, LV_PART_MAIN);
+  lv_obj_set_style_pad_bottom(obj, CURRENT_BUTTON_PRESSED_OUTLINE,
+                              LV_PART_MAIN);
   return true;
 }

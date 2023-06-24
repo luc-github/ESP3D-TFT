@@ -63,6 +63,7 @@ lv_style_set_text_opa(&style_text, LV_OPA_COVER);
 lv_style_set_text_color(&style_text, lv_color_hex(0xFFFFFF));
 lv_style_set_text_font(&style_text, &lv_font_montserrat_12);
 ```
+  
 Create the label and attach to screen :
 ```
 lv_obj_t *label1 = lv_label_create(ui_Screen1);
@@ -280,6 +281,10 @@ https://docs.lvgl.io/master/layouts/grid.html
 
 ## Timer
 https://docs.lvgl.io/master/overview/timer.html
+
+## Styles
+Instead of using style API the obj API can be used :
+lv_obj_set_style_bg_color(object, lv_palette_main(LV_PALETTE_GREY),0);
 
 
 

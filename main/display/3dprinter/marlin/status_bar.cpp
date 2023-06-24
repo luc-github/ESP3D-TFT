@@ -41,7 +41,7 @@ static void event_handler_status_list(lv_event_t *e) {
   }
 }
 
-lv_obj_t *status_bar(lv_obj_t *screen, lv_obj_t *page_container) {
+lv_obj_t *status_bar(lv_obj_t *screen) {
   // Create style for status bar
   const ESP3DValuesDescription *status_bar_desc =
       esp3dTftValues.get_description(ESP3DValuesIndex::status_bar_label);

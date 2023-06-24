@@ -124,7 +124,7 @@ bool init_styles() {
 
   /*Add a large outline when pressed*/
   lv_style_set_outline_width(&style_btn_pressed,
-                             CURRENT_BUTTON_COLOR_PRESSED_OUTLINE);
+                             CURRENT_BUTTON_PRESSED_OUTLINE);
   lv_style_set_outline_opa(&style_btn_pressed, LV_OPA_TRANSP);
 
   lv_style_set_shadow_ofs_y(&style_btn_pressed,

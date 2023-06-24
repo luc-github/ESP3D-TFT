@@ -124,7 +124,7 @@ bool init_styles() {
 
   /*Add a large outline when pressed*/
   lv_style_set_outline_width(&style_btn_pressed,
-                             CURRENT_BUTTON_COLOR_PRESSED_OUTLINE);
+                             CURRENT_BUTTON_PRESSED_OUTLINE);
   lv_style_set_outline_opa(&style_btn_pressed, LV_OPA_TRANSP);
 
   lv_style_set_shadow_ofs_y(&style_btn_pressed,
@@ -262,11 +262,15 @@ bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
     case ESP3DStyleType::row_container:
       lv_obj_add_style(obj, &style_row_container_default, LV_STATE_DEFAULT);
       lv_obj_set_style_clip_corner(obj, true, 0);
+      lv_obj_set_style_pad_top(obj, 10, LV_PART_MAIN);
+      lv_obj_set_style_pad_bottom(obj, 10, LV_PART_MAIN);
       break;
 
     case ESP3DStyleType::col_container:
       lv_obj_add_style(obj, &style_col_container_default, LV_STATE_DEFAULT);
       lv_obj_set_style_clip_corner(obj, true, 0);
+      lv_obj_set_style_pad_top(obj, 10, LV_PART_MAIN);
+      lv_obj_set_style_pad_bottom(obj, 10, LV_PART_MAIN);
       break;
 
     case ESP3DStyleType::status_list:
