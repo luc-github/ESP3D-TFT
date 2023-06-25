@@ -37,6 +37,8 @@
 
 #define CURRENT_BUTTON_BORDER_COLOR lv_palette_main(LV_PALETTE_GREY)
 #define CURRENT_BUTTON_TEXT_COLOR lv_color_hex(0xFFFFFF)
+#define CURRENT_BUTTON_OUTLINE_COLOR_PALETTE LV_PALETTE_GREEN
+#define CURRENT_BUTTON_PRESSED_COLOR_PALETTE LV_PALETTE_GREY
 
 // Create styles for main background
 lv_style_t style_main_bg;
@@ -124,8 +126,9 @@ bool init_styles() {
   lv_style_set_border_color(&style_btn_default, CURRENT_BUTTON_BORDER_COLOR);
 
   lv_style_set_outline_opa(&style_btn_default, LV_OPA_COVER);
-  lv_style_set_outline_color(&style_btn_default,
-                             lv_palette_main(CURRENT_BUTTON_COLOR_PALETTE));
+  lv_style_set_outline_color(
+      &style_btn_default,
+      lv_palette_main(CURRENT_BUTTON_OUTLINE_COLOR_PALETTE));
 
   lv_style_set_text_color(&style_btn_default, CURRENT_BUTTON_TEXT_COLOR);
   lv_style_set_pad_all(&style_btn_default, CURRENT_BUTTON_PAD);
@@ -141,11 +144,11 @@ bool init_styles() {
   lv_style_set_shadow_ofs_y(&style_btn_pressed,
                             CURRENT_BUTTON_COLOR_PRESSED_SHADOW_OFFSET);
   lv_style_set_bg_color(&style_btn_pressed,
-                        lv_palette_darken(CURRENT_BUTTON_COLOR_PALETTE,
+                        lv_palette_darken(CURRENT_BUTTON_PRESSED_COLOR_PALETTE,
                                           CURRENT_BUTTON_COLOR_PALETTE_DARKEN));
   lv_style_set_bg_grad_color(
       &style_btn_pressed,
-      lv_palette_darken(CURRENT_BUTTON_COLOR_PALETTE,
+      lv_palette_darken(CURRENT_BUTTON_PRESSED_COLOR_PALETTE,
                         CURRENT_BUTTON_COLOR_PALETTE_DARKEN * 2));
   /*Add a transition to the outline*/
   static lv_style_transition_dsc_t trans;

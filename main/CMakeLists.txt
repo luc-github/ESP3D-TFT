@@ -54,7 +54,7 @@ if(GCODE_HOST_SERVICE)
 endif()
 
  if(TFT_UI_SERVICE)
-    list(APPEND SOURCES "display")
+    #list(APPEND SOURCES "display")
     if(TARGET_FW_MARLIN)
        list(APPEND SOURCES "display/3dprinter/marlin")
     elseif(TARGET_FW_REPETIER)

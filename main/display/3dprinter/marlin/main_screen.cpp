@@ -151,6 +151,7 @@ void main_screen() {
   lv_label_set_text(labelsensors5, LV_SYMBOL_SETTINGS);
   lv_obj_center(labelsensors5);
   lv_obj_set_style_text_align(labelsensors5, LV_TEXT_ALIGN_CENTER, 0);
+  lv_obj_clear_flag(ui_sensors_container, LV_OBJ_FLAG_SCROLLABLE);
 
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
