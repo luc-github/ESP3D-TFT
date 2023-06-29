@@ -41,6 +41,7 @@ enum class ESP3DScreenType : uint8_t {
   leveling,
   filament,
   preferences,
+  informations
 };
 
 #ifdef __cplusplus

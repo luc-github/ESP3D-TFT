@@ -157,7 +157,7 @@ void event_button_resume_handler(lv_event_t *e) { esp3d_log("Resume Clicked"); }
 
 void event_button_pause_handler(lv_event_t *e) { esp3d_log("Pause Clicked"); }
 
-void event_button_stop_handler(lv_event_t *e) { esp3d_log("Pause Clicked"); }
+void event_button_stop_handler(lv_event_t *e) { esp3d_log("Stop Clicked"); }
 
 void main_screen() {
   esp3dTftui.set_current_screen(ESP3DScreenType::main);
