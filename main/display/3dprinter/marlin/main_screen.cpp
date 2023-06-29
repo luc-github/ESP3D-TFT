@@ -30,6 +30,12 @@
  **********************/
 
 void empty_screen();
+void temperatures_screen();
+void positions_screen();
+void fan_screen();
+void speed_screen();
+void files_screen();
+void settings_screen();
 
 lv_timer_t *main_stream_delay_timer = NULL;
 ESP3DScreenType next_screen = ESP3DScreenType::none;
@@ -44,6 +50,25 @@ void main_stream_delay_timer_cb(lv_timer_t *timer) {
     case ESP3DScreenType::none:
       empty_screen();
       break;
+    case ESP3DScreenType::temperatures:
+      temperatures_screen();
+      break;
+    case ESP3DScreenType::positions:
+      positions_screen();
+      break;
+    case ESP3DScreenType::fan:
+      fan_screen();
+      break;
+    case ESP3DScreenType::speed:
+      speed_screen();
+      break;
+    case ESP3DScreenType::files:
+      files_screen();
+      break;
+    case ESP3DScreenType::settings:
+      settings_screen();
+      break;
+
     default:
 
       break;
@@ -67,13 +92,72 @@ lv_obj_t *create_button(lv_obj_t *container, lv_obj_t *&btn, lv_obj_t *&label,
 void event_button_E0_handler(lv_event_t *e) {
   esp3d_log("E0 Clicked");
   if (main_stream_delay_timer) return;
-  next_screen = ESP3DScreenType::none;
+  next_screen = ESP3DScreenType::temperatures;
   main_stream_delay_timer =
       lv_timer_create(main_stream_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
 }
 
-lv_obj_t *labelE0 = nullptr;
-lv_obj_t *btnE0 = nullptr;
+void event_button_E1_handler(lv_event_t *e) {
+  esp3d_log("E1 Clicked");
+  if (main_stream_delay_timer) return;
+  next_screen = ESP3DScreenType::temperatures;
+  main_stream_delay_timer =
+      lv_timer_create(main_stream_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+}
+
+void event_button_Bed_handler(lv_event_t *e) {
+  esp3d_log("Bed Clicked");
+  if (main_stream_delay_timer) return;
+  next_screen = ESP3DScreenType::temperatures;
+  main_stream_delay_timer =
+      lv_timer_create(main_stream_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+}
+
+void event_button_positions_handler(lv_event_t *e) {
+  esp3d_log("Positions Clicked");
+  if (main_stream_delay_timer) return;
+  next_screen = ESP3DScreenType::positions;
+  main_stream_delay_timer =
+      lv_timer_create(main_stream_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+}
+
+void event_button_fan_handler(lv_event_t *e) {
+  esp3d_log("Fan Clicked");
+  if (main_stream_delay_timer) return;
+  next_screen = ESP3DScreenType::fan;
+  main_stream_delay_timer =
+      lv_timer_create(main_stream_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+}
+
+void event_button_speed_handler(lv_event_t *e) {
+  esp3d_log("Speed Clicked");
+  if (main_stream_delay_timer) return;
+  next_screen = ESP3DScreenType::speed;
+  main_stream_delay_timer =
+      lv_timer_create(main_stream_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+}
+
+void event_button_files_handler(lv_event_t *e) {
+  esp3d_log("Files Clicked");
+  if (main_stream_delay_timer) return;
+  next_screen = ESP3DScreenType::files;
+  main_stream_delay_timer =
+      lv_timer_create(main_stream_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+}
+
+void event_button_settings_handler(lv_event_t *e) {
+  esp3d_log("Settings Clicked");
+  if (main_stream_delay_timer) return;
+  next_screen = ESP3DScreenType::settings;
+  main_stream_delay_timer =
+      lv_timer_create(main_stream_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+}
+
+void event_button_resume_handler(lv_event_t *e) { esp3d_log("Resume Clicked"); }
+
+void event_button_pause_handler(lv_event_t *e) { esp3d_log("Pause Clicked"); }
+
+void event_button_stop_handler(lv_event_t *e) { esp3d_log("Pause Clicked"); }
 
 void main_screen() {
   esp3dTftui.set_current_screen(ESP3DScreenType::main);
@@ -130,16 +214,20 @@ void main_screen() {
   label = create_button(ui_top_buttons_container, btn, label);
   lv_label_set_text_fmt(label, "%s\n%s\n%s%s", "20", "60",
                         LV_SYMBOL_HEAT_EXTRUDER, "2");
+  lv_obj_add_event_cb(btn, event_button_E1_handler, LV_EVENT_PRESSED, NULL);
 
   // Create button and label for Bed
   label = create_button(ui_top_buttons_container, btn, label);
   lv_label_set_text_fmt(label, "%s\n%s\n%s", "20", "60", LV_SYMBOL_HEAT_BED);
+  lv_obj_add_event_cb(btn, event_button_Bed_handler, LV_EVENT_PRESSED, NULL);
 
   // Create button and label for positions
   label = create_button(ui_top_buttons_container, btn, label,
                         BUTTON_WIDTH * 1.5, false);
   lv_label_set_text_fmt(label, "X: %s\nY: %s\nZ: %s", "150.00", "60.00",
                         "15.00");
+  lv_obj_add_event_cb(btn, event_button_positions_handler, LV_EVENT_PRESSED,
+                      NULL);
 
   // Create button and label for middle container
   label = lv_label_create(ui_middle_container);
@@ -153,22 +241,28 @@ void main_screen() {
   // Create button and label for fan
   label = create_button(ui_bottom_buttons_container, btn, label);
   lv_label_set_text_fmt(label, "%s\n%s", "100%", LV_SYMBOL_FAN);
+  lv_obj_add_event_cb(btn, event_button_fan_handler, LV_EVENT_PRESSED, NULL);
 
   // Create button and label for speed
   label = create_button(ui_bottom_buttons_container, btn, label);
   lv_label_set_text_fmt(label, "%s\n%s", "100%", LV_SYMBOL_SPEED);
+  lv_obj_add_event_cb(btn, event_button_speed_handler, LV_EVENT_PRESSED, NULL);
 
   // Create button and label for pause
   label = create_button(ui_bottom_buttons_container, btn, label);
   lv_label_set_text_fmt(label, "%s", LV_SYMBOL_PAUSE);
+  lv_obj_add_event_cb(btn, event_button_pause_handler, LV_EVENT_PRESSED, NULL);
 
   // Create button and label for stop
   label = create_button(ui_bottom_buttons_container, btn, label);
   lv_label_set_text_fmt(label, "%s", LV_SYMBOL_STOP);
+  lv_obj_add_event_cb(btn, event_button_stop_handler, LV_EVENT_PRESSED, NULL);
 
   // Create button and label for settings
   label = create_button(ui_bottom_buttons_container, btn, label);
   lv_label_set_text_fmt(label, "%s", LV_SYMBOL_SETTINGS);
+  lv_obj_add_event_cb(btn, event_button_settings_handler, LV_EVENT_PRESSED,
+                      NULL);
 
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();

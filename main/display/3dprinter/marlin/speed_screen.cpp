@@ -1,0 +1,59 @@
+/*
+  esp3d_tft
+
+  Copyright (c) 2022 Luc Lebosse. All rights reserved.
+
+  This code is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This code is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
+#include <string>
+
+#include "esp3d_hal.h"
+#include "esp3d_log.h"
+#include "esp3d_styles.h"
+#include "esp3d_tft_ui.h"
+
+/**********************
+ *  STATIC PROTOTYPES
+ **********************/
+
+void main_screen();
+
+void event_button_speed_back_handler(lv_event_t *e) {
+  esp3d_log("back Clicked");
+  main_screen();
+}
+
+void speed_screen() {
+  esp3dTftui.set_current_screen(ESP3DScreenType::speed);
+  // Screen creation
+  esp3d_log("Speed screen creation");
+  lv_obj_t *ui_new_screen = lv_obj_create(NULL);
+  apply_style(ui_new_screen, ESP3DStyleType::main_bg);
+
+  // TODO: Add your code here
+  lv_obj_t *btn = lv_btn_create(ui_new_screen);
+  lv_obj_t *label = lv_label_create(btn);
+  lv_obj_center(btn);
+  lv_obj_center(label);
+  lv_label_set_text(label, "Back");
+  lv_obj_add_event_cb(btn, event_button_speed_back_handler, LV_EVENT_PRESSED,
+                      NULL);
+
+  // Display new screen and delete old one
+  lv_obj_t *ui_current_screen = lv_scr_act();
+  lv_scr_load(ui_new_screen);
+  lv_obj_del(ui_current_screen);
+}

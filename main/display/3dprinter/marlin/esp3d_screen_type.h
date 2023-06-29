@@ -26,7 +26,22 @@
 extern "C" {
 #endif
 
-enum class ESP3DScreenType : uint8_t { none = 0, splash, main, status_list };
+enum class ESP3DScreenType : uint8_t {
+  none = 0,
+  splash,
+  main,
+  status_list,
+  temperatures,
+  positions,
+  files,
+  fan,
+  speed,
+  settings,
+  wifi,
+  leveling,
+  filament,
+  preferences,
+};
 
 #ifdef __cplusplus
 }  // extern "C"
