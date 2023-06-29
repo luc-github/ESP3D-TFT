@@ -50,7 +50,7 @@ bool status_list_cb(ESP3DValuesIndex index, const char *value,
     esp3d_log("status_list pushing %s now size is %d", value,
               ui_status_screen_list.size());
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::status_list) {
-      esp3d_log("Refreshibng status screen");
+      esp3d_log("Refreshing status screen");
       status_screen();
     } else {
       esp3d_log("No refreshe needed");
@@ -78,15 +78,12 @@ void status_screen() {
   // Screen creation
   esp3d_log("Main screen creation");
   lv_obj_t *ui_status_screen = lv_obj_create(NULL);
-  const ESP3DValuesDescription *status_bar_desc =
-      esp3dTftValues.get_description(ESP3DValuesIndex::status_bar_label);
 
   // Apply background color
   apply_style(ui_status_screen, ESP3DStyleType::main_bg);
   // Create screen container
   lv_obj_t *ui_status_screen_container = lv_obj_create(ui_status_screen);
   apply_style(ui_status_screen_container, ESP3DStyleType::col_container);
-  // Set container size
   lv_obj_set_size(ui_status_screen_container, LV_HOR_RES, LV_VER_RES);
   lv_obj_clear_flag(ui_status_screen_container, LV_OBJ_FLAG_SCROLLABLE);
   lv_obj_set_style_pad_top(ui_status_screen_container, 0, LV_PART_MAIN);

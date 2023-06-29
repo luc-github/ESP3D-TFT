@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 
+#include "esp3d_styles_res.h"
 #include "lvgl.h"
 
 #ifdef __cplusplus

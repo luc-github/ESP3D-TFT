@@ -22,23 +22,34 @@
 
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
-#include "lvgl.h"
+#include "esp3d_styles.h"
+#include "esp3d_tft_ui.h"
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 
+void main_screen();
+
+void event_button_handler(lv_event_t *e) {
+  esp3d_log("back Clicked");
+  main_screen();
+}
+
 void empty_screen() {
+  esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Main screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
-  // Apply background color
-  lv_obj_set_style_bg_color(ui_new_screen, lv_color_hex(0x000000),
-                            LV_PART_MAIN);
-  lv_obj_clear_flag(ui_new_screen, LV_OBJ_FLAG_SCROLLABLE);
-  // Fill screen content
+  apply_style(ui_new_screen, ESP3DStyleType::main_bg);
 
   // TODO: Add your code here
+  lv_obj_t *btn = lv_btn_create(ui_new_screen);
+  lv_obj_t *label = lv_label_create(btn);
+  lv_obj_center(btn);
+  lv_obj_center(label);
+  lv_label_set_text(label, "Back");
+  lv_obj_add_event_cb(btn, event_button_handler, LV_EVENT_PRESSED, NULL);
 
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();

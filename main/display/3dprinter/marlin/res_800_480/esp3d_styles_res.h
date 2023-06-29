@@ -38,6 +38,11 @@ extern "C" {
 
 #define CURRENT_CONTAINER_RADIUS 10
 
+#define BUTTON_WIDTH (LV_HOR_RES / 6)
+#define BUTTON_HEIGHT BUTTON_WIDTH
+
+#define BUTTON_ANIMATION_DELAY 300
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

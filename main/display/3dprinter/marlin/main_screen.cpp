@@ -29,7 +29,51 @@
  *  STATIC PROTOTYPES
  **********************/
 
+void empty_screen();
+
+lv_timer_t *main_stream_delay_timer = NULL;
+ESP3DScreenType next_screen = ESP3DScreenType::none;
+
+void main_stream_delay_timer_cb(lv_timer_t *timer) {
+  // If timer is not null, delete it to avoid multiple call
+  if (main_stream_delay_timer) {
+    lv_timer_del(main_stream_delay_timer);
+    main_stream_delay_timer = NULL;
+  }
+  switch (next_screen) {
+    case ESP3DScreenType::none:
+      empty_screen();
+      break;
+    default:
+
+      break;
+  }
+  next_screen = ESP3DScreenType::none;
+}
+
 lv_obj_t *status_bar(lv_obj_t *screen);
+
+lv_obj_t *create_button(lv_obj_t *container, lv_obj_t *&btn, lv_obj_t *&label,
+                        int width = BUTTON_WIDTH, bool center = true) {
+  btn = lv_btn_create(container);
+  apply_style(btn, ESP3DStyleType::button);
+  lv_obj_set_size(btn, width, BUTTON_HEIGHT);
+  label = lv_label_create(btn);
+  lv_obj_center(label);
+  if (center) lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
+  return label;
+}
+
+void event_button_E0_handler(lv_event_t *e) {
+  esp3d_log("E0 Clicked");
+  if (main_stream_delay_timer) return;
+  next_screen = ESP3DScreenType::none;
+  main_stream_delay_timer =
+      lv_timer_create(main_stream_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+}
+
+lv_obj_t *labelE0 = nullptr;
+lv_obj_t *btnE0 = nullptr;
 
 void main_screen() {
   esp3dTftui.set_current_screen(ESP3DScreenType::main);
@@ -41,131 +85,90 @@ void main_screen() {
 
   lv_obj_t *ui_status_bar_container = status_bar(ui_main_screen);
   lv_obj_update_layout(ui_status_bar_container);
-  // create container for main screen buttons
 
+  // create container for main screen buttons
   lv_obj_t *ui_container_main_screen = lv_obj_create(ui_main_screen);
   apply_style(ui_container_main_screen, ESP3DStyleType::col_container);
   lv_obj_clear_flag(ui_container_main_screen, LV_OBJ_FLAG_SCROLLABLE);
-
-  // Set container size
   lv_obj_set_size(ui_container_main_screen, LV_HOR_RES,
                   LV_VER_RES - lv_obj_get_height(ui_status_bar_container));
-  // Align container under status bar
   lv_obj_align_to(ui_container_main_screen, ui_status_bar_container,
                   LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
 
-  // Add buttons containers to main container
-  lv_obj_t *ui_heaters_container = lv_obj_create(ui_container_main_screen);
-  apply_style(ui_heaters_container, ESP3DStyleType::row_container);
-  lv_obj_set_size(ui_heaters_container, LV_HOR_RES, LV_SIZE_CONTENT);
-  apply_outline_pad(ui_heaters_container);
+  // Add buttons top containers to main container
+  lv_obj_t *ui_top_buttons_container = lv_obj_create(ui_container_main_screen);
+  apply_style(ui_top_buttons_container, ESP3DStyleType::row_container);
+  lv_obj_set_size(ui_top_buttons_container, LV_HOR_RES, LV_SIZE_CONTENT);
+  apply_outline_pad(ui_top_buttons_container);
+  lv_obj_clear_flag(ui_top_buttons_container, LV_OBJ_FLAG_SCROLLABLE);
 
-  lv_obj_t *ui_move_container = lv_btn_create(ui_container_main_screen);
-  apply_style(ui_move_container, ESP3DStyleType::row_container);
-  lv_obj_set_size(ui_move_container, LV_HOR_RES, LV_SIZE_CONTENT);
-  apply_outline_pad(ui_move_container);
-  lv_obj_t *ui_btn_move = lv_btn_create(ui_move_container);
-  apply_style(ui_btn_move, ESP3DStyleType::button);
+  // Middle container
+  lv_obj_t *ui_middle_container = lv_btn_create(ui_container_main_screen);
+  apply_style(ui_middle_container, ESP3DStyleType::row_container);
+  lv_obj_set_size(ui_middle_container, LV_HOR_RES, LV_SIZE_CONTENT);
+  apply_outline_pad(ui_middle_container);
 
-  lv_obj_t *ui_sensors_container = lv_obj_create(ui_container_main_screen);
-  apply_style(ui_sensors_container, ESP3DStyleType::row_container);
-  lv_obj_set_size(ui_sensors_container, LV_HOR_RES, LV_SIZE_CONTENT);
-  apply_outline_pad(ui_sensors_container);
-
-  lv_obj_t *ui_menu_container = lv_obj_create(ui_container_main_screen);
-  apply_style(ui_menu_container, ESP3DStyleType::row_container);
-  lv_obj_set_size(ui_menu_container, LV_HOR_RES, LV_SIZE_CONTENT);
-  apply_outline_pad(ui_menu_container);
-
-#define BUTTON_WIDTH (LV_HOR_RES / 6)
-#define BUTTON_HEIGHT (123)
+  // Add buttons bottom containers to main container
+  lv_obj_t *ui_bottom_buttons_container =
+      lv_obj_create(ui_container_main_screen);
+  apply_style(ui_bottom_buttons_container, ESP3DStyleType::row_container);
+  lv_obj_set_size(ui_bottom_buttons_container, LV_HOR_RES, LV_SIZE_CONTENT);
+  apply_outline_pad(ui_bottom_buttons_container);
+  lv_obj_clear_flag(ui_bottom_buttons_container, LV_OBJ_FLAG_SCROLLABLE);
 
   //**********************************
-  lv_obj_t *btn1 = lv_btn_create(ui_heaters_container);
-  apply_style(btn1, ESP3DStyleType::button);
-  lv_obj_set_size(btn1, BUTTON_WIDTH, BUTTON_HEIGHT);
-  lv_obj_t *label = lv_label_create(btn1);
-  lv_label_set_recolor(label, true);
+  lv_obj_t *label = nullptr;
+  lv_obj_t *btn = nullptr;
+
+  // Create button and label for Extruder 0
+  label = create_button(ui_top_buttons_container, btn, label);
   lv_label_set_text_fmt(label, "%s\n%s\n%s%s", "160", "260",
                         LV_SYMBOL_HEAT_EXTRUDER, "1");
-  lv_obj_center(label);
-  lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
+  lv_obj_add_event_cb(btn, event_button_E0_handler, LV_EVENT_PRESSED, NULL);
 
-  lv_obj_t *btn2 = lv_btn_create(ui_heaters_container);
-  apply_style(btn2, ESP3DStyleType::button);
-  lv_obj_set_size(btn2, BUTTON_WIDTH, BUTTON_HEIGHT);
-  lv_obj_t *label2 = lv_label_create(btn2);
-  lv_label_set_text_fmt(label2, "%s\n%s\n%s%s", "20", "60", LV_SYMBOL_EXTRUDER,
-                        "2");
-  lv_obj_center(label2);
-  lv_obj_set_style_text_align(label2, LV_TEXT_ALIGN_CENTER, 0);
+  // Create button and label for Extruder 1
+  label = create_button(ui_top_buttons_container, btn, label);
+  lv_label_set_text_fmt(label, "%s\n%s\n%s%s", "20", "60",
+                        LV_SYMBOL_HEAT_EXTRUDER, "2");
 
-  lv_obj_t *btn22 = lv_btn_create(ui_heaters_container);
-  apply_style(btn22, ESP3DStyleType::button);
-  lv_obj_set_size(btn22, BUTTON_WIDTH, BUTTON_HEIGHT);
-  lv_obj_t *label22 = lv_label_create(btn22);
+  // Create button and label for Bed
+  label = create_button(ui_top_buttons_container, btn, label);
+  lv_label_set_text_fmt(label, "%s\n%s\n%s", "20", "60", LV_SYMBOL_HEAT_BED);
 
-  lv_label_set_text_fmt(label22, "%s\n%s\n%s", "20", "60",
-                        LV_SYMBOL_NO_HEAT_BED);
-  lv_obj_center(label22);
-  lv_obj_set_style_text_align(label22, LV_TEXT_ALIGN_CENTER, 0);
-
-  lv_obj_t *btn3 = lv_btn_create(ui_heaters_container);
-  apply_style(btn3, ESP3DStyleType::button);
-  lv_obj_set_size(btn3, LV_SIZE_CONTENT, BUTTON_HEIGHT);
-  lv_obj_t *label3 = lv_label_create(btn3);
-  lv_label_set_text_fmt(label3, "X: %s\nY: %s\nZ: %s", "150.00", "60.00",
+  // Create button and label for positions
+  label = create_button(ui_top_buttons_container, btn, label,
+                        BUTTON_WIDTH * 1.5, false);
+  lv_label_set_text_fmt(label, "X: %s\nY: %s\nZ: %s", "150.00", "60.00",
                         "15.00");
-  lv_obj_center(label3);
 
-  lv_obj_t *posxyz = lv_label_create(ui_btn_move);
-  lv_label_set_text_fmt(
-      posxyz, "Progression: %s %%  ETE: 11H 22M 14S\nTest.gco", "50.2");
-  lv_obj_center(posxyz);
-  lv_obj_set_size(ui_btn_move, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-  lv_obj_update_layout(label3);
-  lv_obj_update_layout(btn3);
+  // Create button and label for middle container
+  label = lv_label_create(ui_middle_container);
+  apply_style(label, ESP3DStyleType::status_bar);
+  // lv_obj_t *label = lv_label_create(ui_btn_middle);
+  lv_label_set_text_fmt(label, "Progression: %s %%  ETE: 11H 22M 14S\nTest.gco",
+                        "50.2");
+  lv_obj_center(label);
+  lv_obj_set_size(label, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
 
-  lv_obj_t *btnsensors1 = lv_btn_create(ui_sensors_container);
-  apply_style(btnsensors1, ESP3DStyleType::button);
-  lv_obj_set_size(btnsensors1, BUTTON_WIDTH, BUTTON_WIDTH);
-  lv_obj_t *labelsensors1 = lv_label_create(btnsensors1);
-  lv_label_set_text_fmt(labelsensors1, "%s\n%s", "100%", LV_SYMBOL_FAN);
-  lv_obj_center(labelsensors1);
-  lv_obj_set_style_text_align(labelsensors1, LV_TEXT_ALIGN_CENTER, 0);
+  // Create button and label for fan
+  label = create_button(ui_bottom_buttons_container, btn, label);
+  lv_label_set_text_fmt(label, "%s\n%s", "100%", LV_SYMBOL_FAN);
 
-  lv_obj_t *btnsensors2 = lv_btn_create(ui_sensors_container);
-  apply_style(btnsensors2, ESP3DStyleType::button);
-  lv_obj_set_size(btnsensors2, BUTTON_WIDTH, BUTTON_WIDTH);
-  lv_obj_t *labelsensors2 = lv_label_create(btnsensors2);
-  lv_label_set_text_fmt(labelsensors2, "%s\n%s", "100%", LV_SYMBOL_SPEED);
-  lv_obj_center(labelsensors2);
-  lv_obj_set_style_text_align(labelsensors2, LV_TEXT_ALIGN_CENTER, 0);
+  // Create button and label for speed
+  label = create_button(ui_bottom_buttons_container, btn, label);
+  lv_label_set_text_fmt(label, "%s\n%s", "100%", LV_SYMBOL_SPEED);
 
-  lv_obj_t *btnsensors3 = lv_btn_create(ui_sensors_container);
-  apply_style(btnsensors3, ESP3DStyleType::button);
-  lv_obj_set_size(btnsensors3, BUTTON_WIDTH, BUTTON_WIDTH);
-  lv_obj_t *labelsensors3 = lv_label_create(btnsensors3);
-  lv_label_set_text_fmt(labelsensors3, "%s", LV_SYMBOL_PAUSE);
-  lv_obj_center(labelsensors3);
-  lv_obj_set_style_text_align(labelsensors3, LV_TEXT_ALIGN_CENTER, 0);
+  // Create button and label for pause
+  label = create_button(ui_bottom_buttons_container, btn, label);
+  lv_label_set_text_fmt(label, "%s", LV_SYMBOL_PAUSE);
 
-  lv_obj_t *btnsensors4 = lv_btn_create(ui_sensors_container);
-  apply_style(btnsensors4, ESP3DStyleType::button);
-  lv_obj_set_size(btnsensors4, BUTTON_WIDTH, BUTTON_WIDTH);
-  lv_obj_t *labelsensors4 = lv_label_create(btnsensors4);
-  lv_label_set_text(labelsensors4, LV_SYMBOL_STOP);
-  lv_obj_center(labelsensors4);
-  lv_obj_set_style_text_align(labelsensors4, LV_TEXT_ALIGN_CENTER, 0);
+  // Create button and label for stop
+  label = create_button(ui_bottom_buttons_container, btn, label);
+  lv_label_set_text_fmt(label, "%s", LV_SYMBOL_STOP);
 
-  lv_obj_t *btnsensors5 = lv_btn_create(ui_sensors_container);
-  apply_style(btnsensors5, ESP3DStyleType::button);
-  lv_obj_set_size(btnsensors5, BUTTON_WIDTH, BUTTON_WIDTH);
-  lv_obj_t *labelsensors5 = lv_label_create(btnsensors5);
-  lv_label_set_text(labelsensors5, LV_SYMBOL_SETTINGS);
-  lv_obj_center(labelsensors5);
-  lv_obj_set_style_text_align(labelsensors5, LV_TEXT_ALIGN_CENTER, 0);
-  lv_obj_clear_flag(ui_sensors_container, LV_OBJ_FLAG_SCROLLABLE);
+  // Create button and label for settings
+  label = create_button(ui_bottom_buttons_container, btn, label);
+  lv_label_set_text_fmt(label, "%s", LV_SYMBOL_SETTINGS);
 
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();

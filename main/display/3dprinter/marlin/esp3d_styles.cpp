@@ -21,7 +21,6 @@
 #include "esp3d_styles.h"
 
 #include "esp3d_log.h"
-#include "esp3d_styles_res.h"
 
 #define CURRENT_MAIN_BG_COLOR lv_color_hex(0x000000)
 
@@ -65,20 +64,8 @@ lv_style_t style_row_container_default;
 
 bool init_styles() {
   /*
-  lv_theme_t* th = lv_theme_default_init(
-      display, //Use the DPI, size, etc from this display
-      LV_COLOR_PALETTE_BLUE,
-      LV_COLOR_PALETTE_CYAN, //Primary and secondary palette
-      false,                 //Light or dark mode
-      &lv_font_montserrat_10, &lv_font_montserrat_14,
-      &lv_font_montserrat_18); //Small, normal, large fonts
-
-  lv_disp_set_theme(display, th); //Assign the theme to the display
-  */
-  /*
   Main background
   */
-  // Create style for main background
   // N/A
 
   /*
@@ -162,8 +149,8 @@ bool init_styles() {
   static lv_style_transition_dsc_t trans;
   static lv_style_prop_t props[] = {LV_STYLE_OUTLINE_WIDTH,
                                     LV_STYLE_OUTLINE_OPA, LV_STYLE_PROP_INV};
-  lv_style_transition_dsc_init(&trans, props, lv_anim_path_linear, 300, 0,
-                               NULL);
+  lv_style_transition_dsc_init(&trans, props, lv_anim_path_linear,
+                               BUTTON_ANIMATION_DELAY, 0, NULL);
   lv_style_set_transition(&style_btn_pressed, &trans);
 
   /*
