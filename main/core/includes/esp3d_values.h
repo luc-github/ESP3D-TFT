@@ -26,10 +26,6 @@
 #include <list>
 #include <string>
 
-#if ESP3D_DISPLAY_FEATURE
-#include "lvgl.h"
-#endif  // ESP3D_DISPLAY_FEATURE
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -65,9 +61,6 @@ struct ESP3DValuesDescription {
   size_t size = 0;
   std::string value = "";
   callbackFunction_t callbackFn = nullptr;
-#if ESP3D_DISPLAY_FEATURE
-  mutable lv_obj_t* label = nullptr;
-#endif  // ESP3D_DISPLAY_FEATURE
 };
 
 class ESP3DValues final {

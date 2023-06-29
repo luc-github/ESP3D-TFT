@@ -23,14 +23,33 @@
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_styles.h"
+#include "esp3d_tft_ui.h"
 #include "esp3d_values.h"
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-lv_obj_t *status_bar_container = NULL;
 
 void status_screen();
+bool status_list_cb(ESP3DValuesIndex index, const char *value,
+                    ESP3DValuesCbAction action);
+/**********************
+ *  STATIC VARIABLES
+ **********************/
+lv_obj_t *status_bar_label = nullptr;
+
+bool status_bar_cb(ESP3DValuesIndex index, const char *value,
+                   ESP3DValuesCbAction action) {
+  if (action == ESP3DValuesCbAction::Add ||
+      action == ESP3DValuesCbAction::Update) {
+    if (status_bar_label != nullptr &&
+        esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
+      lv_label_set_text(status_bar_label, value);
+    }
+  }
+  status_list_cb(index, value, action);
+  return true;
+}
 
 static void event_handler_status_list(lv_event_t *e) {
   lv_event_code_t code = lv_event_get_code(e);
@@ -50,10 +69,10 @@ lv_obj_t *status_bar(lv_obj_t *screen) {
     return nullptr;
   }
 
-  status_bar_container = lv_obj_create(screen);
-  status_bar_desc->label = lv_label_create(status_bar_container);
-  apply_style(status_bar_desc->label, ESP3DStyleType::status_bar);
-  lv_label_set_text(status_bar_desc->label, status_bar_desc->value.c_str());
+  lv_obj_t *status_bar_container = lv_obj_create(screen);
+  status_bar_label = lv_label_create(status_bar_container);
+  apply_style(status_bar_label, ESP3DStyleType::status_bar);
+  lv_label_set_text(status_bar_label, status_bar_desc->value.c_str());
 
   // Apply style to status bar
 

@@ -78,39 +78,53 @@ void main_screen() {
   apply_outline_pad(ui_menu_container);
 
 #define BUTTON_WIDTH (LV_HOR_RES / 6)
+#define BUTTON_HEIGHT (123)
 
   //**********************************
   lv_obj_t *btn1 = lv_btn_create(ui_heaters_container);
   apply_style(btn1, ESP3DStyleType::button);
-  lv_obj_set_size(btn1, BUTTON_WIDTH, BUTTON_WIDTH);
+  lv_obj_set_size(btn1, BUTTON_WIDTH, BUTTON_HEIGHT);
   lv_obj_t *label = lv_label_create(btn1);
-  lv_label_set_text_fmt(label, "%s\n%s\n%s%s", "160", "260", LV_SYMBOL_EXTRUDER,
-                        "1");
+  lv_label_set_recolor(label, true);
+  lv_label_set_text_fmt(label, "%s\n%s\n%s%s", "160", "260",
+                        LV_SYMBOL_HEAT_EXTRUDER, "1");
   lv_obj_center(label);
   lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
 
   lv_obj_t *btn2 = lv_btn_create(ui_heaters_container);
   apply_style(btn2, ESP3DStyleType::button);
-  lv_obj_set_size(btn2, BUTTON_WIDTH, BUTTON_WIDTH);
+  lv_obj_set_size(btn2, BUTTON_WIDTH, BUTTON_HEIGHT);
   lv_obj_t *label2 = lv_label_create(btn2);
-  lv_label_set_text_fmt(label2, "%s\n%s\n%s%s", "60", "60", LV_SYMBOL_EXTRUDER,
+  lv_label_set_text_fmt(label2, "%s\n%s\n%s%s", "20", "60", LV_SYMBOL_EXTRUDER,
                         "2");
   lv_obj_center(label2);
   lv_obj_set_style_text_align(label2, LV_TEXT_ALIGN_CENTER, 0);
 
+  lv_obj_t *btn22 = lv_btn_create(ui_heaters_container);
+  apply_style(btn22, ESP3DStyleType::button);
+  lv_obj_set_size(btn22, BUTTON_WIDTH, BUTTON_HEIGHT);
+  lv_obj_t *label22 = lv_label_create(btn22);
+
+  lv_label_set_text_fmt(label22, "%s\n%s\n%s", "20", "60",
+                        LV_SYMBOL_NO_HEAT_BED);
+  lv_obj_center(label22);
+  lv_obj_set_style_text_align(label22, LV_TEXT_ALIGN_CENTER, 0);
+
   lv_obj_t *btn3 = lv_btn_create(ui_heaters_container);
   apply_style(btn3, ESP3DStyleType::button);
-  lv_obj_set_size(btn3, BUTTON_WIDTH, BUTTON_WIDTH);
+  lv_obj_set_size(btn3, LV_SIZE_CONTENT, BUTTON_HEIGHT);
   lv_obj_t *label3 = lv_label_create(btn3);
-  lv_label_set_text_fmt(label3, "%s\n%s\n%s", "60", "60", LV_SYMBOL_HEAT_BED);
+  lv_label_set_text_fmt(label3, "X: %s\nY: %s\nZ: %s", "150.00", "60.00",
+                        "15.00");
   lv_obj_center(label3);
-  lv_obj_set_style_text_align(label3, LV_TEXT_ALIGN_CENTER, 0);
 
   lv_obj_t *posxyz = lv_label_create(ui_btn_move);
-  lv_label_set_text_fmt(posxyz, "    X: %s     Y: %s     Z: %s    ", "100.0",
-                        "160.0", "1.0");
+  lv_label_set_text_fmt(
+      posxyz, "Progression: %s %%  ETE: 11H 22M 14S\nTest.gco", "50.2");
   lv_obj_center(posxyz);
   lv_obj_set_size(ui_btn_move, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+  lv_obj_update_layout(label3);
+  lv_obj_update_layout(btn3);
 
   lv_obj_t *btnsensors1 = lv_btn_create(ui_sensors_container);
   apply_style(btnsensors1, ESP3DStyleType::button);
@@ -132,7 +146,7 @@ void main_screen() {
   apply_style(btnsensors3, ESP3DStyleType::button);
   lv_obj_set_size(btnsensors3, BUTTON_WIDTH, BUTTON_WIDTH);
   lv_obj_t *labelsensors3 = lv_label_create(btnsensors3);
-  lv_label_set_text_fmt(labelsensors3, "%s\n%s", "40%", LV_SYMBOL_PAUSE);
+  lv_label_set_text_fmt(labelsensors3, "%s", LV_SYMBOL_PAUSE);
   lv_obj_center(labelsensors3);
   lv_obj_set_style_text_align(labelsensors3, LV_TEXT_ALIGN_CENTER, 0);
 

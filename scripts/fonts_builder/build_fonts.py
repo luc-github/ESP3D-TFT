@@ -18,8 +18,8 @@ symbols_array = [
 [0xf027,'VOLUME_LOW','fa-solid-900.ttf'],
 [0xf6a9,'VOLUME_OFF','fa-solid-900.ttf'],
 [0xf013,'SETTINGS','fa-solid-900.ttf'],
-[0xf1de,'SETTINGS_2','fa-solid-900.ttf'],
-[0xf7d9,'SETTINGS_3','fa-solid-900.ttf'],
+[0xf2d1,'NO_HEAT_BED','fa-solid-900.ttf'],
+[0xe040,'HEAT_EXTRUDER','fa-solid-900.ttf'],
 [0xf2ed,'TRASH','fa-solid-900.ttf'],
 [0xe3af,'HOME','fa-solid-900.ttf'],
 [0xf019,'DOWNLOAD','fa-solid-900.ttf'],
@@ -53,7 +53,7 @@ symbols_array = [
 [0xf624,'GAUGE','fa-solid-900.ttf'],
 [0xf1ab,'LANGUAGE','fa-solid-900.ttf'],
 [0xf863,'FAN','fa-solid-900.ttf'],
-[0xf48b,'SPEED_','fa-solid-900.ttf'],
+[0xf48b,'SPEED','fa-solid-900.ttf'],
 [0xf72b,'WIZARD','fa-solid-900.ttf'],
 [0xf185,'LIGHT','fa-solid-900.ttf'],
 [0xf05b,'CENTER','fa-solid-900.ttf'],
@@ -69,7 +69,8 @@ symbols_array = [
 [0xe4c3,'MILLING','fa-solid-900.ttf'],
 [0xf3e5,'NEW_LINE','fa-solid-900.ttf'],
 [0xf293,'BLUETOOTH','fa-brands-400.ttf'],
-[0xf287,'USB','fa-brands-400.ttf']
+[0xf287,'USB','fa-brands-400.ttf'],
+[0xf055,'MORE_INFO','fa-solid-900.ttf']
 ]
 
 #list of font sizes to generate

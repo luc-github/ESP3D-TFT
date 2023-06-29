@@ -38,7 +38,7 @@ class ESP3DTftUi final {
   ESP3DScreenType get_current_screen() { return _current_screen; }
 
  private:
-  ESP3DScreenType _current_screen = ESP3DScreenType::splash;
+  ESP3DScreenType _current_screen = ESP3DScreenType::none;
   bool _started;
 };
 

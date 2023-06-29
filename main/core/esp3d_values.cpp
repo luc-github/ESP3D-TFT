@@ -72,15 +72,6 @@ bool ESP3DValues::set_string_value(ESP3DValuesIndex index, const char* value) {
       if (element->callbackFn) {
         element->callbackFn(element->index, value, ESP3DValuesCbAction::Update);
       }
-#if ESP3D_DISPLAY_FEATURE
-      esp3d_log("label %d %d ", (int)element->index, (int)(&(element->label)));
-      if (element->label) {
-        lv_label_set_text(element->label, value);
-      } else {
-        esp3d_log_w("label %d %d is null", (int)element->index,
-                    (int)(&(element->label)));
-      }
-#endif  // ESP3D_DISPLAY_FEATURE
       return true;
     }
   }

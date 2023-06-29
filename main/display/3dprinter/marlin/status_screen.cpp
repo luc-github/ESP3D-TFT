@@ -80,19 +80,17 @@ void status_screen() {
   lv_obj_t *ui_status_screen = lv_obj_create(NULL);
   const ESP3DValuesDescription *status_bar_desc =
       esp3dTftValues.get_description(ESP3DValuesIndex::status_bar_label);
-  // the control is deleted but not the label is not set to null so we need to
-  // do it to avoid crash if we try to update it
-  if (status_bar_desc != nullptr &&
-      ESP3DScreenType::status_list == esp3dTftui.get_current_screen()) {
-    status_bar_desc->label = nullptr;
-  }
+
   // Apply background color
   apply_style(ui_status_screen, ESP3DStyleType::main_bg);
   // Create screen container
   lv_obj_t *ui_status_screen_container = lv_obj_create(ui_status_screen);
   apply_style(ui_status_screen_container, ESP3DStyleType::col_container);
-  lv_obj_set_height(ui_status_screen_container, LV_VER_RES);
-  lv_obj_set_width(ui_status_screen_container, LV_HOR_RES);
+  // Set container size
+  lv_obj_set_size(ui_status_screen_container, LV_HOR_RES, LV_VER_RES);
+  lv_obj_clear_flag(ui_status_screen_container, LV_OBJ_FLAG_SCROLLABLE);
+  lv_obj_set_style_pad_top(ui_status_screen_container, 0, LV_PART_MAIN);
+  lv_obj_set_style_pad_bottom(ui_status_screen_container, 0, LV_PART_MAIN);
 
   lv_obj_t *ui_status_list_ctl = lv_list_create(ui_status_screen_container);
   apply_style(ui_status_list_ctl, ESP3DStyleType::status_list);

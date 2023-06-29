@@ -17,8 +17,8 @@ symbols_array = [
 [0xf027,'VOLUME_LOW'],
 [0xf6a9,'VOLUME_OFF'],
 [0xf013,'SETTINGS'],
-[0xf1de,'SETTINGS_2'],
-[0xf7d9,'SETTINGS_3'],
+[0xf2d1,'NO_HEAT_BED'],
+[0xe040,'HEAT_EXTRUDER'],
 [0xf2ed,'TRASH'],
 [0xe3af,'HOME'],
 [0xf019,'DOWNLOAD'],
@@ -52,7 +52,7 @@ symbols_array = [
 [0xf624,'GAUGE'],
 [0xf1ab,'LANGUAGE'],
 [0xf863,'FAN'],
-[0xf48b,'SPEED_'],
+[0xf48b,'SPEED'],
 [0xf72b,'WIZARD'],
 [0xf185,'LIGHT'],
 [0xf05b,'CENTER'],
@@ -68,7 +68,8 @@ symbols_array = [
 [0xe4c3,'MILLING'],
 [0xf3e5,'NEW_LINE'],
 [0xf293,'BLUETOOTH'],
-[0xf287,'USB']
+[0xf287,'USB'],
+[0xf055,'MORE_INFO']
 ]
 total_items = len(symbols_array)
 
