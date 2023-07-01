@@ -29,11 +29,27 @@
  *  STATIC PROTOTYPES
  **********************/
 
-void main_screen();
+void menu_screen();
+lv_obj_t *create_back_button(lv_obj_t *parent);
+lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back);
+lv_obj_t *create_menu_button(lv_obj_t *container, lv_obj_t *&btn,
+                             lv_obj_t *&label, int width = BUTTON_WIDTH,
+                             bool center = true);
+
+lv_timer_t *settings_screen_delay_timer = NULL;
+
+void settings_screen_delay_timer_cb(lv_timer_t *timer) {
+  if (settings_screen_delay_timer) {
+    lv_timer_del(settings_screen_delay_timer);
+    settings_screen_delay_timer = NULL;
+  }
+  menu_screen();
+}
 
 void event_button_settings_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
-  main_screen();
+  settings_screen_delay_timer = lv_timer_create(settings_screen_delay_timer_cb,
+                                                BUTTON_ANIMATION_DELAY, NULL);
 }
 
 void settings_screen() {
@@ -44,13 +60,13 @@ void settings_screen() {
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
 
   // TODO: Add your code here
-  lv_obj_t *btn = lv_btn_create(ui_new_screen);
-  lv_obj_t *label = lv_label_create(btn);
-  lv_obj_center(btn);
-  lv_obj_center(label);
-  lv_label_set_text(label, "Back");
-  lv_obj_add_event_cb(btn, event_button_settings_back_handler, LV_EVENT_PRESSED,
-                      NULL);
+  lv_obj_t *btnback = create_back_button(ui_new_screen);
+  lv_obj_add_event_cb(btnback, event_button_settings_back_handler,
+                      LV_EVENT_PRESSED, NULL);
+  lv_obj_t *ui_main_container = create_main_container(ui_new_screen, btnback);
+
+  lv_obj_set_style_bg_opa(ui_main_container, LV_OPA_COVER, LV_PART_MAIN);
+  lv_obj_set_style_bg_color(ui_main_container, lv_color_white(), LV_PART_MAIN);
 
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();

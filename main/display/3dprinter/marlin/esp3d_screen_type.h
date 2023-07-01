@@ -40,7 +40,7 @@ enum class ESP3DScreenType : uint8_t {
   wifi,
   leveling,
   filament,
-  preferences,
+  menu,
   informations
 };
 

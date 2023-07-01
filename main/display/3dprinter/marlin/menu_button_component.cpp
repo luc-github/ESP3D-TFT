@@ -29,24 +29,14 @@
  *  STATIC PROTOTYPES
  **********************/
 
-void main_screen();
-
-void event_button_handler(lv_event_t *e) {
-  esp3d_log("back Clicked");
-  main_screen();
-}
-
-void empty_screen() {
-  esp3dTftui.set_current_screen(ESP3DScreenType::none);
-  // Screen creation
-  esp3d_log("Main screen creation");
-  lv_obj_t *ui_new_screen = lv_obj_create(NULL);
-  apply_style(ui_new_screen, ESP3DStyleType::main_bg);
-  lv_obj_add_event_cb(ui_new_screen, event_button_handler, LV_EVENT_PRESSED,
-                      NULL);
-
-  // Display new screen and delete old one
-  lv_obj_t *ui_current_screen = lv_scr_act();
-  lv_scr_load(ui_new_screen);
-  lv_obj_del(ui_current_screen);
+lv_obj_t *create_menu_button(lv_obj_t *container, lv_obj_t *&btn,
+                             lv_obj_t *&label, int width = BUTTON_WIDTH,
+                             bool center = true) {
+  btn = lv_btn_create(container);
+  apply_style(btn, ESP3DStyleType::button);
+  lv_obj_set_size(btn, width, BUTTON_HEIGHT);
+  label = lv_label_create(btn);
+  lv_obj_center(label);
+  if (center) lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
+  return label;
 }

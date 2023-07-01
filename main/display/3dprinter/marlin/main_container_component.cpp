@@ -29,24 +29,15 @@
  *  STATIC PROTOTYPES
  **********************/
 
-void main_screen();
-
-void event_button_handler(lv_event_t *e) {
-  esp3d_log("back Clicked");
-  main_screen();
-}
-
-void empty_screen() {
-  esp3dTftui.set_current_screen(ESP3DScreenType::none);
-  // Screen creation
-  esp3d_log("Main screen creation");
-  lv_obj_t *ui_new_screen = lv_obj_create(NULL);
-  apply_style(ui_new_screen, ESP3DStyleType::main_bg);
-  lv_obj_add_event_cb(ui_new_screen, event_button_handler, LV_EVENT_PRESSED,
-                      NULL);
-
-  // Display new screen and delete old one
-  lv_obj_t *ui_current_screen = lv_scr_act();
-  lv_scr_load(ui_new_screen);
-  lv_obj_del(ui_current_screen);
+lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back) {
+  lv_obj_t *ui_container = lv_obj_create(parent);
+  apply_style(ui_container, ESP3DStyleType::col_container);
+  lv_obj_clear_flag(ui_container, LV_OBJ_FLAG_SCROLLABLE);
+  lv_obj_update_layout(button_back);
+  lv_obj_set_size(ui_container, LV_HOR_RES,
+                  LV_VER_RES - lv_obj_get_height(button_back) -
+                      (1 * CURRENT_BUTTON_PRESSED_OUTLINE));
+  lv_obj_set_style_pad_top(ui_container, CURRENT_BUTTON_PRESSED_OUTLINE * 1,
+                           LV_PART_MAIN);
+  return ui_container;
 }

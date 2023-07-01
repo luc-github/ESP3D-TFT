@@ -29,31 +29,13 @@
  *  STATIC PROTOTYPES
  **********************/
 
-void settings_screen();
-
-void event_button_preferences_back_handler(lv_event_t *e) {
-  esp3d_log("back Clicked");
-  settings_screen();
-}
-
-void preferences_screen() {
-  esp3dTftui.set_current_screen(ESP3DScreenType::preferences);
-  // Screen creation
-  esp3d_log("Preferences screen creation");
-  lv_obj_t *ui_new_screen = lv_obj_create(NULL);
-  apply_style(ui_new_screen, ESP3DStyleType::main_bg);
-
-  // TODO: Add your code here
-  lv_obj_t *btn = lv_btn_create(ui_new_screen);
+lv_obj_t *create_back_button(lv_obj_t *parent) {
+  lv_obj_t *btn = lv_btn_create(parent);
   lv_obj_t *label = lv_label_create(btn);
-  lv_obj_center(btn);
+  lv_label_set_text(label, " " LV_SYMBOL_NEW_LINE " ");
   lv_obj_center(label);
-  lv_label_set_text(label, "Back");
-  lv_obj_add_event_cb(btn, event_button_preferences_back_handler,
-                      LV_EVENT_PRESSED, NULL);
-
-  // Display new screen and delete old one
-  lv_obj_t *ui_current_screen = lv_scr_act();
-  lv_scr_load(ui_new_screen);
-  lv_obj_del(ui_current_screen);
+  apply_style(btn, ESP3DStyleType::button);
+  lv_obj_align(btn, LV_ALIGN_BOTTOM_RIGHT, -CURRENT_BUTTON_PRESSED_OUTLINE,
+               -CURRENT_BUTTON_PRESSED_OUTLINE);
+  return btn;
 }

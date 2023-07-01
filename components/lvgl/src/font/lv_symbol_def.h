@@ -28,7 +28,7 @@ extern "C" {
       61618,61559,61560,61523,61524,61728,63012,61867,
       63587,62603,63275,61829,61531,62973,58552,62683,
       58557,61442,62679,62156,61758,61842,58563,62437,
-      62099,62087,61525
+      62099,62087,61601
 */
 
 /* These symbols can be prefined in the lv_conf.h file.
@@ -300,7 +300,7 @@ extern "C" {
 #endif
 
 #if !defined LV_SYMBOL_MORE_INFO
-#define LV_SYMBOL_MORE_INFO           "\xEF\x81\x95" /*61525, 0xF055*/
+#define LV_SYMBOL_MORE_INFO           "\xEF\x82\xA1" /*61601, 0xF0A1*/
 #endif
 
 #if !defined LV_SYMBOL_DUMMY
