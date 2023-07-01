@@ -18,12 +18,23 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <string>
-
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
+#include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "esp3d_version.h"
+#include "esp_chip_info.h"
+#include "esp_flash.h"
+#include "esp_heap_caps.h"
+#include "esp_system.h"
+#include "rom/ets_sys.h"
+#include "sdkconfig.h"
+#include "spi_flash_mmap.h"
+#include "translations/esp3d_translation_service.h"
+#if ESP3D_UPDATE_FEATURE
+#include "update/esp3d_update_service.h"
+#endif  // ESP3D_UPDATE_FEATURE
 
 /**********************
  *  STATIC PROTOTYPES
@@ -63,9 +74,71 @@ void informations_screen() {
   lv_obj_add_event_cb(btnback, event_button_informations_back_handler,
                       LV_EVENT_PRESSED, NULL);
   lv_obj_t *ui_main_container = create_main_container(ui_new_screen, btnback);
+  lv_obj_set_style_flex_flow(ui_main_container, LV_FLEX_FLOW_ROW,
+                             LV_FLEX_ALIGN_SPACE_EVENLY);
+  lv_obj_t *ui_info_list_ctl = lv_list_create(ui_main_container);
+  apply_style(ui_info_list_ctl, ESP3DStyleType::status_list);
+  lv_obj_set_style_pad_left(ui_main_container, CURRENT_BUTTON_PRESSED_OUTLINE,
+                            LV_PART_MAIN);
 
-  lv_obj_set_style_bg_opa(ui_main_container, LV_OPA_COVER, LV_PART_MAIN);
-  lv_obj_set_style_bg_color(ui_main_container, lv_color_white(), LV_PART_MAIN);
+  lv_obj_update_layout(ui_main_container);
+  lv_obj_set_size(ui_info_list_ctl,
+                  LV_HOR_RES - CURRENT_BUTTON_PRESSED_OUTLINE * 2,
+                  lv_obj_get_height(ui_main_container) -
+                      CURRENT_BUTTON_PRESSED_OUTLINE * 2);
+  lv_obj_set_style_radius(ui_info_list_ctl, CURRENT_CONTAINER_RADIUS, 0);
+
+  lv_list_add_btn(ui_info_list_ctl, "", "Screen: " TFT_TARGET);
+  lv_list_add_btn(ui_info_list_ctl, "",
+                  "FW: "
+                  "V" ESP3D_TFT_VERSION);
+  lv_list_add_btn(ui_info_list_ctl, "", "arch: " CONFIG_IDF_TARGET);
+  lv_list_add_btn(ui_info_list_ctl, "", "SDK: " IDF_VER);
+  std::string tmpstr =
+      "Freq: " + std::to_string(ets_get_cpu_frequency()) + "MHz";
+  lv_list_add_btn(ui_info_list_ctl, "", tmpstr.c_str());
+  // Free memory
+  tmpstr = "Free Mem: ";
+  tmpstr += esp3d_strings::formatBytes(esp_get_free_heap_size());
+  lv_list_add_btn(ui_info_list_ctl, "", tmpstr.c_str());
+#if CONFIG_SPIRAM
+  multi_heap_info_t info;
+  heap_caps_get_info(&info, MALLOC_CAP_SPIRAM);
+  tmpstr = "Total psram: ";
+  tmpstr += esp3d_strings::formatBytes(info.total_free_bytes +
+                                       info.total_allocated_bytes);
+  lv_list_add_btn(ui_info_list_ctl, "", tmpstr.c_str());
+
+#endif  // CONFIG_SPIRAM
+  uint32_t flash_size;
+  if (esp_flash_get_size(NULL, &flash_size) != ESP_OK) {
+    esp3d_log_e("Get flash size failed");
+    flash_size = 0;
+  }
+  tmpstr = "flash size: ";
+  tmpstr += esp3d_strings::formatBytes(flash_size);
+  lv_list_add_btn(ui_info_list_ctl, "", tmpstr.c_str());
+
+#if ESP3D_UPDATE_FEATURE
+  // Update max
+  tmpstr = "size for update: ";
+  tmpstr += esp3d_strings::formatBytes(esp3dUpdateService.maxUpdateSize());
+  lv_list_add_btn(ui_info_list_ctl, "", tmpstr.c_str());
+#if ESP3D_SD_CARD_FEATURE
+  // SD updater
+  tmpstr = "SD updater: ";
+  ESP3DState statesetting = (ESP3DState)esp3dTftsettings.readByte(
+      ESP3DSettingIndex::esp3d_check_update_on_sd);
+  if (statesetting == ESP3DState::off) {
+    tmpstr += "OFF";
+  } else {
+    tmpstr += "ON";
+  }
+  lv_list_add_btn(ui_info_list_ctl, "", tmpstr.c_str());
+#endif  // ESP3D_SD_CARD_FEATURE
+#else
+  lv_list_add_btn(ui_info_list_ctl, "", "FW Update: OFF");
+#endif  // ESP3D_UPDATE_FEATURE
 
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();

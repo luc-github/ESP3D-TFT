@@ -141,7 +141,7 @@ void ESP3DCommands::ESP420(int cmd_params_pos, ESP3DMessage *msg) {
   // Flash size
   uint32_t flash_size;
   if (esp_flash_get_size(NULL, &flash_size) != ESP_OK) {
-    printf("Get flash size failed");
+    esp3d_log_e("Get flash size failed");
     return;
   }
 
