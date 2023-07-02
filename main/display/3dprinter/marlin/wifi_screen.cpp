@@ -109,7 +109,9 @@ void wifi_screen() {
       ui_new_screen, btnback, ESP3DStyleType::default_style);
 
   lv_obj_set_style_bg_opa(ui_main_container, LV_OPA_COVER, LV_PART_MAIN);
-  lv_obj_set_style_bg_color(ui_main_container, lv_color_white(), LV_PART_MAIN);
+  lv_obj_set_style_bg_color(ui_main_container, lv_color_black(), LV_PART_MAIN);
+  lv_obj_set_style_border_width(ui_main_container, 0, LV_PART_MAIN);
+
   lv_obj_t *spinner = lv_spinner_create(ui_new_screen, 1000, 60);
   lv_obj_set_size(spinner, 100, 100);
   lv_obj_center(spinner);
@@ -129,6 +131,7 @@ void wifi_screen() {
   lv_obj_t *kb = lv_keyboard_create(ui_main_container);
   lv_keyboard_set_textarea(kb, NULL);
   lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+  lv_obj_set_style_radius(kb, CURRENT_BUTTON_RADIUS_VALUE, LV_PART_MAIN);
   lv_obj_add_event_cb(ta, ta_event_cb, LV_EVENT_ALL, kb);
   lv_obj_add_event_cb(tp, tp_event_cb, LV_EVENT_ALL, kb);
 
