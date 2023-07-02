@@ -30,7 +30,8 @@
  **********************/
 void menu_screen();
 lv_obj_t *create_back_button(lv_obj_t *parent);
-lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back);
+lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
+                                ESP3DStyleType style);
 lv_obj_t *create_menu_button(lv_obj_t *container, lv_obj_t *&btn,
                              lv_obj_t *&label, int width = BUTTON_WIDTH,
                              bool center = true);
@@ -51,6 +52,48 @@ void event_button_wifi_back_handler(lv_event_t *e) {
       lv_timer_create(wifi_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
 }
 
+void ta_event_cb(lv_event_t *e) {
+  lv_event_code_t code = lv_event_get_code(e);
+  lv_obj_t *ta = lv_event_get_target(e);
+  lv_obj_t *kb = (lv_obj_t *)lv_event_get_user_data(e);
+  if (code == LV_EVENT_FOCUSED) {
+    lv_keyboard_set_textarea(kb, ta);
+    lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_AUTO);
+  }
+
+  else if (code == LV_EVENT_DEFOCUSED) {
+    lv_textarea_set_cursor_pos(ta, 0);
+    lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_OFF);
+    lv_keyboard_set_textarea(kb, NULL);
+    lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+  }
+  if (code == LV_EVENT_READY || code == LV_EVENT_DEFOCUSED) {
+    esp3d_log("Ready, current text: %s", lv_textarea_get_text(ta));
+  }
+}
+
+void tp_event_cb(lv_event_t *e) {
+  lv_event_code_t code = lv_event_get_code(e);
+  lv_obj_t *ta = lv_event_get_target(e);
+  lv_obj_t *kb = (lv_obj_t *)lv_event_get_user_data(e);
+  if (code == LV_EVENT_FOCUSED) {
+    lv_keyboard_set_textarea(kb, ta);
+    lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_AUTO);
+    lv_textarea_set_password_mode(ta, false);
+  } else if (code == LV_EVENT_DEFOCUSED) {
+    lv_textarea_set_cursor_pos(ta, 0);
+    lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_OFF);
+    lv_keyboard_set_textarea(kb, NULL);
+    lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+    lv_textarea_set_password_mode(ta, true);
+  }
+  if (code == LV_EVENT_READY || code == LV_EVENT_DEFOCUSED) {
+    esp3d_log("Ready, current text: %s", lv_textarea_get_text(ta));
+  }
+}
+
 void wifi_screen() {
   esp3dTftui.set_current_screen(ESP3DScreenType::wifi);
   // Screen creation
@@ -62,10 +105,32 @@ void wifi_screen() {
   lv_obj_t *btnback = create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_wifi_back_handler, LV_EVENT_PRESSED,
                       NULL);
-  lv_obj_t *ui_main_container = create_main_container(ui_new_screen, btnback);
+  lv_obj_t *ui_main_container = create_main_container(
+      ui_new_screen, btnback, ESP3DStyleType::default_style);
 
   lv_obj_set_style_bg_opa(ui_main_container, LV_OPA_COVER, LV_PART_MAIN);
   lv_obj_set_style_bg_color(ui_main_container, lv_color_white(), LV_PART_MAIN);
+  lv_obj_t *spinner = lv_spinner_create(ui_new_screen, 1000, 60);
+  lv_obj_set_size(spinner, 100, 100);
+  lv_obj_center(spinner);
+  lv_obj_add_flag(spinner, LV_OBJ_FLAG_HIDDEN);
+  lv_obj_t *ta;
+  lv_obj_t *tp;
+  ta = lv_textarea_create(ui_main_container);
+  lv_textarea_set_one_line(ta, true);
+  lv_textarea_set_max_length(ta, 32);
+  tp = lv_textarea_create(ui_main_container);
+  lv_textarea_set_password_mode(tp, true);
+  lv_textarea_set_password_bullet(tp, "•");
+  lv_textarea_set_max_length(tp, 64);
+  lv_textarea_set_one_line(tp, true);
+  lv_obj_align_to(tp, ta, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
+
+  lv_obj_t *kb = lv_keyboard_create(ui_main_container);
+  lv_keyboard_set_textarea(kb, NULL);
+  lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+  lv_obj_add_event_cb(ta, ta_event_cb, LV_EVENT_ALL, kb);
+  lv_obj_add_event_cb(tp, tp_event_cb, LV_EVENT_ALL, kb);
 
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();

@@ -248,6 +248,7 @@ void main_screen() {
   label = create_menu_button(ui_bottom_buttons_container, btn, label);
   lv_label_set_text_fmt(label, "%s", LV_SYMBOL_STOP);
   lv_obj_add_event_cb(btn, event_button_stop_handler, LV_EVENT_PRESSED, NULL);
+  lv_obj_add_flag(btn, LV_OBJ_FLAG_HIDDEN);
 
   // Create button and label for menu
   label = create_menu_button(ui_bottom_buttons_container, btn, label);

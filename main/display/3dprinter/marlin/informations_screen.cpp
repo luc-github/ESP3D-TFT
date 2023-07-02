@@ -41,7 +41,8 @@
  **********************/
 void menu_screen();
 lv_obj_t *create_back_button(lv_obj_t *parent);
-lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back);
+lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
+                                ESP3DStyleType style);
 lv_obj_t *create_menu_button(lv_obj_t *container, lv_obj_t *&btn,
                              lv_obj_t *&label, int width = BUTTON_WIDTH,
                              bool center = true);
@@ -73,7 +74,8 @@ void informations_screen() {
   lv_obj_t *btnback = create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_informations_back_handler,
                       LV_EVENT_PRESSED, NULL);
-  lv_obj_t *ui_main_container = create_main_container(ui_new_screen, btnback);
+  lv_obj_t *ui_main_container = create_main_container(
+      ui_new_screen, btnback, ESP3DStyleType::col_container);
   lv_obj_set_style_flex_flow(ui_main_container, LV_FLEX_FLOW_ROW,
                              LV_FLEX_ALIGN_SPACE_EVENLY);
   lv_obj_t *ui_info_list_ctl = lv_list_create(ui_main_container);

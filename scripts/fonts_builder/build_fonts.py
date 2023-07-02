@@ -83,8 +83,8 @@ fonts_files_list=[]
 def generateFont(sizefont):
 	mainfont = "Montserrat-Medium.ttf"
 	fontname = "lv_font_montserrat_"
-	rangemain= "0x20-0x7F,0xB0,0x2022"
-	source = "lv_font_conv --no-compress --no-prefilter --bpp 4 --size "+sizefont+" --font " + mainfont + " -r "+rangemain+symboles+" --format lvgl -o fonts/"+fontname+sizefont+".c --force-fast-kern-format"
+	rangemain= "0x20-0x7F,0xB0"
+	source = "lv_font_conv --no-compress --no-prefilter --bpp 4 --size "+sizefont+" --font " + mainfont + " -r "+rangemain + " --font FreeSerifBold.ttf -r 0x2022" +symboles+" --format lvgl -o fonts/"+fontname+sizefont+".c --force-fast-kern-format"
 	print("Generating "+sizefont+" px, "+fontname+sizefont+".c" )
 	os.system(source)
 

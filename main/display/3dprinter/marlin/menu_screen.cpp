@@ -37,7 +37,8 @@ void informations_screen();
 void wifi_screen();
 
 lv_obj_t *create_back_button(lv_obj_t *parent);
-lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back);
+lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
+                                ESP3DStyleType style);
 lv_obj_t *create_menu_button(lv_obj_t *container, lv_obj_t *&btn,
                              lv_obj_t *&label, int width = BUTTON_WIDTH,
                              bool center = true);
@@ -137,7 +138,8 @@ void menu_screen() {
   lv_obj_t *btnback = create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_menu_back_handler, LV_EVENT_PRESSED,
                       NULL);
-  lv_obj_t *ui_main_container = create_main_container(ui_new_screen, btnback);
+  lv_obj_t *ui_main_container = create_main_container(
+      ui_new_screen, btnback, ESP3DStyleType::col_container);
 
   // Add buttons top container to main container
   lv_obj_t *ui_top_buttons_container = lv_obj_create(ui_main_container);
