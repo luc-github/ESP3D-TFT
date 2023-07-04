@@ -43,8 +43,7 @@ lv_obj_t *create_menu_button(lv_obj_t *container, lv_obj_t *&btn,
                              lv_obj_t *&label, int width = BUTTON_WIDTH,
                              bool center = true);
 
-lv_obj_t *create_symbol_button(lv_obj_t *container, lv_obj_t *&btn,
-                               lv_obj_t *&label,
+lv_obj_t *create_symbol_button(lv_obj_t *container, const char *symbol,
                                int width = SYMBOL_BUTTON_WIDTH,
                                int height = SYMBOL_BUTTON_HEIGHT,
                                bool center = true, bool slash = false,
@@ -166,8 +165,8 @@ void menu_screen() {
   lv_obj_t *btn = nullptr;
 
   // Create button and label for filament button
-  label = create_menu_button(ui_top_buttons_container, btn, label);
-  lv_label_set_text_fmt(label, "%s", LV_SYMBOL_FILAMENT);
+  btn = create_symbol_button(ui_top_buttons_container, LV_SYMBOL_FILAMENT,
+                             BUTTON_WIDTH, BUTTON_HEIGHT, true, false, 90);
   lv_obj_add_event_cb(btn, event_button_filament_handler, LV_EVENT_PRESSED,
                       NULL);
 
@@ -189,9 +188,8 @@ void menu_screen() {
   lv_obj_add_event_cb(btn, event_button_wifi_handler, LV_EVENT_PRESSED, NULL);
 
   // Create button and label for disable steppers button
-  label = create_symbol_button(ui_bottom_buttons_container, btn, label,
-                               BUTTON_WIDTH, BUTTON_HEIGHT, true, false, 90);
-  lv_label_set_text_fmt(label, "%s", LV_SYMBOL_ENGINE);
+  btn = create_symbol_button(ui_bottom_buttons_container, LV_SYMBOL_ENGINE,
+                             BUTTON_WIDTH, BUTTON_HEIGHT, true, true, 90);
   label = lv_label_create(btn);
   lv_label_set_text_fmt(label, "%s", LV_SYMBOL_UP);
   lv_obj_set_align(label, LV_ALIGN_TOP_MID);

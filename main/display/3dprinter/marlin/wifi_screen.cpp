@@ -35,8 +35,7 @@ void sta_screen();
 lv_obj_t *create_back_button(lv_obj_t *parent);
 lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
                                 ESP3DStyleType style);
-lv_obj_t *create_symbol_button(lv_obj_t *container, lv_obj_t *&btn,
-                               lv_obj_t *&label,
+lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text,
                                int width = SYMBOL_BUTTON_WIDTH,
                                int height = SYMBOL_BUTTON_HEIGHT,
                                bool center = true, bool slash = false,
@@ -110,25 +109,21 @@ void wifi_screen() {
   apply_outline_pad(ui_buttons_container);
   lv_obj_clear_flag(ui_buttons_container, LV_OBJ_FLAG_SCROLLABLE);
 
-  lv_obj_t *label = nullptr;
   lv_obj_t *btn = nullptr;
 
   // Create button and label for ap
-  label = create_symbol_button(ui_buttons_container, btn, label, BUTTON_WIDTH,
-                               BUTTON_WIDTH);
-  lv_label_set_text(label, LV_SYMBOL_ACCESS_POINT);
+  btn = create_symbol_button(ui_buttons_container, LV_SYMBOL_ACCESS_POINT,
+                             BUTTON_WIDTH, BUTTON_WIDTH);
   lv_obj_add_event_cb(btn, event_button_ap_handler, LV_EVENT_PRESSED, NULL);
 
   // Create button and label for sta
-  label = create_symbol_button(ui_buttons_container, btn, label, BUTTON_WIDTH,
-                               BUTTON_WIDTH);
-  lv_label_set_text(label, LV_SYMBOL_STATION_MODE);
+  btn = create_symbol_button(ui_buttons_container, LV_SYMBOL_STATION_MODE,
+                             BUTTON_WIDTH, BUTTON_WIDTH);
   lv_obj_add_event_cb(btn, event_button_sta_handler, LV_EVENT_PRESSED, NULL);
 
   // Create button and label for no wifi
-  label = create_symbol_button(ui_buttons_container, btn, label, BUTTON_WIDTH,
-                               BUTTON_WIDTH, true, true);
-  lv_label_set_text(label, LV_SYMBOL_WIFI);
+  btn = create_symbol_button(ui_buttons_container, LV_SYMBOL_WIFI, BUTTON_WIDTH,
+                             BUTTON_WIDTH, true, true);
   lv_obj_add_event_cb(btn, event_button_no_wifi_handler, LV_EVENT_PRESSED,
                       NULL);
 

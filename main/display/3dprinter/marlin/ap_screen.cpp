@@ -33,8 +33,7 @@ void wifi_screen();
 lv_obj_t *create_back_button(lv_obj_t *parent);
 lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
                                 ESP3DStyleType style);
-lv_obj_t *create_symbol_button(lv_obj_t *container, lv_obj_t *&btn,
-                               lv_obj_t *&label,
+lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text,
                                int width = SYMBOL_BUTTON_WIDTH,
                                int height = SYMBOL_BUTTON_HEIGHT,
                                bool center = true, bool slash = false,
@@ -198,21 +197,20 @@ void ap_screen() {
                   LV_ALIGN_OUT_LEFT_MID, 0, 0);
   lv_label_set_text(ap_connection_type, LV_SYMBOL_STATION_MODE);
 
-  lv_obj_t *label = nullptr;
   lv_obj_t *btn = nullptr;
 
   // Create button and label for search
-  label = create_symbol_button(ui_main_container, btn, label,
-                               SYMBOL_BUTTON_WIDTH, SYMBOL_BUTTON_WIDTH);
-  lv_label_set_text(label, LV_SYMBOL_OK);
+  btn = create_symbol_button(ui_main_container, LV_SYMBOL_OK,
+                             SYMBOL_BUTTON_WIDTH, SYMBOL_BUTTON_WIDTH);
+
   lv_obj_add_event_cb(btn, ap_event_button_ok_handler, LV_EVENT_PRESSED, NULL);
   lv_obj_align(btn, LV_ALIGN_TOP_RIGHT, 0, 0);
 
   // Create button and label for apply
   lv_obj_t *btn2 = nullptr;
-  label = create_symbol_button(ui_main_container, btn2, label,
-                               SYMBOL_BUTTON_WIDTH, SYMBOL_BUTTON_WIDTH);
-  lv_label_set_text(label, LV_SYMBOL_SEARCH);
+  btn = create_symbol_button(ui_main_container, LV_SYMBOL_SEARCH,
+                             SYMBOL_BUTTON_WIDTH, SYMBOL_BUTTON_WIDTH);
+
   lv_obj_add_event_cb(btn2, ap_event_button_search_handler, LV_EVENT_PRESSED,
                       NULL);
   lv_obj_align_to(btn2, btn, LV_ALIGN_OUT_LEFT_MID,
