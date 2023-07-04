@@ -1,0 +1,224 @@
+/*
+  esp3d_tft
+
+  Copyright (c) 2022 Luc Lebosse. All rights reserved.
+
+  This code is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This code is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
+#include <string>
+
+#include "esp3d_hal.h"
+#include "esp3d_log.h"
+#include "esp3d_settings.h"
+#include "esp3d_styles.h"
+#include "esp3d_tft_ui.h"
+
+/**********************
+ *  STATIC PROTOTYPES
+ **********************/
+void wifi_screen();
+lv_obj_t *create_back_button(lv_obj_t *parent);
+lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
+                                ESP3DStyleType style);
+lv_obj_t *create_symbol_button(lv_obj_t *container, lv_obj_t *&btn,
+                               lv_obj_t *&label,
+                               int width = SYMBOL_BUTTON_WIDTH,
+                               int height = SYMBOL_BUTTON_HEIGHT,
+                               bool center = true, bool slash = false);
+
+lv_timer_t *ap_screen_delay_timer = NULL;
+lv_obj_t *ap_ta_ssid = NULL;
+lv_obj_t *ap_ta_password = NULL;
+lv_obj_t *ui_ap_ssid_list_ctl = NULL;
+lv_obj_t *ap_spinner = NULL;
+lv_obj_t *ap_connection_status = NULL;
+lv_obj_t *ap_connection_type = NULL;
+
+void ap_screen_delay_timer_cb(lv_timer_t *timer) {
+  if (ap_screen_delay_timer) {
+    lv_timer_del(ap_screen_delay_timer);
+    ap_screen_delay_timer = NULL;
+  }
+  wifi_screen();
+}
+
+void event_button_ap_back_handler(lv_event_t *e) {
+  esp3d_log("back Clicked");
+  ap_screen_delay_timer =
+      lv_timer_create(ap_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+}
+
+void ap_ta_event_cb(lv_event_t *e) {
+  lv_event_code_t code = lv_event_get_code(e);
+  lv_obj_t *ta = lv_event_get_target(e);
+  lv_obj_t *kb = (lv_obj_t *)lv_event_get_user_data(e);
+  if (code == LV_EVENT_FOCUSED) {
+    lv_keyboard_set_textarea(kb, ta);
+    lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_AUTO);
+    if (ta == ap_ta_password) {
+      lv_textarea_set_password_mode(ta, false);
+    }
+    if (ui_ap_ssid_list_ctl)
+      lv_obj_add_flag(ui_ap_ssid_list_ctl, LV_OBJ_FLAG_HIDDEN);
+    if (ap_spinner) lv_obj_add_flag(ap_spinner, LV_OBJ_FLAG_HIDDEN);
+
+  }
+
+  else if (code == LV_EVENT_DEFOCUSED) {
+    lv_textarea_set_cursor_pos(ta, 0);
+    lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_OFF);
+    lv_keyboard_set_textarea(kb, NULL);
+    lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+    if (ta == ap_ta_password) {
+      lv_textarea_set_password_mode(ta, true);
+    }
+  } else if (code == LV_EVENT_READY || code == LV_EVENT_DEFOCUSED) {
+    if (ta == ap_ta_ssid) {
+      esp3d_log("Ready, SSID: %s", lv_textarea_get_text(ta));
+    } else if (ta == ap_ta_password) {
+      esp3d_log("Ready, PASSWORD: %s", lv_textarea_get_text(ta));
+    }
+  }
+}
+
+void ap_event_button_search_handler(lv_event_t *e) {
+  esp3d_log("search Clicked");
+  if (ui_ap_ssid_list_ctl) {
+    lv_obj_clear_flag(ui_ap_ssid_list_ctl, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(ap_spinner, LV_OBJ_FLAG_HIDDEN);
+  }
+}
+
+void ap_event_button_ok_handler(lv_event_t *e) { esp3d_log("Ok Clicked"); }
+
+void ap_screen() {
+  esp3dTftui.set_current_screen(ESP3DScreenType::wifi);
+  // Screen creation
+  esp3d_log("Wifi screen creation");
+  lv_obj_t *ui_new_screen = lv_obj_create(NULL);
+  apply_style(ui_new_screen, ESP3DStyleType::main_bg);
+
+  // TODO: Add your code here
+  lv_obj_t *btnback = create_back_button(ui_new_screen);
+  lv_obj_add_event_cb(btnback, event_button_ap_back_handler, LV_EVENT_PRESSED,
+                      NULL);
+  lv_obj_t *ui_main_container = create_main_container(
+      ui_new_screen, btnback, ESP3DStyleType::simple_container);
+
+  // SSID
+  lv_obj_t *label_ssid = lv_label_create(ui_main_container);
+  lv_label_set_text(label_ssid, LV_SYMBOL_ACCESS_POINT);
+  apply_style(label_ssid, ESP3DStyleType::bg_label);
+  ap_ta_ssid = lv_textarea_create(ui_main_container);
+  lv_textarea_set_one_line(ap_ta_ssid, true);
+  lv_textarea_set_max_length(ap_ta_ssid, 32);
+  lv_obj_align_to(ap_ta_ssid, label_ssid, LV_ALIGN_OUT_RIGHT_MID,
+                  CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+  lv_obj_set_width(ap_ta_ssid, (LV_HOR_RES / 2));
+
+  // Password
+  lv_obj_t *label_pwd = lv_label_create(ui_main_container);
+  lv_label_set_text(label_pwd, LV_SYMBOL_UNLOCK);
+  apply_style(label_pwd, ESP3DStyleType::bg_label);
+
+  ap_ta_password = lv_textarea_create(ui_main_container);
+  lv_textarea_set_password_mode(ap_ta_password, true);
+  lv_textarea_set_password_bullet(ap_ta_password, "•");
+  lv_textarea_set_max_length(ap_ta_password, 64);
+  lv_textarea_set_one_line(ap_ta_password, true);
+  lv_obj_set_width(ap_ta_password, (LV_HOR_RES / 2));
+
+  lv_obj_align_to(ap_ta_password, ap_ta_ssid, LV_ALIGN_OUT_BOTTOM_LEFT, 0,
+                  CURRENT_BUTTON_PRESSED_OUTLINE);
+  lv_obj_align_to(
+      label_pwd, ap_ta_password, LV_ALIGN_OUT_LEFT_MID,
+      -(CURRENT_BUTTON_PRESSED_OUTLINE + lv_obj_get_width(label_pwd) / 2), 0);
+  // Keyboard
+  lv_obj_t *kb = lv_keyboard_create(ui_main_container);
+  lv_keyboard_set_textarea(kb, NULL);
+  lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+  lv_obj_set_style_radius(kb, CURRENT_BUTTON_RADIUS_VALUE, LV_PART_MAIN);
+  lv_obj_add_event_cb(ap_ta_ssid, ap_ta_event_cb, LV_EVENT_ALL, kb);
+  lv_obj_add_event_cb(ap_ta_password, ap_ta_event_cb, LV_EVENT_ALL, kb);
+
+  // SSID list
+  ui_ap_ssid_list_ctl = lv_list_create(ui_new_screen);
+  lv_obj_update_layout(ap_ta_password);
+  lv_obj_align_to(ui_ap_ssid_list_ctl, ap_ta_password, LV_ALIGN_OUT_BOTTOM_LEFT,
+                  -(2 * CURRENT_BUTTON_PRESSED_OUTLINE),
+                  (CURRENT_BUTTON_PRESSED_OUTLINE));
+
+  lv_obj_set_width(ui_ap_ssid_list_ctl,
+                   (LV_HOR_RES / 2) + (3 * CURRENT_BUTTON_PRESSED_OUTLINE));
+  lv_obj_update_layout(ui_ap_ssid_list_ctl);
+
+  lv_obj_set_height(
+      ui_ap_ssid_list_ctl,
+      lv_obj_get_y(btnback) -
+          (lv_obj_get_y(ap_ta_password) + lv_obj_get_height(ap_ta_password)));
+  lv_obj_update_layout(ui_ap_ssid_list_ctl);
+
+  // ap_spinner
+  ap_spinner = lv_spinner_create(ui_new_screen, 1000, 60);
+  lv_obj_set_size(ap_spinner, CURRENT_SPINNER_SIZE, CURRENT_SPINNER_SIZE);
+  lv_obj_set_x(ap_spinner, lv_obj_get_x(ui_ap_ssid_list_ctl) +
+                               (lv_obj_get_width(ui_ap_ssid_list_ctl) / 2) -
+                               (CURRENT_SPINNER_SIZE / 2));
+  lv_obj_set_y(ap_spinner, lv_obj_get_y(ui_ap_ssid_list_ctl) +
+                               (lv_obj_get_height(ui_ap_ssid_list_ctl) / 2) -
+                               (CURRENT_SPINNER_SIZE / 2));
+  lv_obj_add_flag(ap_spinner, LV_OBJ_FLAG_HIDDEN);
+  lv_obj_add_flag(ui_ap_ssid_list_ctl, LV_OBJ_FLAG_HIDDEN);
+
+  // Connection status
+  ap_connection_status = lv_led_create(ui_new_screen);
+  lv_led_set_brightness(ap_connection_status, 255);
+  lv_obj_align_to(ap_connection_status, btnback, LV_ALIGN_OUT_LEFT_MID,
+                  -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+  lv_led_set_color(ap_connection_status, lv_palette_main(LV_PALETTE_RED));
+
+  // Connection type
+  ap_connection_type = lv_label_create(ui_new_screen);
+  lv_obj_align_to(ap_connection_type, ap_connection_status,
+                  LV_ALIGN_OUT_LEFT_MID, 0, 0);
+  lv_label_set_text(ap_connection_type, LV_SYMBOL_STATION_MODE);
+
+  lv_obj_t *label = nullptr;
+  lv_obj_t *btn = nullptr;
+
+  // Create button and label for search
+  label = create_symbol_button(ui_main_container, btn, label,
+                               SYMBOL_BUTTON_WIDTH, SYMBOL_BUTTON_WIDTH);
+  lv_label_set_text(label, LV_SYMBOL_OK);
+  lv_obj_add_event_cb(btn, ap_event_button_ok_handler, LV_EVENT_PRESSED, NULL);
+  lv_obj_align(btn, LV_ALIGN_TOP_RIGHT, 0, 0);
+
+  // Create button and label for apply
+  lv_obj_t *btn2 = nullptr;
+  label = create_symbol_button(ui_main_container, btn2, label,
+                               SYMBOL_BUTTON_WIDTH, SYMBOL_BUTTON_WIDTH);
+  lv_label_set_text(label, LV_SYMBOL_SEARCH);
+  lv_obj_add_event_cb(btn2, ap_event_button_search_handler, LV_EVENT_PRESSED,
+                      NULL);
+  lv_obj_align_to(btn2, btn, LV_ALIGN_OUT_LEFT_MID,
+                  -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+
+  // Display new screen and delete old one
+  lv_obj_t *ui_current_screen = lv_scr_act();
+  lv_scr_load(ui_new_screen);
+  lv_obj_del(ui_current_screen);
+}

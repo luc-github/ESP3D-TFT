@@ -6,7 +6,7 @@ symbols_array = [
 [0xe568,'HEAT_BED'],
 [0xf2c9,'EXTRUDER'],
 [0xf0ca,'LIST'],
-[0xf6ff,'NETWORK'],
+[0xf715,'SLASH'],
 [0xf012,'STATION_MODE'],
 [0xf519,'ACCESS_POINT'],
 [0xf00c,'OK'],

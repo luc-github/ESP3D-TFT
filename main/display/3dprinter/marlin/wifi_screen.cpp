@@ -22,6 +22,7 @@
 
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
+#include "esp3d_settings.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 
@@ -29,69 +30,64 @@
  *  STATIC PROTOTYPES
  **********************/
 void menu_screen();
+void ap_screen();
+void sta_screen();
 lv_obj_t *create_back_button(lv_obj_t *parent);
 lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
                                 ESP3DStyleType style);
-lv_obj_t *create_menu_button(lv_obj_t *container, lv_obj_t *&btn,
-                             lv_obj_t *&label, int width = BUTTON_WIDTH,
-                             bool center = true);
-
+lv_obj_t *create_symbol_button(lv_obj_t *container, lv_obj_t *&btn,
+                               lv_obj_t *&label,
+                               int width = SYMBOL_BUTTON_WIDTH,
+                               int height = SYMBOL_BUTTON_HEIGHT,
+                               bool center = true, bool slash = false);
 lv_timer_t *wifi_screen_delay_timer = NULL;
+ESP3DScreenType wifi_next_screen = ESP3DScreenType::none;
 
 void wifi_screen_delay_timer_cb(lv_timer_t *timer) {
   if (wifi_screen_delay_timer) {
     lv_timer_del(wifi_screen_delay_timer);
     wifi_screen_delay_timer = NULL;
   }
-  menu_screen();
+  switch (wifi_next_screen) {
+    case ESP3DScreenType::access_point:
+      ap_screen();
+      break;
+    case ESP3DScreenType::station:
+      sta_screen();
+      break;
+    case ESP3DScreenType::menu:
+      menu_screen();
+      break;
+    default:
+      break;
+  }
 }
 
 void event_button_wifi_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
+  if (wifi_screen_delay_timer) return;
+  wifi_next_screen = ESP3DScreenType::menu;
   wifi_screen_delay_timer =
       lv_timer_create(wifi_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
 }
 
-void ta_event_cb(lv_event_t *e) {
-  lv_event_code_t code = lv_event_get_code(e);
-  lv_obj_t *ta = lv_event_get_target(e);
-  lv_obj_t *kb = (lv_obj_t *)lv_event_get_user_data(e);
-  if (code == LV_EVENT_FOCUSED) {
-    lv_keyboard_set_textarea(kb, ta);
-    lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_AUTO);
-  }
-
-  else if (code == LV_EVENT_DEFOCUSED) {
-    lv_textarea_set_cursor_pos(ta, 0);
-    lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_OFF);
-    lv_keyboard_set_textarea(kb, NULL);
-    lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
-  }
-  if (code == LV_EVENT_READY || code == LV_EVENT_DEFOCUSED) {
-    esp3d_log("Ready, current text: %s", lv_textarea_get_text(ta));
-  }
+void event_button_ap_handler(lv_event_t *e) {
+  esp3d_log("AP Clicked");
+  if (wifi_screen_delay_timer) return;
+  wifi_next_screen = ESP3DScreenType::access_point;
+  wifi_screen_delay_timer =
+      lv_timer_create(wifi_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
 }
 
-void tp_event_cb(lv_event_t *e) {
-  lv_event_code_t code = lv_event_get_code(e);
-  lv_obj_t *ta = lv_event_get_target(e);
-  lv_obj_t *kb = (lv_obj_t *)lv_event_get_user_data(e);
-  if (code == LV_EVENT_FOCUSED) {
-    lv_keyboard_set_textarea(kb, ta);
-    lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_AUTO);
-    lv_textarea_set_password_mode(ta, false);
-  } else if (code == LV_EVENT_DEFOCUSED) {
-    lv_textarea_set_cursor_pos(ta, 0);
-    lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_OFF);
-    lv_keyboard_set_textarea(kb, NULL);
-    lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
-    lv_textarea_set_password_mode(ta, true);
-  }
-  if (code == LV_EVENT_READY || code == LV_EVENT_DEFOCUSED) {
-    esp3d_log("Ready, current text: %s", lv_textarea_get_text(ta));
-  }
+void event_button_sta_handler(lv_event_t *e) {
+  esp3d_log("STA Clicked");
+  if (wifi_screen_delay_timer) return;
+  wifi_next_screen = ESP3DScreenType::station;
+  wifi_screen_delay_timer =
+      lv_timer_create(wifi_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+}
+void event_button_no_wifi_handler(lv_event_t *e) {
+  esp3d_log("no wifi Clicked");
 }
 
 void wifi_screen() {
@@ -101,39 +97,39 @@ void wifi_screen() {
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
 
-  // TODO: Add your code here
   lv_obj_t *btnback = create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_wifi_back_handler, LV_EVENT_PRESSED,
                       NULL);
   lv_obj_t *ui_main_container = create_main_container(
-      ui_new_screen, btnback, ESP3DStyleType::default_style);
+      ui_new_screen, btnback, ESP3DStyleType::col_container);
 
-  lv_obj_set_style_bg_opa(ui_main_container, LV_OPA_COVER, LV_PART_MAIN);
-  lv_obj_set_style_bg_color(ui_main_container, lv_color_black(), LV_PART_MAIN);
-  lv_obj_set_style_border_width(ui_main_container, 0, LV_PART_MAIN);
+  lv_obj_t *ui_buttons_container = lv_obj_create(ui_main_container);
+  apply_style(ui_buttons_container, ESP3DStyleType::row_container);
+  lv_obj_set_size(ui_buttons_container, LV_HOR_RES, LV_SIZE_CONTENT);
+  apply_outline_pad(ui_buttons_container);
+  lv_obj_clear_flag(ui_buttons_container, LV_OBJ_FLAG_SCROLLABLE);
 
-  lv_obj_t *spinner = lv_spinner_create(ui_new_screen, 1000, 60);
-  lv_obj_set_size(spinner, 100, 100);
-  lv_obj_center(spinner);
-  lv_obj_add_flag(spinner, LV_OBJ_FLAG_HIDDEN);
-  lv_obj_t *ta;
-  lv_obj_t *tp;
-  ta = lv_textarea_create(ui_main_container);
-  lv_textarea_set_one_line(ta, true);
-  lv_textarea_set_max_length(ta, 32);
-  tp = lv_textarea_create(ui_main_container);
-  lv_textarea_set_password_mode(tp, true);
-  lv_textarea_set_password_bullet(tp, "•");
-  lv_textarea_set_max_length(tp, 64);
-  lv_textarea_set_one_line(tp, true);
-  lv_obj_align_to(tp, ta, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
+  lv_obj_t *label = nullptr;
+  lv_obj_t *btn = nullptr;
 
-  lv_obj_t *kb = lv_keyboard_create(ui_main_container);
-  lv_keyboard_set_textarea(kb, NULL);
-  lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
-  lv_obj_set_style_radius(kb, CURRENT_BUTTON_RADIUS_VALUE, LV_PART_MAIN);
-  lv_obj_add_event_cb(ta, ta_event_cb, LV_EVENT_ALL, kb);
-  lv_obj_add_event_cb(tp, tp_event_cb, LV_EVENT_ALL, kb);
+  // Create button and label for ap
+  label = create_symbol_button(ui_buttons_container, btn, label, BUTTON_WIDTH,
+                               BUTTON_WIDTH);
+  lv_label_set_text(label, LV_SYMBOL_ACCESS_POINT);
+  lv_obj_add_event_cb(btn, event_button_ap_handler, LV_EVENT_PRESSED, NULL);
+
+  // Create button and label for sta
+  label = create_symbol_button(ui_buttons_container, btn, label, BUTTON_WIDTH,
+                               BUTTON_WIDTH);
+  lv_label_set_text(label, LV_SYMBOL_STATION_MODE);
+  lv_obj_add_event_cb(btn, event_button_sta_handler, LV_EVENT_PRESSED, NULL);
+
+  // Create button and label for no wifi
+  label = create_symbol_button(ui_buttons_container, btn, label, BUTTON_WIDTH,
+                               BUTTON_WIDTH, true, true);
+  lv_label_set_text(label, LV_SYMBOL_WIFI);
+  lv_obj_add_event_cb(btn, event_button_no_wifi_handler, LV_EVENT_PRESSED,
+                      NULL);
 
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();

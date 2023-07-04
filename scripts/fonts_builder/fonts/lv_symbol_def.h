@@ -20,7 +20,7 @@ extern "C" {
 *-----------------------------*/
 
 /*In the font converter use this list as range:
-      58728,62153,61642,63231,61458,62745,61452,58774,
+      58728,62153,61642,63253,61458,62745,61452,58774,
       61453,61457,61480,61479,63145,61459,62161,57408,
       62189,58287,61465,61473,62212,61512,61521,61515,
       61516,61639,61664,61671,63343,61942,61475,62172,
@@ -47,8 +47,8 @@ extern "C" {
 #define LV_SYMBOL_LIST           "\xEF\x83\x8A" /*61642, 0xF0CA*/
 #endif
 
-#if !defined LV_SYMBOL_NETWORK
-#define LV_SYMBOL_NETWORK           "\xEF\x9B\xBF" /*63231, 0xF6FF*/
+#if !defined LV_SYMBOL_SLASH
+#define LV_SYMBOL_SLASH           "\xEF\x9C\x95" /*63253, 0xF715*/
 #endif
 
 #if !defined LV_SYMBOL_STATION_MODE
@@ -312,7 +312,7 @@ enum {
     _LV_STR_SYMBOL_HEAT_BED,
     _LV_STR_SYMBOL_EXTRUDER,
     _LV_STR_SYMBOL_LIST,
-    _LV_STR_SYMBOL_NETWORK,
+    _LV_STR_SYMBOL_SLASH,
     _LV_STR_SYMBOL_STATION_MODE,
     _LV_STR_SYMBOL_ACCESS_POINT,
     _LV_STR_SYMBOL_OK,

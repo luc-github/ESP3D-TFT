@@ -36,9 +36,10 @@ enum class ESP3DStyleType : uint8_t {
   embedded_button,
   row_container,
   col_container,
+  simple_container,
   status_bar,
   status_list,
-  bg_label
+  bg_label,
 };
 
 extern bool init_styles();

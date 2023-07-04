@@ -41,7 +41,12 @@ extern "C" {
 #define BUTTON_WIDTH (LV_HOR_RES / 6)
 #define BUTTON_HEIGHT BUTTON_WIDTH
 
+#define SYMBOL_BUTTON_WIDTH 100
+#define SYMBOL_BUTTON_HEIGHT 100
+
 #define BUTTON_ANIMATION_DELAY 300
+
+#define CURRENT_SPINNER_SIZE 100
 
 #ifdef __cplusplus
 }  // extern "C"

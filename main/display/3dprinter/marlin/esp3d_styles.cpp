@@ -61,18 +61,21 @@ lv_style_t style_embedded_btn_pressed;
 // Create styles for containers
 lv_style_t style_col_container_default;
 lv_style_t style_row_container_default;
+lv_style_t style_simple_container_default;
 
 bool init_styles() {
   /*
   Main background
   */
-  // N/A
+  lv_style_init(&style_main_bg);
+  lv_style_set_text_opa(&style_main_bg, LV_OPA_COVER);
+  lv_style_set_text_color(&style_main_bg, CURRENT_BG_LABEL_TEXT_COLOR);
+  lv_style_set_bg_color(&style_main_bg, CURRENT_MAIN_BG_COLOR);
 
   /*
   Label on main background
   */
   lv_style_init(&style_bg_label);
-
   lv_style_set_text_opa(&style_bg_label, LV_OPA_COVER);
   lv_style_set_text_color(&style_bg_label, CURRENT_BG_LABEL_TEXT_COLOR);
   lv_style_set_bg_color(&style_bg_label, CURRENT_MAIN_BG_COLOR);
@@ -237,6 +240,13 @@ bool init_styles() {
   lv_style_set_flex_main_place(&style_row_container_default,
                                LV_FLEX_ALIGN_SPACE_EVENLY);
 
+  /*
+  Simple Container
+  */
+  lv_style_init(&style_simple_container_default);
+  lv_style_set_bg_opa(&style_simple_container_default, LV_OPA_COVER);
+  lv_style_set_bg_color(&style_simple_container_default, CURRENT_MAIN_BG_COLOR);
+
   return true;
 }
 
@@ -248,8 +258,6 @@ bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
   switch (type) {
     case ESP3DStyleType::main_bg:
       lv_obj_add_style(obj, &style_main_bg, LV_STATE_DEFAULT);
-      // Apply background color
-      lv_obj_set_style_bg_color(obj, CURRENT_MAIN_BG_COLOR, LV_PART_MAIN);
       lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
       break;
     case ESP3DStyleType::bg_label:
@@ -287,7 +295,11 @@ bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
       lv_obj_set_style_pad_bottom(obj, CURRENT_BUTTON_PRESSED_OUTLINE,
                                   LV_PART_MAIN);
       break;
-
+    case ESP3DStyleType::simple_container:
+      lv_obj_add_style(obj, &style_simple_container_default, LV_STATE_DEFAULT);
+      lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
+      apply_outline_pad(obj);
+      break;
     case ESP3DStyleType::status_list:
       lv_obj_add_style(obj, &style_status_list_default, LV_STATE_DEFAULT);
       break;

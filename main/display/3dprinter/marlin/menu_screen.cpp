@@ -123,7 +123,7 @@ void event_button_informations_handler(lv_event_t *e) {
       lv_timer_create(menu_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
 }
 
-void event_button_disable_stepper_handler(lv_event_t *e) {
+void event_button_disable_steppers_handler(lv_event_t *e) {
   esp3d_log("Disable Steppers Clicked");
 }
 
@@ -134,7 +134,6 @@ void menu_screen() {
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
 
-  // TODO: Add your code here
   lv_obj_t *btnback = create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_menu_back_handler, LV_EVENT_PRESSED,
                       NULL);
@@ -174,7 +173,8 @@ void menu_screen() {
   // Create button and label for settings button
   label = create_menu_button(ui_top_buttons_container, btn, label);
   lv_label_set_text_fmt(label, "%s", LV_SYMBOL_SETTINGS);
-  lv_obj_add_event_cb(btn, event_button_wifi_handler, LV_EVENT_PRESSED, NULL);
+  lv_obj_add_event_cb(btn, event_button_settings_handler, LV_EVENT_PRESSED,
+                      NULL);
 
   // Create button and label for wifi button
   label = create_menu_button(ui_bottom_buttons_container, btn, label);
@@ -184,7 +184,8 @@ void menu_screen() {
   // Create button and label for disable steppers button
   label = create_menu_button(ui_bottom_buttons_container, btn, label);
   lv_label_set_text_fmt(label, "%s", LV_SYMBOL_UNLOCK " " LV_SYMBOL_JOG);
-  lv_obj_add_event_cb(btn, event_button_wifi_handler, LV_EVENT_PRESSED, NULL);
+  lv_obj_add_event_cb(btn, event_button_disable_steppers_handler,
+                      LV_EVENT_PRESSED, NULL);
 
   // Create button and label for informations button
   label = create_menu_button(ui_bottom_buttons_container, btn, label);

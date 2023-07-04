@@ -7,7 +7,7 @@ symbols_array = [
 [0xe568,'HEAT_BED','fa-solid-900.ttf'],
 [0xf2c9,'EXTRUDER','fa-solid-900.ttf'],
 [0xf0ca,'LIST','fa-solid-900.ttf'],
-[0xf6ff,'NETWORK','fa-solid-900.ttf'],
+[0xf715,'SLASH','fa-solid-900.ttf'],
 [0xf012,'STATION_MODE','fa-solid-900.ttf'],
 [0xf519,'ACCESS_POINT','fa-solid-900.ttf'],
 [0xf00c,'OK','fa-solid-900.ttf'],
