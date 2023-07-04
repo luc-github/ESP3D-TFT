@@ -37,7 +37,8 @@ lv_obj_t *create_symbol_button(lv_obj_t *container, lv_obj_t *&btn,
                                lv_obj_t *&label,
                                int width = SYMBOL_BUTTON_WIDTH,
                                int height = SYMBOL_BUTTON_HEIGHT,
-                               bool center = true, bool slash = false);
+                               bool center = true, bool slash = false,
+                               int rotation = 0);
 
 lv_timer_t *ap_screen_delay_timer = NULL;
 lv_obj_t *ap_ta_ssid = NULL;

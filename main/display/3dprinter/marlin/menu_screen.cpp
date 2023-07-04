@@ -43,6 +43,13 @@ lv_obj_t *create_menu_button(lv_obj_t *container, lv_obj_t *&btn,
                              lv_obj_t *&label, int width = BUTTON_WIDTH,
                              bool center = true);
 
+lv_obj_t *create_symbol_button(lv_obj_t *container, lv_obj_t *&btn,
+                               lv_obj_t *&label,
+                               int width = SYMBOL_BUTTON_WIDTH,
+                               int height = SYMBOL_BUTTON_HEIGHT,
+                               bool center = true, bool slash = false,
+                               int rotation = 0);
+
 lv_timer_t *menu_screen_delay_timer = NULL;
 ESP3DScreenType menu_next_screen = ESP3DScreenType::none;
 
@@ -182,8 +189,21 @@ void menu_screen() {
   lv_obj_add_event_cb(btn, event_button_wifi_handler, LV_EVENT_PRESSED, NULL);
 
   // Create button and label for disable steppers button
-  label = create_menu_button(ui_bottom_buttons_container, btn, label);
-  lv_label_set_text_fmt(label, "%s", LV_SYMBOL_UNLOCK " " LV_SYMBOL_JOG);
+  label = create_symbol_button(ui_bottom_buttons_container, btn, label,
+                               BUTTON_WIDTH, BUTTON_HEIGHT, true, false, 90);
+  lv_label_set_text_fmt(label, "%s", LV_SYMBOL_ENGINE);
+  label = lv_label_create(btn);
+  lv_label_set_text_fmt(label, "%s", LV_SYMBOL_UP);
+  lv_obj_set_align(label, LV_ALIGN_TOP_MID);
+  label = lv_label_create(btn);
+  lv_label_set_text_fmt(label, "%s", LV_SYMBOL_DOWN);
+  lv_obj_set_align(label, LV_ALIGN_BOTTOM_MID);
+  label = lv_label_create(btn);
+  lv_label_set_text_fmt(label, "%s", LV_SYMBOL_LEFT);
+  lv_obj_set_align(label, LV_ALIGN_LEFT_MID);
+  label = lv_label_create(btn);
+  lv_label_set_text_fmt(label, "%s", LV_SYMBOL_RIGHT);
+  lv_obj_set_align(label, LV_ALIGN_RIGHT_MID);
   lv_obj_add_event_cb(btn, event_button_disable_steppers_handler,
                       LV_EVENT_PRESSED, NULL);
 
