@@ -36,7 +36,8 @@ lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text,
                                int rotation = 0) {
   lv_obj_t *btn = lv_btn_create(container);
   apply_style(btn, ESP3DStyleType::button);
-  lv_obj_set_size(btn, width, height);
+  if (width != -1) lv_obj_set_width(btn, width);
+  if (height != -1) lv_obj_set_height(btn, height);
   lv_obj_t *label = lv_label_create(btn);
   lv_label_set_text(label, text);
   lv_obj_update_layout(label);

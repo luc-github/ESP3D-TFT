@@ -208,8 +208,8 @@ void ap_screen() {
 
   // Create button and label for apply
   lv_obj_t *btn2 = nullptr;
-  btn = create_symbol_button(ui_main_container, LV_SYMBOL_SEARCH,
-                             SYMBOL_BUTTON_WIDTH, SYMBOL_BUTTON_WIDTH);
+  btn2 = create_symbol_button(ui_main_container, LV_SYMBOL_SEARCH,
+                              SYMBOL_BUTTON_WIDTH, SYMBOL_BUTTON_WIDTH);
 
   lv_obj_add_event_cb(btn2, ap_event_button_search_handler, LV_EVENT_PRESSED,
                       NULL);

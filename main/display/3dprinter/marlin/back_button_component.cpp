@@ -28,13 +28,15 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text,
+                               int width = SYMBOL_BUTTON_WIDTH,
+                               int height = SYMBOL_BUTTON_HEIGHT,
+                               bool center = true, bool slash = false,
+                               int rotation = 0);
 
 lv_obj_t *create_back_button(lv_obj_t *parent) {
-  lv_obj_t *btn = lv_btn_create(parent);
-  lv_obj_t *label = lv_label_create(btn);
-  lv_label_set_text(label, " " LV_SYMBOL_NEW_LINE " ");
-  lv_obj_center(label);
-  apply_style(btn, ESP3DStyleType::button);
+  lv_obj_t *btn = create_symbol_button(parent, LV_SYMBOL_NEW_LINE,
+                                       BACK_BUTTON_WIDTH, BACK_BUTTON_HEIGHT);
   lv_obj_align(btn, LV_ALIGN_BOTTOM_RIGHT, -CURRENT_BUTTON_PRESSED_OUTLINE,
                -CURRENT_BUTTON_PRESSED_OUTLINE);
   return btn;

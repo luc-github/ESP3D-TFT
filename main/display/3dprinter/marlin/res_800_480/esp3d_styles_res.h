@@ -48,6 +48,9 @@ extern "C" {
 
 #define CURRENT_SPINNER_SIZE 100
 
+#define BACK_BUTTON_WIDTH 80
+#define BACK_BUTTON_HEIGHT -1
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif
