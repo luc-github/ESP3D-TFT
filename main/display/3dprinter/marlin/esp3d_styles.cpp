@@ -219,6 +219,8 @@ bool init_styles() {
   lv_style_set_pad_gap(&style_btn_matrix_bar, 0);
   lv_style_set_clip_corner(&style_btn_matrix_bar, true);
   lv_style_set_radius(&style_btn_matrix_bar, CURRENT_BUTTON_RADIUS_VALUE);
+  lv_style_set_pad_left(&style_btn_matrix_bar, 4);
+  lv_style_set_pad_top(&style_btn_matrix_bar, 4);
 
   // border
   lv_style_set_border_opa(&style_btn_matrix_bar, LV_OPA_40);
