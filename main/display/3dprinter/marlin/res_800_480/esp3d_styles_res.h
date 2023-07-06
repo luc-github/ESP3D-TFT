@@ -51,6 +51,8 @@ extern "C" {
 #define BACK_BUTTON_WIDTH 80
 #define BACK_BUTTON_HEIGHT -1
 
+#define MATRIX_BUTTON_HEIGHT 80
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

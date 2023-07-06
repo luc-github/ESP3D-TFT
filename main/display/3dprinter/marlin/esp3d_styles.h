@@ -40,6 +40,7 @@ enum class ESP3DStyleType : uint8_t {
   status_bar,
   status_list,
   bg_label,
+  buttons_matrix
 };
 
 extern bool init_styles();

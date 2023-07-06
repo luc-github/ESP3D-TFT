@@ -28,7 +28,7 @@ extern "C" {
       61618,61559,61560,61523,61524,61728,63012,61867,
       63587,62603,63275,61829,62913,62973,58552,62683,
       58557,61442,62679,62156,61758,61842,58563,62437,
-      62099,62087,61601
+      62099,62087,61601,61525,61526
 */
 
 /* These symbols can be prefined in the lv_conf.h file.
@@ -303,6 +303,14 @@ extern "C" {
 #define LV_SYMBOL_MORE_INFO           "\xEF\x82\xA1" /*61601, 0xF0A1*/
 #endif
 
+#if !defined LV_SYMBOL_PLUS
+#define LV_SYMBOL_PLUS           "\xEF\x81\x95" /*61525, 0xF055*/
+#endif
+
+#if !defined LV_SYMBOL_MINUS
+#define LV_SYMBOL_MINUS           "\xEF\x81\x96" /*61526, 0xF056*/
+#endif
+
 #if !defined LV_SYMBOL_DUMMY
 /** Invalid symbol at (U+F8FF). If written before a string then `lv_img` will show it as a label*/
 #define LV_SYMBOL_DUMMY           "\xEF\xA3\xBF"
@@ -376,6 +384,8 @@ enum {
     _LV_STR_SYMBOL_BLUETOOTH,
     _LV_STR_SYMBOL_USB,
     _LV_STR_SYMBOL_MORE_INFO,
+    _LV_STR_SYMBOL_PLUS,
+    _LV_STR_SYMBOL_MINUS,
     _LV_STR_SYMBOL_DUMMY,
 };
  

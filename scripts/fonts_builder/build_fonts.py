@@ -70,7 +70,9 @@ symbols_array = [
 [0xf3e5,'NEW_LINE','fa-solid-900.ttf'],
 [0xf293,'BLUETOOTH','fa-brands-400.ttf'],
 [0xf287,'USB','fa-brands-400.ttf'],
-[0xf0a1,'MORE_INFO','fa-solid-900.ttf']
+[0xf0a1,'MORE_INFO','fa-solid-900.ttf'],
+[0xf055,'PLUS','fa-solid-900.ttf'],
+[0xf056,'MINUS','fa-solid-900.ttf']
 ]
 
 #list of font sizes to generate

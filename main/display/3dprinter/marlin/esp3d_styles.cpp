@@ -55,6 +55,11 @@ lv_style_t style_status_list_default;
 lv_style_t style_btn_default;
 lv_style_t style_btn_pressed;
 
+lv_style_t style_btn_matrix_default;
+lv_style_t style_btn_matrix_pressed;
+lv_style_t style_btn_matrix_checked;
+lv_style_t style_btn_matrix_bar;
+
 lv_style_t style_embedded_btn_default;
 lv_style_t style_embedded_btn_pressed;
 
@@ -203,6 +208,105 @@ bool init_styles() {
                           CURRENT_BUTTON_PRESSED_TEXT_COLOR);
   lv_style_set_border_color(&style_embedded_btn_pressed,
                             CURRENT_BUTTON_PRESSED_BORDER_COLOR);
+
+  /*
+  Buttons matrix
+  */
+
+  // Bar
+  lv_style_init(&style_btn_matrix_bar);
+  lv_style_set_pad_all(&style_btn_matrix_bar, 1);
+  lv_style_set_pad_gap(&style_btn_matrix_bar, 0);
+  lv_style_set_clip_corner(&style_btn_matrix_bar, true);
+  lv_style_set_radius(&style_btn_matrix_bar, CURRENT_BUTTON_RADIUS_VALUE);
+
+  // border
+  lv_style_set_border_opa(&style_btn_matrix_bar, LV_OPA_40);
+  lv_style_set_border_width(&style_btn_matrix_bar, CURRENT_BUTTON_BORDER_VALUE);
+  lv_style_set_border_color(&style_btn_matrix_bar, CURRENT_BUTTON_BORDER_COLOR);
+
+  // bg
+  lv_style_set_bg_opa(&style_btn_matrix_bar, LV_OPA_100);
+  lv_style_set_bg_color(&style_btn_matrix_bar,
+                        lv_palette_main(CURRENT_BUTTON_COLOR_PALETTE));
+  lv_style_set_bg_grad_color(
+      &style_btn_matrix_bar,
+      lv_palette_darken(CURRENT_BUTTON_COLOR_PALETTE,
+                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN));
+  lv_style_set_bg_grad_dir(&style_btn_matrix_bar, LV_GRAD_DIR_VER);
+
+  // text
+  lv_style_set_text_color(&style_btn_matrix_bar, CURRENT_BUTTON_TEXT_COLOR);
+
+  //*****************************************************************
+
+  // Default
+  lv_style_init(&style_btn_matrix_default);
+  lv_style_set_radius(&style_btn_matrix_default, CURRENT_BUTTON_RADIUS_VALUE);
+
+  // bg
+  // text
+  // border
+
+  //********************************************************************
+
+  // Pressed
+  lv_style_init(&style_btn_matrix_pressed);
+  lv_style_set_pad_all(&style_btn_matrix_pressed, 10);
+  lv_style_set_radius(&style_btn_matrix_pressed, CURRENT_BUTTON_RADIUS_VALUE);
+  lv_style_set_outline_opa(&style_btn_matrix_pressed, LV_OPA_40);
+  lv_style_set_outline_color(
+      &style_btn_matrix_pressed,
+      lv_palette_main(CURRENT_BUTTON_OUTLINE_COLOR_PALETTE));
+  lv_style_set_outline_width(&style_btn_matrix_pressed, 1);
+
+  // bg
+  lv_style_set_bg_opa(&style_btn_matrix_pressed, LV_OPA_60);
+  lv_style_set_bg_color(
+      &style_btn_matrix_pressed,
+      lv_palette_darken(CURRENT_BUTTON_PRESSED_COLOR_PALETTE,
+                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN * 2));
+  lv_style_set_bg_grad_color(
+      &style_btn_matrix_pressed,
+      lv_palette_darken(CURRENT_BUTTON_PRESSED_COLOR_PALETTE,
+                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN * 2));
+  // text
+  lv_style_set_text_color(
+      &style_btn_matrix_pressed,
+      lv_palette_darken(CURRENT_BUTTON_OUTLINE_COLOR_PALETTE,
+                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN));
+
+  // border
+  lv_style_set_border_color(&style_btn_matrix_pressed,
+                            CURRENT_BUTTON_PRESSED_BORDER_COLOR);
+  lv_style_set_border_width(&style_btn_matrix_pressed, 3);
+  lv_style_set_border_opa(&style_btn_matrix_pressed, LV_OPA_60);
+
+  //********************************************************************
+  // checked
+  lv_style_init(&style_btn_matrix_checked);
+  lv_style_set_pad_all(&style_btn_matrix_checked, 10);
+  lv_style_set_radius(&style_btn_matrix_checked, CURRENT_BUTTON_RADIUS_VALUE);
+
+  // bg
+  lv_style_set_bg_opa(&style_btn_matrix_checked, LV_OPA_40);
+  lv_style_set_bg_color(
+      &style_btn_matrix_checked,
+      lv_palette_darken(CURRENT_BUTTON_PRESSED_COLOR_PALETTE,
+                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN * 2));
+  lv_style_set_bg_grad_color(
+      &style_btn_matrix_checked,
+      lv_palette_darken(CURRENT_BUTTON_PRESSED_COLOR_PALETTE,
+                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN * 2));
+  // text
+  lv_style_set_text_color(&style_btn_matrix_checked,
+                          CURRENT_BUTTON_PRESSED_TEXT_COLOR);
+  // border
+  lv_style_set_border_color(&style_btn_matrix_checked,
+                            CURRENT_BUTTON_PRESSED_BORDER_COLOR);
+  lv_style_set_border_width(&style_btn_matrix_checked, 2);
+  lv_style_set_border_opa(&style_btn_matrix_checked, LV_OPA_40);
+
   /*
   Status list
   */
@@ -214,8 +318,10 @@ bool init_styles() {
   lv_style_set_bg_color(&style_status_list_default,
                         CURRENT_STATUS_BAR_BG_COLOR);
   lv_style_set_radius(&style_status_list_default, 0);
-  // lv_style_set_pad_hor(&style_status_list_default, CURRENT_STATUS_BAR_H_PAD);
-  // lv_style_set_pad_ver(&style_status_list_default, CURRENT_STATUS_BAR_V_PAD);
+  // lv_style_set_pad_hor(&style_status_list_default,
+  // CURRENT_STATUS_BAR_H_PAD);
+  // lv_style_set_pad_ver(&style_status_list_default,
+  // CURRENT_STATUS_BAR_V_PAD);
   lv_style_set_border_width(&style_status_list_default,
                             CURRENT_STATUS_BAR_BORDER_VALUE);
   lv_style_set_border_color(&style_status_list_default,
@@ -251,7 +357,8 @@ bool init_styles() {
 }
 
 bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
-  if (type != ESP3DStyleType::main_bg && type != ESP3DStyleType::status_list) {
+  if (type != ESP3DStyleType::main_bg && type != ESP3DStyleType::status_list /*&&
+      type != ESP3DStyleType::buttons_matrix*/) {
     lv_obj_remove_style_all(obj); /*Remove the style coming from the
     // theme*/
   }
@@ -273,6 +380,21 @@ bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
     case ESP3DStyleType::button:
       lv_obj_add_style(obj, &style_btn_default, LV_STATE_DEFAULT);
       lv_obj_add_style(obj, &style_btn_pressed, LV_STATE_PRESSED);
+      break;
+    case ESP3DStyleType::buttons_matrix:
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-enum-enum-conversion"
+
+      lv_obj_add_style(obj, &style_btn_matrix_bar, LV_STATE_DEFAULT);
+      lv_obj_add_style(obj, &style_btn_matrix_default, LV_PART_ITEMS);
+      lv_obj_add_style(obj, &style_btn_matrix_pressed,
+                       LV_PART_ITEMS | LV_STATE_PRESSED);
+      lv_obj_add_style(obj, &style_btn_matrix_checked,
+                       LV_PART_ITEMS | LV_STATE_CHECKED);
+      lv_btnmatrix_set_btn_ctrl_all(obj, LV_BTNMATRIX_CTRL_CHECKABLE);
+      lv_btnmatrix_set_one_checked(obj, true);
+
+#pragma GCC diagnostic pop
       break;
 
     case ESP3DStyleType::embedded_button:
