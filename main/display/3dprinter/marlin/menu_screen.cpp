@@ -213,6 +213,8 @@ void menu_screen() {
   lv_obj_t *btn5 =
       create_symbol_button(ui_bottom_buttons_container, LV_SYMBOL_ENGINE,
                            BUTTON_WIDTH, BUTTON_HEIGHT, true, true, 90);
+  lv_obj_add_event_cb(btn5, event_button_disable_steppers_handler,
+                      LV_EVENT_RELEASED, NULL);
 
   // Create button and label for informations button
   std::string label6 = LV_SYMBOL_MORE_INFO;

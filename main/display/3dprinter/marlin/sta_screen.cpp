@@ -127,16 +127,16 @@ void sta_screen() {
   lv_label_set_text(label_ssid, LV_SYMBOL_ACCESS_POINT);
   apply_style(label_ssid, ESP3DStyleType::bg_label);
   lv_obj_update_layout(label_ssid);
-
+  int width_label = lv_obj_get_width(label_ssid);
+  esp3d_log("width_label %d", lv_obj_get_width(label_ssid));
   sta_ta_ssid = lv_textarea_create(ui_main_container);
   lv_textarea_set_one_line(sta_ta_ssid, true);
   lv_textarea_set_max_length(sta_ta_ssid, 32);
   lv_obj_align(sta_ta_ssid, LV_ALIGN_TOP_LEFT,
-               lv_obj_get_width(label_ssid) + CURRENT_BUTTON_PRESSED_OUTLINE,
-               0);
-  lv_obj_align_to(sta_ta_ssid, label_ssid, LV_ALIGN_OUT_RIGHT_MID,
-                  CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+               width_label + (CURRENT_BUTTON_PRESSED_OUTLINE * 2), 0);
   lv_obj_set_width(sta_ta_ssid, (LV_HOR_RES / 2));
+  lv_obj_align_to(label_ssid, sta_ta_ssid, LV_ALIGN_OUT_LEFT_MID,
+                  -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
 
   // Password
   lv_obj_t *label_pwd = lv_label_create(ui_main_container);
