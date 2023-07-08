@@ -29,6 +29,11 @@
  *  STATIC PROTOTYPES
  **********************/
 lv_obj_t *create_menu_button(lv_obj_t *container, const char *text);
+lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text,
+                               int width = SYMBOL_BUTTON_WIDTH,
+                               int height = SYMBOL_BUTTON_HEIGHT,
+                               bool center = true, bool slash = false,
+                               int rotation = 0);
 void empty_screen();
 void temperatures_screen();
 void positions_screen();
@@ -249,7 +254,8 @@ void main_screen() {
   // Create button and label for positions
   std::string label_text3 = "X: 150.00\nY: 150.00\nZ: 150.00";
   lv_obj_t *btn3 =
-      create_menu_button(ui_top_buttons_container, label_text3.c_str());
+      create_symbol_button(ui_top_buttons_container, label_text3.c_str(),
+                           BUTTON_WIDTH * 1.5, BUTTON_HEIGHT);
   lv_obj_add_event_cb(btn3, event_button_positions_handler, LV_EVENT_RELEASED,
                       NULL);
 
