@@ -78,7 +78,10 @@ void status_screen() {
   // Screen creation
   esp3d_log("Main screen creation");
   lv_obj_t *ui_status_screen = lv_obj_create(NULL);
-
+  // Display new screen and delete old one
+  lv_obj_t *ui_current_screen = lv_scr_act();
+  lv_scr_load(ui_status_screen);
+  lv_obj_del(ui_current_screen);
   // Apply background color
   apply_style(ui_status_screen, ESP3DStyleType::main_bg);
   // Create screen container
@@ -110,8 +113,4 @@ void status_screen() {
   lv_obj_set_height(ui_status_list_ctl,
                     LV_VER_RES - lv_obj_get_height(btn_back));
   lv_obj_set_width(ui_status_list_ctl, LV_HOR_RES);
-  // Display new screen and delete old one
-  lv_obj_t *ui_current_screen = lv_scr_act();
-  lv_scr_load(ui_status_screen);
-  lv_obj_del(ui_current_screen);
 }

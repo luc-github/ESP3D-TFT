@@ -29,14 +29,12 @@
  *  STATIC PROTOTYPES
  **********************/
 
-lv_obj_t *create_menu_button(lv_obj_t *container, lv_obj_t *&btn,
-                             lv_obj_t *&label, int width = BUTTON_WIDTH,
-                             bool center = true) {
-  btn = lv_btn_create(container);
-  apply_style(btn, ESP3DStyleType::button);
-  lv_obj_set_size(btn, width, BUTTON_HEIGHT);
-  label = lv_label_create(btn);
-  lv_obj_center(label);
-  if (center) lv_obj_set_style_text_align(label, LV_TEXT_ALIGN_CENTER, 0);
-  return label;
+lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text,
+                               int width = SYMBOL_BUTTON_WIDTH,
+                               int height = SYMBOL_BUTTON_HEIGHT,
+                               bool center = true, bool slash = false,
+                               int rotation = 0);
+
+lv_obj_t *create_menu_button(lv_obj_t *container, const char *text) {
+  return create_symbol_button(container, text, BUTTON_WIDTH, BUTTON_HEIGHT);
 }

@@ -32,9 +32,7 @@ void menu_screen();
 lv_obj_t *create_back_button(lv_obj_t *parent);
 lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
                                 ESP3DStyleType style);
-lv_obj_t *create_menu_button(lv_obj_t *container, lv_obj_t *&btn,
-                             lv_obj_t *&label, int width = BUTTON_WIDTH,
-                             bool center = true);
+lv_obj_t *create_menu_button(lv_obj_t *container, const char *text);
 
 lv_timer_t *filament_screen_delay_timer = NULL;
 
@@ -48,8 +46,12 @@ void filament_screen_delay_timer_cb(lv_timer_t *timer) {
 
 void event_button_filament_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
-  filament_screen_delay_timer = lv_timer_create(filament_screen_delay_timer_cb,
-                                                BUTTON_ANIMATION_DELAY, NULL);
+  if (BUTTON_ANIMATION_DELAY) {
+    filament_screen_delay_timer = lv_timer_create(
+        filament_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+  } else {
+    filament_screen_delay_timer_cb(NULL);
+  }
 }
 
 void filament_screen() {
@@ -57,20 +59,19 @@ void filament_screen() {
   // Screen creation
   esp3d_log("Filanent screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
+  // Display new screen and delete old one
+  lv_obj_t *ui_current_screen = lv_scr_act();
+  lv_scr_load(ui_new_screen);
+  lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
 
   // TODO: Add your code here
   lv_obj_t *btnback = create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_filament_back_handler,
-                      LV_EVENT_PRESSED, NULL);
+                      LV_EVENT_RELEASED, NULL);
   lv_obj_t *ui_main_container = create_main_container(
       ui_new_screen, btnback, ESP3DStyleType::col_container);
 
   lv_obj_set_style_bg_opa(ui_main_container, LV_OPA_COVER, LV_PART_MAIN);
   lv_obj_set_style_bg_color(ui_main_container, lv_color_white(), LV_PART_MAIN);
-
-  // Display new screen and delete old one
-  lv_obj_t *ui_current_screen = lv_scr_act();
-  lv_scr_load(ui_new_screen);
-  lv_obj_del(ui_current_screen);
 }

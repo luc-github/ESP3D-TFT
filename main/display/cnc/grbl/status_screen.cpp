@@ -75,6 +75,10 @@ void status_screen() {
   // Screen creation
   esp3d_log("Main screen creation");
   lv_obj_t *ui_status_screen = lv_obj_create(NULL);
+  // Display new screen and delete old one
+  lv_obj_t *ui_current_screen = lv_scr_act();
+  lv_scr_load(ui_status_screen);
+  lv_obj_del(ui_current_screen);
   const ESP3DValuesDescription *status_bar_desc =
       esp3dTftValues.get_description(ESP3DValuesIndex::status_bar_label);
   // the control is deleted but not the label is not set to null so we need to
@@ -110,8 +114,4 @@ void status_screen() {
   lv_obj_update_layout(btn_back);
   lv_obj_set_height(status_list, LV_VER_RES - lv_obj_get_height(btn_back));
   lv_obj_set_width(status_list, LV_HOR_RES);
-  // Display new screen and delete old one
-  lv_obj_t *ui_current_screen = lv_scr_act();
-  lv_scr_load(ui_status_screen);
-  lv_obj_del(ui_current_screen);
 }

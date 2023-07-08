@@ -67,24 +67,36 @@ void event_button_wifi_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
   if (wifi_screen_delay_timer) return;
   wifi_next_screen = ESP3DScreenType::menu;
-  wifi_screen_delay_timer =
-      lv_timer_create(wifi_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+  if (BUTTON_ANIMATION_DELAY) {
+    wifi_screen_delay_timer = lv_timer_create(wifi_screen_delay_timer_cb,
+                                              BUTTON_ANIMATION_DELAY, NULL);
+  } else {
+    wifi_screen_delay_timer_cb(NULL);
+  }
 }
 
 void event_button_ap_handler(lv_event_t *e) {
   esp3d_log("AP Clicked");
   if (wifi_screen_delay_timer) return;
   wifi_next_screen = ESP3DScreenType::access_point;
-  wifi_screen_delay_timer =
-      lv_timer_create(wifi_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+  if (BUTTON_ANIMATION_DELAY) {
+    wifi_screen_delay_timer = lv_timer_create(wifi_screen_delay_timer_cb,
+                                              BUTTON_ANIMATION_DELAY, NULL);
+  } else {
+    wifi_screen_delay_timer_cb(NULL);
+  }
 }
 
 void event_button_sta_handler(lv_event_t *e) {
   esp3d_log("STA Clicked");
   if (wifi_screen_delay_timer) return;
   wifi_next_screen = ESP3DScreenType::station;
-  wifi_screen_delay_timer =
-      lv_timer_create(wifi_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+  if (BUTTON_ANIMATION_DELAY) {
+    wifi_screen_delay_timer = lv_timer_create(wifi_screen_delay_timer_cb,
+                                              BUTTON_ANIMATION_DELAY, NULL);
+  } else {
+    wifi_screen_delay_timer_cb(NULL);
+  }
 }
 void event_button_no_wifi_handler(lv_event_t *e) {
   esp3d_log("no wifi Clicked");
@@ -95,11 +107,15 @@ void wifi_screen() {
   // Screen creation
   esp3d_log("Wifi screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
+  // Display new screen and delete old one
+  lv_obj_t *ui_current_screen = lv_scr_act();
+  lv_scr_load(ui_new_screen);
+  lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
 
   lv_obj_t *btnback = create_back_button(ui_new_screen);
-  lv_obj_add_event_cb(btnback, event_button_wifi_back_handler, LV_EVENT_PRESSED,
-                      NULL);
+  lv_obj_add_event_cb(btnback, event_button_wifi_back_handler,
+                      LV_EVENT_RELEASED, NULL);
   lv_obj_t *ui_main_container = create_main_container(
       ui_new_screen, btnback, ESP3DStyleType::col_container);
 
@@ -114,21 +130,16 @@ void wifi_screen() {
   // Create button and label for ap
   btn = create_symbol_button(ui_buttons_container, LV_SYMBOL_ACCESS_POINT,
                              BUTTON_WIDTH, BUTTON_WIDTH);
-  lv_obj_add_event_cb(btn, event_button_ap_handler, LV_EVENT_PRESSED, NULL);
+  lv_obj_add_event_cb(btn, event_button_ap_handler, LV_EVENT_RELEASED, NULL);
 
   // Create button and label for sta
   btn = create_symbol_button(ui_buttons_container, LV_SYMBOL_STATION_MODE,
                              BUTTON_WIDTH, BUTTON_WIDTH);
-  lv_obj_add_event_cb(btn, event_button_sta_handler, LV_EVENT_PRESSED, NULL);
+  lv_obj_add_event_cb(btn, event_button_sta_handler, LV_EVENT_RELEASED, NULL);
 
   // Create button and label for no wifi
   btn = create_symbol_button(ui_buttons_container, LV_SYMBOL_WIFI, BUTTON_WIDTH,
                              BUTTON_WIDTH, true, true);
-  lv_obj_add_event_cb(btn, event_button_no_wifi_handler, LV_EVENT_PRESSED,
+  lv_obj_add_event_cb(btn, event_button_no_wifi_handler, LV_EVENT_RELEASED,
                       NULL);
-
-  // Display new screen and delete old one
-  lv_obj_t *ui_current_screen = lv_scr_act();
-  lv_scr_load(ui_new_screen);
-  lv_obj_del(ui_current_screen);
 }

@@ -28,9 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-lv_obj_t *create_menu_button(lv_obj_t *container, lv_obj_t *&btn,
-                             lv_obj_t *&label, int width = BUTTON_WIDTH,
-                             bool center = true);
+lv_obj_t *create_menu_button(lv_obj_t *container, const char *text);
 void empty_screen();
 void temperatures_screen();
 void positions_screen();
@@ -84,64 +82,95 @@ void event_button_E0_handler(lv_event_t *e) {
   esp3d_log("E0 Clicked");
   if (main_screen_delay_timer) return;
   next_screen = ESP3DScreenType::temperatures;
-  main_screen_delay_timer =
-      lv_timer_create(main_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+  if (BUTTON_ANIMATION_DELAY)
+    main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
+                                              BUTTON_ANIMATION_DELAY, NULL);
+  else {
+    main_screen_delay_timer_cb(NULL);
+  }
 }
 
 void event_button_E1_handler(lv_event_t *e) {
   esp3d_log("E1 Clicked");
   if (main_screen_delay_timer) return;
   next_screen = ESP3DScreenType::temperatures;
-  main_screen_delay_timer =
-      lv_timer_create(main_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+  if (BUTTON_ANIMATION_DELAY)
+    main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
+                                              BUTTON_ANIMATION_DELAY, NULL);
+  else {
+    main_screen_delay_timer_cb(NULL);
+  }
 }
 
 void event_button_Bed_handler(lv_event_t *e) {
   esp3d_log("Bed Clicked");
   if (main_screen_delay_timer) return;
   next_screen = ESP3DScreenType::temperatures;
-  main_screen_delay_timer =
-      lv_timer_create(main_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+  if (BUTTON_ANIMATION_DELAY) {
+    main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
+                                              BUTTON_ANIMATION_DELAY, NULL);
+  } else {
+    main_screen_delay_timer_cb(NULL);
+  }
 }
 
 void event_button_positions_handler(lv_event_t *e) {
   esp3d_log("Positions Clicked");
   if (main_screen_delay_timer) return;
   next_screen = ESP3DScreenType::positions;
-  main_screen_delay_timer =
-      lv_timer_create(main_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+  if (BUTTON_ANIMATION_DELAY) {
+    main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
+                                              BUTTON_ANIMATION_DELAY, NULL);
+  } else {
+    main_screen_delay_timer_cb(NULL);
+  }
 }
 
 void event_button_fan_handler(lv_event_t *e) {
   esp3d_log("Fan Clicked");
   if (main_screen_delay_timer) return;
   next_screen = ESP3DScreenType::fan;
-  main_screen_delay_timer =
-      lv_timer_create(main_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+  if (BUTTON_ANIMATION_DELAY) {
+    main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
+                                              BUTTON_ANIMATION_DELAY, NULL);
+  } else {
+    main_screen_delay_timer_cb(NULL);
+  }
 }
 
 void event_button_speed_handler(lv_event_t *e) {
   esp3d_log("Speed Clicked");
   if (main_screen_delay_timer) return;
   next_screen = ESP3DScreenType::speed;
-  main_screen_delay_timer =
-      lv_timer_create(main_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+  if (BUTTON_ANIMATION_DELAY) {
+    main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
+                                              BUTTON_ANIMATION_DELAY, NULL);
+  } else {
+    main_screen_delay_timer_cb(NULL);
+  }
 }
 
 void event_button_files_handler(lv_event_t *e) {
   esp3d_log("Files Clicked");
   if (main_screen_delay_timer) return;
   next_screen = ESP3DScreenType::files;
-  main_screen_delay_timer =
-      lv_timer_create(main_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+  if (BUTTON_ANIMATION_DELAY) {
+    main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
+                                              BUTTON_ANIMATION_DELAY, NULL);
+  } else {
+    main_screen_delay_timer_cb(NULL);
+  }
 }
 
 void event_button_menu_handler(lv_event_t *e) {
   esp3d_log("Menu Clicked");
   if (main_screen_delay_timer) return;
   next_screen = ESP3DScreenType::menu;
-  main_screen_delay_timer =
-      lv_timer_create(main_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+  if (BUTTON_ANIMATION_DELAY)
+    main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
+                                              BUTTON_ANIMATION_DELAY, NULL);
+  else
+    main_screen_delay_timer_cb(NULL);
 }
 
 void event_button_resume_handler(lv_event_t *e) { esp3d_log("Resume Clicked"); }
@@ -156,6 +185,10 @@ void main_screen() {
   esp3d_log("Main screen creation");
   // Background
   lv_obj_t *ui_main_screen = lv_obj_create(NULL);
+  // Display new screen and delete old one
+  lv_obj_t *ui_current_screen = lv_scr_act();
+  lv_scr_load(ui_main_screen);
+  lv_obj_del(ui_current_screen);
   apply_style(ui_main_screen, ESP3DStyleType::main_bg);
 
   lv_obj_t *ui_status_bar_container = status_bar(ui_main_screen);
@@ -192,36 +225,36 @@ void main_screen() {
   lv_obj_clear_flag(ui_bottom_buttons_container, LV_OBJ_FLAG_SCROLLABLE);
 
   //**********************************
-  lv_obj_t *label = nullptr;
-  lv_obj_t *btn = nullptr;
-
   // Create button and label for Extruder 0
-  label = create_menu_button(ui_top_buttons_container, btn, label);
-  lv_label_set_text_fmt(label, "%s\n%s\n%s%s", "160", "260",
-                        LV_SYMBOL_HEAT_EXTRUDER, "1");
-  lv_obj_add_event_cb(btn, event_button_E0_handler, LV_EVENT_PRESSED, NULL);
+  std::string label_text1 =
+      "160\n260\n" + std::string(LV_SYMBOL_HEAT_EXTRUDER) + std::string("1");
+  lv_obj_t *btn1 =
+      create_menu_button(ui_top_buttons_container, label_text1.c_str());
+
+  lv_obj_add_event_cb(btn1, event_button_E0_handler, LV_EVENT_RELEASED, NULL);
 
   // Create button and label for Extruder 1
-  label = create_menu_button(ui_top_buttons_container, btn, label);
-  lv_label_set_text_fmt(label, "%s\n%s\n%s%s", "20", "60",
-                        LV_SYMBOL_HEAT_EXTRUDER, "2");
-  lv_obj_add_event_cb(btn, event_button_E1_handler, LV_EVENT_PRESSED, NULL);
+  std::string label_text2 =
+      "160\n260\n" + std::string(LV_SYMBOL_HEAT_EXTRUDER) + std::string("2");
+  lv_obj_t *btn2 =
+      create_menu_button(ui_top_buttons_container, label_text2.c_str());
+  lv_obj_add_event_cb(btn2, event_button_E1_handler, LV_EVENT_RELEASED, NULL);
 
   // Create button and label for Bed
-  label = create_menu_button(ui_top_buttons_container, btn, label);
-  lv_label_set_text_fmt(label, "%s\n%s\n%s", "20", "60", LV_SYMBOL_HEAT_BED);
-  lv_obj_add_event_cb(btn, event_button_Bed_handler, LV_EVENT_PRESSED, NULL);
+  std::string label_text_bed = "160\n260\n" + std::string(LV_SYMBOL_HEAT_BED);
+  lv_obj_t *btn_b =
+      create_menu_button(ui_top_buttons_container, label_text_bed.c_str());
+  lv_obj_add_event_cb(btn_b, event_button_Bed_handler, LV_EVENT_RELEASED, NULL);
 
   // Create button and label for positions
-  label = create_menu_button(ui_top_buttons_container, btn, label,
-                             BUTTON_WIDTH * 1.5, false);
-  lv_label_set_text_fmt(label, "X: %s\nY: %s\nZ: %s", "150.00", "60.00",
-                        "15.00");
-  lv_obj_add_event_cb(btn, event_button_positions_handler, LV_EVENT_PRESSED,
+  std::string label_text3 = "X: 150.00\nY: 150.00\nZ: 150.00";
+  lv_obj_t *btn3 =
+      create_menu_button(ui_top_buttons_container, label_text3.c_str());
+  lv_obj_add_event_cb(btn3, event_button_positions_handler, LV_EVENT_RELEASED,
                       NULL);
 
   // Create button and label for middle container
-  label = lv_label_create(ui_middle_container);
+  lv_obj_t *label = lv_label_create(ui_middle_container);
   apply_style(label, ESP3DStyleType::status_bar);
   // lv_obj_t *label = lv_label_create(ui_btn_middle);
   lv_label_set_text_fmt(label, "Progression: %s %%  ETE: 11H 22M 14S\nTest.gco",
@@ -230,33 +263,35 @@ void main_screen() {
   lv_obj_set_size(label, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
 
   // Create button and label for fan
-  label = create_menu_button(ui_bottom_buttons_container, btn, label);
-  lv_label_set_text_fmt(label, "%s\n%s", "100%", LV_SYMBOL_FAN);
-  lv_obj_add_event_cb(btn, event_button_fan_handler, LV_EVENT_PRESSED, NULL);
+  std::string label_text4 = "100%\n" + std::string(LV_SYMBOL_FAN);
+  lv_obj_t *btn4 =
+      create_menu_button(ui_bottom_buttons_container, label_text4.c_str());
+  lv_obj_add_event_cb(btn4, event_button_fan_handler, LV_EVENT_RELEASED, NULL);
 
   // Create button and label for speed
-  label = create_menu_button(ui_bottom_buttons_container, btn, label);
-  lv_label_set_text_fmt(label, "%s\n%s", "100%", LV_SYMBOL_SPEED);
-  lv_obj_add_event_cb(btn, event_button_speed_handler, LV_EVENT_PRESSED, NULL);
+  std::string label_text5 = "100%\n" + std::string(LV_SYMBOL_SPEED);
+  lv_obj_t *btn5 =
+      create_menu_button(ui_bottom_buttons_container, label_text5.c_str());
+  lv_obj_add_event_cb(btn5, event_button_speed_handler, LV_EVENT_RELEASED,
+                      NULL);
 
   // Create button and label for pause
-  label = create_menu_button(ui_bottom_buttons_container, btn, label);
-  lv_label_set_text_fmt(label, "%s", LV_SYMBOL_PAUSE);
-  lv_obj_add_event_cb(btn, event_button_pause_handler, LV_EVENT_PRESSED, NULL);
+  std::string label_text6 = LV_SYMBOL_PAUSE;
+  lv_obj_t *btn6 =
+      create_menu_button(ui_bottom_buttons_container, label_text6.c_str());
+  lv_obj_add_event_cb(btn6, event_button_pause_handler, LV_EVENT_RELEASED,
+                      NULL);
 
   // Create button and label for stop
-  label = create_menu_button(ui_bottom_buttons_container, btn, label);
-  lv_label_set_text_fmt(label, "%s", LV_SYMBOL_STOP);
-  lv_obj_add_event_cb(btn, event_button_stop_handler, LV_EVENT_PRESSED, NULL);
-  lv_obj_add_flag(btn, LV_OBJ_FLAG_HIDDEN);
+  std::string label_text7 = LV_SYMBOL_STOP;
+  lv_obj_t *btn7 =
+      create_menu_button(ui_bottom_buttons_container, label_text7.c_str());
+  lv_obj_add_event_cb(btn7, event_button_pause_handler, LV_EVENT_RELEASED,
+                      NULL);
 
   // Create button and label for menu
-  label = create_menu_button(ui_bottom_buttons_container, btn, label);
-  lv_label_set_text_fmt(label, "%s", LV_SYMBOL_LIST);
-  lv_obj_add_event_cb(btn, event_button_menu_handler, LV_EVENT_PRESSED, NULL);
-
-  // Display new screen and delete old one
-  lv_obj_t *ui_current_screen = lv_scr_act();
-  lv_scr_load(ui_main_screen);
-  lv_obj_del(ui_current_screen);
+  std::string label_text8 = LV_SYMBOL_LIST;
+  lv_obj_t *btn8 =
+      create_menu_button(ui_bottom_buttons_container, label_text8.c_str());
+  lv_obj_add_event_cb(btn8, event_button_menu_handler, LV_EVENT_RELEASED, NULL);
 }

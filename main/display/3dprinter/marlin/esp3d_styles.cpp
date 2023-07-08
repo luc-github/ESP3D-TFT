@@ -153,13 +153,15 @@ bool init_styles() {
                           CURRENT_BUTTON_PRESSED_TEXT_COLOR);
   lv_style_set_border_color(&style_btn_pressed,
                             CURRENT_BUTTON_PRESSED_BORDER_COLOR);
-  /*Add a transition to the outline*/
-  static lv_style_transition_dsc_t trans;
-  static lv_style_prop_t props[] = {LV_STYLE_OUTLINE_WIDTH,
-                                    LV_STYLE_OUTLINE_OPA, LV_STYLE_PROP_INV};
-  lv_style_transition_dsc_init(&trans, props, lv_anim_path_linear,
-                               BUTTON_ANIMATION_DELAY, 0, NULL);
-  lv_style_set_transition(&style_btn_pressed, &trans);
+  if (BUTTON_ANIMATION_DELAY) {
+    /*Add a transition to the outline*/
+    static lv_style_transition_dsc_t trans;
+    static lv_style_prop_t props[] = {LV_STYLE_OUTLINE_WIDTH,
+                                      LV_STYLE_OUTLINE_OPA, LV_STYLE_PROP_INV};
+    lv_style_transition_dsc_init(&trans, props, lv_anim_path_linear,
+                                 BUTTON_ANIMATION_DELAY, 0, NULL);
+    lv_style_set_transition(&style_btn_pressed, &trans);
+  }
 
   /*
   Embedded buttons

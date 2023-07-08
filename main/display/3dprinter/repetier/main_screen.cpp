@@ -45,6 +45,10 @@ void main_screen() {
   // Screen creation
   esp3d_log("Main screen creation");
   lv_obj_t *ui_main_screen = lv_obj_create(NULL);
+  // Display new screen and delete old one
+  lv_obj_t *ui_current_screen = lv_scr_act();
+  lv_scr_load(ui_main_screen);
+  lv_obj_del(ui_current_screen);
   apply_style(ui_main_screen, ESP3DStyleType::main_bg);
   //  Apply background color
   // lv_obj_set_style_bg_color(ui_main_screen,
@@ -172,9 +176,4 @@ void main_screen() {
   lv_obj_t *label2_3 = lv_label_create(btn2_3);
   lv_label_set_text(label2_3, LV_SYMBOL_WIFI);
   lv_obj_center(label2_3);*/
-
-  // Display new screen and delete old one
-  lv_obj_t *ui_current_screen = lv_scr_act();
-  lv_scr_load(ui_main_screen);
-  lv_obj_del(ui_current_screen);
 }

@@ -33,9 +33,7 @@ void main_screen();
 lv_obj_t *create_back_button(lv_obj_t *parent);
 lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
                                 ESP3DStyleType style);
-lv_obj_t *create_menu_button(lv_obj_t *container, lv_obj_t *&btn,
-                             lv_obj_t *&label, int width = BUTTON_WIDTH,
-                             bool center = true);
+lv_obj_t *create_menu_button(lv_obj_t *container, const char *text);
 
 lv_timer_t *temperatures_screen_delay_timer = NULL;
 
@@ -49,8 +47,12 @@ void temperatures_screen_delay_timer_cb(lv_timer_t *timer) {
 
 void event_button_temperatures_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
-  temperatures_screen_delay_timer = lv_timer_create(
-      temperatures_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+  if (BUTTON_ANIMATION_DELAY) {
+    temperatures_screen_delay_timer = lv_timer_create(
+        temperatures_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+  } else {
+    temperatures_screen_delay_timer_cb(NULL);
+  }
 }
 
 void temperatures_screen() {
@@ -63,7 +65,7 @@ void temperatures_screen() {
   // TODO: Add your code here
   lv_obj_t *btnback = create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_temperatures_back_handler,
-                      LV_EVENT_PRESSED, NULL);
+                      LV_EVENT_RELEASED, NULL);
   lv_obj_t *ui_main_container = create_main_container(
       ui_new_screen, btnback, ESP3DStyleType::col_container);
 

@@ -108,13 +108,16 @@ void ap_event_button_ok_handler(lv_event_t *e) { esp3d_log("Ok Clicked"); }
 void ap_screen() {
   esp3dTftui.set_current_screen(ESP3DScreenType::wifi);
   // Screen creation
-  esp3d_log("Wifi screen creation");
+  esp3d_log("AP screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
+  // Display new screen and delete old one
+  lv_obj_t *ui_current_screen = lv_scr_act();
+  lv_scr_load(ui_new_screen);
+  lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
 
-  // TODO: Add your code here
   lv_obj_t *btnback = create_back_button(ui_new_screen);
-  lv_obj_add_event_cb(btnback, event_button_ap_back_handler, LV_EVENT_PRESSED,
+  lv_obj_add_event_cb(btnback, event_button_ap_back_handler, LV_EVENT_RELEASED,
                       NULL);
   lv_obj_t *ui_main_container = create_main_container(
       ui_new_screen, btnback, ESP3DStyleType::simple_container);
@@ -122,6 +125,7 @@ void ap_screen() {
   // SSID
   lv_obj_t *label_ssid = lv_label_create(ui_main_container);
   lv_label_set_text(label_ssid, LV_SYMBOL_ACCESS_POINT);
+
   apply_style(label_ssid, ESP3DStyleType::bg_label);
   ap_ta_ssid = lv_textarea_create(ui_main_container);
   lv_textarea_set_one_line(ap_ta_ssid, true);
@@ -129,6 +133,11 @@ void ap_screen() {
   lv_obj_align_to(ap_ta_ssid, label_ssid, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE, 0);
   lv_obj_set_width(ap_ta_ssid, (LV_HOR_RES / 2));
+  lv_obj_update_layout(ap_ta_ssid);
+  lv_obj_update_layout(label_ssid);
+  lv_obj_set_y(ap_ta_ssid, CURRENT_BUTTON_PRESSED_OUTLINE);
+  lv_obj_align_to(label_ssid, ap_ta_ssid, LV_ALIGN_OUT_LEFT_MID,
+                  -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
 
   // Password
   lv_obj_t *label_pwd = lv_label_create(ui_main_container);
@@ -203,7 +212,7 @@ void ap_screen() {
   btn = create_symbol_button(ui_main_container, LV_SYMBOL_OK,
                              SYMBOL_BUTTON_WIDTH, SYMBOL_BUTTON_WIDTH);
 
-  lv_obj_add_event_cb(btn, ap_event_button_ok_handler, LV_EVENT_PRESSED, NULL);
+  lv_obj_add_event_cb(btn, ap_event_button_ok_handler, LV_EVENT_RELEASED, NULL);
   lv_obj_align(btn, LV_ALIGN_TOP_RIGHT, 0, 0);
 
   // Create button and label for apply
@@ -211,13 +220,8 @@ void ap_screen() {
   btn2 = create_symbol_button(ui_main_container, LV_SYMBOL_SEARCH,
                               SYMBOL_BUTTON_WIDTH, SYMBOL_BUTTON_WIDTH);
 
-  lv_obj_add_event_cb(btn2, ap_event_button_search_handler, LV_EVENT_PRESSED,
+  lv_obj_add_event_cb(btn2, ap_event_button_search_handler, LV_EVENT_RELEASED,
                       NULL);
   lv_obj_align_to(btn2, btn, LV_ALIGN_OUT_LEFT_MID,
                   -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
-
-  // Display new screen and delete old one
-  lv_obj_t *ui_current_screen = lv_scr_act();
-  lv_scr_load(ui_new_screen);
-  lv_obj_del(ui_current_screen);
 }

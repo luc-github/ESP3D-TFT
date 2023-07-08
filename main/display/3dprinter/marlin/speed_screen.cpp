@@ -56,8 +56,12 @@ void speed_screen_delay_timer_cb(lv_timer_t *timer) {
 
 void event_button_speed_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
-  speed_screen_delay_timer = lv_timer_create(speed_screen_delay_timer_cb,
-                                             BUTTON_ANIMATION_DELAY, NULL);
+  if (BUTTON_ANIMATION_DELAY) {
+    speed_screen_delay_timer = lv_timer_create(speed_screen_delay_timer_cb,
+                                               BUTTON_ANIMATION_DELAY, NULL);
+  } else {
+    speed_screen_delay_timer_cb(NULL);
+  }
 }
 
 void speed_ta_event_cb(lv_event_t *e) {
@@ -133,11 +137,15 @@ void speed_screen() {
   // Screen creation
   esp3d_log("Speed screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
+  // Display new screen and delete old one
+  lv_obj_t *ui_current_screen = lv_scr_act();
+  lv_scr_load(ui_new_screen);
+  lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
 
   lv_obj_t *btnback = create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_speed_back_handler,
-                      LV_EVENT_PRESSED, NULL);
+                      LV_EVENT_RELEASED, NULL);
   lv_obj_t *ui_main_container = create_main_container(
       ui_new_screen, btnback, ESP3DStyleType::simple_container);
 
@@ -179,13 +187,14 @@ void speed_screen() {
       create_symbol_button(ui_main_container, LV_SYMBOL_UP "\n" LV_SYMBOL_PLUS);
   lv_obj_align_to(btn, speed_ta, LV_ALIGN_OUT_TOP_MID, 0,
                   -CURRENT_BUTTON_PRESSED_OUTLINE);
-  lv_obj_add_event_cb(btn, speed_btn_up_event_cb, LV_EVENT_PRESSED, speed_ta);
+  lv_obj_add_event_cb(btn, speed_btn_up_event_cb, LV_EVENT_RELEASED, speed_ta);
 
   btn = create_symbol_button(ui_main_container,
                              LV_SYMBOL_MINUS "\n" LV_SYMBOL_DOWN);
   lv_obj_align_to(btn, speed_ta, LV_ALIGN_OUT_BOTTOM_MID, 0,
                   CURRENT_BUTTON_PRESSED_OUTLINE);
-  lv_obj_add_event_cb(btn, speed_btn_down_event_cb, LV_EVENT_PRESSED, speed_ta);
+  lv_obj_add_event_cb(btn, speed_btn_down_event_cb, LV_EVENT_RELEASED,
+                      speed_ta);
 
   label = lv_label_create(ui_main_container);
   lv_label_set_text(label, "%");
@@ -197,11 +206,11 @@ void speed_screen() {
   btn = create_symbol_button(ui_main_container, LV_SYMBOL_OK);
   lv_obj_align_to(btn, label, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE, 0);
-  lv_obj_add_event_cb(btn, speed_btn_ok_event_cb, LV_EVENT_PRESSED, speed_ta);
+  lv_obj_add_event_cb(btn, speed_btn_ok_event_cb, LV_EVENT_RELEASED, speed_ta);
   lv_obj_t *btn2 = create_symbol_button(ui_main_container, LV_SYMBOL_GAUGE);
   lv_obj_align_to(btn2, btn, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE, 0);
-  lv_obj_add_event_cb(btn2, speed_btn_reset_event_cb, LV_EVENT_PRESSED,
+  lv_obj_add_event_cb(btn2, speed_btn_reset_event_cb, LV_EVENT_RELEASED,
                       speed_ta);
 
   lv_obj_t *speed_kb = lv_keyboard_create(ui_main_container);
@@ -215,9 +224,4 @@ void speed_screen() {
   lv_obj_set_style_radius(speed_kb, CURRENT_BUTTON_RADIUS_VALUE, LV_PART_MAIN);
   lv_obj_add_flag(speed_kb, LV_OBJ_FLAG_HIDDEN);
   lv_obj_add_event_cb(speed_ta, speed_ta_event_cb, LV_EVENT_ALL, speed_kb);
-
-  // Display new screen and delete old one
-  lv_obj_t *ui_current_screen = lv_scr_act();
-  lv_scr_load(ui_new_screen);
-  lv_obj_del(ui_current_screen);
 }
