@@ -26,16 +26,11 @@
 #include <list>
 #include <string>
 
+#include "esp3d_values_list.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-// this list depend of target feature
-enum class ESP3DValuesIndex : uint16_t {
-  status_bar_label,
-  current_ip,
-  unknown_index
-};
 
 enum class ESP3DValuesType : uint8_t {
   unknown = 0,
