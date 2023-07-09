@@ -114,8 +114,8 @@ void wifi_screen() {
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
 
   lv_obj_t *btnback = create_back_button(ui_new_screen);
-  lv_obj_add_event_cb(btnback, event_button_wifi_back_handler,
-                      LV_EVENT_RELEASED, NULL);
+  lv_obj_add_event_cb(btnback, event_button_wifi_back_handler, LV_EVENT_CLICKED,
+                      NULL);
   lv_obj_t *ui_main_container = create_main_container(
       ui_new_screen, btnback, ESP3DStyleType::col_container);
 
@@ -130,16 +130,16 @@ void wifi_screen() {
   // Create button and label for ap
   btn = create_symbol_button(ui_buttons_container, LV_SYMBOL_ACCESS_POINT,
                              BUTTON_WIDTH, BUTTON_WIDTH);
-  lv_obj_add_event_cb(btn, event_button_ap_handler, LV_EVENT_RELEASED, NULL);
+  lv_obj_add_event_cb(btn, event_button_ap_handler, LV_EVENT_CLICKED, NULL);
 
   // Create button and label for sta
   btn = create_symbol_button(ui_buttons_container, LV_SYMBOL_STATION_MODE,
                              BUTTON_WIDTH, BUTTON_WIDTH);
-  lv_obj_add_event_cb(btn, event_button_sta_handler, LV_EVENT_RELEASED, NULL);
+  lv_obj_add_event_cb(btn, event_button_sta_handler, LV_EVENT_CLICKED, NULL);
 
   // Create button and label for no wifi
   btn = create_symbol_button(ui_buttons_container, LV_SYMBOL_WIFI, BUTTON_WIDTH,
                              BUTTON_WIDTH, true, true);
-  lv_obj_add_event_cb(btn, event_button_no_wifi_handler, LV_EVENT_RELEASED,
+  lv_obj_add_event_cb(btn, event_button_no_wifi_handler, LV_EVENT_CLICKED,
                       NULL);
 }

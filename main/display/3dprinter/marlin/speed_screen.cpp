@@ -145,7 +145,7 @@ void speed_screen() {
 
   lv_obj_t *btnback = create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_speed_back_handler,
-                      LV_EVENT_RELEASED, NULL);
+                      LV_EVENT_CLICKED, NULL);
   lv_obj_t *ui_main_container = create_main_container(
       ui_new_screen, btnback, ESP3DStyleType::simple_container);
 
@@ -187,14 +187,13 @@ void speed_screen() {
       create_symbol_button(ui_main_container, LV_SYMBOL_UP "\n" LV_SYMBOL_PLUS);
   lv_obj_align_to(btn, speed_ta, LV_ALIGN_OUT_TOP_MID, 0,
                   -CURRENT_BUTTON_PRESSED_OUTLINE);
-  lv_obj_add_event_cb(btn, speed_btn_up_event_cb, LV_EVENT_RELEASED, speed_ta);
+  lv_obj_add_event_cb(btn, speed_btn_up_event_cb, LV_EVENT_CLICKED, speed_ta);
 
   btn = create_symbol_button(ui_main_container,
                              LV_SYMBOL_MINUS "\n" LV_SYMBOL_DOWN);
   lv_obj_align_to(btn, speed_ta, LV_ALIGN_OUT_BOTTOM_MID, 0,
                   CURRENT_BUTTON_PRESSED_OUTLINE);
-  lv_obj_add_event_cb(btn, speed_btn_down_event_cb, LV_EVENT_RELEASED,
-                      speed_ta);
+  lv_obj_add_event_cb(btn, speed_btn_down_event_cb, LV_EVENT_CLICKED, speed_ta);
 
   label = lv_label_create(ui_main_container);
   lv_label_set_text(label, "%");
@@ -206,11 +205,11 @@ void speed_screen() {
   btn = create_symbol_button(ui_main_container, LV_SYMBOL_OK);
   lv_obj_align_to(btn, label, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE, 0);
-  lv_obj_add_event_cb(btn, speed_btn_ok_event_cb, LV_EVENT_RELEASED, speed_ta);
+  lv_obj_add_event_cb(btn, speed_btn_ok_event_cb, LV_EVENT_CLICKED, speed_ta);
   lv_obj_t *btn2 = create_symbol_button(ui_main_container, LV_SYMBOL_GAUGE);
   lv_obj_align_to(btn2, btn, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE, 0);
-  lv_obj_add_event_cb(btn2, speed_btn_reset_event_cb, LV_EVENT_RELEASED,
+  lv_obj_add_event_cb(btn2, speed_btn_reset_event_cb, LV_EVENT_CLICKED,
                       speed_ta);
 
   lv_obj_t *speed_kb = lv_keyboard_create(ui_main_container);

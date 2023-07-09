@@ -117,7 +117,7 @@ void ap_screen() {
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
 
   lv_obj_t *btnback = create_back_button(ui_new_screen);
-  lv_obj_add_event_cb(btnback, event_button_ap_back_handler, LV_EVENT_RELEASED,
+  lv_obj_add_event_cb(btnback, event_button_ap_back_handler, LV_EVENT_CLICKED,
                       NULL);
   lv_obj_t *ui_main_container = create_main_container(
       ui_new_screen, btnback, ESP3DStyleType::simple_container);
@@ -211,7 +211,7 @@ void ap_screen() {
   btn = create_symbol_button(ui_main_container, LV_SYMBOL_OK,
                              SYMBOL_BUTTON_WIDTH, SYMBOL_BUTTON_WIDTH);
 
-  lv_obj_add_event_cb(btn, ap_event_button_ok_handler, LV_EVENT_RELEASED, NULL);
+  lv_obj_add_event_cb(btn, ap_event_button_ok_handler, LV_EVENT_CLICKED, NULL);
   lv_obj_align(btn, LV_ALIGN_TOP_RIGHT, 0, 0);
 
   // Create button and label for apply
@@ -219,7 +219,7 @@ void ap_screen() {
   btn2 = create_symbol_button(ui_main_container, LV_SYMBOL_SEARCH,
                               SYMBOL_BUTTON_WIDTH, SYMBOL_BUTTON_WIDTH);
 
-  lv_obj_add_event_cb(btn2, ap_event_button_search_handler, LV_EVENT_RELEASED,
+  lv_obj_add_event_cb(btn2, ap_event_button_search_handler, LV_EVENT_CLICKED,
                       NULL);
   lv_obj_align_to(btn2, btn, LV_ALIGN_OUT_LEFT_MID,
                   -CURRENT_BUTTON_PRESSED_OUTLINE, 0);

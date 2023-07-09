@@ -78,7 +78,7 @@ void informations_screen() {
   // TODO: Add your code here
   lv_obj_t *btnback = create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_informations_back_handler,
-                      LV_EVENT_RELEASED, NULL);
+                      LV_EVENT_CLICKED, NULL);
   lv_obj_t *ui_main_container = create_main_container(
       ui_new_screen, btnback, ESP3DStyleType::col_container);
   lv_obj_set_style_flex_flow(ui_main_container, LV_FLEX_FLOW_ROW,

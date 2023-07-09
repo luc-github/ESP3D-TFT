@@ -236,27 +236,27 @@ void main_screen() {
   lv_obj_t *btn1 =
       create_menu_button(ui_top_buttons_container, label_text1.c_str());
 
-  lv_obj_add_event_cb(btn1, event_button_E0_handler, LV_EVENT_RELEASED, NULL);
+  lv_obj_add_event_cb(btn1, event_button_E0_handler, LV_EVENT_CLICKED, NULL);
 
   // Create button and label for Extruder 1
   std::string label_text2 =
       "160\n260\n" + std::string(LV_SYMBOL_HEAT_EXTRUDER) + std::string("2");
   lv_obj_t *btn2 =
       create_menu_button(ui_top_buttons_container, label_text2.c_str());
-  lv_obj_add_event_cb(btn2, event_button_E1_handler, LV_EVENT_RELEASED, NULL);
+  lv_obj_add_event_cb(btn2, event_button_E1_handler, LV_EVENT_CLICKED, NULL);
 
   // Create button and label for Bed
   std::string label_text_bed = "160\n260\n" + std::string(LV_SYMBOL_HEAT_BED);
   lv_obj_t *btn_b =
       create_menu_button(ui_top_buttons_container, label_text_bed.c_str());
-  lv_obj_add_event_cb(btn_b, event_button_Bed_handler, LV_EVENT_RELEASED, NULL);
+  lv_obj_add_event_cb(btn_b, event_button_Bed_handler, LV_EVENT_CLICKED, NULL);
 
   // Create button and label for positions
   std::string label_text3 = "X: 150.00\nY: 150.00\nZ: 150.00";
   lv_obj_t *btn3 =
       create_symbol_button(ui_top_buttons_container, label_text3.c_str(),
                            BUTTON_WIDTH * 1.5, BUTTON_HEIGHT);
-  lv_obj_add_event_cb(btn3, event_button_positions_handler, LV_EVENT_RELEASED,
+  lv_obj_add_event_cb(btn3, event_button_positions_handler, LV_EVENT_CLICKED,
                       NULL);
 
   // Create button and label for middle container
@@ -272,32 +272,29 @@ void main_screen() {
   std::string label_text4 = "100%\n" + std::string(LV_SYMBOL_FAN);
   lv_obj_t *btn4 =
       create_menu_button(ui_bottom_buttons_container, label_text4.c_str());
-  lv_obj_add_event_cb(btn4, event_button_fan_handler, LV_EVENT_RELEASED, NULL);
+  lv_obj_add_event_cb(btn4, event_button_fan_handler, LV_EVENT_CLICKED, NULL);
 
   // Create button and label for speed
   std::string label_text5 = "100%\n" + std::string(LV_SYMBOL_SPEED);
   lv_obj_t *btn5 =
       create_menu_button(ui_bottom_buttons_container, label_text5.c_str());
-  lv_obj_add_event_cb(btn5, event_button_speed_handler, LV_EVENT_RELEASED,
-                      NULL);
+  lv_obj_add_event_cb(btn5, event_button_speed_handler, LV_EVENT_CLICKED, NULL);
 
   // Create button and label for pause
   std::string label_text6 = LV_SYMBOL_PAUSE;
   lv_obj_t *btn6 =
       create_menu_button(ui_bottom_buttons_container, label_text6.c_str());
-  lv_obj_add_event_cb(btn6, event_button_pause_handler, LV_EVENT_RELEASED,
-                      NULL);
+  lv_obj_add_event_cb(btn6, event_button_pause_handler, LV_EVENT_CLICKED, NULL);
 
   // Create button and label for stop
   std::string label_text7 = LV_SYMBOL_STOP;
   lv_obj_t *btn7 =
       create_menu_button(ui_bottom_buttons_container, label_text7.c_str());
-  lv_obj_add_event_cb(btn7, event_button_pause_handler, LV_EVENT_RELEASED,
-                      NULL);
+  lv_obj_add_event_cb(btn7, event_button_pause_handler, LV_EVENT_CLICKED, NULL);
 
   // Create button and label for menu
   std::string label_text8 = LV_SYMBOL_LIST;
   lv_obj_t *btn8 =
       create_menu_button(ui_bottom_buttons_container, label_text8.c_str());
-  lv_obj_add_event_cb(btn8, event_button_menu_handler, LV_EVENT_RELEASED, NULL);
+  lv_obj_add_event_cb(btn8, event_button_menu_handler, LV_EVENT_CLICKED, NULL);
 }
