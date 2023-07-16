@@ -48,22 +48,38 @@ bool ESP3DClient::clearRxQueue() {
 }
 
 ESP3DMessage* ESP3DClient::popRx() {
-  ESP3DMessage* msg = _rx_queue.front();
-  _rx_size -= msg->size;
-  _rx_queue.pop_front();
+  ESP3DMessage* msg = nullptr;
+  if (_rx_mutex) {
+    if (pthread_mutex_lock(_rx_mutex) == 0) {
+      msg = _rx_queue.front();
+      _rx_size -= msg->size;
+      _rx_queue.pop_front();
+      pthread_mutex_unlock(_rx_mutex);
+    }
+  } else {
+    esp3d_log_e("no mutex available");
+  }
   return msg;
 }
 ESP3DMessage* ESP3DClient::popTx() {
-  ESP3DMessage* msg = _tx_queue.front();
-  _tx_size -= msg->size;
-  _tx_queue.pop_front();
+  ESP3DMessage* msg = nullptr;
+  if (_tx_mutex) {
+    if (pthread_mutex_lock(_tx_mutex) == 0) {
+      msg = _tx_queue.front();
+      _tx_size -= msg->size;
+      _tx_queue.pop_front();
+      pthread_mutex_unlock(_tx_mutex);
+    }
+  } else {
+    esp3d_log_e("no mutex available");
+  }
   return msg;
 }
 
 void ESP3DClient::deleteMsg(ESP3DMessage* msg) {
   if (msg) {
-    // esp3d_log("Deletion origin: %d, Target: %d, size: %d  : Now we have %ld
-    // msg", msg->origin, msg->target, msg->size, --msg_counting);
+    // esp3d_log("Deletion origin: %d, Target: %d, size: %d  : Now we have
+    // %ld msg", msg->origin, msg->target, msg->size, --msg_counting);
     free(msg->data);
     free(msg);
     msg = nullptr;
