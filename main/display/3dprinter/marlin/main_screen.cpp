@@ -35,13 +35,13 @@ lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text,
                                bool center = true, bool slash = false,
                                int rotation = 0);
 void empty_screen();
-void temperatures_screen();
+void temperatures_screen(uint8_t target_heater);
 void positions_screen();
 void fan_screen();
 void speed_screen();
 void files_screen();
 void menu_screen();
-
+uint8_t main_screen_temperature_target = 0;
 lv_timer_t *main_screen_delay_timer = NULL;
 ESP3DScreenType next_screen = ESP3DScreenType::none;
 
@@ -56,7 +56,7 @@ void main_screen_delay_timer_cb(lv_timer_t *timer) {
       empty_screen();
       break;
     case ESP3DScreenType::temperatures:
-      temperatures_screen();
+      temperatures_screen(main_screen_temperature_target);
       break;
     case ESP3DScreenType::positions:
       positions_screen();
@@ -87,6 +87,7 @@ void event_button_E0_handler(lv_event_t *e) {
   esp3d_log("E0 Clicked");
   if (main_screen_delay_timer) return;
   next_screen = ESP3DScreenType::temperatures;
+  main_screen_temperature_target = 0;
   if (BUTTON_ANIMATION_DELAY)
     main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
                                               BUTTON_ANIMATION_DELAY, NULL);
@@ -99,6 +100,7 @@ void event_button_E1_handler(lv_event_t *e) {
   esp3d_log("E1 Clicked");
   if (main_screen_delay_timer) return;
   next_screen = ESP3DScreenType::temperatures;
+  main_screen_temperature_target = 1;
   if (BUTTON_ANIMATION_DELAY)
     main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
                                               BUTTON_ANIMATION_DELAY, NULL);
@@ -111,6 +113,7 @@ void event_button_Bed_handler(lv_event_t *e) {
   esp3d_log("Bed Clicked");
   if (main_screen_delay_timer) return;
   next_screen = ESP3DScreenType::temperatures;
+  main_screen_temperature_target = 2;
   if (BUTTON_ANIMATION_DELAY) {
     main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
                                               BUTTON_ANIMATION_DELAY, NULL);

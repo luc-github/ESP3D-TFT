@@ -194,7 +194,7 @@ void menu_screen() {
   // Create button and label for leveling button
   std::string label2 = LV_SYMBOL_LEVELING;
   lv_obj_t *btn2 = create_menu_button(ui_top_buttons_container, label2.c_str());
-  lv_obj_add_event_cb(btn2, event_button_filament_handler, LV_EVENT_CLICKED,
+  lv_obj_add_event_cb(btn2, event_button_leveling_handler, LV_EVENT_CLICKED,
                       NULL);
 
   // Create button and label for settings button
