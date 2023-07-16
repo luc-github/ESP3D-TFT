@@ -260,9 +260,10 @@ bool ESP3DClient::setDataContent(ESP3DMessage* msg, const uint8_t* data,
   if (msg->data) {
     free(msg->data);
   }
-  msg->data = (uint8_t*)malloc(sizeof(uint8_t) * length);
+  msg->data = (uint8_t*)malloc((sizeof(uint8_t) * (length + 1)));
   if (msg->data) {
     memcpy(msg->data, data, length);
+    msg->data[length] = (char) 0;
     msg->size = length;
     return true;
   }
