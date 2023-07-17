@@ -106,7 +106,7 @@ void ap_event_button_search_handler(lv_event_t *e) {
 void ap_event_button_ok_handler(lv_event_t *e) { esp3d_log("Ok Clicked"); }
 
 void ap_screen() {
-  esp3dTftui.set_current_screen(ESP3DScreenType::wifi);
+  esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("AP screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
@@ -223,4 +223,5 @@ void ap_screen() {
                       NULL);
   lv_obj_align_to(btn2, btn, LV_ALIGN_OUT_LEFT_MID,
                   -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+  esp3dTftui.set_current_screen(ESP3DScreenType::access_point);
 }

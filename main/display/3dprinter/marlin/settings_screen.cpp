@@ -48,6 +48,7 @@ void settings_screen_delay_timer_cb(lv_timer_t *timer) {
 void event_button_settings_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
   if (BUTTON_ANIMATION_DELAY) {
+    if (settings_screen_delay_timer) return;
     settings_screen_delay_timer = lv_timer_create(
         settings_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
   } else {
@@ -56,7 +57,7 @@ void event_button_settings_back_handler(lv_event_t *e) {
 }
 
 void settings_screen() {
-  esp3dTftui.set_current_screen(ESP3DScreenType::settings);
+  esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Settings screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
@@ -75,4 +76,5 @@ void settings_screen() {
 
   lv_obj_set_style_bg_opa(ui_main_container, LV_OPA_COVER, LV_PART_MAIN);
   lv_obj_set_style_bg_color(ui_main_container, lv_color_white(), LV_PART_MAIN);
+  esp3dTftui.set_current_screen(ESP3DScreenType::settings);
 }

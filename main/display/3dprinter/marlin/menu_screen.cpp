@@ -84,6 +84,7 @@ void event_button_menu_back_handler(lv_event_t *e) {
   if (menu_screen_delay_timer) return;
   menu_next_screen = ESP3DScreenType::main;
   if (BUTTON_ANIMATION_DELAY) {
+    if (menu_screen_delay_timer) return;
     menu_screen_delay_timer = lv_timer_create(menu_screen_delay_timer_cb,
                                               BUTTON_ANIMATION_DELAY, NULL);
   } else {
@@ -96,6 +97,7 @@ void event_button_filament_handler(lv_event_t *e) {
   if (menu_screen_delay_timer) return;
   menu_next_screen = ESP3DScreenType::filament;
   if (BUTTON_ANIMATION_DELAY) {
+    if (menu_screen_delay_timer) return;
     menu_screen_delay_timer = lv_timer_create(menu_screen_delay_timer_cb,
                                               BUTTON_ANIMATION_DELAY, NULL);
   } else {
@@ -107,10 +109,11 @@ void event_button_wifi_handler(lv_event_t *e) {
   esp3d_log("wifi Clicked");
   if (menu_screen_delay_timer) return;
   menu_next_screen = ESP3DScreenType::wifi;
-  if (BUTTON_ANIMATION_DELAY)
+  if (BUTTON_ANIMATION_DELAY) {
+    if (menu_screen_delay_timer) return;
     menu_screen_delay_timer = lv_timer_create(menu_screen_delay_timer_cb,
                                               BUTTON_ANIMATION_DELAY, NULL);
-  else {
+  } else {
     menu_screen_delay_timer_cb(NULL);
   }
 }
@@ -119,10 +122,11 @@ void event_button_settings_handler(lv_event_t *e) {
   esp3d_log("settings Clicked");
   if (menu_screen_delay_timer) return;
   menu_next_screen = ESP3DScreenType::settings;
-  if (BUTTON_ANIMATION_DELAY)
+  if (BUTTON_ANIMATION_DELAY) {
+    if (menu_screen_delay_timer) return;
     menu_screen_delay_timer = lv_timer_create(menu_screen_delay_timer_cb,
                                               BUTTON_ANIMATION_DELAY, NULL);
-  else
+  } else
     menu_screen_delay_timer_cb(NULL);
 }
 
@@ -130,10 +134,11 @@ void event_button_leveling_handler(lv_event_t *e) {
   esp3d_log("leveling Clicked");
   if (menu_screen_delay_timer) return;
   menu_next_screen = ESP3DScreenType::leveling;
-  if (BUTTON_ANIMATION_DELAY)
+  if (BUTTON_ANIMATION_DELAY) {
+    if (menu_screen_delay_timer) return;
     menu_screen_delay_timer = lv_timer_create(menu_screen_delay_timer_cb,
                                               BUTTON_ANIMATION_DELAY, NULL);
-  else
+  } else
     menu_screen_delay_timer_cb(NULL);
 }
 
@@ -141,10 +146,11 @@ void event_button_informations_handler(lv_event_t *e) {
   esp3d_log("informations Clicked");
   if (menu_screen_delay_timer) return;
   menu_next_screen = ESP3DScreenType::informations;
-  if (BUTTON_ANIMATION_DELAY)
+  if (BUTTON_ANIMATION_DELAY) {
+    if (menu_screen_delay_timer) return;
     menu_screen_delay_timer = lv_timer_create(menu_screen_delay_timer_cb,
                                               BUTTON_ANIMATION_DELAY, NULL);
-  else
+  } else
     menu_screen_delay_timer_cb(NULL);
 }
 
@@ -153,7 +159,7 @@ void event_button_disable_steppers_handler(lv_event_t *e) {
 }
 
 void menu_screen() {
-  esp3dTftui.set_current_screen(ESP3DScreenType::menu);
+  esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("menu screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
@@ -222,4 +228,5 @@ void menu_screen() {
       create_menu_button(ui_bottom_buttons_container, label6.c_str());
   lv_obj_add_event_cb(btn6, event_button_informations_handler, LV_EVENT_CLICKED,
                       NULL);
+  esp3dTftui.set_current_screen(ESP3DScreenType::menu);
 }

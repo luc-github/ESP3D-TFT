@@ -62,7 +62,7 @@ void boot_screen() {
 }
 
 void splash_screen() {
-  esp3dTftui.set_current_screen(ESP3DScreenType::splash);
+  esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Get active screen
   lv_obj_t *ui_Screen = lv_scr_act();
   // Create logo object
@@ -79,4 +79,5 @@ void splash_screen() {
   lv_obj_align(label, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
   // Set timer to switch to main screen
   boot_timer = lv_timer_create(main_screen_timer_cb, 2000, NULL);
+  esp3dTftui.set_current_screen(ESP3DScreenType::splash);
 }

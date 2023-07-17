@@ -74,7 +74,7 @@ static void event_handler_button_back(lv_event_t *e) {
 }
 
 void status_screen() {
-  esp3dTftui.set_current_screen(ESP3DScreenType::status_list);
+  esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Main screen creation");
   lv_obj_t *ui_status_screen = lv_obj_create(NULL);
@@ -113,4 +113,5 @@ void status_screen() {
   lv_obj_set_height(ui_status_list_ctl,
                     LV_VER_RES - lv_obj_get_height(btn_back));
   lv_obj_set_width(ui_status_list_ctl, LV_HOR_RES);
+  esp3dTftui.set_current_screen(ESP3DScreenType::status_list);
 }

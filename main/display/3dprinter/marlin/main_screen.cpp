@@ -88,10 +88,11 @@ void event_button_E0_handler(lv_event_t *e) {
   if (main_screen_delay_timer) return;
   next_screen = ESP3DScreenType::temperatures;
   main_screen_temperature_target = 0;
-  if (BUTTON_ANIMATION_DELAY)
+  if (BUTTON_ANIMATION_DELAY) {
+    if (main_screen_delay_timer) return;
     main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
                                               BUTTON_ANIMATION_DELAY, NULL);
-  else {
+  } else {
     main_screen_delay_timer_cb(NULL);
   }
 }
@@ -101,10 +102,11 @@ void event_button_E1_handler(lv_event_t *e) {
   if (main_screen_delay_timer) return;
   next_screen = ESP3DScreenType::temperatures;
   main_screen_temperature_target = 1;
-  if (BUTTON_ANIMATION_DELAY)
+  if (BUTTON_ANIMATION_DELAY) {
+    if (main_screen_delay_timer) return;
     main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
                                               BUTTON_ANIMATION_DELAY, NULL);
-  else {
+  } else {
     main_screen_delay_timer_cb(NULL);
   }
 }
@@ -115,6 +117,7 @@ void event_button_Bed_handler(lv_event_t *e) {
   next_screen = ESP3DScreenType::temperatures;
   main_screen_temperature_target = 2;
   if (BUTTON_ANIMATION_DELAY) {
+    if (main_screen_delay_timer) return;
     main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
                                               BUTTON_ANIMATION_DELAY, NULL);
   } else {
@@ -127,6 +130,7 @@ void event_button_positions_handler(lv_event_t *e) {
   if (main_screen_delay_timer) return;
   next_screen = ESP3DScreenType::positions;
   if (BUTTON_ANIMATION_DELAY) {
+    if (main_screen_delay_timer) return;
     main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
                                               BUTTON_ANIMATION_DELAY, NULL);
   } else {
@@ -139,6 +143,7 @@ void event_button_fan_handler(lv_event_t *e) {
   if (main_screen_delay_timer) return;
   next_screen = ESP3DScreenType::fan;
   if (BUTTON_ANIMATION_DELAY) {
+    if (main_screen_delay_timer) return;
     main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
                                               BUTTON_ANIMATION_DELAY, NULL);
   } else {
@@ -151,6 +156,7 @@ void event_button_speed_handler(lv_event_t *e) {
   if (main_screen_delay_timer) return;
   next_screen = ESP3DScreenType::speed;
   if (BUTTON_ANIMATION_DELAY) {
+    if (main_screen_delay_timer) return;
     main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
                                               BUTTON_ANIMATION_DELAY, NULL);
   } else {
@@ -163,6 +169,7 @@ void event_button_files_handler(lv_event_t *e) {
   if (main_screen_delay_timer) return;
   next_screen = ESP3DScreenType::files;
   if (BUTTON_ANIMATION_DELAY) {
+    if (main_screen_delay_timer) return;
     main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
                                               BUTTON_ANIMATION_DELAY, NULL);
   } else {
@@ -174,10 +181,11 @@ void event_button_menu_handler(lv_event_t *e) {
   esp3d_log("Menu Clicked");
   if (main_screen_delay_timer) return;
   next_screen = ESP3DScreenType::menu;
-  if (BUTTON_ANIMATION_DELAY)
+  if (BUTTON_ANIMATION_DELAY) {
+    if (main_screen_delay_timer) return;
     main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
                                               BUTTON_ANIMATION_DELAY, NULL);
-  else
+  } else
     main_screen_delay_timer_cb(NULL);
 }
 

@@ -133,7 +133,7 @@ void fan_matrix_buttons_event_cb(lv_event_t *e) {
 }
 
 void fan_screen() {
-  esp3dTftui.set_current_screen(ESP3DScreenType::fan);
+  esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Fan screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
@@ -221,4 +221,5 @@ void fan_screen() {
   lv_obj_set_style_radius(fan_kb, CURRENT_BUTTON_RADIUS_VALUE, LV_PART_MAIN);
   lv_obj_add_flag(fan_kb, LV_OBJ_FLAG_HIDDEN);
   lv_obj_add_event_cb(fan_ta, fan_ta_event_cb, LV_EVENT_ALL, fan_kb);
+  esp3dTftui.set_current_screen(ESP3DScreenType::fan);
 }

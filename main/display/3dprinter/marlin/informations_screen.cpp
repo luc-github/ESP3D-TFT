@@ -57,15 +57,16 @@ void informations_screen_delay_timer_cb(lv_timer_t *timer) {
 
 void event_button_informations_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
-  if (BUTTON_ANIMATION_DELAY)
+  if (BUTTON_ANIMATION_DELAY) {
+    if (informations_screen_delay_timer) return;
     informations_screen_delay_timer = lv_timer_create(
         informations_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
-  else
+  } else
     informations_screen_delay_timer_cb(NULL);
 }
 
 void informations_screen() {
-  esp3dTftui.set_current_screen(ESP3DScreenType::informations);
+  esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Settings screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
@@ -146,4 +147,5 @@ void informations_screen() {
 #else
   lv_list_add_btn(ui_info_list_ctl, "", "FW Update: OFF");
 #endif  // ESP3D_UPDATE_FEATURE
+  esp3dTftui.set_current_screen(ESP3DScreenType::informations);
 }

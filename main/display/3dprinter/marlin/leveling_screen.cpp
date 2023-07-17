@@ -55,7 +55,7 @@ void event_button_leveling_back_handler(lv_event_t *e) {
 }
 
 void leveling_screen() {
-  esp3dTftui.set_current_screen(ESP3DScreenType::leveling);
+  esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Leveling screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
@@ -74,4 +74,5 @@ void leveling_screen() {
 
   lv_obj_set_style_bg_opa(ui_main_container, LV_OPA_COVER, LV_PART_MAIN);
   lv_obj_set_style_bg_color(ui_main_container, lv_color_white(), LV_PART_MAIN);
+  esp3dTftui.set_current_screen(ESP3DScreenType::leveling);
 }

@@ -57,6 +57,7 @@ void positions_screen_delay_timer_cb(lv_timer_t *timer) {
 void event_button_positions_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
   if (BUTTON_ANIMATION_DELAY) {
+    if (positions_screen_delay_timer) return;
     positions_screen_delay_timer = lv_timer_create(
         positions_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
   } else {
@@ -133,7 +134,7 @@ void positions_matrix_buttons_event_cb(lv_event_t *e) {
 }
 
 void positions_screen() {
-  esp3dTftui.set_current_screen(ESP3DScreenType::positions);
+  esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Positions screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
@@ -229,4 +230,5 @@ void positions_screen() {
   lv_obj_add_flag(positions_kb, LV_OBJ_FLAG_HIDDEN);
   lv_obj_add_event_cb(positions_ta, positions_ta_event_cb, LV_EVENT_ALL,
                       positions_kb);
+  esp3dTftui.set_current_screen(ESP3DScreenType::positions);
 }

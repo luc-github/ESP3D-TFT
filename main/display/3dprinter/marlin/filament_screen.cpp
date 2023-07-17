@@ -133,7 +133,7 @@ void filament_matrix_buttons_event_cb(lv_event_t *e) {
 }
 
 void filament_screen() {
-  esp3dTftui.set_current_screen(ESP3DScreenType::filament);
+  esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Filament screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
@@ -234,4 +234,5 @@ void filament_screen() {
   lv_obj_add_flag(filament_kb, LV_OBJ_FLAG_HIDDEN);
   lv_obj_add_event_cb(filament_ta, filament_ta_event_cb, LV_EVENT_ALL,
                       filament_kb);
+  esp3dTftui.set_current_screen(ESP3DScreenType::filament);
 }

@@ -57,6 +57,7 @@ void speed_screen_delay_timer_cb(lv_timer_t *timer) {
 void event_button_speed_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
   if (BUTTON_ANIMATION_DELAY) {
+    if (speed_screen_delay_timer) return;
     speed_screen_delay_timer = lv_timer_create(speed_screen_delay_timer_cb,
                                                BUTTON_ANIMATION_DELAY, NULL);
   } else {
@@ -133,7 +134,7 @@ void speed_matrix_buttons_event_cb(lv_event_t *e) {
 }
 
 void speed_screen() {
-  esp3dTftui.set_current_screen(ESP3DScreenType::speed);
+  esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Speed screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
@@ -223,4 +224,5 @@ void speed_screen() {
   lv_obj_set_style_radius(speed_kb, CURRENT_BUTTON_RADIUS_VALUE, LV_PART_MAIN);
   lv_obj_add_flag(speed_kb, LV_OBJ_FLAG_HIDDEN);
   lv_obj_add_event_cb(speed_ta, speed_ta_event_cb, LV_EVENT_ALL, speed_kb);
+  esp3dTftui.set_current_screen(ESP3DScreenType::speed);
 }

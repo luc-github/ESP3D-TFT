@@ -68,6 +68,7 @@ void event_button_wifi_back_handler(lv_event_t *e) {
   if (wifi_screen_delay_timer) return;
   wifi_next_screen = ESP3DScreenType::menu;
   if (BUTTON_ANIMATION_DELAY) {
+    if (wifi_screen_delay_timer) return;
     wifi_screen_delay_timer = lv_timer_create(wifi_screen_delay_timer_cb,
                                               BUTTON_ANIMATION_DELAY, NULL);
   } else {
@@ -80,6 +81,7 @@ void event_button_ap_handler(lv_event_t *e) {
   if (wifi_screen_delay_timer) return;
   wifi_next_screen = ESP3DScreenType::access_point;
   if (BUTTON_ANIMATION_DELAY) {
+    if (wifi_screen_delay_timer) return;
     wifi_screen_delay_timer = lv_timer_create(wifi_screen_delay_timer_cb,
                                               BUTTON_ANIMATION_DELAY, NULL);
   } else {
@@ -92,6 +94,7 @@ void event_button_sta_handler(lv_event_t *e) {
   if (wifi_screen_delay_timer) return;
   wifi_next_screen = ESP3DScreenType::station;
   if (BUTTON_ANIMATION_DELAY) {
+    if (wifi_screen_delay_timer) return;
     wifi_screen_delay_timer = lv_timer_create(wifi_screen_delay_timer_cb,
                                               BUTTON_ANIMATION_DELAY, NULL);
   } else {
