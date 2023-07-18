@@ -29,11 +29,17 @@
  **********************/
 
 void main_screen();
-void positions_screen();
-
-std::string positions_value = "100";
-const char *positions_buttons_map[] = {"1", "5", "10", "50", ""};
+void positions_screen(uint8_t target = 0);
+std::string position_value = "10.00";
+const char *positions_buttons_map[] = {"0.1", "1", "10", "50", ""};
 uint8_t positions_buttons_map_id = 0;
+
+const char *axis_buttons_map[] = {"X", "Y", "Z", ""};
+
+uint8_t axis_buttons_map_id = 0;
+
+lv_obj_t *label_current_position_value = NULL;
+lv_obj_t *label_current_position = NULL;
 
 lv_obj_t *create_back_button(lv_obj_t *parent);
 lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
@@ -65,7 +71,7 @@ void event_button_positions_back_handler(lv_event_t *e) {
   }
 }
 
-void positions_ta_event_cb(lv_event_t *e) {
+void position_ta_event_cb(lv_event_t *e) {
   lv_event_code_t code = lv_event_get_code(e);
   lv_obj_t *ta = lv_event_get_target(e);
   lv_obj_t *kb = (lv_obj_t *)lv_event_get_user_data(e);
@@ -80,50 +86,64 @@ void positions_ta_event_cb(lv_event_t *e) {
     lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_OFF);
     lv_keyboard_set_textarea(kb, NULL);
     lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
-    positions_value = lv_textarea_get_text(ta);
+    position_value = lv_textarea_get_text(ta);
   } else if (code == LV_EVENT_READY || code == LV_EVENT_CANCEL) {
     esp3d_log("Ready, Value: %s", lv_textarea_get_text(ta));
     // No idea how to change ta focus to another control
     // every tests I did failed
     // so I refresh all screen ... orz
-    positions_value = lv_textarea_get_text(ta);
-    positions_screen();
+    position_value = lv_textarea_get_text(ta);
+    esp3d_log("Value changed: %s", position_value.c_str());
+    positions_screen(axis_buttons_map_id);
   } else if (code == LV_EVENT_VALUE_CHANGED) {
-    positions_value = lv_textarea_get_text(ta);
-    esp3d_log("Value changed: %s", positions_value.c_str());
+    // position_value = lv_textarea_get_text(ta);
+    // esp3d_log("Value changed: %s", position_value.c_str());
   }
 }
 
 void positions_btn_up_event_cb(lv_event_t *e) {
-  lv_obj_t *positions_ta = (lv_obj_t *)lv_event_get_user_data(e);
-  std::string positions_value = lv_textarea_get_text(positions_ta);
-  int positions_int = std::stoi(positions_value);
-  int step = atoi(positions_buttons_map[positions_buttons_map_id]);
-  positions_int += step;
-  positions_value = std::to_string(positions_int);
-  lv_textarea_set_text(positions_ta, positions_value.c_str());
+  lv_obj_t *position_ta = (lv_obj_t *)lv_event_get_user_data(e);
+  std::string position_value = lv_textarea_get_text(position_ta);
+  double position_double = std::stod(position_value);
+  double step = std::stod(positions_buttons_map[positions_buttons_map_id]);
+  esp3d_log("Current pos: %s,  %f", position_value.c_str(), position_double);
+  position_double += step;
+  esp3d_log("Up: %f, new pos: %f", step, position_double);
+  position_value =
+      esp3d_strings::set_precision(std::to_string(position_double), 2);
+  lv_textarea_set_text(position_ta, position_value.c_str());
 }
 
 void positions_btn_down_event_cb(lv_event_t *e) {
-  lv_obj_t *positions_ta = (lv_obj_t *)lv_event_get_user_data(e);
-  std::string positions_value = lv_textarea_get_text(positions_ta);
-  int positions_int = std::stoi(positions_value);
-  int step = atoi(positions_buttons_map[positions_buttons_map_id]);
-  positions_int -= step;
-  positions_value = std::to_string(positions_int);
-  lv_textarea_set_text(positions_ta, positions_value.c_str());
+  lv_obj_t *position_ta = (lv_obj_t *)lv_event_get_user_data(e);
+  std::string position_value = lv_textarea_get_text(position_ta);
+  double position_double = std::stod(position_value);
+  double step = std::stod(positions_buttons_map[positions_buttons_map_id]);
+  esp3d_log("Current pos: %s,  %f", position_value.c_str(), position_double);
+  position_double -= step;
+  esp3d_log("Down: %f, new pos: %f", step, position_double);
+  if (position_double < 0) position_double = 0;
+  position_value =
+      esp3d_strings::set_precision(std::to_string(position_double), 2);
+  lv_textarea_set_text(position_ta, position_value.c_str());
 }
 
 void positions_btn_ok_event_cb(lv_event_t *e) {
-  lv_obj_t *positions_ta = (lv_obj_t *)lv_event_get_user_data(e);
-  std::string positions_value = lv_textarea_get_text(positions_ta);
-  esp3d_log("Ok: %s", positions_value.c_str());
+  lv_obj_t *position_ta = (lv_obj_t *)lv_event_get_user_data(e);
+  std::string position_value = lv_textarea_get_text(position_ta);
+  esp3d_log("Ok: %s", position_value.c_str());
 }
 
-void positions_btn_reset_event_cb(lv_event_t *e) {
-  lv_obj_t *positions_ta = (lv_obj_t *)lv_event_get_user_data(e);
-  esp3d_log("Reset");
-  lv_textarea_set_text(positions_ta, "100");
+void positions_btn_home_axis_event_cb(lv_event_t *e) {
+  lv_obj_t *position_ta = (lv_obj_t *)lv_event_get_user_data(e);
+  esp3d_log("Home Axis");
+  lv_textarea_set_text(position_ta, "0");
+}
+
+void home_all_axis_button_event_cb(lv_event_t *e) {
+  lv_obj_t *position_ta = (lv_obj_t *)lv_event_get_user_data(e);
+  esp3d_log("Home All Axis");
+  lv_textarea_set_text(position_ta, "0");
 }
 
 void positions_matrix_buttons_event_cb(lv_event_t *e) {
@@ -133,25 +153,33 @@ void positions_matrix_buttons_event_cb(lv_event_t *e) {
   esp3d_log("Button %s clicked", positions_buttons_map[id]);
 }
 
-void positions_screen() {
+void axis_matrix_buttons_event_cb(lv_event_t *e) {
+  lv_obj_t *obj = lv_event_get_target(e);
+  uint32_t id = lv_btnmatrix_get_selected_btn(obj);
+  axis_buttons_map_id = id;
+  lv_label_set_text(label_current_position,
+                    axis_buttons_map[axis_buttons_map_id]);
+  esp3d_log("Button %s clicked", axis_buttons_map[id]);
+}
+
+void positions_screen(uint8_t target) {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
+  axis_buttons_map_id = target;
   // Screen creation
-  esp3d_log("Positions screen creation");
+  esp3d_log("Positions screen creation for target %d", target);
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
   lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
-
+  // back button
   lv_obj_t *btnback = create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_positions_back_handler,
                       LV_EVENT_CLICKED, NULL);
-  lv_obj_t *ui_main_container = create_main_container(
-      ui_new_screen, btnback, ESP3DStyleType::simple_container);
 
   // Steps in button matrix
-  lv_obj_t *btnm = lv_btnmatrix_create(ui_main_container);
+  lv_obj_t *btnm = lv_btnmatrix_create(ui_new_screen);
   lv_btnmatrix_set_map(btnm, positions_buttons_map);
   apply_style(btnm, ESP3DStyleType::buttons_matrix);
   lv_obj_set_size(btnm, LV_HOR_RES / 2, MATRIX_BUTTON_HEIGHT);
@@ -162,73 +190,133 @@ void positions_screen() {
   lv_obj_add_event_cb(btnm, positions_matrix_buttons_event_cb,
                       LV_EVENT_VALUE_CHANGED, NULL);
 
-  lv_obj_t *label = lv_label_create(ui_main_container);
-  lv_label_set_text(label, LV_SYMBOL_JOG);
-  apply_style(label, ESP3DStyleType::bg_label);
-  lv_obj_update_layout(label);
-  lv_obj_set_y(label, lv_obj_get_height(ui_main_container) / 2 -
-                          lv_obj_get_height(label) / 2);
-
-  lv_obj_t *positions_ta = lv_textarea_create(ui_main_container);
-  lv_obj_add_event_cb(positions_ta, positions_ta_event_cb,
+  // Target selector button matrix
+  lv_obj_t *btnm_target = lv_btnmatrix_create(ui_new_screen);
+  lv_btnmatrix_set_map(btnm_target, axis_buttons_map);
+  apply_style(btnm_target, ESP3DStyleType::buttons_matrix);
+  lv_obj_set_height(btnm_target, MATRIX_BUTTON_HEIGHT);
+  lv_btnmatrix_set_btn_ctrl(btnm_target, axis_buttons_map_id,
+                            LV_BTNMATRIX_CTRL_CHECKED);
+  lv_obj_add_event_cb(btnm_target, axis_matrix_buttons_event_cb,
                       LV_EVENT_VALUE_CHANGED, NULL);
-  lv_textarea_set_accepted_chars(positions_ta, "0123456789");
-  lv_textarea_set_max_length(positions_ta, 3);
-  lv_textarea_set_one_line(positions_ta, true);
-  esp3d_log("value: %s", positions_value.c_str());
-  std::string positions_value_init = positions_value;
-  lv_textarea_set_text(positions_ta, positions_value_init.c_str());
-  lv_obj_set_style_text_align(positions_ta, LV_TEXT_ALIGN_CENTER, 0);
-  lv_obj_set_width(positions_ta, LV_HOR_RES / 6);
 
-  lv_obj_align_to(positions_ta, label, LV_ALIGN_OUT_RIGHT_MID,
+  lv_obj_align_to(btnm_target, btnback, LV_ALIGN_OUT_LEFT_BOTTOM,
+                  -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+  // Home all axis
+  lv_obj_t *btn_home_all = create_symbol_button(
+      ui_new_screen, LV_SYMBOL_HOME "xyz", -1, MATRIX_BUTTON_HEIGHT);
+  lv_obj_align_to(btn_home_all, btnm_target, LV_ALIGN_OUT_LEFT_BOTTOM,
+                  -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+
+  // Label current axis
+  label_current_position = lv_label_create(ui_new_screen);
+  lv_label_set_text(label_current_position,
+                    axis_buttons_map[axis_buttons_map_id]);  // need to change
+                                                             // according axis
+  apply_style(label_current_position, ESP3DStyleType::bg_label);
+  lv_obj_align(label_current_position, LV_ALIGN_TOP_LEFT,
+               CURRENT_BUTTON_PRESSED_OUTLINE, CURRENT_BUTTON_PRESSED_OUTLINE);
+  lv_obj_update_layout(label_current_position);
+
+  // Label current axis e
+  label_current_position_value = lv_label_create(ui_new_screen);
+
+  std::string current_position_value_init = "280.00";
+
+  lv_label_set_text(label_current_position_value,
+                    current_position_value_init.c_str());
+
+  apply_style(label_current_position_value, ESP3DStyleType::read_only_value);
+  lv_obj_set_width(label_current_position_value, LV_HOR_RES / 5);
+  lv_obj_align_to(label_current_position_value, label_current_position,
+                  LV_ALIGN_OUT_RIGHT_MID, CURRENT_BUTTON_PRESSED_OUTLINE / 2,
+                  0);
+  // unit
+  lv_obj_t *label_unit1 = lv_label_create(ui_new_screen);
+  lv_label_set_text(label_unit1, "mm");
+  apply_style(label_unit1, ESP3DStyleType::bg_label);
+  lv_obj_align_to(label_unit1, label_current_position_value,
+                  LV_ALIGN_OUT_RIGHT_MID, CURRENT_BUTTON_PRESSED_OUTLINE / 2,
+                  0);
+  // Button up
+  lv_obj_t *btn_up =
+      create_symbol_button(ui_new_screen, LV_SYMBOL_UP "\n" LV_SYMBOL_PLUS);
+  lv_obj_align_to(btn_up, label_current_position_value, LV_ALIGN_OUT_BOTTOM_MID,
+                  0, CURRENT_BUTTON_PRESSED_OUTLINE);
+  // Text area
+  lv_obj_t *position_ta = lv_textarea_create(ui_new_screen);
+  lv_obj_add_event_cb(position_ta, position_ta_event_cb, LV_EVENT_VALUE_CHANGED,
+                      NULL);
+  lv_textarea_set_accepted_chars(position_ta, "0123456789.");
+  lv_textarea_set_max_length(position_ta, 7);
+  lv_textarea_set_one_line(position_ta, true);
+  esp3d_log("value: %s", position_value.c_str());
+  std::string position_value_init =
+      esp3d_strings::set_precision(position_value, 2);
+  lv_textarea_set_text(position_ta, position_value_init.c_str());
+  lv_obj_set_style_text_align(position_ta, LV_TEXT_ALIGN_CENTER, 0);
+  lv_obj_set_width(position_ta, LV_HOR_RES / 5);
+
+  lv_obj_align_to(position_ta, btn_up, LV_ALIGN_OUT_BOTTOM_MID, 0,
+                  CURRENT_BUTTON_PRESSED_OUTLINE / 2);
+
+  lv_obj_add_event_cb(btn_up, positions_btn_up_event_cb, LV_EVENT_CLICKED,
+                      position_ta);
+
+  // Label target axis
+  lv_obj_t *label_target = lv_label_create(ui_new_screen);
+  lv_label_set_text(label_target,
+                    LV_SYMBOL_JOG);  // need to change according
+                                     // axis
+  apply_style(label_target, ESP3DStyleType::bg_label);
+  lv_obj_align_to(label_target, position_ta, LV_ALIGN_OUT_LEFT_MID,
+                  -CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
+
+  // Unit
+  lv_obj_t *label_unit2 = lv_label_create(ui_new_screen);
+  lv_label_set_text(label_unit2, "mm");
+  apply_style(label_unit2, ESP3DStyleType::bg_label);
+
+  lv_obj_align_to(label_unit2, position_ta, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
-
-  lv_obj_t *btn =
-      create_symbol_button(ui_main_container, LV_SYMBOL_UP "\n" LV_SYMBOL_PLUS);
-  lv_obj_align_to(btn, positions_ta, LV_ALIGN_OUT_TOP_MID, 0,
-                  -CURRENT_BUTTON_PRESSED_OUTLINE);
-  lv_obj_add_event_cb(btn, positions_btn_up_event_cb, LV_EVENT_CLICKED,
-                      positions_ta);
-
-  btn = create_symbol_button(ui_main_container,
-                             LV_SYMBOL_MINUS "\n" LV_SYMBOL_DOWN);
-  lv_obj_align_to(btn, positions_ta, LV_ALIGN_OUT_BOTTOM_MID, 0,
-                  CURRENT_BUTTON_PRESSED_OUTLINE);
-  lv_obj_add_event_cb(btn, positions_btn_down_event_cb, LV_EVENT_CLICKED,
-                      positions_ta);
-
-  label = lv_label_create(ui_main_container);
-  lv_label_set_text(label, "mm");
-  apply_style(label, ESP3DStyleType::bg_label);
-
-  lv_obj_align_to(label, positions_ta, LV_ALIGN_OUT_RIGHT_MID,
+  // set button
+  lv_obj_t *btn_set = create_symbol_button(ui_new_screen, LV_SYMBOL_OK);
+  lv_obj_align_to(btn_set, label_unit2, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE, 0);
-
-  btn = create_symbol_button(ui_main_container, LV_SYMBOL_OK);
-  lv_obj_align_to(btn, label, LV_ALIGN_OUT_RIGHT_MID,
+  lv_obj_add_event_cb(btn_set, positions_btn_ok_event_cb, LV_EVENT_CLICKED,
+                      position_ta);
+  // Home axis
+  lv_obj_t *btn_home_axis = create_symbol_button(ui_new_screen, LV_SYMBOL_HOME);
+  lv_obj_align_to(btn_home_axis, btn_set, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE, 0);
-  lv_obj_add_event_cb(btn, positions_btn_ok_event_cb, LV_EVENT_CLICKED,
-                      positions_ta);
-  lv_obj_t *btn2 = create_symbol_button(ui_main_container, LV_SYMBOL_GAUGE);
-  lv_obj_align_to(btn2, btn, LV_ALIGN_OUT_RIGHT_MID,
-                  CURRENT_BUTTON_PRESSED_OUTLINE, 0);
-  lv_obj_add_event_cb(btn2, positions_btn_reset_event_cb, LV_EVENT_CLICKED,
-                      positions_ta);
+  lv_obj_add_event_cb(btn_home_axis, positions_btn_home_axis_event_cb,
+                      LV_EVENT_CLICKED, position_ta);
+  lv_obj_add_event_cb(btn_home_all, home_all_axis_button_event_cb,
+                      LV_EVENT_CLICKED, position_ta);
 
-  lv_obj_t *positions_kb = lv_keyboard_create(ui_main_container);
+  // Keyboard
+  lv_obj_t *positions_kb = lv_keyboard_create(ui_new_screen);
   lv_keyboard_set_mode(positions_kb, LV_KEYBOARD_MODE_NUMBER);
   lv_keyboard_set_textarea(positions_kb, NULL);
-  lv_obj_align_to(positions_kb, positions_ta, LV_ALIGN_OUT_RIGHT_MID,
-                  CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
-  lv_obj_update_layout(positions_kb);
+  lv_obj_update_layout(label_unit2);
   lv_obj_set_content_width(positions_kb,
-                           LV_HOR_RES - lv_obj_get_x(positions_kb) -
-                               2 * CURRENT_BUTTON_PRESSED_OUTLINE);
+                           LV_HOR_RES - (lv_obj_get_x(label_unit2) +
+                                         CURRENT_BUTTON_PRESSED_OUTLINE));
+  lv_obj_align_to(positions_kb, position_ta, LV_ALIGN_OUT_RIGHT_MID,
+                  CURRENT_BUTTON_PRESSED_OUTLINE / 2,
+                  -CURRENT_BUTTON_PRESSED_OUTLINE / 2);
   lv_obj_set_style_radius(positions_kb, CURRENT_BUTTON_RADIUS_VALUE,
                           LV_PART_MAIN);
   lv_obj_add_flag(positions_kb, LV_OBJ_FLAG_HIDDEN);
-  lv_obj_add_event_cb(positions_ta, positions_ta_event_cb, LV_EVENT_ALL,
+  lv_obj_add_event_cb(position_ta, position_ta_event_cb, LV_EVENT_ALL,
                       positions_kb);
+  // Button down
+  lv_obj_t *btn_down =
+      create_symbol_button(ui_new_screen, LV_SYMBOL_MINUS "\n" LV_SYMBOL_DOWN);
+  lv_obj_align_to(btn_down, position_ta, LV_ALIGN_OUT_BOTTOM_MID, 0,
+                  CURRENT_BUTTON_PRESSED_OUTLINE / 2);
+  lv_obj_add_event_cb(btn_down, positions_btn_down_event_cb, LV_EVENT_CLICKED,
+                      position_ta);
+
   esp3dTftui.set_current_screen(ESP3DScreenType::positions);
 }
