@@ -103,6 +103,17 @@ void temperatures_ta_event_cb(lv_event_t *e) {
   }
 }
 
+// power_all_heaters_event_cb
+void power_all_heaters_event_cb(lv_event_t *e) {
+  lv_obj_t *temperatures_ta = (lv_obj_t *)lv_event_get_user_data(e);
+  std::string temperatures_value = "0";
+  int temperatures_int = std::stoi(temperatures_value);
+  temperatures_value = std::to_string(temperatures_int);
+  lv_textarea_set_text(temperatures_ta, temperatures_value.c_str());
+  esp3d_log("Power off all heaters");
+}
+
+// Increase temperature
 void temperatures_btn_up_event_cb(lv_event_t *e) {
   lv_obj_t *temperatures_ta = (lv_obj_t *)lv_event_get_user_data(e);
   std::string temperatures_value = lv_textarea_get_text(temperatures_ta);
@@ -113,6 +124,7 @@ void temperatures_btn_up_event_cb(lv_event_t *e) {
   lv_textarea_set_text(temperatures_ta, temperatures_value.c_str());
 }
 
+// Decrease temperature
 void temperatures_btn_down_event_cb(lv_event_t *e) {
   lv_obj_t *temperatures_ta = (lv_obj_t *)lv_event_get_user_data(e);
   std::string temperatures_value = lv_textarea_get_text(temperatures_ta);
@@ -193,6 +205,12 @@ void temperatures_screen(uint8_t target) {
   lv_obj_align_to(btnm_target, btnback, LV_ALIGN_OUT_LEFT_BOTTOM,
                   -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
 
+  // Power off all heater
+  lv_obj_t *btn_power_off_all = create_symbol_button(
+      ui_new_screen, LV_SYMBOL_POWER "...", -1, MATRIX_BUTTON_HEIGHT);
+  lv_obj_align_to(btn_power_off_all, btnm_target, LV_ALIGN_OUT_LEFT_BOTTOM,
+                  -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+
   // Label current heater
   label_current_temperature = lv_label_create(ui_new_screen);
   lv_label_set_text(
@@ -242,6 +260,8 @@ void temperatures_screen(uint8_t target) {
 
   lv_obj_add_event_cb(btn_up, temperatures_btn_up_event_cb, LV_EVENT_CLICKED,
                       temperatures_ta);
+  lv_obj_add_event_cb(btn_power_off_all, power_all_heaters_event_cb,
+                      LV_EVENT_CLICKED, temperatures_ta);
 
   // Label target heater
   lv_obj_t *label_target = lv_label_create(ui_new_screen);
