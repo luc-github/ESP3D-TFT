@@ -36,7 +36,7 @@ lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text,
                                int rotation = 0);
 void empty_screen();
 void temperatures_screen(uint8_t target_heater);
-void positions_screen();
+void positions_screen(uint8_t target = 0);
 void fan_screen();
 void speed_screen();
 void files_screen();
