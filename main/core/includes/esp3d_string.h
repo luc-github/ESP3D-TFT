@@ -32,6 +32,7 @@ namespace esp3d_strings {
 // some functions do internal change and others do copy of original string and
 // modify it need to review for consistency  or allows both copy and insite of
 // string TBD
+std::string set_precision(std::string str_value, uint8_t precision);
 const char* str_replace(const char* currentstr, const char* oldsubstr,
                         const char* newsubstr);
 const char* str_trim(const char* str);

@@ -19,196 +19,212 @@
 */
 
 #include "esp3d_string.h"
-#include <algorithm>
+
 #include <string.h>
 
+#include <algorithm>
 
-//Replace all occurrences of oldsubstr by newsubstr and return new string
-const char * esp3d_strings::str_replace(const char *  currentstr, const char * oldsubstr, const char * newsubstr)
-{
-    static std::string resstr;
-    resstr = currentstr;
-    std::string oldstr = oldsubstr;
-    std::string newstr = newsubstr;
-
-    size_t pos = 0;
-    while((pos = resstr.find(oldstr, pos)) != std::string::npos) {
-        resstr.replace(pos, oldstr.length(), newstr);
-        pos += newstr.length();
+// helper to format string float to readable string with precision
+std::string esp3d_strings::set_precision(std::string str_value,
+                                         uint8_t precision) {
+  static std::string tmp;
+  tmp = str_value;
+  int pos = tmp.find(".");
+  if (pos != std::string::npos) {
+    for (uint8_t i = 0; i < precision; i++) {
+      tmp += "0";
     }
-    return resstr.c_str();
+    tmp = tmp.substr(0, pos + precision + 1);
+  } else {
+    tmp += ".";
+    for (uint8_t i = 0; i < precision; i++) {
+      tmp += "0";
+    }
+  }
+  return tmp;
 }
 
-//Trim string function
-const char * esp3d_strings::str_trim(const char * str)
-{
-    static std::string s;
-    s = str;
-    auto start = s.begin();
-    while (start != s.end() && std::isspace(*start)) {
-        start++;
-    }
-    auto end = s.end();
-    do {
-        end--;
-    } while (std::distance(start, end) > 0 && std::isspace(*end));
-    s = std::string(start, end + 1);
-    return s.c_str();
-}
-//Upper case string
-void  esp3d_strings::str_toUpperCase(std::string * str)
-{
-    std::transform(str->begin(), str->end(), str->begin(), ::toupper);
+// Replace all occurrences of oldsubstr by newsubstr and return new string
+const char* esp3d_strings::str_replace(const char* currentstr,
+                                       const char* oldsubstr,
+                                       const char* newsubstr) {
+  static std::string resstr;
+  resstr = currentstr;
+  std::string oldstr = oldsubstr;
+  std::string newstr = newsubstr;
+
+  size_t pos = 0;
+  while ((pos = resstr.find(oldstr, pos)) != std::string::npos) {
+    resstr.replace(pos, oldstr.length(), newstr);
+    pos += newstr.length();
+  }
+  return resstr.c_str();
 }
 
-//Lower case string
-void  esp3d_strings::str_toLowerCase(std::string * str)
-{
-    std::transform(str->begin(), str->end(), str->begin(), ::tolower);
+// Trim string function
+const char* esp3d_strings::str_trim(const char* str) {
+  static std::string s;
+  s = str;
+  auto start = s.begin();
+  while (start != s.end() && std::isspace(*start)) {
+    start++;
+  }
+  auto end = s.end();
+  do {
+    end--;
+  } while (std::distance(start, end) > 0 && std::isspace(*end));
+  s = std::string(start, end + 1);
+  return s.c_str();
+}
+// Upper case string
+void esp3d_strings::str_toUpperCase(std::string* str) {
+  std::transform(str->begin(), str->end(), str->begin(), ::toupper);
 }
 
-//helper to format size to readable string
-const char* esp3d_strings::formatBytes (uint64_t bytes)
-{
-    static char buffer[32];
-    memset(buffer, 0, sizeof(buffer));
-    int res = 0;
-    if (bytes < 1024) {
-        res = snprintf(buffer, sizeof(buffer), "%d B", (int)bytes);
-    } else if (bytes < (1024 * 1024) ) {
-        res =  snprintf(buffer, sizeof(buffer), "%.2f KB", ((float)(bytes / 1024.0)));
-    } else if (bytes < (1024 * 1024 * 1024) ) {
-        res =  snprintf(buffer, sizeof(buffer), "%.2f MB", ((float)(bytes / 1024.0 / 1024.0)));
-    } else {
-        res =  snprintf(buffer, sizeof(buffer), "%.2f GB", ((float)(bytes / 1024.0 / 1024.0 / 1024.0)));
-    }
-    if (res < 0) {
-        strcpy(buffer, "? B");
-    }
-    return buffer;
+// Lower case string
+void esp3d_strings::str_toLowerCase(std::string* str) {
+  std::transform(str->begin(), str->end(), str->begin(), ::tolower);
 }
 
-const char*  esp3d_strings::urlDecode(const char * text)
-{
-    static char * decoded=nullptr;
-    if (decoded) {
-        free(decoded);
-    }
-    char temp[] = "0x00";
-    unsigned int len = strlen(text);
-    unsigned int i = 0;
-    unsigned int p = 0;
-    decoded = (char*)malloc(len +1);
-    if (decoded) {
-        while (i < len) {
-            char decodedChar;
-            char encodedChar = text[i++];
-            if ((encodedChar == '%') && (i + 1 < len)) {
-                temp[2] = text[i++];
-                temp[3] = text[i++];
-                decodedChar = strtol(temp, NULL, 16);
-            } else {
-                if (encodedChar == '+') {
-                    decodedChar = ' ';
-                } else {
-                    decodedChar = encodedChar;    // normal ascii char
-                }
-            }
-            decoded[p++] = decodedChar;
+// helper to format size to readable string
+const char* esp3d_strings::formatBytes(uint64_t bytes) {
+  static char buffer[32];
+  memset(buffer, 0, sizeof(buffer));
+  int res = 0;
+  if (bytes < 1024) {
+    res = snprintf(buffer, sizeof(buffer), "%d B", (int)bytes);
+  } else if (bytes < (1024 * 1024)) {
+    res =
+        snprintf(buffer, sizeof(buffer), "%.2f KB", ((float)(bytes / 1024.0)));
+  } else if (bytes < (1024 * 1024 * 1024)) {
+    res = snprintf(buffer, sizeof(buffer), "%.2f MB",
+                   ((float)(bytes / 1024.0 / 1024.0)));
+  } else {
+    res = snprintf(buffer, sizeof(buffer), "%.2f GB",
+                   ((float)(bytes / 1024.0 / 1024.0 / 1024.0)));
+  }
+  if (res < 0) {
+    strcpy(buffer, "? B");
+  }
+  return buffer;
+}
+
+const char* esp3d_strings::urlDecode(const char* text) {
+  static char* decoded = nullptr;
+  if (decoded) {
+    free(decoded);
+  }
+  char temp[] = "0x00";
+  unsigned int len = strlen(text);
+  unsigned int i = 0;
+  unsigned int p = 0;
+  decoded = (char*)malloc(len + 1);
+  if (decoded) {
+    while (i < len) {
+      char decodedChar;
+      char encodedChar = text[i++];
+      if ((encodedChar == '%') && (i + 1 < len)) {
+        temp[2] = text[i++];
+        temp[3] = text[i++];
+        decodedChar = strtol(temp, NULL, 16);
+      } else {
+        if (encodedChar == '+') {
+          decodedChar = ' ';
+        } else {
+          decodedChar = encodedChar;  // normal ascii char
         }
-        decoded[p] = 0x0;
-        return decoded;
-    } else {
-        return nullptr;
+      }
+      decoded[p++] = decodedChar;
     }
+    decoded[p] = 0x0;
+    return decoded;
+  } else {
+    return nullptr;
+  }
 }
 
-bool esp3d_strings::endsWith(const char * str, const char * endpart)
-{
-    if (!str || !endpart) {
-        return false;
+bool esp3d_strings::endsWith(const char* str, const char* endpart) {
+  if (!str || !endpart) {
+    return false;
+  }
+  uint lenStr = strlen(str);
+  uint lenEnd = strlen(endpart);
+  if (lenEnd > lenStr) {
+    return false;
+  }
+  for (uint i = 0; i < lenEnd; i++) {
+    if (str[lenStr - 1 - i] != endpart[lenEnd - 1 - i]) {
+      return false;
     }
-    uint lenStr = strlen(str);
-    uint lenEnd = strlen(endpart);
-    if (lenEnd>lenStr) {
-        return false;
-    }
-    for(uint i=0; i < lenEnd; i++) {
-        if (str[lenStr-1-i]!= endpart[lenEnd-1-i]) {
-            return false;
-        }
-    }
-    return true;
+  }
+  return true;
 }
 
-bool esp3d_strings::startsWith(const char * str, const char * startPart)
-{
-    if (!str || !startPart) {
-        return false;
+bool esp3d_strings::startsWith(const char* str, const char* startPart) {
+  if (!str || !startPart) {
+    return false;
+  }
+  uint lenStr = strlen(str);
+  uint lenStart = strlen(startPart);
+  if (lenStart > lenStr) {
+    return false;
+  }
+  for (uint i = 0; i < lenStart; i++) {
+    if (str[i] != startPart[i]) {
+      return false;
     }
-    uint lenStr = strlen(str);
-    uint lenStart = strlen(startPart);
-    if (lenStart>lenStr) {
-        return false;
-    }
-    for(uint i=0; i < lenStart; i++) {
-        if (str[i]!= startPart[i]) {
-            return false;
-        }
-    }
-    return true;
+  }
+  return true;
 }
 
-const char* esp3d_strings::getContentType (const char* filename)
-{
-    std::string file_name;
-    file_name= filename;
-    esp3d_strings::str_toLowerCase(&file_name);
-    std::size_t found = file_name.find_last_of(".");
-    if (found) {
-        std::string extension = file_name.substr(found+1);
-        if (extension =="htm")  {
-            return "text/html";
-        } else if (extension =="html")  {
-            return "text/html";
-        } else if (extension =="css") {
-            return "text/css";
-        } else if (extension =="js") {
-            return "application/javascript";
-        } else if (extension =="png") {
-            return "image/png";
-        } else if (extension =="gif") {
-            return "image/gif";
-        } else if (extension =="jpeg") {
-            return "image/jpeg";
-        } else if (extension =="jpg") {
-            return "image/jpeg";
-        } else if (extension =="ico") {
-            return "image/x-icon";
-        } else if (extension =="xml") {
-            return "text/xml";
-        } else if (extension =="pdf") {
-            return "application/x-pdf";
-        } else if (extension =="zip") {
-            return "application/x-zip";
-        } else if (extension =="gz") {
-            return "application/x-gzip";
-        } else if (extension =="txt") {
-            return "text/plain";
-        }
+const char* esp3d_strings::getContentType(const char* filename) {
+  std::string file_name;
+  file_name = filename;
+  esp3d_strings::str_toLowerCase(&file_name);
+  std::size_t found = file_name.find_last_of(".");
+  if (found) {
+    std::string extension = file_name.substr(found + 1);
+    if (extension == "htm") {
+      return "text/html";
+    } else if (extension == "html") {
+      return "text/html";
+    } else if (extension == "css") {
+      return "text/css";
+    } else if (extension == "js") {
+      return "application/javascript";
+    } else if (extension == "png") {
+      return "image/png";
+    } else if (extension == "gif") {
+      return "image/gif";
+    } else if (extension == "jpeg") {
+      return "image/jpeg";
+    } else if (extension == "jpg") {
+      return "image/jpeg";
+    } else if (extension == "ico") {
+      return "image/x-icon";
+    } else if (extension == "xml") {
+      return "text/xml";
+    } else if (extension == "pdf") {
+      return "application/x-pdf";
+    } else if (extension == "zip") {
+      return "application/x-zip";
+    } else if (extension == "gz") {
+      return "application/x-gzip";
+    } else if (extension == "txt") {
+      return "text/plain";
     }
-    return "application/octet-stream";
+  }
+  return "application/octet-stream";
 }
 
-int esp3d_strings::find(const char * str, const char *subStr, size_t start)
-{
-    if (!str ||!subStr ||start +strlen(subStr)>strlen(str)) {
-        return -1;
-    }
-    for (int i=start; i<strlen(str); i++) {
-        if (esp3d_strings::startsWith(&str[i], subStr)) {
-            return i;
-        }
-    }
+int esp3d_strings::find(const char* str, const char* subStr, size_t start) {
+  if (!str || !subStr || start + strlen(subStr) > strlen(str)) {
     return -1;
+  }
+  for (int i = start; i < strlen(str); i++) {
+    if (esp3d_strings::startsWith(&str[i], subStr)) {
+      return i;
+    }
+  }
+  return -1;
 }
