@@ -97,7 +97,7 @@ void status_screen() {
   lv_obj_set_align(ui_status_list_ctl, LV_ALIGN_TOP_MID);
   esp3d_log("status_list size is %d", ui_status_screen_list.size());
   for (auto &line : ui_status_screen_list) {
-    lv_list_add_btn(ui_status_list_ctl, "", line.c_str(), "");
+    lv_list_add_btn(ui_status_list_ctl, "", line.c_str());
   }
 
   lv_obj_t *btn_back = lv_btn_create(ui_status_screen_container);

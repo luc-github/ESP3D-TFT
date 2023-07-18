@@ -73,33 +73,27 @@ lv_obj_t * lv_list_add_text(lv_obj_t * list, const char * txt)
     return obj;
 }
 
-lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * icon, const char * txt, const void * icon2)
+lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * icon, const char * txt)
 {
     LV_LOG_INFO("begin");
     lv_obj_t * obj = lv_obj_class_create_obj(&lv_list_btn_class, list);
     lv_obj_class_init_obj(obj);
     lv_obj_set_size(obj, LV_PCT(100), LV_SIZE_CONTENT);
     lv_obj_set_flex_flow(obj, LV_FLEX_FLOW_ROW);
+
 #if LV_USE_IMG == 1
     if(icon) {
         lv_obj_t * img = lv_img_create(obj);
         lv_img_set_src(img, icon);
     }
-#endif 
+#endif
 
-if(txt) {
+    if(txt) {
         lv_obj_t * label = lv_label_create(obj);
         lv_label_set_text(label, txt);
         lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
         lv_obj_set_flex_grow(label, 1);
     }
-
-#if LV_USE_IMG == 1
-    if(icon2) {
-        lv_obj_t * img = lv_img_create(obj);
-        lv_img_set_src(img, icon2);
-    }
-#endif
 
     return obj;
 }

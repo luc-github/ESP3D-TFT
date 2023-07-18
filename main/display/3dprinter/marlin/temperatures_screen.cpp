@@ -142,9 +142,9 @@ void temperatures_btn_ok_event_cb(lv_event_t *e) {
   esp3d_log("Ok: %s", temperatures_value.c_str());
 }
 
-void temperatures_btn_power_off_event_cb(lv_event_t *e) {
+void temperatures_btn_reset_event_cb(lv_event_t *e) {
   lv_obj_t *temperatures_ta = (lv_obj_t *)lv_event_get_user_data(e);
-  esp3d_log("Power off current heater %d", heater_buttons_map_id);
+  esp3d_log("Reset");
   lv_textarea_set_text(temperatures_ta, "0");
 }
 
@@ -285,11 +285,11 @@ void temperatures_screen(uint8_t target) {
                   CURRENT_BUTTON_PRESSED_OUTLINE, 0);
   lv_obj_add_event_cb(btn_set, temperatures_btn_ok_event_cb, LV_EVENT_CLICKED,
                       temperatures_ta);
-  // Power off button to 0
+  // reset button to 0
   lv_obj_t *btn_stop = create_symbol_button(ui_new_screen, LV_SYMBOL_POWER);
   lv_obj_align_to(btn_stop, btn_set, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE, 0);
-  lv_obj_add_event_cb(btn_stop, temperatures_btn_power_off_event_cb,
+  lv_obj_add_event_cb(btn_stop, temperatures_btn_reset_event_cb,
                       LV_EVENT_CLICKED, temperatures_ta);
   // Keyboard
   lv_obj_t *temperatures_kb = lv_keyboard_create(ui_new_screen);
