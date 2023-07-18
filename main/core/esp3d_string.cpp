@@ -34,6 +34,15 @@ std::string esp3d_strings::set_precision(std::string str_value,
     for (uint8_t i = 0; i < precision; i++) {
       tmp += "0";
     }
+    if (pos == 0) {
+      tmp = "0" + tmp;
+    }
+    int pos = tmp.find(".");
+    for (uint i = pos + 1; i < tmp.length(); i++) {
+      if (tmp[i] == '.') {
+        tmp[i] = '0';
+      }
+    }
     tmp = tmp.substr(0, pos + precision + 1);
   } else {
     tmp += ".";
