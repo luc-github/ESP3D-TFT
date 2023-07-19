@@ -58,8 +58,20 @@ bool ESP3DTranslationService::begin() {
   esp3d_log("Starting Translation Service");
   _translations.clear();
   _translations = {{ESP3DLabel::language, "English"},
-                   {ESP3DLabel::update, "Update"},
-                   {ESP3DLabel::version, "Version"}};
+                   {ESP3DLabel::version, "Version"},
+                   {ESP3DLabel::size_for_update, "Size for update"},
+                   {ESP3DLabel::screen, "Screen"},
+                   {ESP3DLabel::architecture, "Arch"},
+                   {ESP3DLabel::sdk_version, "SDK"},
+                   {ESP3DLabel::cpu_freq, "Freq"},
+                   {ESP3DLabel::flash_size, "Flash"},
+                   {ESP3DLabel::free_heap, "Free Heap"},
+                   {ESP3DLabel::total_psram, "PSRAM"},
+                   {ESP3DLabel::sd_updater, "SD Updater"},
+                   {ESP3DLabel::on, "On"},
+                   {ESP3DLabel::off, "Off"},
+                   {ESP3DLabel::millimeters, "mm"},
+                   {ESP3DLabel::celcius, "°C"}};
 
   std::string filename = DEFAULT_LANGUAGE_PACK;
   _languageCode = DEFAULT_LANGUAGE;

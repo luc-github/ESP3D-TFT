@@ -26,23 +26,18 @@
 
 #include "esp3d_settings.h"
 #include "esp3d_string.h"
+#include "esp3d_translations_list.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-enum class ESP3DLabel : uint16_t {
-  language = 0,
-  update,
-  version,
-  unknown_index
-};
 
 class ESP3DTranslationService final {
  public:
   ESP3DTranslationService();
   ~ESP3DTranslationService();
   bool begin();
+  void init();
   void handle();
   const char *translate(ESP3DLabel label, ...);
   uint16_t getLanguagesList();

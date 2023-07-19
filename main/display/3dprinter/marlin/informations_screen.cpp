@@ -65,6 +65,20 @@ void event_button_informations_back_handler(lv_event_t *e) {
     informations_screen_delay_timer_cb(NULL);
 }
 
+void addInformationToList(lv_obj_t *list, ESP3DLabel label, const char *info) {
+  std::string infoStr = esp3dTranslationService.translate(label);
+  infoStr += ": ";
+  infoStr += info;
+  lv_list_add_btn(list, "", infoStr.c_str());
+}
+
+void addInformationToList(lv_obj_t *list, ESP3DLabel label, ESP3DLabel info) {
+  std::string infoStr = esp3dTranslationService.translate(label);
+  infoStr += ": ";
+  infoStr += esp3dTranslationService.translate(info);
+  lv_list_add_btn(list, "", infoStr.c_str());
+}
+
 void informations_screen() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
@@ -95,56 +109,55 @@ void informations_screen() {
                       CURRENT_BUTTON_PRESSED_OUTLINE * 2);
   lv_obj_set_style_radius(ui_info_list_ctl, CURRENT_CONTAINER_RADIUS, 0);
 
-  lv_list_add_btn(ui_info_list_ctl, "", "Screen: " TFT_TARGET);
-  lv_list_add_btn(ui_info_list_ctl, "",
-                  "FW: "
-                  "V" ESP3D_TFT_VERSION);
-  lv_list_add_btn(ui_info_list_ctl, "", "arch: " CONFIG_IDF_TARGET);
-  lv_list_add_btn(ui_info_list_ctl, "", "SDK: " IDF_VER);
-  std::string tmpstr =
-      "Freq: " + std::to_string(ets_get_cpu_frequency()) + "MHz";
-  lv_list_add_btn(ui_info_list_ctl, "", tmpstr.c_str());
+  addInformationToList(ui_info_list_ctl, ESP3DLabel::screen, TFT_TARGET);
+  addInformationToList(ui_info_list_ctl, ESP3DLabel::version,
+                       ESP3D_TFT_VERSION);
+  addInformationToList(ui_info_list_ctl, ESP3DLabel::architecture,
+                       CONFIG_IDF_TARGET);
+  addInformationToList(ui_info_list_ctl, ESP3DLabel::sdk_version, IDF_VER);
+  std::string tmpstr = std::to_string(ets_get_cpu_frequency()) + "MHz";
+  addInformationToList(ui_info_list_ctl, ESP3DLabel::cpu_freq, tmpstr.c_str());
+
   // Free memory
-  tmpstr = "Free Mem: ";
-  tmpstr += esp3d_strings::formatBytes(esp_get_free_heap_size());
-  lv_list_add_btn(ui_info_list_ctl, "", tmpstr.c_str());
+  tmpstr = esp3d_strings::formatBytes(esp_get_free_heap_size());
+  addInformationToList(ui_info_list_ctl, ESP3DLabel::free_heap, tmpstr.c_str());
+
 #if CONFIG_SPIRAM
   multi_heap_info_t info;
   heap_caps_get_info(&info, MALLOC_CAP_SPIRAM);
-  tmpstr = "Total psram: ";
-  tmpstr += esp3d_strings::formatBytes(info.total_free_bytes +
-                                       info.total_allocated_bytes);
-  lv_list_add_btn(ui_info_list_ctl, "", tmpstr.c_str());
-
+  tmpstr = esp3d_strings::formatBytes(info.total_free_bytes +
+                                      info.total_allocated_bytes);
+  addInformationToList(ui_info_list_ctl, ESP3DLabel::total_psram,
+                       tmpstr.c_str());
 #endif  // CONFIG_SPIRAM
   uint32_t flash_size;
   if (esp_flash_get_size(NULL, &flash_size) != ESP_OK) {
     esp3d_log_e("Get flash size failed");
     flash_size = 0;
   }
-  tmpstr = "flash size: ";
-  tmpstr += esp3d_strings::formatBytes(flash_size);
-  lv_list_add_btn(ui_info_list_ctl, "", tmpstr.c_str());
+  tmpstr = esp3d_strings::formatBytes(flash_size);
+  addInformationToList(ui_info_list_ctl, ESP3DLabel::flash_size,
+                       tmpstr.c_str());
 
 #if ESP3D_UPDATE_FEATURE
   // Update max
-  tmpstr = "size for update: ";
-  tmpstr += esp3d_strings::formatBytes(esp3dUpdateService.maxUpdateSize());
-  lv_list_add_btn(ui_info_list_ctl, "", tmpstr.c_str());
+  tmpstr = esp3d_strings::formatBytes(esp3dUpdateService.maxUpdateSize());
+  addInformationToList(ui_info_list_ctl, ESP3DLabel::size_for_update,
+                       tmpstr.c_str());
 #if ESP3D_SD_CARD_FEATURE
   // SD updater
-  tmpstr = "SD updater: ";
   ESP3DState statesetting = (ESP3DState)esp3dTftsettings.readByte(
       ESP3DSettingIndex::esp3d_check_update_on_sd);
   if (statesetting == ESP3DState::off) {
-    tmpstr += "OFF";
+    tmpstr = esp3dTranslationService.translate(ESP3DLabel::off);
   } else {
-    tmpstr += "ON";
+    tmpstr = esp3dTranslationService.translate(ESP3DLabel::on);
   }
-  lv_list_add_btn(ui_info_list_ctl, "", tmpstr.c_str());
+  addInformationToList(ui_info_list_ctl, ESP3DLabel::sd_updater,
+                       tmpstr.c_str());
 #endif  // ESP3D_SD_CARD_FEATURE
 #else
-  lv_list_add_btn(ui_info_list_ctl, "", "FW Update: OFF");
+  addInformationToList(ui_info_list_ctl, ESP3DLabel::update, ESP3DLabel::off);
 #endif  // ESP3D_UPDATE_FEATURE
   esp3dTftui.set_current_screen(ESP3DScreenType::informations);
 }

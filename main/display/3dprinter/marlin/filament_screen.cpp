@@ -23,6 +23,7 @@
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "translations/esp3d_translation_service.h"
 
 /**********************
  *  STATIC PROTOTYPES
@@ -235,7 +236,8 @@ void filament_screen(uint8_t target) {
                   0);
   // unit
   lv_obj_t *label_unit1 = lv_label_create(ui_new_screen);
-  lv_label_set_text(label_unit1, "°C");
+  lv_label_set_text(label_unit1,
+                    esp3dTranslationService.translate(ESP3DLabel::celcius));
   apply_style(label_unit1, ESP3DStyleType::bg_label);
   lv_obj_align_to(label_unit1, label_current_distance_value,
                   LV_ALIGN_OUT_RIGHT_MID, CURRENT_BUTTON_PRESSED_OUTLINE / 2,
@@ -288,7 +290,8 @@ void filament_screen(uint8_t target) {
 
   // Unit
   lv_obj_t *label_unit2 = lv_label_create(ui_new_screen);
-  lv_label_set_text(label_unit2, "mm");
+  lv_label_set_text(label_unit2,
+                    esp3dTranslationService.translate(ESP3DLabel::millimeters));
   apply_style(label_unit2, ESP3DStyleType::bg_label);
 
   lv_obj_align_to(label_unit2, distance_ta, LV_ALIGN_OUT_RIGHT_MID,
