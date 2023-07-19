@@ -449,6 +449,7 @@ bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
       break;
     case ESP3DStyleType::status_list:
       lv_obj_add_style(obj, &style_status_list_default, LV_STATE_DEFAULT);
+      lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_ELASTIC);
       break;
 
     default:

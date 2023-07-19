@@ -76,7 +76,6 @@ void informations_screen() {
   lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
 
-  // TODO: Add your code here
   lv_obj_t *btnback = create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_informations_back_handler,
                       LV_EVENT_CLICKED, NULL);
