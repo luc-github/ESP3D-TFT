@@ -57,25 +57,9 @@ bool ESP3DTranslationService::begin() {
   _started = false;
   esp3d_log("Starting Translation Service");
   _translations.clear();
-  _translations = {{ESP3DLabel::language, "English"},
-                   {ESP3DLabel::version, "Version"},
-                   {ESP3DLabel::size_for_update, "Size for update"},
-                   {ESP3DLabel::screen, "Screen"},
-                   {ESP3DLabel::architecture, "Arch"},
-                   {ESP3DLabel::sdk_version, "SDK"},
-                   {ESP3DLabel::cpu_freq, "Freq"},
-                   {ESP3DLabel::flash_size, "Flash"},
-                   {ESP3DLabel::free_heap, "Free Heap"},
-                   {ESP3DLabel::total_psram, "PSRAM"},
-                   {ESP3DLabel::sd_updater, "SD Updater"},
-                   {ESP3DLabel::on, "On"},
-                   {ESP3DLabel::off, "Off"},
-                   {ESP3DLabel::millimeters, "mm"},
-                   {ESP3DLabel::celcius, "°C"}};
-
+  init();
   std::string filename = DEFAULT_LANGUAGE_PACK;
   _languageCode = DEFAULT_LANGUAGE;
-  // TODO read setting language value
   const ESP3DSettingDescription *settingPtr =
       esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_ui_language);
   if (settingPtr) {
@@ -101,6 +85,7 @@ bool ESP3DTranslationService::begin() {
       filename = ESP3D_FLASH_FS_HEADER + filename;
       ESP3DConfigFile updateTranslations(
           filename.c_str(), esp3dTranslationService.processingFileFunction);
+      esp3d_log("Processing language pack: %s", filename.c_str());
       if (updateTranslations.processFile()) {
         esp3d_log("Processing language pack, done: %s",
                   translate(ESP3DLabel::language));
@@ -119,6 +104,10 @@ bool ESP3DTranslationService::begin() {
   }
   if (!_started) {
     esp3d_log_e("Translation Service not started");
+    _translations.clear();
+    init();
+    _languageCode = DEFAULT_LANGUAGE;
+    _started = true;
   }
   return _started;
 }
@@ -254,7 +243,7 @@ bool ESP3DTranslationService::processingFileFunction(const char *section,
     // TODO Update reference language array
     esp3d_log("Processing Section: %s, Key: %s, Value: %s", section, key,
               value);
-    if (strlen(value) >= 3) {
+    if (strlen(value) >= 1) {
       uint16_t keyIndex = atoi(&key[2]);
       if (keyIndex >= static_cast<uint16_t>(ESP3DLabel::unknown_index)) {
         esp3d_log_e("Key index: %d is invalid", keyIndex);

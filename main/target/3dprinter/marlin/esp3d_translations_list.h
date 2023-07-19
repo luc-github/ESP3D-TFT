@@ -30,7 +30,6 @@ enum class ESP3DLabel : uint16_t {
   size_for_update,
   screen,
   architecture,
-  core_version,
   sdk_version,
   cpu_freq,
   flash_size,

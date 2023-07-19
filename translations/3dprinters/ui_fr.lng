@@ -1,0 +1,24 @@
+#Translation pack for french language
+[translations]
+l_0=Français
+l_1=Taille MAJ
+l_2=Ecran
+l_3=Arch
+l_4=SDK
+l_5=Freq
+l_6=Taille Flash
+l_7=Memoire
+l_8=PSRam
+l_9=Version
+l_10=MAJ Carte SD
+l_11=Oui
+l_12=Non
+l_13=mm
+l_14=°C
+
+[info]
+creator=luc@tech-hunter.com
+creation_date=2023-05-16
+maintainer==luc@tech-hunter.com
+last_update=2023-07-19
+target=French
