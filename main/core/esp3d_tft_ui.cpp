@@ -34,8 +34,8 @@
 #include "version.h"
 
 #define LV_TICK_PERIOD_MS 10
-#define STACKDEPTH NETWORK_STACK_DEPTH
-#define TASKPRIORITY 2
+#define STACKDEPTH UI_STACK_DEPTH
+#define TASKPRIORITY 0
 #define TASKCORE 1
 
 /**********************
