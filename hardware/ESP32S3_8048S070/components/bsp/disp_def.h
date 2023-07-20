@@ -17,9 +17,6 @@ extern "C" {
 #define DISP_VER_RES_MAX (800)
 #endif
 
-// 1/10
-#define DISP_BUF_SIZE (DISP_HOR_RES_MAX * (DISP_VER_RES_MAX / 10))
-
 #define DISP_BITS_WIDTH (16)  // RGB565 in parallel mode, thus 16bit in width
 
 #define DISP_CLK_FREQ (8000000)
@@ -62,10 +59,10 @@ extern "C" {
 #define DISP_USE_BOUNCE_BUFFER (true)
 
 #define DISP_BACKLIGHT_SWITCH 1
-// #define DISP_BACKLIGHT_PWM //CONFIG_LV_DISP_BACKLIGHT_PWM
-#define BACKLIGHT_ACTIVE_LVL 1      // CONFIG_LV_BACKLIGHT_ACTIVE_LVL
-#define DISP_PIN_BCKL 2             // GPIO 2
-#define DISP_BCKL_DEFAULT_DUTY 100  //%
+#define DISP_BACKLIGHT_PWM         // CONFIG_LV_DISP_BACKLIGHT_PWM
+#define BACKLIGHT_ACTIVE_LVL 1     // CONFIG_LV_BACKLIGHT_ACTIVE_LVL
+#define DISP_PIN_BCKL 2            // GPIO 2
+#define DISP_BCKL_DEFAULT_DUTY 20  //%
 
 #ifdef __cplusplus
 } /* extern "C" */
