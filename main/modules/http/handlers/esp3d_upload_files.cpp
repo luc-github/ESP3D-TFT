@@ -67,14 +67,14 @@ esp_err_t ESP3DHttpService::upload_to_flash_handler(
       break;
     case ESP3DUploadState::file_write:
       // esp3d_log("Write :%d bytes", datasize);
-      /* if (datasize && FileFD ) {
-         if (fwrite(data, datasize, 1, FileFD) != 1) {
-           esp3d_log_e("Error cannot writing data on flash filesystem ");
-           esp3dHttpService.pushError(ESP3DUploadError::write_failed,
-                                      "Error file write failed");
-           return ESP_FAIL;
-         }
-       }*/
+      if (datasize && FileFD) {
+        if (fwrite(data, datasize, 1, FileFD) != 1) {
+          esp3d_log_e("Error cannot writing data on flash filesystem ");
+          esp3dHttpService.pushError(ESP3DUploadError::write_failed,
+                                     "Error file write failed");
+          return ESP_FAIL;
+        }
+      }
       break;
     case ESP3DUploadState::upload_end:
       esp3d_log("Ending upload");
