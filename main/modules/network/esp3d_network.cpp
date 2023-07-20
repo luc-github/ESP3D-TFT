@@ -541,8 +541,8 @@ bool ESP3DNetwork::startApMode(bool configMode) {
   _current_radio_mode = ESP3DRadioMode::wifi_ap;
   if (ESP_OK == esp_netif_get_ip_info(_wifiApPtr, &ip_info)) {
 #if ESP3D_TFT_LOG
-    esp3d_log("wifi_init_softap done.\nSSID:%s\npassword:%s\nchannel:%d",
-              ssid_str, ssid_pwd_str, channel);
+    esp3d_log("wifi_init_softap done. - SSID:%s - channel:%d", ssid_str,
+              channel);
     esp3d_log("AP IP: " IPSTR, IP2STR(&ip_info.ip));
     esp3d_log("AP GW: " IPSTR, IP2STR(&ip_info.gw));
     esp3d_log("AP NETMASK: " IPSTR, IP2STR(&ip_info.netmask));

@@ -35,7 +35,7 @@
 
 #define LV_TICK_PERIOD_MS 10
 #define STACKDEPTH NETWORK_STACK_DEPTH
-#define TASKPRIORITY 0
+#define TASKPRIORITY 2
 #define TASKCORE 1
 
 /**********************

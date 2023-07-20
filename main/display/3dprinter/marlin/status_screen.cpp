@@ -53,7 +53,7 @@ bool status_list_cb(ESP3DValuesIndex index, const char *value,
       esp3d_log("Refreshing status screen");
       status_screen();
     } else {
-      esp3d_log("No refreshe needed");
+      esp3d_log("No refresh needed");
     }
   } else if (action == ESP3DValuesCbAction::Clear) {
     ui_status_screen_list.clear();

@@ -2,6 +2,8 @@
  * SPDX-FileCopyrightText: 2021 Espressif Systems (Shanghai) CO LTD
  *
  * SPDX-License-Identifier: Apache-2.0
+ * 
+ * Created by luc lebosse - luc@tech-hunters - https://github.com/luc-github - 2022-09-20
  */
 #include <stdlib.h>
 #include <sys/cdefs.h>

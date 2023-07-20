@@ -91,7 +91,7 @@ esp_err_t bsp_init(void)
         .channel_idx = 0 // @todo this prevents us from having two PWM controlled displays
     };
     disp_backlight_h bckl_handle = disp_backlight_new(&bckl_config);
-    disp_backlight_set(bckl_handle, 100);
+    disp_backlight_set(bckl_handle, DISP_BCKL_DEFAULT_DUTY);
 #endif
     /* Touch controller initialization */
     esp3d_log( "Initializing touch controller");
