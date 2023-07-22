@@ -171,9 +171,7 @@ bool ESP3DSettings::isValidStringSetting(const char* value,
   }
   // use strlen because it crash with regex if value is longer than 41
   // characters
-#if ESP3D_WIFI_FEATURE
   size_t len = strlen(value);
-#endif  // ESP3D_WIFI_FEATURE
   switch (settingElement) {
 #if ESP3D_WIFI_FEATURE
     case ESP3DSettingIndex::esp3d_ap_ssid:

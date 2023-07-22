@@ -30,7 +30,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-std::list<std::string> ui_status_screen_list;
+static std::list<std::string> ui_status_screen_list;
 
 #define MAX_STATUS_SCREEN_LIST 10
 void main_screen();
@@ -38,15 +38,23 @@ void status_screen();
 
 bool status_list_cb(ESP3DValuesIndex index, const char *value,
                     ESP3DValuesCbAction action) {
-  if (action == ESP3DValuesCbAction::Add ||
-      action == ESP3DValuesCbAction::Update) {
+  if (action == ESP3DValuesCbAction::Clear) {
+    ui_status_screen_list.clear();
+    esp3d_log("status_list clear");
+  } else if (action == ESP3DValuesCbAction::Add ||
+             action == ESP3DValuesCbAction::Update) {
+    if (!value) {
+      esp3d_log_e("status_list_cb value is null");
+      return false;
+    }
     esp3d_log("status_list_cb size is %d", ui_status_screen_list.size());
     if (ui_status_screen_list.size() > MAX_STATUS_SCREEN_LIST) {
       esp3d_log("status_list size %d pop", ui_status_screen_list.size());
       ui_status_screen_list.pop_back();
     }
+    std::string tmp = value;
+    ui_status_screen_list.push_front(tmp);
 
-    ui_status_screen_list.push_front(value);
     esp3d_log("status_list pushing %s now size is %d", value,
               ui_status_screen_list.size());
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::status_list) {
@@ -55,9 +63,6 @@ bool status_list_cb(ESP3DValuesIndex index, const char *value,
     } else {
       esp3d_log("No refresh needed");
     }
-  } else if (action == ESP3DValuesCbAction::Clear) {
-    ui_status_screen_list.clear();
-    esp3d_log("status_list clear");
   } else {
     esp3d_log_e("status_list unknown action %d", (int)action);
     return false;

@@ -43,16 +43,18 @@
  **********************/
 
 ESP3DTftUi esp3dTftui;
-
+#if !LV_TICK_CUSTOM
 static void lv_tick_task(void *arg);
+#endif
 static void guiTask(void *pvParameter);
 extern void create_application(void);
-
+#if !LV_TICK_CUSTOM
 static void lv_tick_task(void *arg) {
   (void)arg;
 
   lv_tick_inc(LV_TICK_PERIOD_MS);
 }
+#endif  // !LV_TICK_CUSTOM
 
 /* Creates a semaphore to handle concurrent call to lvgl stuff
  * If you wish to call *any* lvgl function from other threads/tasks
@@ -62,7 +64,7 @@ SemaphoreHandle_t xGuiSemaphore;
 static void guiTask(void *pvParameter) {
   (void)pvParameter;
   xGuiSemaphore = xSemaphoreCreateMutex();
-
+#if !LV_TICK_CUSTOM
   /* Create and start a periodic timer interrupt to call lv_tick_inc */
   const esp_timer_create_args_t periodic_timer_args = {
       .callback = &lv_tick_task,
@@ -74,7 +76,7 @@ static void guiTask(void *pvParameter) {
   ESP_ERROR_CHECK(esp_timer_create(&periodic_timer_args, &periodic_timer));
   ESP_ERROR_CHECK(
       esp_timer_start_periodic(periodic_timer, LV_TICK_PERIOD_MS * 1000));
-
+#endif  // !LV_TICK_CUSTOM
   create_application();
 
   while (1) {

@@ -22,16 +22,18 @@
  *      INCLUDES
  *********************/
 #include "bsp.h"
-
-#include "disp_def.h"
-#include "ek9716.h"
-#include "esp3d_log.h"
-#include "esp_lcd_backlight.h"
-#include "gt911.h"
 #include "i2c_bus.h"
 #include "i2c_def.h"
+#include "esp3d_log.h"
+#if ESP3D_DISPLAY_FEATURE
+#include "disp_def.h"
+#include "ek9716.h"
 #include "lvgl.h"
 #include "touch_def.h"
+#include "gt911.h"
+#include "esp_lcd_backlight.h"
+#endif//ESP3D_DISPLAY_FEATURE 
+
 
 static i2c_bus_handle_t i2c_bus_handle = NULL;
 
@@ -69,8 +71,6 @@ static i2c_config_t conf = {.mode = I2C_MODE_MASTER,
  **********************/
 
 esp_err_t bsp_init(void) {
-  static lv_disp_drv_t disp_drv; /*Descriptor of a display driver*/
-
   /* i2c controller initialization */
   esp3d_log("Initializing i2C controller");
 
@@ -84,7 +84,8 @@ esp_err_t bsp_init(void) {
     esp3d_log_e("I2C bus failed to be initialized.");
     return ESP_FAIL;
   }
-
+#if ESP3D_DISPLAY_FEATURE
+  static lv_disp_drv_t disp_drv; /*Descriptor of a display driver*/
 #if (defined(DISP_BACKLIGHT_SWITCH) || defined(DISP_BACKLIGHT_PWM))
   const disp_backlight_config_t bckl_config = {
     .gpio_num = DISP_PIN_BCKL,
@@ -181,5 +182,6 @@ esp_err_t bsp_init(void) {
   indev_drv.read_cb = gt911_read;         /*Set your driver function*/
   lv_indev_drv_register(&indev_drv);      /*Finally register the driver*/
 
+#endif  // ESP3D_DISPLAY_FEATURE
   return ESP_OK;
 }

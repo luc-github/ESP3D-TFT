@@ -28,7 +28,7 @@
 #if ESP3D_SD_CARD_FEATURE
 #include "filesystem/esp3d_sd.h"
 #endif  // ESP3D_SD_CARD_FEATURE
-#include "esp3d_tft_stream.h"
+#include "gcode_host/esp3d_tft_stream.h"
 #include "notifications/esp3d_notifications_service.h"
 #include "translations/esp3d_translation_service.h"
 

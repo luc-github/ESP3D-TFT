@@ -174,6 +174,7 @@ endif()
 
 if(TFT_UI_SERVICE)
     add_compile_options(-DESP3D_DISPLAY_FEATURE=1)
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/main/display")
 endif()
 
 if(SD_CARD_SERVICE)
