@@ -28,10 +28,12 @@
 #include "esp_flash.h"
 #include "esp_heap_caps.h"
 #include "esp_system.h"
+#include "filesystem/esp3d_flash.h"
 #include "rom/ets_sys.h"
 #include "sdkconfig.h"
 #include "spi_flash_mmap.h"
 #include "translations/esp3d_translation_service.h"
+
 #if ESP3D_UPDATE_FEATURE
 #include "update/esp3d_update_service.h"
 #endif  // ESP3D_UPDATE_FEATURE
@@ -130,6 +132,11 @@ void informations_screen() {
   addInformationToList(ui_info_list_ctl, ESP3DLabel::total_psram,
                        tmpstr.c_str());
 #endif  // CONFIG_SPIRAM
+
+  // Flash type
+  addInformationToList(ui_info_list_ctl, ESP3DLabel::flash_type,
+                       flashFs.getFileSystemName());
+  // Flash size
   uint32_t flash_size;
   if (esp_flash_get_size(NULL, &flash_size) != ESP_OK) {
     esp3d_log_e("Get flash size failed");

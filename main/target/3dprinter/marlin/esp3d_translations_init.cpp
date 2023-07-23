@@ -38,5 +38,6 @@ void ESP3DTranslationService::init() {
                    {ESP3DLabel::on, "On"},
                    {ESP3DLabel::off, "Off"},
                    {ESP3DLabel::millimeters, "mm"},
-                   {ESP3DLabel::celcius, "°C"}};
+                   {ESP3DLabel::celcius, "°C"},
+                   {ESP3DLabel::flash_type, "Flash type"}};
 }

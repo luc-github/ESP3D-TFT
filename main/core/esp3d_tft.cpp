@@ -36,6 +36,9 @@
 #include "gcode_host/esp3d_tft_stream.h"
 #endif  // ESP3D_GCODE_HOST_FEATURE
 #include "esp_freertos_hooks.h"
+//////////////////////////////// Remove me
+#include "esp_spiffs.h"
+////////////////////////////////
 #include "filesystem/esp3d_flash.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
@@ -101,8 +104,11 @@ bool ESP3DTft::begin() {
   }
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
   bool success = true;
-  bool successFs = flashFs.begin();
+  bool successFs = true;
   bool successSd = true;
+
+  // Init filesystem
+  successFs = flashFs.begin();
 #if ESP3D_SD_CARD_FEATURE
   successSd = sd.begin();
 #endif  // ESP3D_SD_CARD_FEATURE

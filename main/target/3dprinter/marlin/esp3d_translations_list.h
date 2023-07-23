@@ -41,6 +41,7 @@ enum class ESP3DLabel : uint16_t {
   off,
   millimeters,
   celcius,
+  flash_type,
   unknown_index
 };
 

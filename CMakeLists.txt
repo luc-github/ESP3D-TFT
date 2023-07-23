@@ -38,6 +38,7 @@ OPTION(SD_CARD_SERVICE "SD card service" ON)
 OPTION(NOTIFICATIONS_SERVICE "Notifications service" ON)
 OPTION(UPDATE_SERVICE "Update service" ON)
 OPTION(GCODE_HOST_SERVICE "GCode Streaming service" ON)
+OPTION(USE_FAT_INSTEAD_OF_LITTLEFS "Use FAT instead of LittleFS" OFF)
 
 # #######################################
 # Do not change anything above this line
@@ -55,7 +56,6 @@ elseif(ESP32S3_HMI43V3)
 elseif(ESP32S3_8048S070)
     set(SDKCONFIG hardware/ESP32S3_8048S070/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_8048S070/components)
-    add_compile_options(-DBUTTON_ANIMATION_DELAY=0)
 elseif(ESP32_ROTRICS_DEXARM35)
     set(SDKCONFIG hardware/ESP32_ROTRICS_DEXARM35/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32_ROTRICS_DEXARM35/components)
@@ -77,6 +77,12 @@ else()
         "No hardware target defined, please define a target in CMakeLists.txt"
         "\n"
         "Now cmake will exit")
+endif()
+
+if(USE_FAT_INSTEAD_OF_LITTLEFS)
+    add_compile_options(-DESP3D_FATFS_FEATURE=1)
+    else()
+    add_compile_options(-DESP3D_LITTLEFS_FEATURE=1)
 endif()
 
 if(TARGET_FW_MARLIN)

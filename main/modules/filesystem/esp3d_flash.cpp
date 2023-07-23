@@ -30,6 +30,7 @@ ESP3DFlash flashFs;
 ESP3DFlash::ESP3DFlash() {
   _mounted = false;
   _started = false;
+  _state = ESP3DFsState::unknown;
 }
 
 ESP3DFileSystemType ESP3DFlash::getFSType(const char* path) {
@@ -40,10 +41,42 @@ ESP3DFileSystemType ESP3DFlash::getFSType(const char* path) {
 bool ESP3DFlash::accessFS(ESP3DFileSystemType FS) {
   (void)FS;
   esp3d_log("Access FS");
+  if (_mounted) {
+    setState(ESP3DFsState::busy);
+  } else {
+    setState(ESP3DFsState::unknown);
+  }
   return _mounted;
 }
 
 void ESP3DFlash::releaseFS(ESP3DFileSystemType FS) {
   (void)FS;
   esp3d_log("Release FS");
+  setState(ESP3DFsState::idle);
+}
+
+ESP3DFsState ESP3DFlash::getState() {
+  if (!_mounted) setState(ESP3DFsState::unknown);
+  return _state;
+};
+
+ESP3DFsState ESP3DFlash::setState(ESP3DFsState state) {
+  _state = state;
+#if ESP3D_TFT_LOG
+  switch (_state) {
+    case ESP3DFsState::idle:
+      esp3d_log("FS Idle");
+      break;
+    case ESP3DFsState::busy:
+      esp3d_log("FS busy");
+      break;
+    case ESP3DFsState::unknown:
+      esp3d_log("FS unknown");
+      break;
+    default:
+      esp3d_log("FS unknown state");
+      break;
+  }
+#endif
+  return _state;
 }
