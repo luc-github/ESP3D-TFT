@@ -30,10 +30,9 @@ extern "C" {
 #include "esp_err.h"
 
 /*********************
-*      DEFINES
-*********************/
+ *      DEFINES
+ *********************/
 
-#define HAS_PSRAM 0 // integrated as main ram allocation
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

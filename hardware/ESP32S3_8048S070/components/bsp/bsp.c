@@ -22,18 +22,20 @@
  *      INCLUDES
  *********************/
 #include "bsp.h"
+
+#include "esp3d_log.h"
 #include "i2c_bus.h"
 #include "i2c_def.h"
-#include "esp3d_log.h"
+
 #if ESP3D_DISPLAY_FEATURE
 #include "disp_def.h"
 #include "ek9716.h"
+#include "esp_lcd_backlight.h"
+#include "gt911.h"
 #include "lvgl.h"
 #include "touch_def.h"
-#include "gt911.h"
-#include "esp_lcd_backlight.h"
-#endif//ESP3D_DISPLAY_FEATURE 
 
+#endif  // ESP3D_DISPLAY_FEATURE
 
 static i2c_bus_handle_t i2c_bus_handle = NULL;
 
@@ -140,21 +142,32 @@ esp_err_t bsp_init(void) {
   lv_disp_draw_buf_init(&draw_buf, buf1, buf2,
                         DISP_HOR_RES_MAX * DISP_VER_RES_MAX);
 #else
-  esp3d_log("Allocate separate LVGL draw buffers from PSRAM");
-  buf1 = heap_caps_malloc(DISP_HOR_RES_MAX * 100 * sizeof(lv_color_t),
-                          MALLOC_CAP_SPIRAM);
+  esp3d_log("Allocate 1 LVGL draw buffer");
+  buf1 = heap_caps_malloc(
+      sizeof(lv_color_t) * DISP_HOR_RES_MAX * DISP_VER_RES_MAX / 4,
+      MALLOC_CAP_SPIRAM);
   if (buf1 == NULL) {
+    esp3d_log_e("Failed to allocate LVGL draw buffer 1");
+    return ESP_FAIL;
+  }
+
+  buf2 = heap_caps_malloc(
+      sizeof(lv_color_t) * DISP_HOR_RES_MAX * DISP_VER_RES_MAX / 4,
+      MALLOC_CAP_SPIRAM);
+  if (buf2 == NULL) {
+    esp3d_log_e("Failed to allocate LVGL draw buffer 2");
     return ESP_FAIL;
   }
 
   /* Use double buffered when not working with monochrome displays */
-  buf2 = heap_caps_malloc(DISP_HOR_RES_MAX * 100 * sizeof(lv_color_t),
-                          MALLOC_CAP_SPIRAM);
-  if (buf2 == NULL) {
-    return ESP_FAIL;
-  }
+  /* buf2 = heap_caps_malloc(DISP_HOR_RES_MAX * 100 * sizeof(lv_color_t),
+                           MALLOC_CAP_SPIRAM);
+   if (buf2 == NULL) {
+     return ESP_FAIL;
+   }
+   */
 
-  uint32_t size_in_px = DISP_HOR_RES_MAX * 100;
+  uint32_t size_in_px = DISP_HOR_RES_MAX * DISP_VER_RES_MAX / 4;
 
   /* Initialize the working buffer depending on the selected display.*/
   lv_disp_draw_buf_init(&draw_buf, buf1, buf2, size_in_px);

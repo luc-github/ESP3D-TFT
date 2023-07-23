@@ -142,7 +142,7 @@ void gt911_read(lv_indev_drv_t* indev_drv, lv_indev_data_t* data) {
       esp3d_log_e("no mutex available");
     }
 
-    esp3d_log("X %d Y %d", last_x, last_y);
+    // esp3d_log("X %d Y %d", last_x, last_y);
   } else {
     data->state = LV_INDEV_STATE_REL;
   }
@@ -223,7 +223,7 @@ static gt911_touch_detect_t gt911_is_touch_detected() {
       if (touch_points_num == 0 || touch_points_num > 5) {
         i2c_bus_write_byte_16(gt911_handle, GT911_READ_XY_REG, 0);
       } else {
-        esp3d_log("GT911 touch detected");
+        // esp3d_log("GT911 touch detected");
         return TOUCH_DETECTED;
       }
     }

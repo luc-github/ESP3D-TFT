@@ -32,8 +32,8 @@
 #include "tasks_def.h"
 
 #define STACKDEPTH NETWORK_STACK_DEPTH
-#define TASKPRIORITY 0
-#define TASKCORE 0
+#define TASKPRIORITY NETWORK_TASK_PRIORITY
+#define TASKCORE NETWORK_TASK_CORE
 
 /**********************
  *  STATIC PROTOTYPES

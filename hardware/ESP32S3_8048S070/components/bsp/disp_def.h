@@ -54,7 +54,7 @@ extern "C" {
 #define DISP_FB_IN_PSRAM \
   (true)  // Do not change as it is mandatory for RGB parallel interface and
           // octal PSRAM
-#define DISP_NUM_FB (2)
+#define DISP_NUM_FB (1)
 #define DISP_AVOID_TEAR_EFFECT_WITH_SEM (false)
 #define DISP_USE_BOUNCE_BUFFER (true)
 

@@ -30,10 +30,8 @@ extern "C" {
 #include "esp_err.h"
 
 /*********************
-*      DEFINES
-*********************/
-
-#define HAS_PSRAM 0
+ *      DEFINES
+ *********************/
 
 /**********************
  * GLOBAL PROTOTYPES

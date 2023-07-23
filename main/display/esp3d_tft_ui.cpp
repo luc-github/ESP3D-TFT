@@ -33,10 +33,9 @@
 #include "tasks_def.h"
 #include "version.h"
 
-#define LV_TICK_PERIOD_MS 10
 #define STACKDEPTH UI_STACK_DEPTH
-#define TASKPRIORITY 0
-#define TASKCORE 1
+#define TASKPRIORITY UI_TASK_PRIORITY
+#define TASKCORE UI_TASK_CORE
 
 /**********************
  *  STATIC PROTOTYPES
