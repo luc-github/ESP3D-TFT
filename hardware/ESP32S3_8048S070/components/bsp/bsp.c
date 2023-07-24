@@ -159,14 +159,6 @@ esp_err_t bsp_init(void) {
     return ESP_FAIL;
   }
 
-  /* Use double buffered when not working with monochrome displays */
-  /* buf2 = heap_caps_malloc(DISP_HOR_RES_MAX * 100 * sizeof(lv_color_t),
-                           MALLOC_CAP_SPIRAM);
-   if (buf2 == NULL) {
-     return ESP_FAIL;
-   }
-   */
-
   uint32_t size_in_px = DISP_HOR_RES_MAX * DISP_VER_RES_MAX / 4;
 
   /* Initialize the working buffer depending on the selected display.*/
@@ -185,6 +177,8 @@ esp_err_t bsp_init(void) {
   disp_drv.full_refresh =
       true;  // the full_refresh mode can maintain the synchronization between
              // the two frame buffers
+#else
+  disp_drv.full_refresh = false;
 #endif
   lv_disp_drv_register(&disp_drv); /*Finally register the driver*/
 

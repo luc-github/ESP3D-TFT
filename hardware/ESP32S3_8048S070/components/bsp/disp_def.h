@@ -19,7 +19,7 @@ extern "C" {
 
 #define DISP_BITS_WIDTH (16)  // RGB565 in parallel mode, thus 16bit in width
 
-#define DISP_CLK_FREQ (8000000)
+#define DISP_CLK_FREQ (16 * 1000 * 1000)
 
 #define DISP_PCLK_PIN (42)
 #define DISP_VSYNC_PIN (40)
@@ -55,8 +55,8 @@ extern "C" {
   (true)  // Do not change as it is mandatory for RGB parallel interface and
           // octal PSRAM
 #define DISP_NUM_FB (1)
-#define DISP_AVOID_TEAR_EFFECT_WITH_SEM (false)
-#define DISP_USE_BOUNCE_BUFFER (true)
+#define DISP_AVOID_TEAR_EFFECT_WITH_SEM (true)
+#define DISP_USE_BOUNCE_BUFFER (false)
 
 #define DISP_BACKLIGHT_SWITCH 1
 #define DISP_BACKLIGHT_PWM         // CONFIG_LV_DISP_BACKLIGHT_PWM
