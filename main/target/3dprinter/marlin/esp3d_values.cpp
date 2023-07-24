@@ -25,6 +25,10 @@
 #if ESP3D_DISPLAY_FEATURE
 bool status_bar_cb(ESP3DValuesIndex index, const char *value,
                    ESP3DValuesCbAction action);
+bool extruder_0_value_cb(ESP3DValuesIndex index, const char *value,
+                         ESP3DValuesCbAction action);
+bool extruder_0_target_cb(ESP3DValuesIndex index, const char *value,
+                          ESP3DValuesCbAction action);
 #endif  // ESP3D_DISPLAY_FEATURE
 
 bool ESP3DValues::intialize() {
@@ -32,15 +36,118 @@ bool ESP3DValues::intialize() {
 #if ESP3D_DISPLAY_FEATURE
   // status bar label
   _values.push_back({ESP3DValuesIndex::status_bar_label,
-                     ESP3DValuesType::string_t, 200, "", status_bar_cb});
+                     ESP3DValuesType::string_t, 200, std::string(""),
+                     status_bar_cb});
 #endif  // ESP3D_DISPLAY_FEATURE
   //  current ip
   _values.push_back({
       ESP3DValuesIndex::current_ip,
       ESP3DValuesType::string_t,
-      16,
-      "",
+      16,  // size
+      std::string("?"),
       nullptr,
   });
-  return _values.size();
+
+  //  ext 0 temperature
+  _values.push_back({
+      ESP3DValuesIndex::ext_0_temperature,
+      ESP3DValuesType::float_t,
+      2,  // precision
+      std::string("?"),
+      extruder_0_value_cb,
+  });
+
+  //  ext 1 temperature
+  _values.push_back({
+      ESP3DValuesIndex::ext_1_temperature,
+      ESP3DValuesType::float_t,
+      2,  // precision
+      std::string("?"),
+      extruder_0_target_cb,
+  });
+
+  //  bed temperature
+  _values.push_back({
+      ESP3DValuesIndex::bed_temperature,
+      ESP3DValuesType::float_t,
+      2,  // precision
+      std::string("?"),
+      nullptr,
+  });
+
+  //  ext 0 target temperature
+  _values.push_back({
+      ESP3DValuesIndex::ext_0_target_temperature,
+      ESP3DValuesType::float_t,
+      2,  // precision
+      std::string("0.00"),
+      nullptr,
+  });
+
+  //  ext 1 target temperature
+  _values.push_back({
+      ESP3DValuesIndex::ext_1_target_temperature,
+      ESP3DValuesType::float_t,
+      2,  // precision
+      std::string("0.00"),
+      nullptr,
+  });
+
+  //  bed target temperature
+  _values.push_back({
+      ESP3DValuesIndex::bed_target_temperature,
+      ESP3DValuesType::float_t,
+      2,  // precision
+      std::string("0.00"),
+      nullptr,
+  });
+
+  //  ext 0 fan speed
+  _values.push_back({
+      ESP3DValuesIndex::ext_0_fan_speed,
+      ESP3DValuesType::integer_t,
+      0,  // precision
+      std::string("100%"),
+      nullptr,
+  });
+
+  //  ext 1 fan speed
+  _values.push_back({
+      ESP3DValuesIndex::ext_1_fan_speed,
+      ESP3DValuesType::integer_t,
+      0,  // precision
+      std::string("100%"),
+      nullptr,
+  });
+
+  //  x position
+
+  _values.push_back({
+      ESP3DValuesIndex::x_position,
+      ESP3DValuesType::float_t,
+      2,  // precision
+      std::string("?"),
+      nullptr,
+  });
+
+  //  y position
+  _values.push_back({
+      ESP3DValuesIndex::y_position,
+      ESP3DValuesType::float_t,
+      2,  // precision
+      std::string("?"),
+      nullptr,
+  });
+
+  //  z position
+
+  _values.push_back({
+      ESP3DValuesIndex::z_position,
+      ESP3DValuesType::float_t,
+      2,  // precision
+      std::string("?"),
+      nullptr,
+  });
+
+  return _values.size() != 0;
 }

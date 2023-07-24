@@ -24,6 +24,7 @@
 #include "esp3d_log.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "esp3d_values.h"
 
 /**********************
  *  STATIC PROTOTYPES
@@ -41,9 +42,60 @@ void fan_screen();
 void speed_screen();
 void files_screen();
 void menu_screen();
+void main_display_extruder_0();
+
 uint8_t main_screen_temperature_target = 0;
 lv_timer_t *main_screen_delay_timer = NULL;
 ESP3DScreenType next_screen = ESP3DScreenType::none;
+
+/**********************
+ *   STATIC VARIABLES
+ **********************/
+lv_obj_t *main_btn_extruder_1 = nullptr;
+
+/**********************
+ *   GLOBAL FUNCTIONS
+ **********************/
+bool extruder_0_value_cb(ESP3DValuesIndex index, const char *value,
+                         ESP3DValuesCbAction action) {
+  if (action == ESP3DValuesCbAction::Update) {
+    if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
+      main_display_extruder_0();
+    }
+    // Todo : update other screens calling each callback update function
+  }
+  return true;
+}
+bool extruder_0_target_cb(ESP3DValuesIndex index, const char *value,
+                          ESP3DValuesCbAction action) {
+  if (action == ESP3DValuesCbAction::Update) {
+    if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
+      main_display_extruder_0();
+    }
+  }
+  return true;
+}
+
+/**********************
+ *   LOCAL FUNCTIONS
+ **********************/
+
+void main_display_extruder_0() {
+  std::string label_text1 = esp3dTftValues.get_string_value(
+      ESP3DValuesIndex::ext_0_target_temperature);
+  std::string tmpstr;
+  if (std::stod(label_text1) == 0) {
+    tmpstr = LV_SYMBOL_EXTRUDER;
+  } else {
+    tmpstr = LV_SYMBOL_HEAT_EXTRUDER;
+  }
+  lv_label_set_text_fmt(
+      lv_obj_get_child(main_btn_extruder_1, 0), "%s\n%s\n%s1",
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::ext_0_temperature),
+      esp3dTftValues.get_string_value(
+          ESP3DValuesIndex::ext_0_target_temperature),
+      tmpstr.c_str());
+}
 
 void main_screen_delay_timer_cb(lv_timer_t *timer) {
   // If timer is not null, delete it to avoid multiple call
@@ -242,12 +294,10 @@ void main_screen() {
 
   //**********************************
   // Create button and label for Extruder 0
-  std::string label_text1 =
-      "160\n260\n" + std::string(LV_SYMBOL_HEAT_EXTRUDER) + std::string("1");
-  lv_obj_t *btn1 =
-      create_menu_button(ui_top_buttons_container, label_text1.c_str());
-
-  lv_obj_add_event_cb(btn1, event_button_E0_handler, LV_EVENT_CLICKED, NULL);
+  main_btn_extruder_1 = create_menu_button(ui_top_buttons_container, "");
+  main_display_extruder_0();
+  lv_obj_add_event_cb(main_btn_extruder_1, event_button_E0_handler,
+                      LV_EVENT_CLICKED, NULL);
 
   // Create button and label for Extruder 1
   std::string label_text2 =

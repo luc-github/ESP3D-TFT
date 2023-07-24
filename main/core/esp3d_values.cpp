@@ -49,23 +49,13 @@ const ESP3DValuesDescription* ESP3DValues::get_description(
   }
   return nullptr;
 }
-uint8_t ESP3DValues::get_byte_value(ESP3DValuesIndex index) { return 0; }
-int ESP3DValues::get_integer_value(ESP3DValuesIndex index) { return 0; }
 const char* ESP3DValues::get_string_value(ESP3DValuesIndex index) {
   const ESP3DValuesDescription* e = get_description(index);
   if (e == nullptr) return nullptr;
   return e->value.c_str();
   return nullptr;
 }
-float ESP3DValues::ESP3DValues::get_float_value(ESP3DValuesIndex index) {
-  return 0.0;
-}
-bool ESP3DValues::set_byte_value(ESP3DValuesIndex index, uint8_t value) {
-  return false;
-}
-bool ESP3DValues::set_integer_value(ESP3DValuesIndex index, int value) {
-  return false;
-}
+
 bool ESP3DValues::set_string_value(ESP3DValuesIndex index, const char* value) {
   for (auto element = _values.begin(); element != _values.end(); ++element) {
     if (element->index == index) {
@@ -76,8 +66,5 @@ bool ESP3DValues::set_string_value(ESP3DValuesIndex index, const char* value) {
       return true;
     }
   }
-  return false;
-}
-bool ESP3DValues::set_float_value(ESP3DValuesIndex index, float value) {
   return false;
 }

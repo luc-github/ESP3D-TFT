@@ -25,7 +25,9 @@
 #include <functional>
 #include <list>
 #include <string>
-
+#if ESP3D_DISPLAY_FEATURE
+#include "lvgl.h"
+#endif  // ESP3D_DISPLAY_FEATURE
 #include "esp3d_values_list.h"
 
 #ifdef __cplusplus
@@ -56,6 +58,9 @@ struct ESP3DValuesDescription {
   size_t size = 0;
   std::string value = "";
   callbackFunction_t callbackFn = nullptr;
+#if ESP3D_DISPLAY_FEATURE
+  lv_obj_t* obj = nullptr;
+#endif  // ESP3D_DISPLAY_FEATURE
 };
 
 class ESP3DValues final {
@@ -65,14 +70,8 @@ class ESP3DValues final {
   bool intialize();
   void clear();
   const ESP3DValuesDescription* get_description(ESP3DValuesIndex index);
-  uint8_t get_byte_value(ESP3DValuesIndex index);
-  int get_integer_value(ESP3DValuesIndex index);
   const char* get_string_value(ESP3DValuesIndex index);
-  float get_float_value(ESP3DValuesIndex index);
-  bool set_byte_value(ESP3DValuesIndex index, uint8_t value);
-  bool set_integer_value(ESP3DValuesIndex index, int value);
   bool set_string_value(ESP3DValuesIndex index, const char* value);
-  bool set_float_value(ESP3DValuesIndex index, float value);
 
  private:
   std::list<ESP3DValuesDescription> _values;

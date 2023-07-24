@@ -34,6 +34,17 @@ extern "C" {
 enum class ESP3DValuesIndex : uint16_t {
   status_bar_label,
   current_ip,
+  ext_0_temperature,
+  ext_1_temperature,
+  bed_temperature,
+  ext_0_target_temperature,
+  ext_1_target_temperature,
+  bed_target_temperature,
+  ext_0_fan_speed,
+  ext_1_fan_speed,
+  x_position,
+  y_position,
+  z_position,
   unknown_index
 };
 
