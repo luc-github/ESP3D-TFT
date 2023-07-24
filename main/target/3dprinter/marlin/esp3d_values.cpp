@@ -27,8 +27,19 @@ bool status_bar_cb(ESP3DValuesIndex index, const char *value,
                    ESP3DValuesCbAction action);
 bool extruder_0_value_cb(ESP3DValuesIndex index, const char *value,
                          ESP3DValuesCbAction action);
-bool extruder_0_target_cb(ESP3DValuesIndex index, const char *value,
-                          ESP3DValuesCbAction action);
+bool extruder_1_value_cb(ESP3DValuesIndex index, const char *value,
+                         ESP3DValuesCbAction action);
+bool bed_value_cb(ESP3DValuesIndex index, const char *value,
+                  ESP3DValuesCbAction action);
+bool fan_value_cb(ESP3DValuesIndex index, const char *value,
+                  ESP3DValuesCbAction action);
+bool speed_value_cb(ESP3DValuesIndex index, const char *value,
+                    ESP3DValuesCbAction action);
+bool position_value_cb(ESP3DValuesIndex index, const char *value,
+                       ESP3DValuesCbAction action);
+bool print_status_value_cb(ESP3DValuesIndex index, const char *value,
+                           ESP3DValuesCbAction action);
+
 #endif  // ESP3D_DISPLAY_FEATURE
 
 bool ESP3DValues::intialize() {
@@ -63,7 +74,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::float_t,
       2,  // precision
       std::string("?"),
-      extruder_0_target_cb,
+      extruder_1_value_cb,
   });
 
   //  bed temperature
@@ -72,7 +83,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::float_t,
       2,  // precision
       std::string("?"),
-      nullptr,
+      bed_value_cb,
   });
 
   //  ext 0 target temperature
@@ -81,7 +92,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::float_t,
       2,  // precision
       std::string("0.00"),
-      nullptr,
+      extruder_0_value_cb,
   });
 
   //  ext 1 target temperature
@@ -90,7 +101,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::float_t,
       2,  // precision
       std::string("0.00"),
-      nullptr,
+      extruder_1_value_cb,
   });
 
   //  bed target temperature
@@ -99,25 +110,34 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::float_t,
       2,  // precision
       std::string("0.00"),
-      nullptr,
+      bed_value_cb,
   });
 
-  //  ext 0 fan speed
+  //  ext 0 fan
   _values.push_back({
-      ESP3DValuesIndex::ext_0_fan_speed,
+      ESP3DValuesIndex::ext_0_fan,
       ESP3DValuesType::integer_t,
       0,  // precision
-      std::string("100%"),
-      nullptr,
+      std::string("100"),
+      fan_value_cb,
   });
 
-  //  ext 1 fan speed
+  //  ext 1 fan
   _values.push_back({
-      ESP3DValuesIndex::ext_1_fan_speed,
+      ESP3DValuesIndex::ext_1_fan,
       ESP3DValuesType::integer_t,
       0,  // precision
-      std::string("100%"),
-      nullptr,
+      std::string("100"),
+      fan_value_cb,
+  });
+
+  //
+  _values.push_back({
+      ESP3DValuesIndex::speed,
+      ESP3DValuesType::integer_t,
+      0,  // precision
+      std::string("100"),
+      fan_value_cb,
   });
 
   //  x position
@@ -127,7 +147,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::float_t,
       2,  // precision
       std::string("?"),
-      nullptr,
+      position_value_cb,
   });
 
   //  y position
@@ -136,7 +156,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::float_t,
       2,  // precision
       std::string("?"),
-      nullptr,
+      position_value_cb,
   });
 
   //  z position
@@ -146,7 +166,16 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::float_t,
       2,  // precision
       std::string("?"),
-      nullptr,
+      position_value_cb,
+  });
+
+  //  print status
+  _values.push_back({
+      ESP3DValuesIndex::print_status,
+      ESP3DValuesType::string_t,
+      200,  // precision
+      std::string("idle"),
+      print_status_value_cb,
   });
 
   return _values.size() != 0;

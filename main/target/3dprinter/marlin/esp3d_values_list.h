@@ -40,11 +40,13 @@ enum class ESP3DValuesIndex : uint16_t {
   ext_0_target_temperature,
   ext_1_target_temperature,
   bed_target_temperature,
-  ext_0_fan_speed,
-  ext_1_fan_speed,
+  ext_0_fan,
+  ext_1_fan,
+  speed,
   x_position,
   y_position,
   z_position,
+  print_status,
   unknown_index
 };
 
