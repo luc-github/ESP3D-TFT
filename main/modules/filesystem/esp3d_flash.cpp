@@ -24,6 +24,11 @@
 #include <string.h>
 
 #include "esp3d_log.h"
+#if defined __has_include
+#if __has_include("bsp_patch.h")
+#include "bsp_patch.h"
+#endif  // __has_include("bsp_patch.h")
+#endif  // defined __has_include
 
 ESP3DFlash flashFs;
 
@@ -43,6 +48,12 @@ bool ESP3DFlash::accessFS(ESP3DFileSystemType FS) {
   esp3d_log("Access FS");
   if (_mounted) {
     setState(ESP3DFsState::busy);
+#if ESP3D_PATCH_FS_ACCESS_RELEASE
+    esp3d_log("apply patch");
+    if (ESP_OK != bsp_accessFs()) {
+      esp3d_log_e("Error applying patch accessing FS");
+    }
+#endif  // ESP3D_PATCH_FS_ACCESS_RELEASE
   } else {
     setState(ESP3DFsState::unknown);
   }
@@ -53,6 +64,12 @@ void ESP3DFlash::releaseFS(ESP3DFileSystemType FS) {
   (void)FS;
   esp3d_log("Release FS");
   setState(ESP3DFsState::idle);
+#if ESP3D_PATCH_FS_ACCESS_RELEASE
+  esp3d_log("revert patch");
+  if (ESP_OK != bsp_releaseFs()) {
+    esp3d_log_e("Error applying patch accessing FS");
+  }
+#endif  // ESP3D_PATCH_FS_ACCESS_RELEASE
 }
 
 ESP3DFsState ESP3DFlash::getState() {
