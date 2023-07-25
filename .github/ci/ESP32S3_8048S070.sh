@@ -10,6 +10,6 @@ sed -i 's/OPTION(ESP32_ROTRICS_DEXARM35 "TFT TARGET is ESP32 Rotrics DexArm 3.5i
 sed -i 's/ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-SRC-4832 3.5inches" ON/ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-SRC-4832 3.5inches" OFF/g' ./CMakeLists.txt
 sed -i 's/ESP32S3_8048S070 "TFT TARGET is ESP32S3 7.0inches" OFF/ESP32S3_8048S070 "TFT TARGET is ESP32S3 7.0inches" ON/g' ./CMakeLists.txt
 idf.py fullclean
-head ./CMakeLists.txt -n 8
-idf.py -DIDF_TARGET=esp32 reconfigure
+head ./CMakeLists.txt -n 9
+idf.py -DIDF_TARGET=esp32s3 reconfigure
 idf.py build
