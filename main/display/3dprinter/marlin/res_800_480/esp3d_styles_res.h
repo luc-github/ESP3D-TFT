@@ -53,7 +53,8 @@ extern "C" {
 
 #define BACK_BUTTON_WIDTH 80
 #define BACK_BUTTON_HEIGHT -1
-
+#define LIST_LINE_HEIGHT 63
+#define LIST_LINE_BUTTON_WIDTH 63
 #define MATRIX_BUTTON_HEIGHT 80
 
 #ifdef __cplusplus
