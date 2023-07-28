@@ -237,3 +237,16 @@ int esp3d_strings::find(const char* str, const char* subStr, size_t start) {
   }
   return -1;
 }
+
+int esp3d_strings::rfind(const char* str, const char* subStr, int start) {
+  if (!str || !subStr || strlen(subStr) > strlen(str)) {
+    return -1;
+  }
+  if (start == -1) start = strlen(str) - 1;
+  for (int i = start; i >= 0; i--) {
+    if (esp3d_strings::startsWith(&str[i], subStr)) {
+      return i;
+    }
+  }
+  return -1;
+}
