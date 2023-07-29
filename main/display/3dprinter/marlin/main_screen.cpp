@@ -239,7 +239,11 @@ void main_display_status_area() {
   if (label_text == "idle") {
     label_text = "Not printing";
   } else {
-    label_text = "Printing";
+    if (label_text == "paused")
+      label_text = "Printing paused: ";
+    else
+      label_text = "Printing: ";
+    label_text += esp3dTftValues.get_string_value(ESP3DValuesIndex::file_name);
   }
   // To DO : add progress
   lv_label_set_text_fmt(main_label_progression_area, "%s", label_text.c_str());
@@ -271,6 +275,7 @@ void main_display_pause() {
   } else {
     lv_obj_add_flag(main_btn_pause, LV_OBJ_FLAG_HIDDEN);
   }
+  main_display_status_area();
 }
 
 void main_display_resume() {
@@ -283,6 +288,7 @@ void main_display_resume() {
   } else {
     lv_obj_add_flag(main_btn_resume, LV_OBJ_FLAG_HIDDEN);
   }
+  main_display_status_area();
 }
 
 void main_display_stop() {
@@ -451,11 +457,20 @@ void event_button_menu_handler(lv_event_t *e) {
     main_screen_delay_timer_cb(NULL);
 }
 
-void event_button_resume_handler(lv_event_t *e) { esp3d_log("Resume Clicked"); }
+void event_button_resume_handler(lv_event_t *e) {
+  esp3d_log("Resume Clicked");
+  esp3dTftValues.set_string_value(ESP3DValuesIndex::print_status, "printing");
+}
 
-void event_button_pause_handler(lv_event_t *e) { esp3d_log("Pause Clicked"); }
+void event_button_pause_handler(lv_event_t *e) {
+  esp3d_log("Pause Clicked");
+  esp3dTftValues.set_string_value(ESP3DValuesIndex::print_status, "paused");
+}
 
-void event_button_stop_handler(lv_event_t *e) { esp3d_log("Stop Clicked"); }
+void event_button_stop_handler(lv_event_t *e) {
+  esp3d_log("Stop Clicked");
+  esp3dTftValues.set_string_value(ESP3DValuesIndex::print_status, "idle");
+}
 
 void main_screen() {
   esp3dTftui.set_current_screen(ESP3DScreenType::main);
@@ -578,7 +593,7 @@ void main_screen() {
                                                   LV_SYMBOL_SD_CARD);
   lv_obj_add_event_cb(main_btn_files, event_button_files_handler,
                       LV_EVENT_CLICKED, NULL);
-  main_display_resume();
+  main_display_files();
 
   // Create button and label for menu
   std::string label_text8 = LV_SYMBOL_LIST;

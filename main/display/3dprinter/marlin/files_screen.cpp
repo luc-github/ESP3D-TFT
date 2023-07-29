@@ -48,6 +48,20 @@ struct ESP3DFileDescriptor {
 };
 std::list<ESP3DFileDescriptor> files_list;
 
+bool playable_file(const char *name) {
+  int pos = esp3d_strings::rfind(name, ".", -1);
+  if (pos != -1) {
+    std::string ext = name + pos;
+    esp3d_strings::str_toLowerCase(&ext);
+    // TODO:
+    //  use the preferences.json list instead of hard coded list
+    if (ext == ".gcode" || ext == ".gco" || ext == ".g" || ext == ".gc") {
+      return true;
+    }
+  }
+  return false;
+}
+
 void fill_files_list() {
   files_list.clear();
   if (sd.accessFS()) {
@@ -64,6 +78,7 @@ void fill_files_list() {
           file.size = "-1";
           files_list.push_back(file);
         } else {
+          if (!playable_file(ent->d_name)) continue;
           file.name = ent->d_name;
           file.size = "0";
           std::string fullPath = "/";
@@ -143,6 +158,26 @@ void event_directory_handler(lv_event_t *e) {
   event_button_files_refresh_handler(e);
 }
 
+void event_file_handler(lv_event_t *e) {
+  ESP3DFileDescriptor *file = (ESP3DFileDescriptor *)lv_event_get_user_data(e);
+
+  esp3d_log("file Clicked: %s", file->name.c_str());
+  std::string file_path_to_play = files_path;
+  if (file_path_to_play != "/") {
+    file_path_to_play = std::string("/") + file->name;
+  } else {
+    file_path_to_play = file->name;
+  }
+  // todo play file and go to main screen
+  esp3dTftValues.set_string_value(ESP3DValuesIndex::file_path,
+                                  file_path_to_play.c_str());
+  esp3dTftValues.set_string_value(ESP3DValuesIndex::file_name,
+                                  file->name.c_str());
+  esp3dTftValues.set_string_value(ESP3DValuesIndex::print_status, "printing");
+  mainScreen::main_screen();
+}
+
+bool first_fill_needed = true;
 void files_screen() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
@@ -206,6 +241,16 @@ void files_screen() {
     lv_obj_add_event_cb(btn_prev, event_button_files_up_handler,
                         LV_EVENT_CLICKED, NULL);
   }
+  // populate if not done
+  if (first_fill_needed) {
+    if (files_list.size() == 0) {
+      lv_obj_clear_flag(files_spinner, LV_OBJ_FLAG_HIDDEN);
+      fill_files_list();
+      lv_obj_add_flag(files_spinner, LV_OBJ_FLAG_HIDDEN);
+    }
+    first_fill_needed = false;
+  }
+
   // dir first
   for (auto &file : files_list) {
     if (file.size == "-1") {
@@ -227,10 +272,9 @@ void files_screen() {
       listLine::add_label_to_line(LV_SYMBOL_FILE, line_container, false);
       listLine::add_label_to_line(file.name.c_str(), line_container, true);
       listLine::add_label_to_line(file.size.c_str(), line_container, false);
-      /*lv_obj_t *btn =
-          listLine::add_button_to_line(LV_SYMBOL_SEARCH, line_container);
-      lv_obj_add_event_cb(btn, event_directory_handler, LV_EVENT_CLICKED,
-                          &file);*/
+      lv_obj_t *btn =
+          listLine::add_button_to_line(LV_SYMBOL_PLAY, line_container);
+      lv_obj_add_event_cb(btn, event_file_handler, LV_EVENT_CLICKED, &file);
     }
   }
 

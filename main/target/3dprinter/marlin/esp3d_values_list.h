@@ -47,6 +47,8 @@ enum class ESP3DValuesIndex : uint16_t {
   y_position,
   z_position,
   print_status,
+  file_path,
+  file_name,
   unknown_index
 };
 

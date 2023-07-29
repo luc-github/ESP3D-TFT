@@ -163,6 +163,22 @@ bool ESP3DValues::intialize() {
       std::string("idle"),
       mainScreen::print_status_value_cb,
   });
+  //  file path
+  _values.push_back({
+      ESP3DValuesIndex::file_path,
+      ESP3DValuesType::string_t,
+      255,  // size
+      std::string(""),
+      nullptr,
+  });
+  //  file name
+  _values.push_back({
+      ESP3DValuesIndex::file_name,
+      ESP3DValuesType::string_t,
+      255,  // size
+      std::string(""),
+      nullptr,
+  });
 #endif  // ESP3D_DISPLAY_FEATURE
   return true;
 }
