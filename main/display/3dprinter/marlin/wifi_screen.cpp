@@ -18,28 +18,26 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "wifi_screen.h"
+
 #include <string>
 
+#include "ap_screen.h"
+#include "back_button_component.h"
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "main_container_component.h"
+#include "menu_screen.h"
+#include "sta_screen.h"
+#include "symbol_button_component.h"
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-void menu_screen();
-void ap_screen();
-void sta_screen();
-lv_obj_t *create_back_button(lv_obj_t *parent);
-lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
-                                ESP3DStyleType style);
-lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text,
-                               int width = SYMBOL_BUTTON_WIDTH,
-                               int height = SYMBOL_BUTTON_HEIGHT,
-                               bool center = true, bool slash = false,
-                               int rotation = 0);
+namespace wifiScreen {
 lv_timer_t *wifi_screen_delay_timer = NULL;
 ESP3DScreenType wifi_next_screen = ESP3DScreenType::none;
 
@@ -50,13 +48,13 @@ void wifi_screen_delay_timer_cb(lv_timer_t *timer) {
   }
   switch (wifi_next_screen) {
     case ESP3DScreenType::access_point:
-      ap_screen();
+      apScreen::ap_screen();
       break;
     case ESP3DScreenType::station:
-      sta_screen();
+      staScreen::sta_screen();
       break;
     case ESP3DScreenType::menu:
-      menu_screen();
+      menuScreen::menu_screen();
       break;
     default:
       break;
@@ -116,10 +114,10 @@ void wifi_screen() {
   lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
 
-  lv_obj_t *btnback = create_back_button(ui_new_screen);
+  lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_wifi_back_handler, LV_EVENT_CLICKED,
                       NULL);
-  lv_obj_t *ui_main_container = create_main_container(
+  lv_obj_t *ui_main_container = mainContainer::create_main_container(
       ui_new_screen, btnback, ESP3DStyleType::col_container);
 
   lv_obj_t *ui_buttons_container = lv_obj_create(ui_main_container);
@@ -131,18 +129,20 @@ void wifi_screen() {
   lv_obj_t *btn = nullptr;
 
   // Create button and label for ap
-  btn = create_symbol_button(ui_buttons_container, LV_SYMBOL_ACCESS_POINT,
-                             BUTTON_WIDTH, BUTTON_WIDTH);
+  btn = symbolButton::create_symbol_button(
+      ui_buttons_container, LV_SYMBOL_ACCESS_POINT, BUTTON_WIDTH, BUTTON_WIDTH);
   lv_obj_add_event_cb(btn, event_button_ap_handler, LV_EVENT_CLICKED, NULL);
 
   // Create button and label for sta
-  btn = create_symbol_button(ui_buttons_container, LV_SYMBOL_STATION_MODE,
-                             BUTTON_WIDTH, BUTTON_WIDTH);
+  btn = symbolButton::create_symbol_button(
+      ui_buttons_container, LV_SYMBOL_STATION_MODE, BUTTON_WIDTH, BUTTON_WIDTH);
   lv_obj_add_event_cb(btn, event_button_sta_handler, LV_EVENT_CLICKED, NULL);
 
   // Create button and label for no wifi
-  btn = create_symbol_button(ui_buttons_container, LV_SYMBOL_WIFI, BUTTON_WIDTH,
-                             BUTTON_WIDTH, true, true);
+  btn = symbolButton::create_symbol_button(ui_buttons_container, LV_SYMBOL_WIFI,
+                                           BUTTON_WIDTH, BUTTON_WIDTH, true,
+                                           true);
   lv_obj_add_event_cb(btn, event_button_no_wifi_handler, LV_EVENT_CLICKED,
                       NULL);
 }
+}  // namespace wifiScreen

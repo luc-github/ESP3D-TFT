@@ -18,31 +18,27 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "fan_screen.h"
+
+#include "back_button_component.h"
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "main_container_component.h"
+#include "main_screen.h"
+#include "symbol_button_component.h"
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 
-void main_screen();
-void fan_screen();
+namespace fanScreen {
 
 std::string fan_value = "100";
 const char *fan_buttons_map[] = {"1", "5", "10", "50", ""};
 uint8_t fan_buttons_map_id = 0;
-
-lv_obj_t *create_back_button(lv_obj_t *parent);
-lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
-                                ESP3DStyleType style);
-lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text,
-                               int width = SYMBOL_BUTTON_WIDTH,
-                               int height = SYMBOL_BUTTON_HEIGHT,
-                               bool center = true, bool slash = false,
-                               int rotation = 0);
 
 lv_timer_t *fan_screen_delay_timer = NULL;
 
@@ -51,7 +47,7 @@ void fan_screen_delay_timer_cb(lv_timer_t *timer) {
     lv_timer_del(fan_screen_delay_timer);
     fan_screen_delay_timer = NULL;
   }
-  main_screen();
+  mainScreen::main_screen();
 }
 
 void event_button_fan_back_handler(lv_event_t *e) {
@@ -143,10 +139,10 @@ void fan_screen() {
   lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
 
-  lv_obj_t *btnback = create_back_button(ui_new_screen);
+  lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_fan_back_handler, LV_EVENT_CLICKED,
                       NULL);
-  lv_obj_t *ui_main_container = create_main_container(
+  lv_obj_t *ui_main_container = mainContainer::create_main_container(
       ui_new_screen, btnback, ESP3DStyleType::simple_container);
 
   // Steps in button matrix
@@ -182,14 +178,14 @@ void fan_screen() {
   lv_obj_align_to(fan_ta, label, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
 
-  lv_obj_t *btn =
-      create_symbol_button(ui_main_container, LV_SYMBOL_UP "\n" LV_SYMBOL_PLUS);
+  lv_obj_t *btn = symbolButton::create_symbol_button(
+      ui_main_container, LV_SYMBOL_UP "\n" LV_SYMBOL_PLUS);
   lv_obj_align_to(btn, fan_ta, LV_ALIGN_OUT_TOP_MID, 0,
                   -CURRENT_BUTTON_PRESSED_OUTLINE);
   lv_obj_add_event_cb(btn, fan_btn_up_event_cb, LV_EVENT_CLICKED, fan_ta);
 
-  btn = create_symbol_button(ui_main_container,
-                             LV_SYMBOL_MINUS "\n" LV_SYMBOL_DOWN);
+  btn = symbolButton::create_symbol_button(ui_main_container,
+                                           LV_SYMBOL_MINUS "\n" LV_SYMBOL_DOWN);
   lv_obj_align_to(btn, fan_ta, LV_ALIGN_OUT_BOTTOM_MID, 0,
                   CURRENT_BUTTON_PRESSED_OUTLINE);
   lv_obj_add_event_cb(btn, fan_btn_down_event_cb, LV_EVENT_CLICKED, fan_ta);
@@ -201,11 +197,12 @@ void fan_screen() {
   lv_obj_align_to(label, fan_ta, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE, 0);
 
-  btn = create_symbol_button(ui_main_container, LV_SYMBOL_OK);
+  btn = symbolButton::create_symbol_button(ui_main_container, LV_SYMBOL_OK);
   lv_obj_align_to(btn, label, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE, 0);
   lv_obj_add_event_cb(btn, fan_btn_ok_event_cb, LV_EVENT_CLICKED, fan_ta);
-  lv_obj_t *btn2 = create_symbol_button(ui_main_container, LV_SYMBOL_GAUGE);
+  lv_obj_t *btn2 =
+      symbolButton::create_symbol_button(ui_main_container, LV_SYMBOL_GAUGE);
   lv_obj_align_to(btn2, btn, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE, 0);
   lv_obj_add_event_cb(btn2, fan_btn_reset_event_cb, LV_EVENT_CLICKED, fan_ta);
@@ -223,3 +220,4 @@ void fan_screen() {
   lv_obj_add_event_cb(fan_ta, fan_ta_event_cb, LV_EVENT_ALL, fan_kb);
   esp3dTftui.set_current_screen(ESP3DScreenType::fan);
 }
+}  // namespace fanScreen

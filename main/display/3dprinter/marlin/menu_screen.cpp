@@ -18,35 +18,30 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "menu_screen.h"
+
 #include <string>
 
+#include "back_button_component.h"
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "filament_screen.h"
+#include "informations_screen.h"
+#include "leveling_screen.h"
+#include "main_container_component.h"
+#include "main_screen.h"
+#include "menu_button_component.h"
+#include "menu_screen.h"
+#include "settings_screen.h"
+#include "symbol_button_component.h"
+#include "wifi_screen.h"
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
-void main_screen();
-void filament_screen(uint8_t target = 0);
-void settings_screen();
-void leveling_screen();
-void informations_screen();
-void wifi_screen();
-
-lv_obj_t *create_back_button(lv_obj_t *parent);
-lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
-                                ESP3DStyleType style);
-lv_obj_t *create_menu_button(lv_obj_t *container, const char *text);
-
-lv_obj_t *create_symbol_button(lv_obj_t *container, const char *symbol,
-                               int width = SYMBOL_BUTTON_WIDTH,
-                               int height = SYMBOL_BUTTON_HEIGHT,
-                               bool center = true, bool slash = false,
-                               int rotation = 0);
-
+namespace menuScreen {
 lv_timer_t *menu_screen_delay_timer = NULL;
 ESP3DScreenType menu_next_screen = ESP3DScreenType::none;
 
@@ -57,22 +52,22 @@ void menu_screen_delay_timer_cb(lv_timer_t *timer) {
   }
   switch (menu_next_screen) {
     case ESP3DScreenType::main:
-      main_screen();
+      mainScreen::main_screen();
       break;
     case ESP3DScreenType::filament:
-      filament_screen();
+      filamentScreen::filament_screen();
       break;
     case ESP3DScreenType::settings:
-      settings_screen();
+      settingsScreen::settings_screen();
       break;
     case ESP3DScreenType::leveling:
-      leveling_screen();
+      levelingScreen::leveling_screen();
       break;
     case ESP3DScreenType::informations:
-      informations_screen();
+      informationsScreen::informations_screen();
       break;
     case ESP3DScreenType::wifi:
-      wifi_screen();
+      wifiScreen::wifi_screen();
       break;
     default:
       break;
@@ -168,10 +163,10 @@ void menu_screen() {
   lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
 
-  lv_obj_t *btnback = create_back_button(ui_new_screen);
+  lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_menu_back_handler, LV_EVENT_CLICKED,
                       NULL);
-  lv_obj_t *ui_main_container = create_main_container(
+  lv_obj_t *ui_main_container = mainContainer::create_main_container(
       ui_new_screen, btnback, ESP3DStyleType::col_container);
 
   // Add buttons top container to main container
@@ -191,42 +186,45 @@ void menu_screen() {
   //**********************************
 
   // Create button and label for filament button
-  lv_obj_t *btn1 =
-      create_symbol_button(ui_top_buttons_container, LV_SYMBOL_FILAMENT,
-                           BUTTON_WIDTH, BUTTON_HEIGHT, true, false, 90);
+  lv_obj_t *btn1 = symbolButton::create_symbol_button(
+      ui_top_buttons_container, LV_SYMBOL_FILAMENT, BUTTON_WIDTH, BUTTON_HEIGHT,
+      true, false, 90);
   lv_obj_add_event_cb(btn1, event_button_filament_handler, LV_EVENT_CLICKED,
                       NULL);
 
   // Create button and label for leveling button
   std::string label2 = LV_SYMBOL_LEVELING;
-  lv_obj_t *btn2 = create_menu_button(ui_top_buttons_container, label2.c_str());
+  lv_obj_t *btn2 =
+      menuButton::create_menu_button(ui_top_buttons_container, label2.c_str());
   lv_obj_add_event_cb(btn2, event_button_leveling_handler, LV_EVENT_CLICKED,
                       NULL);
 
   // Create button and label for settings button
   std::string label3 = LV_SYMBOL_SETTINGS;
-  lv_obj_t *btn3 = create_menu_button(ui_top_buttons_container, label3.c_str());
+  lv_obj_t *btn3 =
+      menuButton::create_menu_button(ui_top_buttons_container, label3.c_str());
   lv_obj_add_event_cb(btn3, event_button_settings_handler, LV_EVENT_CLICKED,
                       NULL);
 
   // Create button and label for wifi button
   std::string label4 = LV_SYMBOL_WIFI;
-  lv_obj_t *btn4 =
-      create_menu_button(ui_bottom_buttons_container, label4.c_str());
+  lv_obj_t *btn4 = menuButton::create_menu_button(ui_bottom_buttons_container,
+                                                  label4.c_str());
   lv_obj_add_event_cb(btn4, event_button_wifi_handler, LV_EVENT_CLICKED, NULL);
 
   // Create button and label for disable steppers button
-  lv_obj_t *btn5 =
-      create_symbol_button(ui_bottom_buttons_container, LV_SYMBOL_ENGINE,
-                           BUTTON_WIDTH, BUTTON_HEIGHT, true, true, 90);
+  lv_obj_t *btn5 = symbolButton::create_symbol_button(
+      ui_bottom_buttons_container, LV_SYMBOL_ENGINE, BUTTON_WIDTH,
+      BUTTON_HEIGHT, true, true, 90);
   lv_obj_add_event_cb(btn5, event_button_disable_steppers_handler,
                       LV_EVENT_CLICKED, NULL);
 
   // Create button and label for informations button
   std::string label6 = LV_SYMBOL_MORE_INFO;
-  lv_obj_t *btn6 =
-      create_menu_button(ui_bottom_buttons_container, label6.c_str());
+  lv_obj_t *btn6 = menuButton::create_menu_button(ui_bottom_buttons_container,
+                                                  label6.c_str());
   lv_obj_add_event_cb(btn6, event_button_informations_handler, LV_EVENT_CLICKED,
                       NULL);
   esp3dTftui.set_current_screen(ESP3DScreenType::menu);
 }
+}  // namespace menuScreen

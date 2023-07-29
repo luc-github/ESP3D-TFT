@@ -18,6 +18,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "status_bar_component.h"
+
 #include <string>
 
 #include "esp3d_hal.h"
@@ -25,14 +27,12 @@
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "esp3d_values.h"
+#include "status_screen.h"
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
-void status_screen();
-extern bool status_list_cb(ESP3DValuesIndex index, const char *value,
-                           ESP3DValuesCbAction action);
+namespace statusBar {
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -47,7 +47,7 @@ bool status_bar_cb(ESP3DValuesIndex index, const char *value,
       lv_label_set_text(status_bar_label, value);
     }
   }
-  return status_list_cb(index, value, action);
+  return statusScreen::status_list_cb(index, value, action);
 }
 
 static void event_handler_status_list(lv_event_t *e) {
@@ -55,7 +55,7 @@ static void event_handler_status_list(lv_event_t *e) {
 
   if (code == LV_EVENT_CLICKED) {
     esp3d_log("Clicked");
-    status_screen();
+    statusScreen::status_screen();
   }
 }
 
@@ -83,3 +83,4 @@ lv_obj_t *status_bar(lv_obj_t *screen) {
                       LV_EVENT_CLICKED, NULL);
   return (status_bar_container);
 }
+}  // namespace statusBar

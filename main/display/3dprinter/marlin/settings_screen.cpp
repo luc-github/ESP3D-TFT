@@ -18,23 +18,22 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "settings_screen.h"
+
 #include <string>
 
+#include "back_button_component.h"
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "main_container_component.h"
+#include "menu_screen.h"
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
-void menu_screen();
-lv_obj_t *create_back_button(lv_obj_t *parent);
-lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
-                                ESP3DStyleType style);
-lv_obj_t *create_menu_button(lv_obj_t *container, const char *text);
-
+namespace settingsScreen {
 lv_timer_t *settings_screen_delay_timer = NULL;
 
 void settings_screen_delay_timer_cb(lv_timer_t *timer) {
@@ -42,7 +41,7 @@ void settings_screen_delay_timer_cb(lv_timer_t *timer) {
     lv_timer_del(settings_screen_delay_timer);
     settings_screen_delay_timer = NULL;
   }
-  menu_screen();
+  menuScreen::menu_screen();
 }
 
 void event_button_settings_back_handler(lv_event_t *e) {
@@ -68,13 +67,14 @@ void settings_screen() {
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
 
   // TODO: Add your code here
-  lv_obj_t *btnback = create_back_button(ui_new_screen);
+  lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_settings_back_handler,
                       LV_EVENT_CLICKED, NULL);
-  lv_obj_t *ui_main_container = create_main_container(
+  lv_obj_t *ui_main_container = mainContainer::create_main_container(
       ui_new_screen, btnback, ESP3DStyleType::col_container);
 
   lv_obj_set_style_bg_opa(ui_main_container, LV_OPA_COVER, LV_PART_MAIN);
   lv_obj_set_style_bg_color(ui_main_container, lv_color_white(), LV_PART_MAIN);
   esp3dTftui.set_current_screen(ESP3DScreenType::settings);
 }
+}  // namespace settingsScreen

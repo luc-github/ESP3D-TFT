@@ -1,6 +1,5 @@
 /*
-  esp3d_tft
-
+    splash_screen.h - esp3d
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
   This code is free software; you can redistribute it and/or
@@ -18,22 +17,22 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "menu_button_component.h"
+#pragma once
+
+#include <stdio.h>
 
 #include <string>
 
-#include "esp3d_hal.h"
-#include "esp3d_log.h"
 #include "esp3d_styles.h"
-#include "esp3d_tft_ui.h"
-#include "symbol_button_component.h"
+#include "esp3d_values.h"
 
-/**********************
- *  STATIC PROTOTYPES
- **********************/
-namespace menuButton {
-lv_obj_t *create_menu_button(lv_obj_t *container, const char *text) {
-  return symbolButton::create_symbol_button(container, text, BUTTON_WIDTH,
-                                            BUTTON_HEIGHT);
-}
-}  // namespace menuButton
+#ifdef __cplusplus
+extern "C" {
+#endif
+namespace splashScreen {
+extern void boot_screen();
+}  // namespace splashScreen
+
+#ifdef __cplusplus
+}  // extern "C"
+#endif

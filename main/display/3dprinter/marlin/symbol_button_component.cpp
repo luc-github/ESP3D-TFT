@@ -18,22 +18,24 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "symbol_button_component.h"
+
 #include <string>
 
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "symbol_button_component.h"
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+namespace symbolButton {
 
-lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text,
-                               int width = SYMBOL_BUTTON_WIDTH,
-                               int height = SYMBOL_BUTTON_HEIGHT,
-                               bool center = true, bool slash = false,
-                               int rotation = 0) {
+lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text, int width,
+                               int height, bool center, bool slash,
+                               int rotation) {
   lv_obj_t *btn = lv_btn_create(container);
   apply_style(btn, ESP3DStyleType::button);
   if (width != -1) lv_obj_set_width(btn, width);
@@ -62,3 +64,4 @@ lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text,
   }
   return btn;
 }
+}  // namespace symbolButton

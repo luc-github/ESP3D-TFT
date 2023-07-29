@@ -18,22 +18,24 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "empty_screen.h"
+
 #include <string>
 
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "main_screen.h"
+
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
-void main_screen();
-
+namespace emptyScreen {
 void event_button_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
-  main_screen();
+  mainScreen::main_screen();
 }
 
 void empty_screen() {
@@ -49,3 +51,5 @@ void empty_screen() {
   lv_obj_add_event_cb(ui_new_screen, event_button_handler, LV_EVENT_CLICKED,
                       NULL);
 }
+
+}  // namespace emptyScreen

@@ -18,6 +18,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "informations_screen.h"
+
+#include "back_button_component.h"
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
@@ -29,6 +32,8 @@
 #include "esp_heap_caps.h"
 #include "esp_system.h"
 #include "filesystem/esp3d_flash.h"
+#include "main_container_component.h"
+#include "menu_screen.h"
 #include "rom/ets_sys.h"
 #include "sdkconfig.h"
 #include "spi_flash_mmap.h"
@@ -41,12 +46,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-void menu_screen();
-lv_obj_t *create_back_button(lv_obj_t *parent);
-lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
-                                ESP3DStyleType style);
-lv_obj_t *create_menu_button(lv_obj_t *container, const char *text);
-
+namespace informationsScreen {
 lv_timer_t *informations_screen_delay_timer = NULL;
 
 void informations_screen_delay_timer_cb(lv_timer_t *timer) {
@@ -54,7 +54,7 @@ void informations_screen_delay_timer_cb(lv_timer_t *timer) {
     lv_timer_del(informations_screen_delay_timer);
     informations_screen_delay_timer = NULL;
   }
-  menu_screen();
+  menuScreen::menu_screen();
 }
 
 void event_button_informations_back_handler(lv_event_t *e) {
@@ -92,10 +92,10 @@ void informations_screen() {
   lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
 
-  lv_obj_t *btnback = create_back_button(ui_new_screen);
+  lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_informations_back_handler,
                       LV_EVENT_CLICKED, NULL);
-  lv_obj_t *ui_main_container = create_main_container(
+  lv_obj_t *ui_main_container = mainContainer::create_main_container(
       ui_new_screen, btnback, ESP3DStyleType::col_container);
   lv_obj_set_style_flex_flow(ui_main_container, LV_FLEX_FLOW_ROW,
                              LV_FLEX_ALIGN_SPACE_EVENLY);
@@ -168,3 +168,4 @@ void informations_screen() {
 #endif  // ESP3D_UPDATE_FEATURE
   esp3dTftui.set_current_screen(ESP3DScreenType::informations);
 }
+}  // namespace informationsScreen

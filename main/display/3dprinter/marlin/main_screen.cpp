@@ -18,30 +18,30 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "main_screen.h"
+
 #include <string>
 
+#include "empty_screen.h"
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "esp3d_values.h"
+#include "fan_screen.h"
+#include "files_screen.h"
+#include "menu_button_component.h"
+#include "menu_screen.h"
+#include "positions_screen.h"
+#include "speed_screen.h"
+#include "status_bar_component.h"
+#include "symbol_button_component.h"
+#include "temperatures_screen.h"
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-lv_obj_t *create_menu_button(lv_obj_t *container, const char *text);
-lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text,
-                               int width = SYMBOL_BUTTON_WIDTH,
-                               int height = SYMBOL_BUTTON_HEIGHT,
-                               bool center = true, bool slash = false,
-                               int rotation = 0);
-void empty_screen();
-void temperatures_screen(uint8_t target_heater);
-void positions_screen(uint8_t target = 0);
-void fan_screen();
-void speed_screen();
-void files_screen();
-void menu_screen();
+namespace mainScreen {
 void main_display_extruder_0();
 void main_display_extruder_1();
 void main_display_bed();
@@ -53,7 +53,6 @@ void main_display_pause();
 void main_display_resume();
 void main_display_stop();
 void main_display_files();
-
 uint8_t main_screen_temperature_target = 0;
 lv_timer_t *main_screen_delay_timer = NULL;
 ESP3DScreenType next_screen = ESP3DScreenType::none;
@@ -318,25 +317,25 @@ void main_screen_delay_timer_cb(lv_timer_t *timer) {
   }
   switch (next_screen) {
     case ESP3DScreenType::none:
-      empty_screen();
+      emptyScreen::empty_screen();
       break;
     case ESP3DScreenType::temperatures:
-      temperatures_screen(main_screen_temperature_target);
+      temperaturesScreen::temperatures_screen(main_screen_temperature_target);
       break;
     case ESP3DScreenType::positions:
-      positions_screen();
+      positionsScreen::positions_screen();
       break;
     case ESP3DScreenType::fan:
-      fan_screen();
+      fanScreen::fan_screen();
       break;
     case ESP3DScreenType::speed:
-      speed_screen();
+      speedScreen::speed_screen();
       break;
     case ESP3DScreenType::files:
-      files_screen();
+      filesScreen::files_screen();
       break;
     case ESP3DScreenType::menu:
-      menu_screen();
+      menuScreen::menu_screen();
       break;
 
     default:
@@ -345,8 +344,6 @@ void main_screen_delay_timer_cb(lv_timer_t *timer) {
   }
   next_screen = ESP3DScreenType::none;
 }
-
-lv_obj_t *status_bar(lv_obj_t *screen);
 
 void event_button_E0_handler(lv_event_t *e) {
   esp3d_log("E0 Clicked");
@@ -472,7 +469,7 @@ void main_screen() {
   lv_obj_del(ui_current_screen);
   apply_style(ui_main_screen, ESP3DStyleType::main_bg);
 
-  lv_obj_t *ui_status_bar_container = status_bar(ui_main_screen);
+  lv_obj_t *ui_status_bar_container = statusBar::status_bar(ui_main_screen);
   lv_obj_update_layout(ui_status_bar_container);
 
   // create container for main screen buttons
@@ -507,26 +504,28 @@ void main_screen() {
 
   //**********************************
   // Create button and label for Extruder 0
-  main_btn_extruder_0 = create_menu_button(ui_top_buttons_container, "");
+  main_btn_extruder_0 =
+      menuButton::create_menu_button(ui_top_buttons_container, "");
   main_display_extruder_0();
   lv_obj_add_event_cb(main_btn_extruder_0, event_button_E0_handler,
                       LV_EVENT_CLICKED, NULL);
 
   // Create button and label for Extruder 1
-  main_btn_extruder_1 = create_menu_button(ui_top_buttons_container, "");
+  main_btn_extruder_1 =
+      menuButton::create_menu_button(ui_top_buttons_container, "");
   main_display_extruder_1();
   lv_obj_add_event_cb(main_btn_extruder_1, event_button_E1_handler,
                       LV_EVENT_CLICKED, NULL);
 
   // Create button and label for Bed
-  main_btn_bed = create_menu_button(ui_top_buttons_container, "");
+  main_btn_bed = menuButton::create_menu_button(ui_top_buttons_container, "");
   main_display_bed();
   lv_obj_add_event_cb(main_btn_bed, event_button_Bed_handler, LV_EVENT_CLICKED,
                       NULL);
 
   // Create button and label for positions
-  main_btn_positions = create_symbol_button(ui_top_buttons_container, "",
-                                            BUTTON_WIDTH * 1.5, BUTTON_HEIGHT);
+  main_btn_positions = symbolButton::create_symbol_button(
+      ui_top_buttons_container, "", BUTTON_WIDTH * 1.5, BUTTON_HEIGHT);
   main_display_positions();
   lv_obj_add_event_cb(main_btn_positions, event_button_positions_handler,
                       LV_EVENT_CLICKED, NULL);
@@ -540,48 +539,51 @@ void main_screen() {
                   CURRENT_STATUS_AREA_HEIGHT);
 
   // Create button and label for fan
-  main_btn_fan = create_menu_button(ui_bottom_buttons_container, "");
+  main_btn_fan =
+      menuButton::create_menu_button(ui_bottom_buttons_container, "");
   main_display_fan();
   lv_obj_add_event_cb(main_btn_fan, event_button_fan_handler, LV_EVENT_CLICKED,
                       NULL);
 
   // Create button and label for speed
-  main_btn_speed = create_menu_button(ui_bottom_buttons_container, "");
+  main_btn_speed =
+      menuButton::create_menu_button(ui_bottom_buttons_container, "");
   main_display_speed();
   lv_obj_add_event_cb(main_btn_speed, event_button_speed_handler,
                       LV_EVENT_CLICKED, NULL);
 
   // Create button and label for pause
-  main_btn_pause =
-      create_menu_button(ui_bottom_buttons_container, LV_SYMBOL_PAUSE);
+  main_btn_pause = menuButton::create_menu_button(ui_bottom_buttons_container,
+                                                  LV_SYMBOL_PAUSE);
   lv_obj_add_event_cb(main_btn_pause, event_button_pause_handler,
                       LV_EVENT_CLICKED, NULL);
   main_display_pause();
 
   // Create button and label for resume
-  main_btn_resume =
-      create_menu_button(ui_bottom_buttons_container, LV_SYMBOL_PLAY);
+  main_btn_resume = menuButton::create_menu_button(ui_bottom_buttons_container,
+                                                   LV_SYMBOL_PLAY);
   lv_obj_add_event_cb(main_btn_resume, event_button_resume_handler,
                       LV_EVENT_CLICKED, NULL);
   main_display_resume();
 
   // Create button and label for stop
-  main_btn_stop =
-      create_menu_button(ui_bottom_buttons_container, LV_SYMBOL_STOP);
+  main_btn_stop = menuButton::create_menu_button(ui_bottom_buttons_container,
+                                                 LV_SYMBOL_STOP);
   lv_obj_add_event_cb(main_btn_stop, event_button_stop_handler,
                       LV_EVENT_CLICKED, NULL);
   main_display_stop();
 
   // Create button and label for files
-  main_btn_files =
-      create_menu_button(ui_bottom_buttons_container, LV_SYMBOL_SD_CARD);
+  main_btn_files = menuButton::create_menu_button(ui_bottom_buttons_container,
+                                                  LV_SYMBOL_SD_CARD);
   lv_obj_add_event_cb(main_btn_files, event_button_files_handler,
                       LV_EVENT_CLICKED, NULL);
   main_display_resume();
 
   // Create button and label for menu
   std::string label_text8 = LV_SYMBOL_LIST;
-  lv_obj_t *btn8 =
-      create_menu_button(ui_bottom_buttons_container, LV_SYMBOL_LIST);
+  lv_obj_t *btn8 = menuButton::create_menu_button(ui_bottom_buttons_container,
+                                                  LV_SYMBOL_LIST);
   lv_obj_add_event_cb(btn8, event_button_menu_handler, LV_EVENT_CLICKED, NULL);
 }
+}  // namespace mainScreen

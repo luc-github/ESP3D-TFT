@@ -1,6 +1,6 @@
 
 /*
-  esp3d_values.cpp -  values esp3d functions class
+  esp3d_styles.cpp -  values esp3d functions class
 
   Copyright (c) 2014 Luc Lebosse. All rights reserved.
 

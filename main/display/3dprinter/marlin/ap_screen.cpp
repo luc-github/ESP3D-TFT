@@ -18,27 +18,24 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "ap_screen.h"
+
 #include <string>
 
+#include "back_button_component.h"
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "main_container_component.h"
+#include "symbol_button_component.h"
+#include "wifi_screen.h"
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-void wifi_screen();
-lv_obj_t *create_back_button(lv_obj_t *parent);
-lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
-                                ESP3DStyleType style);
-lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text,
-                               int width = SYMBOL_BUTTON_WIDTH,
-                               int height = SYMBOL_BUTTON_HEIGHT,
-                               bool center = true, bool slash = false,
-                               int rotation = 0);
-
+namespace apScreen {
 lv_timer_t *ap_screen_delay_timer = NULL;
 lv_obj_t *ap_ta_ssid = NULL;
 lv_obj_t *ap_ta_password = NULL;
@@ -52,7 +49,7 @@ void ap_screen_delay_timer_cb(lv_timer_t *timer) {
     lv_timer_del(ap_screen_delay_timer);
     ap_screen_delay_timer = NULL;
   }
-  wifi_screen();
+  wifiScreen::wifi_screen();
 }
 
 void event_button_ap_back_handler(lv_event_t *e) {
@@ -116,10 +113,10 @@ void ap_screen() {
   lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
 
-  lv_obj_t *btnback = create_back_button(ui_new_screen);
+  lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_ap_back_handler, LV_EVENT_CLICKED,
                       NULL);
-  lv_obj_t *ui_main_container = create_main_container(
+  lv_obj_t *ui_main_container = mainContainer::create_main_container(
       ui_new_screen, btnback, ESP3DStyleType::simple_container);
 
   // SSID
@@ -208,16 +205,18 @@ void ap_screen() {
   lv_obj_t *btn = nullptr;
 
   // Create button and label for search
-  btn = create_symbol_button(ui_main_container, LV_SYMBOL_OK,
-                             SYMBOL_BUTTON_WIDTH, SYMBOL_BUTTON_WIDTH);
+  btn = symbolButton::create_symbol_button(ui_main_container, LV_SYMBOL_OK,
+                                           SYMBOL_BUTTON_WIDTH,
+                                           SYMBOL_BUTTON_WIDTH);
 
   lv_obj_add_event_cb(btn, ap_event_button_ok_handler, LV_EVENT_CLICKED, NULL);
   lv_obj_align(btn, LV_ALIGN_TOP_RIGHT, 0, 0);
 
   // Create button and label for apply
   lv_obj_t *btn2 = nullptr;
-  btn2 = create_symbol_button(ui_main_container, LV_SYMBOL_SEARCH,
-                              SYMBOL_BUTTON_WIDTH, SYMBOL_BUTTON_WIDTH);
+  btn2 = symbolButton::create_symbol_button(ui_main_container, LV_SYMBOL_SEARCH,
+                                            SYMBOL_BUTTON_WIDTH,
+                                            SYMBOL_BUTTON_WIDTH);
 
   lv_obj_add_event_cb(btn2, ap_event_button_search_handler, LV_EVENT_CLICKED,
                       NULL);
@@ -225,3 +224,4 @@ void ap_screen() {
                   -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
   esp3dTftui.set_current_screen(ESP3DScreenType::access_point);
 }
+}  // namespace apScreen

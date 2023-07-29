@@ -18,19 +18,22 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "temperatures_screen.h"
+
+#include "back_button_component.h"
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "main_screen.h"
+#include "symbol_button_component.h"
 #include "translations/esp3d_translation_service.h"
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
-void main_screen();
-void temperatures_screen(uint8_t target);
+namespace temperaturesScreen {
 std::string temperatures_value = "10";
 const char *temperatures_buttons_map[] = {"1", "10", "50", "100", ""};
 uint8_t temperatures_buttons_map_id = 0;
@@ -45,15 +48,6 @@ uint8_t heater_buttons_map_id = 0;
 lv_obj_t *label_current_temperature_value = NULL;
 lv_obj_t *label_current_temperature = NULL;
 
-lv_obj_t *create_back_button(lv_obj_t *parent);
-lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
-                                ESP3DStyleType style);
-lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text,
-                               int width = SYMBOL_BUTTON_WIDTH,
-                               int height = SYMBOL_BUTTON_HEIGHT,
-                               bool center = true, bool slash = false,
-                               int rotation = 0);
-
 lv_timer_t *temperatures_screen_delay_timer = NULL;
 
 void temperatures_screen_delay_timer_cb(lv_timer_t *timer) {
@@ -61,7 +55,7 @@ void temperatures_screen_delay_timer_cb(lv_timer_t *timer) {
     lv_timer_del(temperatures_screen_delay_timer);
     temperatures_screen_delay_timer = NULL;
   }
-  main_screen();
+  mainScreen::main_screen();
 }
 
 void event_button_temperatures_back_handler(lv_event_t *e) {
@@ -177,7 +171,7 @@ void temperatures_screen(uint8_t target) {
   lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
   // back button
-  lv_obj_t *btnback = create_back_button(ui_new_screen);
+  lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_temperatures_back_handler,
                       LV_EVENT_CLICKED, NULL);
 
@@ -207,7 +201,7 @@ void temperatures_screen(uint8_t target) {
                   -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
 
   // Power off all heater
-  lv_obj_t *btn_power_off_all = create_symbol_button(
+  lv_obj_t *btn_power_off_all = symbolButton::create_symbol_button(
       ui_new_screen, LV_SYMBOL_POWER "...", -1, MATRIX_BUTTON_HEIGHT);
   lv_obj_align_to(btn_power_off_all, btnm_target, LV_ALIGN_OUT_LEFT_BOTTOM,
                   -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
@@ -240,8 +234,8 @@ void temperatures_screen(uint8_t target) {
                   LV_ALIGN_OUT_RIGHT_MID, CURRENT_BUTTON_PRESSED_OUTLINE / 2,
                   0);
   // Button up
-  lv_obj_t *btn_up =
-      create_symbol_button(ui_new_screen, LV_SYMBOL_UP "\n" LV_SYMBOL_PLUS);
+  lv_obj_t *btn_up = symbolButton::create_symbol_button(
+      ui_new_screen, LV_SYMBOL_UP "\n" LV_SYMBOL_PLUS);
   lv_obj_align_to(btn_up, label_current_temperature_value,
                   LV_ALIGN_OUT_BOTTOM_MID, 0, CURRENT_BUTTON_PRESSED_OUTLINE);
   // Text area
@@ -283,13 +277,15 @@ void temperatures_screen(uint8_t target) {
   lv_obj_align_to(label_unit2, temperatures_ta, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
   // set button
-  lv_obj_t *btn_set = create_symbol_button(ui_new_screen, LV_SYMBOL_OK);
+  lv_obj_t *btn_set =
+      symbolButton::create_symbol_button(ui_new_screen, LV_SYMBOL_OK);
   lv_obj_align_to(btn_set, label_unit2, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE, 0);
   lv_obj_add_event_cb(btn_set, temperatures_btn_ok_event_cb, LV_EVENT_CLICKED,
                       temperatures_ta);
   // Power off button to 0
-  lv_obj_t *btn_stop = create_symbol_button(ui_new_screen, LV_SYMBOL_POWER);
+  lv_obj_t *btn_stop =
+      symbolButton::create_symbol_button(ui_new_screen, LV_SYMBOL_POWER);
   lv_obj_align_to(btn_stop, btn_set, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE, 0);
   lv_obj_add_event_cb(btn_stop, temperatures_btn_power_off_event_cb,
@@ -311,8 +307,8 @@ void temperatures_screen(uint8_t target) {
   lv_obj_add_event_cb(temperatures_ta, temperatures_ta_event_cb, LV_EVENT_ALL,
                       temperatures_kb);
   // Button down
-  lv_obj_t *btn_down =
-      create_symbol_button(ui_new_screen, LV_SYMBOL_MINUS "\n" LV_SYMBOL_DOWN);
+  lv_obj_t *btn_down = symbolButton::create_symbol_button(
+      ui_new_screen, LV_SYMBOL_MINUS "\n" LV_SYMBOL_DOWN);
   lv_obj_align_to(btn_down, temperatures_ta, LV_ALIGN_OUT_BOTTOM_MID, 0,
                   CURRENT_BUTTON_PRESSED_OUTLINE / 2);
   lv_obj_add_event_cb(btn_down, temperatures_btn_down_event_cb,
@@ -320,3 +316,4 @@ void temperatures_screen(uint8_t target) {
 
   esp3dTftui.set_current_screen(ESP3DScreenType::temperatures);
 }
+}  // namespace temperaturesScreen

@@ -18,22 +18,26 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "splash_screen.h"
+
 #include <string>
 
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "main_screen.h"
 #include "version.h"
+
 
 LV_IMG_DECLARE(logo_esp3d_tft);
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+namespace splashScreen {
 lv_timer_t *boot_timer = NULL;
 
-void main_screen();
 void splash_screen();
 
 void splash_in_timer_cb(lv_timer_t *timer) {
@@ -53,7 +57,7 @@ void main_screen_timer_cb(lv_timer_t *timer) {
     boot_timer = NULL;
   }
   // Call main screen
-  main_screen();
+  mainScreen::main_screen();
 }
 
 void boot_screen() {
@@ -81,3 +85,5 @@ void splash_screen() {
   boot_timer = lv_timer_create(main_screen_timer_cb, 2000, NULL);
   esp3dTftui.set_current_screen(ESP3DScreenType::splash);
 }
+
+}  // namespace splashScreen

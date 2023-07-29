@@ -18,6 +18,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "status_screen.h"
+
 #include <list>
 #include <string>
 
@@ -26,15 +28,15 @@
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "esp3d_values.h"
+#include "main_screen.h"
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+namespace statusScreen {
 static std::list<std::string> ui_status_screen_list;
 
 #define MAX_STATUS_SCREEN_LIST 10
-void main_screen();
-void status_screen();
 
 bool status_list_cb(ESP3DValuesIndex index, const char *value,
                     ESP3DValuesCbAction action) {
@@ -74,7 +76,7 @@ static void event_handler_button_back(lv_event_t *e) {
   lv_event_code_t code = lv_event_get_code(e);
   if (code == LV_EVENT_CLICKED) {
     esp3d_log("Clicked");
-    main_screen();
+    mainScreen::main_screen();
   }
 }
 
@@ -120,3 +122,4 @@ void status_screen() {
   lv_obj_set_width(ui_status_list_ctl, LV_HOR_RES);
   esp3dTftui.set_current_screen(ESP3DScreenType::status_list);
 }
+}  // namespace statusScreen

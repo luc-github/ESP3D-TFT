@@ -18,6 +18,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "main_container_component.h"
+
 #include <string>
 
 #include "esp3d_hal.h"
@@ -28,7 +30,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
+namespace mainContainer {
 lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
                                 ESP3DStyleType style) {
   lv_obj_t *ui_container = lv_obj_create(parent);
@@ -42,3 +44,4 @@ lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
                            LV_PART_MAIN);
   return ui_container;
 }
+}  // namespace mainContainer

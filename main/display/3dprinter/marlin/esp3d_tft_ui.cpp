@@ -19,12 +19,12 @@
 */
 #include "esp3d_log.h"
 #include "esp3d_styles.h"
+#include "splash_screen.h"
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-void boot_screen();
 
 void create_application(void) {
   init_styles();
-  boot_screen();
+  splashScreen::boot_screen();
 }

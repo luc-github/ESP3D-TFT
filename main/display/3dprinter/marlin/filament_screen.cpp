@@ -18,19 +18,24 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "filament_screen.h"
+
+#include "back_button_component.h"
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "menu_screen.h"
+#include "symbol_button_component.h"
 #include "translations/esp3d_translation_service.h"
+
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 
-void menu_screen();
-void filament_screen(uint8_t target = 0);
+namespace filamentScreen {
 std::string distance_value = "1";
 
 const char *filament_buttons_map[] = {"1", "10", "50", "100", ""};
@@ -44,15 +49,6 @@ uint8_t extruder_buttons_map_id = 0;
 lv_obj_t *label_current_distance_value = NULL;
 lv_obj_t *label_current_filament = NULL;
 
-lv_obj_t *create_back_button(lv_obj_t *parent);
-lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
-                                ESP3DStyleType style);
-lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text,
-                               int width = SYMBOL_BUTTON_WIDTH,
-                               int height = SYMBOL_BUTTON_HEIGHT,
-                               bool center = true, bool slash = false,
-                               int rotation = 0);
-
 lv_timer_t *filament_screen_delay_timer = NULL;
 
 void filament_screen_delay_timer_cb(lv_timer_t *timer) {
@@ -60,7 +56,7 @@ void filament_screen_delay_timer_cb(lv_timer_t *timer) {
     lv_timer_del(filament_screen_delay_timer);
     filament_screen_delay_timer = NULL;
   }
-  menu_screen();
+  menuScreen::menu_screen();
 }
 
 void event_button_filament_back_handler(lv_event_t *e) {
@@ -171,28 +167,28 @@ void filament_screen(uint8_t target) {
   lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
   // back button
-  lv_obj_t *btnback = create_back_button(ui_new_screen);
+  lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_filament_back_handler,
                       LV_EVENT_CLICKED, NULL);
 
   // Steps in button bar
   // 100 mm
-  lv_obj_t *btn_100 = create_symbol_button(
+  lv_obj_t *btn_100 = symbolButton::create_symbol_button(
       ui_new_screen, "100", MATRIX_BUTTON_HEIGHT, MATRIX_BUTTON_HEIGHT);
   lv_obj_align(btn_100, LV_ALIGN_TOP_RIGHT, -CURRENT_BUTTON_PRESSED_OUTLINE,
                CURRENT_BUTTON_PRESSED_OUTLINE / 2);
   // 50 mm
-  lv_obj_t *btn_50 = create_symbol_button(
+  lv_obj_t *btn_50 = symbolButton::create_symbol_button(
       ui_new_screen, "50", MATRIX_BUTTON_HEIGHT, MATRIX_BUTTON_HEIGHT);
   lv_obj_align_to(btn_50, btn_100, LV_ALIGN_OUT_LEFT_MID,
                   -CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
   // 10 mm
-  lv_obj_t *btn_10 = create_symbol_button(
+  lv_obj_t *btn_10 = symbolButton::create_symbol_button(
       ui_new_screen, "10", MATRIX_BUTTON_HEIGHT, MATRIX_BUTTON_HEIGHT);
   lv_obj_align_to(btn_10, btn_50, LV_ALIGN_OUT_LEFT_MID,
                   -CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
   // 1 mm
-  lv_obj_t *btn_1 = create_symbol_button(
+  lv_obj_t *btn_1 = symbolButton::create_symbol_button(
       ui_new_screen, "1", MATRIX_BUTTON_HEIGHT, MATRIX_BUTTON_HEIGHT);
   lv_obj_align_to(btn_1, btn_10, LV_ALIGN_OUT_LEFT_MID,
                   -CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
@@ -243,8 +239,8 @@ void filament_screen(uint8_t target) {
                   LV_ALIGN_OUT_RIGHT_MID, CURRENT_BUTTON_PRESSED_OUTLINE / 2,
                   0);
   // Button up
-  lv_obj_t *btn_up =
-      create_symbol_button(ui_new_screen, LV_SYMBOL_UP "\n" LV_SYMBOL_PLUS);
+  lv_obj_t *btn_up = symbolButton::create_symbol_button(
+      ui_new_screen, LV_SYMBOL_UP "\n" LV_SYMBOL_PLUS);
   lv_obj_align_to(btn_up, label_current_distance_value, LV_ALIGN_OUT_BOTTOM_MID,
                   0, CURRENT_BUTTON_PRESSED_OUTLINE);
   // Text area
@@ -314,8 +310,8 @@ void filament_screen(uint8_t target) {
   lv_obj_add_event_cb(distance_ta, distance_ta_event_cb, LV_EVENT_ALL,
                       filament_kb);
   // Button down
-  lv_obj_t *btn_down =
-      create_symbol_button(ui_new_screen, LV_SYMBOL_MINUS "\n" LV_SYMBOL_DOWN);
+  lv_obj_t *btn_down = symbolButton::create_symbol_button(
+      ui_new_screen, LV_SYMBOL_MINUS "\n" LV_SYMBOL_DOWN);
   lv_obj_align_to(btn_down, distance_ta, LV_ALIGN_OUT_BOTTOM_MID, 0,
                   CURRENT_BUTTON_PRESSED_OUTLINE / 2);
   lv_obj_add_event_cb(btn_down, filament_btn_down_event_cb, LV_EVENT_CLICKED,
@@ -323,3 +319,4 @@ void filament_screen(uint8_t target) {
 
   esp3dTftui.set_current_screen(ESP3DScreenType::filament);
 }
+}  // namespace filamentScreen

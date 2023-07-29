@@ -18,26 +18,28 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "back_button_component.h"
+
 #include <string>
 
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "symbol_button_component.h"
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text,
-                               int width = SYMBOL_BUTTON_WIDTH,
-                               int height = SYMBOL_BUTTON_HEIGHT,
-                               bool center = true, bool slash = false,
-                               int rotation = 0);
+
+namespace backButton {
 
 lv_obj_t *create_back_button(lv_obj_t *parent) {
-  lv_obj_t *btn = create_symbol_button(parent, LV_SYMBOL_NEW_LINE,
-                                       BACK_BUTTON_WIDTH, BACK_BUTTON_HEIGHT);
+  lv_obj_t *btn = symbolButton::create_symbol_button(
+      parent, LV_SYMBOL_NEW_LINE, BACK_BUTTON_WIDTH, BACK_BUTTON_HEIGHT);
   lv_obj_align(btn, LV_ALIGN_BOTTOM_RIGHT, -CURRENT_BUTTON_PRESSED_OUTLINE,
                -CURRENT_BUTTON_PRESSED_OUTLINE);
   return btn;
 }
+
+}  // namespace backButton
