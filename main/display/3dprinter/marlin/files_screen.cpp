@@ -28,6 +28,7 @@
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "filesystem/esp3d_sd.h"
 #include "list_line_component.h"
 #include "main_screen.h"
 #include "symbol_button_component.h"
@@ -40,12 +41,66 @@ namespace filesScreen {
 lv_timer_t *files_screen_delay_timer = NULL;
 lv_obj_t *ui_files_list_ctl = NULL;
 lv_obj_t *files_spinner = NULL;
-std::string files_path = "/mypath/from/esp3d";
+std::string files_path = "/";
 struct ESP3DFileDescriptor {
   std::string name;
   std::string size;
 };
 std::list<ESP3DFileDescriptor> files_list;
+
+void fill_files_list() {
+  files_list.clear();
+  if (sd.accessFS()) {
+    DIR *dir = sd.opendir(files_path.c_str());
+    if (dir) {
+      struct dirent *ent;
+      struct stat entry_stat;
+      while ((ent = readdir(dir)) != NULL) {
+        ESP3DFileDescriptor file;
+        if (ent->d_type == DT_DIR) {
+          if (strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0)
+            continue;
+          file.name = ent->d_name;
+          file.size = "-1";
+          files_list.push_back(file);
+        } else {
+          file.name = ent->d_name;
+          file.size = "0";
+          std::string fullPath = "/";
+          if (files_path != "/") {
+            fullPath = files_path + std::string("/") + ent->d_name;
+          } else {
+            fullPath += ent->d_name;
+          }
+          if (sd.stat(fullPath.c_str(), &entry_stat) == -1) {
+            esp3d_log_e("Failed to stat %s : %s",
+                        ent->d_type == DT_DIR ? "DIR" : "FILE", ent->d_name);
+            continue;
+          }
+          esp3d_log("File size is %ld", entry_stat.st_size);
+          file.size = esp3d_strings::formatBytes(entry_stat.st_size);
+          files_list.push_back(file);
+        }
+        esp3d_log("Found %s, %s", file.name.c_str(), file.size.c_str());
+      }
+      esp3d_log("Files list size %d", files_list.size());
+      closedir(dir);
+    }
+    sd.releaseFS();
+  }
+}
+
+void event_button_files_refresh_handler(lv_event_t *e) {
+  esp3d_log("refresh Clicked");
+  lv_obj_clear_flag(files_spinner, LV_OBJ_FLAG_HIDDEN);
+  size_t i = lv_obj_get_child_cnt(ui_files_list_ctl);
+  while (i > 0) {
+    lv_obj_del(lv_obj_get_child(ui_files_list_ctl, 0));
+    i--;
+  }
+  fill_files_list();
+  files_screen();
+}
 
 void event_button_files_up_handler(lv_event_t *e) {
   int pos = esp3d_strings::rfind(files_path.c_str(), "/", -1);
@@ -54,7 +109,7 @@ void event_button_files_up_handler(lv_event_t *e) {
   if (newpath == "") newpath = "/";
   esp3d_log("old path %s, new path %s", files_path.c_str(), newpath.c_str());
   files_path = newpath;
-  files_screen();
+  event_button_files_refresh_handler(e);
 }
 
 void files_screen_delay_timer_cb(lv_timer_t *timer) {
@@ -76,14 +131,16 @@ void event_button_files_back_handler(lv_event_t *e) {
   }
 }
 
-void event_button_files_refresh_handler(lv_event_t *e) {
-  esp3d_log("refresh Clicked");
-  lv_obj_clear_flag(files_spinner, LV_OBJ_FLAG_HIDDEN);
-  size_t i = lv_obj_get_child_cnt(ui_files_list_ctl);
-  while (i > 0) {
-    lv_obj_del(lv_obj_get_child(ui_files_list_ctl, 0));
-    i--;
+void event_directory_handler(lv_event_t *e) {
+  ESP3DFileDescriptor *file = (ESP3DFileDescriptor *)lv_event_get_user_data(e);
+
+  esp3d_log("dir Clicked: %s", file->name.c_str());
+  if (files_path != "/") {
+    files_path += std::string("/") + file->name;
+  } else {
+    files_path += file->name;
   }
+  event_button_files_refresh_handler(e);
 }
 
 void files_screen() {
@@ -149,16 +206,32 @@ void files_screen() {
     lv_obj_add_event_cb(btn_prev, event_button_files_up_handler,
                         LV_EVENT_CLICKED, NULL);
   }
+  // dir first
+  for (auto &file : files_list) {
+    if (file.size == "-1") {
+      lv_obj_t *line_container =
+          listLine::create_list_line_container(ui_files_list_ctl);
+      listLine::add_label_to_line(LV_SYMBOL_FOLDER, line_container, false);
+      listLine::add_label_to_line(file.name.c_str(), line_container, true);
+      lv_obj_t *btn =
+          listLine::add_button_to_line(LV_SYMBOL_SEARCH, line_container);
+      lv_obj_add_event_cb(btn, event_directory_handler, LV_EVENT_CLICKED,
+                          &file);
+    }
+  }
 
-  for (uint8_t i = 0; i < 20; i++) {
-    lv_obj_t *line_container =
-        listLine::create_list_line_container(ui_files_list_ctl);
-    lv_obj_t *h =
-        listLine::add_label_to_line(LV_SYMBOL_FOLDER, line_container, false);
-    lv_obj_t *n =
-        listLine::add_label_to_line("Directory name", line_container, true);
-    lv_obj_t *btn =
-        listLine::add_button_to_line(LV_SYMBOL_SEARCH, line_container);
+  for (auto &file : files_list) {
+    if (file.size != "-1") {
+      lv_obj_t *line_container =
+          listLine::create_list_line_container(ui_files_list_ctl);
+      listLine::add_label_to_line(LV_SYMBOL_FILE, line_container, false);
+      listLine::add_label_to_line(file.name.c_str(), line_container, true);
+      listLine::add_label_to_line(file.size.c_str(), line_container, false);
+      /*lv_obj_t *btn =
+          listLine::add_button_to_line(LV_SYMBOL_SEARCH, line_container);
+      lv_obj_add_event_cb(btn, event_directory_handler, LV_EVENT_CLICKED,
+                          &file);*/
+    }
   }
 
   esp3dTftui.set_current_screen(ESP3DScreenType::files);
