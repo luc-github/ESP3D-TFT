@@ -20,11 +20,11 @@
 
 #include "wifi_status_component.h"
 
-#include <string>
-
 #include "esp3d_log.h"
+#include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "network/esp3d_network.h"
 
 /**********************
  *  STATIC PROTOTYPES
@@ -34,13 +34,29 @@ namespace wifiStatus {
  *  STATIC VARIABLES
  **********************/
 lv_obj_t *wifi_mode_label = nullptr;
-lv_obj_t *wifi_status_led = nullptr;
 lv_obj_t *wifi_signal = nullptr;
 
-void wifi_display_led() {
-  lv_obj_add_flag(wifi_status_led, LV_OBJ_FLAG_HIDDEN);
+void wifi_display_signal() {
+  //
+  std::string mode =
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
+  std::string status =
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::network_status);
+  if (mode == LV_SYMBOL_STATION_MODE && status == "+") {
+    wifi_ap_record_t ap;
+    esp_err_t res = esp_wifi_sta_get_ap_info(&ap);
+    if (res == ESP_OK) {
+      int32_t signal = esp3dNetwork.getSignal(ap.rssi, false);
+      std::string tmpstr = std::to_string(signal);
+      tmpstr += "%";
+      lv_label_set_text(wifi_signal, tmpstr.c_str());
+    } else {
+      lv_label_set_text(wifi_signal, "?%");
+    }
+  } else {
+    lv_obj_add_flag(wifi_signal, LV_OBJ_FLAG_HIDDEN);
+  }
 }
-void wifi_display_signal() { lv_obj_add_flag(wifi_signal, LV_OBJ_FLAG_HIDDEN); }
 void wifi_display_mode() {
   std::string label_text =
       esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
@@ -49,28 +65,38 @@ void wifi_display_mode() {
 
 lv_obj_t *wifi_status(lv_obj_t *parent, lv_obj_t *btnback) {
   lv_obj_update_layout(btnback);
-  // Connection status
-  wifi_status_led = lv_led_create(parent);
-  lv_led_set_brightness(wifi_status_led, 255);
-  lv_obj_align_to(wifi_status_led, btnback, LV_ALIGN_OUT_LEFT_MID,
-                  -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
-  lv_led_set_color(wifi_status_led, lv_palette_main(LV_PALETTE_RED));
+  lv_obj_t *status_container = lv_obj_create(parent);
+  apply_style(status_container, ESP3DStyleType::default_style);
+  lv_obj_clear_flag(status_container, LV_OBJ_FLAG_SCROLLABLE);
+  lv_obj_set_size(status_container,
+                  LV_HOR_RES - (lv_obj_get_width(btnback) +
+                                (2 * CURRENT_BUTTON_PRESSED_OUTLINE)),
+                  LV_SIZE_CONTENT);
+  lv_obj_set_style_pad_all(status_container, 0, LV_PART_MAIN);
+  lv_obj_set_style_layout(status_container, LV_LAYOUT_FLEX, LV_PART_MAIN);
+  lv_obj_set_style_flex_flow(status_container, LV_FLEX_FLOW_ROW_REVERSE,
+                             LV_PART_MAIN);
+  lv_obj_set_style_pad_column(status_container,
+                              CURRENT_BUTTON_PRESSED_OUTLINE / 2, LV_PART_MAIN);
+  lv_obj_set_style_flex_main_place(status_container, LV_FLEX_ALIGN_END,
+                                   LV_PART_MAIN);
+
   // signal
-  wifi_signal = lv_label_create(parent);
-  lv_obj_align_to(wifi_signal, btnback, LV_ALIGN_OUT_LEFT_MID,
-                  -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+  wifi_signal = lv_label_create(status_container);
+
   lv_label_set_text(wifi_signal, "?");
 
   // Connection type
-  wifi_mode_label = lv_label_create(parent);
-  lv_obj_align_to(wifi_mode_label, wifi_status_led, LV_ALIGN_OUT_LEFT_MID, 0,
-                  0);
-  lv_label_set_text(wifi_mode_label, "?");
+  wifi_mode_label = lv_label_create(status_container);
 
-  wifi_display_led();
+  lv_label_set_text(wifi_mode_label, "?");
+  lv_obj_update_layout(status_container);
+  lv_obj_align_to(status_container, btnback, LV_ALIGN_OUT_LEFT_MID,
+                  -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+
   wifi_display_signal();
   wifi_display_mode();
-  return wifi_mode_label;
+  return status_container;
 }
 
 bool network_status_value_cb(ESP3DValuesIndex index, const char *value,
@@ -79,7 +105,6 @@ bool network_status_value_cb(ESP3DValuesIndex index, const char *value,
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::wifi ||
         esp3dTftui.get_current_screen() == ESP3DScreenType::station ||
         esp3dTftui.get_current_screen() == ESP3DScreenType::access_point) {
-      wifi_display_led();
       wifi_display_signal();
       wifi_display_mode();
     } else {
