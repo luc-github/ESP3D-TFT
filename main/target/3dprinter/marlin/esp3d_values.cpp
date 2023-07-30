@@ -25,6 +25,7 @@
 #if ESP3D_DISPLAY_FEATURE
 #include "main_screen.h"
 #include "status_bar_component.h"
+#include "wifi_status_component.h"
 
 #endif  // ESP3D_DISPLAY_FEATURE
 
@@ -178,6 +179,22 @@ bool ESP3DValues::intialize() {
       255,  // size
       std::string(""),
       nullptr,
+  });
+  //  network status
+  _values.push_back({
+      ESP3DValuesIndex::network_status,
+      ESP3DValuesType::string_t,
+      1,  // size
+      std::string("?"),
+      wifiStatus::network_status_value_cb,
+  });
+  //  network mode
+  _values.push_back({
+      ESP3DValuesIndex::network_mode,
+      ESP3DValuesType::string_t,
+      1,  // size
+      std::string("?"),
+      wifiStatus::network_mode_value_cb,
   });
 #endif  // ESP3D_DISPLAY_FEATURE
   return true;

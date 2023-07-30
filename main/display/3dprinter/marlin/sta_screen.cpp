@@ -31,7 +31,7 @@
 #include "main_container_component.h"
 #include "symbol_button_component.h"
 #include "wifi_screen.h"
-
+#include "wifi_status_component.h"
 
 /**********************
  *  STATIC PROTOTYPES
@@ -190,18 +190,7 @@ void sta_screen() {
   lv_obj_add_flag(sta_spinner, LV_OBJ_FLAG_HIDDEN);
   lv_obj_add_flag(ui_sta_ssid_list_ctl, LV_OBJ_FLAG_HIDDEN);
 
-  // Connection status
-  sta_connection_status = lv_led_create(ui_new_screen);
-  lv_led_set_brightness(sta_connection_status, 255);
-  lv_obj_align_to(sta_connection_status, btnback, LV_ALIGN_OUT_LEFT_MID,
-                  -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
-  lv_led_set_color(sta_connection_status, lv_palette_main(LV_PALETTE_RED));
-
-  // Connection type
-  sta_connection_type = lv_label_create(ui_new_screen);
-  lv_obj_align_to(sta_connection_type, sta_connection_status,
-                  LV_ALIGN_OUT_LEFT_MID, 0, 0);
-  lv_label_set_text(sta_connection_type, LV_SYMBOL_STATION_MODE);
+  wifiStatus::wifi_status(ui_new_screen, btnback);
 
   lv_obj_t *btn = nullptr;
 

@@ -33,6 +33,7 @@
 #include "menu_screen.h"
 #include "sta_screen.h"
 #include "symbol_button_component.h"
+#include "wifi_status_component.h"
 
 /**********************
  *  STATIC PROTOTYPES
@@ -104,7 +105,7 @@ void event_button_no_wifi_handler(lv_event_t *e) {
 }
 
 void wifi_screen() {
-  esp3dTftui.set_current_screen(ESP3DScreenType::wifi);
+  esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Wifi screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
@@ -117,6 +118,7 @@ void wifi_screen() {
   lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_wifi_back_handler, LV_EVENT_CLICKED,
                       NULL);
+  wifiStatus::wifi_status(ui_new_screen, btnback);
   lv_obj_t *ui_main_container = mainContainer::create_main_container(
       ui_new_screen, btnback, ESP3DStyleType::col_container);
 
@@ -144,5 +146,7 @@ void wifi_screen() {
                                            true);
   lv_obj_add_event_cb(btn, event_button_no_wifi_handler, LV_EVENT_CLICKED,
                       NULL);
+
+  esp3dTftui.set_current_screen(ESP3DScreenType::wifi);
 }
 }  // namespace wifiScreen

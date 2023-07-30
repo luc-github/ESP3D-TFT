@@ -1,8 +1,7 @@
-
 /*
-  esp3d_values.h -  values esp3d functions class
+  wifi_status_component.h - ESP3D screens styles definition
 
-  Copyright (c) 2014 Luc Lebosse. All rights reserved.
+  Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
   This code is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -15,44 +14,30 @@
   Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
-  License along with This code; if not, write to the Free Software
+  License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #pragma once
+
 #include <stdio.h>
 
-#include <functional>
-#include <list>
 #include <string>
+
+#include "esp3d_values.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+namespace wifiStatus {
+extern lv_obj_t *wifi_status(lv_obj_t *parent, lv_obj_t *backbutton);
 
-// this list depend of target feature
-enum class ESP3DValuesIndex : uint16_t {
-  status_bar_label,
-  current_ip,
-  ext_0_temperature,
-  ext_1_temperature,
-  bed_temperature,
-  ext_0_target_temperature,
-  ext_1_target_temperature,
-  bed_target_temperature,
-  ext_0_fan,
-  ext_1_fan,
-  speed,
-  x_position,
-  y_position,
-  z_position,
-  print_status,
-  file_path,
-  file_name,
-  network_status,
-  network_mode,
-  unknown_index
-};
+extern bool network_status_value_cb(ESP3DValuesIndex index, const char *value,
+                                    ESP3DValuesCbAction action);
+extern bool network_mode_value_cb(ESP3DValuesIndex index, const char *value,
+                                  ESP3DValuesCbAction action);
+
+}  // namespace wifiStatus
 
 #ifdef __cplusplus
 }  // extern "C"

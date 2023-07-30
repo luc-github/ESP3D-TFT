@@ -31,6 +31,7 @@
 #include "main_container_component.h"
 #include "symbol_button_component.h"
 #include "wifi_screen.h"
+#include "wifi_status_component.h"
 
 /**********************
  *  STATIC PROTOTYPES
@@ -89,6 +90,8 @@ void ap_ta_event_cb(lv_event_t *e) {
 
 void ap_event_button_ok_handler(lv_event_t *e) { esp3d_log("Ok Clicked"); }
 
+void ap_event_button_save_handler(lv_event_t *e) { esp3d_log("Save Clicked"); }
+
 void ap_screen() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
@@ -121,6 +124,17 @@ void ap_screen() {
   lv_obj_set_width(ap_ta_ssid, (LV_HOR_RES / 2));
   lv_obj_align_to(label_ssid, ap_ta_ssid, LV_ALIGN_OUT_LEFT_MID,
                   -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+  std::string tmp_str;
+  char out_str[255] = {0};
+  const ESP3DSettingDescription *settingPtr =
+      esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_ap_ssid);
+  if (settingPtr) {
+    tmp_str = esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_ap_ssid,
+                                          out_str, settingPtr->size);
+    lv_textarea_set_text(ap_ta_ssid, tmp_str.c_str());
+  } else {
+    esp3d_log_e("This setting is unknown");
+  }
 
   // Password
   lv_obj_t *label_pwd = lv_label_create(ui_main_container);
@@ -128,7 +142,7 @@ void ap_screen() {
   apply_style(label_pwd, ESP3DStyleType::bg_label);
 
   ap_ta_password = lv_textarea_create(ui_main_container);
-  lv_textarea_set_password_mode(ap_ta_password, true);
+  lv_textarea_set_password_mode(ap_ta_password, false);
   lv_textarea_set_password_bullet(ap_ta_password, "•");
   lv_textarea_set_max_length(ap_ta_password, 64);
   lv_textarea_set_one_line(ap_ta_password, true);
@@ -139,6 +153,18 @@ void ap_screen() {
   lv_obj_align_to(
       label_pwd, ap_ta_password, LV_ALIGN_OUT_LEFT_MID,
       -(CURRENT_BUTTON_PRESSED_OUTLINE + lv_obj_get_width(label_pwd) / 2), 0);
+
+  settingPtr =
+      esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_ap_password);
+  if (settingPtr) {
+    tmp_str = esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_ap_password,
+                                          out_str, settingPtr->size);
+    lv_textarea_set_text(ap_ta_password, tmp_str.c_str());
+  } else {
+    esp3d_log_e("This setting is unknown");
+  }
+  lv_textarea_set_password_mode(ap_ta_password, true);
+
   // Keyboard
   lv_obj_t *kb = lv_keyboard_create(ui_main_container);
   lv_keyboard_set_textarea(kb, NULL);
@@ -147,18 +173,7 @@ void ap_screen() {
   lv_obj_add_event_cb(ap_ta_ssid, ap_ta_event_cb, LV_EVENT_ALL, kb);
   lv_obj_add_event_cb(ap_ta_password, ap_ta_event_cb, LV_EVENT_ALL, kb);
 
-  // Connection status
-  ap_connection_status = lv_led_create(ui_new_screen);
-  lv_led_set_brightness(ap_connection_status, 255);
-  lv_obj_align_to(ap_connection_status, btnback, LV_ALIGN_OUT_LEFT_MID,
-                  -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
-  lv_led_set_color(ap_connection_status, lv_palette_main(LV_PALETTE_RED));
-
-  // Connection type
-  ap_connection_type = lv_label_create(ui_new_screen);
-  lv_obj_align_to(ap_connection_type, ap_connection_status,
-                  LV_ALIGN_OUT_LEFT_MID, 0, 0);
-  lv_label_set_text(ap_connection_type, LV_SYMBOL_STATION_MODE);
+  wifiStatus::wifi_status(ui_new_screen, btnback);
 
   lv_obj_t *btn_ok = nullptr;
 
@@ -175,6 +190,8 @@ void ap_screen() {
   lv_obj_t *btn_save = symbolButton::create_symbol_button(
       ui_main_container, LV_SYMBOL_SAVE, SYMBOL_BUTTON_WIDTH,
       SYMBOL_BUTTON_WIDTH);
+  lv_obj_add_event_cb(btn_save, ap_event_button_save_handler, LV_EVENT_CLICKED,
+                      NULL);
 
   lv_obj_align_to(btn_save, btn_ok, LV_ALIGN_OUT_LEFT_MID,
                   -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
