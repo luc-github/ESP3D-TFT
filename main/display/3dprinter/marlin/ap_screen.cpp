@@ -39,8 +39,6 @@ namespace apScreen {
 lv_timer_t *ap_screen_delay_timer = NULL;
 lv_obj_t *ap_ta_ssid = NULL;
 lv_obj_t *ap_ta_password = NULL;
-lv_obj_t *ui_ap_ssid_list_ctl = NULL;
-lv_obj_t *ap_spinner = NULL;
 lv_obj_t *ap_connection_status = NULL;
 lv_obj_t *ap_connection_type = NULL;
 
@@ -69,9 +67,6 @@ void ap_ta_event_cb(lv_event_t *e) {
     if (ta == ap_ta_password) {
       lv_textarea_set_password_mode(ta, false);
     }
-    if (ui_ap_ssid_list_ctl)
-      lv_obj_add_flag(ui_ap_ssid_list_ctl, LV_OBJ_FLAG_HIDDEN);
-    if (ap_spinner) lv_obj_add_flag(ap_spinner, LV_OBJ_FLAG_HIDDEN);
 
   }
 
@@ -89,14 +84,6 @@ void ap_ta_event_cb(lv_event_t *e) {
     } else if (ta == ap_ta_password) {
       esp3d_log("Ready, PASSWORD: %s", lv_textarea_get_text(ta));
     }
-  }
-}
-
-void ap_event_button_search_handler(lv_event_t *e) {
-  esp3d_log("search Clicked");
-  if (ui_ap_ssid_list_ctl) {
-    lv_obj_clear_flag(ui_ap_ssid_list_ctl, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(ap_spinner, LV_OBJ_FLAG_HIDDEN);
   }
 }
 
@@ -160,35 +147,6 @@ void ap_screen() {
   lv_obj_add_event_cb(ap_ta_ssid, ap_ta_event_cb, LV_EVENT_ALL, kb);
   lv_obj_add_event_cb(ap_ta_password, ap_ta_event_cb, LV_EVENT_ALL, kb);
 
-  // SSID list
-  ui_ap_ssid_list_ctl = lv_list_create(ui_new_screen);
-  lv_obj_update_layout(ap_ta_password);
-  lv_obj_align_to(ui_ap_ssid_list_ctl, ap_ta_password, LV_ALIGN_OUT_BOTTOM_LEFT,
-                  -(2 * CURRENT_BUTTON_PRESSED_OUTLINE),
-                  (CURRENT_BUTTON_PRESSED_OUTLINE));
-
-  lv_obj_set_width(ui_ap_ssid_list_ctl,
-                   (LV_HOR_RES / 2) + (3 * CURRENT_BUTTON_PRESSED_OUTLINE));
-  lv_obj_update_layout(ui_ap_ssid_list_ctl);
-
-  lv_obj_set_height(
-      ui_ap_ssid_list_ctl,
-      lv_obj_get_y(btnback) -
-          (lv_obj_get_y(ap_ta_password) + lv_obj_get_height(ap_ta_password)));
-  lv_obj_update_layout(ui_ap_ssid_list_ctl);
-
-  // ap_spinner
-  ap_spinner = lv_spinner_create(ui_new_screen, 1000, 60);
-  lv_obj_set_size(ap_spinner, CURRENT_SPINNER_SIZE, CURRENT_SPINNER_SIZE);
-  lv_obj_set_x(ap_spinner, lv_obj_get_x(ui_ap_ssid_list_ctl) +
-                               (lv_obj_get_width(ui_ap_ssid_list_ctl) / 2) -
-                               (CURRENT_SPINNER_SIZE / 2));
-  lv_obj_set_y(ap_spinner, lv_obj_get_y(ui_ap_ssid_list_ctl) +
-                               (lv_obj_get_height(ui_ap_ssid_list_ctl) / 2) -
-                               (CURRENT_SPINNER_SIZE / 2));
-  lv_obj_add_flag(ap_spinner, LV_OBJ_FLAG_HIDDEN);
-  lv_obj_add_flag(ui_ap_ssid_list_ctl, LV_OBJ_FLAG_HIDDEN);
-
   // Connection status
   ap_connection_status = lv_led_create(ui_new_screen);
   lv_led_set_brightness(ap_connection_status, 255);
@@ -202,26 +160,25 @@ void ap_screen() {
                   LV_ALIGN_OUT_LEFT_MID, 0, 0);
   lv_label_set_text(ap_connection_type, LV_SYMBOL_STATION_MODE);
 
-  lv_obj_t *btn = nullptr;
+  lv_obj_t *btn_ok = nullptr;
 
-  // Create button and label for search
-  btn = symbolButton::create_symbol_button(ui_main_container, LV_SYMBOL_OK,
-                                           SYMBOL_BUTTON_WIDTH,
-                                           SYMBOL_BUTTON_WIDTH);
+  // Create button and label for ok
+  btn_ok = symbolButton::create_symbol_button(ui_main_container, LV_SYMBOL_OK,
+                                              SYMBOL_BUTTON_WIDTH,
+                                              SYMBOL_BUTTON_WIDTH);
 
-  lv_obj_add_event_cb(btn, ap_event_button_ok_handler, LV_EVENT_CLICKED, NULL);
-  lv_obj_align(btn, LV_ALIGN_TOP_RIGHT, 0, 0);
-
-  // Create button and label for apply
-  lv_obj_t *btn2 = nullptr;
-  btn2 = symbolButton::create_symbol_button(ui_main_container, LV_SYMBOL_SEARCH,
-                                            SYMBOL_BUTTON_WIDTH,
-                                            SYMBOL_BUTTON_WIDTH);
-
-  lv_obj_add_event_cb(btn2, ap_event_button_search_handler, LV_EVENT_CLICKED,
+  lv_obj_add_event_cb(btn_ok, ap_event_button_ok_handler, LV_EVENT_CLICKED,
                       NULL);
-  lv_obj_align_to(btn2, btn, LV_ALIGN_OUT_LEFT_MID,
+  lv_obj_align(btn_ok, LV_ALIGN_TOP_RIGHT, 0, CURRENT_BUTTON_PRESSED_OUTLINE);
+
+  // Create button and label for ok
+  lv_obj_t *btn_save = symbolButton::create_symbol_button(
+      ui_main_container, LV_SYMBOL_SAVE, SYMBOL_BUTTON_WIDTH,
+      SYMBOL_BUTTON_WIDTH);
+
+  lv_obj_align_to(btn_save, btn_ok, LV_ALIGN_OUT_LEFT_MID,
                   -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+
   esp3dTftui.set_current_screen(ESP3DScreenType::access_point);
 }
 }  // namespace apScreen
