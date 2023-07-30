@@ -61,6 +61,9 @@ lv_style_t style_btn_matrix_pressed;
 lv_style_t style_btn_matrix_checked;
 lv_style_t style_btn_matrix_bar;
 
+lv_style_t style_btn_msb_box_default;
+lv_style_t style_btn_msb_box_pressed;
+
 lv_style_t style_embedded_btn_default;
 lv_style_t style_embedded_btn_pressed;
 
@@ -330,6 +333,69 @@ bool init_styles() {
   lv_style_set_border_opa(&style_btn_matrix_checked, LV_OPA_40);
 
   /*
+  Buttons message box
+  */
+  /*Default*/
+  lv_style_init(&style_btn_msb_box_default);
+  lv_style_set_radius(&style_btn_msb_box_default, CURRENT_BUTTON_RADIUS_VALUE);
+  lv_style_set_bg_opa(&style_btn_msb_box_default, LV_OPA_100);
+  lv_style_set_bg_color(&style_btn_msb_box_default,
+                        lv_palette_main(CURRENT_BUTTON_COLOR_PALETTE));
+  lv_style_set_bg_grad_color(
+      &style_btn_msb_box_default,
+      lv_palette_darken(CURRENT_BUTTON_COLOR_PALETTE,
+                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN));
+  lv_style_set_bg_grad_dir(&style_btn_msb_box_default, LV_GRAD_DIR_VER);
+
+  lv_style_set_border_opa(&style_btn_msb_box_default, LV_OPA_40);
+  lv_style_set_border_width(&style_btn_msb_box_default,
+                            CURRENT_BUTTON_BORDER_VALUE);
+  lv_style_set_border_color(&style_btn_msb_box_default,
+                            CURRENT_BUTTON_BORDER_COLOR);
+
+  lv_style_set_outline_opa(&style_btn_msb_box_default, LV_OPA_COVER);
+  lv_style_set_outline_color(
+      &style_btn_msb_box_default,
+      lv_palette_main(CURRENT_BUTTON_OUTLINE_COLOR_PALETTE));
+
+  lv_style_set_text_color(&style_btn_msb_box_default,
+                          CURRENT_BUTTON_TEXT_COLOR);
+  lv_style_set_pad_all(&style_btn_msb_box_default, CURRENT_BUTTON_PAD);
+
+  /*Pressed*/
+
+  lv_style_init(&style_btn_msb_box_pressed);
+
+  /*Add a large outline when pressed*/
+  lv_style_set_outline_width(&style_btn_msb_box_pressed,
+                             CURRENT_BUTTON_PRESSED_OUTLINE);
+  lv_style_set_outline_opa(&style_btn_msb_box_pressed, LV_OPA_TRANSP);
+
+  lv_style_set_shadow_ofs_y(&style_btn_msb_box_pressed,
+                            CURRENT_BUTTON_COLOR_PRESSED_SHADOW_OFFSET);
+  lv_style_set_bg_color(&style_btn_msb_box_pressed,
+                        lv_palette_darken(CURRENT_BUTTON_PRESSED_COLOR_PALETTE,
+                                          CURRENT_BUTTON_COLOR_PALETTE_DARKEN));
+  lv_style_set_bg_grad_color(
+      &style_btn_msb_box_pressed,
+      lv_palette_darken(CURRENT_BUTTON_PRESSED_COLOR_PALETTE,
+                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN * 2));
+
+  lv_style_set_text_color(&style_btn_msb_box_pressed,
+                          CURRENT_BUTTON_PRESSED_TEXT_COLOR);
+  lv_style_set_border_color(&style_btn_msb_box_pressed,
+                            CURRENT_BUTTON_PRESSED_BORDER_COLOR);
+  if (BUTTON_ANIMATION_DELAY) {
+    /*Add a transition to the outline*/
+    static lv_style_transition_dsc_t trans;
+    static lv_style_prop_t props[] = {LV_STYLE_OUTLINE_WIDTH,
+                                      LV_STYLE_OUTLINE_OPA, LV_STYLE_PROP_INV};
+    lv_style_transition_dsc_init(&trans, props, lv_anim_path_linear,
+                                 BUTTON_ANIMATION_DELAY, 0, NULL);
+    lv_style_set_transition(&style_btn_msb_box_pressed, &trans);
+  }
+
+  /*
   Status list
   */
   lv_style_init(&style_status_list_default);
@@ -379,8 +445,9 @@ bool init_styles() {
 }
 
 bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
-  if (type != ESP3DStyleType::main_bg && type != ESP3DStyleType::status_list /*&&
-      type != ESP3DStyleType::buttons_matrix*/) {
+  if (type != ESP3DStyleType::main_bg && type != ESP3DStyleType::status_list &&
+      type != ESP3DStyleType::buttons_msgbox &&
+      type != ESP3DStyleType::message_box) {
     lv_obj_remove_style_all(obj); /*Remove the style coming from the
     // theme*/
   }
@@ -406,6 +473,14 @@ bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
       lv_obj_add_style(obj, &style_btn_default, LV_STATE_DEFAULT);
       lv_obj_add_style(obj, &style_btn_pressed, LV_STATE_PRESSED);
       break;
+    case ESP3DStyleType::buttons_msgbox:
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-enum-enum-conversion"
+      lv_obj_add_style(obj, &style_btn_msb_box_default, LV_PART_ITEMS);
+      lv_obj_add_style(obj, &style_btn_msb_box_pressed,
+                       LV_PART_ITEMS | LV_STATE_PRESSED);
+#pragma GCC diagnostic pop
+      break;
     case ESP3DStyleType::buttons_matrix:
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-enum-enum-conversion"
@@ -421,7 +496,13 @@ bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
 
 #pragma GCC diagnostic pop
       break;
-
+    case ESP3DStyleType::message_box:
+      lv_obj_set_width(obj, LV_PCT(80));
+      apply_style(lv_msgbox_get_close_btn(obj), ESP3DStyleType::button);
+      apply_style(lv_msgbox_get_btns(obj), ESP3DStyleType::buttons_msgbox);
+      lv_obj_set_height(lv_msgbox_get_btns(obj), SYMBOL_BUTTON_HEIGHT);
+      lv_obj_set_width(lv_msgbox_get_btns(obj), MSGBOX_BUTTON_WIDTH);
+      break;
     case ESP3DStyleType::embedded_button:
       lv_obj_add_style(obj, &style_embedded_btn_default, LV_STATE_DEFAULT);
       lv_obj_add_style(obj, &style_embedded_btn_pressed, LV_STATE_PRESSED);

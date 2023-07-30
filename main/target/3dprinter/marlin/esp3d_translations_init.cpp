@@ -24,20 +24,24 @@
 #include "translations/esp3d_translation_service.h"
 
 void ESP3DTranslationService::init() {
-  _translations = {{ESP3DLabel::language, "English"},
-                   {ESP3DLabel::version, "Version"},
-                   {ESP3DLabel::size_for_update, "Size for update"},
-                   {ESP3DLabel::screen, "Screen"},
-                   {ESP3DLabel::architecture, "Arch"},
-                   {ESP3DLabel::sdk_version, "SDK"},
-                   {ESP3DLabel::cpu_freq, "Freq"},
-                   {ESP3DLabel::flash_size, "Flash"},
-                   {ESP3DLabel::free_heap, "Free Heap"},
-                   {ESP3DLabel::total_psram, "PSRAM"},
-                   {ESP3DLabel::sd_updater, "SD Updater"},
-                   {ESP3DLabel::on, "On"},
-                   {ESP3DLabel::off, "Off"},
-                   {ESP3DLabel::millimeters, "mm"},
-                   {ESP3DLabel::celcius, "°C"},
-                   {ESP3DLabel::flash_type, "Flash type"}};
+  _translations = {
+      {ESP3DLabel::language, "English"},
+      {ESP3DLabel::version, "Version"},
+      {ESP3DLabel::size_for_update, "Size for update"},
+      {ESP3DLabel::screen, "Screen"},
+      {ESP3DLabel::architecture, "Arch"},
+      {ESP3DLabel::sdk_version, "SDK"},
+      {ESP3DLabel::cpu_freq, "Freq"},
+      {ESP3DLabel::flash_size, "Flash"},
+      {ESP3DLabel::free_heap, "Free Heap"},
+      {ESP3DLabel::total_psram, "PSRAM"},
+      {ESP3DLabel::sd_updater, "SD Updater"},
+      {ESP3DLabel::on, "On"},
+      {ESP3DLabel::off, "Off"},
+      {ESP3DLabel::millimeters, "mm"},
+      {ESP3DLabel::celcius, "°C"},
+      {ESP3DLabel::flash_type, "Flash type"},
+      {ESP3DLabel::confirm, "Please confirm"},
+      {ESP3DLabel::stop_print, "Do you want to stop current print?"},
+  };
 }

@@ -56,6 +56,7 @@ extern "C" {
 #define LIST_LINE_HEIGHT 63
 #define LIST_LINE_BUTTON_WIDTH 63
 #define MATRIX_BUTTON_HEIGHT 80
+#define MSGBOX_BUTTON_WIDTH 220
 
 #ifdef __cplusplus
 }  // extern "C"

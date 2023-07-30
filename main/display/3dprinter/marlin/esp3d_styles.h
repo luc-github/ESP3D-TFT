@@ -42,6 +42,8 @@ enum class ESP3DStyleType : uint8_t {
   bg_label,
   buttons_matrix,
   read_only_value,
+  message_box,
+  buttons_msgbox,
 };
 
 extern bool init_styles();

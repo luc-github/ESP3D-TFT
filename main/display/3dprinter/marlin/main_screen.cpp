@@ -37,6 +37,7 @@
 #include "status_bar_component.h"
 #include "symbol_button_component.h"
 #include "temperatures_screen.h"
+#include "translations/esp3d_translation_service.h"
 
 /**********************
  *  STATIC PROTOTYPES
@@ -467,9 +468,27 @@ void event_button_pause_handler(lv_event_t *e) {
   esp3dTftValues.set_string_value(ESP3DValuesIndex::print_status, "paused");
 }
 
+void event_confirm_stop_cb(lv_event_t *e) {
+  lv_obj_t *mbox = lv_event_get_current_target(e);
+  std::string rep = lv_msgbox_get_active_btn_text(mbox);
+  if (rep == LV_SYMBOL_OK) {
+    esp3dTftValues.set_string_value(ESP3DValuesIndex::print_status, "idle");
+  }
+  lv_msgbox_close(mbox);
+}
+
 void event_button_stop_handler(lv_event_t *e) {
   esp3d_log("Stop Clicked");
-  esp3dTftValues.set_string_value(ESP3DValuesIndex::print_status, "idle");
+  // esp3dTftValues.set_string_value(ESP3DValuesIndex::print_status, "idle");
+  static const char *btns[] = {LV_SYMBOL_OK, LV_SYMBOL_CLOSE, ""};
+  std::string title = esp3dTranslationService.translate(ESP3DLabel::confirm);
+  std::string text = esp3dTranslationService.translate(ESP3DLabel::stop_print);
+  lv_obj_t *mbox =
+      lv_msgbox_create(NULL, title.c_str(), text.c_str(), btns, true);
+  apply_style(mbox, ESP3DStyleType::message_box);
+  lv_obj_add_event_cb(mbox, event_confirm_stop_cb, LV_EVENT_VALUE_CHANGED,
+                      NULL);
+  lv_obj_center(mbox);
 }
 
 void main_screen() {
