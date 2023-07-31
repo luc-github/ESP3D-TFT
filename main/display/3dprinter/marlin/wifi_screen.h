@@ -31,6 +31,7 @@ extern "C" {
 #endif
 namespace wifiScreen {
 extern void wifi_screen();
+extern void update_button_no_wifi();
 
 }  // namespace wifiScreen
 

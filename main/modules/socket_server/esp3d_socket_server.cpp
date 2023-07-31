@@ -81,11 +81,19 @@ bool ESP3DSocketServer::startSocketServer() {
   dest_addr_ip4->sin_addr.s_addr = htonl(INADDR_ANY);
   dest_addr_ip4->sin_family = AF_INET;
   dest_addr_ip4->sin_port = htons(_port);
+  if (_listen_socket != FREE_SOCKET_HANDLE) {
+    close(_listen_socket);
+  }
   _listen_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
   if (_listen_socket < 0) {
     esp3d_log_e("Unable to create socket: errno %d", errno);
     return false;
   }
+  // https://github.com/espressif/esp-idf/issues/6394#issuecomment-762218598
+  // workarround for ip already in use when it was already closed
+  BaseType_t xTrueValue = pdTRUE;
+  setsockopt(_listen_socket, SOL_SOCKET, SO_REUSEADDR, (void *)&xTrueValue,
+             sizeof(xTrueValue));
 
   // Marking the socket as non-blocking
   int flags = fcntl(_listen_socket, F_GETFL);
@@ -96,14 +104,13 @@ bool ESP3DSocketServer::startSocketServer() {
     return false;
   }
   esp3d_log("Socket marked as non blocking");
-  // int opt = 1;
 
   esp3d_log("Socket created");
 
   int err =
       bind(_listen_socket, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
   if (err != 0) {
-    esp3d_log_e("Socket unable to bind: errno %d", errno);
+    esp3d_log_e("Socket unable to bind: errno %d, %s", errno, strerror(errno));
     esp3d_log_e("IPPROTO: %d", AF_INET);
     close(_listen_socket);
     return false;
@@ -111,7 +118,8 @@ bool ESP3DSocketServer::startSocketServer() {
   esp3d_log("Socket bound, port %ld", _port);
   err = listen(_listen_socket, 1);
   if (err != 0) {
-    esp3d_log_e("Error occurred during listen: errno %d", errno);
+    esp3d_log_e("Error occurred during listen: errno %d, %s", errno,
+                strerror(errno));
     close(_listen_socket);
     return false;
   }
@@ -206,7 +214,9 @@ void ESP3DSocketServer::readSockets() {
 // this task only collecting serial RX data and push thenmm to Rx Queue
 static void esp3d_socket_rx_task(void *pvParameter) {
   (void)pvParameter;
-  if (esp3dSocketServer.startSocketServer()) {
+  bool res = esp3dSocketServer.startSocketServer();
+
+  if (res) {
     // uint64_t startTimeout = 0; // milliseconds
     while (1) {
       esp3dSocketServer.getClient();
@@ -214,10 +224,11 @@ static void esp3d_socket_rx_task(void *pvParameter) {
       esp3dSocketServer.handle();
       vTaskDelay(pdMS_TO_TICKS(10));
     }
+
   } else {
     esp3d_log_e("Starting socket server failed");
   }
-  esp3dSocketServer.end();
+  vTaskDelete(NULL);
 }
 
 bool ESP3DSocketServer::sendToSocket(const int sock, const char *data,
@@ -498,6 +509,7 @@ void ESP3DSocketServer::flush() {
 }
 
 void ESP3DSocketServer::end() {
+  esp3d_log("End socket server");
   if (_started) {
     flush();
     _started = false;
@@ -515,14 +527,18 @@ void ESP3DSocketServer::end() {
     esp3d_log("Stop telnet server");
     // TODO
     _port = 0;
+  } else {
+    esp3d_log("Socket server not started");
   }
   if (_xHandle) {
     vTaskDelete(_xHandle);
     _xHandle = NULL;
+    esp3d_log("Socket server task deleted");
   }
   if (_data) {
     free(_data);
     _data = NULL;
+    esp3d_log("Socket server data cleared");
   }
   if (_buffer) {
     for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
@@ -533,12 +549,15 @@ void ESP3DSocketServer::end() {
     }
     free(_buffer);
     _buffer = NULL;
+    esp3d_log("Socket server buffer cleared");
   }
+  close(_listen_socket);
   _listen_socket = FREE_SOCKET_HANDLE;
   closeAllClients();
 }
 
 void ESP3DSocketServer::closeAllClients() {
+  esp3d_log("Socket server closing all clients");
   for (uint s = 0; s < ESP3D_MAX_SOCKET_CLIENTS; s++) {
     closeSocket(_clients[s].socket_id);
   }

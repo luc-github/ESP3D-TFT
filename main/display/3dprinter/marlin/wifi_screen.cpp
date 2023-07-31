@@ -31,8 +31,11 @@
 #include "esp3d_tft_ui.h"
 #include "main_container_component.h"
 #include "menu_screen.h"
+#include "message_box_component.h"
+#include "network/esp3d_network.h"
 #include "sta_screen.h"
 #include "symbol_button_component.h"
+#include "translations/esp3d_translation_service.h"
 #include "wifi_status_component.h"
 
 /**********************
@@ -41,6 +44,18 @@
 namespace wifiScreen {
 lv_timer_t *wifi_screen_delay_timer = NULL;
 ESP3DScreenType wifi_next_screen = ESP3DScreenType::none;
+
+lv_obj_t *btn_no_wifi = nullptr;
+
+void update_button_no_wifi() {
+  std::string mode =
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
+  if (mode == LV_SYMBOL_WIFI) {
+    lv_obj_add_flag(btn_no_wifi, LV_OBJ_FLAG_HIDDEN);
+  } else {
+    lv_obj_clear_flag(btn_no_wifi, LV_OBJ_FLAG_HIDDEN);
+  }
+}
 
 void wifi_screen_delay_timer_cb(lv_timer_t *timer) {
   if (wifi_screen_delay_timer) {
@@ -102,6 +117,16 @@ void event_button_sta_handler(lv_event_t *e) {
 }
 void event_button_no_wifi_handler(lv_event_t *e) {
   esp3d_log("no wifi Clicked");
+  if (!esp3dTftsettings.writeByte(ESP3DSettingIndex::esp3d_radio_mode,
+                                  static_cast<uint8_t>(ESP3DRadioMode::off))) {
+    std::string text =
+        esp3dTranslationService.translate(ESP3DLabel::error_applying_mode);
+    msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+    esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
+                                    text.c_str());
+  } else {
+    esp3dNetwork.setMode(ESP3DRadioMode::off);
+  }
 }
 
 void wifi_screen() {
@@ -141,12 +166,13 @@ void wifi_screen() {
   lv_obj_add_event_cb(btn, event_button_sta_handler, LV_EVENT_CLICKED, NULL);
 
   // Create button and label for no wifi
-  btn = symbolButton::create_symbol_button(ui_buttons_container, LV_SYMBOL_WIFI,
-                                           BUTTON_WIDTH, BUTTON_WIDTH, true,
-                                           true);
-  lv_obj_add_event_cb(btn, event_button_no_wifi_handler, LV_EVENT_CLICKED,
-                      NULL);
+  btn_no_wifi = symbolButton::create_symbol_button(ui_buttons_container,
+                                                   LV_SYMBOL_WIFI, BUTTON_WIDTH,
+                                                   BUTTON_WIDTH, true, true);
+  lv_obj_add_event_cb(btn_no_wifi, event_button_no_wifi_handler,
+                      LV_EVENT_CLICKED, NULL);
 
   esp3dTftui.set_current_screen(ESP3DScreenType::wifi);
+  update_button_no_wifi();
 }
 }  // namespace wifiScreen

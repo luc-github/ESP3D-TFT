@@ -32,6 +32,7 @@
 #include "files_screen.h"
 #include "menu_button_component.h"
 #include "menu_screen.h"
+#include "message_box_component.h"
 #include "positions_screen.h"
 #include "speed_screen.h"
 #include "status_bar_component.h"
@@ -493,16 +494,11 @@ void event_confirm_stop_cb(lv_event_t *e) {
 
 void event_button_stop_handler(lv_event_t *e) {
   esp3d_log("Stop Clicked");
-  // esp3dTftValues.set_string_value(ESP3DValuesIndex::print_status, "idle");
-  static const char *btns[] = {LV_SYMBOL_OK, LV_SYMBOL_CLOSE, ""};
-  std::string title = esp3dTranslationService.translate(ESP3DLabel::confirm);
   std::string text = esp3dTranslationService.translate(ESP3DLabel::stop_print);
   lv_obj_t *mbox =
-      lv_msgbox_create(NULL, title.c_str(), text.c_str(), btns, true);
-  apply_style(mbox, ESP3DStyleType::message_box);
+      msgBox::messageBox(NULL, MsgBoxType::confirmation, text.c_str());
   lv_obj_add_event_cb(mbox, event_confirm_stop_cb, LV_EVENT_VALUE_CHANGED,
                       NULL);
-  lv_obj_center(mbox);
 }
 
 void main_screen() {

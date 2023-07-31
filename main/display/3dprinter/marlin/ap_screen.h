@@ -31,6 +31,7 @@ extern "C" {
 #endif
 namespace apScreen {
 extern void ap_screen();
+extern void update_button_ok();
 }  // namespace apScreen
 
 #ifdef __cplusplus

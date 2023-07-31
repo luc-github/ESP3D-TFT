@@ -20,16 +20,18 @@
 
 #include "ap_screen.h"
 
-#include <string>
-
 #include "back_button_component.h"
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
+#include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "main_container_component.h"
+#include "message_box_component.h"
+#include "network/esp3d_network.h"
 #include "symbol_button_component.h"
+#include "translations/esp3d_translation_service.h"
 #include "wifi_screen.h"
 #include "wifi_status_component.h"
 
@@ -40,8 +42,80 @@ namespace apScreen {
 lv_timer_t *ap_screen_delay_timer = NULL;
 lv_obj_t *ap_ta_ssid = NULL;
 lv_obj_t *ap_ta_password = NULL;
-lv_obj_t *ap_connection_status = NULL;
-lv_obj_t *ap_connection_type = NULL;
+lv_obj_t *btn_ok = nullptr;
+lv_obj_t *btn_save = nullptr;
+
+std::string ssid_ini;
+std::string password_ini;
+std::string ssid_current;
+std::string password_current;
+void update_button_save();
+
+bool save_parameters() {
+  bool res = true;
+  if (!esp3dTftsettings.writeString(ESP3DSettingIndex::esp3d_ap_ssid,
+                                    ssid_current.c_str())) {
+    std::string text =
+        esp3dTranslationService.translate(ESP3DLabel::error_applying_mode);
+    msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+    esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
+                                    text.c_str());
+    res = false;
+  } else {
+    ssid_ini = ssid_current;
+    if (!esp3dTftsettings.writeString(ESP3DSettingIndex::esp3d_ap_password,
+                                      password_current.c_str())) {
+      std::string text =
+          esp3dTranslationService.translate(ESP3DLabel::error_applying_mode);
+      msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+      esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
+                                      text.c_str());
+      res = false;
+    } else {
+      password_ini = password_current;
+    }
+  }
+  update_button_save();
+  return res;
+}
+
+void update_button_ok() {
+  esp3d_log("Update ok vibility");
+  std::string mode =
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
+  if (ssid_current.length() == 0 || ssid_current.length() > 32 ||
+      mode == LV_SYMBOL_ACCESS_POINT || password_current.length() > 64 ||
+      (password_current.length() != 0 && password_current.length() < 8)) {
+    esp3d_log("Ok hide");
+    lv_obj_add_flag(btn_ok, LV_OBJ_FLAG_HIDDEN);
+  } else {
+    esp3d_log("Ok visible");
+    lv_obj_clear_flag(btn_ok, LV_OBJ_FLAG_HIDDEN);
+  }
+}
+
+void update_button_save() {
+  esp3d_log("Update save vibility");
+  if (ssid_ini == ssid_current) {
+    lv_obj_add_flag(btn_save, LV_OBJ_FLAG_HIDDEN);
+    esp3d_log("Save hide");
+    if (password_ini == password_current) {
+      lv_obj_add_flag(btn_save, LV_OBJ_FLAG_HIDDEN);
+    } else {
+      lv_obj_clear_flag(btn_save, LV_OBJ_FLAG_HIDDEN);
+    }
+  } else {
+    lv_obj_clear_flag(btn_save, LV_OBJ_FLAG_HIDDEN);
+    esp3d_log("Save visible");
+  }
+  if (ssid_current.length() == 0 || ssid_current.length() > 32) {
+    lv_obj_add_flag(btn_save, LV_OBJ_FLAG_HIDDEN);
+  }
+  if (password_current.length() > 64 ||
+      (password_current.length() != 0 && password_current.length() < 8)) {
+    lv_obj_add_flag(btn_save, LV_OBJ_FLAG_HIDDEN);
+  }
+}
 
 void ap_screen_delay_timer_cb(lv_timer_t *timer) {
   if (ap_screen_delay_timer) {
@@ -68,7 +142,8 @@ void ap_ta_event_cb(lv_event_t *e) {
     if (ta == ap_ta_password) {
       lv_textarea_set_password_mode(ta, false);
     }
-
+    update_button_ok();
+    update_button_save();
   }
 
   else if (code == LV_EVENT_DEFOCUSED) {
@@ -79,18 +154,62 @@ void ap_ta_event_cb(lv_event_t *e) {
     if (ta == ap_ta_password) {
       lv_textarea_set_password_mode(ta, true);
     }
+    update_button_ok();
+    update_button_save();
   } else if (code == LV_EVENT_READY || code == LV_EVENT_DEFOCUSED) {
     if (ta == ap_ta_ssid) {
+      ssid_current = lv_textarea_get_text(ta);
       esp3d_log("Ready, SSID: %s", lv_textarea_get_text(ta));
     } else if (ta == ap_ta_password) {
       esp3d_log("Ready, PASSWORD: %s", lv_textarea_get_text(ta));
+      password_current = lv_textarea_get_text(ta);
     }
+    update_button_ok();
+    update_button_save();
+  } else if (code == LV_EVENT_VALUE_CHANGED) {
+    if (ta == ap_ta_ssid) {
+      ssid_current = lv_textarea_get_text(ta);
+      esp3d_log("Value changed, SSID: %s > %s", ssid_ini.c_str(),
+                ssid_current.c_str());
+    } else if (ta == ap_ta_password) {
+      password_current = lv_textarea_get_text(ta);
+      esp3d_log("Value changed, PASSWORD: %s > %s", password_ini.c_str(),
+                password_current.c_str());
+    }
+    update_button_ok();
+    update_button_save();
   }
 }
 
-void ap_event_button_ok_handler(lv_event_t *e) { esp3d_log("Ok Clicked"); }
+void ap_event_button_ok_handler(lv_event_t *e) {
+  esp3d_log("Ok Clicked");
+  esp3d_log("ssid: %s, password:%s", ssid_current.c_str(),
+            password_current.c_str());
+  // Do save first
+  if (!save_parameters()) {
+    return;
+  }
 
-void ap_event_button_save_handler(lv_event_t *e) { esp3d_log("Save Clicked"); }
+  // Apply now
+  if (!esp3dTftsettings.writeByte(
+          ESP3DSettingIndex::esp3d_radio_mode,
+          static_cast<uint8_t>(ESP3DRadioMode::wifi_ap))) {
+    std::string text =
+        esp3dTranslationService.translate(ESP3DLabel::error_applying_mode);
+    msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+    esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
+                                    text.c_str());
+  } else {
+    esp3dNetwork.setMode(ESP3DRadioMode::wifi_ap);
+  }
+}
+
+void ap_event_button_save_handler(lv_event_t *e) {
+  esp3d_log("Save Clicked");
+  esp3d_log("ssid: %s, password:%s", ssid_current.c_str(),
+            password_current.c_str());
+  save_parameters();
+}
 
 void ap_screen() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
@@ -129,9 +248,10 @@ void ap_screen() {
   const ESP3DSettingDescription *settingPtr =
       esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_ap_ssid);
   if (settingPtr) {
-    tmp_str = esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_ap_ssid,
-                                          out_str, settingPtr->size);
-    lv_textarea_set_text(ap_ta_ssid, tmp_str.c_str());
+    ssid_ini = esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_ap_ssid,
+                                           out_str, settingPtr->size);
+    lv_textarea_set_text(ap_ta_ssid, ssid_ini.c_str());
+    ssid_current = ssid_ini;
   } else {
     esp3d_log_e("This setting is unknown");
   }
@@ -157,9 +277,10 @@ void ap_screen() {
   settingPtr =
       esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_ap_password);
   if (settingPtr) {
-    tmp_str = esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_ap_password,
-                                          out_str, settingPtr->size);
-    lv_textarea_set_text(ap_ta_password, tmp_str.c_str());
+    password_ini = esp3dTftsettings.readString(
+        ESP3DSettingIndex::esp3d_ap_password, out_str, settingPtr->size);
+    lv_textarea_set_text(ap_ta_password, password_ini.c_str());
+    password_current = password_ini;
   } else {
     esp3d_log_e("This setting is unknown");
   }
@@ -175,8 +296,6 @@ void ap_screen() {
 
   wifiStatus::wifi_status(ui_new_screen, btnback);
 
-  lv_obj_t *btn_ok = nullptr;
-
   // Create button and label for ok
   btn_ok = symbolButton::create_symbol_button(ui_main_container, LV_SYMBOL_OK,
                                               SYMBOL_BUTTON_WIDTH,
@@ -187,7 +306,7 @@ void ap_screen() {
   lv_obj_align(btn_ok, LV_ALIGN_TOP_RIGHT, 0, CURRENT_BUTTON_PRESSED_OUTLINE);
 
   // Create button and label for ok
-  lv_obj_t *btn_save = symbolButton::create_symbol_button(
+  btn_save = symbolButton::create_symbol_button(
       ui_main_container, LV_SYMBOL_SAVE, SYMBOL_BUTTON_WIDTH,
       SYMBOL_BUTTON_WIDTH);
   lv_obj_add_event_cb(btn_save, ap_event_button_save_handler, LV_EVENT_CLICKED,
@@ -195,7 +314,8 @@ void ap_screen() {
 
   lv_obj_align_to(btn_save, btn_ok, LV_ALIGN_OUT_LEFT_MID,
                   -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
-
+  update_button_ok();
+  update_button_save();
   esp3dTftui.set_current_screen(ESP3DScreenType::access_point);
 }
 }  // namespace apScreen

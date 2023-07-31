@@ -20,11 +20,14 @@
 
 #include "wifi_status_component.h"
 
+#include "ap_screen.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "network/esp3d_network.h"
+#include "wifi_screen.h"
+
 
 /**********************
  *  STATIC PROTOTYPES
@@ -43,16 +46,21 @@ void wifi_display_signal() {
       esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
   std::string status =
       esp3dTftValues.get_string_value(ESP3DValuesIndex::network_status);
-  if (mode == LV_SYMBOL_STATION_MODE && status == "+") {
-    wifi_ap_record_t ap;
-    esp_err_t res = esp_wifi_sta_get_ap_info(&ap);
-    if (res == ESP_OK) {
-      int32_t signal = esp3dNetwork.getSignal(ap.rssi, false);
-      std::string tmpstr = std::to_string(signal);
-      tmpstr += "%";
-      lv_label_set_text(wifi_signal, tmpstr.c_str());
+  if (mode == LV_SYMBOL_STATION_MODE) {
+    lv_obj_clear_flag(wifi_signal, LV_OBJ_FLAG_HIDDEN);
+    if (status == "+") {
+      wifi_ap_record_t ap;
+      esp_err_t res = esp_wifi_sta_get_ap_info(&ap);
+      if (res == ESP_OK) {
+        int32_t signal = esp3dNetwork.getSignal(ap.rssi, false);
+        std::string tmpstr = std::to_string(signal);
+        tmpstr += "%";
+        lv_label_set_text(wifi_signal, tmpstr.c_str());
+      } else {
+        lv_label_set_text(wifi_signal, "?%");
+      }
     } else {
-      lv_label_set_text(wifi_signal, "?%");
+      lv_label_set_text(wifi_signal, "?");
     }
   } else {
     lv_obj_add_flag(wifi_signal, LV_OBJ_FLAG_HIDDEN);
@@ -116,6 +124,7 @@ bool network_status_value_cb(ESP3DValuesIndex index, const char *value,
         esp3dTftui.get_current_screen() == ESP3DScreenType::access_point) {
       wifi_display_signal();
       wifi_display_mode();
+
     } else {
       // Todo : update other screens calling each callback update function
     }
@@ -131,6 +140,12 @@ bool network_mode_value_cb(ESP3DValuesIndex index, const char *value,
         esp3dTftui.get_current_screen() == ESP3DScreenType::access_point) {
       wifi_display_signal();
       wifi_display_mode();
+      if (esp3dTftui.get_current_screen() == ESP3DScreenType::access_point) {
+        apScreen::update_button_ok();
+      }
+      if (esp3dTftui.get_current_screen() == ESP3DScreenType::wifi) {
+        wifiScreen::update_button_no_wifi();
+      }
     } else {
       // Todo : update other screens calling each callback update function
     }
