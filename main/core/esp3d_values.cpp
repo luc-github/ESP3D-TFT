@@ -60,11 +60,13 @@ bool ESP3DValues::set_string_value(ESP3DValuesIndex index, const char* value) {
   for (auto element = _values.begin(); element != _values.end(); ++element) {
     if (element->index == index) {
       element->value = value;
+      esp3d_log("Setting String value %s for %d", value, (int)index);
       if (element->callbackFn) {
         element->callbackFn(element->index, value, ESP3DValuesCbAction::Update);
       }
       return true;
     }
   }
+  esp3d_log_e("Cannot set String value %s for %d", value, (int)index);
   return false;
 }

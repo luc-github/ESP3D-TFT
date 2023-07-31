@@ -202,15 +202,16 @@ ESP3DNetwork::~ESP3DNetwork() {}
 bool ESP3DNetwork::begin() {
   static bool bootDone = false;
   esp3d_log("Free mem %ld", esp_get_minimum_free_heap_size());
+
   if (!bootDone) {
     bootDone = true;
     uint8_t bootMode =
         esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_radio_boot_mode);
+    esp3dTftValues.set_string_value(ESP3DValuesIndex::network_mode,
+                                    LV_SYMBOL_WIFI);
+    esp3dTftValues.set_string_value(ESP3DValuesIndex::network_status, "x");
     if (bootMode == static_cast<uint8_t>(ESP3DRadioMode::off)) {
       esp3d_log("Radio is off at boot time");
-      esp3dTftValues.set_string_value(ESP3DValuesIndex::network_mode,
-                                      LV_SYMBOL_STOP);
-      esp3dTftValues.set_string_value(ESP3DValuesIndex::network_status, "x");
       _started = true;
       return true;
     }
@@ -709,7 +710,6 @@ bool ESP3DNetwork::setMode(ESP3DRadioMode mode, bool restart) {
   esp3d_log("Current mode is %d, and ask for %d",
             static_cast<uint8_t>(_current_radio_mode),
             static_cast<uint8_t>(mode));
-
   if (mode == _current_radio_mode && !restart) {
     esp3d_log("Current mode and new mode are identical so cancel");
     return true;
@@ -741,7 +741,7 @@ bool ESP3DNetwork::setMode(ESP3DRadioMode mode, bool restart) {
     case ESP3DRadioMode::off:
       startNoRadioMode();
       esp3dTftValues.set_string_value(ESP3DValuesIndex::network_mode,
-                                      LV_SYMBOL_STOP);
+                                      LV_SYMBOL_WIFI);
       break;
 #if ESP3D_WIFI_FEATURE
     case ESP3DRadioMode::wifi_sta:
