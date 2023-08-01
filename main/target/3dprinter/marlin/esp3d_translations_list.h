@@ -42,7 +42,7 @@ enum class ESP3DLabel : uint16_t {
   millimeters,
   celcius,
   flash_type,
-  confirm,
+  confirmation,
   stop_print,
   error,
   error_applying_mode,

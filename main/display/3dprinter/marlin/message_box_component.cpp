@@ -43,17 +43,16 @@ void event_msgbox_cb(lv_event_t *e) {
   lv_msgbox_close(mbox);
 }
 
-lv_obj_t *messageBox(lv_obj_t *container, MsgBoxType type,
-                     const char *content) {
+lv_obj_t *messageBoxMain(lv_obj_t *container, MsgBoxType type,
+                         const char *content) {
   std::string title;
-
   switch (type) {
     case MsgBoxType::error:
       title = esp3dTranslationService.translate(ESP3DLabel::error);
       btns = (char **)btn_simple;
       break;
     case MsgBoxType::confirmation:
-      title = esp3dTranslationService.translate(ESP3DLabel::error);
+      title = esp3dTranslationService.translate(ESP3DLabel::confirmation);
       btns = (char **)btn_ok_cancel;
       break;
     default:
@@ -64,9 +63,21 @@ lv_obj_t *messageBox(lv_obj_t *container, MsgBoxType type,
   lv_obj_t *mbox =
       lv_msgbox_create(NULL, title.c_str(), content, (const char **)btns, true);
   apply_style(mbox, ESP3DStyleType::message_box);
+  lv_obj_center(mbox);
+  return mbox;
+}
+
+lv_obj_t *messageBox(lv_obj_t *container, MsgBoxType type,
+                     const char *content) {
+  lv_obj_t *mbox = messageBoxMain(container, type, content);
   lv_obj_add_event_cb(mbox, event_msgbox_cb, LV_EVENT_VALUE_CHANGED,
                       (void *)&type);
-  lv_obj_center(mbox);
+  return mbox;
+}
+lv_obj_t *confirmationBox(lv_obj_t *container, MsgBoxType type,
+                          const char *content, lv_event_cb_t event_cb) {
+  lv_obj_t *mbox = messageBoxMain(container, type, content);
+  lv_obj_add_event_cb(mbox, event_cb, LV_EVENT_VALUE_CHANGED, (void *)&type);
   return mbox;
 }
 }  // namespace msgBox

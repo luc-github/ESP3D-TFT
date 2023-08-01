@@ -36,7 +36,11 @@ enum class MsgBoxType : uint8_t {
 };
 
 namespace msgBox {
-lv_obj_t *messageBox(lv_obj_t *container, MsgBoxType type, const char *content);
+extern lv_obj_t *messageBox(lv_obj_t *container, MsgBoxType type,
+                            const char *content);
+
+extern lv_obj_t *confirmationBox(lv_obj_t *container, MsgBoxType type,
+                                 const char *content, lv_event_cb_t event_cb);
 
 }  // namespace msgBox
 

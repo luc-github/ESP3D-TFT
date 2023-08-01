@@ -41,7 +41,7 @@ void ESP3DTranslationService::init() {
       {ESP3DLabel::millimeters, "mm"},
       {ESP3DLabel::celcius, "°C"},
       {ESP3DLabel::flash_type, "Flash type"},
-      {ESP3DLabel::confirm, "Please confirm"},
+      {ESP3DLabel::confirmation, "Please confirm"},
       {ESP3DLabel::stop_print, "Do you want to stop current print?"},
       {ESP3DLabel::error, "Error"},
       {ESP3DLabel::error_applying_mode, "Apply mode failed!"},

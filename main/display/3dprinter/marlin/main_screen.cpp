@@ -486,6 +486,7 @@ void event_button_pause_handler(lv_event_t *e) {
 void event_confirm_stop_cb(lv_event_t *e) {
   lv_obj_t *mbox = lv_event_get_current_target(e);
   std::string rep = lv_msgbox_get_active_btn_text(mbox);
+  esp3d_log("Button selectionned : %s", rep == LV_SYMBOL_OK ? "Ok" : "Cancel");
   if (rep == LV_SYMBOL_OK) {
     esp3dTftValues.set_string_value(ESP3DValuesIndex::print_status, "idle");
   }
@@ -495,10 +496,8 @@ void event_confirm_stop_cb(lv_event_t *e) {
 void event_button_stop_handler(lv_event_t *e) {
   esp3d_log("Stop Clicked");
   std::string text = esp3dTranslationService.translate(ESP3DLabel::stop_print);
-  lv_obj_t *mbox =
-      msgBox::messageBox(NULL, MsgBoxType::confirmation, text.c_str());
-  lv_obj_add_event_cb(mbox, event_confirm_stop_cb, LV_EVENT_VALUE_CHANGED,
-                      NULL);
+  msgBox::confirmationBox(NULL, MsgBoxType::confirmation, text.c_str(),
+                          event_confirm_stop_cb);
 }
 
 void main_screen() {
