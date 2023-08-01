@@ -371,7 +371,7 @@ bool ESP3DHttpService::begin() {
     if (_started) {
       if (ESP3DState::on != (ESP3DState)esp3dTftsettings.readByte(
                                 ESP3DSettingIndex::esp3d_ws_on)) {
-        esp3d_log("WS is not enabled");
+        esp3d_log("WS data is not enabled");
       } else {
         wsConfig.max_clients = 2;
         wsConfig.type = esp3dSocketType::websocket_data;
