@@ -84,7 +84,8 @@ void update_button_ok() {
   std::string mode =
       esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
   if (ssid_current.length() == 0 || ssid_current.length() > 32 ||
-      mode == LV_SYMBOL_ACCESS_POINT || password_current.length() > 64 ||
+      (mode == LV_SYMBOL_ACCESS_POINT && ssid_ini == ssid_current) ||
+      password_current.length() > 64 ||
       (password_current.length() != 0 && password_current.length() < 8)) {
     esp3d_log("Ok hide");
     lv_obj_add_flag(btn_ok, LV_OBJ_FLAG_HIDDEN);
@@ -287,7 +288,7 @@ void ap_screen() {
   lv_textarea_set_password_mode(ap_ta_password, true);
 
   // Keyboard
-  lv_obj_t *kb = lv_keyboard_create(ui_main_container);
+  lv_obj_t *kb = lv_keyboard_create(ui_new_screen);
   lv_keyboard_set_textarea(kb, NULL);
   lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
   lv_obj_set_style_radius(kb, CURRENT_BUTTON_RADIUS_VALUE, LV_PART_MAIN);

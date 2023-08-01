@@ -725,10 +725,10 @@ bool ESP3DNetwork::setMode(ESP3DRadioMode mode, bool restart) {
   esp3d_log("Current mode is %d, and ask for %d",
             static_cast<uint8_t>(_current_radio_mode),
             static_cast<uint8_t>(mode));
-  if (mode == _current_radio_mode && !restart) {
-    esp3d_log("Current mode and new mode are identical so cancel");
-    return true;
-  }
+  /* if (mode == _current_radio_mode && !restart) {
+     esp3d_log("Current mode and new mode are identical so cancel");
+     return true;
+   }*/
 
   switch (_current_radio_mode) {
     case ESP3DRadioMode::off:

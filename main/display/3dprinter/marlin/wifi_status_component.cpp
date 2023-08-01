@@ -26,8 +26,8 @@
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "network/esp3d_network.h"
+#include "sta_screen.h"
 #include "wifi_screen.h"
-
 
 /**********************
  *  STATIC PROTOTYPES
@@ -142,6 +142,9 @@ bool network_mode_value_cb(ESP3DValuesIndex index, const char *value,
       wifi_display_mode();
       if (esp3dTftui.get_current_screen() == ESP3DScreenType::access_point) {
         apScreen::update_button_ok();
+      }
+      if (esp3dTftui.get_current_screen() == ESP3DScreenType::station) {
+        staScreen::update_sta_button_ok();
       }
       if (esp3dTftui.get_current_screen() == ESP3DScreenType::wifi) {
         wifiScreen::update_button_no_wifi();

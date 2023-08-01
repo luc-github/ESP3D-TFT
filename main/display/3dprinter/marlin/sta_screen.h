@@ -31,6 +31,7 @@ extern "C" {
 #endif
 namespace staScreen {
 extern void sta_screen();
+extern void update_sta_button_ok();
 
 }  // namespace staScreen
 
