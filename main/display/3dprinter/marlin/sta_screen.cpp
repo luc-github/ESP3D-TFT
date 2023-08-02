@@ -29,11 +29,14 @@
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "list_line_component.h"
 #include "main_container_component.h"
 #include "message_box_component.h"
 #include "network/esp3d_network.h"
 #include "symbol_button_component.h"
+#include "tasks_def.h"
 #include "translations/esp3d_translation_service.h"
 #include "wifi_screen.h"
 #include "wifi_status_component.h"
@@ -42,6 +45,9 @@
  *  STATIC PROTOTYPES
  **********************/
 namespace staScreen {
+#define STACKDEPTH 4096
+#define TASKPRIORITY UI_TASK_PRIORITY - 1
+#define TASKCORE UI_TASK_CORE
 lv_timer_t *sta_screen_delay_timer = NULL;
 lv_obj_t *sta_ta_ssid = NULL;
 lv_obj_t *sta_ta_password = NULL;
@@ -65,6 +71,24 @@ struct ESP3DSSIDDescriptor {
 };
 std::list<ESP3DSSIDDescriptor> ssid_scanned_list;
 #define MAX_SCAN_LIST_SIZE 15
+void fill_ssid_scanned_list();
+void fill_ui_sta_ssid_list();
+void refresh_ssid_scanned_list_cb(lv_timer_t *timer) {
+  if (start_scan_timer) {
+    lv_timer_del(start_scan_timer);
+    start_scan_timer = NULL;
+  }
+  fill_ui_sta_ssid_list();
+}
+static void bgScanTask(void *pvParameter) {
+  (void)pvParameter;
+  vTaskDelay(pdMS_TO_TICKS(100));
+  fill_ssid_scanned_list();
+  if (!start_scan_timer) {
+    start_scan_timer = lv_timer_create(refresh_ssid_scanned_list_cb, 100, NULL);
+  }
+  vTaskDelete(NULL);
+}
 
 void fill_ssid_scanned_list() {
   ssid_scanned_list.clear();
@@ -122,10 +146,7 @@ void event_bg_touched_cb(lv_event_t *e) {
   lv_obj_add_flag(ui_sta_ssid_list_ctl, LV_OBJ_FLAG_HIDDEN);
 }
 
-void do_scan_now() {
-  fill_ssid_scanned_list();
-  lv_obj_add_flag(sta_spinner, LV_OBJ_FLAG_HIDDEN);
-
+void fill_ui_sta_ssid_list() {
   for (auto &ssid_desc : ssid_scanned_list) {
     lv_obj_t *line_container =
         listLine::create_list_line_container(ui_sta_ssid_list_ctl);
@@ -139,6 +160,19 @@ void do_scan_now() {
         listLine::add_button_to_line(LV_SYMBOL_OK, line_container);
     lv_obj_add_event_cb(btnJoin, event_button_join_cb, LV_EVENT_CLICKED,
                         (void *)&ssid_desc);
+  }
+  lv_obj_add_flag(sta_spinner, LV_OBJ_FLAG_HIDDEN);
+}
+
+void do_scan_now() {
+  TaskHandle_t xHandle = NULL;
+  BaseType_t res =
+      xTaskCreatePinnedToCore(bgScanTask, "scanTask", STACKDEPTH, NULL,
+                              TASKPRIORITY, &xHandle, TASKCORE);
+  if (res == pdPASS && xHandle) {
+    esp3d_log("Created Scan Task");
+  } else {
+    esp3d_log_e("Scan Task creation failed");
   }
 }
 

@@ -29,14 +29,20 @@
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "filesystem/esp3d_sd.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "list_line_component.h"
 #include "main_screen.h"
 #include "symbol_button_component.h"
+#include "tasks_def.h"
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 namespace filesScreen {
+#define STACKDEPTH 4096
+#define TASKPRIORITY UI_TASK_PRIORITY - 1
+#define TASKCORE UI_TASK_CORE
 
 lv_timer_t *files_screen_delay_timer = NULL;
 lv_obj_t *refresh_button = NULL;
@@ -49,6 +55,23 @@ struct ESP3DFileDescriptor {
   std::string size;
 };
 std::list<ESP3DFileDescriptor> files_list;
+void fill_files_list();
+void refresh_files_list_cb(lv_timer_t *timer) {
+  if (start_files_list_timer) {
+    lv_timer_del(start_files_list_timer);
+    start_files_list_timer = NULL;
+  }
+  files_screen();
+}
+static void bgFilesTask(void *pvParameter) {
+  (void)pvParameter;
+  vTaskDelay(pdMS_TO_TICKS(100));
+  fill_files_list();
+  if (!start_files_list_timer) {
+    start_files_list_timer = lv_timer_create(refresh_files_list_cb, 100, NULL);
+  }
+  vTaskDelete(NULL);
+}
 
 bool playable_file(const char *name) {
   int pos = esp3d_strings::rfind(name, ".", -1);
@@ -108,9 +131,15 @@ void fill_files_list() {
 }
 
 void do_files_list_now() {
-  fill_files_list();
-  // Now refresh screen
-  files_screen();
+  TaskHandle_t xHandle = NULL;
+  BaseType_t res =
+      xTaskCreatePinnedToCore(bgFilesTask, "filesTask", STACKDEPTH, NULL,
+                              TASKPRIORITY, &xHandle, TASKCORE);
+  if (res == pdPASS && xHandle) {
+    esp3d_log("Created Files Task");
+  } else {
+    esp3d_log_e("Files Task creation failed");
+  }
 }
 
 void start_files_list_timer_cb(lv_timer_t *timer) {
@@ -130,8 +159,10 @@ void event_button_files_refresh_handler(lv_event_t *e) {
     i--;
   }
   lv_obj_clear_flag(files_spinner, LV_OBJ_FLAG_HIDDEN);
-  start_files_list_timer =
-      lv_timer_create(start_files_list_timer_cb, 100, NULL);
+  if (!start_files_list_timer) {
+    start_files_list_timer =
+        lv_timer_create(start_files_list_timer_cb, 100, NULL);
+  }
 }
 
 void event_button_files_up_handler(lv_event_t *e) {
