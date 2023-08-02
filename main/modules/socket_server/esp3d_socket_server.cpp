@@ -64,6 +64,12 @@ uint ESP3DSocketServer::clientsConnected() {
   return count;
 }
 
+void ESP3DSocketServer::closeMainSocket() {
+  shutdown(_listen_socket, 0);
+  close(_listen_socket);
+  _listen_socket = FREE_SOCKET_HANDLE;
+}
+
 ESP3DSocketInfos *ESP3DSocketServer::getClientInfos(uint index) {
   if (_started) {
     if (index <= ESP3D_MAX_SOCKET_CLIENTS) {
@@ -76,13 +82,14 @@ ESP3DSocketInfos *ESP3DSocketServer::getClientInfos(uint index) {
 }
 
 bool ESP3DSocketServer::startSocketServer() {
+  _isRunning = false;
   struct sockaddr_storage dest_addr;
   struct sockaddr_in *dest_addr_ip4 = (struct sockaddr_in *)&dest_addr;
   dest_addr_ip4->sin_addr.s_addr = htonl(INADDR_ANY);
   dest_addr_ip4->sin_family = AF_INET;
   dest_addr_ip4->sin_port = htons(_port);
   if (_listen_socket != FREE_SOCKET_HANDLE) {
-    close(_listen_socket);
+    closeMainSocket();
   }
   _listen_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
   if (_listen_socket < 0) {
@@ -91,16 +98,16 @@ bool ESP3DSocketServer::startSocketServer() {
   }
   // https://github.com/espressif/esp-idf/issues/6394#issuecomment-762218598
   // workarround for ip already in use when it was already closed
-  BaseType_t xTrueValue = pdTRUE;
+  /*BaseType_t xTrueValue = pdTRUE;
   setsockopt(_listen_socket, SOL_SOCKET, SO_REUSEADDR, (void *)&xTrueValue,
-             sizeof(xTrueValue));
+             sizeof(xTrueValue));*/
 
   // Marking the socket as non-blocking
   int flags = fcntl(_listen_socket, F_GETFL);
   if (fcntl(_listen_socket, F_SETFL, flags | O_NONBLOCK) == SOCKET_ERROR) {
     esp3d_log_e("Unable to set socket non blocking: errno %d: %s", errno,
                 strerror(errno));
-    close(_listen_socket);
+    closeMainSocket();
     return false;
   }
   esp3d_log("Socket marked as non blocking");
@@ -112,7 +119,7 @@ bool ESP3DSocketServer::startSocketServer() {
   if (err != 0) {
     esp3d_log_e("Socket unable to bind: errno %d, %s", errno, strerror(errno));
     esp3d_log_e("IPPROTO: %d", AF_INET);
-    close(_listen_socket);
+    closeMainSocket();
     return false;
   }
   esp3d_log("Socket bound, port %ld", _port);
@@ -120,9 +127,10 @@ bool ESP3DSocketServer::startSocketServer() {
   if (err != 0) {
     esp3d_log_e("Error occurred during listen: errno %d, %s", errno,
                 strerror(errno));
-    close(_listen_socket);
+    closeMainSocket();
     return false;
   }
+  _isRunning = true;
   return true;
 }
 
@@ -218,7 +226,7 @@ static void esp3d_socket_rx_task(void *pvParameter) {
 
   if (res) {
     // uint64_t startTimeout = 0; // milliseconds
-    while (1) {
+    while (esp3dSocketServer.isRunning()) {
       esp3dSocketServer.getClient();
       esp3dSocketServer.readSockets();
       esp3dSocketServer.handle();
@@ -227,7 +235,9 @@ static void esp3d_socket_rx_task(void *pvParameter) {
 
   } else {
     esp3d_log_e("Starting socket server failed");
+    esp3dSocketServer.end();
   }
+  esp3dSocketServer.resetTaskHandle();
   vTaskDelete(NULL);
 }
 
@@ -339,6 +349,10 @@ bool ESP3DSocketServer::begin() {
     esp3d_log("Telnet is not enabled");
     // return true because no error but _started is false
     return true;
+  }
+  if (_xHandle) {
+    esp3d_log_e("ESP3DSocketServer already has task, invalide state");
+    return false;
   }
   // Initialize client buffer
   if (pthread_mutex_init(&_rx_mutex, NULL) != 0) {
@@ -509,15 +523,18 @@ void ESP3DSocketServer::flush() {
 }
 
 void ESP3DSocketServer::end() {
-  esp3d_log("End socket server");
   if (_started) {
+    esp3d_log("End socket server");
+    _isRunning = false;
+    vTaskDelay(pdMS_TO_TICKS(500));
     flush();
+    closeAllClients();
     _started = false;
     esp3d_log("Clearing queue Rx messages");
     clearRxQueue();
     esp3d_log("Clearing queue Tx messages");
     clearTxQueue();
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    vTaskDelay(pdMS_TO_TICKS(500));
     if (pthread_mutex_destroy(&_tx_mutex) != 0) {
       esp3d_log_w("Mutex destruction for tx failed");
     }
@@ -525,16 +542,16 @@ void ESP3DSocketServer::end() {
       esp3d_log_w("Mutex destruction for rx failed");
     }
     esp3d_log("Stop telnet server");
-    // TODO
+    closeMainSocket();
     _port = 0;
-  } else {
-    esp3d_log("Socket server not started");
   }
-  if (_xHandle) {
+  // Sanity checks that need to be done even server is not started
+  // No need to kill task since server auto delete task when loop is not running
+  /*if (_xHandle) {
     vTaskDelete(_xHandle);
     _xHandle = NULL;
-    esp3d_log("Socket server task deleted");
-  }
+
+  }*/
   if (_data) {
     free(_data);
     _data = NULL;
@@ -551,9 +568,6 @@ void ESP3DSocketServer::end() {
     _buffer = NULL;
     esp3d_log("Socket server buffer cleared");
   }
-  close(_listen_socket);
-  _listen_socket = FREE_SOCKET_HANDLE;
-  closeAllClients();
 }
 
 void ESP3DSocketServer::closeAllClients() {

@@ -60,7 +60,9 @@ class ESP3DSocketServer : public ESP3DClient {
   bool getClient();
   uint clientsConnected();
   void closeAllClients();
+  void resetTaskHandle() { _xHandle = NULL; }
   ESP3DSocketInfos* getClientInfos(uint index);
+  bool isRunning() { return _isRunning; }
 
  private:
   bool sendToSocket(const int sock, const char* data, const size_t len);
@@ -68,8 +70,10 @@ class ESP3DSocketServer : public ESP3DClient {
   int getFreeClientSlot();
   ESP3DSocketInfos _clients[ESP3D_MAX_SOCKET_CLIENTS];
   int _listen_socket;
+  void closeMainSocket();
   bool _started;
   uint32_t _port;
+  bool _isRunning;
   pthread_mutex_t _tx_mutex;
   pthread_mutex_t _rx_mutex;
   TaskHandle_t _xHandle;
