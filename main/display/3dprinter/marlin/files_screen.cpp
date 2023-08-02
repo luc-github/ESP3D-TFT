@@ -39,8 +39,10 @@
 namespace filesScreen {
 
 lv_timer_t *files_screen_delay_timer = NULL;
+lv_obj_t *refresh_button = NULL;
 lv_obj_t *ui_files_list_ctl = NULL;
 lv_obj_t *files_spinner = NULL;
+lv_timer_t *start_files_list_timer = NULL;
 std::string files_path = "/";
 struct ESP3DFileDescriptor {
   std::string name;
@@ -105,6 +107,20 @@ void fill_files_list() {
   }
 }
 
+void do_files_list_now() {
+  fill_files_list();
+  // Now refresh screen
+  files_screen();
+}
+
+void start_files_list_timer_cb(lv_timer_t *timer) {
+  if (start_files_list_timer) {
+    lv_timer_del(start_files_list_timer);
+    start_files_list_timer = NULL;
+  }
+  do_files_list_now();
+}
+
 void event_button_files_refresh_handler(lv_event_t *e) {
   esp3d_log("refresh Clicked");
   lv_obj_clear_flag(files_spinner, LV_OBJ_FLAG_HIDDEN);
@@ -113,8 +129,9 @@ void event_button_files_refresh_handler(lv_event_t *e) {
     lv_obj_del(lv_obj_get_child(ui_files_list_ctl, 0));
     i--;
   }
-  fill_files_list();
-  files_screen();
+  lv_obj_clear_flag(files_spinner, LV_OBJ_FLAG_HIDDEN);
+  start_files_list_timer =
+      lv_timer_create(start_files_list_timer_cb, 100, NULL);
 }
 
 void event_button_files_up_handler(lv_event_t *e) {
@@ -196,12 +213,12 @@ void files_screen() {
   lv_obj_update_layout(btnback);
 
   // button refresh
-  lv_obj_t *btnrefresh = symbolButton::create_symbol_button(
+  refresh_button = symbolButton::create_symbol_button(
       ui_new_screen, LV_SYMBOL_REFRESH, SYMBOL_BUTTON_WIDTH,
       lv_obj_get_height(btnback));
-  lv_obj_align(btnrefresh, LV_ALIGN_BOTTOM_MID, 0,
+  lv_obj_align(refresh_button, LV_ALIGN_BOTTOM_MID, 0,
                -CURRENT_BUTTON_PRESSED_OUTLINE);
-  lv_obj_add_event_cb(btnrefresh, event_button_files_refresh_handler,
+  lv_obj_add_event_cb(refresh_button, event_button_files_refresh_handler,
                       LV_EVENT_CLICKED, NULL);
   // label path
   lv_obj_t *labelpath = lv_label_create(ui_new_screen);
@@ -244,9 +261,7 @@ void files_screen() {
   // populate if not done
   if (first_fill_needed) {
     if (files_list.size() == 0) {
-      lv_obj_clear_flag(files_spinner, LV_OBJ_FLAG_HIDDEN);
-      fill_files_list();
-      lv_obj_add_flag(files_spinner, LV_OBJ_FLAG_HIDDEN);
+      event_button_files_refresh_handler(nullptr);
     }
     first_fill_needed = false;
   }
