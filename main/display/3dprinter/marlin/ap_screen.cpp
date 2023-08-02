@@ -83,10 +83,11 @@ void update_button_ok() {
   esp3d_log("Update ok vibility");
   std::string mode =
       esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
-  if (ssid_current.length() == 0 || ssid_current.length() > 32 ||
+  if (!esp3dTftsettings.isValidStringSetting(
+          ssid_current.c_str(), ESP3DSettingIndex::esp3d_ap_ssid) ||
       (mode == LV_SYMBOL_ACCESS_POINT && ssid_ini == ssid_current) ||
-      password_current.length() > 64 ||
-      (password_current.length() != 0 && password_current.length() < 8)) {
+      !esp3dTftsettings.isValidStringSetting(
+          password_current.c_str(), ESP3DSettingIndex::esp3d_ap_password)) {
     esp3d_log("Ok hide");
     lv_obj_add_flag(btn_ok, LV_OBJ_FLAG_HIDDEN);
   } else {
@@ -109,11 +110,12 @@ void update_button_save() {
     lv_obj_clear_flag(btn_save, LV_OBJ_FLAG_HIDDEN);
     esp3d_log("Save visible");
   }
-  if (ssid_current.length() == 0 || ssid_current.length() > 32) {
+  if (!esp3dTftsettings.isValidStringSetting(
+          ssid_current.c_str(), ESP3DSettingIndex::esp3d_ap_ssid)) {
     lv_obj_add_flag(btn_save, LV_OBJ_FLAG_HIDDEN);
   }
-  if (password_current.length() > 64 ||
-      (password_current.length() != 0 && password_current.length() < 8)) {
+  if (!esp3dTftsettings.isValidStringSetting(
+          password_current.c_str(), ESP3DSettingIndex::esp3d_ap_password)) {
     lv_obj_add_flag(btn_save, LV_OBJ_FLAG_HIDDEN);
   }
 }
