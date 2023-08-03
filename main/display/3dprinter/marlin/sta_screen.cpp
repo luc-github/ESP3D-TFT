@@ -92,6 +92,16 @@ static void bgScanTask(void *pvParameter) {
 
 void fill_ssid_scanned_list() {
   ssid_scanned_list.clear();
+  bool nowifi = false;
+  if (esp3dNetwork.getMode() == ESP3DRadioMode::off) {
+    nowifi = true;
+    esp3dNetwork.setModeAsync(ESP3DRadioMode::wifi_ap_limited);
+    // FIXME: Should add a timout if failed
+    while (esp3dNetwork.getMode() != ESP3DRadioMode::wifi_ap_limited) {
+      vTaskDelay(pdMS_TO_TICKS(1000));
+      esp3d_log("Waiting limited mode is active");
+    }
+  }
   if (esp3dNetwork.getMode() != ESP3DRadioMode::wifi_sta) {
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
   }
@@ -132,6 +142,13 @@ void fill_ssid_scanned_list() {
   }
   if (esp3dNetwork.getMode() != ESP3DRadioMode::wifi_sta) {
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
+  }
+  if (nowifi) {
+    esp3dNetwork.setModeAsync(ESP3DRadioMode::off);
+    while (esp3dNetwork.getMode() != ESP3DRadioMode::off) {
+      vTaskDelay(pdMS_TO_TICKS(1000));
+      esp3d_log("Waiting limited mode back to off");
+    }
   }
 }
 

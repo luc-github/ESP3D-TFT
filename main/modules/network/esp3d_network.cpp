@@ -191,6 +191,7 @@ bool ESP3DNetwork::getLocalIp(ESP3DIpInfos* ipInfo) {
 
 ESP3DNetwork::ESP3DNetwork() {
   _current_radio_mode = ESP3DRadioMode::off;
+  _async_radio_mode = ESP3DRadioMode::none;
 #if ESP3D_WIFI_FEATURE
   _wifiApPtr = nullptr;
   _s_wifi_event_group = nullptr;
@@ -233,6 +234,12 @@ bool ESP3DNetwork::begin() {
   return _started;
 }
 
+bool ESP3DNetwork::setModeAsync(ESP3DRadioMode mode) {
+  _async_radio_mode = mode;
+  esp3d_log_e("Enabling async mode to %d", (uint8_t)_async_radio_mode);
+  return true;
+}
+
 void ESP3DNetwork::handle() {
 #if ESP3D_WIFI_FEATURE
   if (_current_radio_mode == ESP3DRadioMode::wifi_sta &&
@@ -242,6 +249,12 @@ void ESP3DNetwork::handle() {
     esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
                                     "IP lost");
     setMode(ESP3DRadioMode::wifi_sta, true);
+  }
+  if (_async_radio_mode != ESP3DRadioMode::none) {
+    esp3d_log_e("Asking for change to %d", (uint8_t)_async_radio_mode);
+    ESP3DRadioMode mode = _async_radio_mode;
+    _async_radio_mode = ESP3DRadioMode::none;
+    setMode(mode);
   }
 #endif  // ESP3D_WIFI_FEATURE
 }
@@ -478,7 +491,7 @@ int32_t ESP3DNetwork::getSignal(int32_t RSSI, bool filter) {
   return (2 * (RSSI + 100));
 }
 
-bool ESP3DNetwork::startApMode(bool configMode) {
+bool ESP3DNetwork::startApMode(bool configMode, bool limited) {
   esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
                                   "Set as Access Point");
   bool success = false;
@@ -597,7 +610,7 @@ bool ESP3DNetwork::startApMode(bool configMode) {
   esp3dCommands.dispatch(stmp.c_str(), ESP3DClientType::all_clients, requestId,
                          ESP3DMessageType::unique, ESP3DClientType::system,
                          ESP3DAuthenticationLevel::admin);
-  if (success) {
+  if (success && !limited) {
     esp3dNetworkServices.begin();
   }
   return success;
@@ -630,6 +643,13 @@ bool ESP3DNetwork::startBtMode() {
 }
 
 #if ESP3D_WIFI_FEATURE
+bool ESP3DNetwork::startLimitedMode() {
+  esp3d_log("Init Limited Mode");
+  bool res = startApMode(true, true);
+  _current_radio_mode = ESP3DRadioMode::wifi_ap_limited;
+  return res;
+}
+
 bool ESP3DNetwork::startConfigMode() {
   esp3d_log("Init Config Mode");
   bool res = startApMode(true);
@@ -714,6 +734,12 @@ bool ESP3DNetwork::stopConfigMode() {
   bool res = stopApMode();
   return res;
 }
+
+bool ESP3DNetwork::stopLimitedMode() {
+  esp3d_log("Stop Limited Mode");
+  bool res = stopApMode();
+  return res;
+}
 #endif  // ESP3D_WIFI_FEATURE
 
 bool ESP3DNetwork::stopBtMode() {
@@ -743,6 +769,9 @@ bool ESP3DNetwork::setMode(ESP3DRadioMode mode, bool restart) {
       break;
     case ESP3DRadioMode::wifi_ap_config:
       stopConfigMode();
+      break;
+    case ESP3DRadioMode::wifi_ap_limited:
+      stopLimitedMode();
       break;
 #endif  // ESP3D_WIFI_FEATURE
     case ESP3DRadioMode::bluetooth_serial:
@@ -776,6 +805,11 @@ bool ESP3DNetwork::setMode(ESP3DRadioMode mode, bool restart) {
       esp3dTftValues.set_string_value(ESP3DValuesIndex::network_mode,
                                       LV_SYMBOL_ACCESS_POINT);
       startConfigMode();
+      break;
+    case ESP3DRadioMode::wifi_ap_limited:
+      esp3dTftValues.set_string_value(ESP3DValuesIndex::network_mode,
+                                      LV_SYMBOL_ACCESS_POINT);
+      startLimitedMode();
       break;
 #endif  // ESP3D_WIFI_FEATURE
     case ESP3DRadioMode::bluetooth_serial:

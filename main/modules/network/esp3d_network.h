@@ -47,7 +47,9 @@ enum class ESP3DRadioMode : uint8_t {
   wifi_sta = 1,
   wifi_ap = 2,
   wifi_ap_config = 3,
-  bluetooth_serial = 4
+  bluetooth_serial = 4,
+  wifi_ap_limited = 6,
+  none = 7,
 };
 
 class ESP3DNetwork final {
@@ -60,11 +62,13 @@ class ESP3DNetwork final {
   bool startNoRadioMode();
 #if ESP3D_WIFI_FEATURE
   bool startStaMode();
-  bool startApMode(bool configMode = false);
+  bool startApMode(bool configMode = false, bool limited = false);
   bool startConfigMode();
+  bool startLimitedMode();
   bool stopStaMode();
   bool stopApMode();
   bool stopConfigMode();
+  bool stopLimitedMode();
 
   const char* getAPMac();
   const char* getSTAMac();
@@ -80,6 +84,7 @@ class ESP3DNetwork final {
   bool stopNoRadioMode();
   bool stopBtMode();
   bool setMode(ESP3DRadioMode mode, bool restart = false);
+  bool setModeAsync(ESP3DRadioMode mode);
   const char* getBTMac();
   const char* getMacAddress(uint8_t mac[6]);
   const char* getModeStr(ESP3DRadioMode mode);
@@ -98,6 +103,7 @@ class ESP3DNetwork final {
   EventGroupHandle_t _s_wifi_event_group;
 #endif  // ESP3D_WIFI_FEATURE
   ESP3DRadioMode _current_radio_mode;
+  ESP3DRadioMode _async_radio_mode;
   std::string _hostname;
   const char* getMac(esp_mac_type_t type);
 };

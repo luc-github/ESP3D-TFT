@@ -94,6 +94,6 @@ bool ESP3DTftNetwork::begin() {
   }
 }
 
-void ESP3DTftNetwork::handle() {}
+void ESP3DTftNetwork::handle() { esp3dNetwork.handle(); }
 
 bool ESP3DTftNetwork::end() { return true; }

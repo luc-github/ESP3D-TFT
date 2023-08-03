@@ -56,6 +56,8 @@ void ESP3DCommands::ESP104(int cmd_params_pos, ESP3DMessage* msg) {
       ok_msg = "CONFIG";
     } else if (byteValue == (uint8_t)ESP3DRadioMode::off) {
       ok_msg = "OFF";
+    } else if (byteValue == (uint8_t)ESP3DRadioMode::wifi_ap_limited) {
+      ok_msg = "LIMITED";
     } else {
       ok_msg = "Unknown";
     }
