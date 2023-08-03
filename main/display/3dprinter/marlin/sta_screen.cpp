@@ -57,6 +57,7 @@ lv_obj_t *btn_save = nullptr;
 lv_obj_t *ui_sta_ssid_list_ctl = NULL;
 lv_obj_t *sta_spinner = NULL;
 lv_timer_t *start_scan_timer = NULL;
+lv_obj_t *status_component = nullptr;
 
 std::string ssid_ini;
 std::string password_ini;
@@ -92,15 +93,9 @@ static void bgScanTask(void *pvParameter) {
 
 void fill_ssid_scanned_list() {
   ssid_scanned_list.clear();
-  bool nowifi = false;
   if (esp3dNetwork.getMode() == ESP3DRadioMode::off) {
-    nowifi = true;
-    esp3dNetwork.setModeAsync(ESP3DRadioMode::wifi_ap_limited);
-    // FIXME: Should add a timout if failed
-    while (esp3dNetwork.getMode() != ESP3DRadioMode::wifi_ap_limited) {
-      vTaskDelay(pdMS_TO_TICKS(1000));
-      esp3d_log("Waiting limited mode is active");
-    }
+    esp3d_log_e("Wifi is off so no scan possible");
+    return;
   }
   if (esp3dNetwork.getMode() != ESP3DRadioMode::wifi_sta) {
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
@@ -143,13 +138,6 @@ void fill_ssid_scanned_list() {
   if (esp3dNetwork.getMode() != ESP3DRadioMode::wifi_sta) {
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
   }
-  if (nowifi) {
-    esp3dNetwork.setModeAsync(ESP3DRadioMode::off);
-    while (esp3dNetwork.getMode() != ESP3DRadioMode::off) {
-      vTaskDelay(pdMS_TO_TICKS(1000));
-      esp3d_log("Waiting limited mode back to off");
-    }
-  }
 }
 
 void event_button_join_cb(lv_event_t *e) {
@@ -160,7 +148,9 @@ void event_button_join_cb(lv_event_t *e) {
 }
 
 void event_bg_touched_cb(lv_event_t *e) {
-  lv_obj_add_flag(ui_sta_ssid_list_ctl, LV_OBJ_FLAG_HIDDEN);
+  if (ui_sta_ssid_list_ctl)
+    lv_obj_add_flag(ui_sta_ssid_list_ctl, LV_OBJ_FLAG_HIDDEN);
+  if (status_component) lv_obj_clear_flag(status_component, LV_OBJ_FLAG_HIDDEN);
 }
 
 void fill_ui_sta_ssid_list() {
@@ -227,6 +217,16 @@ bool save_parameters() {
   }
   update_button_save();
   return res;
+}
+
+void update_sta_button_scan() {
+  std::string mode =
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
+  if (mode == LV_SYMBOL_WIFI) {
+    lv_obj_add_flag(btn_scan, LV_OBJ_FLAG_HIDDEN);
+  } else {
+    lv_obj_clear_flag(btn_scan, LV_OBJ_FLAG_HIDDEN);
+  }
 }
 
 void update_sta_button_ok() {
@@ -298,6 +298,9 @@ void sta_ta_event_cb(lv_event_t *e) {
     }
     if (ui_sta_ssid_list_ctl)
       lv_obj_add_flag(ui_sta_ssid_list_ctl, LV_OBJ_FLAG_HIDDEN);
+    if (status_component)
+      lv_obj_clear_flag(status_component, LV_OBJ_FLAG_HIDDEN);
+
     if (sta_spinner) lv_obj_add_flag(sta_spinner, LV_OBJ_FLAG_HIDDEN);
     update_sta_button_ok();
     update_button_save();
@@ -343,7 +346,8 @@ void sta_event_button_scan_handler(lv_event_t *e) {
   esp3d_log("scan Clicked");
   if (ui_sta_ssid_list_ctl) {
     lv_obj_clear_flag(ui_sta_ssid_list_ctl, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(sta_spinner, LV_OBJ_FLAG_HIDDEN);
+    if (status_component) lv_obj_add_flag(status_component, LV_OBJ_FLAG_HIDDEN);
+    if (sta_spinner) lv_obj_clear_flag(sta_spinner, LV_OBJ_FLAG_HIDDEN);
     start_scan_timer = lv_timer_create(start_scan_timer_cb, 100, NULL);
     size_t i = lv_obj_get_child_cnt(ui_sta_ssid_list_ctl);
     while (i > 0) {
@@ -458,6 +462,8 @@ void sta_screen() {
   }
   lv_textarea_set_password_mode(sta_ta_password, true);
 
+  status_component = wifiStatus::wifi_status(ui_new_screen, btnback);
+
   // Keyboard
   lv_obj_t *kb = lv_keyboard_create(ui_new_screen);
   lv_keyboard_set_textarea(kb, NULL);
@@ -465,8 +471,6 @@ void sta_screen() {
   lv_obj_set_style_radius(kb, CURRENT_BUTTON_RADIUS_VALUE, LV_PART_MAIN);
   lv_obj_add_event_cb(sta_ta_ssid, sta_ta_event_cb, LV_EVENT_ALL, kb);
   lv_obj_add_event_cb(sta_ta_password, sta_ta_event_cb, LV_EVENT_ALL, kb);
-
-  wifiStatus::wifi_status(ui_new_screen, btnback);
 
   // Create button and label for ok
   btn_ok = symbolButton::create_symbol_button(ui_main_container, LV_SYMBOL_OK,
@@ -524,11 +528,14 @@ void sta_screen() {
   lv_obj_set_y(sta_spinner, lv_obj_get_y(ui_sta_ssid_list_ctl) +
                                 (lv_obj_get_height(ui_sta_ssid_list_ctl) / 2) -
                                 (CURRENT_SPINNER_SIZE / 2));
-  lv_obj_add_flag(sta_spinner, LV_OBJ_FLAG_HIDDEN);
-  lv_obj_add_flag(ui_sta_ssid_list_ctl, LV_OBJ_FLAG_HIDDEN);
+  if (sta_spinner) lv_obj_add_flag(sta_spinner, LV_OBJ_FLAG_HIDDEN);
+  if (ui_sta_ssid_list_ctl)
+    lv_obj_add_flag(ui_sta_ssid_list_ctl, LV_OBJ_FLAG_HIDDEN);
+  if (status_component) lv_obj_clear_flag(status_component, LV_OBJ_FLAG_HIDDEN);
 
   update_sta_button_ok();
   update_button_save();
+  update_sta_button_scan();
   esp3dTftui.set_current_screen(ESP3DScreenType::station);
 }
 }  // namespace staScreen

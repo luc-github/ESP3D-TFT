@@ -34,18 +34,20 @@
 namespace listLine {
 lv_obj_t *create_list_line_container(lv_obj_t *container) {
   lv_obj_t *line_container = lv_obj_create(container);
-  lv_obj_update_layout(container);
-  lv_obj_set_width(line_container, lv_obj_get_content_width(container));
-  lv_obj_set_height(line_container, LIST_LINE_HEIGHT);
+  if (line_container) {
+    lv_obj_update_layout(container);
+    lv_obj_set_width(line_container, lv_obj_get_content_width(container));
+    lv_obj_set_height(line_container, LIST_LINE_HEIGHT);
 
-  lv_obj_set_style_pad_all(line_container, 0, LV_PART_MAIN);
-  lv_obj_set_style_pad_bottom(line_container, 4, LV_PART_MAIN);
-  lv_obj_set_style_pad_right(line_container, CURRENT_BUTTON_PRESSED_OUTLINE,
-                             LV_PART_MAIN);
-  lv_obj_set_style_border_side(line_container, LV_BORDER_SIDE_BOTTOM,
+    lv_obj_set_style_pad_all(line_container, 0, LV_PART_MAIN);
+    lv_obj_set_style_pad_bottom(line_container, 4, LV_PART_MAIN);
+    lv_obj_set_style_pad_right(line_container, CURRENT_BUTTON_PRESSED_OUTLINE,
                                LV_PART_MAIN);
-  lv_obj_set_flex_flow(line_container, LV_FLEX_FLOW_ROW);
-  lv_obj_clear_flag(line_container, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_border_side(line_container, LV_BORDER_SIDE_BOTTOM,
+                                 LV_PART_MAIN);
+    lv_obj_set_flex_flow(line_container, LV_FLEX_FLOW_ROW);
+    lv_obj_clear_flag(line_container, LV_OBJ_FLAG_SCROLLABLE);
+  }
   return line_container;
 }
 

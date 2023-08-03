@@ -236,13 +236,13 @@ bool ESP3DNetwork::begin() {
 
 bool ESP3DNetwork::setModeAsync(ESP3DRadioMode mode) {
   _async_radio_mode = mode;
-  esp3d_log_e("Enabling async mode to %d", (uint8_t)_async_radio_mode);
+  esp3d_log("Enabling async mode to %d", (uint8_t)_async_radio_mode);
   return true;
 }
 
 void ESP3DNetwork::handle() {
 #if ESP3D_WIFI_FEATURE
-  if (_current_radio_mode == ESP3DRadioMode::wifi_sta &&
+  if (_current_radio_mode == ESP3DRadioMode::wifi_sta && _s_wifi_event_group &&
       (xEventGroupGetBits(_s_wifi_event_group) & WIFI_STA_LOST_IP)) {
     xEventGroupClearBits(_s_wifi_event_group, WIFI_STA_LOST_IP);
     esp3d_log("Force restart wifi station");
@@ -251,7 +251,7 @@ void ESP3DNetwork::handle() {
     setMode(ESP3DRadioMode::wifi_sta, true);
   }
   if (_async_radio_mode != ESP3DRadioMode::none) {
-    esp3d_log_e("Asking for change to %d", (uint8_t)_async_radio_mode);
+    esp3d_log("Asking for change to %d", (uint8_t)_async_radio_mode);
     ESP3DRadioMode mode = _async_radio_mode;
     _async_radio_mode = ESP3DRadioMode::none;
     setMode(mode);

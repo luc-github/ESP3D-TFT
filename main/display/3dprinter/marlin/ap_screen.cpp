@@ -289,6 +289,8 @@ void ap_screen() {
   }
   lv_textarea_set_password_mode(ap_ta_password, true);
 
+  wifiStatus::wifi_status(ui_new_screen, btnback);
+
   // Keyboard
   lv_obj_t *kb = lv_keyboard_create(ui_new_screen);
   lv_keyboard_set_textarea(kb, NULL);
@@ -296,8 +298,6 @@ void ap_screen() {
   lv_obj_set_style_radius(kb, CURRENT_BUTTON_RADIUS_VALUE, LV_PART_MAIN);
   lv_obj_add_event_cb(ap_ta_ssid, ap_ta_event_cb, LV_EVENT_ALL, kb);
   lv_obj_add_event_cb(ap_ta_password, ap_ta_event_cb, LV_EVENT_ALL, kb);
-
-  wifiStatus::wifi_status(ui_new_screen, btnback);
 
   // Create button and label for ok
   btn_ok = symbolButton::create_symbol_button(ui_main_container, LV_SYMBOL_OK,
