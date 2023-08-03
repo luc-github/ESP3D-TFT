@@ -27,14 +27,17 @@
 #include "esp3d_log.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "list_line_component.h"
 #include "main_container_component.h"
 #include "menu_screen.h"
+#include "translations/esp3d_translation_service.h"
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 namespace settingsScreen {
 lv_timer_t *settings_screen_delay_timer = NULL;
+lv_obj_t *ui_settings_list_ctl = NULL;
 
 void settings_screen_delay_timer_cb(lv_timer_t *timer) {
   if (settings_screen_delay_timer) {
@@ -65,16 +68,34 @@ void settings_screen() {
   lv_scr_load(ui_new_screen);
   lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
-
-  // TODO: Add your code here
   lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_settings_back_handler,
                       LV_EVENT_CLICKED, NULL);
-  lv_obj_t *ui_main_container = mainContainer::create_main_container(
-      ui_new_screen, btnback, ESP3DStyleType::col_container);
 
-  lv_obj_set_style_bg_opa(ui_main_container, LV_OPA_COVER, LV_PART_MAIN);
-  lv_obj_set_style_bg_color(ui_main_container, lv_color_white(), LV_PART_MAIN);
+  ui_settings_list_ctl = lv_list_create(ui_new_screen);
+  lv_obj_clear_flag(ui_settings_list_ctl, LV_OBJ_FLAG_SCROLL_ELASTIC);
+
+  lv_obj_set_size(
+      ui_settings_list_ctl, LV_HOR_RES - CURRENT_BUTTON_PRESSED_OUTLINE * 2,
+      LV_VER_RES -
+          ((3 * CURRENT_BUTTON_PRESSED_OUTLINE) + lv_obj_get_height(btnback)));
+
+  lv_obj_set_pos(ui_settings_list_ctl, CURRENT_BUTTON_PRESSED_OUTLINE,
+                 CURRENT_BUTTON_PRESSED_OUTLINE);
+  // Hostname
+  lv_obj_t *line_container =
+      listLine::create_list_line_container(ui_settings_list_ctl);
+  std::string LabelStr =
+      esp3dTranslationService.translate(ESP3DLabel::hostname);
+  if (line_container) {
+    listLine::add_label_to_line(LabelStr.c_str(), line_container, false);
+  }
+  // Extensions
+  line_container = listLine::create_list_line_container(ui_settings_list_ctl);
+  LabelStr = esp3dTranslationService.translate(ESP3DLabel::extensions);
+  if (line_container) {
+    listLine::add_label_to_line(LabelStr.c_str(), line_container, false);
+  }
   esp3dTftui.set_current_screen(ESP3DScreenType::settings);
 }
 }  // namespace settingsScreen

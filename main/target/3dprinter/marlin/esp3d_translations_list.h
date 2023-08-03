@@ -46,6 +46,8 @@ enum class ESP3DLabel : uint16_t {
   stop_print,
   error,
   error_applying_mode,
+  hostname,
+  extensions,
   unknown_index
 };
 
