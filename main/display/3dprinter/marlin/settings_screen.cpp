@@ -89,12 +89,20 @@ void settings_screen() {
       esp3dTranslationService.translate(ESP3DLabel::hostname);
   if (line_container) {
     listLine::add_label_to_line(LabelStr.c_str(), line_container, false);
+    lv_obj_t *lbl = listLine::add_label_to_line("ESP3d", line_container, true);
+    lv_obj_set_style_text_align(lbl, LV_TEXT_ALIGN_RIGHT, 0);
+    lv_obj_t *btnEdit =
+        listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
   }
   // Extensions
   line_container = listLine::create_list_line_container(ui_settings_list_ctl);
   LabelStr = esp3dTranslationService.translate(ESP3DLabel::extensions);
   if (line_container) {
     listLine::add_label_to_line(LabelStr.c_str(), line_container, false);
+    lv_obj_t *lbl = listLine::add_label_to_line("ESP3d", line_container, true);
+    lv_obj_set_style_text_align(lbl, LV_TEXT_ALIGN_RIGHT, 0);
+    lv_obj_t *btnEdit =
+        listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
   }
   esp3dTftui.set_current_screen(ESP3DScreenType::settings);
 }
