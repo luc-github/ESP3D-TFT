@@ -47,13 +47,13 @@ const char* ESP3DJsonSettings::readString(const char* section,
 
   char chunk[CHUNK_BUFFER_SIZE + 1];
   std::string currentLabel = "";
+  std::string currentSection = "";
   bool initialString = true;
   bool waitForBoolean = false;
   uint deepthLevel = 0;
   int currentIndex = 0;
   int valueIndex = 0;
   bool valueIsString = false;
-  std::string currentSection = "";
   std::string currentParsingStr = "";
   std::string valueSearched = "";
   currentIndex = 0;
@@ -74,6 +74,10 @@ const char* ESP3DJsonSettings::readString(const char* section,
             // is section label?
             if (currentLabel.length() > 0) {
               esp3d_log("Entering in section '%s'", currentLabel.c_str());
+              currentSection = currentLabel;
+              if (currentSection == section) {
+                deepthLevel = 0;
+              }
             }
             currentLabel = "";
             currentParsingStr = "";
@@ -84,7 +88,8 @@ const char* ESP3DJsonSettings::readString(const char* section,
             if (waitForBoolean) {
               std::string key = currentLabel;
               std::string value = currentParsingStr;
-              if (key == entry) {
+              if (key == entry &&
+                  (currentSection == section || deepthLevel == 0)) {
                 valueIsString = false;
                 parsingDone = true;
                 valueSearched = value;
@@ -113,12 +118,13 @@ const char* ESP3DJsonSettings::readString(const char* section,
               } else {
                 std::string key = currentLabel;
                 std::string value = currentParsingStr;
-                if (key == entry) {
+                if (key == entry &&
+                    (currentSection == section || deepthLevel == 0)) {
                   valueIsString = true;
                   parsingDone = true;
                   valueIndex = currentIndex - value.length() - 1;
                   valueSearched = value;
-                  esp3d_log("Found");
+                  esp3d_log("Found at level %d", deepthLevel);
                 }
                 esp3d_log("Setting %s = %s", key.c_str(), value.c_str());
                 currentLabel = "";
@@ -134,7 +140,8 @@ const char* ESP3DJsonSettings::readString(const char* section,
             if (waitForBoolean) {
               std::string key = currentLabel;
               std::string value = currentParsingStr;
-              if (key == entry) {
+              if (key == entry &&
+                  (currentSection == section || deepthLevel == 0)) {
                 valueIsString = false;
                 parsingDone = true;
                 valueIndex = currentIndex - value.length() - 1;
