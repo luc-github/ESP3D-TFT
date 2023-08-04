@@ -24,6 +24,7 @@
 
 #include "back_button_component.h"
 #include "esp3d_hal.h"
+#include "esp3d_json_settings.h"
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
 #include "esp3d_styles.h"
@@ -42,6 +43,7 @@ namespace settingsScreen {
 lv_timer_t *settings_screen_delay_timer = NULL;
 lv_obj_t *ui_settings_list_ctl = NULL;
 lv_obj_t *hostname_label = NULL;
+lv_obj_t *extensions_label = NULL;
 
 void settings_screen_delay_timer_cb(lv_timer_t *timer) {
   if (settings_screen_delay_timer) {
@@ -68,6 +70,16 @@ void hostname_edit_done_cb(const char *str) {
     }
   }
 }
+
+void event_button_edit_extensions_cb(lv_event_t *e) {
+  esp3d_log("Show component");
+  // const char *text = (const char *)lv_event_get_user_data(e);
+  char str[255 + 1] = {0};
+  bool has_error = false;
+  esp3dTftJsonSettings.readString("settings", "filesfilter", str, 255,
+                                  &has_error);
+}
+
 void event_button_edit_hostname_cb(lv_event_t *e) {
   esp3d_log("Show component");
   const char *text = (const char *)lv_event_get_user_data(e);
@@ -138,11 +150,14 @@ void settings_screen() {
   LabelStr = esp3dTranslationService.translate(ESP3DLabel::extensions);
   if (line_container) {
     listLine::add_label_to_line(LabelStr.c_str(), line_container, false);
-    lv_obj_t *lbl =
+    extensions_label =
         listLine::add_label_to_line("gco;gcode;g", line_container, true);
-    lv_obj_set_style_text_align(lbl, LV_TEXT_ALIGN_RIGHT, 0);
+    lv_obj_set_style_text_align(extensions_label, LV_TEXT_ALIGN_RIGHT, 0);
     lv_obj_t *btnEdit =
         listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
+    lv_obj_add_event_cb(btnEdit, event_button_edit_extensions_cb,
+                        LV_EVENT_CLICKED,
+                        (void *)(lv_label_get_text(extensions_label)));
   }
   esp3dTftui.set_current_screen(ESP3DScreenType::settings);
 }
