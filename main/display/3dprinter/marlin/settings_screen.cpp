@@ -25,11 +25,14 @@
 #include "back_button_component.h"
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
+#include "esp3d_settings.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "list_line_component.h"
 #include "main_container_component.h"
 #include "menu_screen.h"
+#include "message_box_component.h"
+#include "text_editor_component.h"
 #include "translations/esp3d_translation_service.h"
 
 /**********************
@@ -38,6 +41,7 @@
 namespace settingsScreen {
 lv_timer_t *settings_screen_delay_timer = NULL;
 lv_obj_t *ui_settings_list_ctl = NULL;
+lv_obj_t *hostname_label = NULL;
 
 void settings_screen_delay_timer_cb(lv_timer_t *timer) {
   if (settings_screen_delay_timer) {
@@ -47,6 +51,28 @@ void settings_screen_delay_timer_cb(lv_timer_t *timer) {
   menuScreen::menu_screen();
 }
 
+void hostname_edit_done_cb(const char *str) {
+  esp3d_log("Saving hostname to: %s\n", str);
+  if (esp3dTftsettings.isValidStringSetting(
+          str, ESP3DSettingIndex::esp3d_hostname)) {
+    esp3d_log("Value %s is valid", str);
+    if (esp3dTftsettings.writeString(ESP3DSettingIndex::esp3d_hostname, str)) {
+      if (hostname_label) {
+        lv_label_set_text(hostname_label, str);
+      }
+    } else {
+      esp3d_log_e("Failed to save hostname");
+      std::string text =
+          esp3dTranslationService.translate(ESP3DLabel::error_applying_mode);
+      msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+    }
+  }
+}
+void event_button_edit_hostname_cb(lv_event_t *e) {
+  esp3d_log("Show component");
+  const char *text = (const char *)lv_event_get_user_data(e);
+  textEditor::create_text_editor(lv_scr_act(), text, hostname_edit_done_cb);
+}
 void event_button_settings_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
   if (BUTTON_ANIMATION_DELAY) {
@@ -88,18 +114,32 @@ void settings_screen() {
   std::string LabelStr =
       esp3dTranslationService.translate(ESP3DLabel::hostname);
   if (line_container) {
+    std::string hostname;
     listLine::add_label_to_line(LabelStr.c_str(), line_container, false);
-    lv_obj_t *lbl = listLine::add_label_to_line("ESP3d", line_container, true);
-    lv_obj_set_style_text_align(lbl, LV_TEXT_ALIGN_RIGHT, 0);
+    const ESP3DSettingDescription *settingPtr =
+        esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_hostname);
+    if (settingPtr) {
+      char out_str[33] = {0};
+      hostname = esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_hostname,
+                                             out_str, settingPtr->size);
+    }
+    hostname_label =
+        listLine::add_label_to_line(hostname.c_str(), line_container, true);
+    lv_obj_set_style_text_align(hostname_label, LV_TEXT_ALIGN_RIGHT, 0);
     lv_obj_t *btnEdit =
         listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
+    lv_obj_add_event_cb(btnEdit, event_button_edit_hostname_cb,
+                        LV_EVENT_CLICKED,
+                        (void *)(lv_label_get_text(hostname_label)));
   }
+
   // Extensions
   line_container = listLine::create_list_line_container(ui_settings_list_ctl);
   LabelStr = esp3dTranslationService.translate(ESP3DLabel::extensions);
   if (line_container) {
     listLine::add_label_to_line(LabelStr.c_str(), line_container, false);
-    lv_obj_t *lbl = listLine::add_label_to_line("ESP3d", line_container, true);
+    lv_obj_t *lbl =
+        listLine::add_label_to_line("gco;gcode;g", line_container, true);
     lv_obj_set_style_text_align(lbl, LV_TEXT_ALIGN_RIGHT, 0);
     lv_obj_t *btnEdit =
         listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);

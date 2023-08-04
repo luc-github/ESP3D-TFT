@@ -45,6 +45,7 @@ void ESP3DTranslationService::init() {
       {ESP3DLabel::stop_print, "Do you want to stop current print?"},
       {ESP3DLabel::error, "Error"},
       {ESP3DLabel::error_applying_mode, "Apply mode failed!"},
+      {ESP3DLabel::error_applying_setting, "Apply setting failed!"},
       {ESP3DLabel::hostname, "Hostname"},
       {ESP3DLabel::extensions, "Extensions"}};
 }
