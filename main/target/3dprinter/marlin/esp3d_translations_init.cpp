@@ -47,5 +47,6 @@ void ESP3DTranslationService::init() {
       {ESP3DLabel::error_applying_mode, "Apply mode failed!"},
       {ESP3DLabel::error_applying_setting, "Apply setting failed!"},
       {ESP3DLabel::hostname, "Hostname"},
-      {ESP3DLabel::extensions, "Extensions"}};
+      {ESP3DLabel::extensions, "Extensions"},
+      {ESP3DLabel::please_wait, "Please wait..."}};
 }

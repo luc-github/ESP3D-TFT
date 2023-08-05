@@ -71,8 +71,27 @@ lv_style_t style_embedded_btn_pressed;
 lv_style_t style_col_container_default;
 lv_style_t style_row_container_default;
 lv_style_t style_simple_container_default;
+lv_style_t style_spinner_screen;
+lv_style_t style_spinner_text;
 
 bool init_styles() {
+  /*
+  Spinner screen
+  */
+  lv_style_init(&style_spinner_screen);
+  lv_style_set_text_opa(&style_spinner_screen, LV_OPA_COVER);
+  lv_style_set_text_color(&style_spinner_screen, CURRENT_BG_LABEL_TEXT_COLOR);
+  lv_style_set_bg_color(&style_spinner_screen, CURRENT_MAIN_BG_COLOR);
+  lv_style_set_bg_opa(&style_spinner_screen, LV_OPA_COVER);
+  /*
+  Spinner text
+  */
+  lv_style_init(&style_spinner_text);
+  lv_style_set_text_opa(&style_spinner_text, LV_OPA_COVER);
+  lv_style_set_text_color(&style_spinner_text, CURRENT_BG_LABEL_TEXT_COLOR);
+  lv_style_set_bg_color(&style_spinner_text, CURRENT_MAIN_BG_COLOR);
+  lv_style_set_bg_opa(&style_spinner_text, LV_OPA_COVER);
+
   /*
   Main background
   */
@@ -452,6 +471,12 @@ bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
     // theme*/
   }
   switch (type) {
+    case ESP3DStyleType::spinnerScreen:
+      lv_obj_add_style(obj, &style_spinner_screen, LV_STATE_DEFAULT);
+      break;
+    case ESP3DStyleType::spinnerText:
+      lv_obj_add_style(obj, &style_spinner_text, LV_STATE_DEFAULT);
+      break;
     case ESP3DStyleType::main_bg:
       lv_obj_add_style(obj, &style_main_bg, LV_STATE_DEFAULT);
       lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);

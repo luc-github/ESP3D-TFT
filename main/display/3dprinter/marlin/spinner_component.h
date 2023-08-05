@@ -1,7 +1,7 @@
 /*
-  esp3d_translation_service
+spinner_component.h - ESP3D screens definition
 
-  Copyright (c) 2023 Luc Lebosse. All rights reserved.
+  Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
   This code is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -19,39 +19,21 @@
 */
 
 #pragma once
+
 #include <stdio.h>
+
+#include <string>
+
+#include "esp3d_styles.h"
+#include "esp3d_values.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-enum class ESP3DLabel : uint16_t {
-  language = 0,
-  size_for_update,
-  screen,
-  architecture,
-  sdk_version,
-  cpu_freq,
-  flash_size,
-  free_heap,
-  total_psram,
-  version,
-  sd_updater,
-  on,
-  off,
-  millimeters,
-  celcius,
-  flash_type,
-  confirmation,
-  stop_print,
-  error,
-  error_applying_mode,
-  error_applying_setting,
-  hostname,
-  extensions,
-  please_wait,
-  unknown_index
-};
+namespace spinnerScreen {
+extern void show_spinner();
+extern void hide_spinner();
+}  // namespace spinnerScreen
 
 #ifdef __cplusplus
 }  // extern "C"
