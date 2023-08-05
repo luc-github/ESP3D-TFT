@@ -21,9 +21,11 @@
 #include "files_screen.h"
 
 #include <list>
+#include <vector>
 
 #include "back_button_component.h"
 #include "esp3d_hal.h"
+#include "esp3d_json_settings.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
@@ -50,6 +52,7 @@ lv_obj_t *ui_files_list_ctl = NULL;
 lv_obj_t *files_spinner = NULL;
 lv_timer_t *start_files_list_timer = NULL;
 std::string files_path = "/";
+std::vector<std::string> files_extensions;
 struct ESP3DFileDescriptor {
   std::string name;
   std::string size;
@@ -74,14 +77,15 @@ static void bgFilesTask(void *pvParameter) {
 }
 
 bool playable_file(const char *name) {
+  if (files_extensions.size() == 0) return true;
   int pos = esp3d_strings::rfind(name, ".", -1);
   if (pos != -1) {
-    std::string ext = name + pos;
+    std::string ext = name + pos + 1;
     esp3d_strings::str_toLowerCase(&ext);
-    // TODO:
-    //  use the preferences.json list instead of hard coded list
-    if (ext == ".gcode" || ext == ".gco" || ext == ".g" || ext == ".gc") {
-      return true;
+    for (auto &extension : files_extensions) {
+      if (ext == extension) {
+        return true;
+      }
     }
   }
   return false;
@@ -89,6 +93,20 @@ bool playable_file(const char *name) {
 
 void fill_files_list() {
   files_list.clear();
+  std::string extensionvalues =
+      esp3dTftJsonSettings.readString("settings", "filesfilter");
+  files_extensions.clear();
+  if (extensionvalues.length() > 0) {
+    char str[extensionvalues.length() + 1];
+    char *p;
+    strcpy(str, extensionvalues.c_str());
+    p = strtok(str, ";");
+    while (p != NULL) {
+      std::string ext = p;
+      files_extensions.push_back(ext);
+      p = strtok(NULL, ";");
+    }
+  }
   if (sd.accessFS()) {
     DIR *dir = sd.opendir(files_path.c_str());
     if (dir) {

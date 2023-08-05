@@ -249,12 +249,14 @@ bool ESP3DJsonSettings::writeString(const char* section, const char* entry,
           }
         }
         // skip existing value length
-        if (!has_error) {
-          chunk_max_size = _value.length();
-          chunksize = fread(chunk, 1, chunk_max_size, prefsHandleJson);
-          if (chunksize <= 0) {
-            has_error = true;
-            esp3d_log_e("Error reading file");
+        if (_value.length() > 0) {
+          if (!has_error) {
+            chunk_max_size = _value.length();
+            chunksize = fread(chunk, 1, chunk_max_size, prefsHandleJson);
+            if (chunksize <= 0) {
+              has_error = true;
+              esp3d_log_e("Error reading file");
+            }
           }
         }
         if (strlen(value) > 0) {
