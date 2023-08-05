@@ -32,9 +32,9 @@ extern "C" {
 #endif
 namespace listLine {
 extern lv_obj_t *create_list_line_container(lv_obj_t *container);
-lv_obj_t *add_label_to_line(const char *lbl, lv_obj_t *line_container,
-                            bool grow);
-lv_obj_t *add_button_to_line(const char *lbl, lv_obj_t *line_container);
+extern lv_obj_t *add_label_to_line(const char *lbl, lv_obj_t *line_container,
+                                   bool grow);
+extern lv_obj_t *add_button_to_line(const char *lbl, lv_obj_t *line_container);
 }  // namespace listLine
 
 #ifdef __cplusplus
