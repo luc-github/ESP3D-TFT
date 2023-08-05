@@ -55,19 +55,24 @@ void settings_screen_delay_timer_cb(lv_timer_t *timer) {
 
 void hostname_edit_done_cb(const char *str) {
   esp3d_log("Saving hostname to: %s\n", str);
-  if (esp3dTftsettings.isValidStringSetting(
-          str, ESP3DSettingIndex::esp3d_hostname)) {
-    esp3d_log("Value %s is valid", str);
-    if (esp3dTftsettings.writeString(ESP3DSettingIndex::esp3d_hostname, str)) {
-      if (hostname_label) {
-        lv_label_set_text(hostname_label, str);
+  if (strcmp(str, lv_label_get_text(hostname_label)) != 0) {
+    if (esp3dTftsettings.isValidStringSetting(
+            str, ESP3DSettingIndex::esp3d_hostname)) {
+      esp3d_log("Value %s is valid", str);
+      if (esp3dTftsettings.writeString(ESP3DSettingIndex::esp3d_hostname,
+                                       str)) {
+        if (hostname_label) {
+          lv_label_set_text(hostname_label, str);
+        }
+      } else {
+        esp3d_log_e("Failed to save hostname");
+        std::string text =
+            esp3dTranslationService.translate(ESP3DLabel::error_applying_mode);
+        msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
       }
-    } else {
-      esp3d_log_e("Failed to save hostname");
-      std::string text =
-          esp3dTranslationService.translate(ESP3DLabel::error_applying_mode);
-      msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
     }
+  } else {
+    esp3d_log("New value is identical do not save it");
   }
 }
 
