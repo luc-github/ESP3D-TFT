@@ -29,10 +29,14 @@
 #include "esp3d_settings.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include "list_line_component.h"
 #include "main_container_component.h"
 #include "menu_screen.h"
 #include "message_box_component.h"
+#include "spinner_component.h"
+#include "tasks_def.h"
 #include "text_editor_component.h"
 #include "translations/esp3d_translation_service.h"
 
@@ -40,10 +44,17 @@
  *  STATIC PROTOTYPES
  **********************/
 namespace settingsScreen {
+#define STACKDEPTH 4096
+#define TASKPRIORITY UI_TASK_PRIORITY - 1
+#define TASKCORE UI_TASK_CORE
+
 lv_timer_t *settings_screen_delay_timer = NULL;
+lv_timer_t *settings_screen_apply_timer = NULL;
 lv_obj_t *ui_settings_list_ctl = NULL;
 lv_obj_t *hostname_label = NULL;
 lv_obj_t *extensions_label = NULL;
+
+void settings_screen();
 
 void settings_screen_delay_timer_cb(lv_timer_t *timer) {
   if (settings_screen_delay_timer) {
@@ -51,6 +62,40 @@ void settings_screen_delay_timer_cb(lv_timer_t *timer) {
     settings_screen_delay_timer = NULL;
   }
   menuScreen::menu_screen();
+}
+
+void refresh_settings_list_cb(lv_timer_t *timer) {
+  if (settings_screen_apply_timer) {
+    lv_timer_del(settings_screen_apply_timer);
+    settings_screen_apply_timer = NULL;
+  }
+  settings_screen();
+}
+
+static void bgSettingsTask(void *pvParameter) {
+  (void)pvParameter;
+  vTaskDelay(pdMS_TO_TICKS(100));
+  const char *str = (const char *)pvParameter;
+  esp3d_log("Got value %s in task", str);
+  // do the change
+
+  esp3d_log("Value %s is valid", str);
+  if (esp3dTftJsonSettings.writeString("settings", "filesfilter", str)) {
+    if (extensions_label) {
+      lv_label_set_text(extensions_label, str);
+    }
+  } else {
+    esp3d_log_e("Failed to save extensions");
+    std::string text =
+        esp3dTranslationService.translate(ESP3DLabel::error_applying_setting);
+    msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+  }
+
+  if (!settings_screen_apply_timer) {
+    settings_screen_apply_timer =
+        lv_timer_create(refresh_settings_list_cb, 100, NULL);
+  }
+  vTaskDelete(NULL);
 }
 
 void hostname_edit_done_cb(const char *str) {
@@ -78,19 +123,20 @@ void hostname_edit_done_cb(const char *str) {
 
 void extensions_edit_done_cb(const char *str) {
   esp3d_log("Saving extensions to: %s\n", str);
+  static std::string value;
+  value = "";
+  if (str && strlen(str) > 0) value = str;
   if (strcmp(str, lv_label_get_text(extensions_label)) != 0) {
-    esp3d_log("Value %s is valid", str);
-    if (esp3dTftJsonSettings.writeString("settings", "filesfilter", str)) {
-      if (extensions_label) {
-        lv_label_set_text(extensions_label, str);
-      }
+    spinnerScreen::show_spinner();
+    TaskHandle_t xHandle = NULL;
+    BaseType_t res = xTaskCreatePinnedToCore(
+        bgSettingsTask, "settingsTask", STACKDEPTH, (void *)(value.c_str()),
+        TASKPRIORITY, &xHandle, TASKCORE);
+    if (res == pdPASS && xHandle) {
+      esp3d_log("Created Settings Task");
     } else {
-      esp3d_log_e("Failed to save extensions");
-      std::string text =
-          esp3dTranslationService.translate(ESP3DLabel::error_applying_setting);
-      msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+      esp3d_log_e("Settings Task creation failed");
     }
-
   } else {
     esp3d_log("New value is identical do not save it");
   }

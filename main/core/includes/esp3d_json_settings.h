@@ -34,7 +34,8 @@ enum class ESP3DParseError : uint8_t {
   failed_opening_file,
   success,
   save_failed,
-  not_found
+  not_found,
+  file_not_present
 };
 
 class ESP3DJsonSettings final {
