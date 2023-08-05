@@ -66,8 +66,8 @@ void hostname_edit_done_cb(const char *str) {
         }
       } else {
         esp3d_log_e("Failed to save hostname");
-        std::string text =
-            esp3dTranslationService.translate(ESP3DLabel::error_applying_mode);
+        std::string text = esp3dTranslationService.translate(
+            ESP3DLabel::error_applying_setting);
         msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
       }
     }
@@ -76,13 +76,30 @@ void hostname_edit_done_cb(const char *str) {
   }
 }
 
+void extensions_edit_done_cb(const char *str) {
+  esp3d_log("Saving extensions to: %s\n", str);
+  if (strcmp(str, lv_label_get_text(extensions_label)) != 0) {
+    esp3d_log("Value %s is valid", str);
+    if (esp3dTftJsonSettings.writeString("settings", "filesfilter", str)) {
+      if (extensions_label) {
+        lv_label_set_text(extensions_label, str);
+      }
+    } else {
+      esp3d_log_e("Failed to save extensions");
+      std::string text =
+          esp3dTranslationService.translate(ESP3DLabel::error_applying_setting);
+      msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+    }
+
+  } else {
+    esp3d_log("New value is identical do not save it");
+  }
+}
+
 void event_button_edit_extensions_cb(lv_event_t *e) {
   esp3d_log("Show component");
-  // const char *text = (const char *)lv_event_get_user_data(e);
-  char str[255 + 1] = {0};
-  bool has_error = false;
-  esp3dTftJsonSettings.readString("settings", "filesfilter", str, 255,
-                                  &has_error);
+  const char *text = (const char *)lv_event_get_user_data(e);
+  textEditor::create_text_editor(lv_scr_act(), text, extensions_edit_done_cb);
 }
 
 void event_button_edit_hostname_cb(lv_event_t *e) {
@@ -155,8 +172,10 @@ void settings_screen() {
   LabelStr = esp3dTranslationService.translate(ESP3DLabel::extensions);
   if (line_container) {
     listLine::add_label_to_line(LabelStr.c_str(), line_container, false);
+    std::string values =
+        esp3dTftJsonSettings.readString("settings", "filesfilter");
     extensions_label =
-        listLine::add_label_to_line("gco;gcode;g", line_container, true);
+        listLine::add_label_to_line(values.c_str(), line_container, true);
     lv_obj_set_style_text_align(extensions_label, LV_TEXT_ALIGN_RIGHT, 0);
     lv_obj_t *btnEdit =
         listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);

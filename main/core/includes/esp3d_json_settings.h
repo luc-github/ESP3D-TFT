@@ -23,21 +23,35 @@
 #include <stdio.h>
 
 #include "esp3d_settings.h"
+#include "esp3d_string.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+enum class ESP3DParseError : uint8_t {
+  no_error,
+  failed_opening_file,
+  success,
+  save_failed,
+  not_found
+};
 
 class ESP3DJsonSettings final {
  public:
   ESP3DJsonSettings();
   ~ESP3DJsonSettings();
 
-  const char* readString(const char* section, const char* entry, char* out_str,
-                         size_t len, bool* haserror = NULL);
-  bool writeString(ESP3DSettingIndex index, const char* byte_buffer);
+  const char *readString(const char *section, const char *entry,
+                         bool *haserror = NULL);
+  bool writeString(const char *section, const char *entry, const char *value);
 
  private:
+  ESP3DParseError parse(const char *file_name, const char *section,
+                        const char *entry);
+  std::string _value;
+  bool _is_value_str;
+  int _valueIndex;
 };
 
 extern ESP3DJsonSettings esp3dTftJsonSettings;
