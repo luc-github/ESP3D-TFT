@@ -789,38 +789,40 @@ bool ESP3DNetwork::setMode(ESP3DRadioMode mode, bool restart) {
       break;
 #if ESP3D_WIFI_FEATURE
     case ESP3DRadioMode::wifi_sta:
-      esp3dTftValues.set_string_value(ESP3DValuesIndex::network_mode,
-                                      LV_SYMBOL_STATION_MODE);
       if (!startStaMode()) {
         setMode(static_cast<ESP3DRadioMode>(
             esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_fallback_mode)));
+      } else {
+        esp3dTftValues.set_string_value(ESP3DValuesIndex::network_mode,
+                                        LV_SYMBOL_STATION_MODE);
       }
       break;
     case ESP3DRadioMode::wifi_ap:
+      startApMode();
       esp3dTftValues.set_string_value(ESP3DValuesIndex::network_mode,
                                       LV_SYMBOL_ACCESS_POINT);
-      startApMode();
       break;
     case ESP3DRadioMode::wifi_ap_config:
+      startConfigMode();
       esp3dTftValues.set_string_value(ESP3DValuesIndex::network_mode,
                                       LV_SYMBOL_ACCESS_POINT);
-      startConfigMode();
       break;
     case ESP3DRadioMode::wifi_ap_limited:
+      startLimitedMode();
       esp3dTftValues.set_string_value(ESP3DValuesIndex::network_mode,
                                       LV_SYMBOL_ACCESS_POINT);
-      startLimitedMode();
       break;
 #endif  // ESP3D_WIFI_FEATURE
     case ESP3DRadioMode::bluetooth_serial:
+      startBtMode();
       esp3dTftValues.set_string_value(ESP3DValuesIndex::network_mode,
                                       LV_SYMBOL_BLUETOOTH);
-      startBtMode();
       break;
     default:
       esp3d_log_e("Unknown radio mode");
-      esp3dTftValues.set_string_value(ESP3DValuesIndex::network_mode, "?");
+
       startNoRadioMode();
+      esp3dTftValues.set_string_value(ESP3DValuesIndex::network_mode, "?");
   };
   return true;
 }
