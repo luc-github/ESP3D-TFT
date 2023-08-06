@@ -402,7 +402,7 @@ bool ESP3DSocketServer::begin() {
     _started = true;
     return true;
   } else {
-    esp3d_log_e("Serial Task creation failed");
+    esp3d_log_e("Socket Task creation failed");
     _started = false;
     return false;
   }
