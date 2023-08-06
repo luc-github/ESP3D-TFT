@@ -172,6 +172,7 @@ void do_files_list_now() {
   if (res == pdPASS && xHandle) {
     esp3d_log("Created Files Task");
   } else {
+    spinnerScreen::hide_spinner();
     esp3d_log_e("Files Task creation failed");
   }
 }
