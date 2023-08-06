@@ -154,6 +154,9 @@ class ESP3DGCodeHostService : public ESP3DClient {
   ESP3DGcodeStream* _current_stream = nullptr;
   ESP3DGcodeFileStream _currentPrintStream;
 
+  pthread_mutex_t _tx_mutex;
+  pthread_mutex_t _rx_mutex;
+
 
 };
 

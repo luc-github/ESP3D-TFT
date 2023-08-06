@@ -36,34 +36,9 @@ ESP3DClient::ESP3DClient() {
   _tx_size = 0;
   _rx_max_size = 1024;
   _tx_max_size = 1024;
+  _rx_mutex = nullptr;
+  _tx_mutex = nullptr;
 }
-
-bool ESP3DClient::mutexInit() {
-  if (pthread_mutex_init(&_rx_mutex, NULL) != 0) {
-    esp3d_log_e("Mutex creation for rx failed");
-    return false;
-  }
-
-  if (pthread_mutex_init(&_tx_mutex, NULL) != 0) {
-    esp3d_log_e("Mutex creation for tx failed");
-    return false;
-  }
-  return true;
-}
-
-bool ESP3DClient::mutexDestroy() {
-  if (pthread_mutex_destroy(&_rx_mutex) != 0) {
-    esp3d_log_e("Mutex destruction for rx failed");
-    return false;
-  }
-
-  if (pthread_mutex_destroy(&_tx_mutex) != 0) {
-    esp3d_log_e("Mutex destruction for tx failed");
-    return false;
-  }
-  return true;
-}
-
 bool ESP3DClient::clearRxQueue() {
   while (!_rx_queue.empty()) {
     deleteMsg(popRx());
@@ -127,13 +102,13 @@ ESP3DClient::~ESP3DClient() {
 bool ESP3DClient::addRxData(ESP3DMessage* msg) {
   bool res = false;
   if (_rx_mutex) {
-    if (pthread_mutex_lock(&_rx_mutex) == 0) {
+    if (pthread_mutex_lock(_rx_mutex) == 0) {
       if (msg->size + _rx_size <= _rx_max_size) {
         _rx_queue.push_back(msg);
         _rx_size += msg->size;
         res = true;
       }
-      pthread_mutex_unlock(&_rx_mutex);
+      pthread_mutex_unlock(_rx_mutex);
     }
   }
   return res;
@@ -141,7 +116,7 @@ bool ESP3DClient::addRxData(ESP3DMessage* msg) {
 bool ESP3DClient::addTxData(ESP3DMessage* msg) {
   bool res = false;
   if (_tx_mutex) {
-    if (pthread_mutex_lock(&_tx_mutex) == 0) {
+    if (pthread_mutex_lock(_tx_mutex) == 0) {
       if (msg->size + _tx_size <= _tx_max_size) {
         _tx_queue.push_back(msg);
         _tx_size += msg->size;
@@ -150,7 +125,7 @@ bool ESP3DClient::addTxData(ESP3DMessage* msg) {
         esp3d_log_e("Queue Size limit exceeded %d vs %d", msg->size + _tx_size,
                     _tx_max_size);
       }
-      pthread_mutex_unlock(&_tx_mutex);
+      pthread_mutex_unlock(_tx_mutex);
     }
   } else {
     esp3d_log_e("no mutex available");
@@ -160,13 +135,13 @@ bool ESP3DClient::addTxData(ESP3DMessage* msg) {
 bool ESP3DClient::addFrontTxData(ESP3DMessage* msg) {
   bool res = false;
   if (_tx_mutex) {
-    if (pthread_mutex_lock(&_tx_mutex) == 0) {
+    if (pthread_mutex_lock(_tx_mutex) == 0) {
       if (msg->size + _tx_size <= _tx_max_size) {
         _tx_queue.push_front(msg);
         _tx_size += msg->size;
         res = true;
       }
-      pthread_mutex_unlock(&_tx_mutex);
+      pthread_mutex_unlock(_tx_mutex);
     }
   }
   return res;
@@ -264,10 +239,9 @@ bool ESP3DClient::setDataContent(ESP3DMessage* msg, const uint8_t* data,
   if (msg->data) {
     free(msg->data);
   }
-  msg->data = (uint8_t*)malloc((sizeof(uint8_t) * (length + 1)));
+  msg->data = (uint8_t*)malloc(sizeof(uint8_t) * length);
   if (msg->data) {
     memcpy(msg->data, data, length);
-    msg->data[length] = (char) 0;
     msg->size = length;
     return true;
   }

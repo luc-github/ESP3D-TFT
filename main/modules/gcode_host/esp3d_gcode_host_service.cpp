@@ -414,7 +414,7 @@ bool ESP3DGCodeHostService::_updateRingBuffer(ESP3DGcodeFileStream* _stream) {
         }
         _ringBuffer[_bufferSeam] = 0;
       }
-      esp3d_log("Updated Buffer")
+      esp3d_log("Updated Buffer");
     //if we're before the seam do two reads to update from seam to buffer end, and from buffer start to current position.
     } else {
       empty = RING_BUFFER_LENGTH - _bufferSeam + _bufferPos;
@@ -432,7 +432,7 @@ bool ESP3DGCodeHostService::_updateRingBuffer(ESP3DGcodeFileStream* _stream) {
         }
         _ringBuffer[_bufferSeam] = 0;
       }
-      esp3d_log("Updated Buffer")
+      esp3d_log("Updated Buffer");
     }
   }
 
@@ -797,7 +797,17 @@ void ESP3DGCodeHostService::process(ESP3DMessage* msg) {
 
 bool ESP3DGCodeHostService::begin() {
   end();
-  mutexInit();
+  if (pthread_mutex_init(&_rx_mutex, NULL) != 0) {
+    esp3d_log_e("Mutex creation for rx failed");
+    return false;
+  }
+  setRxMutex(&_rx_mutex);
+
+  if (pthread_mutex_init(&_tx_mutex, NULL) != 0) {
+    esp3d_log_e("Mutex creation for tx failed");
+    return false;
+  }
+  setTxMutex(&_tx_mutex);
   // Task is never stopped so no need to kill the task from outside
   _started = true;
   BaseType_t res = xTaskCreatePinnedToCore(
@@ -1108,7 +1118,12 @@ void ESP3DGCodeHostService::end() {
     esp3d_log("Clearing queue Tx messages");
     clearTxQueue();
     vTaskDelay(pdMS_TO_TICKS(1000));
-    mutexDestroy();
+    if (pthread_mutex_destroy(&_tx_mutex) != 0) {
+      esp3d_log_w("Mutex destruction for tx failed");
+    }
+    if (pthread_mutex_destroy(&_rx_mutex) != 0) {
+      esp3d_log_w("Mutex destruction for rx failed");
+    }
 
   }
   if (_xHandle) {
