@@ -34,7 +34,6 @@
 #include "touch_def.h"
 #include "usb_serial.h"
 
-
 static i2c_bus_handle_t i2c_bus_handle = NULL;
 
 /*
@@ -135,13 +134,15 @@ esp_err_t bsp_init(void) {
   }
 
   /* Use double buffered when not working with monochrome displays */
-  lv_color_t* buf2 = (lv_color_t*)heap_caps_malloc(
-      DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
+  lv_color_t* buf2 = NULL;
+#if DISP_USE_DOUBLE_BUFFER
+  buf2 = (lv_color_t*)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t),
+                                       MALLOC_CAP_DMA);
   if (buf2 == NULL) {
     esp3d_log_e("Failed to allocate LVGL draw buffer 2");
     return ESP_FAIL;
   }
-
+#endif  // DISP_USE_DOUBLE_BUFFER
   static lv_disp_draw_buf_t draw_buf;
 
   uint32_t size_in_px = DISP_BUF_SIZE;
