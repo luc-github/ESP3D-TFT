@@ -30,10 +30,12 @@
 #include "main_container_component.h"
 #include "message_box_component.h"
 #include "network/esp3d_network.h"
+#include "spinner_component.h"
 #include "symbol_button_component.h"
 #include "translations/esp3d_translation_service.h"
 #include "wifi_screen.h"
 #include "wifi_status_component.h"
+
 
 /**********************
  *  STATIC PROTOTYPES
@@ -89,6 +91,7 @@ void update_button_ok() {
       !esp3dTftsettings.isValidStringSetting(
           password_current.c_str(), ESP3DSettingIndex::esp3d_ap_password)) {
     esp3d_log("Ok hide");
+    spinnerScreen::hide_spinner();
     lv_obj_add_flag(btn_ok, LV_OBJ_FLAG_HIDDEN);
   } else {
     esp3d_log("Ok visible");
@@ -203,7 +206,8 @@ void ap_event_button_ok_handler(lv_event_t *e) {
     esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
                                     text.c_str());
   } else {
-    esp3dNetwork.setMode(ESP3DRadioMode::wifi_ap);
+    spinnerScreen::show_spinner();
+    esp3dNetwork.setModeAsync(ESP3DRadioMode::wifi_ap);
   }
 }
 

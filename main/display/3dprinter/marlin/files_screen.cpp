@@ -173,7 +173,7 @@ void do_files_list_now() {
     esp3d_log("Created Files Task");
   } else {
     spinnerScreen::hide_spinner();
-    esp3d_log_e("Files Task creation failed");
+    esp3d_log_e("Scan Task creation failed %d , %d", (int)res, (int)xHandle);
   }
 }
 

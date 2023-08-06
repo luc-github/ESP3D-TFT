@@ -33,6 +33,7 @@
 #include "menu_screen.h"
 #include "message_box_component.h"
 #include "network/esp3d_network.h"
+#include "spinner_component.h"
 #include "sta_screen.h"
 #include "symbol_button_component.h"
 #include "translations/esp3d_translation_service.h"
@@ -52,6 +53,7 @@ void update_button_no_wifi() {
       esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
   if (mode == LV_SYMBOL_WIFI) {
     lv_obj_add_flag(btn_no_wifi, LV_OBJ_FLAG_HIDDEN);
+    spinnerScreen::hide_spinner();
   } else {
     lv_obj_clear_flag(btn_no_wifi, LV_OBJ_FLAG_HIDDEN);
   }
@@ -125,7 +127,8 @@ void event_button_no_wifi_handler(lv_event_t *e) {
     esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
                                     text.c_str());
   } else {
-    esp3dNetwork.setMode(ESP3DRadioMode::off);
+    spinnerScreen::show_spinner();
+    esp3dNetwork.setModeAsync(ESP3DRadioMode::off);
   }
 }
 

@@ -35,6 +35,7 @@
 #include "main_container_component.h"
 #include "message_box_component.h"
 #include "network/esp3d_network.h"
+#include "spinner_component.h"
 #include "symbol_button_component.h"
 #include "tasks_def.h"
 #include "translations/esp3d_translation_service.h"
@@ -55,7 +56,6 @@ lv_obj_t *btn_ok = nullptr;
 lv_obj_t *btn_scan = nullptr;
 lv_obj_t *btn_save = nullptr;
 lv_obj_t *ui_sta_ssid_list_ctl = NULL;
-lv_obj_t *sta_spinner = NULL;
 lv_timer_t *start_scan_timer = NULL;
 lv_obj_t *status_component = nullptr;
 
@@ -168,7 +168,7 @@ void fill_ui_sta_ssid_list() {
     lv_obj_add_event_cb(btnJoin, event_button_join_cb, LV_EVENT_CLICKED,
                         (void *)&ssid_desc);
   }
-  lv_obj_add_flag(sta_spinner, LV_OBJ_FLAG_HIDDEN);
+  spinnerScreen::hide_spinner();
 }
 
 void do_scan_now() {
@@ -179,7 +179,7 @@ void do_scan_now() {
   if (res == pdPASS && xHandle) {
     esp3d_log("Created Scan Task");
   } else {
-    esp3d_log_e("Scan Task creation failed");
+    esp3d_log_e("Scan Task creation failed %d , %d", (int)res, (int)xHandle);
   }
 }
 
@@ -239,6 +239,7 @@ void update_sta_button_ok() {
       !esp3dTftsettings.isValidStringSetting(
           password_current.c_str(), ESP3DSettingIndex::esp3d_sta_password)) {
     esp3d_log("Ok hide");
+    spinnerScreen::hide_spinner();
     lv_obj_add_flag(btn_ok, LV_OBJ_FLAG_HIDDEN);
   } else {
     esp3d_log("Ok visible");
@@ -301,7 +302,7 @@ void sta_ta_event_cb(lv_event_t *e) {
     if (status_component)
       lv_obj_clear_flag(status_component, LV_OBJ_FLAG_HIDDEN);
 
-    if (sta_spinner) lv_obj_add_flag(sta_spinner, LV_OBJ_FLAG_HIDDEN);
+    spinnerScreen::hide_spinner();
     update_sta_button_ok();
     update_button_save();
   }
@@ -347,7 +348,7 @@ void sta_event_button_scan_handler(lv_event_t *e) {
   if (ui_sta_ssid_list_ctl) {
     lv_obj_clear_flag(ui_sta_ssid_list_ctl, LV_OBJ_FLAG_HIDDEN);
     if (status_component) lv_obj_add_flag(status_component, LV_OBJ_FLAG_HIDDEN);
-    if (sta_spinner) lv_obj_clear_flag(sta_spinner, LV_OBJ_FLAG_HIDDEN);
+    spinnerScreen::show_spinner();
     start_scan_timer = lv_timer_create(start_scan_timer_cb, 100, NULL);
     size_t i = lv_obj_get_child_cnt(ui_sta_ssid_list_ctl);
     while (i > 0) {
@@ -375,7 +376,8 @@ void sta_event_button_ok_handler(lv_event_t *e) {
     esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
                                     text.c_str());
   } else {
-    esp3dNetwork.setMode(ESP3DRadioMode::wifi_sta);
+    spinnerScreen::show_spinner();
+    esp3dNetwork.setModeAsync(ESP3DRadioMode::wifi_sta);
   }
 }
 
@@ -519,16 +521,6 @@ void sta_screen() {
           (lv_obj_get_y(sta_ta_password) + lv_obj_get_height(sta_ta_password)));
   lv_obj_update_layout(ui_sta_ssid_list_ctl);
 
-  // sta_spinner
-  sta_spinner = lv_spinner_create(ui_new_screen, 1000, 60);
-  lv_obj_set_size(sta_spinner, CURRENT_SPINNER_SIZE, CURRENT_SPINNER_SIZE);
-  lv_obj_set_x(sta_spinner, lv_obj_get_x(ui_sta_ssid_list_ctl) +
-                                (lv_obj_get_width(ui_sta_ssid_list_ctl) / 2) -
-                                (CURRENT_SPINNER_SIZE / 2));
-  lv_obj_set_y(sta_spinner, lv_obj_get_y(ui_sta_ssid_list_ctl) +
-                                (lv_obj_get_height(ui_sta_ssid_list_ctl) / 2) -
-                                (CURRENT_SPINNER_SIZE / 2));
-  if (sta_spinner) lv_obj_add_flag(sta_spinner, LV_OBJ_FLAG_HIDDEN);
   if (ui_sta_ssid_list_ctl)
     lv_obj_add_flag(ui_sta_ssid_list_ctl, LV_OBJ_FLAG_HIDDEN);
   if (status_component) lv_obj_clear_flag(status_component, LV_OBJ_FLAG_HIDDEN);
