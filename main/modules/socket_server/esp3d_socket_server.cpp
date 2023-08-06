@@ -350,6 +350,10 @@ bool ESP3DSocketServer::begin() {
     // return true because no error but _started is false
     return true;
   }
+  if (_xHandle) {
+    esp3d_log_e("ESP3DSocketServer already has task, invalide state");
+    return false;
+  }
   // Initialize client buffer
   if (pthread_mutex_init(&_rx_mutex, NULL) != 0) {
     esp3d_log_e("Mutex creation for rx failed");

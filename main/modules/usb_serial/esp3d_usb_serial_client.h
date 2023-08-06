@@ -62,6 +62,8 @@ class ESP3DUsbSerialClient : public ESP3DClient {
   bool _stopConnect;
   bool _started;
   bool _connected;
+  pthread_mutex_t _tx_mutex;
+  pthread_mutex_t _rx_mutex;
   SemaphoreHandle_t _device_disconnected_sem;
   std::unique_ptr<CdcAcmDevice> _vcp;
 };
