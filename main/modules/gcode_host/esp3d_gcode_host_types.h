@@ -41,7 +41,7 @@ enum class ESP3DGcodeStreamState : uint8_t { //weed out unneccesary states
   //no_stream = 0,
   start,
   end,
-  read_line,
+  read_line, //maybe should rename
   wait_for_send, //wait for currentCommand to be sent, so we can read the next command ready.
   pause, // only needed for file stream, maybe better to have another class?
   resume,
@@ -54,7 +54,7 @@ enum class ESP3DGcodeStreamState : uint8_t { //weed out unneccesary states
 };
 
 enum class ESP3DGcodeHostState : uint8_t { //maybe need stream state and host state?
-  wait = 0, // wait for a command to send
+  idle = 0, // wait for a command to send
   //start, // these will be stream states
   //end,
   //read_line,
@@ -91,7 +91,7 @@ enum class ESP3DGcodeHostError : uint8_t {
 
 enum class ESP3DGcodeHostFileType : uint8_t {
   single_command,
-  multiple_commands,
+  multiple_commands, // no real difference between single and multiple in practice
   filesystem,
   script,
 #if ESP3D_SD_CARD_FEATURE
