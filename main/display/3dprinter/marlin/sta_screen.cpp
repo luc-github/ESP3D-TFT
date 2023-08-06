@@ -505,8 +505,9 @@ void sta_screen() {
   // SSID list
   ui_sta_ssid_list_ctl = lv_list_create(ui_new_screen);
   lv_obj_clear_flag(ui_sta_ssid_list_ctl, LV_OBJ_FLAG_SCROLL_ELASTIC);
-  lv_obj_update_layout(sta_ta_password);
-  lv_obj_align_to(ui_sta_ssid_list_ctl, label_pwd, LV_ALIGN_OUT_BOTTOM_LEFT,
+  // lv_obj_update_layout(sta_ta_ssid);
+  lv_obj_update_layout(label_ssid);
+  lv_obj_align_to(ui_sta_ssid_list_ctl, label_ssid, LV_ALIGN_OUT_BOTTOM_LEFT,
                   -(CURRENT_BUTTON_PRESSED_OUTLINE),
                   (CURRENT_BUTTON_PRESSED_OUTLINE));
 
@@ -517,8 +518,8 @@ void sta_screen() {
 
   lv_obj_set_height(
       ui_sta_ssid_list_ctl,
-      lv_obj_get_y(btnback) -
-          (lv_obj_get_y(sta_ta_password) + lv_obj_get_height(sta_ta_password)));
+      (lv_obj_get_y(btnback)) -
+          ((lv_obj_get_y(label_ssid) + lv_obj_get_height(label_ssid))));
   lv_obj_update_layout(ui_sta_ssid_list_ctl);
 
   if (ui_sta_ssid_list_ctl)
