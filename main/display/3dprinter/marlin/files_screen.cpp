@@ -35,6 +35,7 @@
 #include "freertos/task.h"
 #include "list_line_component.h"
 #include "main_screen.h"
+#include "spinner_component.h"
 #include "symbol_button_component.h"
 #include "tasks_def.h"
 
@@ -49,7 +50,6 @@ namespace filesScreen {
 lv_timer_t *files_screen_delay_timer = NULL;
 lv_obj_t *refresh_button = NULL;
 lv_obj_t *ui_files_list_ctl = NULL;
-lv_obj_t *files_spinner = NULL;
 lv_timer_t *start_files_list_timer = NULL;
 std::string files_path = "/";
 std::vector<std::string> files_extensions;
@@ -59,11 +59,14 @@ struct ESP3DFileDescriptor {
 };
 std::list<ESP3DFileDescriptor> files_list;
 void fill_files_list();
+void files_screen();
+
 void refresh_files_list_cb(lv_timer_t *timer) {
   if (start_files_list_timer) {
     lv_timer_del(start_files_list_timer);
     start_files_list_timer = NULL;
   }
+  spinnerScreen::hide_spinner();
   files_screen();
 }
 static void bgFilesTask(void *pvParameter) {
@@ -161,6 +164,7 @@ void fill_files_list() {
 }
 
 void do_files_list_now() {
+  spinnerScreen::show_spinner();
   TaskHandle_t xHandle = NULL;
   BaseType_t res =
       xTaskCreatePinnedToCore(bgFilesTask, "filesTask", STACKDEPTH, NULL,
@@ -172,27 +176,27 @@ void do_files_list_now() {
   }
 }
 
-void start_files_list_timer_cb(lv_timer_t *timer) {
+/*void start_files_list_timer_cb(lv_timer_t *timer) {
   if (start_files_list_timer) {
     lv_timer_del(start_files_list_timer);
     start_files_list_timer = NULL;
   }
   do_files_list_now();
-}
+}*/
 
 void event_button_files_refresh_handler(lv_event_t *e) {
   esp3d_log("refresh Clicked");
-  lv_obj_clear_flag(files_spinner, LV_OBJ_FLAG_HIDDEN);
-  size_t i = lv_obj_get_child_cnt(ui_files_list_ctl);
+
+  do_files_list_now();
+  /*size_t i = lv_obj_get_child_cnt(ui_files_list_ctl);
   while (i > 0) {
     lv_obj_del(lv_obj_get_child(ui_files_list_ctl, 0));
     i--;
   }
-  lv_obj_clear_flag(files_spinner, LV_OBJ_FLAG_HIDDEN);
   if (!start_files_list_timer) {
     start_files_list_timer =
         lv_timer_create(start_files_list_timer_cb, 100, NULL);
-  }
+  }*/
 }
 
 void event_button_files_up_handler(lv_event_t *e) {
@@ -305,12 +309,6 @@ void files_screen() {
       LV_VER_RES -
           ((1.5 * CURRENT_BUTTON_PRESSED_OUTLINE) + lv_obj_get_height(btnback) +
            lv_obj_get_height(labelpath) + (2 * CURRENT_STATUS_BAR_V_PAD)));
-
-  // spinner creation in center of screen
-  files_spinner = lv_spinner_create(ui_new_screen, 1000, 60);
-  lv_obj_set_size(files_spinner, CURRENT_SPINNER_SIZE, CURRENT_SPINNER_SIZE);
-  lv_obj_center(files_spinner);
-  lv_obj_add_flag(files_spinner, LV_OBJ_FLAG_HIDDEN);
 
   if (files_path != "/") {
     std::string tmplabel = ".." LV_SYMBOL_NEW_LINE;

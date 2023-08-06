@@ -82,7 +82,7 @@ bool init_styles() {
   lv_style_set_text_opa(&style_spinner_screen, LV_OPA_COVER);
   lv_style_set_text_color(&style_spinner_screen, CURRENT_BG_LABEL_TEXT_COLOR);
   lv_style_set_bg_color(&style_spinner_screen, CURRENT_MAIN_BG_COLOR);
-  lv_style_set_bg_opa(&style_spinner_screen, LV_OPA_COVER);
+  lv_style_set_bg_opa(&style_spinner_screen, LV_OPA_50);
   /*
   Spinner text
   */

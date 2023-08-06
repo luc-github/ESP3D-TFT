@@ -35,9 +35,9 @@ namespace spinnerScreen {
 lv_obj_t* spinnerObj = NULL;
 
 void show_spinner() {
+  // to avoid multiple call to show spinner
   if (spinnerObj != NULL) {
-    lv_obj_del(spinnerObj);
-    spinnerObj = NULL;
+    return;
   }
   spinnerObj = lv_obj_create(lv_scr_act());
   apply_style(spinnerObj, ESP3DStyleType::spinnerScreen);

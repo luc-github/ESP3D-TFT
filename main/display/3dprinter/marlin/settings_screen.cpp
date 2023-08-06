@@ -69,6 +69,7 @@ void refresh_settings_list_cb(lv_timer_t *timer) {
     lv_timer_del(settings_screen_apply_timer);
     settings_screen_apply_timer = NULL;
   }
+  spinnerScreen::hide_spinner();
   settings_screen();
 }
 
@@ -229,6 +230,7 @@ void settings_screen() {
                         LV_EVENT_CLICKED,
                         (void *)(lv_label_get_text(extensions_label)));
   }
+
   esp3dTftui.set_current_screen(ESP3DScreenType::settings);
 }
 }  // namespace settingsScreen
