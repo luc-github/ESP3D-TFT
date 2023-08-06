@@ -1,4 +1,4 @@
-//Task definition for ESP32_ROTRICS_DEXARM35
+// Task definition for ESP32_ROTRICS_DEXARM35
 
 #pragma once
 
@@ -6,9 +6,17 @@
 extern "C" {
 #endif
 
-#define NETWORK_STACK_DEPTH 4096 *2
-#define STREAM_STACK_DEPTH 4096 *2
-#define UI_STACK_DEPTH 4096 *2
+#define NETWORK_TASK_CORE 0
+#define NETWORK_TASK_PRIORITY 0
+#define NETWORK_STACK_DEPTH 4096 * 2
+
+#define STREAM_TASK_CORE 1
+#define STREAM_TASK_PRIORITY 0
+#define STREAM_STACK_DEPTH 4096 * 2
+
+#define UI_TASK_CORE 1
+#define UI_TASK_PRIORITY 0
+#define UI_STACK_DEPTH 4096 * 2
 
 #define STREAM_CHUNK_SIZE 1024
 
@@ -21,6 +29,8 @@ extern "C" {
 #define ESP3D_WS_TASK_SIZE 4096
 #define ESP3D_WS_TASK_PRIORITY 5
 #define ESP3D_WS_TASK_CORE 0
+
+#define LV_TICK_PERIOD_MS 10
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -28,8 +28,9 @@
 #if ESP3D_SD_CARD_FEATURE
 #include "filesystem/esp3d_sd.h"
 #endif  // ESP3D_SD_CARD_FEATURE
-#include "esp3d_tft_stream.h"
+#include "gcode_host/esp3d_tft_stream.h"
 #include "notifications/esp3d_notifications_service.h"
+#include "translations/esp3d_translation_service.h"
 
 #define COMMAND_ID 401
 
@@ -175,6 +176,9 @@ void ESP3DCommands::ESP401(int cmd_params_pos, ESP3DMessage* msg) {
     // hot changes
     if (!hasError) {
       switch (index_setting) {
+        case ESP3DSettingIndex::esp3d_ui_language:
+          esp3dTranslationService.begin();
+          break;
 #if ESP3D_SD_CARD_FEATURE
 #if ESP3D_SD_IS_SPI
         case ESP3DSettingIndex::esp3d_spi_divider:

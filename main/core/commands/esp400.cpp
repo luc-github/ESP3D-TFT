@@ -21,6 +21,8 @@
 #include "esp3d_client.h"
 #include "esp3d_commands.h"
 #include "esp3d_string.h"
+#include "translations/esp3d_translation_service.h"
+
 #if ESP3D_SD_CARD_FEATURE
 #include "sd_def.h"
 #endif  // ESP3D_SD_CARD_FEATURE
@@ -133,6 +135,49 @@ void ESP3DCommands::ESP400(int cmd_params_pos, ESP3DMessage* msg) {
                        sizeof(FirmwareValues) / sizeof(char*), -1, -1, -1,
                        nullptr, false, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
+  }
+  // TFT UI Language
+  uint16_t count = esp3dTranslationService.getLanguagesList();
+  char** UIValues = (char**)calloc(count, sizeof(char*));
+  char** UILabels = (char**)calloc(count, sizeof(char*));
+  if (UIValues && UILabels) {
+    for (int i = 0; i < esp3dTranslationService.getLanguagesValues().size();
+         i++) {
+      UIValues[i] = (char*)calloc(
+          (esp3dTranslationService.getLanguagesValues()[i].size() + 1),
+          sizeof(char));
+      if (UIValues[i])
+        strcpy(UIValues[i],
+               esp3dTranslationService.getLanguagesValues()[i].c_str());
+    }
+    for (int i = 0; i < esp3dTranslationService.getLanguagesLabels().size();
+         i++) {
+      UILabels[i] = (char*)calloc(
+          (esp3dTranslationService.getLanguagesLabels()[i].size() + 1),
+          sizeof(char));
+      if (UILabels[i])
+        strcpy(UILabels[i],
+               esp3dTranslationService.getLanguagesLabels()[i].c_str());
+    }
+  }
+
+  if (!dispatchSetting(json, "system/system",
+                       ESP3DSettingIndex::esp3d_ui_language, "language",
+                       (const char**)(UIValues), (const char**)(UILabels),
+                       count, -1, -1, -1, nullptr, false, target, requestId)) {
+    esp3d_log_e("Error sending response to clients");
+  }
+  if (UIValues) {
+    for (int i = 0; i < count; i++) {
+      free(UIValues[i]);
+    }
+    free(UIValues);
+  }
+  if (UILabels) {
+    for (int i = 0; i < count; i++) {
+      free(UILabels[i]);
+    }
+    free(UILabels);
   }
 
   // Radio mode

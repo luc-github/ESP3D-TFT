@@ -74,6 +74,9 @@ const ESP3DSettingDescription ESP3DSettingsData[] = {
      SIZE_OF_SETTING_VERSION, "Invalid data"},  // Version
     {ESP3DSettingIndex::esp3d_baud_rate, ESP3DSettingType::integer_t, 4,
      ESP3D_SERIAL_BAUDRATE},  // BaudRate
+    {ESP3DSettingIndex::esp3d_ui_language, ESP3DSettingType::string_t,
+     SIZE_OF_UI_LANGUAGE, "default"},  // Language
+
 #if ESP3D_USB_SERIAL_FEATURE
     {ESP3DSettingIndex::esp3d_usb_serial_baud_rate, ESP3DSettingType::integer_t,
      4, ESP3D_USB_SERIAL_BAUDRATE},  // BaudRate
@@ -168,9 +171,7 @@ bool ESP3DSettings::isValidStringSetting(const char* value,
   }
   // use strlen because it crash with regex if value is longer than 41
   // characters
-#if ESP3D_WIFI_FEATURE
   size_t len = strlen(value);
-#endif  // ESP3D_WIFI_FEATURE
   switch (settingElement) {
 #if ESP3D_WIFI_FEATURE
     case ESP3DSettingIndex::esp3d_ap_ssid:
@@ -184,6 +185,8 @@ bool ESP3DSettings::isValidStringSetting(const char* value,
           (len >= 8 &&
            len <= SIZE_OF_SETTING_SSID_PWD));  // any string from 8 to 64 or 0
 #endif                                         // ESP3D_WIFI_FEATURE
+    case ESP3DSettingIndex::esp3d_ui_language:
+      return len <= SIZE_OF_UI_LANGUAGE;
     case ESP3DSettingIndex::esp3d_hostname:
       esp3d_log("Checking hostname validity");
       return std::regex_match(

@@ -32,7 +32,7 @@
 /*Enable features to draw on transparent background.
  *It's required if opa, and transform_* style properties are used.
  *Can be also used if the UI is above another layer, e.g. an OSD menu or video player.*/
-#define LV_COLOR_SCREEN_TRANSP 0
+#define LV_COLOR_SCREEN_TRANSP 1
 
 /* Adjust color mix functions rounding. GPUs might calculate color mix (blending) differently.
  * 0: round down, 64: round up from x.75, 128: round up from half, 192: round up from x.25, 254: round up */
@@ -87,8 +87,8 @@
  *It removes the need to manually update the tick with `lv_tick_inc()`)*/
 #define LV_TICK_CUSTOM 0
 #if LV_TICK_CUSTOM
-#define LV_TICK_CUSTOM_INCLUDE "Arduino.h"         /*Header for the system time function*/
-#define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())    /*Expression evaluating to current system time in ms*/
+    #define LV_TICK_CUSTOM_INCLUDE "esp_timer.h"         /*Header for the system time function*/
+    #define LV_TICK_CUSTOM_SYS_TIME_EXPR (esp_timer_get_time() / 1000LL)    /*Expression evaluating to current system time in ms*/
 #endif   /*LV_TICK_CUSTOM*/
 
 /*Default Dot Per Inch. Used to initialize default sizes such as widgets sized, style paddings.
@@ -236,14 +236,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #define LV_LOG_PRINTF 0
 
 /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
-#define LV_LOG_TRACE_MEM        1
-#define LV_LOG_TRACE_TIMER      1
-#define LV_LOG_TRACE_INDEV      1
-#define LV_LOG_TRACE_DISP_REFR  1
-#define LV_LOG_TRACE_EVENT      1
-#define LV_LOG_TRACE_OBJ_CREATE 1
-#define LV_LOG_TRACE_LAYOUT     1
-#define LV_LOG_TRACE_ANIM       1
+#define LV_LOG_TRACE_MEM        0
+#define LV_LOG_TRACE_TIMER      0
+#define LV_LOG_TRACE_INDEV      0
+#define LV_LOG_TRACE_DISP_REFR  0
+#define LV_LOG_TRACE_EVENT      0
+#define LV_LOG_TRACE_OBJ_CREATE 0
+#define LV_LOG_TRACE_LAYOUT     0
+#define LV_LOG_TRACE_ANIM       0
 
 #endif  /*LV_USE_LOG*/
 
@@ -268,14 +268,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  *-----------*/
 
 /*1: Show CPU usage and FPS count*/
-#define LV_USE_PERF_MONITOR 1
+#define LV_USE_PERF_MONITOR 0
 #if LV_USE_PERF_MONITOR
 #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
 #endif
 
 /*1: Show the used memory and the memory fragmentation
  * Requires LV_MEM_CUSTOM = 0*/
-#define LV_USE_MEM_MONITOR 1
+#define LV_USE_MEM_MONITOR 0
 #if LV_USE_MEM_MONITOR
 #define LV_USE_MEM_MONITOR_POS LV_ALIGN_BOTTOM_LEFT
 #endif
@@ -482,14 +482,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #define LV_LABEL_LONG_TXT_HINT 1  /*Store some extra info in labels to speed up drawing of very long texts*/
 #endif
 
-#define LV_USE_LINE       1
+#define LV_USE_LINE       0
 
 #define LV_USE_ROLLER     0   /*Requires: lv_label*/
 #if LV_USE_ROLLER
 #define LV_ROLLER_INF_PAGES 7 /*Number of extra "pages" when the roller is infinite*/
 #endif
 
-#define LV_USE_SLIDER     1   /*Requires: lv_bar*/
+#define LV_USE_SLIDER     0   /*Requires: lv_bar*/
 
 #define LV_USE_SWITCH     1
 
@@ -523,7 +523,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #define LV_USE_CALENDAR_HEADER_DROPDOWN 1
 #endif  /*LV_USE_CALENDAR*/
 
-#define LV_USE_CHART      1
+#define LV_USE_CHART      0
 
 #define LV_USE_COLORWHEEL 0
 
@@ -531,7 +531,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 #define LV_USE_KEYBOARD   1
 
-#define LV_USE_LED        0
+#define LV_USE_LED        1
 
 #define LV_USE_LIST       1
 
@@ -555,7 +555,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 
 #define LV_USE_TILEVIEW   0
 
-#define LV_USE_WIN        1
+#define LV_USE_WIN        0
 
 /*-----------
  * Themes

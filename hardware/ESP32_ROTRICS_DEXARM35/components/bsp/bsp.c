@@ -21,17 +21,16 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "esp3d_log.h"
-#include "lvgl.h"
 #include "bsp.h"
-#include "xpt2046.h"
+
+#include "disp_spi.h"
+#include "esp3d_log.h"
+#include "esp_lcd_backlight.h"
 #include "ili9488.h"
+#include "lvgl.h"
 #include "spi_bus.h"
 #include "touch_spi.h"
-#include "disp_spi.h"
-#include "esp_lcd_backlight.h"
-
-
+#include "xpt2046.h"
 
 /*********************
  *      DEFINES
@@ -40,7 +39,6 @@
 /**********************
  *      TYPEDEFS
  **********************/
-
 
 /**********************
  *  STATIC PROTOTYPES
@@ -58,86 +56,84 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-esp_err_t bsp_init(void)
-{
-    //Driver initialization
-    esp3d_log("Display buffer size: %d", DISP_BUF_SIZE);
+esp_err_t bsp_init(void) {
+  // Driver initialization
+  esp3d_log("Display buffer size: %d", DISP_BUF_SIZE);
 
-    /* Display controller initialization */
-    esp3d_log("Initializing shared SPI master");
+  /* Display controller initialization */
+  esp3d_log("Initializing shared SPI master");
 
-    spi_driver_init(DISP_SPI_HOST,
-                    TOUCH_SPI_MISO, DISP_SPI_MOSI, DISP_SPI_CLK,
-                    DISP_SPI_BUS_MAX_TRANSFER_SZ, 1,
-                    -1, -1);
-    
-    esp3d_log("Initializing display controller");                
-    disp_spi_add_device(DISP_SPI_HOST);
-    tp_spi_add_device(TOUCH_SPI_HOST);
-    ili9488_init();
+  spi_driver_init(DISP_SPI_HOST, TOUCH_SPI_MISO, DISP_SPI_MOSI, DISP_SPI_CLK,
+                  DISP_SPI_BUS_MAX_TRANSFER_SZ, 1, -1, -1);
+
+  esp3d_log("Initializing display controller");
+  disp_spi_add_device(DISP_SPI_HOST);
+  tp_spi_add_device(TOUCH_SPI_HOST);
+  ili9488_init();
 #if (defined(DISP_BACKLIGHT_SWITCH) || defined(DISP_BACKLIGHT_PWM))
-    const disp_backlight_config_t bckl_config = {
-        .gpio_num = DISP_PIN_BCKL,
+  const disp_backlight_config_t bckl_config = {
+    .gpio_num = DISP_PIN_BCKL,
 #if defined DISP_BACKLIGHT_PWM
-        .pwm_control = true,
+    .pwm_control = true,
 #else
-        .pwm_control = false,
+    .pwm_control = false,
 #endif
 #if defined BACKLIGHT_ACTIVE_LVL
-        .output_invert = false, // Backlight on high
+    .output_invert = false,  // Backlight on high
 #else
-        .output_invert = true, // Backlight on low
+    .output_invert = true,  // Backlight on low
 #endif
-        .timer_idx = 0,
-        .channel_idx = 0 // @todo this prevents us from having two PWM controlled displays
-    };
-    disp_backlight_h bckl_handle = disp_backlight_new(&bckl_config);
-    disp_backlight_set(bckl_handle, 100);
+    .timer_idx = 0,
+    .channel_idx =
+        0  // @todo this prevents us from having two PWM controlled displays
+  };
+  disp_backlight_h bckl_handle = disp_backlight_new(&bckl_config);
+  disp_backlight_set(bckl_handle, DISP_BCKL_DEFAULT_DUTY);
 #endif
 
-    /* Touch controller initialization */
-    esp3d_log("Initializing touch controller");
-    //SPI is shared between touch and display so no need to init againt SPI
-    
-    xpt2046_init();
+  /* Touch controller initialization */
+  esp3d_log("Initializing touch controller");
+  // SPI is shared between touch and display so no need to init againt SPI
 
-    //Lvgl initialization
-    lv_init();
+  xpt2046_init();
 
-    //Lvgl setup
-    esp3d_log("Setup Lvgl");
-    lv_color_t* buf1 = (lv_color_t*)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t), HAS_PSRAM ?MALLOC_CAP_SPIRAM: MALLOC_CAP_DMA);
-    if (buf1 == NULL) return ESP_FAIL;
+  // Lvgl initialization
+  lv_init();
 
-    /* Use double buffered when not working with monochrome displays */
-    lv_color_t* buf2 = (lv_color_t*)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t),  HAS_PSRAM ?MALLOC_CAP_SPIRAM: MALLOC_CAP_DMA);
-    if (buf2 == NULL) return ESP_FAIL;
+  // Lvgl setup
+  esp3d_log("Setup Lvgl");
+  lv_color_t* buf1 = (lv_color_t*)heap_caps_malloc(
+      DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_SPIRAM);
+  if (buf1 == NULL) return ESP_FAIL;
 
+  /* Use double buffered when not working with monochrome displays */
+  lv_color_t* buf2 = (lv_color_t*)heap_caps_malloc(
+      DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_SPIRAM);
+  if (buf2 == NULL) return ESP_FAIL;
 
-    static lv_disp_draw_buf_t draw_buf;
+  static lv_disp_draw_buf_t draw_buf;
 
-    uint32_t size_in_px = DISP_BUF_SIZE;
+  uint32_t size_in_px = DISP_BUF_SIZE;
 
-    /* Initialize the working buffer depending on the selected display.*/
-    lv_disp_draw_buf_init(&draw_buf, buf1, buf2, size_in_px);
+  /* Initialize the working buffer depending on the selected display.*/
+  lv_disp_draw_buf_init(&draw_buf, buf1, buf2, size_in_px);
 
-    static lv_disp_drv_t disp_drv;        /*Descriptor of a display driver*/
-    lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
-    disp_drv.flush_cb = ili9488_flush;    /*Set your driver function*/
-    disp_drv.draw_buf = &draw_buf;        /*Assign the buffer to the display*/
-    disp_drv.hor_res = DISP_HOR_RES_MAX;   /*Set the horizontal resolution of the display*/
-    disp_drv.ver_res = DISP_VER_RES_MAX;   /*Set the vertical resolution of the display*/
-    lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
+  static lv_disp_drv_t disp_drv;     /*Descriptor of a display driver*/
+  lv_disp_drv_init(&disp_drv);       /*Basic initialization*/
+  disp_drv.flush_cb = ili9488_flush; /*Set your driver function*/
+  disp_drv.draw_buf = &draw_buf;     /*Assign the buffer to the display*/
+  disp_drv.hor_res =
+      DISP_HOR_RES_MAX; /*Set the horizontal resolution of the display*/
+  disp_drv.ver_res =
+      DISP_VER_RES_MAX; /*Set the vertical resolution of the display*/
+  lv_disp_drv_register(&disp_drv); /*Finally register the driver*/
 
+  /* Register an input device */
+  static lv_indev_drv_t indev_drv; /*Descriptor of a input device driver*/
+  lv_indev_drv_init(&indev_drv);   /*Basic initialization*/
+  indev_drv.type = LV_INDEV_TYPE_POINTER; /*Touch pad is a pointer-like device*/
+  indev_drv.read_cb = xpt2046_read;       /*Set your driver function*/
+  lv_indev_drv_register(&indev_drv);      /*Finally register the driver*/
 
-
-    /* Register an input device */
-    static lv_indev_drv_t indev_drv;           /*Descriptor of a input device driver*/
-    lv_indev_drv_init(&indev_drv);             /*Basic initialization*/
-    indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*/
-    indev_drv.read_cb = xpt2046_read;          /*Set your driver function*/
-    lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
-
-    return ESP_OK;
+  return ESP_OK;
 }
-

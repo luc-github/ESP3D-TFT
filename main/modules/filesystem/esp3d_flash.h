@@ -28,6 +28,12 @@
 
 #define ESP3D_FLASH_FS_HEADER "/fs/"
 
+enum class ESP3DFsState : uint8_t {
+  idle,
+  busy,
+  unknown,
+};
+
 class ESP3DFlash final {
  public:
   ESP3DFlash();
@@ -56,10 +62,13 @@ class ESP3DFlash final {
   void rewinddir(DIR *dir);
   FILE *open(const char *filename, const char *mode);
   void close(FILE *fd);
+  ESP3DFsState getState();
+  ESP3DFsState setState(ESP3DFsState state);
 
  private:
   bool _mounted;
   bool _started;
+  ESP3DFsState _state;
 };
 
 extern ESP3DFlash flashFs;

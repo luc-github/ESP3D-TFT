@@ -34,6 +34,41 @@
     #error "Cannot use DMA2D with LV_COLOR_DEPTH other than 16 or 32"
 #endif
 
+/**********************
+ *  STATIC PROTOTYPES
+ **********************/
+static void lv_draw_stm32_dma2d_blend(lv_draw_ctx_t * draw_ctx, const lv_draw_sw_blend_dsc_t * dsc);
+static void lv_draw_stm32_dma2d_buffer_copy(lv_draw_ctx_t * draw_ctx,
+                                            void * dest_buf, lv_coord_t dest_stride, const lv_area_t * dest_area,
+                                            void * src_buf, lv_coord_t src_stride, const lv_area_t * src_area);
+static void lv_draw_stm32_dma2d_img_decoded(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * img_dsc,
+                                            const lv_area_t * coords, const uint8_t * src_buf, lv_img_cf_t color_format);
+static dma2d_color_format_t lv_color_format_to_dma2d_color_format(lv_img_cf_t color_format);
+static lv_point_t lv_area_get_offset(const lv_area_t * area1, const lv_area_t * area2);
+
+LV_STM32_DMA2D_STATIC void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx);
+LV_STM32_DMA2D_STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * img_dsc,
+                                                       const lv_area_t * src_area, const void * src);
+LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_fill(const lv_color_t * dst_buf, lv_coord_t dst_stride,
+                                                           const lv_area_t * draw_area, lv_color_t color, lv_opa_t opa);
+LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_map(const lv_color_t * dest_buf, lv_coord_t dest_stride,
+                                                          const lv_area_t * draw_area, const void * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset, lv_opa_t opa,
+                                                          dma2d_color_format_t src_color_format, bool ignore_src_alpha);
+LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_paint(const lv_color_t * dst_buf, lv_coord_t dst_stride,
+                                                            const lv_area_t * draw_area, const lv_opa_t * mask_buf, lv_coord_t mask_stride, const lv_point_t * mask_offset,
+                                                            lv_color_t color, lv_opa_t opa);
+LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_copy_buffer(const lv_color_t * dest_buf, lv_coord_t dest_stride,
+                                                            const lv_area_t * draw_area, const lv_color_t * src_buf, lv_coord_t src_stride, const lv_point_t * src_offset);
+LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_await_dma_transfer_finish(lv_disp_drv_t * disp_drv);
+LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_start_dma_transfer(void);
+LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_invalidate_cache(uint32_t address, lv_coord_t offset,
+                                                                lv_coord_t width, lv_coord_t height, uint8_t pixel_size);
+LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_clean_cache(uint32_t address, lv_coord_t offset, lv_coord_t width,
+                                                           lv_coord_t height, uint8_t pixel_size);
+LV_STM32_DMA2D_STATIC bool _lv_gpu_stm32_dwt_init(void);
+LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dwt_reset(void);
+LV_STM32_DMA2D_STATIC uint32_t _lv_gpu_stm32_dwt_get_us(void);
+
 static bool isDma2dInProgess = false; // indicates whether DMA2D transfer *initiated here* is in progress
 
 /**
@@ -276,9 +311,8 @@ static dma2d_color_format_t lv_color_format_to_dma2d_color_format(lv_img_cf_t co
     }
 }
 
-static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * img_dsc,
-                                        const lv_area_t * src_area,
-                                        const void * src)
+LV_STM32_DMA2D_STATIC lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_img_dsc_t * img_dsc,
+                                                       const lv_area_t * src_area, const void * src)
 {
     //if(lv_img_src_get_type(src) != LV_IMG_SRC_VARIABLE) return LV_RES_INV;
     return LV_RES_INV;
@@ -315,7 +349,7 @@ static lv_res_t lv_draw_stm32_dma2d_img(lv_draw_ctx_t * draw_ctx, const lv_draw_
     return LV_RES_OK;
 }
 
-static void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
+LV_STM32_DMA2D_STATIC void lv_gpu_stm32_dma2d_wait_cb(lv_draw_ctx_t * draw_ctx)
 {
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
     _lv_gpu_stm32_dma2d_await_dma_transfer_finish(disp->driver);
@@ -343,7 +377,9 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_fill(const lv_color_t * de
         DMA2D->CR = 0x3UL << DMA2D_CR_MODE_Pos; // Register-to-memory (no FG nor BG, only output stage active)
 
         DMA2D->OPFCCR = LvglColorFormat;
+#if defined(DMA2D_OPFCCR_RBS_Pos)
         DMA2D->OPFCCR |= (RBS_BIT << DMA2D_OPFCCR_RBS_Pos);
+#endif
         DMA2D->OMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
         DMA2D->OOR = dest_stride - draw_width;  // out buffer offset
         // Note: unlike FGCOLR and BGCOLR, OCOLR bits must match DMA2D_OUTPUT_COLOR, alpha can be specified
@@ -370,14 +406,18 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_fill(const lv_color_t * de
         DMA2D->FGCOLR = lv_color_to32(color) & 0x00ffffff; // swap FGCOLR R/B bits if FGPFCCR.RBS (RBS_BIT) bit is set
 
         DMA2D->BGPFCCR = LvglColorFormat;
+#if defined(DMA2D_BGPFCCR_RBS_Pos)
         DMA2D->BGPFCCR |= (RBS_BIT << DMA2D_BGPFCCR_RBS_Pos);
+#endif
         DMA2D->BGMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
         DMA2D->BGOR = dest_stride - draw_width;
         DMA2D->BGCOLR = 0;  // used in A4 and A8 modes only
         _lv_gpu_stm32_dma2d_clean_cache(DMA2D->BGMAR, DMA2D->BGOR, draw_width, draw_height, sizeof(lv_color_t));
 
         DMA2D->OPFCCR = LvglColorFormat;
+#if defined(DMA2D_OPFCCR_RBS_Pos)
         DMA2D->OPFCCR |= (RBS_BIT << DMA2D_OPFCCR_RBS_Pos);
+#endif
         DMA2D->OMAR = DMA2D->BGMAR;
         DMA2D->OOR = DMA2D->BGOR;
         DMA2D->OCOLR = 0;
@@ -454,15 +494,18 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_map(const lv_color_t * des
             DMA2D->FGPFCCR |= (0x1UL << DMA2D_FGPFCCR_AM_Pos);
         }
     }
-
+#if defined(DMA2D_FGPFCCR_RBS_Pos)
     DMA2D->FGPFCCR |= (RBS_BIT << DMA2D_FGPFCCR_RBS_Pos);
+#endif
     DMA2D->FGMAR = ((uint32_t)src_buf) + srcBpp * ((src_stride * src_offset->y) + src_offset->x);
     DMA2D->FGOR = src_stride - draw_width;
     DMA2D->FGCOLR = 0;  // used in A4 and A8 modes only
     _lv_gpu_stm32_dma2d_clean_cache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height, srcBpp);
 
     DMA2D->OPFCCR = LvglColorFormat;
+#if defined(DMA2D_OPFCCR_RBS_Pos)
     DMA2D->OPFCCR |= (RBS_BIT << DMA2D_OPFCCR_RBS_Pos);
+#endif
     DMA2D->OMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
     DMA2D->OOR = dest_stride - draw_width;
     DMA2D->OCOLR = 0;
@@ -470,7 +513,9 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_map(const lv_color_t * des
     if(opa != 0xff || bitmapHasOpacity) {
         // use background (BG*) registers
         DMA2D->BGPFCCR = LvglColorFormat;
+#if defined(DMA2D_BGPFCCR_RBS_Pos)
         DMA2D->BGPFCCR |= (RBS_BIT << DMA2D_BGPFCCR_RBS_Pos);
+#endif
         DMA2D->BGMAR = DMA2D->OMAR;
         DMA2D->BGOR = DMA2D->OOR;
         DMA2D->BGCOLR = 0;  // used in A4 and A8 modes only
@@ -514,14 +559,18 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_blend_paint(const lv_color_t * d
     _lv_gpu_stm32_dma2d_clean_cache(DMA2D->FGMAR, DMA2D->FGOR, draw_width, draw_height, sizeof(lv_opa_t));
 
     DMA2D->BGPFCCR = LvglColorFormat;
+#if defined(DMA2D_BGPFCCR_RBS_Pos)
     DMA2D->BGPFCCR |= (RBS_BIT << DMA2D_BGPFCCR_RBS_Pos);
+#endif
     DMA2D->BGMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
     DMA2D->BGOR = dest_stride - draw_width;
     DMA2D->BGCOLR = 0;  // used in A4 and A8 modes only
     _lv_gpu_stm32_dma2d_clean_cache(DMA2D->BGMAR, DMA2D->BGOR, draw_width, draw_height, sizeof(lv_color_t));
 
     DMA2D->OPFCCR = LvglColorFormat;
+#if defined(DMA2D_OPFCCR_RBS_Pos)
     DMA2D->OPFCCR |= (RBS_BIT << DMA2D_OPFCCR_RBS_Pos);
+#endif
     DMA2D->OMAR = DMA2D->BGMAR;
     DMA2D->OOR = DMA2D->BGOR;
     DMA2D->OCOLR = 0;
@@ -547,7 +596,9 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_copy_buffer(const lv_color_t * d
     DMA2D->CR = 0x0UL; // Memory-to-memory (FG fetch only)
 
     DMA2D->FGPFCCR = LvglColorFormat;
+#if defined(DMA2D_FGPFCCR_RBS_Pos)
     DMA2D->FGPFCCR |= (RBS_BIT << DMA2D_FGPFCCR_RBS_Pos);
+#endif
     DMA2D->FGMAR = (uint32_t)(src_buf + (src_stride * src_offset->y) + src_offset->x);
     DMA2D->FGOR = src_stride - draw_width;
     DMA2D->FGCOLR = 0;  // used in A4 and A8 modes only
@@ -556,7 +607,9 @@ LV_STM32_DMA2D_STATIC void _lv_draw_stm32_dma2d_copy_buffer(const lv_color_t * d
     // Note BG* registers do not need to be set up since BG is not used
 
     DMA2D->OPFCCR = LvglColorFormat;
+#if defined(DMA2D_OPFCCR_RBS_Pos)
     DMA2D->OPFCCR |= (RBS_BIT << DMA2D_OPFCCR_RBS_Pos);
+#endif
     DMA2D->OMAR = (uint32_t)(dest_buf + (dest_stride * draw_area->y1) + draw_area->x1);
     DMA2D->OOR = dest_stride - draw_width;
     DMA2D->OCOLR = 0;
@@ -615,6 +668,7 @@ LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_await_dma_transfer_finish(lv_disp
 LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_invalidate_cache(uint32_t address, lv_coord_t offset, lv_coord_t width,
                                                                 lv_coord_t height, uint8_t pixel_size)
 {
+#if defined (__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
     if(((SCB->CCR) & SCB_CCR_DC_Msk) == 0) return; // L1 data cache is disabled
     uint16_t stride = pixel_size * (width + offset); // in bytes
     uint16_t ll = pixel_size * width; // line length in bytes
@@ -640,11 +694,13 @@ LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_invalidate_cache(uint32_t address
 
     __DSB();
     __ISB();
+#endif
 }
 
 LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_clean_cache(uint32_t address, lv_coord_t offset, lv_coord_t width,
                                                            lv_coord_t height, uint8_t pixel_size)
 {
+#if defined (__DCACHE_PRESENT) && (__DCACHE_PRESENT == 1U)
     if(((SCB->CCR) & SCB_CCR_DC_Msk) == 0) return; // L1 data cache is disabled
     uint16_t stride = pixel_size * (width + offset); // in bytes
     uint16_t ll = pixel_size * width; // line length in bytes
@@ -669,6 +725,7 @@ LV_STM32_DMA2D_STATIC void _lv_gpu_stm32_dma2d_clean_cache(uint32_t address, lv_
 
     __DSB();
     __ISB();
+#endif
 }
 
 // initialize µs timer
@@ -679,8 +736,9 @@ LV_STM32_DMA2D_STATIC bool _lv_gpu_stm32_dwt_init(void)
     // enable TRC
     CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 
+#if defined(__CORTEX_M) && (__CORTEX_M == 7U)
     DWT->LAR = 0xC5ACCE55;
-
+#endif
     // disable clock cycle counter
     DWT->CTRL &= ~DWT_CTRL_CYCCNTENA_Msk;
     // enable  clock cycle counter

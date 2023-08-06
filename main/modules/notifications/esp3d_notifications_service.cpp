@@ -22,6 +22,7 @@
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
 #include "esp3d_string.h"
+#include "esp3d_values.h"
 #include "mbedtls/base64.h"
 #include "network/esp3d_network.h"
 
@@ -148,6 +149,8 @@ bool ESP3DNotificationsService::sendMSG(const char* title,
 #if ESP3D_HTTP_FEATURE
   esp3dWsWebUiService.pushNotification(formated_message.c_str());
 #endif  // ESP3D_HTTP_FEATURE
+  esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
+                                  formated_message.c_str());
 
   if (_started) {
     switch (_notificationType) {

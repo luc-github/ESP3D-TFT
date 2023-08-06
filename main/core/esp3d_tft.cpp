@@ -29,14 +29,22 @@
 #include "esp3d_commands.h"
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
-#include "esp3d_tft_network.h"
-#include "esp3d_tft_stream.h"
+#if ESP3D_WIFI_FEATURE
+#include "network/esp3d_tft_network.h"
+#endif  // ESP3D_WIFI_FEATURE
+#if ESP3D_GCODE_HOST_FEATURE
+#include "gcode_host/esp3d_tft_stream.h"
+#endif  // ESP3D_GCODE_HOST_FEATURE
 #include "esp_freertos_hooks.h"
+//////////////////////////////// Remove me
+#include "esp_spiffs.h"
+////////////////////////////////
 #include "filesystem/esp3d_flash.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
+#include "translations/esp3d_translation_service.h"
 #include "version.h"
 
 #if ESP3D_SD_CARD_FEATURE
@@ -95,13 +103,17 @@ bool ESP3DTft::begin() {
     }
   }
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
-  bool successFs = flashFs.begin();
+  bool success = true;
+  bool successFs = true;
   bool successSd = true;
+
+  // Init filesystem
+  successFs = flashFs.begin();
 #if ESP3D_SD_CARD_FEATURE
   successSd = sd.begin();
 #endif  // ESP3D_SD_CARD_FEATURE
-  bool success = true;
 #if ESP3D_DISPLAY_FEATURE
+  esp3dTranslationService.begin();
   esp3dTftui.begin();
 #endif  // ESP3D_DISPLAY_FEATURE
 #if ESP3D_UPDATE_FEATURE
@@ -109,12 +121,16 @@ bool ESP3DTft::begin() {
     esp3dUpdateService.begin();
   }
 #endif  // ESP3D_UPDATE_FEATURE
+#if ESP3D_GCODE_HOST_FEATURE
   if (success) {
     success = esp3dTftstream.begin();
   }
+#endif  // ESP3D_GCODE_HOST_FEATURE
+#if ESP3D_WIFI_FEATURE
   if (success) {
     success = esp3dTftnetwork.begin();
   }
+#endif  // ESP3D_WIFI_FEATURE
   return success && successFs && successSd;
 }
 

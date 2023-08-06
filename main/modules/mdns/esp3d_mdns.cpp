@@ -173,6 +173,7 @@ bool ESP3DmDNS::begin() {
 void ESP3DmDNS::handle() {}
 
 void ESP3DmDNS::end() {
+  esp3d_log("Stop mDNS service");
   _count = 0;
   freeServiceScan();
   if (_started) {

@@ -68,6 +68,10 @@ static bool style_refr = true;
  *   GLOBAL FUNCTIONS
  **********************/
 
+void lv_obj_remove_style_all(struct _lv_obj_t* obj) {
+  lv_obj_remove_style(obj, NULL, LV_PART_ANY | LV_STATE_ANY);
+}
+
 void _lv_obj_style_init(void)
 {
     _lv_ll_init(&LV_GC_ROOT(_lv_obj_style_trans_ll), sizeof(trans_t));
@@ -149,12 +153,6 @@ void lv_obj_remove_style(lv_obj_t * obj, lv_style_t * style, lv_style_selector_t
         lv_obj_refresh_style(obj, part, prop);
     }
 }
-
-void lv_obj_remove_style_all(struct _lv_obj_t * obj)
-{
-    lv_obj_remove_style(obj, NULL, LV_PART_ANY | LV_STATE_ANY);
-}
-
 
 void lv_obj_report_style_change(lv_style_t * style)
 {
@@ -755,6 +753,7 @@ static void trans_anim_cb(void * _tr, int32_t v)
                 else value_final.ptr = tr->end_value.ptr;
                 break;
             case LV_STYLE_BG_COLOR:
+            case LV_STYLE_BG_GRAD_COLOR:
             case LV_STYLE_BORDER_COLOR:
             case LV_STYLE_TEXT_COLOR:
             case LV_STYLE_SHADOW_COLOR:

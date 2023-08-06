@@ -102,6 +102,7 @@ bool ESP3Dssdp::begin() {
 void ESP3Dssdp::handle() {}
 
 void ESP3Dssdp::end() {
+  esp3d_log("Stop SSDP service");
   ssdp_stop();
   _started = false;
 }

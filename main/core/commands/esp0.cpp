@@ -70,6 +70,9 @@ const char* help[] = {
     "[ESP202](factor) - display / set  SD Card  SD card Speed divider factor "
     "(1 2 4 6 8 16 32)",
 #endif  // ESP3D_SD_IS_SPI
+#if ESP3D_DISPLAY_FEATURE
+    "[ESP214](Text) - Output to esp screen status",
+#endif  // ESP3D_DISPLAY_FEATURE
 #endif  // ESP3D_SD_CARD_FEATURE
     "[ESP400] - display ESP3D settings",
     "[ESP401]P=(position) T=(type) V=(value) - Set specific setting",
@@ -87,6 +90,7 @@ const char* help[] = {
 #if ESP3D_MDNS_FEATURE
     "[ESP450]display ESP3D list on network",
 #endif  // #if ESP3D_MDNS_FEATURE
+    "[ESP460](language code) - display/set UI language code",
 #if ESP3D_AUTHENTICATION_FEATURE
     "[ESP500] - set get connection status",
     "[ESP510](timeout) - display/set session timeout",
@@ -150,7 +154,9 @@ const uint cmdlist[] = {
 #if ESP3D_SD_IS_SPI
     202,
 #endif  // ESP3D_SD_IS_SPI
-
+#if ESP3D_DISPLAY_FEATURE
+    214,
+#endif  // ESP3D_DISPLAY_FEATURE
 #endif  // ESP3D_SD_CARD_FEATURE
 
     400, 401,
@@ -162,11 +168,11 @@ const uint cmdlist[] = {
 #if ESP3D_WIFI_FEATURE
     410,
 #endif  // ESP3D_WIFI_FEATURE
-    420,
+    420, 444,
 #if ESP3D_MDNS_FEATURE
     450,
 #endif  // ESP3D_MDNS_FEATURE
-    444,
+    460,
 #if ESP3D_AUTHENTICATION_FEATURE
     500, 510, 550, 555,
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE

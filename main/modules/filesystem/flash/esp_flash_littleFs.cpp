@@ -1,5 +1,5 @@
 /*
-  esp_sd_spi.cpp - ESP3D SD support class
+  esp_flash_littleFs.cpp - ESP3D SD support class
 
   Copyright (c) 2014 Luc Lebosse. All rights reserved.
 
@@ -17,7 +17,7 @@
   License along with This code; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
+#if ESP3D_LITTLEFS_FEATURE
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/unistd.h>
@@ -255,3 +255,5 @@ void ESP3DFlash::close(FILE *fd) {
   fclose(fd);
   fd = nullptr;
 }
+
+#endif  // ESP3D_LITTLEFS_FEATURE

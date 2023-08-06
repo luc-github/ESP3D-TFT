@@ -1,15 +1,29 @@
 # #######################################
-# Select the target
+# Select the targeted hardware
 # #######################################
 OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R 2.8inches" OFF)
 OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" OFF)
 OPTION(ESP32_ROTRICS_DEXARM35 "TFT TARGET is ESP32 Rotrics DexArm 3.5inches" ON)
 OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-SRC-4832 3.5inches" OFF)
+OPTION(ESP32S3_FREENOVE_1_1 "HARDWARE TARGET is ESP32S3 Freenove v1.1" OFF)
+OPTION(ESP32S3_ESP32S3_CUSTOM "HARDWARE TARGET is ESP32S3 custom board" OFF)
+OPTION(ESP32S3_ESP32_CUSTOM "HARDWARE TARGET is ESP32 custom board" OFF)
+OPTION(ESP32S3_8048S070 "TFT TARGET is ESP32S3 7.0inches" OFF)
+
+
+# #######################################
+# Select the targeted firmware
+# #######################################
+OPTION(TARGET_FW_MARLIN "Marlin firmware" ON)
+OPTION(TARGET_FW_REPETIER "Repetier firmware" OFF)
+OPTION(TARGET_FW_SMOOTHIEWARE "Smoothieware firmware" OFF)
+OPTION(TARGET_FW_GRBL "GRBL firmware" OFF)
+
 
 # #######################################
 # Select the Options
 # #######################################
-OPTION(ESP3D_AUTHENTICATION "Authentication on all clients" ON)
+OPTION(ESP3D_AUTHENTICATION "Authentication on all clients" OFF)
 OPTION(DISABLE_SERIAL_AUTHENTICATION "Disable Serial Authentication" ON)
 OPTION(TIMESTAMP_ON_FILES "Time on file" OFF)
 OPTION(SSDP_SERVICE "SSDP service" ON)
@@ -24,6 +38,7 @@ OPTION(SD_CARD_SERVICE "SD card service" ON)
 OPTION(NOTIFICATIONS_SERVICE "Notifications service" ON)
 OPTION(UPDATE_SERVICE "Update service" ON)
 OPTION(GCODE_HOST_SERVICE "GCode Streaming service" ON)
+OPTION(USE_FAT_INSTEAD_OF_LITTLEFS "Use FAT instead of LittleFS" OFF)
 
 # #######################################
 # Do not change anything above this line
@@ -37,19 +52,66 @@ if(ESP32_2432S028R)
 elseif(ESP32S3_HMI43V3)
     set(SDKCONFIG hardware/ESP32S3_HMI43V3/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_HMI43V3/components)
+elseif(ESP32S3_8048S070)
+    set(SDKCONFIG hardware/ESP32S3_8048S070/sdkconfig)
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_8048S070/components)
 elseif(ESP32_ROTRICS_DEXARM35)
     set(SDKCONFIG hardware/ESP32_ROTRICS_DEXARM35/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32_ROTRICS_DEXARM35/components)
 elseif(ESP32S3_ZX3D50CE02S_USRC_4832)
     set(SDKCONFIG hardware/ESP32S3_ZX3D50CE02S_USRC_4832/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_ZX3D50CE02S_USRC_4832/components)
+elseif(ESP32S3_FREENOVE_1_1)
+    set(SDKCONFIG hardware/ESP32S3_FREENOVE_1_1/sdkconfig)
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_FREENOVE_1_1/components)
+elseif(ESP32S3_CUSTOM)
+    set(SDKCONFIG hardware/ESP32S3_CUSTOM/sdkconfig)
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_CUSTOM/components)
+elseif(ESP32_CUSTOM)
+    set(SDKCONFIG hardware/ESP32_CUSTOM/sdkconfig)
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_CUSTOM/components)
 else()
     message(FATAL_ERROR
         "\n"
-        "No target defined, please define a target in CMakeLists.txt"
+        "No hardware target defined, please define a target in CMakeLists.txt"
         "\n"
         "Now cmake will exit")
 endif()
+
+if(USE_FAT_INSTEAD_OF_LITTLEFS)
+    add_compile_options(-DESP3D_FATFS_FEATURE=1)
+    else()
+    add_compile_options(-DESP3D_LITTLEFS_FEATURE=1)
+endif()
+
+if(TARGET_FW_MARLIN)
+    if(TFT_UI_SERVICE)
+        add_compile_options("-I${CMAKE_SOURCE_DIR}/main/display/3dprinter/marlin")
+    endif()
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/main/target/3dprinter/marlin")
+elseif(TARGET_FW_REPETIER)
+     if(TFT_UI_SERVICE)
+        add_compile_options("-I${CMAKE_SOURCE_DIR}/main/display/3dprinter/repetier")
+    endif()
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/main/target/3dprinter/repetier")
+elseif(TARGET_FW_SMOOTHIEWARE)
+     if(TFT_UI_SERVICE)
+        add_compile_options("-I${CMAKE_SOURCE_DIR}/main/display/3dprinter/smoothiware")
+    endif()
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/main/target/3dprinter/smoothiware")
+elseif(TARGET_FW_GRBL)
+     if(TFT_UI_SERVICE)
+        add_compile_options("-I${CMAKE_SOURCE_DIR}/main/display/cnc/grbl")
+    endif()
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/main/target/cnc/grbl")
+else()
+    message(FATAL_ERROR
+        "\n"
+        "No firmware target defined, please define a target in CMakeLists.txt"
+        "\n"
+        "Now cmake will exit")
+endif()
+
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
@@ -61,9 +123,9 @@ add_compile_options(-DLV_LVGL_H_INCLUDE_SIMPLE=1)
 # All  = 2
 # Error only = 1
 # Disabled = 0
-add_compile_options(-DESP3D_TFT_LOG=0)
+add_compile_options(-DESP3D_TFT_LOG=2)
 # Disable ANSI color to fit some serial terminals 
-add_compile_options(-DDISABLE_COLOR_LOG=1)
+add_compile_options(-DDISABLE_COLOR_LOG=0)
 
 
 # ESP3D-TFT specific bechmark
@@ -117,6 +179,7 @@ endif()
 
 if(TFT_UI_SERVICE)
     add_compile_options(-DESP3D_DISPLAY_FEATURE=1)
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/main/display")
 endif()
 
 if(SD_CARD_SERVICE)
@@ -140,6 +203,10 @@ elseif(ESP32S3_HMI43V3)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_HMI43V3/components)
     set(TFT_TARGET "ESP32S3_HMI43V3")
     add_compile_options(-DESP3D_USB_SERIAL_FEATURE=1)
+elseif(ESP32S3_8048S070)
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32S3_8048S070/components/bsp")
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_8048S070/components)
+    set(TFT_TARGET "ESP32S3_8048S070")
 elseif(ESP32_ROTRICS_DEXARM35)
     add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32_ROTRICS_DEXARM35/components/bsp")
     set(EXTRA_COMPONENT_DIRS hardware/ESP32_ROTRICS_DEXARM35/components)
@@ -149,6 +216,20 @@ elseif(ESP32S3_ZX3D50CE02S_USRC_4832)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_ZX3D50CE02S_USRC_4832/components)
     set(TFT_TARGET "ESP32S3_ZX3D50CE02S_USRC_4832")
     add_compile_options(-DESP3D_USB_SERIAL_FEATURE=1)
+elseif(ESP32S3_FREENOVE_1_1)
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32S3_FREENOVE_1_1/components/bsp")
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_FREENOVE_1_1/components)
+    set(TFT_TARGET "ESP32S3_FREENOVE_1_1")
+    add_compile_options(-DESP3D_USB_SERIAL_FEATURE=1)
+elseif(ESP32S3_CUSTOM)
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32S3_CUSTOM/components/bsp")
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_CUSTOM/components)
+    set(TFT_TARGET "ESP32S3_CUSTOM")
+    add_compile_options(-DESP3D_USB_SERIAL_FEATURE=1)
+elseif(ESP32_CUSTOM)
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32_CUSTOM/components/bsp")
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32_CUSTOM/components)
+    set(TFT_TARGET "ESP32_CUSTOM")
 endif()
 
 # Add entry point for customizations headers

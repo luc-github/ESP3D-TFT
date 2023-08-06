@@ -25,8 +25,10 @@
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
 #include "esp3d_string.h"
+#include "esp3d_values.h"
 #include "esp_wifi.h"
 #include "http/esp3d_http_service.h"
+
 
 #if ESP3D_NOTIFICATIONS_FEATURE
 #include "notifications/esp3d_notifications_service.h"
@@ -49,6 +51,7 @@ ESP3DNetworkServices::ESP3DNetworkServices() { _started = false; }
 ESP3DNetworkServices::~ESP3DNetworkServices() {}
 
 bool ESP3DNetworkServices::begin() {
+  esp3dTftValues.set_string_value(ESP3DValuesIndex::network_status, "+");
   esp3d_log("Starting Services");
   _started = esp3dAuthenthicationService.begin();
 #if ESP3D_HTTP_FEATURE

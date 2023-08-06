@@ -32,6 +32,7 @@ namespace esp3d_strings {
 // some functions do internal change and others do copy of original string and
 // modify it need to review for consistency  or allows both copy and insite of
 // string TBD
+std::string set_precision(std::string str_value, uint8_t precision);
 const char* str_replace(const char* currentstr, const char* oldsubstr,
                         const char* newsubstr);
 const char* str_trim(const char* str);
@@ -40,6 +41,7 @@ void str_toLowerCase(std::string* str);
 bool endsWith(const char* str, const char* endpart);
 bool startsWith(const char* str, const char* startPart);
 int find(const char* str, const char* subStr, size_t start = 0);
+int rfind(const char* str, const char* subStr, int start = -1);
 const char* formatBytes(uint64_t bytes);
 const char* urlDecode(const char* text);
 const char* getContentType(const char* filename);

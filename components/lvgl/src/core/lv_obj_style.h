@@ -18,7 +18,6 @@ extern "C" {
 
 #include "../misc/lv_bidi.h"
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -43,7 +42,7 @@ typedef enum {
 typedef uint32_t lv_style_selector_t;
 
 typedef struct {
-  lv_style_t *style;
+  lv_style_t* style;
   uint32_t selector : 24;
   uint32_t is_local : 1;
   uint32_t is_trans : 1;
@@ -56,7 +55,7 @@ typedef struct {
   lv_style_prop_t prop;
   lv_anim_path_cb_t path_cb;
 #if LV_USE_USER_DATA
-  void *user_data;
+  void* user_data;
 #endif
 } _lv_obj_style_transition_dsc_t;
 
@@ -80,7 +79,7 @@ void _lv_obj_style_init(void);
  * @example         lv_obj_add_style(btn, &btn_red, LV_STATE_PRESSED);
  * //Overwrite only some colors to red when pressed
  */
-void lv_obj_add_style(struct _lv_obj_t *obj, lv_style_t *style,
+void lv_obj_add_style(struct _lv_obj_t* obj, lv_style_t* style,
                       lv_style_selector_t selector);
 
 /**
@@ -97,7 +96,7 @@ void lv_obj_add_style(struct _lv_obj_t *obj, lv_style_t *style,
  * @example lv_obj_remove_style(obj, NULL, LV_PART_ANY | LV_STATE_ANY); //Remove
  * all styles
  */
-void lv_obj_remove_style(struct _lv_obj_t *obj, lv_style_t *style,
+void lv_obj_remove_style(struct _lv_obj_t* obj, lv_style_t* style,
                          lv_style_selector_t selector);
 
 /**
@@ -111,7 +110,7 @@ void lv_obj_remove_style_all(struct _lv_obj_t *obj);
  * @param style     pointer to a style. Only the objects with this style will be
  * notified (NULL to notify all objects)
  */
-void lv_obj_report_style_change(lv_style_t *style);
+void lv_obj_report_style_change(lv_style_t* style);
 
 /**
  * Notify an object and its children about its style is modified.
@@ -122,7 +121,7 @@ void lv_obj_report_style_change(lv_style_t *style);
  *                  It is used to optimize what needs to be refreshed.
  *                  `LV_STYLE_PROP_INV` to perform only a style cache update
  */
-void lv_obj_refresh_style(struct _lv_obj_t *obj, lv_part_t part,
+void lv_obj_refresh_style(struct _lv_obj_t* obj, lv_part_t part,
                           lv_style_prop_t prop);
 
 /**
@@ -143,7 +142,7 @@ void lv_obj_enable_style_refresh(bool en);
  *                  Should be read from the correct field of the
  * `lv_style_value_t` according to the type of the property.
  */
-lv_style_value_t lv_obj_get_style_prop(const struct _lv_obj_t *obj,
+lv_style_value_t lv_obj_get_style_prop(const struct _lv_obj_t* obj,
                                        lv_part_t part, lv_style_prop_t prop);
 
 /**
@@ -155,17 +154,17 @@ lv_style_value_t lv_obj_get_style_prop(const struct _lv_obj_t *obj,
  * @param selector  OR-ed value of parts and state for which the style should be
  * set
  */
-void lv_obj_set_local_style_prop(struct _lv_obj_t *obj, lv_style_prop_t prop,
+void lv_obj_set_local_style_prop(struct _lv_obj_t* obj, lv_style_prop_t prop,
                                  lv_style_value_t value,
                                  lv_style_selector_t selector);
 
-void lv_obj_set_local_style_prop_meta(struct _lv_obj_t *obj,
+void lv_obj_set_local_style_prop_meta(struct _lv_obj_t* obj,
                                       lv_style_prop_t prop, uint16_t meta,
                                       lv_style_selector_t selector);
 
-lv_style_res_t lv_obj_get_local_style_prop(struct _lv_obj_t *obj,
+lv_style_res_t lv_obj_get_local_style_prop(struct _lv_obj_t* obj,
                                            lv_style_prop_t prop,
-                                           lv_style_value_t *value,
+                                           lv_style_value_t* value,
                                            lv_style_selector_t selector);
 
 /**
@@ -177,13 +176,13 @@ lv_style_res_t lv_obj_get_local_style_prop(struct _lv_obj_t *obj,
  * @return true     the property was found and removed; false: the property was
  * not found
  */
-bool lv_obj_remove_local_style_prop(struct _lv_obj_t *obj, lv_style_prop_t prop,
+bool lv_obj_remove_local_style_prop(struct _lv_obj_t* obj, lv_style_prop_t prop,
                                     lv_style_selector_t selector);
 
 /**
  * Used internally for color filtering
  */
-lv_style_value_t _lv_obj_style_apply_color_filter(const struct _lv_obj_t *obj,
+lv_style_value_t _lv_obj_style_apply_color_filter(const struct _lv_obj_t* obj,
                                                   uint32_t part,
                                                   lv_style_value_t v);
 
@@ -195,10 +194,10 @@ lv_style_value_t _lv_obj_style_apply_color_filter(const struct _lv_obj_t *obj,
  * @param new_state
  * @param tr
  */
-void _lv_obj_style_create_transition(struct _lv_obj_t *obj, lv_part_t part,
+void _lv_obj_style_create_transition(struct _lv_obj_t* obj, lv_part_t part,
                                      lv_state_t prev_state,
                                      lv_state_t new_state,
-                                     const _lv_obj_style_transition_dsc_t *tr);
+                                     const _lv_obj_style_transition_dsc_t* tr);
 
 /**
  * Used internally to compare the appearance of an object in 2 states
@@ -207,7 +206,7 @@ void _lv_obj_style_create_transition(struct _lv_obj_t *obj, lv_part_t part,
  * @param state2
  * @return
  */
-_lv_style_state_cmp_t _lv_obj_style_state_compare(struct _lv_obj_t *obj,
+_lv_style_state_cmp_t _lv_obj_style_state_compare(struct _lv_obj_t* obj,
                                                   lv_state_t state1,
                                                   lv_state_t state2);
 
@@ -217,7 +216,7 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(struct _lv_obj_t *obj,
  * @param time      time of fade
  * @param delay     delay to start the animation
  */
-void lv_obj_fade_in(struct _lv_obj_t *obj, uint32_t time, uint32_t delay);
+void lv_obj_fade_in(struct _lv_obj_t* obj, uint32_t time, uint32_t delay);
 
 /**
  * Fade out an an object and all its children.
@@ -225,7 +224,7 @@ void lv_obj_fade_in(struct _lv_obj_t *obj, uint32_t time, uint32_t delay);
  * @param time      time of fade
  * @param delay     delay to start the animation
  */
-void lv_obj_fade_out(struct _lv_obj_t *obj, uint32_t time, uint32_t delay);
+void lv_obj_fade_out(struct _lv_obj_t* obj, uint32_t time, uint32_t delay);
 
 lv_state_t lv_obj_style_get_selector_state(lv_style_selector_t selector);
 
@@ -233,7 +232,7 @@ lv_part_t lv_obj_style_get_selector_part(lv_style_selector_t selector);
 
 #include "lv_obj_style_gen.h"
 
-static inline void lv_obj_set_style_pad_all(struct _lv_obj_t *obj,
+static inline void lv_obj_set_style_pad_all(struct _lv_obj_t* obj,
                                             lv_coord_t value,
                                             lv_style_selector_t selector) {
   lv_obj_set_style_pad_left(obj, value, selector);
@@ -242,37 +241,37 @@ static inline void lv_obj_set_style_pad_all(struct _lv_obj_t *obj,
   lv_obj_set_style_pad_bottom(obj, value, selector);
 }
 
-static inline void lv_obj_set_style_pad_hor(struct _lv_obj_t *obj,
+static inline void lv_obj_set_style_pad_hor(struct _lv_obj_t* obj,
                                             lv_coord_t value,
                                             lv_style_selector_t selector) {
   lv_obj_set_style_pad_left(obj, value, selector);
   lv_obj_set_style_pad_right(obj, value, selector);
 }
 
-static inline void lv_obj_set_style_pad_ver(struct _lv_obj_t *obj,
+static inline void lv_obj_set_style_pad_ver(struct _lv_obj_t* obj,
                                             lv_coord_t value,
                                             lv_style_selector_t selector) {
   lv_obj_set_style_pad_top(obj, value, selector);
   lv_obj_set_style_pad_bottom(obj, value, selector);
 }
 
-static inline void lv_obj_set_style_pad_gap(struct _lv_obj_t *obj,
+static inline void lv_obj_set_style_pad_gap(struct _lv_obj_t* obj,
                                             lv_coord_t value,
                                             lv_style_selector_t selector) {
   lv_obj_set_style_pad_row(obj, value, selector);
   lv_obj_set_style_pad_column(obj, value, selector);
 }
 
-static inline void lv_obj_set_style_size(struct _lv_obj_t *obj,
+static inline void lv_obj_set_style_size(struct _lv_obj_t* obj,
                                          lv_coord_t value,
                                          lv_style_selector_t selector) {
   lv_obj_set_style_width(obj, value, selector);
   lv_obj_set_style_height(obj, value, selector);
 }
 
-lv_text_align_t lv_obj_calculate_style_text_align(const struct _lv_obj_t *obj,
+lv_text_align_t lv_obj_calculate_style_text_align(const struct _lv_obj_t* obj,
                                                   lv_part_t part,
-                                                  const char *txt);
+                                                  const char* txt);
 
 /**********************
  *      MACROS

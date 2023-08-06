@@ -26,7 +26,6 @@
 #include "esp3d_client.h"
 #include "esp3d_commands.h"
 #include "esp3d_string.h"
-#include "esp3d_version.h"
 #include "esp_netif_ip_addr.h"
 #include "mdns/esp3d_mdns.h"
 #include "network/esp3d_network.h"

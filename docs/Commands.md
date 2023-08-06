@@ -164,6 +164,9 @@ label can be: light/framesize/quality/contrast/brightness/saturation/gainceiling
     output is JSON or plain text according parameter   
     `[ESP450]json=<no> <pwd=admin/user>`
 
+* Get/Set UI language
+   output is JSON or plain text according parameter
+   `[ESP460]json=<no> <DUMP> <pwd=admin/user> <language code>`
 * Get/Set connection status   
     `[ESP500] json=<no> pwd=<admin password>`
 

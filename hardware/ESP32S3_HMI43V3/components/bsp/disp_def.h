@@ -19,11 +19,12 @@ extern "C" {
 
 // 1/10
 #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * (DISP_VER_RES_MAX / 10))
+#define DISP_USE_DOUBLE_BUFFER (2)
 
 #define DISP_BITS_WIDTH (16)
 #define DISP_CMD_BITS_WIDTH (16)
 #define DISP_PARAM_BITS_WIDTH (16)
-#define DISP_CLK_FREQ (2 * 1000 * 1000)  // could be 10 if no PSRAM memory
+#define DISP_CLK_FREQ (8 * 1000 * 1000)  // could be 10 if no PSRAM memory
 
 #define DISP_BL_PIN (-1)
 #define DISP_CS_PIN (-1)
