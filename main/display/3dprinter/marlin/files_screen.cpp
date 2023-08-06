@@ -91,11 +91,19 @@ bool playable_file(const char *name) {
   return false;
 }
 
+bool is_in_list(const char *name) {
+  for (auto &ext : files_extensions) {
+    if (ext == name) return true;
+  }
+  return false;
+}
+
 void fill_files_list() {
   files_list.clear();
   std::string extensionvalues =
       esp3dTftJsonSettings.readString("settings", "filesfilter");
   files_extensions.clear();
+  esp3d_strings::str_toLowerCase(&extensionvalues);
   if (extensionvalues.length() > 0) {
     char str[extensionvalues.length() + 1];
     char *p;
@@ -103,7 +111,10 @@ void fill_files_list() {
     p = strtok(str, ";");
     while (p != NULL) {
       std::string ext = p;
-      files_extensions.push_back(ext);
+      if (!is_in_list(ext.c_str())) {
+        esp3d_log("Add extension %s", ext.c_str());
+        files_extensions.push_back(ext);
+      }
       p = strtok(NULL, ";");
     }
   }
@@ -140,6 +151,7 @@ void fill_files_list() {
           files_list.push_back(file);
         }
         esp3d_log("Found %s, %s", file.name.c_str(), file.size.c_str());
+        esp3d_hal::wait(2);
       }
       esp3d_log("Files list size %d", files_list.size());
       closedir(dir);
