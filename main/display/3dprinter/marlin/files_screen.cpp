@@ -177,27 +177,10 @@ void do_files_list_now() {
   }
 }
 
-/*void start_files_list_timer_cb(lv_timer_t *timer) {
-  if (start_files_list_timer) {
-    lv_timer_del(start_files_list_timer);
-    start_files_list_timer = NULL;
-  }
-  do_files_list_now();
-}*/
-
 void event_button_files_refresh_handler(lv_event_t *e) {
   esp3d_log("refresh Clicked");
 
   do_files_list_now();
-  /*size_t i = lv_obj_get_child_cnt(ui_files_list_ctl);
-  while (i > 0) {
-    lv_obj_del(lv_obj_get_child(ui_files_list_ctl, 0));
-    i--;
-  }
-  if (!start_files_list_timer) {
-    start_files_list_timer =
-        lv_timer_create(start_files_list_timer_cb, 100, NULL);
-  }*/
 }
 
 void event_button_files_up_handler(lv_event_t *e) {
