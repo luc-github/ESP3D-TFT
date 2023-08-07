@@ -75,7 +75,7 @@ elseif(ESP32S3_CUSTOM)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_CUSTOM/components)
 elseif(ESP32_CUSTOM)
     set(SDKCONFIG hardware/ESP32_CUSTOM/sdkconfig)
-    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_CUSTOM/components)
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32_CUSTOM/components)
 else()
     message(FATAL_ERROR
         "\n"
