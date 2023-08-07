@@ -539,9 +539,11 @@ void ESP3DCommands::ESP420(int cmd_params_pos, ESP3DMessage *msg) {
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
         // UI language
   tmpstr = esp3dTranslationService.translate(ESP3DLabel::language);
-  tmpstr += " (";
-  tmpstr += esp3dTranslationService.getLanguageCode();
-  tmpstr += ")";
+  if (tmpstr != "???") {
+    tmpstr += " (";
+    tmpstr += esp3dTranslationService.getLanguageCode();
+    tmpstr += ")";
+  }
   if (!dispatchIdValue(json, "language", tmpstr.c_str(), target, requestId)) {
     return;
   }

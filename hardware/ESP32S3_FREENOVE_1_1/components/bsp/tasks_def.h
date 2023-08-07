@@ -1,4 +1,4 @@
-// Task definition for ESP32S3_HMI43V3
+// Task definition for  ESP32_S3_FREENOVE
 
 #pragma once
 

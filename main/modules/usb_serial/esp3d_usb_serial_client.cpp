@@ -157,10 +157,14 @@ void ESP3DUsbSerialClient::setConnected(bool connected) {
   _connected = connected;
 
   if (connected) {
+#if ESP3D_HTTP_FEATURE
     esp3dWsWebUiService.pushNotification("Connected");
+#endif  // ESP3D_HTTP_FEATURE
     xSemaphoreTake(_device_disconnected_sem, portMAX_DELAY);
   } else {
+#if ESP3D_HTTP_FEATURE
     esp3dWsWebUiService.pushNotification("Disconnected");
+#endif  // ESP3D_HTTP_FEATURE
     xSemaphoreGive(_device_disconnected_sem);
   }
 }
