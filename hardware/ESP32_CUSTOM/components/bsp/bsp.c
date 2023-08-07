@@ -21,9 +21,9 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "esp3d_log.h"
 #include "bsp.h"
-#include "usb_serial.h"
+
+#include "esp3d_log.h"
 
 /*********************
  *      DEFINES
@@ -48,24 +48,5 @@
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-esp_err_t bsp_init_usb(void)
-{
-    /*usb host initialization */
-    esp3d_log("Initializing usb-serial");
-    return usb_serial_create_task();
-}
 
-esp_err_t bsp_deinit_usb(void)
-{
-    esp3d_log("Remove usb-serial");
-    return usb_serial_deinit();
-}
-
-esp_err_t bsp_init(void)
-{
-    if ( usb_serial_init()!=ESP_OK) {
-        return ESP_FAIL;
-    }
-    return ESP_OK;
-}
-
+esp_err_t bsp_init(void) { return ESP_OK; }
