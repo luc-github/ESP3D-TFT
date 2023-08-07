@@ -90,6 +90,9 @@ static void esp3d_gcode_host_task(void* pvParameter) {
   vTaskDelete(NULL);
 }
 
+/// @brief Ascertains the type of stream referred to by a string. 
+/// @param file Const Char Pointer, to an array containing a command string, or a file system path.
+/// @return Returns a stream type, either FS, SD, single or multiple commands. 
 ESP3DGcodeHostFileType ESP3DGCodeHostService::_getStreamType(const char* file) { //maybe this can also check for invalid file extensions if not done elsewhere
   if (file[0] == '/') {
     if (strstr(file, "/sd/") == file) {
@@ -308,6 +311,9 @@ bool ESP3DGCodeHostService::_isEmergencyParse(const char* cmd) {
 
 //##################### File/Script Handling Functions ########################
 
+/// @brief Opens the file assosciated with the provided file stream, and seeks to the correct position.
+/// @param _stream Pointer to the file stream to be opened.
+/// @return True if file opened successfully.
 bool ESP3DGCodeHostService::_openFile(ESP3DGcodeFileStream* _stream) { 
   esp3d_log("File name is %s", _stream -> _fileName);
     if (globalFs.accessFS((char*)(_stream -> _fileName))) {
@@ -336,6 +342,9 @@ bool ESP3DGCodeHostService::_openFile(ESP3DGcodeFileStream* _stream) {
   return false;
 }
 
+/// @brief Closes the File assosciated with the provided file stream.
+/// @param _stream Pointer to the file stream to be closed.
+/// @return True if file closed and FS released successfully.
 bool ESP3DGCodeHostService::_closeFile(ESP3DGcodeFileStream* _stream) { 
   
   if (_stream->streamFile == nullptr){
@@ -350,8 +359,9 @@ bool ESP3DGCodeHostService::_closeFile(ESP3DGcodeFileStream* _stream) {
   return true;
 }
 
-//Update the ring buffer with data from the stream _stream. Call whenever idle to reduce latency.
-//Must be called when switching streams or if the end of the buffer is reached.
+/// @brief Update the ring buffer with data from the provided file stream.
+/// @param _stream Pointer to the file stream to update the buffer with.
+/// @return True if buffer successfully updated.
 bool ESP3DGCodeHostService::_updateRingBuffer(ESP3DGcodeFileStream* _stream) {
 
   // _bufferSeam: This is the index of the earliest byte (end) in the buffer. 
@@ -441,7 +451,9 @@ bool ESP3DGCodeHostService::_updateRingBuffer(ESP3DGcodeFileStream* _stream) {
 
 }
 
-//Read a character from the ring buffer, updating the buffer as required. Returns 0 at file end.
+/// @brief Read a single character from the ring buffer, from the provided file stream. Will update contents of the buffer as required.
+/// @param _stream Pointer to the file stream to read a character from.
+/// @return Current character from the buffer. Will return 0 at the end of the stream.
 char ESP3DGCodeHostService::_readCharFromRingBuffer(ESP3DGcodeFileStream* _stream) {
   
   //if we're at the seam, and not fresh, whole buffer is used and needs updating.
@@ -458,7 +470,9 @@ char ESP3DGCodeHostService::_readCharFromRingBuffer(ESP3DGcodeFileStream* _strea
   return c; // if this returns NULL, we're at endfile
 }
 
-//Read a character from a queued script's buffer. Returns 0 at script end.
+/// @brief Read a single character from the buffer of the provided command stream.
+/// @param _stream Pointer to the command buffer to read a character from.
+/// @return Current character from the buffer. Will return 0 at the end of the stream.
 char ESP3DGCodeHostService::_readCharFromCommandBuffer(ESP3DGcodeCommandStream* _stream){
   char c = _stream -> commandBuffer[((ESP3DGcodeCommandStream*)_stream) -> bufferPos];
   _stream -> bufferPos++;
@@ -467,7 +481,8 @@ char ESP3DGCodeHostService::_readCharFromCommandBuffer(ESP3DGcodeCommandStream* 
 
 //##################### Stream Handling Functions ########################
 
-bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* _stream) { //get rid of this, initialize size etc in _Stream()
+//would be better to eliminate this function, and find the size of the stream elsewhere. (_Stream() Maybe)
+bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* _stream) {
   //function may not be needed after _Stream() <------ do this for sure.
   //nothing to be done if command stream
   _stream -> lineStart = 0;
@@ -492,7 +507,9 @@ bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* _stream) { //get rid 
   return false;
 }
 
-//End the stream, freeing the memory allocated to in _Stream().
+/// @brief End the current stream, freeing any allocated memory and removing scripts from the queue.
+/// @param _stream Pointer to the stream to end and free.
+/// @return Always true.
 bool ESP3DGCodeHostService::_endStream(ESP3DGcodeStream* _stream) {
   esp3d_log("Freeing stream buffers");
   if(isFileStream(_stream)) {
@@ -520,44 +537,37 @@ bool ESP3DGCodeHostService::_endStream(ESP3DGcodeStream* _stream) {
   return true;
 }
 
+/// @brief Read the next command line from the provided stream into _currentCommand. Skips past comments and empty lines.
+/// @param _stream Pointer to the command or file stream to be read from.
+/// @return True if command is read, False if no command read (end of stream).
 bool ESP3DGCodeHostService::_readNextCommand(ESP3DGcodeStream* _stream) {
 
   _stream -> lineStart = _stream -> processedSize;
-  //esp3d_log("Setting line start to: %d", (int)((ESP3DGcodeFileStream*)_stream) -> lineStart);
   uint32_t cmdPos = 0;
 
   if(isFileStream(_stream)){
-    /*
-    if (_bufferedStream != _stream) {
-    _updateRingBuffer((ESP3DGcodeFileStream*)_stream);
-    }
-    */
+
     char c = (char) 0;
 
     do{
       c = _readCharFromRingBuffer((ESP3DGcodeFileStream*)_stream);
       ((ESP3DGcodeFileStream*)_stream) -> processedSize++;
-        //esp3d_log_e("Setting procced to: %d", (int)((ESP3DGcodeFileStream*)_stream) -> processedSize);
 
       while (isWhiteSpace(c)){ //ignore any leading spaces and empty lines
         c = _readCharFromRingBuffer((ESP3DGcodeFileStream*)_stream);
         ((ESP3DGcodeFileStream*)_stream) -> processedSize++;
-        //esp3d_log_e("Setting procced to: %d", (int)((ESP3DGcodeFileStream*)_stream) -> processedSize);
       }
       while (c == ';'){ // while its a full line comment, skim to next line
         while (!(isEndLineEndFile(c))){
           c = _readCharFromRingBuffer((ESP3DGcodeFileStream*)_stream);
           ((ESP3DGcodeFileStream*)_stream) -> processedSize++;
-          //esp3d_log_e("Setting procced to: %d", (int)((ESP3DGcodeFileStream*)_stream) -> processedSize);
         }
         while (isWhiteSpace(c)){ //ignore leading spaces and empty lines
           c = _readCharFromRingBuffer((ESP3DGcodeFileStream*)_stream);
           ((ESP3DGcodeFileStream*)_stream) -> processedSize++;
-          //esp3d_log_e("Setting procced to: %d", (int)((ESP3DGcodeFileStream*)_stream) -> processedSize);
         }
       }
       _stream -> lineStart = _stream -> processedSize;
-      //esp3d_log("Setting line start to: %d", (int)((ESP3DGcodeFileStream*)_stream) -> lineStart);
 
       while (!(isEndLineEndFile(c) || (((ESP3DGcodeFileStream*)_stream) -> processedSize >= ((ESP3DGcodeFileStream*)_stream) -> totalSize))){ // while not end of line or end of file
         if (c == ';'){ //reached a comment, skim to next line
@@ -584,8 +594,6 @@ bool ESP3DGCodeHostService::_readNextCommand(ESP3DGcodeStream* _stream) {
       esp3d_log("End of Buffer");
       return false;
     }
-    //c = (char)((ESP3DGcodeCommandStream*)_stream) -> commandBuffer[((ESP3DGcodeCommandStream*)_stream) -> bufferPos];
-    //((ESP3DGcodeCommandStream*)_stream) -> bufferPos++;
 
     c = _readCharFromCommandBuffer((ESP3DGcodeCommandStream*) _stream);
     ((ESP3DGcodeCommandStream*)_stream) -> processedSize++;
@@ -609,7 +617,6 @@ bool ESP3DGCodeHostService::_readNextCommand(ESP3DGcodeStream* _stream) {
       }
     }
     esp3d_log("First char is: %c", c);
-    //((ESP3DGcodeCommandStream*)_stream) -> lineStart = ((ESP3DGcodeCommandStream*)_stream) -> processedSize;
     _stream -> lineStart = _stream -> processedSize;
     esp3d_log("Setting line start to: %d", (int)((ESP3DGcodeFileStream*)_stream) -> lineStart);
     while (!(isEndLineEndFile(c) || (((ESP3DGcodeCommandStream*)_stream) -> processedSize >= ((ESP3DGcodeCommandStream*)_stream) -> totalSize))){ // while not end of line or end of file
@@ -623,33 +630,32 @@ bool ESP3DGCodeHostService::_readNextCommand(ESP3DGcodeStream* _stream) {
         }
       } else { //no comment yet, read into command
         esp3d_log("Appending %c", c);
-        //strcat(_currentCommand, &c);
         _currentCommand[cmdPos] = c;
         cmdPos++;
         c = _readCharFromCommandBuffer((ESP3DGcodeCommandStream*) _stream);
         ((ESP3DGcodeCommandStream*)_stream) -> processedSize++;
       }
     } 
-
   }
 
   _currentCommand[cmdPos] = 0;
   esp3d_log("CurrCommand: %s", _currentCommand);
-  //_currentCommand[cmdPos] = '\n'; //<------------------------------- needs moving after the if statement
   if (strlen((char*)_currentCommand) == 0) {
     esp3d_log("Line Empty");
     return false;
   } else {
-    //_currentCommand[cmdPos] = '\n';
-    //_currentCommand[cmdPos+1] = 0;
     esp3d_log("Command Read");
     return true;
   }
 
   return false;
 
-} //return false at end of file/script.
+}
 
+/// @brief Calculate a checksum for the command provided. (Use crc.h instead?)
+/// @param command Const Char Pointer to a buffer containing the null terminated command.
+/// @param commandSize The number of bytes of data in the command.
+/// @return The checksum as an unsigned integer.
 uint8_t ESP3DGCodeHostService::_Checksum(const char * command, uint32_t commandSize)
 {
   uint8_t checksum_val =0;
@@ -663,30 +669,27 @@ uint8_t ESP3DGCodeHostService::_Checksum(const char * command, uint32_t commandS
 }
 
 //maybe rejig to use _currentCommand and cmdno (no vars necessary) //maybe absorb _Checksum() //use esp32 crc
+
+/// @brief Apply a line number and checksum to the command referred to by the pointer.
+/// @param command Pointer to the command to be altered.
+/// @param commandnb Line number of the command.
+/// @return True if altered. False if command is empty.
 bool ESP3DGCodeHostService::_CheckSumCommand(char* command, uint32_t commandnb)
 {
   if (command[0] == 0) return false;
   std::string stringy;
 
   char buffer[ESP_GCODE_HOST_COMMAND_LINE_BUFFER];
-  //std::copy(begin(command), end(command), )
   strcpy(buffer, command);
-  //itoa(commandnb, buffer, 10);
-  //buffer = *buffer;
-  //stringy = "N" + (std::string)buffer + " ";
 
-  //buffer = "N" + 
-  //strcat(buffer, )
   uint8_t crc = _Checksum(command, strlen(command));
   sprintf(command, "N%u %s *%u", (unsigned int) commandnb, buffer, (unsigned int) crc);
-  //command = buffer;
-  //esp3d_log_e("Checksum gives: %s", command);
-  //*command = "N" + c_str(buffer) + " " + command;
-  //String commandchecksum = "N" + String((uint32_t)commandnb)+ " " + command;
-  //commandchecksum+="*"+String(crc);
   return true;
 }
 
+/// @brief Go to the specified line start in the current print stream. For use with resend requests.
+/// @param line The line to move to.
+/// @return True if line found and set correctly.
 bool ESP3DGCodeHostService::_gotoLine(uint64_t line){ //remember to account for M110 Nx commands
   //Not yet implemented
   return false;
