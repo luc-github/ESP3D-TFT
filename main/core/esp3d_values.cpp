@@ -57,6 +57,10 @@ const char* ESP3DValues::get_string_value(ESP3DValuesIndex index) {
 }
 
 bool ESP3DValues::set_string_value(ESP3DValuesIndex index, const char* value) {
+  if (_values.size() == 0) {
+    // No values list set  - service is ignored
+    return true;
+  }
   for (auto element = _values.begin(); element != _values.end(); ++element) {
     if (element->index == index) {
       element->value = value;
@@ -67,6 +71,6 @@ bool ESP3DValues::set_string_value(ESP3DValuesIndex index, const char* value) {
       return true;
     }
   }
-  esp3d_log_e("Cannot set String value %s for %d", value, (int)index);
+  esp3d_log_w("Cannot set String value %s for %d", value, (int)index);
   return false;
 }

@@ -29,10 +29,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #if ESP3D_SD_CARD_FEATURE
-#include "sd_def.h"
-#endif  // ESP3D_SD_CARD_FEATURE
-#if ESP3D_SD_CARD_FEATURE
 #include "filesystem/esp3d_sd.h"
+#include "sd_def.h"
 #endif  // ESP3D_SD_CARD_FEATURE
 
 #include "network/esp3d_network.h"

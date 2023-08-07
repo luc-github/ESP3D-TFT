@@ -1,14 +1,19 @@
 # #######################################
 # Select the targeted hardware
 # #######################################
-OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R 2.8inches" OFF)
+
 OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" OFF)
 OPTION(ESP32_ROTRICS_DEXARM35 "TFT TARGET is ESP32 Rotrics DexArm 3.5inches" ON)
 OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-SRC-4832 3.5inches" OFF)
+OPTION(ESP32S3_8048S070 "TFT TARGET is ESP32S3 7.0inches" OFF)
 OPTION(ESP32S3_FREENOVE_1_1 "HARDWARE TARGET is ESP32S3 Freenove v1.1" OFF)
 OPTION(ESP32S3_ESP32S3_CUSTOM "HARDWARE TARGET is ESP32S3 custom board" OFF)
 OPTION(ESP32S3_ESP32_CUSTOM "HARDWARE TARGET is ESP32 custom board" OFF)
-OPTION(ESP32S3_8048S070 "TFT TARGET is ESP32S3 7.0inches" OFF)
+
+
+# Support canceled from now, do not use it or at your own risk
+# do not ask help or support for this target
+OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R 2.8inches" OFF) 
 
 
 # #######################################
@@ -45,25 +50,26 @@ OPTION(USE_FAT_INSTEAD_OF_LITTLEFS "Use FAT instead of LittleFS" OFF)
 # #######################################
 cmake_minimum_required(VERSION 3.12.4)
 set(CMAKE_CXX_STANDARD 20)
-
-if(ESP32_2432S028R)
+#C:/Users/luc/Documents/GitHub/ESP3D-TFT/
+if(ESP32S3_FREENOVE_1_1)
+    set(SDKCONFIG hardware/ESP32S3_FREENOVE_1_1/sdkconfig)
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_FREENOVE_1_1/components)
+    unset(TFT_UI_SERVICE CACHE)
+elseif(ESP32S3_8048S070)
+    set(SDKCONFIG hardware/ESP32S3_8048S070/sdkconfig)
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_8048S070/components)
+elseif(ESP32_2432S028R)
     set(SDKCONFIG hardware/ESP32_2432S028R/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32_2432S028R/components)
 elseif(ESP32S3_HMI43V3)
     set(SDKCONFIG hardware/ESP32S3_HMI43V3/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_HMI43V3/components)
-elseif(ESP32S3_8048S070)
-    set(SDKCONFIG hardware/ESP32S3_8048S070/sdkconfig)
-    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_8048S070/components)
 elseif(ESP32_ROTRICS_DEXARM35)
     set(SDKCONFIG hardware/ESP32_ROTRICS_DEXARM35/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32_ROTRICS_DEXARM35/components)
 elseif(ESP32S3_ZX3D50CE02S_USRC_4832)
     set(SDKCONFIG hardware/ESP32S3_ZX3D50CE02S_USRC_4832/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_ZX3D50CE02S_USRC_4832/components)
-elseif(ESP32S3_FREENOVE_1_1)
-    set(SDKCONFIG hardware/ESP32S3_FREENOVE_1_1/sdkconfig)
-    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_FREENOVE_1_1/components)
 elseif(ESP32S3_CUSTOM)
     set(SDKCONFIG hardware/ESP32S3_CUSTOM/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_CUSTOM/components)
@@ -114,10 +120,6 @@ endif()
 
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
-
-# For lvgl_conf to use simple path
-add_compile_options(-DLV_CONF_INCLUDE_SIMPLE=1)
-add_compile_options(-DLV_LVGL_H_INCLUDE_SIMPLE=1)
 
 # ESP3D-TFT specific log level
 # All  = 2
@@ -179,15 +181,21 @@ endif()
 
 if(TFT_UI_SERVICE)
     add_compile_options(-DESP3D_DISPLAY_FEATURE=1)
+    # For lvgl_conf to use simple path
+    add_compile_options(-DLV_CONF_INCLUDE_SIMPLE=1)
+    add_compile_options(-DLV_LVGL_H_INCLUDE_SIMPLE=1)
     add_compile_options("-I${CMAKE_SOURCE_DIR}/main/display")
+    else()
+    add_compile_options(-DLV_CONF_SUPPRESS_DEFINE_CHECK=1)
 endif()
 
 if(SD_CARD_SERVICE)
     add_compile_options(-DESP3D_SD_CARD_FEATURE=1)
-
     if(UPDATE_SERVICE)
         add_compile_options(-DESP3D_UPDATE_FEATURE=1)
     endif()
+else()
+unset(UPDATE_SERVICE CACHE)
 endif()
 
 if(GCODE_HOST_SERVICE)

@@ -38,12 +38,27 @@
 #include "symbol_button_component.h"
 #include "translations/esp3d_translation_service.h"
 #include "wifi_status_component.h"
+#if defined __has_include
+#if __has_include("bsp_patch.h")
+#include "bsp_patch.h"
+#endif  // __has_include("bsp_patch.h")
+#endif  // defined __has_include
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 namespace wifiScreen {
 lv_timer_t *wifi_screen_delay_timer = NULL;
+#if ESP3D_PATCH_DELAY_REFRESH
+lv_timer_t *wifi_screen_delay_refresh_timer = NULL;
+void wifi_screen_delay_refresh_timer_cb(lv_timer_t *timer) {
+  if (wifi_screen_delay_refresh_timer) {
+    lv_timer_del(wifi_screen_delay_refresh_timer);
+    wifi_screen_delay_refresh_timer = NULL;
+  }
+  spinnerScreen::hide_spinner();
+}
+#endif  // ESP3D_PATCH_DELAY_REFRESH
 ESP3DScreenType wifi_next_screen = ESP3DScreenType::none;
 
 lv_obj_t *btn_no_wifi = nullptr;
@@ -53,7 +68,16 @@ void update_button_no_wifi() {
       esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
   if (mode == LV_SYMBOL_WIFI) {
     lv_obj_add_flag(btn_no_wifi, LV_OBJ_FLAG_HIDDEN);
+#if ESP3D_PATCH_DELAY_REFRESH
+    if (wifi_screen_delay_refresh_timer) {
+      lv_timer_del(wifi_screen_delay_refresh_timer);
+      wifi_screen_delay_refresh_timer = NULL;
+    }
+    wifi_screen_delay_refresh_timer =
+        lv_timer_create(wifi_screen_delay_refresh_timer_cb, 100, NULL);
+#else
     spinnerScreen::hide_spinner();
+#endif  // ESP3D_PATCH_DELAY_REFRESH
   } else {
     lv_obj_clear_flag(btn_no_wifi, LV_OBJ_FLAG_HIDDEN);
   }

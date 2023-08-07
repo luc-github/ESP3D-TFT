@@ -1,5 +1,5 @@
-// Pins definition for ESP32_ROTRICS_DEXARM35
-// SD SPI
+// Pins definition for  ESP32_S3_FREENOVE
+// SD SDIO
 #pragma once
 
 #ifdef __cplusplus
@@ -15,16 +15,16 @@ extern "C" {
 
 // DEFINE CMD DATA CLK PINS
 // Only for reference for ESP32 devices
-#define ESP3D_SDIO_CMD_PIN (15)  // GPIO 15
-#define ESP3D_SDIO_CLK_PIN (14)  // GPIO 14
-#define ESP3D_SDIO_D0_PIN (2)    // GPIO 2
+#define ESP3D_SDIO_CMD_PIN (38)  // GPIO 38
+#define ESP3D_SDIO_CLK_PIN (39)  // GPIO 39
+#define ESP3D_SDIO_D0_PIN (40)   // GPIO 40
 #define ESP3D_SDIO_D1_PIN (-1)   // NC
 #define ESP3D_SDIO_D2_PIN (-1)   // NC
 #define ESP3D_SDIO_D3_PIN (-1)   // NC
 
 #define ESP3D_SDIO_BIT_WIDTH 1
 
-#define ESP3D_SD_DETECT_PIN (37)  // GPIO -1
+#define ESP3D_SD_DETECT_PIN (-1)  // GPIO -1
 // #define ESP3D_SD_DETECT_VALUE (0) //LOW
 
 //(range 400kHz - 40MHz for SDIO, less for other devices)

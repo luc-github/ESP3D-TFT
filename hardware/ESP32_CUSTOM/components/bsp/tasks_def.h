@@ -1,4 +1,4 @@
-// Task definition for ESP32S3_HMI43V3
+// Task definition for ESP32_CUSTOM
 
 #pragma once
 
@@ -14,10 +14,6 @@ extern "C" {
 #define STREAM_TASK_PRIORITY 0
 #define STREAM_STACK_DEPTH 4096
 
-#define UI_TASK_CORE 1
-#define UI_TASK_PRIORITY 0
-#define UI_STACK_DEPTH 4096
-
 #define STREAM_CHUNK_SIZE 1024
 
 #define ESP3D_SOCKET_RX_BUFFER_SIZE 512
@@ -29,8 +25,6 @@ extern "C" {
 #define ESP3D_WS_TASK_SIZE 4096
 #define ESP3D_WS_TASK_PRIORITY 5
 #define ESP3D_WS_TASK_CORE 0
-
-#define LV_TICK_PERIOD_MS 10
 
 #ifdef __cplusplus
 } /* extern "C" */

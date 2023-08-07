@@ -1,9 +1,10 @@
-//Pins definition for ESP32S3_HMI43V3
-//Serial
+// Pins definition for  ESP32_S3_FREENOVE
+// Serial
 #pragma once
 
-#include "driver/uart.h"
 #include "driver/gpio.h"
+#include "driver/uart.h"
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,7 +24,6 @@ extern "C" {
 #define ESP3D_SERIAL_RX_TASK_SIZE 4096
 #define ESP3D_SERIAL_TASK_CORE 1
 #define ESP3D_SERIAL_TASK_PRIORITY 10
-
 
 #ifdef __cplusplus
 } /* extern "C" */
