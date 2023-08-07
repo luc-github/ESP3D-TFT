@@ -2,13 +2,13 @@
 # Select the targeted hardware
 # #######################################
 OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R 2.8inches" OFF)
-OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" ON)
+OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" OFF)
 OPTION(ESP32_ROTRICS_DEXARM35 "TFT TARGET is ESP32 Rotrics DexArm 3.5inches" OFF)
 OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-SRC-4832 3.5inches" OFF)
 OPTION(ESP32S3_FREENOVE_1_1 "HARDWARE TARGET is ESP32S3 Freenove v1.1" OFF)
 OPTION(ESP32S3_ESP32S3_CUSTOM "HARDWARE TARGET is ESP32S3 custom board" OFF)
 OPTION(ESP32S3_ESP32_CUSTOM "HARDWARE TARGET is ESP32 custom board" OFF)
-OPTION(ESP32S3_8048S070 "TFT TARGET is ESP32S3 7.0inches" OFF)
+OPTION(ESP32S3_8048S070 "TFT TARGET is ESP32S3 7.0inches" ON)
 
 
 # #######################################
@@ -45,16 +45,16 @@ OPTION(USE_FAT_INSTEAD_OF_LITTLEFS "Use FAT instead of LittleFS" OFF)
 # #######################################
 cmake_minimum_required(VERSION 3.12.4)
 set(CMAKE_CXX_STANDARD 20)
-
-if(ESP32_2432S028R)
+#C:/Users/luc/Documents/GitHub/ESP3D-TFT/
+if(ESP32S3_8048S070)
+    set(SDKCONFIG C:/Users/luc/Documents/GitHub/ESP3D-TFT/hardware/ESP32S3_8048S070/sdkconfig)
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_8048S070/components)
+elseif(ESP32_2432S028R)
     set(SDKCONFIG hardware/ESP32_2432S028R/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32_2432S028R/components)
 elseif(ESP32S3_HMI43V3)
     set(SDKCONFIG hardware/ESP32S3_HMI43V3/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_HMI43V3/components)
-elseif(ESP32S3_8048S070)
-    set(SDKCONFIG hardware/ESP32S3_8048S070/sdkconfig)
-    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_8048S070/components)
 elseif(ESP32_ROTRICS_DEXARM35)
     set(SDKCONFIG hardware/ESP32_ROTRICS_DEXARM35/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32_ROTRICS_DEXARM35/components)

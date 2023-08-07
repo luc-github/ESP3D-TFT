@@ -41,6 +41,11 @@
 #include "translations/esp3d_translation_service.h"
 #include "wifi_screen.h"
 #include "wifi_status_component.h"
+#if defined __has_include
+#if __has_include("bsp_patch.h")
+#include "bsp_patch.h"
+#endif  // __has_include("bsp_patch.h")
+#endif  // defined __has_include
 
 /**********************
  *  STATIC PROTOTYPES
@@ -50,6 +55,16 @@ namespace staScreen {
 #define TASKPRIORITY UI_TASK_PRIORITY - 1
 #define TASKCORE UI_TASK_CORE
 lv_timer_t *sta_screen_delay_timer = NULL;
+#if ESP3D_PATCH_DELAY_REFRESH
+lv_timer_t *sta_screen_delay_refresh_timer = NULL;
+void sta_screen_delay_refresh_timer_cb(lv_timer_t *timer) {
+  if (sta_screen_delay_refresh_timer) {
+    lv_timer_del(sta_screen_delay_refresh_timer);
+    sta_screen_delay_refresh_timer = NULL;
+  }
+  spinnerScreen::hide_spinner();
+}
+#endif  // ESP3D_PATCH_DELAY_REFRESH
 lv_obj_t *sta_ta_ssid = NULL;
 lv_obj_t *sta_ta_password = NULL;
 lv_obj_t *btn_ok = nullptr;
@@ -239,8 +254,17 @@ void update_sta_button_ok() {
       !esp3dTftsettings.isValidStringSetting(
           password_current.c_str(), ESP3DSettingIndex::esp3d_sta_password)) {
     esp3d_log("Ok hide");
-    spinnerScreen::hide_spinner();
     lv_obj_add_flag(btn_ok, LV_OBJ_FLAG_HIDDEN);
+#if ESP3D_PATCH_DELAY_REFRESH
+    if (sta_screen_delay_refresh_timer) {
+      lv_timer_del(sta_screen_delay_refresh_timer);
+      sta_screen_delay_refresh_timer = NULL;
+    }
+    sta_screen_delay_refresh_timer =
+        lv_timer_create(sta_screen_delay_refresh_timer_cb, 100, NULL);
+#else
+    spinnerScreen::hide_spinner();
+#endif  // ESP3D_PATCH_DELAY_REFRESH
   } else {
     esp3d_log("Ok visible");
     lv_obj_clear_flag(btn_ok, LV_OBJ_FLAG_HIDDEN);
