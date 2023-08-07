@@ -1,5 +1,5 @@
 // Pins definition for  ESP32_S3_FREENOVE
-// SD SPI
+// SD SDIO
 #pragma once
 
 #ifdef __cplusplus
