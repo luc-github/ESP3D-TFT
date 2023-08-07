@@ -102,7 +102,7 @@ esp_err_t bsp_init(void) {
 
   // Lvgl setup
   esp3d_log("Setup Lvgl");
-  lv_color_t* buf1 = (lv_color_t*)heap_caps_malloc(
+  lv_color_t *buf1 = (lv_color_t *)heap_caps_malloc(
       DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
   if (buf1 == NULL) {
     esp3d_log_e("Failed to allocate LVGL draw buffer 1");
@@ -110,12 +110,15 @@ esp_err_t bsp_init(void) {
   }
 
   /* Use double buffered when not working with monochrome displays */
-  lv_color_t* buf2 = (lv_color_t*)heap_caps_malloc(
-      DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
+  lv_color_t *buf2 = NULL;
+#if DISP_USE_DOUBLE_BUFFER
+  buf2 = (lv_color_t *)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t),
+                                        MALLOC_CAP_DMA);
   if (buf2 == NULL) {
     esp3d_log_e("Failed to allocate LVGL draw buffer 2");
     return ESP_FAIL;
   }
+#endif  // DISP_USE_DOUBLE_BUFFER
 
   static lv_disp_draw_buf_t draw_buf;
 

@@ -35,8 +35,10 @@
 #include "filesystem/esp3d_sd.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "sd_def.h"
 #include "sdkconfig.h"
 #include "sdmmc_cmd.h"
+
 
 sdmmc_card_t *card;
 sdmmc_host_t host = SDSPI_HOST_DEFAULT();
@@ -79,7 +81,7 @@ bool ESP3DSd::mount() {
   esp_vfs_fat_sdmmc_mount_config_t mount_config = {
       .format_if_mount_failed = false,
       .max_files = 10,
-      .allocation_unit_size = 16 * 1024,
+      .allocation_unit_size = SPI_ALLOCATION_SIZE,
       /** New IDF 5.0, Try to enable if you need to handle situations when SD
        * cards are not unmounted properly before physical removal or you are
        * experiencing issues with SD cards.*/

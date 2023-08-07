@@ -16,6 +16,8 @@ extern "C" {
 #define ESP3D_SD_CLK_PIN (12)   // GPIO 12
 #define ESP3D_SD_CS_PIN (10)    // GPIO 10
 
+#define SPI_ALLOCATION_SIZE (16 * 1024)
+
 // #define ESP3D_SD_DETECT_PIN (-1) //GPIO -1
 // #define ESP3D_SD_DETECT_VALUE (0) //LOW
 #define MAX_TRANSFER_SZ (4092)
