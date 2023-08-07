@@ -1,14 +1,19 @@
 # #######################################
 # Select the targeted hardware
 # #######################################
-OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R 2.8inches" OFF)
+
 OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" ON)
 OPTION(ESP32_ROTRICS_DEXARM35 "TFT TARGET is ESP32 Rotrics DexArm 3.5inches" OFF)
 OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-SRC-4832 3.5inches" OFF)
+OPTION(ESP32S3_8048S070 "TFT TARGET is ESP32S3 7.0inches" OFF)
 OPTION(ESP32S3_FREENOVE_1_1 "HARDWARE TARGET is ESP32S3 Freenove v1.1" OFF)
 OPTION(ESP32S3_ESP32S3_CUSTOM "HARDWARE TARGET is ESP32S3 custom board" OFF)
 OPTION(ESP32S3_ESP32_CUSTOM "HARDWARE TARGET is ESP32 custom board" OFF)
-OPTION(ESP32S3_8048S070 "TFT TARGET is ESP32S3 7.0inches" OFF)
+
+
+# Support canceled from now, do not use it or at your own risk
+# do not ask help or support for this target
+OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R 2.8inches" OFF) 
 
 
 # #######################################
@@ -115,10 +120,6 @@ endif()
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
-# For lvgl_conf to use simple path
-add_compile_options(-DLV_CONF_INCLUDE_SIMPLE=1)
-add_compile_options(-DLV_LVGL_H_INCLUDE_SIMPLE=1)
-
 # ESP3D-TFT specific log level
 # All  = 2
 # Error only = 1
@@ -179,7 +180,12 @@ endif()
 
 if(TFT_UI_SERVICE)
     add_compile_options(-DESP3D_DISPLAY_FEATURE=1)
+    # For lvgl_conf to use simple path
+    add_compile_options(-DLV_CONF_INCLUDE_SIMPLE=1)
+    add_compile_options(-DLV_LVGL_H_INCLUDE_SIMPLE=1)
     add_compile_options("-I${CMAKE_SOURCE_DIR}/main/display")
+    else()
+    add_compile_options(-DLV_CONF_SUPPRESS_DEFINE_CHECK=1)
 endif()
 
 if(SD_CARD_SERVICE)

@@ -30,6 +30,13 @@
 extern "C" {
 #endif
 
+#if !ESP3D_DISPLAY_FEATURE
+#define LV_SYMBOL_STATION_MODE "S"
+#define LV_SYMBOL_ACCESS_POINT "A"
+#define LV_SYMBOL_BLUETOOTH "B"
+#define LV_SYMBOL_WIFI "O"
+#endif  // ESP3D_DISPLAY_FEATURE
+
 // this list depend of target feature
 enum class ESP3DValuesIndex : uint16_t {
   status_bar_label,

@@ -22,8 +22,6 @@ extern "C" {
 #define ESP3D_SDIO_D2_PIN (-1)   // NC
 #define ESP3D_SDIO_D3_PIN (-1)   // NC
 
-#define SPI_ALLOCATION_SIZE (16 * 1024)
-
 #define ESP3D_SDIO_BIT_WIDTH 1
 
 #define ESP3D_SD_DETECT_PIN (37)  // GPIO -1
