@@ -35,6 +35,9 @@
 #include "filesystem/esp3d_flash.h"
 #include "filesystem/esp3d_globalfs.h"
 
+#include "driver/uart.h"
+#include "serial_def.h"
+
 #if ESP3D_SD_CARD_FEATURE
 #include "filesystem/esp3d_sd.h"
 #endif  // ESP3D_SD_CARD_FEATURE
@@ -1135,11 +1138,7 @@ void ESP3DGCodeHostService::handle() {
                               // it should end up in the wait for ack state.
                               // just a precaution for now, remove later.
           esp3d_log("Sending to output client: %s", &_currentCommand[0]);
-          ESP3DMessage* msg = newMsg(
-              ESP3DClientType::stream, esp3dCommands.getOutputClient(),
-              (uint8_t*)(&(_currentCommand[0])),
-              strlen((char*)&(_currentCommand[0])), _current_stream->auth_type);
-          esp3dCommands.process(msg);  // may just dispatch to output client
+          uart_write_bytes(ESP3D_SERIAL_PORT, &_currentCommand, strlen((char*)&(_currentCommand[0])));
           _startTimeout = esp3d_hal::millis();
           _awaitingAck = true;
           _currentCommand[0] = 0;
