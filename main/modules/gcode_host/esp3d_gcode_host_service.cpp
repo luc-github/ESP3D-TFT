@@ -979,7 +979,7 @@ bool ESP3DGCodeHostService::_setStream() {
     }
 
   } else {
-    esp3d_log("No Stream");
+    //esp3d_log("No Stream");
     _current_stream = nullptr;
   }
 
