@@ -43,6 +43,7 @@
 #include "esp32/rom/crc.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "tasks_def.h"
 
 // Macro behaviour:
 // to be executed regardless of streaming state (ie paused)
@@ -51,10 +52,6 @@
 ESP3DGCodeHostService gcodeHostService;
 
 #define RX_FLUSH_TIME_OUT 1500  // milliseconds timeout
-#define ESP3D_GCODE_HOST_TASK_SIZE 4096
-#define ESP3D_GCODE_HOST_TASK_PRIORITY 2
-#define ESP3D_GCODE_HOST_TASK_CORE 1
-#define ESP3D_GCODE_HOST_PORT 0
 
 #define HOST_PAUSE_SCRIPT "M125\n"
 #define HOST_RESUME_SCRIPT "M108\n"
