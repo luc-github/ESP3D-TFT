@@ -24,8 +24,7 @@
 #include <stdio.h>
 
 #include "serial/esp3d_serial_client.h"
-#if ESP3D_USB_SERIAL_FEATURE  // ######################################################
-                              // <Make sure nothing special needs doing for this
+#if ESP3D_USB_SERIAL_FEATURE
 #include "usb_serial/esp3d_usb_serial_client.h"
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
 
@@ -766,7 +765,7 @@ bool ESP3DGCodeHostService::_parseResponse(
 }
 
 bool ESP3DGCodeHostService::_processRx(ESP3DMessage* rx) {
-  if ((rx->origin != ESP3DClientType::serial) &&
+  if ((rx->origin != esp3dCommands.getOutputClient()) &&
       (rx->origin != ESP3DClientType::command)) {
     esp3d_log("Streaming: %s", (char*)(rx->data));
     _streamFile((char*)(rx->data), rx->authentication_level);
@@ -1135,12 +1134,12 @@ void ESP3DGCodeHostService::handle() {
         if (!_awaitingAck) {  // if else shouldn't really be necessary here, as
                               // it should end up in the wait for ack state.
                               // just a precaution for now, remove later.
-          esp3d_log("Sending to serial: %s", &_currentCommand[0]);
+          esp3d_log("Sending to output client: %s", &_currentCommand[0]);
           ESP3DMessage* msg = newMsg(
-              ESP3DClientType::stream, ESP3DClientType::serial,
+              ESP3DClientType::stream, esp3dCommands.getOutputClient(),
               (uint8_t*)(&(_currentCommand[0])),
               strlen((char*)&(_currentCommand[0])), _current_stream->auth_type);
-          esp3dCommands.process(msg);  // may just dispatch to serial
+          esp3dCommands.process(msg);  // may just dispatch to output client
           _startTimeout = esp3d_hal::millis();
           _awaitingAck = true;
           _currentCommand[0] = 0;
