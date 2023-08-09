@@ -101,18 +101,35 @@ ESP3DGcodeHostFileType ESP3DGCodeHostService::_getStreamType(
 }
 
 bool ESP3DGCodeHostService::newStream(const char* command, ESP3DAuthenticationLevel authentication_level, bool isPrintStream) {
+  //ESP700 will have isPrintStream == true, terminal commands and macros use default of false.
 
   uint8_t* data = (uint8_t*)pvPortMalloc(sizeof(uint8_t) * (strlen(command) + 5));
+  if (data == nullptr){
+    esp3d_log_e("Failed to allocate memory for stream data.");
+    return false;
+  }
+
+  ESP3DMessage* msg = newMsg(
+    ESP3DClientType::stream, ESP3DClientType::stream, //might be a bad way to do it, let me know what you think.
+    authentication_level);
+  if (msg == nullptr){
+    esp3d_log_e("Failed to create stream request message.");
+    return false;
+  }
+
   if (isPrintStream == true){
     //Check here to see if print is in progres - reject if so. Awaiting updated getCurrentStream/getState functions.
+    if (false){
+      esp3d_log_w("Print stream already in progress");
+      return false;
+    }
+
     strncpy((char*)data, "PNT:", 5); //prefixes allow for file macros if desired. ex: "PNT:/sd/benchy.gcode" vs "CMD:/sd/macrostuff.gcode"
   } else {                            //cmd file doesn't get rejected when print in progress, pnt does
     strncpy((char*)data, "CMD:", 5);
   }
   strcat((char*)data, command);
-  ESP3DMessage* msg = newMsg(
-    ESP3DClientType::stream, ESP3DClientType::stream, //might be a bad way to do it, let me know what you think.
-    authentication_level);
+  
 
   msg->data = data;
   process(msg);
