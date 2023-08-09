@@ -509,7 +509,7 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
 
     case ESP3DClientType::all_clients:
       // msg need to be duplicate for each target
-      // Do not broadcast to printer output
+      // Do not broadcast system messages to printer output
       // printer may receive unwhished messages
 #if ESP3D_GCODE_HOST_FEATURE
       // ESP3DClientType::serial
@@ -525,7 +525,7 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
             copy_msg->target = ESP3DClientType::stream;
             dispatch(copy_msg);
           } else {
-            esp3d_log_e("Cannot duplicate message for Serial");
+            esp3d_log_e("Cannot duplicate message for stream");
           }
         }
       }
@@ -1017,7 +1017,6 @@ bool ESP3DCommands::formatCommand(char* cmd, size_t len) {
 ESP3DClientType ESP3DCommands::getOutputClient(bool fromSettings) {
   if (fromSettings) {
     _output_client = ESP3DClientType::serial;
-    //_output_client = ESP3DClientType::stream;
 #if ESP3D_USB_SERIAL_FEATURE
     uint8_t value =
         esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_output_client);
