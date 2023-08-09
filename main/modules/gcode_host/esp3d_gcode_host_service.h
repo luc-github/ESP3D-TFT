@@ -81,7 +81,7 @@ struct ESP3DGcodeCommandStream : public ESP3DGcodeStream {
 
   uint32_t bufferPos = 0;
   uint8_t* commandBuffer =
-      nullptr;  // don't need malloc if we make this a flexible array?
+      nullptr;
 };
 
 struct ESP3DGcodeFileStream : public ESP3DGcodeStream {
@@ -108,6 +108,8 @@ class ESP3DGCodeHostService : public ESP3DClient {
   void process(ESP3DMessage* msg);
   void flush();
   bool started() { return _started; }
+
+  bool newStream(const char* command, ESP3DAuthenticationLevel authentication_level, bool isPrintStream = false);
 
   bool abort();
   bool pause();

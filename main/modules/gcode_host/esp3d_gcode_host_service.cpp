@@ -100,6 +100,26 @@ ESP3DGcodeHostFileType ESP3DGCodeHostService::_getStreamType(
   }
 }
 
+bool ESP3DGCodeHostService::newStream(const char* command, ESP3DAuthenticationLevel authentication_level, bool isPrintStream) {
+
+  uint8_t* data = (uint8_t*)pvPortMalloc(sizeof(uint8_t) * (strlen(command) + 5));
+  if (isPrintStream == true){
+    //Check here to see if print is in progres - reject if so. Awaiting updated getCurrentStream/getState functions.
+    strncpy((char*)data, "PNT:", 5); //prefixes allow for file macros if desired. ex: "PNT:/sd/benchy.gcode" vs "CMD:/sd/macrostuff.gcode"
+  } else {                            //cmd file doesn't get rejected when print in progress, pnt does
+    strncpy((char*)data, "CMD:", 5);
+  }
+  strcat((char*)data, command);
+  ESP3DMessage* msg = newMsg(
+    ESP3DClientType::stream, ESP3DClientType::stream, //might be a bad way to do it, let me know what you think.
+    authentication_level);
+
+  msg->data = data;
+  process(msg);
+  return true;
+
+}
+
 bool ESP3DGCodeHostService::_streamFile(const char* file,
                                         ESP3DAuthenticationLevel auth_type,
                                         bool executeAsMacro,
@@ -768,13 +788,14 @@ bool ESP3DGCodeHostService::_parseResponse(
 }
 
 bool ESP3DGCodeHostService::_processRx(ESP3DMessage* rx) {
-  if ((rx->origin != esp3dCommands.getOutputClient()) &&
-      (rx->origin != ESP3DClientType::command)) {
-    esp3d_log("Streaming: %s", (char*)(rx->data));
-    _streamFile((char*)(rx->data), rx->authentication_level);
-  } else if (rx->origin != ESP3DClientType::command) {
+    if ((rx->origin == ESP3DClientType::serial ) || (rx->origin == ESP3DClientType::usb_serial)) { //this will be performed for every command sent whilst printing, getOutputClient() is unnecessarily intensive
     esp3d_log("Stream got the response: %s", (char*)(rx->data));
     _parseResponse(rx);
+  } else if (rx->origin == ESP3DClientType::stream) {
+    _streamFile((char*)&(rx->data[4]), rx->authentication_level);
+  } else {
+    esp3d_log("Forwarding message from: %d", static_cast<uint8_t>(rx->origin));
+    newStream((const char*)rx->data, rx->authentication_level); //placeholder until external code uses newStream()
   }
   deleteMsg(rx);
   return true;
