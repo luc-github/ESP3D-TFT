@@ -165,8 +165,8 @@ class ESP3DGCodeHostService : public ESP3DClient {
   bool _awaitingAck = false;
   uint64_t _startTimeout;
   uint64_t _timeoutInterval = ESP_HOST_OK_TIMEOUT;
-  ESP3DGcodeHostState state = ESP3DGcodeHostState::idle;
-  ESP3DGcodeHostState next_state = ESP3DGcodeHostState::idle;
+  ESP3DGcodeHostState _current_state = ESP3DGcodeHostState::idle;
+  ESP3DGcodeHostState _next_state = ESP3DGcodeHostState::idle;
   std::list<ESP3DGcodeStream*> _scripts;
   ESP3DGcodeStream* _current_stream = nullptr;
   ESP3DGcodeFileStream _currentPrintStream;

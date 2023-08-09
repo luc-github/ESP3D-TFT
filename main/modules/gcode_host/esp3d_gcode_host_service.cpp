@@ -1045,10 +1045,10 @@ void ESP3DGCodeHostService::handle() {
                       (uint8_t*)(&(_currentCommand[0])),
                       strlen((char*)(&(_currentCommand[0]))))) {
                 esp3d_log("Is ESP Command");
-                next_state =
-                    state;  // if waiting_for_ack we can send this and check on
-                            // ack after we send any esp commands
-                state = ESP3DGcodeHostState::send_esp_command;
+                _next_state = _current_state;  // if waiting_for_ack we can send
+                                               // this and check on ack after we
+                                               // send any esp commands
+                _current_state = ESP3DGcodeHostState::send_esp_command;
                 strcat((char*)_currentCommand, "\n");
               } else {
                 esp3d_log("Is Gcode Command");
@@ -1059,15 +1059,15 @@ void ESP3DGCodeHostService::handle() {
                                    _currentPrintStream.commandNumber);
                 }
                 strcat((char*)_currentCommand, "\n");
-                if (state == ESP3DGcodeHostState::wait_for_ack) {
-                  next_state = ESP3DGcodeHostState::send_gcode_command;
+                if (_current_state == ESP3DGcodeHostState::wait_for_ack) {
+                  _next_state = ESP3DGcodeHostState::send_gcode_command;
                 } else {
-                  state = ESP3DGcodeHostState::send_gcode_command;
+                  _current_state = ESP3DGcodeHostState::send_gcode_command;
                 }
               }
             } else {  // returns false at end of file/script
               esp3d_log("Stream Empty");
-              next_state = ESP3DGcodeHostState::idle;
+              _next_state = ESP3DGcodeHostState::idle;
               _current_stream->state = ESP3DGcodeStreamState::end;
             }
           }
@@ -1098,8 +1098,9 @@ void ESP3DGCodeHostService::handle() {
 
         case ESP3DGcodeStreamState::paused:  // might be worth updating the ring
                                              // buffer here
-          state = ESP3DGcodeHostState::idle;  // may need renaming to better
-                                              // reflect current state of stream
+          _current_state =
+              ESP3DGcodeHostState::idle;  // may need renaming to better
+                                          // reflect current state of stream
           break;
 
         default:
@@ -1108,18 +1109,18 @@ void ESP3DGCodeHostService::handle() {
     }
 
     // esp3d_log("Host state: %d", static_cast<uint8_t>(state));
-    switch (state) {
+    switch (_current_state) {
       case ESP3DGcodeHostState::idle:
         // esp3d_log("Idling");
         // do nothing, either no stream, or stream is paused
-        // state = next_state; //shouldn't be necessary, next_state should only
-        // be used with wait_for_ack esp3d_log("Wait"); vTaskDelay?
+        // _current_state = _next_state; //shouldn't be necessary, _next_state
+        // should only be used with wait_for_ack esp3d_log("Wait"); vTaskDelay?
         break;
 
       case ESP3DGcodeHostState::wait_for_ack:
         if (!_awaitingAck) {
-          state = next_state;
-          next_state = ESP3DGcodeHostState::idle;
+          _current_state = _next_state;
+          _next_state = ESP3DGcodeHostState::idle;
         } else {
           if (_current_stream != nullptr) {
             if (isFileStream(_current_stream)) {
@@ -1127,7 +1128,7 @@ void ESP3DGCodeHostService::handle() {
             }
           }
           if (esp3d_hal::millis() - _startTimeout > _timeoutInterval) {
-            state = ESP3DGcodeHostState::error;  // unhandled
+            _current_state = ESP3DGcodeHostState::error;  // unhandled
             esp3d_log_e("Timeout waiting for ok");
           }
         }
@@ -1146,10 +1147,10 @@ void ESP3DGCodeHostService::handle() {
           _startTimeout = esp3d_hal::millis();
           _awaitingAck = true;
           _currentCommand[0] = 0;
-          state = ESP3DGcodeHostState::wait_for_ack;
-          next_state = ESP3DGcodeHostState::idle;
+          _current_state = ESP3DGcodeHostState::wait_for_ack;
+          _next_state = ESP3DGcodeHostState::idle;
         } else {
-          state = ESP3DGcodeHostState::wait_for_ack;
+          _current_state = ESP3DGcodeHostState::wait_for_ack;
         }
         break;
       }
@@ -1161,8 +1162,8 @@ void ESP3DGCodeHostService::handle() {
             strlen((char*)&(_currentCommand[0])), _current_stream->auth_type);
         esp3dCommands.process(msg);
         _currentCommand[0] = 0;
-        state = next_state;
-        next_state = ESP3DGcodeHostState::idle;
+        _current_state = _next_state;
+        _next_state = ESP3DGcodeHostState::idle;
         break;
       }
 
