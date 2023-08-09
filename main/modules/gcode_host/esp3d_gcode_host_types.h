@@ -26,7 +26,7 @@
 extern "C" {
 #endif
 
-enum class ESP3DGcodeStreamState : uint8_t {  // weed out unneccesary states
+enum class ESP3DGcodeStreamState : uint8_t {
   // no_stream = 0,
   start,
   end,
@@ -45,8 +45,7 @@ enum class ESP3DGcodeStreamState : uint8_t {  // weed out unneccesary states
 
 enum class ESP3DGcodeHostState : uint8_t {  // maybe need stream state and host
                                             // state?
-  idle = 0,  // wait for a command to send
-
+  idle = 0,                                 // wait for a command to send
   send_gcode_command,  // if waiting not waiting for ack send command
   send_esp_command,    //
   wait_for_ack,

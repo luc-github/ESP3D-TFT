@@ -37,7 +37,7 @@
 #include <stdio.h>
 #if ESP3D_GCODE_HOST_FEATURE
 #include "gcode_host/esp3d_gcode_host_service.h"
-#endif // ESP3D_GCODE_HOST_FEATURE
+#endif  // ESP3D_GCODE_HOST_FEATURE
 
 #include <string>
 
@@ -45,7 +45,9 @@
 
 ESP3DCommands esp3dCommands;
 
-ESP3DCommands::ESP3DCommands() { _output_client = ESP3DClientType::stream; }//_output_client = ESP3DClientType::serial; }
+ESP3DCommands::ESP3DCommands() {
+  _output_client = ESP3DClientType::stream;
+}  //_output_client = ESP3DClientType::serial; }
 ESP3DCommands::~ESP3DCommands() {}
 bool ESP3DCommands::is_esp_command(uint8_t* sbuf, size_t len) {
   if (len < 5) {
@@ -476,10 +478,11 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
         gcodeHostService.process(msg);
       } else {
         sendOk = false;
-        esp3d_log_w("gcodeHostService not started for message size  %d", msg->size);
+        esp3d_log_w("gcodeHostService not started for message size  %d",
+                    msg->size);
       }
       break;
-#endif // ESP3D_GCODE_HOST_FEATURE
+#endif  // ESP3D_GCODE_HOST_FEATURE
 
     case ESP3DClientType::serial:
       esp3d_log("Serial client got message");
@@ -509,42 +512,24 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
       // Do not broadcast to printer output
       // printer may receive unwhished messages
 #if ESP3D_GCODE_HOST_FEATURE
-       //ESP3DClientType::serial
-       if (msg->origin!=ESP3DClientType::stream) {
-           if (msg->target==ESP3DClientType::all_clients) {
-               //become the reference message
-               msg->target=ESP3DClientType::stream;
-           } else {
-               //duplicate message because current is already pending
-               ESP3DMessage * copy_msg = gcodeHostService.copyMsg(*msg); //ESP3DClient::copyMsg(*msg);
-               if (copy_msg) {
-                   copy_msg->target = ESP3DClientType::stream;
-                   dispatch(copy_msg);
-               } else {
-                   esp3d_log_e("Cannot duplicate message for Serial");
-               }
-           }
-       }
-#endif
-      /*
-      #if ESP3D_USB_SERIAL_FEATURE
-      //ESP3DClientType::usb_serial
-      if (msg->origin!=ESP3DClientType::usb_serial) {
-          if (msg->target==ESP3DClientType::all_clients) {
-              //become the reference message
-              msg->target=ESP3DClientType::usb_serial;
+      // ESP3DClientType::serial
+      if (msg->origin != ESP3DClientType::stream) {
+        if (msg->target == ESP3DClientType::all_clients) {
+          // become the reference message
+          msg->target = ESP3DClientType::stream;
+        } else {
+          // duplicate message because current is already pending
+          ESP3DMessage* copy_msg =
+              gcodeHostService.copyMsg(*msg);  // ESP3DClient::copyMsg(*msg);
+          if (copy_msg) {
+            copy_msg->target = ESP3DClientType::stream;
+            dispatch(copy_msg);
           } else {
-              //duplicate message because current is  already pending
-              ESP3DMessage * copy_msg = ESP3DClient::copyMsg(*msg);
-              if (copy_msg) {
-                  copy_msg->target = ESP3DClientType::usb_serial;
-                  dispatch(copy_msg);
-              } else {
-                  esp3d_log_e("Cannot duplicate message for USB Serial");
-              }
+            esp3d_log_e("Cannot duplicate message for Serial");
           }
+        }
       }
-      #endif //#if ESP3D_USB_SERIAL_FEATURE*/
+#endif
 #if ESP3D_HTTP_FEATURE
       // ESP3DClientType::webui_websocket
       if (msg->origin != ESP3DClientType::webui_websocket) {
