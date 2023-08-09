@@ -259,19 +259,19 @@ bool ESP3DGCodeHostService::_streamFile(const char* file,
 
 bool ESP3DGCodeHostService::abort() {
   xTaskNotifyGive(_xHandle);
-  xTaskNotifyGiveIndexed(_xHandle, xAbortIndex);
+  xTaskNotifyGiveIndexed(_xHandle, _xAbortNotifyIndex);
   return true;
 }
 
 bool ESP3DGCodeHostService::pause() {
   xTaskNotifyGive(_xHandle);
-  xTaskNotifyGiveIndexed(_xHandle, xPauseIndex);
+  xTaskNotifyGiveIndexed(_xHandle, _xPauseNotifyIndex);
   return true;
 }
 
 bool ESP3DGCodeHostService::resume() {
   xTaskNotifyGive(_xHandle);
-  xTaskNotifyGiveIndexed(_xHandle, xResumeIndex);
+  xTaskNotifyGiveIndexed(_xHandle, _xResumeNotifyIndex);
   return true;
 }
 
@@ -991,13 +991,13 @@ void ESP3DGCodeHostService::handle() {
   if (_started) {
     // Check for notifications, set the current stream state
     if (ulTaskNotifyTake(pdTRUE, 0)) {
-      if (ulTaskNotifyTakeIndexed(xPauseIndex, pdTRUE, 0)) {
+      if (ulTaskNotifyTakeIndexed(_xPauseNotifyIndex, pdTRUE, 0)) {
         esp3d_log("Received pause notification");
         if (_currentPrintStream._fileName != nullptr) {
           _currentPrintStream.state = ESP3DGcodeStreamState::pause;
         }
       }
-      if (ulTaskNotifyTakeIndexed(xResumeIndex, pdTRUE, 0)) {
+      if (ulTaskNotifyTakeIndexed(_xResumeNotifyIndex, pdTRUE, 0)) {
         esp3d_log("Received resume notification");
         if (_currentPrintStream.state == ESP3DGcodeStreamState::paused) {
           _currentPrintStream.state = ESP3DGcodeStreamState::resume;
@@ -1011,7 +1011,7 @@ void ESP3DGCodeHostService::handle() {
           esp3d_log_w("No paused stream - nothing to resume");
         }
       }
-      if (ulTaskNotifyTakeIndexed(xAbortIndex, pdTRUE, 0)) {
+      if (ulTaskNotifyTakeIndexed(_xAbortNotifyIndex, pdTRUE, 0)) {
         esp3d_log("Received abort notification");
         if (_currentPrintStream._fileName != nullptr) {
           _currentPrintStream.state = ESP3DGcodeStreamState::abort;

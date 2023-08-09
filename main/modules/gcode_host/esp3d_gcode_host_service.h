@@ -158,9 +158,9 @@ class ESP3DGCodeHostService : public ESP3DClient {
 
   TaskHandle_t _xHandle;
   bool _started;
-  const UBaseType_t xPauseIndex = 1;
-  const UBaseType_t xResumeIndex = 2;
-  const UBaseType_t xAbortIndex = 3;
+  const UBaseType_t _xPauseNotifyIndex = 1;
+  const UBaseType_t _xResumeNotifyIndex = 2;
+  const UBaseType_t _xAbortNotifyIndex = 3;
 
   bool _awaitingAck = false;
   uint64_t _startTimeout;
