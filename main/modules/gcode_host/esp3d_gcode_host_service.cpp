@@ -410,7 +410,7 @@ bool ESP3DGCodeHostService::_updateRingBuffer(ESP3DGcodeFileStream* stream) {
 
   } else {
     if ((_bufferPos == _bufferSeam) && (_bufferFresh == true)) {
-      esp3d_log("Buffer is full");
+      //esp3d_log("Buffer is full");
       return false;  // return, buffer is already full of fresh data
     }
     if ((_ringBuffer[_bufferSeam] == 0) || (_ringBuffer[_bufferPos] == 0)) {
