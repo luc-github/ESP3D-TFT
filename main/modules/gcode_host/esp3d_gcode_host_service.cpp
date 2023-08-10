@@ -100,10 +100,10 @@ ESP3DGcodeHostFileType ESP3DGCodeHostService::_getStreamType(
   }
 }
 
-bool ESP3DGCodeHostService::newStream(const char* command, ESP3DAuthenticationLevel authentication_level, bool isPrintStream) {
+bool ESP3DGCodeHostService::newStream(const char* command, size_t length, ESP3DAuthenticationLevel authentication_level, bool isPrintStream) {
   //ESP700 will have isPrintStream == true, terminal commands and macros use default of false.
 
-  uint8_t* data = (uint8_t*)pvPortMalloc(sizeof(uint8_t) * (strlen(command) + 5));
+  uint8_t* data = (uint8_t*)pvPortMalloc(sizeof(uint8_t) * (length + 5));
   if (data == nullptr){
     esp3d_log_e("Failed to allocate memory for stream data.");
     return false;
@@ -128,10 +128,12 @@ bool ESP3DGCodeHostService::newStream(const char* command, ESP3DAuthenticationLe
   } else {                            //cmd file doesn't get rejected when print in progress, pnt does
     strncpy((char*)data, "CMD:", 5);
   }
-  strcat((char*)data, command);
+  memcpy(&data[4], command, length);
+  data[length+4] = 0;
   
 
   msg->data = data;
+  msg->size = strlen((char*)data) + 1;
   process(msg);
   return true;
 
@@ -812,7 +814,7 @@ bool ESP3DGCodeHostService::_processRx(ESP3DMessage* rx) {
     _streamFile((char*)&(rx->data[4]), rx->authentication_level);
   } else {
     esp3d_log("Forwarding message from: %d", static_cast<uint8_t>(rx->origin));
-    newStream((const char*)rx->data, rx->authentication_level); //placeholder until external code uses newStream()
+    newStream((const char*)rx->data, rx->size, rx->authentication_level); //placeholder until external code uses newStream()
   }
   deleteMsg(rx);
   return true;

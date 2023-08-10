@@ -109,7 +109,7 @@ class ESP3DGCodeHostService : public ESP3DClient {
   void flush();
   bool started() { return _started; }
 
-  bool newStream(const char* command, ESP3DAuthenticationLevel authentication_level, bool isPrintStream = false);
+  bool newStream(const char* command, size_t length, ESP3DAuthenticationLevel authentication_level, bool isPrintStream = false);
 
   bool abort();
   bool pause();
