@@ -239,10 +239,13 @@ bool ESP3DClient::setDataContent(ESP3DMessage* msg, const uint8_t* data,
   if (msg->data) {
     free(msg->data);
   }
-  msg->data = (uint8_t*)malloc(sizeof(uint8_t) * length);
+  // add some security in case data is called as string so add 1 byte for \0
+  msg->data = (uint8_t*)malloc(sizeof(uint8_t) * (length + 1));
   if (msg->data) {
     memcpy(msg->data, data, length);
     msg->size = length;
+    msg->data[length] =
+        '\0';  // add some security in case data is called as string
     return true;
   }
   esp3d_log_e("Out of memory");
