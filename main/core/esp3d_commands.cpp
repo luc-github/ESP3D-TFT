@@ -513,7 +513,8 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
       // printer may receive unwhished messages
 #if ESP3D_GCODE_HOST_FEATURE
       // ESP3DClientType::serial
-      if (msg->origin != ESP3DClientType::stream) {
+      if (msg->origin != ESP3DClientType::stream &&
+          msg->origin != ESP3DClientType::system) {
         if (msg->target == ESP3DClientType::all_clients) {
           // become the reference message
           msg->target = ESP3DClientType::stream;
