@@ -34,6 +34,7 @@ extern "C" {
 #define SIZE_OF_SETTING_NOFIFICATION_T1 64
 #define SIZE_OF_SETTING_NOFIFICATION_T2 64
 #define SIZE_OF_SETTING_NOFIFICATION_TS 128
+#define SIZE_OF_SCRIPT 255
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 #define SIZE_OF_LOCAL_PASSWORD 20
 #define HIDDEN_SETTING_VALUE "********"
@@ -77,6 +78,9 @@ enum class ESP3DSettingIndex : uint16_t {
   esp3d_user_password,
   esp3d_session_timeout,
   esp3d_ui_language,
+  esp3d_pause_script,
+  esp3d_stop_script,
+  esp3d_resume_script,
   unknown_index
 };
 

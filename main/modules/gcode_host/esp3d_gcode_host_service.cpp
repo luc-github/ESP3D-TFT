@@ -28,14 +28,13 @@
 #include "usb_serial/esp3d_usb_serial_client.h"
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
 
+#include "driver/uart.h"
 #include "esp3d_commands.h"
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
 #include "filesystem/esp3d_flash.h"
 #include "filesystem/esp3d_globalfs.h"
-
-#include "driver/uart.h"
 #include "serial_def.h"
 
 #if ESP3D_SD_CARD_FEATURE
@@ -55,14 +54,10 @@ ESP3DGCodeHostService gcodeHostService;
 
 #define RX_FLUSH_TIME_OUT 1500  // milliseconds timeout
 
-#define HOST_PAUSE_SCRIPT "M125\n"
-#define HOST_RESUME_SCRIPT "M108\n"
-#define HOST_ABORT_SCRIPT \
-  "G91\nG0 Z5\nG90\nG28 X Y\nM104 S0\nM140 S0\nM107\nM84\n"
-
 // main task
 static void esp3d_gcode_host_task(void* pvParameter) {
   (void)pvParameter;
+  gcodeHostService.updateScripts();
   while (1) {
     /* Delay */
     vTaskDelay(pdMS_TO_TICKS(10));
@@ -100,43 +95,59 @@ ESP3DGcodeHostFileType ESP3DGCodeHostService::_getStreamType(
   }
 }
 
-bool ESP3DGCodeHostService::newStream(const char* command, size_t length, ESP3DAuthenticationLevel authentication_level, bool isPrintStream) {
-  //ESP700 will have isPrintStream == true, terminal commands and macros use default of false.
+void ESP3DGCodeHostService::updateScripts() {
+  char buffer[SIZE_OF_SCRIPT + 1];
+  _stop_script = esp3dTftsettings.readString(
+      ESP3DSettingIndex::esp3d_stop_script, buffer, SIZE_OF_SCRIPT);
+  _resume_script = esp3dTftsettings.readString(
+      ESP3DSettingIndex::esp3d_resume_script, buffer, SIZE_OF_SCRIPT);
+  _pause_script = esp3dTftsettings.readString(
+      ESP3DSettingIndex::esp3d_pause_script, buffer, SIZE_OF_SCRIPT);
+}
+
+bool ESP3DGCodeHostService::newStream(
+    const char* command, size_t length,
+    ESP3DAuthenticationLevel authentication_level, bool isPrintStream) {
+  // ESP700 will have isPrintStream == true, terminal commands and macros use
+  // default of false.
 
   uint8_t* data = (uint8_t*)pvPortMalloc(sizeof(uint8_t) * (length + 5));
-  if (data == nullptr){
+  if (data == nullptr) {
     esp3d_log_e("Failed to allocate memory for stream data.");
     return false;
   }
 
-  ESP3DMessage* msg = newMsg(
-    ESP3DClientType::stream, ESP3DClientType::stream, //might be a bad way to do it, let me know what you think.
-    authentication_level);
-  if (msg == nullptr){
+  ESP3DMessage* msg =
+      newMsg(ESP3DClientType::stream,
+             ESP3DClientType::stream,  // might be a bad way to do it, let me
+                                       // know what you think.
+             authentication_level);
+  if (msg == nullptr) {
     esp3d_log_e("Failed to create stream request message.");
     return false;
   }
 
-  if (isPrintStream == true){
-    //Check here to see if print is in progres - reject if so. Awaiting updated getCurrentStream/getState functions.
-    if (false){
+  if (isPrintStream == true) {
+    // Check here to see if print is in progres - reject if so. Awaiting updated
+    // getCurrentStream/getState functions.
+    if (false) {
       esp3d_log_w("Print stream already in progress");
       return false;
     }
 
-    strncpy((char*)data, "PNT:", 5); //prefixes allow for file macros if desired. ex: "PNT:/sd/benchy.gcode" vs "CMD:/sd/macrostuff.gcode"
-  } else {                            //cmd file doesn't get rejected when print in progress, pnt does
+    strncpy((char*)data,
+            "PNT:", 5);  // prefixes allow for file macros if desired. ex:
+                         // "PNT:/sd/benchy.gcode" vs "CMD:/sd/macrostuff.gcode"
+  } else {  // cmd file doesn't get rejected when print in progress, pnt does
     strncpy((char*)data, "CMD:", 5);
   }
   memcpy(&data[4], command, length);
-  data[length+4] = 0;
-  
+  data[length + 4] = 0;
 
   msg->data = data;
   msg->size = strlen((char*)data) + 1;
   process(msg);
   return true;
-
 }
 
 bool ESP3DGCodeHostService::_streamFile(const char* file,
@@ -429,7 +440,7 @@ bool ESP3DGCodeHostService::_updateRingBuffer(ESP3DGcodeFileStream* stream) {
 
   } else {
     if ((_bufferPos == _bufferSeam) && (_bufferFresh == true)) {
-      //esp3d_log("Buffer is full");
+      // esp3d_log("Buffer is full");
       return false;  // return, buffer is already full of fresh data
     }
     if ((_ringBuffer[_bufferSeam] == 0) || (_ringBuffer[_bufferPos] == 0)) {
@@ -807,14 +818,21 @@ bool ESP3DGCodeHostService::_parseResponse(
 }
 
 bool ESP3DGCodeHostService::_processRx(ESP3DMessage* rx) {
-    if ((rx->origin == ESP3DClientType::serial ) || (rx->origin == ESP3DClientType::usb_serial)) { //this will be performed for every command sent whilst printing, getOutputClient() is unnecessarily intensive
+  if ((rx->origin == ESP3DClientType::serial) ||
+      (rx->origin ==
+       ESP3DClientType::usb_serial)) {  // this will be performed for every
+                                        // command sent whilst printing,
+                                        // getOutputClient() is unnecessarily
+                                        // intensive
     esp3d_log("Stream got the response: %s", (char*)(rx->data));
     _parseResponse(rx);
   } else if (rx->origin == ESP3DClientType::stream) {
     _streamFile((char*)&(rx->data[4]), rx->authentication_level);
   } else {
     esp3d_log("Forwarding message from: %d", static_cast<uint8_t>(rx->origin));
-    newStream((const char*)rx->data, rx->size, rx->authentication_level); //placeholder until external code uses newStream()
+    newStream((const char*)rx->data, rx->size,
+              rx->authentication_level);  // placeholder until external code
+                                          // uses newStream()
   }
   deleteMsg(rx);
   return true;
@@ -1019,7 +1037,7 @@ bool ESP3DGCodeHostService::_setStream() {
     }
 
   } else {
-    //esp3d_log("No Stream");
+    // esp3d_log("No Stream");
     _current_stream = nullptr;
   }
 
@@ -1116,7 +1134,7 @@ void ESP3DGCodeHostService::handle() {
           // add pause script to _scripts
           //_current_stream -> state = ESP3DGcodeStreamState::paused;
           _currentPrintStream.state = ESP3DGcodeStreamState::paused;
-          _streamFile(HOST_PAUSE_SCRIPT, _current_stream->auth_type, true,
+          _streamFile(_pause_script.c_str(), _current_stream->auth_type, true,
                       true);
           break;
 
@@ -1124,7 +1142,7 @@ void ESP3DGCodeHostService::handle() {
           // add resume script to _scripts
           //_current_stream -> state = ESP3DGcodeStreamState::read_line;
           _currentPrintStream.state = ESP3DGcodeStreamState::read_line;
-          _streamFile(HOST_RESUME_SCRIPT, _current_stream->auth_type, true);
+          _streamFile(_resume_script.c_str(), _current_stream->auth_type, true);
           break;
 
         case ESP3DGcodeStreamState::abort:
@@ -1132,7 +1150,7 @@ void ESP3DGCodeHostService::handle() {
           //_current_stream -> state = ESP3DGcodeStreamState::end; // Does this
           // need to apply only to currentPrintStream?
           _currentPrintStream.state = ESP3DGcodeStreamState::end;
-          _streamFile(HOST_ABORT_SCRIPT, _current_stream->auth_type, true);
+          _streamFile(_stop_script.c_str(), _current_stream->auth_type, true);
           break;
 
         case ESP3DGcodeStreamState::paused:  // might be worth updating the ring
@@ -1178,7 +1196,8 @@ void ESP3DGCodeHostService::handle() {
                               // it should end up in the wait for ack state.
                               // just a precaution for now, remove later.
           esp3d_log("Sending to output client: %s", &_currentCommand[0]);
-          uart_write_bytes(ESP3D_SERIAL_PORT, &_currentCommand, strlen((char*)&(_currentCommand[0])));
+          uart_write_bytes(ESP3D_SERIAL_PORT, &_currentCommand,
+                           strlen((char*)&(_currentCommand[0])));
           _startTimeout = esp3d_hal::millis();
           _awaitingAck = true;
           _currentCommand[0] = 0;

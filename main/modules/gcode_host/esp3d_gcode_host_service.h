@@ -80,8 +80,7 @@ struct ESP3DGcodeCommandStream : public ESP3DGcodeStream {
   ESP3DGcodeCommandStream() = default;
 
   uint32_t bufferPos = 0;
-  uint8_t* commandBuffer =
-      nullptr;
+  uint8_t* commandBuffer = nullptr;
 };
 
 struct ESP3DGcodeFileStream : public ESP3DGcodeStream {
@@ -109,8 +108,10 @@ class ESP3DGCodeHostService : public ESP3DClient {
   void flush();
   bool started() { return _started; }
 
-  bool newStream(const char* command, size_t length, ESP3DAuthenticationLevel authentication_level, bool isPrintStream = false);
-
+  bool newStream(const char* command, size_t length,
+                 ESP3DAuthenticationLevel authentication_level,
+                 bool isPrintStream = false);
+  void updateScripts();
   bool abort();
   bool pause();
   bool resume();
@@ -172,6 +173,9 @@ class ESP3DGCodeHostService : public ESP3DClient {
   std::list<ESP3DGcodeStream*> _scripts;
   ESP3DGcodeStream* _current_stream = nullptr;
   ESP3DGcodeFileStream _currentPrintStream;
+  std::string _stop_script;
+  std::string _pause_script;
+  std::string _resume_script;
 
   pthread_mutex_t _tx_mutex;
   pthread_mutex_t _rx_mutex;

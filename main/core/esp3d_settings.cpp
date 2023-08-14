@@ -110,6 +110,14 @@ const ESP3DSettingDescription ESP3DSettingsData[] = {
      "192.168.0.1"},
     {ESP3DSettingIndex::esp3d_ap_channel, ESP3DSettingType::byte_t, 1, "2"},
 #endif  // ESP3D_WIFI_FEATURE
+#if ESP3D_GCODE_HOST_FEATURE
+    {ESP3DSettingIndex::esp3d_pause_script, ESP3DSettingType::string_t,
+     SIZE_OF_SCRIPT, ""},
+    {ESP3DSettingIndex::esp3d_resume_script, ESP3DSettingType::string_t,
+     SIZE_OF_SCRIPT, ""},
+    {ESP3DSettingIndex::esp3d_stop_script, ESP3DSettingType::string_t,
+     SIZE_OF_SCRIPT, ""},
+#endif  // ESP3D_GCODE_HOST_FEATURE
 #if ESP3D_HTTP_FEATURE
     {ESP3DSettingIndex::esp3d_http_port, ESP3DSettingType::integer_t, 4, "80"},
     {ESP3DSettingIndex::esp3d_http_on, ESP3DSettingType::byte_t, 1, "1"},
@@ -173,6 +181,12 @@ bool ESP3DSettings::isValidStringSetting(const char* value,
   // characters
   size_t len = strlen(value);
   switch (settingElement) {
+#if ESP3D_GCODE_HOST_FEATURE
+    case ESP3DSettingIndex::esp3d_pause_script:
+    case ESP3DSettingIndex::esp3d_resume_script:
+    case ESP3DSettingIndex::esp3d_stop_script:
+      return len <= SIZE_OF_SCRIPT;
+#endif  // ESP3D_GCODE_HOST_FEATURE
 #if ESP3D_WIFI_FEATURE
     case ESP3DSettingIndex::esp3d_ap_ssid:
     case ESP3DSettingIndex::esp3d_sta_ssid:
@@ -403,6 +417,15 @@ bool ESP3DSettings::isValidSettingsNvs() {
       esp3d_log_e("Expected %s but got %s", SETTING_VERSION, result);
       return false;
     } else {
+#if ESP3D_TFT_LOG
+      nvs_stats_t nvs_stats;
+      nvs_get_stats(NULL, &nvs_stats);
+#endif  // ESP3D_TFT_LOG
+      esp3d_log(
+          "\n**************************\nNVS entries Count: \nUsed = %d \nFree "
+          "= %d \nAll = %d\n**************************\n",
+          nvs_stats.used_entries, nvs_stats.free_entries,
+          nvs_stats.total_entries);
       return true;
     }
   } else {
@@ -542,6 +565,14 @@ bool ESP3DSettings::reset() {
       esp3d_log_e("Setting  %d is unknown", static_cast<uint16_t>(setting));
     }
   }
+#if ESP3D_TFT_LOG
+  nvs_stats_t nvs_stats;
+  nvs_get_stats(NULL, &nvs_stats);
+#endif  // ESP3D_TFT_LOG
+  esp3d_log(
+      "\n**************************\nNVS entries Count: \nUsed = %d \nFree "
+      "= %d \nAll = %d\n**************************\n",
+      nvs_stats.used_entries, nvs_stats.free_entries, nvs_stats.total_entries);
   return result;
 }
 

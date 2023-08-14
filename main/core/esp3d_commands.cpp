@@ -661,15 +661,15 @@ bool ESP3DCommands::hasTag(ESP3DMessage* msg, uint start, const char* label) {
 }
 
 const char* ESP3DCommands::get_param(ESP3DMessage* msg, uint start,
-                                     const char* label) {
+                                     const char* label, bool* found) {
   if (!msg) {
     return "";
   }
-  return get_param((const char*)msg->data, msg->size, start, label);
+  return get_param((const char*)msg->data, msg->size, start, label, found);
 }
 
 const char* ESP3DCommands::get_param(const char* data, uint size, uint start,
-                                     const char* label) {
+                                     const char* label, bool* found) {
   int startPos = -1;
   uint lenLabel = strlen(label);
   static std::string value;
@@ -677,6 +677,9 @@ const char* ESP3DCommands::get_param(const char* data, uint size, uint start,
   bool prevCharIsspace = true;
   value.clear();
   uint startp = start;
+  if (found) {
+    *found = false;
+  }
   while (char(data[startp]) == ' ' && startp < size) {
     startp++;
   }
@@ -693,6 +696,9 @@ const char* ESP3DCommands::get_param(const char* data, uint size, uint start,
       }
       if (p == lenLabel) {
         startPos = i;
+        if (found) {
+          *found = true;
+        }
       }
     }
     if (std::isspace(c) && !prevCharIsEscaped) {
@@ -938,6 +944,9 @@ void ESP3DCommands::execute_internal_command(int cmd, int cmd_params_pos,
       break;
     case 701:
       ESP701(cmd_params_pos, msg);
+      break;
+    case 702:
+      ESP702(cmd_params_pos, msg);
       break;
 #endif  // ESP3D_GCODE_HOST_FEATURE
     case 710:
