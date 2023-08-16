@@ -51,6 +51,7 @@ lv_timer_t *files_screen_delay_timer = NULL;
 lv_obj_t *refresh_button = NULL;
 lv_obj_t *ui_files_list_ctl = NULL;
 lv_timer_t *start_files_list_timer = NULL;
+bool files_has_sd = false;
 std::string files_path = "/";
 std::vector<std::string> files_extensions;
 struct ESP3DFileDescriptor {
@@ -122,6 +123,7 @@ void fill_files_list() {
     }
   }
   if (sd.accessFS()) {
+    files_has_sd = true;
     DIR *dir = sd.opendir(files_path.c_str());
     if (dir) {
       struct dirent *ent;
@@ -160,6 +162,8 @@ void fill_files_list() {
       closedir(dir);
     }
     sd.releaseFS();
+  } else {
+    files_has_sd = false;
   }
 }
 
@@ -309,31 +313,39 @@ void files_screen() {
     first_fill_needed = false;
   }
 
-  // dir first
-  for (auto &file : files_list) {
-    if (file.size == "-1") {
-      lv_obj_t *line_container =
-          listLine::create_list_line_container(ui_files_list_ctl);
-      listLine::add_label_to_line(LV_SYMBOL_FOLDER, line_container, false);
-      listLine::add_label_to_line(file.name.c_str(), line_container, true);
-      lv_obj_t *btn =
-          listLine::add_button_to_line(LV_SYMBOL_SEARCH, line_container);
-      lv_obj_add_event_cb(btn, event_directory_handler, LV_EVENT_CLICKED,
-                          &file);
+  if (files_has_sd) {
+    // dir first
+    for (auto &file : files_list) {
+      if (file.size == "-1") {
+        lv_obj_t *line_container =
+            listLine::create_list_line_container(ui_files_list_ctl);
+        listLine::add_label_to_line(LV_SYMBOL_FOLDER, line_container, false);
+        listLine::add_label_to_line(file.name.c_str(), line_container, true);
+        lv_obj_t *btn =
+            listLine::add_button_to_line(LV_SYMBOL_SEARCH, line_container);
+        lv_obj_add_event_cb(btn, event_directory_handler, LV_EVENT_CLICKED,
+                            &file);
+      }
     }
-  }
 
-  for (auto &file : files_list) {
-    if (file.size != "-1") {
-      lv_obj_t *line_container =
-          listLine::create_list_line_container(ui_files_list_ctl);
-      listLine::add_label_to_line(LV_SYMBOL_FILE, line_container, false);
-      listLine::add_label_to_line(file.name.c_str(), line_container, true);
-      listLine::add_label_to_line(file.size.c_str(), line_container, false);
-      lv_obj_t *btn =
-          listLine::add_button_to_line(LV_SYMBOL_PLAY, line_container);
-      lv_obj_add_event_cb(btn, event_file_handler, LV_EVENT_CLICKED, &file);
+    for (auto &file : files_list) {
+      if (file.size != "-1") {
+        lv_obj_t *line_container =
+            listLine::create_list_line_container(ui_files_list_ctl);
+        listLine::add_label_to_line(LV_SYMBOL_FILE, line_container, false);
+        listLine::add_label_to_line(file.name.c_str(), line_container, true);
+        listLine::add_label_to_line(file.size.c_str(), line_container, false);
+        lv_obj_t *btn =
+            listLine::add_button_to_line(LV_SYMBOL_PLAY, line_container);
+        lv_obj_add_event_cb(btn, event_file_handler, LV_EVENT_CLICKED, &file);
+      }
     }
+  } else {
+    lv_obj_del(ui_files_list_ctl);
+    lv_obj_t *msg = lv_label_create(ui_new_screen);
+    lv_obj_del(labelpath);
+    lv_label_set_text(msg, "No SD card");
+    lv_obj_center(msg);
   }
 
   esp3dTftui.set_current_screen(ESP3DScreenType::files);
