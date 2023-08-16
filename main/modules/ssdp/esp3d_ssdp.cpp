@@ -39,6 +39,7 @@ bool ESP3Dssdp::begin() {
   if (_started) {
     end();
   }
+  ssdp_init();
   ssdp_config_t config = SDDP_DEFAULT_CONFIG();
   // Customization
   std::string efuseMacStr = std::to_string(esp3d_hal::getEfuseMac());
