@@ -84,7 +84,7 @@ ESP3DGcodeHostFileType ESP3DGCodeHostService::_getStreamType(
       return ESP3DGcodeHostFileType::filesystem;
     }
   } else {
-    if (strstr(file, "\n") != nullptr) {  // can we use \n instead of ;?
+    if (strstr(file, "\n") != nullptr || (strstr(file, ";") != nullptr) {
       return ESP3DGcodeHostFileType::multiple_commands;
     } else {
       if (strlen(file) != 0)
@@ -285,6 +285,12 @@ bool ESP3DGCodeHostService::_streamFile(const char* file,
       }
       esp3d_log("Command length: %d", (unsigned int)strlen(file));
       strncpy((char*)streamPointer->commandBuffer, file, strlen(file) + 1);
+      // replace ; with \n
+      for (int i = 0; i < strlen(file); i++) {
+        if (streamPointer->commandBuffer[i] == ';') {
+          streamPointer->commandBuffer[i] = '\n';
+        }
+      }
       esp3d_log("copied");
       streamPointer->type = type;
       streamPointer->id = esp3d_hal::millis();
