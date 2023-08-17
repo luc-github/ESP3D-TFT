@@ -84,7 +84,7 @@ ESP3DGcodeHostFileType ESP3DGCodeHostService::_getStreamType(
       return ESP3DGcodeHostFileType::filesystem;
     }
   } else {
-    if (strstr(file, "\n") != nullptr || (strstr(file, ";") != nullptr) {
+    if (strstr(file, "\n") != nullptr || (strstr(file, ";") != nullptr)) {
       return ESP3DGcodeHostFileType::multiple_commands;
     } else {
       if (strlen(file) != 0)
