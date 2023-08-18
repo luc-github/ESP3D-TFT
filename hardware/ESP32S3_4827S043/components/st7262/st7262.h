@@ -1,5 +1,5 @@
 /**
- * @file ek9716.h
+ * @file st7262.h
  */
 
 #pragma once
@@ -40,9 +40,9 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-esp_err_t ek9716_init(lv_disp_drv_t* disp_drv);
-esp_lcd_panel_handle_t* get_ek9716_panel_handle();
-void ek9716_flush(lv_disp_drv_t* disp_drv, const lv_area_t* area,
+esp_err_t st7262_init(lv_disp_drv_t* disp_drv);
+esp_lcd_panel_handle_t* get_st7262_panel_handle();
+void st7262_flush(lv_disp_drv_t* disp_drv, const lv_area_t* area,
                   lv_color_t* color_p);
 
 /**********************

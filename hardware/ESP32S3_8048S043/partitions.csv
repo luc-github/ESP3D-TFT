@@ -1,0 +1,7 @@
+#16MB Flash + OTA - APP = 4 MB X 2 + Flash = 8 MB
+# Name,   Type, SubType, Offset,  Size, Flags
+nvs,      data, nvs,     0x9000,  0x5000,
+otadata,  data, ota,     ,  0x2000,
+app0,     app,  ota_0,   , 0x400000,
+app1,     app,  ota_1,   ,0x400000,
+flashfs,   data, spiffs,  ,0x3C0000,

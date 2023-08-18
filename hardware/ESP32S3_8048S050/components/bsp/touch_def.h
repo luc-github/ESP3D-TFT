@@ -1,4 +1,4 @@
-// Pins definition for ESP32S3_8048S070
+// Pins definition for ESP32S3_8048S050
 // Touch driver GT911
 #pragma once
 
