@@ -24,6 +24,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include "nvs.h"
 
 #define SIZE_OF_SETTING_VERSION 25
 #define SIZE_OF_SETTING_SSID_ID 32
@@ -120,6 +121,8 @@ class ESP3DSettings final {
   ESP3DSettings();
   ~ESP3DSettings();
   bool isValidSettingsNvs();
+  bool access_nvs(nvs_open_mode_t mode);
+  void release_nvs(nvs_open_mode_t mode);
   uint8_t readByte(ESP3DSettingIndex index, bool* haserror = NULL);
   uint32_t readUint32(ESP3DSettingIndex index, bool* haserror = NULL);
   const char* readIPString(ESP3DSettingIndex index, bool* haserror = NULL);

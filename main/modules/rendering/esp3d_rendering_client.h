@@ -1,5 +1,5 @@
 /*
-  esp3d-client
+  esp3d_rendering_client
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -19,27 +19,37 @@
 */
 
 #pragma once
-
+#include <pthread.h>
 #include <stdio.h>
+
+#include "esp3d_client.h"
+#include "esp3d_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/semphr.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-enum class ESP3DClientType : uint8_t {
-  no_client = 0,
-  serial = 1,
-  usb_serial = 2,
-  stream = 3,
-  telnet = 4,
-  webui = 5,
-  webui_websocket = 6,
-  websocket = 7,
-  rendering = 8,
-  command,  // origin only
-  system,   // origin only
-  all_clients
+class ESP3DRenderingClient : public ESP3DClient {
+ public:
+  ESP3DRenderingClient();
+  ~ESP3DRenderingClient();
+  bool begin();
+  void handle();
+  void end();
+  void process(ESP3DMessage* msg);
+  void flush();
+  bool started() { return _started; }
+
+ private:
+  TaskHandle_t _xHandle;
+  bool _started;
+  SemaphoreHandle_t _xGuiSemaphore;
+  pthread_mutex_t _rx_mutex;
 };
+
+extern ESP3DRenderingClient renderingClient;
 
 #ifdef __cplusplus
 }  // extern "C"

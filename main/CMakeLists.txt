@@ -55,6 +55,7 @@ endif()
 
  if(TFT_UI_SERVICE)
     list(APPEND SOURCES "display")
+    list(APPEND SOURCES "modules/rendering")
     if(TARGET_FW_MARLIN)
        list(APPEND SOURCES "display/3dprinter/marlin")
     elseif(TARGET_FW_REPETIER)

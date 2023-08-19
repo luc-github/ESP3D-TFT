@@ -34,6 +34,10 @@
 #if ESP3D_SD_CARD_FEATURE
 #include "sd_def.h"
 #endif  // ESP3D_SD_CARD_FEATURE
+#if ESP3D_DISPLAY_FEATURE
+#include "rendering/esp3d_rendering_client.h"
+#endif  // ESP3D_DISPLAY_FEATURE
+
 #include <stdio.h>
 
 #include <string>
@@ -467,6 +471,16 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
       }
       break;
 #endif  // ESP3D_TELNET_FEATURE
+#if ESP3D_DISPLAY_FEATURE
+    case ESP3DClientType::rendering:
+      if (renderingClient.started()) {
+        renderingClient.process(msg);
+      } else {
+        sendOk = false;
+        esp3d_log_w("rendering not started for message size  %d", msg->size);
+      }
+      break;
+#endif  // ESP3D_DISPLAY_FEATURE
 
     case ESP3DClientType::serial:
       esp3d_log("Serial client got message");
@@ -586,6 +600,28 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
         }
       }
 #endif  // ESP3D_TELNET_FEATURE
+#if ESP3D_DISPLAY_FEATURE
+      // ESP3DClientType::rendering
+      if (msg->origin != ESP3DClientType::rendering &&
+          msg->origin != ESP3DClientType::command &&
+          msg->origin != ESP3DClientType::no_client &&
+          msg->origin != ESP3DClientType::system) {
+        msg->request_id.id = 0;
+        if (msg->target == ESP3DClientType::all_clients) {
+          // become the reference message
+          msg->target = ESP3DClientType::rendering;
+        } else {
+          // duplicate message because current is  already pending
+          ESP3DMessage* copy_msg = ESP3DClient::copyMsg(*msg);
+          if (copy_msg) {
+            copy_msg->target = ESP3DClientType::rendering;
+            dispatch(copy_msg);
+          } else {
+            esp3d_log_e("Cannot duplicate message for Rendering");
+          }
+        }
+      }
+#endif  // ESP3D_DISPLAY_FEATURE
         // Send pending if any or cancel message is no client did handle it
       if (msg->target == ESP3DClientType::all_clients) {
         sendOk = false;

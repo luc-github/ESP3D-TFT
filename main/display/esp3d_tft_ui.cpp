@@ -30,8 +30,10 @@
 #include "freertos/semphr.h"
 #include "freertos/task.h"
 #include "lvgl.h"
+#include "rendering/esp3d_rendering_client.h"
 #include "tasks_def.h"
 #include "version.h"
+
 
 #define STACKDEPTH UI_STACK_DEPTH
 #define TASKPRIORITY UI_TASK_PRIORITY
@@ -98,6 +100,11 @@ ESP3DTftUi::ESP3DTftUi() {}
 ESP3DTftUi::~ESP3DTftUi() {}
 
 bool ESP3DTftUi::begin() {
+  if (!renderingClient.begin()) {
+    esp3d_log_e("Rendering client not started");
+    return false;
+  }
+
   // Ui creation
   TaskHandle_t xHandle = NULL;
   BaseType_t res = xTaskCreatePinnedToCore(guiTask, "tftUI", STACKDEPTH, NULL,
@@ -113,4 +120,8 @@ bool ESP3DTftUi::begin() {
 
 void ESP3DTftUi::handle() {}
 
-bool ESP3DTftUi::end() { return true; }
+bool ESP3DTftUi::end() {
+  // TODO : stop TFT task and delete it
+  renderingClient.end();
+  return true;
+}
