@@ -26,6 +26,9 @@ extern "C" {
 #endif
 #include "nvs.h"
 
+const uint32_t SupportedBaudList[] = {9600,   19200,  38400,  57600,  74880,
+                                      115200, 230400, 250000, 500000, 921600};
+
 #define SIZE_OF_SETTING_VERSION 25
 #define SIZE_OF_SETTING_SSID_ID 32
 #define SIZE_OF_SETTING_SSID_PWD 64

@@ -48,5 +48,10 @@ void ESP3DTranslationService::init() {
       {ESP3DLabel::error_applying_setting, "Apply setting failed!"},
       {ESP3DLabel::hostname, "Hostname"},
       {ESP3DLabel::extensions, "Extensions"},
-      {ESP3DLabel::please_wait, "Please wait..."}};
+      {ESP3DLabel::please_wait, "Please wait..."},
+      {ESP3DLabel::output_client, "Output port"},
+      {ESP3DLabel::serial_baud_rate, "Serial baud rate"},
+      {ESP3DLabel::usb_baud_rate, "USB serial baud rate"},
+      {ESP3DLabel::usb, "USB"},
+      {ESP3DLabel::serial, "Serial"}};
 }

@@ -100,6 +100,10 @@ void ESP3DRenderingClient::handle() {
           // Analyse message content
           esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
                                           (char *)msg->data);
+          esp3dTftValues.set_string_value(
+              ESP3DValuesIndex::ext_0_target_temperature, "100");
+          esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_0_temperature,
+                                          "80");
           deleteMsg(msg);
         };
         xSemaphoreGive(_xGuiSemaphore);

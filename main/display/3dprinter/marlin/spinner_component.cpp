@@ -40,7 +40,7 @@ void show_spinner() {
     return;
   }
   spinnerObj = lv_obj_create(lv_scr_act());
-  apply_style(spinnerObj, ESP3DStyleType::spinnerScreen);
+  apply_style(spinnerObj, ESP3DStyleType::spinner_screen);
   lv_obj_move_foreground(spinnerObj);
   lv_obj_set_size(spinnerObj, LV_HOR_RES, LV_VER_RES);
   lv_obj_set_pos(spinnerObj, 0, 0);
@@ -50,7 +50,7 @@ void show_spinner() {
 
   std::string text = esp3dTranslationService.translate(ESP3DLabel::please_wait);
   lv_obj_t* lbl = lv_label_create(spinnerObj);
-  apply_style(lbl, ESP3DStyleType::spinnerText);
+  apply_style(lbl, ESP3DStyleType::spinner_text);
   lv_label_set_text(lbl, text.c_str());
   lv_obj_align_to(lbl, spinner, LV_ALIGN_OUT_BOTTOM_MID, 0,
                   CURRENT_BUTTON_PRESSED_OUTLINE);

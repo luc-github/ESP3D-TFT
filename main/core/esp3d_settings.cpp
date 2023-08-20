@@ -23,7 +23,6 @@
 #include "nvs_flash.h"
 #include "nvs_handle.hpp"
 
-
 #if ESP3D_WIFI_FEATURE
 #include "lwip/ip_addr.h"
 #endif  // ESP3D_WIFI_FEATURE
@@ -60,8 +59,6 @@
 
 ESP3DSettings esp3dTftsettings;
 
-const uint32_t SupportedBaudList[] = {9600,   19200,  38400,  57600,  74880,
-                                      115200, 230400, 250000, 500000, 921600};
 const uint8_t SupportedBaudListSize =
     sizeof(SupportedBaudList) / sizeof(uint32_t);
 
