@@ -25,6 +25,7 @@
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
+#include "esp3d_values.h"
 #include "freertos/task.h"
 #include "tasks_def.h"
 
@@ -97,6 +98,8 @@ void ESP3DRenderingClient::handle() {
           esp3d_log("Rendering client received message: %s", (char *)msg->data);
           // Todo
           // Analyse message content
+          esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
+                                          (char *)msg->data);
           deleteMsg(msg);
         };
         xSemaphoreGive(_xGuiSemaphore);
