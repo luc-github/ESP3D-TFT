@@ -115,12 +115,14 @@ class ESP3DGCodeHostService : public ESP3DClient {
   bool abort();
   bool pause();
   bool resume();
+  bool updateOutputClient();
   ESP3DGcodeHostState getState();
   ESP3DGcodeHostError getErrorNum();
   ESP3DGcodeStream* getCurrentStream(
       ESP3DGcodeHostFileType type = ESP3DGcodeHostFileType::active);
 
  private:
+  void _updateOutputClient();
   bool _streamFile(const char* file, ESP3DAuthenticationLevel auth_type,
                    bool executeAsMacro = false, bool executeFirst = false);
   uint8_t _currentCommand[ESP_GCODE_HOST_COMMAND_LINE_BUFFER];
@@ -164,7 +166,9 @@ class ESP3DGCodeHostService : public ESP3DClient {
   const UBaseType_t _xPauseNotifyIndex = 1;
   const UBaseType_t _xResumeNotifyIndex = 2;
   const UBaseType_t _xAbortNotifyIndex = 3;
+  const UBaseType_t _xOutputChangeNotifyIndex = 4;
 
+  ESP3DClientType _outputClient = ESP3DClientType::no_client;
   bool _awaitingAck = false;
   uint64_t _startTimeout;
   uint64_t _timeoutInterval = ESP_HOST_OK_TIMEOUT;

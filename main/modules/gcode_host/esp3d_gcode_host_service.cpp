@@ -330,6 +330,12 @@ bool ESP3DGCodeHostService::resume() {
   return true;
 }
 
+bool ESP3DGCodeHostService::updateOutputClient() {
+  xTaskNotifyGive(_xHandle);
+  xTaskNotifyGiveIndexed(_xHandle, _xOutputChangeNotifyIndex);
+  return true;
+}
+
 // ##################### Parsing Functions ########################
 
 bool ESP3DGCodeHostService::_isAck(const char* cmd) {
@@ -824,12 +830,7 @@ bool ESP3DGCodeHostService::_parseResponse(
 }
 
 bool ESP3DGCodeHostService::_processRx(ESP3DMessage* rx) {
-  if ((rx->origin == ESP3DClientType::serial) ||
-      (rx->origin ==
-       ESP3DClientType::usb_serial)) {  // this will be performed for every
-                                        // command sent whilst printing,
-                                        // getOutputClient() is unnecessarily
-                                        // intensive
+  if (rx->origin == _outputClient){
     esp3d_log("Stream got the response: %s", (char*)(rx->data));
     _parseResponse(rx);
   } else if (rx->origin == ESP3DClientType::stream) {
@@ -912,6 +913,10 @@ void ESP3DGCodeHostService::process(ESP3DMessage* msg) {
   //}
 }
 
+void ESP3DGCodeHostService::_updateOutputClient() {
+  _outputClient = esp3dCommands.getOutputClient();
+}
+
 bool ESP3DGCodeHostService::begin() {
   end();
   if (pthread_mutex_init(&_rx_mutex, NULL) != 0) {
@@ -927,6 +932,7 @@ bool ESP3DGCodeHostService::begin() {
   setTxMutex(&_tx_mutex);
   // Task is never stopped so no need to kill the task from outside
   _started = true;
+  _updateOutputClient();
   BaseType_t res = xTaskCreatePinnedToCore(
       esp3d_gcode_host_task, "esp3d_gcode_host_task",
       ESP3D_GCODE_HOST_TASK_SIZE, NULL, ESP3D_GCODE_HOST_TASK_PRIORITY,
@@ -1080,6 +1086,9 @@ void ESP3DGCodeHostService::handle() {
           _currentPrintStream.state = ESP3DGcodeStreamState::abort;
         }
       }
+      if (ulTaskNotifyTakeIndexed(_xOutputChangeNotifyIndex, pdTRUE, 0)){
+        _updateOutputClient();
+      }
     }
 
     _setStream();
@@ -1202,8 +1211,19 @@ void ESP3DGCodeHostService::handle() {
                               // it should end up in the wait for ack state.
                               // just a precaution for now, remove later.
           esp3d_log("Sending to output client: %s", &_currentCommand[0]);
-          uart_write_bytes(ESP3D_SERIAL_PORT, &_currentCommand,
+          if (_outputClient == ESP3DClientType::serial){
+            uart_write_bytes(ESP3D_SERIAL_PORT, &_currentCommand,
                            strlen((char*)&(_currentCommand[0])));
+#if ESP3D_USB_SERIAL_FEATURE
+          } else if (_outputClient == ESP3DClientType::usb_serial){
+            ESP3DMessage* msg = newMsg(
+              ESP3DClientType::stream, _outputClient,
+              (uint8_t*)(&(_currentCommand[0])),
+              strlen((char*)&(_currentCommand[0])), _current_stream->auth_type);
+            usbSerialClient.process(msg);  // may just dispatch to output client
+#endif
+          }
+
           _startTimeout = esp3d_hal::millis();
           _awaitingAck = true;
           _currentCommand[0] = 0;
