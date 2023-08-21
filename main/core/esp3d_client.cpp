@@ -239,6 +239,7 @@ bool ESP3DClient::setDataContent(ESP3DMessage* msg, const uint8_t* data,
   if (msg->data) {
     free(msg->data);
   }
+
   // add some security in case data is called as string so add 1 byte for \0
   msg->data = (uint8_t*)malloc(sizeof(uint8_t) * (length + 1));
   if (msg->data) {

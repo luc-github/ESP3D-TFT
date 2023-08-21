@@ -30,7 +30,6 @@ leveling_screen.cpp - esp3d
 #include "main_container_component.h"
 #include "menu_screen.h"
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/

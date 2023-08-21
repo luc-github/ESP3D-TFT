@@ -20,7 +20,6 @@
 */
 #include "esp3d_settings.h"
 
-#include "nvs.h"
 #include "nvs_flash.h"
 #include "nvs_handle.hpp"
 
@@ -47,6 +46,12 @@
 #include "notifications/esp3d_notifications_service.h"
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 
+#if defined __has_include
+#if __has_include("bsp_patch.h")
+#include "bsp_patch.h"
+#endif  // __has_include("bsp_patch.h")
+#endif  // defined __has_include
+
 #include "authentication/esp3d_authentication.h"
 
 #define STORAGE_NAME "ESP3D_TFT"
@@ -54,8 +59,6 @@
 
 ESP3DSettings esp3dTftsettings;
 
-const uint32_t SupportedBaudList[] = {9600,   19200,  38400,  57600,  74880,
-                                      115200, 230400, 250000, 500000, 921600};
 const uint8_t SupportedBaudListSize =
     sizeof(SupportedBaudList) / sizeof(uint32_t);
 
@@ -580,14 +583,40 @@ ESP3DSettings::ESP3DSettings() {}
 
 ESP3DSettings::~ESP3DSettings() {}
 
+bool ESP3DSettings::access_nvs(nvs_open_mode_t mode) {
+  if (mode == NVS_READONLY) {
+    return true;
+  }
+#if ESP3D_PATCH_FS_ACCESS_RELEASE
+  esp3d_log("apply patch");
+  if (ESP_OK != bsp_accessFs()) {
+    esp3d_log_e("Error applying patch accessing FS");
+  }
+#endif  // ESP3D_PATCH_FS_ACCESS_RELEASE
+  return true;
+}
+
+void ESP3DSettings::release_nvs(nvs_open_mode_t mode) {
+  if (mode == NVS_READONLY) {
+    return;
+  }
+#if ESP3D_PATCH_FS_ACCESS_RELEASE
+  esp3d_log("revert patch");
+  if (ESP_OK != bsp_releaseFs()) {
+    esp3d_log_e("Error applying patch accessing FS");
+  }
+#endif  // ESP3D_PATCH_FS_ACCESS_RELEASE
+}
+
 uint8_t ESP3DSettings::readByte(ESP3DSettingIndex index, bool* haserror) {
   uint8_t value = 0;
   const ESP3DSettingDescription* query = getSettingPtr(index);
   if (query) {
     if (query->type == ESP3DSettingType::byte_t) {
       esp_err_t err;
+      access_nvs(NVS_READONLY);
       std::shared_ptr<nvs::NVSHandle> handle =
-          nvs::open_nvs_handle(STORAGE_NAME, NVS_READWRITE, &err);
+          nvs::open_nvs_handle(STORAGE_NAME, NVS_READONLY, &err);
       if (err != ESP_OK) {
         esp3d_log_e("Failling accessing NVS");
       } else {
@@ -597,6 +626,7 @@ uint8_t ESP3DSettings::readByte(ESP3DSettingIndex index, bool* haserror) {
           if (haserror) {
             *haserror = false;
           }
+          release_nvs(NVS_READONLY);
           return value;
         }
         if (err == ESP_ERR_NVS_NOT_FOUND) {
@@ -604,9 +634,11 @@ uint8_t ESP3DSettings::readByte(ESP3DSettingIndex index, bool* haserror) {
           if (haserror) {
             *haserror = false;
           }
+          release_nvs(NVS_READONLY);
           return value;
         }
       }
+      release_nvs(NVS_READONLY);
     }
   }
   if (haserror) {
@@ -622,6 +654,7 @@ uint32_t ESP3DSettings::readUint32(ESP3DSettingIndex index, bool* haserror) {
     if (query->type == ESP3DSettingType::integer_t ||
         query->type == ESP3DSettingType::ip) {
       esp_err_t err;
+      access_nvs(NVS_READONLY);
       std::shared_ptr<nvs::NVSHandle> handle =
           nvs::open_nvs_handle(STORAGE_NAME, NVS_READONLY, &err);
       if (err != ESP_OK) {
@@ -633,6 +666,7 @@ uint32_t ESP3DSettings::readUint32(ESP3DSettingIndex index, bool* haserror) {
           if (haserror) {
             *haserror = false;
           }
+          release_nvs(NVS_READONLY);
           return value;
         }
         if (err == ESP_ERR_NVS_NOT_FOUND) {
@@ -647,9 +681,11 @@ uint32_t ESP3DSettings::readUint32(ESP3DSettingIndex index, bool* haserror) {
           if (haserror) {
             *haserror = false;
           }
+          release_nvs(NVS_READONLY);
           return value;
         }
       }
+      release_nvs(NVS_READONLY);
     }
   }
   if (haserror) {
@@ -673,6 +709,7 @@ const char* ESP3DSettings::readString(ESP3DSettingIndex index, char* out_str,
     if (query->type == ESP3DSettingType::string_t) {
       esp_err_t err;
       if (out_str && len >= (query->size)) {
+        access_nvs(NVS_READONLY);
         std::shared_ptr<nvs::NVSHandle> handle =
             nvs::open_nvs_handle(STORAGE_NAME, NVS_READONLY, &err);
         if (err != ESP_OK) {
@@ -684,6 +721,7 @@ const char* ESP3DSettings::readString(ESP3DSettingIndex index, char* out_str,
             if (haserror) {
               *haserror = false;
             }
+            release_nvs(NVS_READONLY);
             return out_str;
           } else {
             esp3d_log_w("Got error %d %s", err, esp_err_to_name(err));
@@ -694,11 +732,13 @@ const char* ESP3DSettings::readString(ESP3DSettingIndex index, char* out_str,
               if (haserror) {
                 *haserror = false;
               }
+              release_nvs(NVS_READONLY);
               return out_str;
             }
           }
           esp3d_log_e("Read %s failed: %s", key.c_str(), esp_err_to_name(err));
         }
+        release_nvs(NVS_READONLY);
       } else {
         if (!out_str) {
           esp3d_log_e("Error no output buffer");
@@ -725,6 +765,7 @@ bool ESP3DSettings::writeByte(ESP3DSettingIndex index, const uint8_t value) {
   if (query) {
     if (query->type == ESP3DSettingType::byte_t) {
       esp_err_t err;
+      access_nvs(NVS_READWRITE);
       std::shared_ptr<nvs::NVSHandle> handle =
           nvs::open_nvs_handle(STORAGE_NAME, NVS_READWRITE, &err);
       if (err != ESP_OK) {
@@ -732,9 +773,11 @@ bool ESP3DSettings::writeByte(ESP3DSettingIndex index, const uint8_t value) {
       } else {
         std::string key = "p_" + std::to_string((uint)query->index);
         if (handle->set_item(key.c_str(), value) == ESP_OK) {
+          release_nvs(NVS_READWRITE);
           return (handle->commit() == ESP_OK);
         }
       }
+      release_nvs(NVS_READWRITE);
     }
   }
   return false;
@@ -746,6 +789,7 @@ bool ESP3DSettings::writeUint32(ESP3DSettingIndex index, const uint32_t value) {
     if (query->type == ESP3DSettingType::integer_t ||
         query->type == ESP3DSettingType::ip) {
       esp_err_t err;
+      access_nvs(NVS_READWRITE);
       std::shared_ptr<nvs::NVSHandle> handle =
           nvs::open_nvs_handle(STORAGE_NAME, NVS_READWRITE, &err);
       if (err != ESP_OK) {
@@ -753,9 +797,11 @@ bool ESP3DSettings::writeUint32(ESP3DSettingIndex index, const uint32_t value) {
       } else {
         std::string key = "p_" + std::to_string((uint)query->index);
         if (handle->set_item(key.c_str(), value) == ESP_OK) {
+          release_nvs(NVS_READWRITE);
           return (handle->commit() == ESP_OK);
         }
       }
+      release_nvs(NVS_READWRITE);
     }
   }
   return false;
@@ -780,6 +826,7 @@ bool ESP3DSettings::writeString(ESP3DSettingIndex index,
     if (query->type == ESP3DSettingType::string_t &&
         strlen(byte_buffer) <= query->size) {
       esp_err_t err;
+      access_nvs(NVS_READWRITE);
       std::shared_ptr<nvs::NVSHandle> handle =
           nvs::open_nvs_handle(STORAGE_NAME, NVS_READWRITE, &err);
       if (err != ESP_OK) {
@@ -788,11 +835,13 @@ bool ESP3DSettings::writeString(ESP3DSettingIndex index,
         std::string key = "p_" + std::to_string((uint)query->index);
         if (handle->set_string(key.c_str(), byte_buffer) == ESP_OK) {
           esp3d_log("Write success");
+          release_nvs(NVS_READWRITE);
           return (handle->commit() == ESP_OK);
         } else {
           esp3d_log_e("Write failed");
         }
       }
+      release_nvs(NVS_READWRITE);
     } else {
       esp3d_log_e("Incorrect valued");
     }

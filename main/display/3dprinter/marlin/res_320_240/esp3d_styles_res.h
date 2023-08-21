@@ -59,6 +59,9 @@ extern "C" {
 #define MATRIX_BUTTON_HEIGHT 40
 #define MSGBOX_BUTTON_WIDTH 100
 
+#define CURRENT_SCROLL_BAR_WIDTH 10
+#define CURRENT_SCROLL_BAR_RADIUS 5
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

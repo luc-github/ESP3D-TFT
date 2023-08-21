@@ -50,6 +50,11 @@ enum class ESP3DLabel : uint16_t {
   hostname,
   extensions,
   please_wait,
+  output_client,
+  usb,
+  serial,
+  serial_baud_rate,
+  usb_baud_rate,
   unknown_index
 };
 
