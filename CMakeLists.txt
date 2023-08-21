@@ -2,7 +2,7 @@
 # Select the targeted hardware
 # #######################################
 
-OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" ON)
+OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" OFF)
 OPTION(ESP32_ROTRICS_DEXARM35 "TFT TARGET is ESP32 Rotrics DexArm 3.5inches" OFF)
 OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-SRC-4832 3.5inches" OFF)
 OPTION(ESP32S3_8048S070 "TFT TARGET is ESP32S3 7.0inches" OFF)
@@ -16,7 +16,7 @@ OPTION(ESP32_CUSTOM "HARDWARE TARGET is ESP32 custom board" OFF)
 
 # Support canceled from now, do not use it or at your own risk
 # do not ask help or support for this target
-OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R 2.8inches" OFF) 
+OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R 2.8inches" ON) 
 
 
 # #######################################
