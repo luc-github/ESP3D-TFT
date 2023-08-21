@@ -157,6 +157,8 @@ lv_obj_t *create_choice_editor(lv_obj_t *container, const char *text,
   lv_obj_add_state(lv_obj_get_child(choice_container, active_index),
                    LV_STATE_CHECKED);
   lv_obj_add_event_cb(choice_container, choice_editor_radio_event_handler,
+                      LV_EVENT_PRESSED, &active_index);
+  lv_obj_add_event_cb(choice_container, choice_editor_radio_event_handler,
                       LV_EVENT_CLICKED, &active_index);
   return main_container;
 }

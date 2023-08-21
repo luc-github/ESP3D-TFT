@@ -46,7 +46,8 @@
 lv_style_t style_main_bg;
 lv_style_t style_bg_label;
 lv_style_t style_read_only_value;
-lv_style_t style_scrollbar;
+lv_style_t style_scrollbar_default;
+lv_style_t style_scrollbar_active;
 
 // Create styles for status bar
 lv_style_t style_status_bar_default;
@@ -58,6 +59,7 @@ lv_style_t style_btn_default;
 lv_style_t style_btn_pressed;
 
 lv_style_t style_btn_radio_default;
+lv_style_t style_btn_radio_pressed;
 lv_style_t style_btn_radio_checked;
 
 lv_style_t style_btn_matrix_default;
@@ -148,17 +150,35 @@ bool init_styles() {
   /*
    Scrollbar
   */
-  lv_style_init(&style_scrollbar);
-  lv_style_set_width(&style_scrollbar, CURRENT_SCROLL_BAR_WIDTH);
-  lv_style_set_bg_opa(&style_scrollbar, LV_OPA_COVER);
-  lv_style_set_bg_color(&style_scrollbar, CURRENT_MAIN_BG_COLOR);
+
+  // Create style for scrollbar default state
+  lv_style_init(&style_scrollbar_default);
+  lv_style_set_width(&style_scrollbar_default, CURRENT_SCROLL_BAR_WIDTH);
+  lv_style_set_bg_opa(&style_scrollbar_default, LV_OPA_COVER);
+  lv_style_set_bg_color(&style_scrollbar_default,
+                        lv_palette_main(LV_PALETTE_GREY));
+
   lv_style_set_border_color(
-      &style_scrollbar,
+      &style_scrollbar_default,
       lv_palette_darken(LV_PALETTE_GREY,
                         CURRENT_BUTTON_COLOR_PALETTE_DARKEN * 2));
-  lv_style_set_border_opa(&style_scrollbar, LV_OPA_COVER);
-  lv_style_set_border_width(&style_scrollbar, CURRENT_BUTTON_BORDER_VALUE);
-  lv_style_set_radius(&style_scrollbar, CURRENT_SCROLL_BAR_RADIUS);
+
+  lv_style_set_border_opa(&style_scrollbar_default, LV_OPA_COVER);
+  lv_style_set_border_width(&style_scrollbar_default,
+                            CURRENT_BUTTON_BORDER_VALUE);
+  lv_style_set_radius(&style_scrollbar_default, CURRENT_SCROLL_BAR_RADIUS);
+  lv_style_set_pad_all(&style_scrollbar_default, 8);
+  // Create style for scrollbar active state
+  lv_style_init(&style_scrollbar_active);
+  lv_style_set_bg_opa(&style_scrollbar_active, LV_OPA_COVER);
+  lv_style_set_bg_color(&style_scrollbar_active,
+                        lv_palette_main(LV_PALETTE_GREEN));
+  lv_style_set_shadow_width(&style_scrollbar_active,
+                            CURRENT_BUTTON_PRESSED_OUTLINE);
+  lv_style_set_shadow_color(&style_scrollbar_active,
+                            lv_palette_main(LV_PALETTE_GREEN));
+  lv_style_set_shadow_spread(&style_scrollbar_active,
+                             CURRENT_BUTTON_COLOR_PRESSED_SHADOW_OFFSET);
 
   /*
    Radio Buttons
@@ -170,7 +190,17 @@ bool init_styles() {
       &style_btn_radio_default,
       lv_palette_darken(LV_PALETTE_GREY,
                         CURRENT_BUTTON_COLOR_PALETTE_DARKEN * 2));
-  // lv_style_set_pad_all(&style_btn_radio_default, 50);
+
+  // Create style for button pressed state
+  lv_style_init(&style_btn_radio_pressed);
+  lv_style_set_shadow_width(&style_btn_radio_pressed,
+                            CURRENT_BUTTON_PRESSED_OUTLINE);
+  lv_style_set_shadow_color(&style_btn_radio_pressed,
+                            lv_palette_main(LV_PALETTE_GREEN));
+  lv_style_set_shadow_spread(&style_btn_radio_pressed,
+                             CURRENT_BUTTON_COLOR_PRESSED_SHADOW_OFFSET);
+  lv_style_set_bg_color(&style_btn_radio_pressed,
+                        lv_palette_main(LV_PALETTE_GREEN));
 
   // Create style for button checked state
   lv_style_init(&style_btn_radio_checked);
@@ -534,6 +564,8 @@ bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-enum-enum-conversion"
       lv_obj_add_style(obj, &style_btn_radio_default, LV_PART_INDICATOR);
+      lv_obj_add_style(obj, &style_btn_radio_pressed,
+                       LV_PART_INDICATOR | LV_STATE_PRESSED);
       lv_obj_add_style(obj, &style_btn_radio_checked,
                        LV_PART_INDICATOR | LV_STATE_CHECKED);
 #pragma GCC diagnostic pop
@@ -602,7 +634,12 @@ bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
       lv_obj_set_style_flex_main_place(obj, LV_FLEX_ALIGN_START, LV_PART_MAIN);
       lv_obj_set_style_pad_all(obj, CURRENT_BUTTON_PRESSED_OUTLINE,
                                LV_PART_MAIN);
-      lv_obj_add_style(obj, &style_scrollbar, LV_PART_SCROLLBAR);
+      lv_obj_add_style(obj, &style_scrollbar_default, LV_PART_SCROLLBAR);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-enum-enum-conversion"
+      lv_obj_add_style(obj, &style_scrollbar_active,
+                       LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
+#pragma GCC diagnostic pop
       lv_obj_set_style_radius(obj, 0, LV_PART_MAIN);
       break;
     case ESP3DStyleType::simple_container:
