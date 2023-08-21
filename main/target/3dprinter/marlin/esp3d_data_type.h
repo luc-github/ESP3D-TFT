@@ -31,8 +31,10 @@ enum class ESP3DDataType : uint8_t {
   ack,
   response,
   error,
+  resend,
   status,
   comment,
+  empty_line,
   unknown
 };
 
