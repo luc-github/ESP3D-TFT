@@ -113,6 +113,8 @@ ESP3DDataType ESP3DGCodeParserService::getType(const char* data) {
     "ok T:25.00 /120.00 B:25.00 /0.00 @:127 B@:0"
     "T:25.00 /0.00 B:25.00 /50.00 T0:25.00 /0.00 T1:25.00 /0.00 @:0 B@:127 @0:0
     @1:0"
+    "ok T0:23.00 /0.00 B:22.62 /0.00 T0:23.00 /0.00 T1:23.08 /0.00 @:0 B@:0 @0:0
+    @1:0"
     "X:0.00 Y:0.00 Z:0.00 E:0.00 Count X:0 Y:0 Z:0"
     */
 
@@ -123,7 +125,8 @@ ESP3DDataType ESP3DGCodeParserService::getType(const char* data) {
       strstr(ptr, "Done printing file") == ptr ||
       strstr(ptr, "SD printing byte") == ptr ||
       strstr(ptr, "Current file:") == ptr || strstr(ptr, "FR:") == ptr ||
-      strstr(ptr, "Cap:") == ptr || strstr(ptr, "FIRMWARE_NAME:") == ptr) {
+      strstr(ptr, "Cap:") == ptr || strstr(ptr, "FIRMWARE_NAME:") == ptr ||
+      strstr(ptr, "ok T0:") == ptr || strstr(ptr, "T0:") == ptr) {
     return ESP3DDataType::response;
   }
 
