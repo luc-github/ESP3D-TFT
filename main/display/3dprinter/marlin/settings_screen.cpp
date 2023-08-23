@@ -294,7 +294,7 @@ void event_button_edit_serial_baud_rate_cb(lv_event_t *e) {
 
 void event_button_edit_extensions_cb(lv_event_t *e) {
   esp3d_log("Show component");
-  const char *text = (const char *)lv_event_get_user_data(e);
+  const char *text = (const char *)lv_label_get_text(extensions_label);
   textEditor::create_text_editor(lv_scr_act(), text, extensions_edit_done_cb);
 }
 
@@ -373,8 +373,7 @@ void settings_screen() {
     lv_obj_t *btnEdit =
         listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
     lv_obj_add_event_cb(btnEdit, event_button_edit_extensions_cb,
-                        LV_EVENT_CLICKED,
-                        (void *)(lv_label_get_text(extensions_label)));
+                        LV_EVENT_CLICKED, NULL);
   }
 
 #if ESP3D_USB_SERIAL_FEATURE

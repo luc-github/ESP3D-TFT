@@ -33,12 +33,17 @@
  **********************/
 namespace spinnerScreen {
 lv_obj_t* spinnerObj = NULL;
+size_t spinner_index = 0;
 
 void show_spinner(const char* msg) {
   // to avoid multiple call to show spinner
+
   if (spinnerObj != NULL) {
+    esp3d_log_w("Spinner already displayed");
     return;
   }
+  spinner_index++;
+  esp3d_log("Spinner index is %d", spinner_index);
   spinnerObj = lv_obj_create(lv_scr_act());
   apply_style(spinnerObj, ESP3DStyleType::spinner_screen);
   lv_obj_move_foreground(spinnerObj);
@@ -65,8 +70,16 @@ void show_spinner(const char* msg) {
 
 void hide_spinner() {
   if (spinnerObj != NULL) {
-    lv_obj_del(spinnerObj);
-    spinnerObj = NULL;
+    try {
+      lv_obj_del(spinnerObj);
+      spinnerObj = NULL;
+    } catch (...) {
+      esp3d_log_e("Error deleting spinner");
+    }
+    spinner_index--;
+    esp3d_log("Spinner index is %d", spinner_index);
+  } else {
+    esp3d_log_w("Spinner already hidden");
   }
 }
 

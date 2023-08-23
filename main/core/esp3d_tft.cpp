@@ -29,6 +29,8 @@
 #include "esp3d_commands.h"
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
+#include "esp_heap_caps.h"
+
 #if ESP3D_WIFI_FEATURE
 #include "network/esp3d_tft_network.h"
 #endif  // ESP3D_WIFI_FEATURE
@@ -67,6 +69,9 @@ bool ESP3DTft::begin() {
   // Generic board initialization
   std::string target = TFT_TARGET;
   esp3d_log("Starting ESP3D-TFT on %s ", target.c_str());
+  esp3d_log("Freeheap %u, %u", (unsigned int)esp_get_free_heap_size(),
+            (unsigned int)heap_caps_get_free_size(MALLOC_CAP_8BIT |
+                                                  MALLOC_CAP_INTERNAL));
   // do nvs init
   esp3d_log("Initialising NVS");
   esp_err_t res = nvs_flash_init();

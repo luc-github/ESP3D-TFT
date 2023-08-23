@@ -194,11 +194,15 @@ void do_scan_now() {
       xTaskCreatePinnedToCore(bgScanTask, "scanTask", STACKDEPTH, NULL,
                               TASKPRIORITY, &xHandle, TASKCORE);
   if (res == pdPASS && xHandle) {
-    esp3d_log("Created Scan Task freeheap %u",
-              (unsigned int)esp_get_free_heap_size());
+    esp3d_log("Created Scan Task freeheap %u, %u",
+              (unsigned int)esp_get_free_heap_size(),
+              (unsigned int)heap_caps_get_free_size(MALLOC_CAP_8BIT |
+                                                    MALLOC_CAP_INTERNAL));
   } else {
-    esp3d_log_e("Scan Task creation failed %d , %d, freeheap %u", (int)res,
-                (int)xHandle, (unsigned int)esp_get_free_heap_size());
+    esp3d_log_e("Scan Task creation failed %d , %d, freeheap %u, %u", (int)res,
+                (int)xHandle, (unsigned int)esp_get_free_heap_size(),
+                (unsigned int)heap_caps_get_free_size(MALLOC_CAP_8BIT |
+                                                      MALLOC_CAP_INTERNAL));
   }
 }
 
@@ -265,6 +269,10 @@ void update_sta_button_ok() {
       (mode == LV_SYMBOL_STATION_MODE && ssid_ini == ssid_current) ||
       !esp3dTftsettings.isValidStringSetting(
           password_current.c_str(), ESP3DSettingIndex::esp3d_sta_password)) {
+    esp3d_log("Created Scan Task freeheap %u, %u",
+              (unsigned int)esp_get_free_heap_size(),
+              (unsigned int)heap_caps_get_free_size(MALLOC_CAP_8BIT |
+                                                    MALLOC_CAP_INTERNAL));
     esp3d_log("Ok hide");
     lv_obj_add_flag(btn_ok, LV_OBJ_FLAG_HIDDEN);
 #if ESP3D_PATCH_DELAY_REFRESH

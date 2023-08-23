@@ -209,9 +209,6 @@ bool ESP3DNetwork::begin() {
   esp3dTftValues.set_string_value(ESP3DValuesIndex::network_mode,
                                   LV_SYMBOL_WIFI);
   esp3dTftValues.set_string_value(ESP3DValuesIndex::network_status, "x");
-  std::string text = esp3dTranslationService.translate(ESP3DLabel::connecting);
-  esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
-                                  text.c_str());
   if (!bootDone) {
     bootDone = true;
     uint8_t bootMode =
