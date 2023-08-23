@@ -55,6 +55,7 @@ enum class ESP3DLabel : uint16_t {
   serial,
   serial_baud_rate,
   usb_baud_rate,
+  connecting,
   unknown_index
 };
 

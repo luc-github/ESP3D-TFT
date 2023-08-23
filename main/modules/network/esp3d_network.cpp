@@ -26,6 +26,7 @@
 #include "esp_event.h"
 #include "esp_wifi.h"
 #include "lwip/apps/netbiosns.h"
+#include "translations/esp3d_translation_service.h"
 
 #endif  // ESP3D_WIFI_FEATURE
 #include "esp3d_commands.h"
@@ -101,7 +102,6 @@ static void wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
       s_retry_num++;
       if (res == ESP_OK) {
         esp3d_log("Success connecting to the AP");
-        esp3dTftValues.set_string_value(ESP3DValuesIndex::network_status, "+");
         if (esp3dNetwork.useStaticIp()) {
           s_retry_num = 0;
           xEventGroupSetBits(esp3dNetwork.getEventGroup(), WIFI_CONNECTED_BIT);
@@ -307,8 +307,13 @@ const char* ESP3DNetwork::getModeStr(ESP3DRadioMode mode) {
 }
 #if ESP3D_WIFI_FEATURE
 bool ESP3DNetwork::startStaMode() {
+  std::string text = esp3dTranslationService.translate(ESP3DLabel::connecting);
   esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
-                                  "Connecting");
+                                  text.c_str());
+  esp3dTftValues.set_string_value(ESP3DValuesIndex::network_mode,
+                                  LV_SYMBOL_WIFI);
+  esp3dTftValues.set_string_value(ESP3DValuesIndex::network_status, "x");
+
   bool connected = false;
   esp_event_handler_instance_t instance_any_id;
   esp_event_handler_instance_t instance_got_ip;
