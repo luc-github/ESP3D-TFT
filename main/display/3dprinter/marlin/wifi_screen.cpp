@@ -59,6 +59,26 @@ void wifi_screen_delay_refresh_timer_cb(lv_timer_t *timer) {
   spinnerScreen::hide_spinner();
 }
 #endif  // ESP3D_PATCH_DELAY_REFRESH
+lv_timer_t *wifi_screen_delay_connecting_timer = nullptr;
+
+void wifi_screen_delay_connecting_timer_cb(lv_timer_t *timer) {
+  std::string mode =
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
+  std::string status =
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::network_status);
+  esp3d_log("mode: %s, %d,  status: %s", mode.c_str(), mode.c_str()[0],
+            status.c_str());
+  if (mode == LV_SYMBOL_WIFI && status == "x") {
+  } else {
+    if (wifi_screen_delay_connecting_timer) {
+      lv_timer_del(wifi_screen_delay_connecting_timer);
+      wifi_screen_delay_connecting_timer = NULL;
+    }
+    spinnerScreen::hide_spinner();
+    wifi_screen();
+  }
+}
+
 ESP3DScreenType wifi_next_screen = ESP3DScreenType::none;
 
 lv_obj_t *btn_no_wifi = nullptr;
@@ -200,6 +220,20 @@ void wifi_screen() {
                       LV_EVENT_CLICKED, NULL);
 
   esp3dTftui.set_current_screen(ESP3DScreenType::wifi);
-  update_button_no_wifi();
+  std::string mode =
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
+  std::string status =
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::network_status);
+  esp3d_log("mode: %s, %d,  status: %s", mode.c_str(), mode.c_str()[0],
+            status.c_str());
+  if (mode == LV_SYMBOL_WIFI && status == "x") {
+    std::string text =
+        esp3dTranslationService.translate(ESP3DLabel::connecting);
+    spinnerScreen::show_spinner(text.c_str());
+    wifi_screen_delay_connecting_timer =
+        lv_timer_create(wifi_screen_delay_connecting_timer_cb, 500, NULL);
+  } else {
+    update_button_no_wifi();
+  }
 }
 }  // namespace wifiScreen

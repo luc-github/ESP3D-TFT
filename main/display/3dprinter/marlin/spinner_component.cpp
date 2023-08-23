@@ -34,7 +34,7 @@
 namespace spinnerScreen {
 lv_obj_t* spinnerObj = NULL;
 
-void show_spinner() {
+void show_spinner(const char* msg) {
   // to avoid multiple call to show spinner
   if (spinnerObj != NULL) {
     return;
@@ -54,7 +54,15 @@ void show_spinner() {
   lv_label_set_text(lbl, text.c_str());
   lv_obj_align_to(lbl, spinner, LV_ALIGN_OUT_BOTTOM_MID, 0,
                   CURRENT_BUTTON_PRESSED_OUTLINE);
+  if (msg != nullptr) {
+    lv_obj_t* lblextra = lv_label_create(spinnerObj);
+    apply_style(lblextra, ESP3DStyleType::spinner_text);
+    lv_label_set_text(lblextra, msg);
+    lv_obj_align_to(lblextra, lbl, LV_ALIGN_OUT_BOTTOM_MID, 0,
+                    CURRENT_BUTTON_PRESSED_OUTLINE);
+  }
 }
+
 void hide_spinner() {
   if (spinnerObj != NULL) {
     lv_obj_del(spinnerObj);

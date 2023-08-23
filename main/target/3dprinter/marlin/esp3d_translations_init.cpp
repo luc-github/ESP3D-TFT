@@ -53,5 +53,6 @@ void ESP3DTranslationService::init() {
       {ESP3DLabel::serial_baud_rate, "Serial baud rate"},
       {ESP3DLabel::usb_baud_rate, "USB serial baud rate"},
       {ESP3DLabel::usb, "USB"},
+      {ESP3DLabel::connecting, "Connecting to wifi..."},
       {ESP3DLabel::serial, "Serial"}};
 }

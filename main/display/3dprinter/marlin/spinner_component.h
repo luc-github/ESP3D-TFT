@@ -31,7 +31,7 @@ spinner_component.h - ESP3D screens definition
 extern "C" {
 #endif
 namespace spinnerScreen {
-extern void show_spinner();
+extern void show_spinner(const char* msg = nullptr);
 extern void hide_spinner();
 }  // namespace spinnerScreen
 
