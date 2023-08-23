@@ -29,6 +29,7 @@
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "esp_heap_caps.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "list_line_component.h"
@@ -41,6 +42,7 @@
 #include "translations/esp3d_translation_service.h"
 #include "wifi_screen.h"
 #include "wifi_status_component.h"
+
 #if defined __has_include
 #if __has_include("bsp_patch.h")
 #include "bsp_patch.h"
@@ -86,7 +88,7 @@ struct ESP3DSSIDDescriptor {
   std::string signal_strength;
 };
 std::list<ESP3DSSIDDescriptor> ssid_scanned_list;
-#define MAX_SCAN_LIST_SIZE 15
+#define MAX_SCAN_LIST_SIZE 10
 void fill_ssid_scanned_list();
 void fill_ui_sta_ssid_list();
 void refresh_ssid_scanned_list_cb(lv_timer_t *timer) {
@@ -192,9 +194,11 @@ void do_scan_now() {
       xTaskCreatePinnedToCore(bgScanTask, "scanTask", STACKDEPTH, NULL,
                               TASKPRIORITY, &xHandle, TASKCORE);
   if (res == pdPASS && xHandle) {
-    esp3d_log("Created Scan Task");
+    esp3d_log("Created Scan Task freeheap %u",
+              (unsigned int)esp_get_free_heap_size());
   } else {
-    esp3d_log_e("Scan Task creation failed %d , %d", (int)res, (int)xHandle);
+    esp3d_log_e("Scan Task creation failed %d , %d, freeheap %u", (int)res,
+                (int)xHandle, (unsigned int)esp_get_free_heap_size());
   }
 }
 
@@ -248,6 +252,14 @@ void update_sta_button_ok() {
   esp3d_log("Update ok vibility");
   std::string mode =
       esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
+  std::string status =
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::network_status);
+  esp3d_log("mode: %s, %s,  status: %s", mode.c_str(),
+            mode == LV_SYMBOL_STATION_MODE   ? "STA"
+            : mode == LV_SYMBOL_ACCESS_POINT ? "AP"
+            : mode == LV_SYMBOL_WIFI         ? "NO WIFI"
+                                             : "?",
+            status.c_str());
   if (!esp3dTftsettings.isValidStringSetting(
           ssid_current.c_str(), ESP3DSettingIndex::esp3d_sta_ssid) ||
       (mode == LV_SYMBOL_STATION_MODE && ssid_ini == ssid_current) ||
@@ -268,6 +280,10 @@ void update_sta_button_ok() {
   } else {
     esp3d_log("Ok visible");
     lv_obj_clear_flag(btn_ok, LV_OBJ_FLAG_HIDDEN);
+    if ((mode == LV_SYMBOL_ACCESS_POINT && status == "+") ||
+        (mode == LV_SYMBOL_WIFI && status == ".")) {
+      spinnerScreen::hide_spinner();
+    }
   }
 }
 
@@ -299,12 +315,20 @@ void sta_screen_delay_timer_cb(lv_timer_t *timer) {
   if (sta_screen_delay_timer) {
     lv_timer_del(sta_screen_delay_timer);
     sta_screen_delay_timer = NULL;
+    if (esp3dTftui.get_current_screen() != ESP3DScreenType::none &&
+        esp3dTftui.get_current_screen() != ESP3DScreenType::wifi) {
+      wifiScreen::wifi_screen();
+    }
   }
-  wifiScreen::wifi_screen();
 }
 
 void event_button_sta_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
+  if (sta_screen_delay_timer) {
+    esp3d_log_w("Timer is already running, delete it");
+    lv_timer_del(sta_screen_delay_timer);
+    sta_screen_delay_timer = NULL;
+  }
   sta_screen_delay_timer =
       lv_timer_create(sta_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
 }

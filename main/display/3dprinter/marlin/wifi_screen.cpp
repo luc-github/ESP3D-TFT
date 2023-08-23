@@ -66,7 +66,11 @@ void wifi_screen_delay_connecting_timer_cb(lv_timer_t *timer) {
       esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
   std::string status =
       esp3dTftValues.get_string_value(ESP3DValuesIndex::network_status);
-  esp3d_log("mode: %s, %d,  status: %s", mode.c_str(), mode.c_str()[0],
+  esp3d_log("mode: %s, %s,  status: %s", mode.c_str(),
+            mode == LV_SYMBOL_STATION_MODE   ? "STA"
+            : mode == LV_SYMBOL_ACCESS_POINT ? "AP"
+            : mode == LV_SYMBOL_WIFI         ? "NO WIFI"
+                                             : "?",
             status.c_str());
   if (mode == LV_SYMBOL_WIFI && status == "x") {
   } else {
@@ -224,7 +228,11 @@ void wifi_screen() {
       esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
   std::string status =
       esp3dTftValues.get_string_value(ESP3DValuesIndex::network_status);
-  esp3d_log("mode: %s, %d,  status: %s", mode.c_str(), mode.c_str()[0],
+  esp3d_log("mode: %s, %s,  status: %s", mode.c_str(),
+            mode == LV_SYMBOL_STATION_MODE   ? "STA"
+            : mode == LV_SYMBOL_ACCESS_POINT ? "AP"
+            : mode == LV_SYMBOL_WIFI         ? "NO WIFI"
+                                             : "?",
             status.c_str());
   if (mode == LV_SYMBOL_WIFI && status == "x") {
     std::string text =
