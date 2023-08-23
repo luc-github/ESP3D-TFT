@@ -49,7 +49,11 @@
 #define LV_MEM_CUSTOM 0
 #if LV_MEM_CUSTOM == 0
 /*Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB)*/
-#define LV_MEM_SIZE (48U * 1024U)          /*[bytes]*/
+#if WITH_PSRAM
+  #define LV_MEM_SIZE (48U * 1024U)          /*[bytes]*/
+#else
+  #define LV_MEM_SIZE (12U * 1024U)          /*[bytes]*/
+#endif  // WITH_PSRAM
 
 /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
 #define LV_MEM_ADR 0     /*0: unused*/
@@ -236,14 +240,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #define LV_LOG_PRINTF 0
 
 /*Enable/disable LV_LOG_TRACE in modules that produces a huge number of logs*/
-#define LV_LOG_TRACE_MEM        0
-#define LV_LOG_TRACE_TIMER      0
-#define LV_LOG_TRACE_INDEV      0
-#define LV_LOG_TRACE_DISP_REFR  0
-#define LV_LOG_TRACE_EVENT      0
-#define LV_LOG_TRACE_OBJ_CREATE 0
-#define LV_LOG_TRACE_LAYOUT     0
-#define LV_LOG_TRACE_ANIM       0
+#define LV_LOG_TRACE_MEM        1
+#define LV_LOG_TRACE_TIMER      1
+#define LV_LOG_TRACE_INDEV      1
+#define LV_LOG_TRACE_DISP_REFR  1
+#define LV_LOG_TRACE_EVENT      1
+#define LV_LOG_TRACE_OBJ_CREATE 1
+#define LV_LOG_TRACE_LAYOUT     1
+#define LV_LOG_TRACE_ANIM       1
 
 #endif  /*LV_USE_LOG*/
 
@@ -268,7 +272,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
  *-----------*/
 
 /*1: Show CPU usage and FPS count*/
-#define LV_USE_PERF_MONITOR 0
+#define LV_USE_PERF_MONITOR 1
 #if LV_USE_PERF_MONITOR
 #define LV_USE_PERF_MONITOR_POS LV_ALIGN_BOTTOM_RIGHT
 #endif
@@ -576,7 +580,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h"*/
 #endif /*LV_USE_THEME_DEFAULT*/
 
 /*A very simple theme that is a good starting point for a custom theme*/
-#define LV_USE_THEME_BASIC 0
+#define LV_USE_THEME_BASIC 1
 
 /*A theme designed for monochrome displays*/
 #define LV_USE_THEME_MONO 0
