@@ -114,6 +114,7 @@ static void wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
       esp3d_log_e("retries to connect to the AP failed");
       esp3dTftValues.set_string_value(ESP3DValuesIndex::network_status, "x");
       xEventGroupSetBits(esp3dNetwork.getEventGroup(), WIFI_FAIL_BIT);
+      s_retry_num = 0;
     }
 
   } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
@@ -208,8 +209,9 @@ bool ESP3DNetwork::begin() {
   esp3dTftValues.set_string_value(ESP3DValuesIndex::network_mode,
                                   LV_SYMBOL_WIFI);
   esp3dTftValues.set_string_value(ESP3DValuesIndex::network_status, "x");
+  std::string text = esp3dTranslationService.translate(ESP3DLabel::connecting);
   esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
-                                  "Not connected");
+                                  text.c_str());
   if (!bootDone) {
     bootDone = true;
     uint8_t bootMode =
@@ -217,8 +219,7 @@ bool ESP3DNetwork::begin() {
 
     if (bootMode == static_cast<uint8_t>(ESP3DRadioMode::off)) {
       esp3d_log("Radio is off at boot time");
-      esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
-                                      "No network");
+      esp3dTftValues.set_string_value(ESP3DValuesIndex::network_status, ".");
       _started = true;
       return true;
     }
@@ -246,8 +247,9 @@ void ESP3DNetwork::handle() {
       (xEventGroupGetBits(_s_wifi_event_group) & WIFI_STA_LOST_IP)) {
     xEventGroupClearBits(_s_wifi_event_group, WIFI_STA_LOST_IP);
     esp3d_log("Force restart wifi station");
+    std::string text = esp3dTranslationService.translate(ESP3DLabel::ip_lost);
     esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
-                                    "IP lost");
+                                    text.c_str());
     setMode(ESP3DRadioMode::wifi_sta, true);
   }
   if (_async_radio_mode != ESP3DRadioMode::none) {
@@ -497,8 +499,9 @@ int32_t ESP3DNetwork::getSignal(int32_t RSSI, bool filter) {
 }
 
 bool ESP3DNetwork::startApMode(bool configMode, bool limited) {
+  std::string text = esp3dTranslationService.translate(ESP3DLabel::ap_mode);
   esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
-                                  "Set as Access Point");
+                                  text.c_str());
   bool success = false;
   char ssid_str[33] = {0};
   char ssid_pwd_str[32] = {0};
@@ -625,8 +628,11 @@ bool ESP3DNetwork::startApMode(bool configMode, bool limited) {
 
 bool ESP3DNetwork::startNoRadioMode() {
   esp3d_log("Start No Radio Mode");
+  std::string text =
+      esp3dTranslationService.translate(ESP3DLabel::not_connected);
   esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
-                                  "Not connected");
+                                  text.c_str());
+  esp3dTftValues.set_string_value(ESP3DValuesIndex::network_status, ".");
   std::string stmp = "Radio is off\n";
   _current_radio_mode = ESP3DRadioMode::off;
   ESP3DRequest requestId = {.id = 0};
@@ -760,6 +766,7 @@ bool ESP3DNetwork::setMode(ESP3DRadioMode mode, bool restart) {
      esp3d_log("Current mode and new mode are identical so cancel");
      return true;
    }*/
+  esp3dTftValues.set_string_value(ESP3DValuesIndex::network_status, "x");
 
   switch (_current_radio_mode) {
     case ESP3DRadioMode::off:
