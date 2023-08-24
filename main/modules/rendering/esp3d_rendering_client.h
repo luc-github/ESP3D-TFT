@@ -39,6 +39,7 @@ class ESP3DRenderingClient : public ESP3DClient {
   void handle();
   void end();
   void process(ESP3DMessage* msg);
+  bool sendGcode(const char* data);
   void flush();
   bool started() { return _started; }
 

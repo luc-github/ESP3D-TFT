@@ -26,9 +26,9 @@
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
+#include "esp3d_string.h"
 #include "freertos/task.h"
 #include "tasks_def.h"
-
 
 ESP3DRenderingClient renderingClient;
 
@@ -45,6 +45,26 @@ static void esp3d_rendering_rx_task(void *pvParameter) {
   }
   /* A task should NEVER return */
   vTaskDelete(NULL);
+}
+
+// this function is send manually by user interface so no need a queue
+bool ESP3DRenderingClient::sendGcode(const char *data) {
+  if (data == nullptr || strlen(data) == 0) {
+    return false;
+  }
+  // the command must end with \n, so we add it if not present
+  std::string cmd = "";
+  ESP3DRequest requestId = {.id = 0};
+  if (data[strlen(data) - 1] != '\n') {
+    cmd = data;
+    cmd += "\n";
+  } else {
+    cmd = data;
+  }
+  return esp3dCommands.dispatch(cmd.c_str(), esp3dCommands.getOutputClient(),
+                                requestId, ESP3DMessageType::unique,
+                                ESP3DClientType::rendering,
+                                ESP3DAuthenticationLevel::admin);
 }
 
 ESP3DRenderingClient::ESP3DRenderingClient() {
