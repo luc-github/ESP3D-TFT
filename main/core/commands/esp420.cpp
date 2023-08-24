@@ -78,6 +78,7 @@ void ESP3DCommands::ESP420(int cmd_params_pos, ESP3DMessage *msg) {
   bool json = hasTag(msg, cmd_params_pos, "json");
   bool addPreTag = hasTag(msg, cmd_params_pos, "addPreTag");
   std::string tmpstr;
+  multi_heap_info_t info;
 #if ESP3D_AUTHENTICATION_FEATURE
   if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
     dispatchAuthenticationError(msg, COMMAND_ID, json);
@@ -131,10 +132,28 @@ void ESP3DCommands::ESP420(int cmd_params_pos, ESP3DMessage *msg) {
     return;
   }
 
+  heap_caps_get_info(&info, MALLOC_CAP_INTERNAL);
+  tmpstr = esp3d_strings::formatBytes(info.total_allocated_bytes);
+  tmpstr += " / ";
+  tmpstr += esp3d_strings::formatBytes(info.total_free_bytes + info.total_allocated_bytes);
+  if (!dispatchIdValue(json, "heap usage", tmpstr.c_str(), target,
+                       requestId)) {
+    return;
+  }
+
 #if CONFIG_SPIRAM
 
   tmpstr = esp3d_strings::formatBytes(esp_psram_get_size());
   if (!dispatchIdValue(json, "Total psram mem", tmpstr.c_str(), target,
+                       requestId)) {
+    return;
+  }
+
+  heap_caps_get_info(&info, MALLOC_CAP_SPIRAM);
+  tmpstr = esp3d_strings::formatBytes(info.total_allocated_bytes);
+  tmpstr += " / ";
+  tmpstr += esp3d_strings::formatBytes(info.total_free_bytes + info.total_allocated_bytes);
+  if (!dispatchIdValue(json, "psram heap usage", tmpstr.c_str(), target,
                        requestId)) {
     return;
   }
@@ -188,7 +207,7 @@ void ESP3DCommands::ESP420(int cmd_params_pos, ESP3DMessage *msg) {
   flashFs.getSpaceInfo(&totalBytes, &usedBytes);
   tmpstr = esp3d_strings::formatBytes(usedBytes);
   tmpstr += " / ";
-  tmpstr += esp3d_strings::formatBytes(totalBytes);
+  tmpstr += esp3d_strings::formatBytes(totalBytes);  
   if (!dispatchIdValue(json, "FS usage", tmpstr.c_str(), target, requestId)) {
     return;
   }
