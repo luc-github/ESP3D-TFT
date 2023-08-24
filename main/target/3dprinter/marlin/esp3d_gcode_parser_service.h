@@ -33,10 +33,16 @@ class ESP3DGCodeParserService final {
   ESP3DGCodeParserService();
   ~ESP3DGCodeParserService();
   ESP3DDataType getType(const char* data);
-  bool needAck(const char* data);
+  bool hasOkAck(const char* data);
+  bool hasMultiLineReport(const char* data);
+  const char* getLastError() { return _lastError.c_str(); }
+  uint64_t getLineResend() { return _lineResend; }
+  bool processCommand(const char* data);
 
  private:
   bool _isMultiLineReportOnGoing;
+  std::string _lastError;
+  uint64_t _lineResend;
 };
 
 extern ESP3DGCodeParserService esp3dGcodeParser;

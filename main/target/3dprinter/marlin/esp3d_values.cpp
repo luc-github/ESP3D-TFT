@@ -130,7 +130,7 @@ bool ESP3DValues::intialize() {
   //  x position
 
   _values.push_back({
-      ESP3DValuesIndex::x_position,
+      ESP3DValuesIndex::position_x,
       ESP3DValuesType::float_t,
       2,  // precision
       std::string("?"),
@@ -139,7 +139,7 @@ bool ESP3DValues::intialize() {
 
   //  y position
   _values.push_back({
-      ESP3DValuesIndex::y_position,
+      ESP3DValuesIndex::position_y,
       ESP3DValuesType::float_t,
       2,  // precision
       std::string("?"),
@@ -149,7 +149,7 @@ bool ESP3DValues::intialize() {
   //  z position
 
   _values.push_back({
-      ESP3DValuesIndex::z_position,
+      ESP3DValuesIndex::position_z,
       ESP3DValuesType::float_t,
       2,  // precision
       std::string("?"),

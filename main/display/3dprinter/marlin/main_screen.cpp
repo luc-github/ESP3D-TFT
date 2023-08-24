@@ -235,9 +235,9 @@ void main_display_bed() {
 void main_display_positions() {
   lv_label_set_text_fmt(
       lv_obj_get_child(main_btn_positions, 0), "X: %s\nY: %s\nZ: %s",
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::x_position),
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::y_position),
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::z_position));
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::position_x),
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::position_y),
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::position_z));
 }
 
 void main_display_status_area() {

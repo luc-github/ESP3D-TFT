@@ -35,6 +35,7 @@ enum class ESP3DDataType : uint8_t {
   status,
   comment,
   empty_line,
+  emergency_command,
   unknown
 };
 
