@@ -29,7 +29,9 @@
 #include "esp3d_tft_ui.h"
 #include "esp3d_values.h"
 #include "fan_screen.h"
+#if ESP3D_SD_CARD_FEATURE
 #include "files_screen.h"
+#endif  // ESP3D_SD_CARD_FEATURE
 #include "menu_button_component.h"
 #include "menu_screen.h"
 #include "message_box_component.h"
@@ -54,7 +56,9 @@ void main_display_status_area();
 void main_display_pause();
 void main_display_resume();
 void main_display_stop();
+#if ESP3D_SD_CARD_FEATURE
 void main_display_files();
+#endif  // ESP3D_SD_CARD_FEATURE
 void main_display_menu();
 
 uint8_t main_screen_temperature_target = 0;
@@ -158,7 +162,9 @@ bool print_status_value_cb(ESP3DValuesIndex index, const char *value,
       main_display_pause();
       main_display_resume();
       main_display_stop();
+#if ESP3D_SD_CARD_FEATURE
       main_display_files();
+#endif  // ESP3D_SD_CARD_FEATURE
       main_display_menu();
     } else {
       menuScreen::menu_screen_print_status_value_cb(index, value, action);
@@ -308,6 +314,8 @@ void main_display_stop() {
   }
 }
 
+#if ESP3D_SD_CARD_FEATURE
+
 void main_display_files() {
   std::string label_text =
       esp3dTftValues.get_string_value(ESP3DValuesIndex::print_status);
@@ -319,6 +327,8 @@ void main_display_files() {
     lv_obj_clear_flag(main_btn_files, LV_OBJ_FLAG_HIDDEN);
   }
 }
+#endif  // ESP3D_SD_CARD_FEATURE
+
 void main_display_menu() {
   std::string label_text =
       esp3dTftValues.get_string_value(ESP3DValuesIndex::print_status);
@@ -353,9 +363,11 @@ void main_screen_delay_timer_cb(lv_timer_t *timer) {
     case ESP3DScreenType::speed:
       speedScreen::speed_screen();
       break;
+#if ESP3D_SD_CARD_FEATURE
     case ESP3DScreenType::files:
       filesScreen::files_screen();
       break;
+#endif  // ESP3D_SD_CARD_FEATURE
     case ESP3DScreenType::menu:
       menuScreen::menu_screen();
       break;
@@ -448,6 +460,7 @@ void event_button_speed_handler(lv_event_t *e) {
   }
 }
 
+#if ESP3D_SD_CARD_FEATURE
 void event_button_files_handler(lv_event_t *e) {
   esp3d_log("Files Clicked");
   if (main_screen_delay_timer) return;
@@ -460,6 +473,7 @@ void event_button_files_handler(lv_event_t *e) {
     main_screen_delay_timer_cb(NULL);
   }
 }
+#endif  // ESP3D_SD_CARD_FEATURE
 
 void event_button_menu_handler(lv_event_t *e) {
   esp3d_log("Menu Clicked");
@@ -612,13 +626,13 @@ void main_screen() {
                                                  LV_SYMBOL_STOP);
   lv_obj_add_event_cb(main_btn_stop, event_button_stop_handler,
                       LV_EVENT_CLICKED, NULL);
-
+#if ESP3D_SD_CARD_FEATURE
   // Create button and label for files
   main_btn_files = menuButton::create_menu_button(ui_bottom_buttons_container,
                                                   LV_SYMBOL_SD_CARD);
   lv_obj_add_event_cb(main_btn_files, event_button_files_handler,
                       LV_EVENT_CLICKED, NULL);
-
+#endif  // ESP3D_SD_CARD_FEATURE
   // Create button and label for menu
   std::string label_text8 = LV_SYMBOL_LIST;
   main_btn_menu = menuButton::create_menu_button(ui_bottom_buttons_container,
@@ -633,7 +647,9 @@ void main_screen() {
   main_display_status_area();
   main_display_pause();
   main_display_resume();
+#if ESP3D_SD_CARD_FEATURE
   main_display_files();
+#endif  // ESP3D_SD_CARD_FEATURE
   main_display_stop();
   main_display_menu();
   main_display_speed();

@@ -17,7 +17,7 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
+#if ESP3D_WIFI_FEATURE
 #include "wifi_status_component.h"
 
 #include "ap_screen.h"
@@ -41,7 +41,6 @@ lv_obj_t *wifi_signal = nullptr;
 lv_obj_t *slash_overlay = nullptr;
 
 void wifi_display_signal() {
-  //
   std::string mode =
       esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
   std::string status =
@@ -158,3 +157,4 @@ bool network_mode_value_cb(ESP3DValuesIndex index, const char *value,
 }
 
 }  // namespace wifiStatus
+#endif  // ESP3D_WIFI_FEATURE

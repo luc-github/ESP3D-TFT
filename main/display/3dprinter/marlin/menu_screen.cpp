@@ -36,7 +36,9 @@
 #include "menu_screen.h"
 #include "settings_screen.h"
 #include "symbol_button_component.h"
+#if ESP3D_WIFI_FEATURE
 #include "wifi_screen.h"
+#endif  // ESP3D_WIFI_FEATURE
 
 /**********************
  *  STATIC PROTOTYPES
@@ -104,9 +106,11 @@ void menu_screen_delay_timer_cb(lv_timer_t *timer) {
     case ESP3DScreenType::informations:
       informationsScreen::informations_screen();
       break;
+#if ESP3D_WIFI_FEATURE
     case ESP3DScreenType::wifi:
       wifiScreen::wifi_screen();
       break;
+#endif  // ESP3D_WIFI_FEATURE
     default:
       break;
   }
@@ -138,6 +142,7 @@ void event_button_filament_handler(lv_event_t *e) {
   }
 }
 
+#if ESP3D_WIFI_FEATURE
 void event_button_wifi_handler(lv_event_t *e) {
   esp3d_log("wifi Clicked");
   if (menu_screen_delay_timer) return;
@@ -150,6 +155,7 @@ void event_button_wifi_handler(lv_event_t *e) {
     menu_screen_delay_timer_cb(NULL);
   }
 }
+#endif  // ESP3D_WIFI_FEATURE
 
 void event_button_settings_handler(lv_event_t *e) {
   esp3d_log("settings Clicked");
@@ -244,11 +250,13 @@ void menu_screen() {
   lv_obj_add_event_cb(btn3, event_button_settings_handler, LV_EVENT_CLICKED,
                       NULL);
 
+#if ESP3D_WIFI_FEATURE
   // Create button and label for wifi button
   std::string label4 = LV_SYMBOL_WIFI;
   lv_obj_t *btn4 = menuButton::create_menu_button(ui_bottom_buttons_container,
                                                   label4.c_str());
   lv_obj_add_event_cb(btn4, event_button_wifi_handler, LV_EVENT_CLICKED, NULL);
+#endif  // ESP3D_WIFI_FEATURE
 
   // Create button and label for disable steppers button
   main_btn_disable_steppers = symbolButton::create_symbol_button(

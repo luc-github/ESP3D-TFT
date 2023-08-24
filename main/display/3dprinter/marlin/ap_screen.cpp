@@ -17,6 +17,7 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#if ESP3D_WIFI_FEATURE
 
 #include "ap_screen.h"
 
@@ -349,3 +350,4 @@ void ap_screen() {
   esp3dTftui.set_current_screen(ESP3DScreenType::access_point);
 }
 }  // namespace apScreen
+#endif  // ESP3D_WIFI_FEATURE

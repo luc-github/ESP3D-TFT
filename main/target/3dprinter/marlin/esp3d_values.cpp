@@ -180,6 +180,7 @@ bool ESP3DValues::intialize() {
       std::string(""),
       nullptr,
   });
+#if ESP3D_WIFI_FEATURE
   //  network status
   _values.push_back({
       ESP3DValuesIndex::network_status,
@@ -196,6 +197,7 @@ bool ESP3DValues::intialize() {
       std::string("?"),
       wifiStatus::network_mode_value_cb,
   });
+#endif  // ESP3D_WIFI_FEATURE
 #endif  // ESP3D_DISPLAY_FEATURE
   return true;
 }
