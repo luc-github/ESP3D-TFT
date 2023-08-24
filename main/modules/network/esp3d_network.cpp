@@ -26,8 +26,6 @@
 #include "esp_event.h"
 #include "esp_wifi.h"
 #include "lwip/apps/netbiosns.h"
-#include "translations/esp3d_translation_service.h"
-
 #endif  // ESP3D_WIFI_FEATURE
 #include "esp3d_commands.h"
 #include "esp3d_hal.h"
@@ -35,6 +33,8 @@
 #include "esp3d_settings.h"
 #include "esp3d_string.h"
 #include "esp3d_values.h"
+#include "translations/esp3d_translation_service.h"
+
 
 ESP3DNetwork esp3dNetwork;
 

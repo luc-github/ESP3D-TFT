@@ -161,7 +161,8 @@ void informations_screen() {
                        tmpstr.c_str());
 #endif  // ESP3D_SD_CARD_FEATURE
 #else
-  addInformationToList(ui_info_list_ctl, ESP3DLabel::update, ESP3DLabel::off);
+  addInformationToList(ui_info_list_ctl, ESP3DLabel::sd_updater,
+                       ESP3DLabel::off);
 #endif  // ESP3D_UPDATE_FEATURE
 
   // Flash type
