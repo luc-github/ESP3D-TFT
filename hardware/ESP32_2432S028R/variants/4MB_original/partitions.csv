@@ -1,4 +1,4 @@
-#4MB Flash + OTA - APP = 1.920 MB + 192KB SPIFFS
+#4MB Flash: 2x 1.88MB APP/OTA, 192KB FS
 # Name,   Type, SubType, Offset,  Size, Flags
 nvs,      data, nvs,     0x9000,  0x5000,
 otadata,  data, ota,     ,  0x2000,

@@ -2,7 +2,7 @@
 # Select the targeted hardware
 # #######################################
 
-OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" ON)
+OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" OFF)
 OPTION(ESP32_ROTRICS_DEXARM35 "TFT TARGET is ESP32 Rotrics DexArm 3.5inches" OFF)
 OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-SRC-4832 3.5inches" OFF)
 OPTION(ESP32S3_8048S070 "TFT TARGET is ESP32S3 7.0inches" OFF)
@@ -13,10 +13,20 @@ OPTION(ESP32S3_FREENOVE_1_1 "HARDWARE TARGET is ESP32S3 Freenove v1.1" OFF)
 OPTION(ESP32S3_CUSTOM "HARDWARE TARGET is ESP32S3 custom board" OFF)
 OPTION(ESP32_CUSTOM "HARDWARE TARGET is ESP32 custom board" OFF)
 
+# WARNING:
+#   Limited help or support available for this target.
+#   PSRAM hardware mod is REQUIRED for full functionality and performance.
+OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R 2.8inches" ON)
 
-# Support canceled from now, do not use it or at your own risk
-# do not ask help or support for this target
-OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R 2.8inches" OFF) 
+
+# #######################################
+# Optionally select a hardware variant
+# #######################################
+if(ESP32_2432S028R)
+    OPTION(ESP32_2432S028R_ORIGINAL "ESP32 2.8inches - Original hardware with 4MB Flash, without PSRAM" OFF)
+    OPTION(ESP32_2432S028R_4MB_WITH_PSRAM "ESP32 2.8inches - 4MB Flash, with External PSRAM mod" OFF)
+    OPTION(ESP32_2432S028R_16MB_WITH_PSRAM "ESP32 2.8inches - 16MB Flash mod, with External PSRAM mod" ON)
+endif()
 
 
 # #######################################
@@ -49,7 +59,7 @@ OPTION(GCODE_HOST_SERVICE "GCode Streaming service" ON)
 OPTION(USE_FAT_INSTEAD_OF_LITTLEFS "Use FAT instead of LittleFS" OFF)
 
 # #######################################
-# Do not change anything above this line
+# Do not change anything below this line
 # #######################################
 cmake_minimum_required(VERSION 3.12.4)
 set(CMAKE_CXX_STANDARD 20)
@@ -71,8 +81,22 @@ elseif(ESP32S3_4827S043)
     set(SDKCONFIG hardware/ESP32S3_4827S043/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_4827S043/components)
 elseif(ESP32_2432S028R)
-    set(SDKCONFIG hardware/ESP32_2432S028R/sdkconfig)
-    set(EXTRA_COMPONENT_DIRS hardware/ESP32_2432S028R/components)
+    if(ESP32_2432S028R_16MB_WITH_PSRAM)
+        set(SDKCONFIG hardware/ESP32_2432S028R/variants/16MB_with_PSRAM/sdkconfig)
+        set(EXTRA_COMPONENT_DIRS hardware/ESP32_2432S028R/variants/16MB_with_PSRAM/components)
+        add_compile_options(-DWITH_PSRAM=1)
+    elseif(ESP32_2432S028R_4MB_WITH_PSRAM)
+        set(SDKCONFIG hardware/ESP32_2432S028R/variants/4MB_with_PSRAM/sdkconfig)
+        set(EXTRA_COMPONENT_DIRS hardware/ESP32_2432S028R/variants/4MB_with_PSRAM/components)
+        add_compile_options(-DWITH_PSRAM=1)
+    else()
+        set(SDKCONFIG hardware/ESP32_2432S028R/variants/4MB_original/sdkconfig)
+        set(EXTRA_COMPONENT_DIRS hardware/ESP32_2432S028R/variants/4MB_original/components)
+        message(DEPRECATION
+            "\n"
+            "Target is missing PSRAM and is not officially supported due to known performance and functionality issues."
+            "\n")
+    endif()
 elseif(ESP32S3_HMI43V3)
     set(SDKCONFIG hardware/ESP32S3_HMI43V3/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_HMI43V3/components)
