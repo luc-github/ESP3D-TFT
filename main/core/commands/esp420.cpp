@@ -188,7 +188,7 @@ void ESP3DCommands::ESP420(int cmd_params_pos, ESP3DMessage *msg) {
   flashFs.getSpaceInfo(&totalBytes, &usedBytes);
   tmpstr = esp3d_strings::formatBytes(usedBytes);
   tmpstr += "/";
-  tmpstr = esp3d_strings::formatBytes(totalBytes);
+  tmpstr += esp3d_strings::formatBytes(totalBytes);
   if (!dispatchIdValue(json, "FS usage", tmpstr.c_str(), target, requestId)) {
     return;
   }
