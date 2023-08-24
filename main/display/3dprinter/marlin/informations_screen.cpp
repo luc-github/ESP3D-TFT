@@ -38,6 +38,9 @@
 #include "sdkconfig.h"
 #include "spi_flash_mmap.h"
 #include "translations/esp3d_translation_service.h"
+#if CONFIG_SPIRAM
+#include "esp_psram.h"
+#endif  // CONFIG_SPIRAM
 
 #if ESP3D_UPDATE_FEATURE
 #include "update/esp3d_update_service.h"
@@ -125,17 +128,11 @@ void informations_screen() {
   addInformationToList(ui_info_list_ctl, ESP3DLabel::free_heap, tmpstr.c_str());
 
 #if CONFIG_SPIRAM
-  multi_heap_info_t info;
-  heap_caps_get_info(&info, MALLOC_CAP_SPIRAM);
-  tmpstr = esp3d_strings::formatBytes(info.total_free_bytes +
-                                      info.total_allocated_bytes);
+  tmpstr = esp3d_strings::formatBytes(esp_psram_get_size());
   addInformationToList(ui_info_list_ctl, ESP3DLabel::total_psram,
                        tmpstr.c_str());
 #endif  // CONFIG_SPIRAM
 
-  // Flash type
-  addInformationToList(ui_info_list_ctl, ESP3DLabel::flash_type,
-                       flashFs.getFileSystemName());
   // Flash size
   uint32_t flash_size;
   if (esp_flash_get_size(NULL, &flash_size) != ESP_OK) {
@@ -166,6 +163,11 @@ void informations_screen() {
 #else
   addInformationToList(ui_info_list_ctl, ESP3DLabel::update, ESP3DLabel::off);
 #endif  // ESP3D_UPDATE_FEATURE
+
+  // Flash type
+  addInformationToList(ui_info_list_ctl, ESP3DLabel::flash_type,
+                       flashFs.getFileSystemName());
+
   esp3dTftui.set_current_screen(ESP3DScreenType::informations);
 }
 }  // namespace informationsScreen
