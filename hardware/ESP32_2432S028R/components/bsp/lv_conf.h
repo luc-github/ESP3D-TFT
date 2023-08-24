@@ -46,14 +46,15 @@
  *=========================*/
 
 /*1: use custom malloc/free, 0: use the built-in `lv_mem_alloc()` and `lv_mem_free()`*/
-#define LV_MEM_CUSTOM 0
+#if WITH_PSRAM
+  #define LV_MEM_CUSTOM 1
+#else
+  #define LV_MEM_CUSTOM 0
+#endif  // WITH_PSRAM
+
 #if LV_MEM_CUSTOM == 0
 /*Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB)*/
-#if WITH_PSRAM
-  #define LV_MEM_SIZE (48U * 1024U)          /*[bytes]*/
-#else
-  #define LV_MEM_SIZE (12U * 1024U)          /*[bytes]*/
-#endif  // WITH_PSRAM
+#define LV_MEM_SIZE (12U * 1024U)          /*[bytes]*/
 
 /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
 #define LV_MEM_ADR 0     /*0: unused*/

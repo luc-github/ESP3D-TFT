@@ -38,11 +38,6 @@
 /*********************
  *      DEFINES
  *********************/
-#if WITH_PSRAM
-  #define LV_BUF_MALLOC_TYPE  MALLOC_CAP_SPIRAM
-#else
-  #define LV_BUF_MALLOC_TYPE  MALLOC_CAP_DMA
-#endif  // WITH_PSRAM
 
 /**********************
  *      TYPEDEFS
@@ -67,7 +62,7 @@
 esp_err_t bsp_init(void) {
 #if ESP3D_DISPLAY_FEATURE
   // Driver initialization
-  esp3d_log("Display buffer size: %d", DISP_BUF_SIZE);
+  esp3d_log("Display buffer size: %1.2f KB", DISP_BUF_SIZE * sizeof(lv_color_t) / 1024.0);
 
   /* Display controller initialization */
   esp3d_log("Initializing SPI master for display");
@@ -108,7 +103,7 @@ esp_err_t bsp_init(void) {
   // Lvgl setup
   esp3d_log("Setup Lvgl");
   lv_color_t *buf1 = (lv_color_t *)heap_caps_malloc(
-      DISP_BUF_SIZE * sizeof(lv_color_t), LV_BUF_MALLOC_TYPE);
+      DISP_BUF_SIZE * sizeof(lv_color_t), DISP_BUF_MALLOC_TYPE);
   if (buf1 == NULL) {
     esp3d_log_e("Failed to allocate LVGL draw buffer 1");
     return ESP_FAIL;
@@ -118,7 +113,7 @@ esp_err_t bsp_init(void) {
   lv_color_t *buf2 = NULL;
 #if DISP_USE_DOUBLE_BUFFER
   buf2 = (lv_color_t *)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t),
-                                        LV_BUF_MALLOC_TYPE);
+                                        DISP_BUF_MALLOC_TYPE);
   if (buf2 == NULL) {
     esp3d_log_e("Failed to allocate LVGL draw buffer 2");
     return ESP_FAIL;
