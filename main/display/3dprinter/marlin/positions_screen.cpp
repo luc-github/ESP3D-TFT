@@ -125,37 +125,54 @@ void position_ta_event_cb(lv_event_t *e) {
   }
 }
 void send_gcode_position(const char *position_value) {
-  std::string gcode = "G1 ";
-  gcode += axis_buttons_map[axis_buttons_map_id];
-  gcode += position_value;
-  renderingClient.sendGcode(gcode.c_str());
+  if (absolute_position) {
+    std::string gcode = "G1 ";
+    gcode += axis_buttons_map[axis_buttons_map_id];
+    gcode += position_value;
+    renderingClient.sendGcode(gcode.c_str());
+  } else {
+    std::string gcode = "G91";
+    renderingClient.sendGcode(gcode.c_str());
+    gcode = "G1 ";
+    gcode += axis_buttons_map[axis_buttons_map_id];
+    gcode += position_value;
+    renderingClient.sendGcode(gcode.c_str());
+    gcode = "G90";
+    renderingClient.sendGcode(gcode.c_str());
+  }
 }
 
 void positions_btn_up_event_cb(lv_event_t *e) {
   lv_obj_t *position_ta = (lv_obj_t *)lv_event_get_user_data(e);
   std::string position_value = lv_textarea_get_text(position_ta);
-  double position_double = std::stod(position_value);
-  double step = std::stod(positions_buttons_map[positions_buttons_map_id]);
-  esp3d_log("Current pos: %s,  %f", position_value.c_str(), position_double);
-  position_double += step;
-  esp3d_log("Up: %f, new pos: %f", step, position_double);
-  position_value =
-      esp3d_strings::set_precision(std::to_string(position_double), 2);
-  lv_textarea_set_text(position_ta, position_value.c_str());
+  if (absolute_position) {
+    double position_double = std::stod(position_value);
+    double step = std::stod(positions_buttons_map[positions_buttons_map_id]);
+    esp3d_log("Current pos: %s,  %f", position_value.c_str(), position_double);
+    position_double += step;
+    esp3d_log("Up: %f, new pos: %f", step, position_double);
+    position_value =
+        esp3d_strings::set_precision(std::to_string(position_double), 2);
+    lv_textarea_set_text(position_ta, position_value.c_str());
+  }
   send_gcode_position(position_value.c_str());
 }
 
 void positions_btn_down_event_cb(lv_event_t *e) {
   lv_obj_t *position_ta = (lv_obj_t *)lv_event_get_user_data(e);
   std::string position_value = lv_textarea_get_text(position_ta);
-  double position_double = std::stod(position_value);
-  double step = std::stod(positions_buttons_map[positions_buttons_map_id]);
-  esp3d_log("Current pos: %s,  %f", position_value.c_str(), position_double);
-  position_double -= step;
-  esp3d_log("Down: %f, new pos: %f", step, position_double);
-  position_value =
-      esp3d_strings::set_precision(std::to_string(position_double), 2);
-  lv_textarea_set_text(position_ta, position_value.c_str());
+  if (absolute_position) {
+    double position_double = std::stod(position_value);
+    double step = std::stod(positions_buttons_map[positions_buttons_map_id]);
+    esp3d_log("Current pos: %s,  %f", position_value.c_str(), position_double);
+    position_double -= step;
+    esp3d_log("Down: %f, new pos: %f", step, position_double);
+    position_value =
+        esp3d_strings::set_precision(std::to_string(position_double), 2);
+    lv_textarea_set_text(position_ta, position_value.c_str());
+  } else {
+    position_value = "-" + position_value;
+  }
   send_gcode_position(position_value.c_str());
 }
 
