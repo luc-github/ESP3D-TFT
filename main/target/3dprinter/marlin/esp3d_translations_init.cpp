@@ -57,5 +57,7 @@ void ESP3DTranslationService::init() {
       {ESP3DLabel::not_connected, "Not connected"},
       {ESP3DLabel::ip_lost, "IP lost"},
       {ESP3DLabel::ap_mode, "Set as access point"},
+      {ESP3DLabel::absolute, "abs"},
+      {ESP3DLabel::relative, "rel"},
       {ESP3DLabel::serial, "Serial"}};
 }

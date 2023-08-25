@@ -27,6 +27,7 @@
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "main_screen.h"
+#include "rendering/esp3d_rendering_client.h"
 #include "symbol_button_component.h"
 #include "translations/esp3d_translation_service.h"
 
@@ -39,14 +40,17 @@ std::string position_value = "0.00";
 const char *positions_buttons_map[] = {"0.1", "1", "10", "50", ""};
 uint8_t positions_buttons_map_id = 0;
 
+bool absolute_position = true;
+
 const char *axis_buttons_map[] = {"X", "Y", "Z", ""};
 
 uint8_t axis_buttons_map_id = 0;
 
 lv_obj_t *label_current_position_value = NULL;
 lv_obj_t *label_current_position = NULL;
-
 lv_timer_t *positions_screen_delay_timer = NULL;
+lv_obj_t *position_ta = NULL;
+lv_obj_t *btn_set = NULL;
 
 bool positions_values_cb(ESP3DValuesIndex index, const char *value,
                          ESP3DValuesCbAction action) {
@@ -120,6 +124,12 @@ void position_ta_event_cb(lv_event_t *e) {
     // esp3d_log("Value changed: %s", position_value.c_str());
   }
 }
+void send_gcode_position(const char *position_value) {
+  std::string gcode = "G1 ";
+  gcode += axis_buttons_map[axis_buttons_map_id];
+  gcode += position_value;
+  renderingClient.sendGcode(gcode.c_str());
+}
 
 void positions_btn_up_event_cb(lv_event_t *e) {
   lv_obj_t *position_ta = (lv_obj_t *)lv_event_get_user_data(e);
@@ -132,6 +142,7 @@ void positions_btn_up_event_cb(lv_event_t *e) {
   position_value =
       esp3d_strings::set_precision(std::to_string(position_double), 2);
   lv_textarea_set_text(position_ta, position_value.c_str());
+  send_gcode_position(position_value.c_str());
 }
 
 void positions_btn_down_event_cb(lv_event_t *e) {
@@ -142,27 +153,69 @@ void positions_btn_down_event_cb(lv_event_t *e) {
   esp3d_log("Current pos: %s,  %f", position_value.c_str(), position_double);
   position_double -= step;
   esp3d_log("Down: %f, new pos: %f", step, position_double);
-  if (position_double < 0) position_double = 0;
   position_value =
       esp3d_strings::set_precision(std::to_string(position_double), 2);
   lv_textarea_set_text(position_ta, position_value.c_str());
+  send_gcode_position(position_value.c_str());
 }
 
 void positions_btn_ok_event_cb(lv_event_t *e) {
   lv_obj_t *position_ta = (lv_obj_t *)lv_event_get_user_data(e);
   std::string position_value = lv_textarea_get_text(position_ta);
   esp3d_log("Ok: %s", position_value.c_str());
+  send_gcode_position(position_value.c_str());
 }
 
 void positions_btn_home_axis_event_cb(lv_event_t *e) {
-  lv_obj_t *position_ta = (lv_obj_t *)lv_event_get_user_data(e);
-  esp3d_log("Home Axis");
-  lv_textarea_set_text(position_ta, "0");
+  // lv_obj_t *position_ta = (lv_obj_t *)lv_event_get_user_data(e);
+  esp3d_log("Home Axis %c", axis_buttons_map[axis_buttons_map_id][0]);
+  std::string gcode = "G28 ";
+  gcode += axis_buttons_map[axis_buttons_map_id];
+  renderingClient.sendGcode(gcode.c_str());
 }
 
+void updateMode(bool mode) {
+  if (mode) {
+    lv_obj_clear_state(position_ta, LV_STATE_DISABLED);
+    std::string current_position_value =
+        lv_label_get_text(label_current_position_value);
+    lv_textarea_set_text(position_ta, current_position_value == "?"
+                                          ? "0.00"
+                                          : current_position_value.c_str());
+    lv_obj_clear_flag(btn_set, LV_OBJ_FLAG_HIDDEN);
+
+  } else {
+    lv_obj_add_flag(btn_set, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_state(position_ta, LV_STATE_DISABLED);
+    lv_textarea_set_text(position_ta,
+                         positions_buttons_map[positions_buttons_map_id]);
+  }
+}
+void updateModeLabel(bool mode, lv_obj_t *label) {
+  std::string absstr = esp3dTranslationService.translate(ESP3DLabel::absolute);
+  std::string relstr = esp3dTranslationService.translate(ESP3DLabel::relative);
+  std::string text;
+  if (mode) {
+    text = "#00ff00 " + absstr + "# / " + relstr;
+  } else {
+    text = absstr + " / #00ff00 " + relstr + "#";
+  }
+
+  lv_label_set_text(label, text.c_str());
+}
+
+void btn_mode_event_cb(lv_event_t *e) {
+  bool *babsolute = (bool *)lv_event_get_user_data(e);
+  *babsolute = !(*babsolute);
+  lv_obj_t *obj = lv_event_get_target(e);
+  lv_obj_t *label = lv_obj_get_child(obj, 0);
+  updateModeLabel(*babsolute, label);
+  updateMode(*babsolute);
+}
 void home_all_axis_button_event_cb(lv_event_t *e) {
   // lv_obj_t *position_ta = (lv_obj_t *)lv_event_get_user_data(e);
   esp3d_log("Home All Axis");
+  renderingClient.sendGcode("G28");
 }
 
 void positions_matrix_buttons_event_cb(lv_event_t *e) {
@@ -170,6 +223,7 @@ void positions_matrix_buttons_event_cb(lv_event_t *e) {
   uint32_t id = lv_btnmatrix_get_selected_btn(obj);
   positions_buttons_map_id = id;
   esp3d_log("Button %s clicked", positions_buttons_map[id]);
+  if (!absolute_position) updateMode(absolute_position);
 }
 
 void axis_matrix_buttons_event_cb(lv_event_t *e) {
@@ -200,6 +254,7 @@ void axis_matrix_buttons_event_cb(lv_event_t *e) {
   }
   lv_label_set_text(label_current_position_value,
                     current_position_value_init.c_str());
+  if (!absolute_position) return;
   std::string position_value_init = esp3d_strings::set_precision(
       current_position_value_init == "?" ? "0.00" : current_position_value_init,
       2);
@@ -306,12 +361,12 @@ void positions_screen(uint8_t target_id) {
   lv_obj_align_to(btn_up, label_current_position_value, LV_ALIGN_OUT_BOTTOM_MID,
                   0, CURRENT_BUTTON_PRESSED_OUTLINE);
   // Text area
-  lv_obj_t *position_ta = lv_textarea_create(ui_new_screen);
+  position_ta = lv_textarea_create(ui_new_screen);
   lv_obj_add_event_cb(position_ta, position_ta_event_cb, LV_EVENT_VALUE_CHANGED,
                       NULL);
   lv_obj_add_event_cb(btnm_target, axis_matrix_buttons_event_cb,
                       LV_EVENT_VALUE_CHANGED, position_ta);
-  lv_textarea_set_accepted_chars(position_ta, "0123456789.");
+  lv_textarea_set_accepted_chars(position_ta, "0123456789.-");
   lv_textarea_set_max_length(position_ta, 7);
   lv_textarea_set_one_line(position_ta, true);
   esp3d_log("value: %s", position_value.c_str());
@@ -346,8 +401,7 @@ void positions_screen(uint8_t target_id) {
   lv_obj_align_to(label_unit2, position_ta, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
   // set button
-  lv_obj_t *btn_set =
-      symbolButton::create_symbol_button(ui_new_screen, LV_SYMBOL_OK);
+  btn_set = symbolButton::create_symbol_button(ui_new_screen, LV_SYMBOL_OK);
   lv_obj_align_to(btn_set, label_unit2, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE, 0);
   lv_obj_add_event_cb(btn_set, positions_btn_ok_event_cb, LV_EVENT_CLICKED,
@@ -361,6 +415,20 @@ void positions_screen(uint8_t target_id) {
                       LV_EVENT_CLICKED, position_ta);
   lv_obj_add_event_cb(btn_home_all, home_all_axis_button_event_cb,
                       LV_EVENT_CLICKED, position_ta);
+
+  // absolute /relative mode button
+  lv_obj_t *btn_mode = lv_btn_create(ui_new_screen);
+  apply_style(btn_mode, ESP3DStyleType::button);
+  lv_obj_t *label = lv_label_create(btn_mode);
+  lv_label_set_recolor(label, true);
+  updateModeLabel(absolute_position, label);
+
+  lv_obj_center(label);
+  lv_obj_add_event_cb(btn_mode, btn_mode_event_cb, LV_EVENT_CLICKED,
+                      &absolute_position);
+
+  lv_obj_align_to(btn_mode, btnm, LV_ALIGN_OUT_BOTTOM_MID, 0,
+                  CURRENT_BUTTON_PRESSED_OUTLINE / 2);
 
   // Keyboard
   lv_obj_t *positions_kb = lv_keyboard_create(ui_new_screen);
@@ -385,7 +453,7 @@ void positions_screen(uint8_t target_id) {
                   CURRENT_BUTTON_PRESSED_OUTLINE / 2);
   lv_obj_add_event_cb(btn_down, positions_btn_down_event_cb, LV_EVENT_CLICKED,
                       position_ta);
-
+  updateMode(absolute_position);
   esp3dTftui.set_current_screen(ESP3DScreenType::positions);
 }
 }  // namespace positionsScreen

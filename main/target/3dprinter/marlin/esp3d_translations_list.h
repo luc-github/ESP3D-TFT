@@ -59,6 +59,8 @@ enum class ESP3DLabel : uint16_t {
   not_connected,
   ap_mode,
   ip_lost,
+  absolute,
+  relative,
   unknown_index
 };
 
