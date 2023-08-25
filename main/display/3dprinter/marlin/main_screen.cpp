@@ -126,7 +126,7 @@ bool position_value_cb(ESP3DValuesIndex index, const char *value,
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
       main_display_positions();
     } else {
-      // Todo : update other screens calling each callback update function
+      positionsScreen::positions_values_cb(index, value, action);
     }
   }
   return true;

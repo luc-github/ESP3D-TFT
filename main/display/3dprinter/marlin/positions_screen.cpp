@@ -30,13 +30,12 @@
 #include "symbol_button_component.h"
 #include "translations/esp3d_translation_service.h"
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 
 namespace positionsScreen {
-std::string position_value = "10.00";
+std::string position_value = "0.00";
 const char *positions_buttons_map[] = {"0.1", "1", "10", "50", ""};
 uint8_t positions_buttons_map_id = 0;
 
@@ -48,6 +47,30 @@ lv_obj_t *label_current_position_value = NULL;
 lv_obj_t *label_current_position = NULL;
 
 lv_timer_t *positions_screen_delay_timer = NULL;
+
+bool positions_values_cb(ESP3DValuesIndex index, const char *value,
+                         ESP3DValuesCbAction action) {
+  switch (index) {
+    case ESP3DValuesIndex::position_x:
+      if (action == ESP3DValuesCbAction::Update && axis_buttons_map_id == 0) {
+        lv_label_set_text(label_current_position_value, value);
+      }
+      break;
+    case ESP3DValuesIndex::position_y:
+      if (action == ESP3DValuesCbAction::Update && axis_buttons_map_id == 1) {
+        lv_label_set_text(label_current_position_value, value);
+      }
+      break;
+    case ESP3DValuesIndex::position_z:
+      if (action == ESP3DValuesCbAction::Update && axis_buttons_map_id == 2) {
+        lv_label_set_text(label_current_position_value, value);
+      }
+      break;
+    default:
+      break;
+  }
+  return true;
+}
 
 void positions_screen_delay_timer_cb(lv_timer_t *timer) {
   if (positions_screen_delay_timer) {
@@ -138,9 +161,8 @@ void positions_btn_home_axis_event_cb(lv_event_t *e) {
 }
 
 void home_all_axis_button_event_cb(lv_event_t *e) {
-  lv_obj_t *position_ta = (lv_obj_t *)lv_event_get_user_data(e);
+  // lv_obj_t *position_ta = (lv_obj_t *)lv_event_get_user_data(e);
   esp3d_log("Home All Axis");
-  lv_textarea_set_text(position_ta, "0");
 }
 
 void positions_matrix_buttons_event_cb(lv_event_t *e) {
@@ -152,18 +174,45 @@ void positions_matrix_buttons_event_cb(lv_event_t *e) {
 
 void axis_matrix_buttons_event_cb(lv_event_t *e) {
   lv_obj_t *obj = lv_event_get_target(e);
+  lv_obj_t *position_ta = (lv_obj_t *)lv_event_get_user_data(e);
   uint32_t id = lv_btnmatrix_get_selected_btn(obj);
   axis_buttons_map_id = id;
   lv_label_set_text(label_current_position,
                     axis_buttons_map[axis_buttons_map_id]);
-  esp3d_log("Button %s clicked", axis_buttons_map[id]);
+  std::string current_position_value_init;
+  switch (axis_buttons_map_id) {
+    case 0:
+      current_position_value_init =
+          esp3dTftValues.get_string_value(ESP3DValuesIndex::position_x);
+      break;
+    case 1:
+      current_position_value_init =
+          esp3dTftValues.get_string_value(ESP3DValuesIndex::position_y);
+      break;
+    case 2:
+      current_position_value_init =
+          esp3dTftValues.get_string_value(ESP3DValuesIndex::position_z);
+      break;
+    default:
+      current_position_value_init = "0.00";
+      break;
+      esp3d_log("Button %s clicked", axis_buttons_map[id]);
+  }
+  lv_label_set_text(label_current_position_value,
+                    current_position_value_init.c_str());
+  std::string position_value_init = esp3d_strings::set_precision(
+      current_position_value_init == "?" ? "0.00" : current_position_value_init,
+      2);
+  lv_textarea_set_text(position_ta, position_value_init.c_str());
 }
 
-void positions_screen(uint8_t target) {
+void positions_screen(uint8_t target_id) {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
-  axis_buttons_map_id = target;
-  // Screen creation
-  esp3d_log("Positions screen creation for target %d", target);
+  if (target_id != 255) {
+    axis_buttons_map_id = target_id;
+  }
+  //  Screen creation
+  esp3d_log("Positions screen creation for target %d", axis_buttons_map_id);
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
@@ -194,8 +243,6 @@ void positions_screen(uint8_t target) {
   lv_obj_set_height(btnm_target, MATRIX_BUTTON_HEIGHT);
   lv_btnmatrix_set_btn_ctrl(btnm_target, axis_buttons_map_id,
                             LV_BTNMATRIX_CTRL_CHECKED);
-  lv_obj_add_event_cb(btnm_target, axis_matrix_buttons_event_cb,
-                      LV_EVENT_VALUE_CHANGED, NULL);
 
   lv_obj_align_to(btnm_target, btnback, LV_ALIGN_OUT_LEFT_BOTTOM,
                   -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
@@ -218,7 +265,24 @@ void positions_screen(uint8_t target) {
   // Label current axis e
   label_current_position_value = lv_label_create(ui_new_screen);
 
-  std::string current_position_value_init = "280.00";
+  std::string current_position_value_init;
+  switch (axis_buttons_map_id) {
+    case 0:
+      current_position_value_init =
+          esp3dTftValues.get_string_value(ESP3DValuesIndex::position_x);
+      break;
+    case 1:
+      current_position_value_init =
+          esp3dTftValues.get_string_value(ESP3DValuesIndex::position_y);
+      break;
+    case 2:
+      current_position_value_init =
+          esp3dTftValues.get_string_value(ESP3DValuesIndex::position_z);
+      break;
+    default:
+      current_position_value_init = "0.00";
+      break;
+  }
 
   lv_label_set_text(label_current_position_value,
                     current_position_value_init.c_str());
@@ -245,12 +309,15 @@ void positions_screen(uint8_t target) {
   lv_obj_t *position_ta = lv_textarea_create(ui_new_screen);
   lv_obj_add_event_cb(position_ta, position_ta_event_cb, LV_EVENT_VALUE_CHANGED,
                       NULL);
+  lv_obj_add_event_cb(btnm_target, axis_matrix_buttons_event_cb,
+                      LV_EVENT_VALUE_CHANGED, position_ta);
   lv_textarea_set_accepted_chars(position_ta, "0123456789.");
   lv_textarea_set_max_length(position_ta, 7);
   lv_textarea_set_one_line(position_ta, true);
   esp3d_log("value: %s", position_value.c_str());
-  std::string position_value_init =
-      esp3d_strings::set_precision(position_value, 2);
+  std::string position_value_init = esp3d_strings::set_precision(
+      current_position_value_init == "?" ? "0.00" : current_position_value_init,
+      2);
   lv_textarea_set_text(position_ta, position_value_init.c_str());
   lv_obj_set_style_text_align(position_ta, LV_TEXT_ALIGN_CENTER, 0);
   lv_obj_set_width(position_ta, LV_HOR_RES / 5);
