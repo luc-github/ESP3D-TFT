@@ -203,7 +203,7 @@ const char *ESP3DTranslationService::translate(ESP3DLabel label, ...) {
       buffer = (char *)malloc(sizeof(char) * (len + 1));
       if (buffer == nullptr) {
         esp3d_log_e("Cannot allocate memory for translation");
-        return nullptr;
+        return "???";
       }
     }
     len = vsnprintf(buffer, len + 1, it->second.c_str(), args);
@@ -215,7 +215,7 @@ const char *ESP3DTranslationService::translate(ESP3DLabel label, ...) {
     return responseString.c_str();
   }
 
-  return nullptr;
+  return "???";
 }
 
 void ESP3DTranslationService::end() { esp3d_log("Stop Translation Service"); }

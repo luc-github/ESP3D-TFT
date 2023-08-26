@@ -159,7 +159,7 @@ const ESP3DSettingDescription ESP3DSettingsData[] = {
      "3"},
 #endif  // ESP3D_AUTHENTICATION_FEATURE
 #if ESP3D_DISPLAY_FEATURE
-    {ESP3DSettingIndex::esp3d_jog_type, ESP3DSettingType::byte_t, 1, "1"},
+    {ESP3DSettingIndex::esp3d_jog_type, ESP3DSettingType::byte_t, 1, "0"},
 #endif  // ESP3D_DISPLAY_FEATURE
 };
 

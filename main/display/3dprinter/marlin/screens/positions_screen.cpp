@@ -25,6 +25,7 @@
 #include "components/back_button_component.h"
 #include "components/symbol_button_component.h"
 #include "esp3d_log.h"
+#include "esp3d_settings.h"
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
@@ -42,7 +43,7 @@ std::string position_value = "0.00";
 const char *positions_buttons_map[] = {"0.1", "1", "10", "50", ""};
 uint8_t positions_buttons_map_id = 0;
 
-bool absolute_position = true;
+bool absolute_position = false;
 
 const char *axis_buttons_map[] = {"X", "Y", "Z", ""};
 
@@ -53,6 +54,8 @@ lv_obj_t *label_current_position = NULL;
 lv_timer_t *positions_screen_delay_timer = NULL;
 lv_obj_t *position_ta = NULL;
 lv_obj_t *btn_set = NULL;
+
+bool intialization_done = false;
 
 bool positions_values_cb(ESP3DValuesIndex index, const char *value,
                          ESP3DValuesCbAction action) {
@@ -211,8 +214,10 @@ void updateMode(bool mode) {
   }
 }
 void updateModeLabel(bool mode, lv_obj_t *label) {
-  std::string absstr = esp3dTranslationService.translate(ESP3DLabel::absolute);
-  std::string relstr = esp3dTranslationService.translate(ESP3DLabel::relative);
+  std::string absstr =
+      esp3dTranslationService.translate(ESP3DLabel::absolute_short);
+  std::string relstr =
+      esp3dTranslationService.translate(ESP3DLabel::relative_short);
   std::string text;
   if (mode) {
     text = "#00ff00 " + absstr + "# / " + relstr;
@@ -284,6 +289,13 @@ void positions_screen(uint8_t target_id) {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   if (target_id != 255) {
     axis_buttons_map_id = target_id;
+  }
+  if (!intialization_done) {
+    absolute_position =
+        esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_jog_type) == 0
+            ? false
+            : true;
+    intialization_done = true;
   }
   //  Screen creation
   esp3d_log("Positions screen creation for target %d", axis_buttons_map_id);

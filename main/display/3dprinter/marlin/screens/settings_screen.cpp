@@ -42,7 +42,6 @@
 #include "tasks_def.h"
 #include "translations/esp3d_translation_service.h"
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -59,9 +58,9 @@ lv_obj_t *extensions_label = NULL;
 lv_obj_t *output_client_label = NULL;
 lv_obj_t *serial_baud_rate_label = NULL;
 lv_obj_t *usb_serial_baud_rate_label = NULL;
+lv_obj_t *jog_type_label = NULL;
 
-void settings_screen();
-
+//
 void settings_screen_delay_timer_cb(lv_timer_t *timer) {
   if (settings_screen_delay_timer) {
     lv_timer_del(settings_screen_delay_timer);
@@ -70,6 +69,7 @@ void settings_screen_delay_timer_cb(lv_timer_t *timer) {
   menuScreen::menu_screen();
 }
 
+// refresh_settings_list_cb
 void refresh_settings_list_cb(lv_timer_t *timer) {
   bool refresh = true;
   if (timer->user_data) {
@@ -83,6 +83,7 @@ void refresh_settings_list_cb(lv_timer_t *timer) {
   if (refresh) settings_screen();
 }
 
+// bgLoadExtensionsSettingsTask
 static void bgLoadExtensionsSettingsTask(void *pvParameter) {
   (void)pvParameter;
   vTaskDelay(pdMS_TO_TICKS(100));
@@ -99,6 +100,7 @@ static void bgLoadExtensionsSettingsTask(void *pvParameter) {
   vTaskDelete(NULL);
 }
 
+// bgSettingsTask
 static void bgSettingsTask(void *pvParameter) {
   (void)pvParameter;
   vTaskDelay(pdMS_TO_TICKS(100));
@@ -175,6 +177,7 @@ void usb_serial_baud_rate_edit_done_cb(const char *str) {
   }
 }
 
+// outputclient_edit_done_cb
 void outputclient_edit_done_cb(const char *str) {
   esp3d_log("Saving output client to: %s\n", str);
 
@@ -208,6 +211,41 @@ void outputclient_edit_done_cb(const char *str) {
   }
 }
 
+// jog_type_edit_done_cb
+void jog_type_edit_done_cb(const char *str) {
+  esp3d_log("Saving jog type to: %s\n", str);
+
+  if (strcmp(str, lv_label_get_text(output_client_label)) != 0) {
+    uint8_t val =
+        (uint8_t)ESP3DClientType::no_client;  // default value if not found
+    if (strcmp(str, esp3dTranslationService.translate(ESP3DLabel::absolute)) ==
+        0) {
+      val = 1;
+    } else if (strcmp(str, esp3dTranslationService.translate(
+                               ESP3DLabel::relative)) == 0) {
+      val = 0;
+    }
+
+    if (esp3dTftsettings.isValidByteSetting(
+            val, ESP3DSettingIndex::esp3d_jog_type)) {
+      esp3d_log("Value %s is valid", str);
+      if (esp3dTftsettings.writeByte(ESP3DSettingIndex::esp3d_jog_type, val)) {
+        if (jog_type_label) {
+          lv_label_set_text(jog_type_label, str);
+        }
+      } else {
+        esp3d_log_e("Failed to save jog type");
+        std::string text = esp3dTranslationService.translate(
+            ESP3DLabel::error_applying_setting);
+        msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+      }
+    }
+  } else {
+    esp3d_log("New value is identical do not save it");
+  }
+}
+
+// hostname_edit_done_cb
 void hostname_edit_done_cb(const char *str) {
   esp3d_log("Saving hostname to: %s\n", str);
   if (strcmp(str, lv_label_get_text(hostname_label)) != 0) {
@@ -231,6 +269,7 @@ void hostname_edit_done_cb(const char *str) {
   }
 }
 
+// extensions_edit_done_cb
 void extensions_edit_done_cb(const char *str) {
   esp3d_log("Saving extensions to: %s\n", str);
   static std::string value;
@@ -252,6 +291,7 @@ void extensions_edit_done_cb(const char *str) {
   }
 }
 
+// event_button_edit_output_client_cb
 void event_button_edit_output_client_cb(lv_event_t *e) {
   esp3d_log("Show component output client editor");
   const char *text = (const char *)lv_event_get_user_data(e);
@@ -264,6 +304,7 @@ void event_button_edit_output_client_cb(lv_event_t *e) {
                                      outputclient_edit_done_cb);
 }
 
+// event_button_edit_usb_serial_baud_rate_cb
 void event_button_edit_usb_serial_baud_rate_cb(lv_event_t *e) {
   esp3d_log("Show component usb serial baud rate editor");
   const char *text = (const char *)lv_event_get_user_data(e);
@@ -279,6 +320,7 @@ void event_button_edit_usb_serial_baud_rate_cb(lv_event_t *e) {
                                      usb_serial_baud_rate_edit_done_cb);
 }
 
+// event_button_edit_serial_baud_rate_cb
 void event_button_edit_serial_baud_rate_cb(lv_event_t *e) {
   esp3d_log("Show component serial baud rate editor");
   const char *text = (const char *)lv_event_get_user_data(e);
@@ -293,17 +335,33 @@ void event_button_edit_serial_baud_rate_cb(lv_event_t *e) {
                                      serial_baud_rate_edit_done_cb);
 }
 
+// event_button_edit_jog_type_cb
+void event_button_edit_jog_type_cb(lv_event_t *e) {
+  esp3d_log("Show component jog type editor");
+  const char *text = (const char *)lv_event_get_user_data(e);
+  std::list<std::string> choices;
+  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::relative));
+  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::absolute));
+  std::string title = esp3dTranslationService.translate(ESP3DLabel::jog_type);
+  choiceEditor::create_choice_editor(lv_scr_act(), text, title.c_str(), choices,
+                                     jog_type_edit_done_cb);
+}
+
+// event_button_edit_extensions_cb
 void event_button_edit_extensions_cb(lv_event_t *e) {
   esp3d_log("Show component");
   const char *text = (const char *)lv_label_get_text(extensions_label);
   textEditor::create_text_editor(lv_scr_act(), text, extensions_edit_done_cb);
 }
 
+// event_button_edit_hostname_cb
 void event_button_edit_hostname_cb(lv_event_t *e) {
   esp3d_log("Show component");
   const char *text = (const char *)lv_event_get_user_data(e);
   textEditor::create_text_editor(lv_scr_act(), text, hostname_edit_done_cb);
 }
+
+// event_button_settings_back_handler
 void event_button_settings_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
   if (BUTTON_ANIMATION_DELAY) {
@@ -448,6 +506,30 @@ void settings_screen() {
     }
   }
 #endif  // ESP3D_USB_SERIAL_FEATURE
+
+  // Jog type
+  line_container = listLine::create_list_line_container(ui_settings_list_ctl);
+  LabelStr = esp3dTranslationService.translate(ESP3DLabel::jog_type);
+  if (line_container) {
+    listLine::add_label_to_line(LabelStr.c_str(), line_container, true);
+    const ESP3DSettingDescription *settingPtr =
+        esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_jog_type);
+    if (settingPtr) {
+      uint8_t val =
+          esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_jog_type);
+      std::string value =
+          val == 0 ? esp3dTranslationService.translate(ESP3DLabel::relative)
+                   : esp3dTranslationService.translate(ESP3DLabel::absolute);
+      jog_type_label =
+          listLine::add_label_to_line(value.c_str(), line_container, false);
+      lv_obj_t *btnEdit =
+          listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
+      lv_obj_add_event_cb(btnEdit, event_button_edit_jog_type_cb,
+                          LV_EVENT_CLICKED,
+                          (void *)(lv_label_get_text(jog_type_label)));
+    }
+  }
+
   esp3dTftui.set_current_screen(ESP3DScreenType::settings);
   spinnerScreen::show_spinner();
   TaskHandle_t xHandle = NULL;
