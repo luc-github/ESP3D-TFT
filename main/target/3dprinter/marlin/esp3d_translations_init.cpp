@@ -62,5 +62,8 @@ void ESP3DTranslationService::init() {
       {ESP3DLabel::relative_short, "rel"},
       {ESP3DLabel::relative, "Relative"},
       {ESP3DLabel::jog_type, "Jog type"},
+      {ESP3DLabel::polling, "Polling"},
+      {ESP3DLabel::enabled, "Enabled"},
+      {ESP3DLabel::disabled, "Disabled"},
       {ESP3DLabel::serial, "Serial"}};
 }

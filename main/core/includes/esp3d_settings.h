@@ -82,6 +82,7 @@ enum class ESP3DSettingIndex : uint16_t {
   esp3d_session_timeout,
   esp3d_ui_language,
   esp3d_jog_type,
+  esp3d_polling_on,
   unknown_index
 };
 
