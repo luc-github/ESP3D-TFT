@@ -20,20 +20,8 @@
 
 #pragma once
 
-#include <stdio.h>
+#include <lvgl.h>
 
-#include <string>
-
-#include "esp3d_styles.h"
-#include "esp3d_values.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 namespace backButton {
 extern lv_obj_t *create_back_button(lv_obj_t *parent);
 }  // namespace backButton
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

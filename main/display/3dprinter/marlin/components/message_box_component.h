@@ -20,16 +20,8 @@ message_box_component.h - ESP3D screens styles definition
 
 #pragma once
 
-#include <stdio.h>
+#include <lvgl.h>
 
-#include <string>
-
-#include "esp3d_styles.h"
-#include "esp3d_values.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 enum class MsgBoxType : uint8_t {
   error = 0,
   confirmation,
@@ -43,7 +35,3 @@ extern lv_obj_t *confirmationBox(lv_obj_t *container, MsgBoxType type,
                                  const char *content, lv_event_cb_t event_cb);
 
 }  // namespace msgBox
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

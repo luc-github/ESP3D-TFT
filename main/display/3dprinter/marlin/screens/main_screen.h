@@ -20,15 +20,8 @@
 
 #pragma once
 
-#include <stdio.h>
-
-#include <string>
-
 #include "esp3d_values.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 namespace mainScreen {
 extern void main_screen();
 extern bool extruder_0_value_cb(ESP3DValuesIndex index, const char *value,
@@ -47,7 +40,3 @@ extern bool print_status_value_cb(ESP3DValuesIndex index, const char *value,
                                   ESP3DValuesCbAction action);
 
 }  // namespace mainScreen
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

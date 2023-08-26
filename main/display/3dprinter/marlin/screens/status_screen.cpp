@@ -20,15 +20,17 @@
 
 #include "status_screen.h"
 
-#include <list>
-#include <string>
+#include <lvgl.h>
 
-#include "esp3d_hal.h"
+#include <list>
+
 #include "esp3d_log.h"
+#include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "esp3d_values.h"
 #include "main_screen.h"
+
 
 /**********************
  *  STATIC PROTOTYPES

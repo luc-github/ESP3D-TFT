@@ -20,7 +20,7 @@
 #if ESP3D_WIFI_FEATURE
 #include "wifi_screen.h"
 
-#include <string>
+#include <lvgl.h>
 
 #include "ap_screen.h"
 #include "components/back_button_component.h"
@@ -29,15 +29,16 @@
 #include "components/spinner_component.h"
 #include "components/symbol_button_component.h"
 #include "components/wifi_status_component.h"
-#include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
+#include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "menu_screen.h"
 #include "network/esp3d_network.h"
 #include "sta_screen.h"
 #include "translations/esp3d_translation_service.h"
+
 
 #if defined __has_include
 #if __has_include("bsp_patch.h")

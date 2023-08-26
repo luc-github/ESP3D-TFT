@@ -19,20 +19,6 @@
 
 #pragma once
 
-#include <stdio.h>
-
-#include <string>
-
-#include "esp3d_styles.h"
-#include "esp3d_values.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 namespace settingsScreen {
 extern void settings_screen();
 }  // namespace settingsScreen
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

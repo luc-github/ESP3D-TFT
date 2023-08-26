@@ -23,10 +23,6 @@
 
 #include "screens/esp3d_screen_type.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 class ESP3DTftUi final {
  public:
   ESP3DTftUi();
@@ -43,7 +39,3 @@ class ESP3DTftUi final {
 };
 
 extern ESP3DTftUi esp3dTftui;
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

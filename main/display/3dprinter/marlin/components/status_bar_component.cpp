@@ -20,12 +20,10 @@
 
 #include "status_bar_component.h"
 
-#include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
-#include "esp3d_values.h"
 #include "screens/status_screen.h"
 
 /**********************

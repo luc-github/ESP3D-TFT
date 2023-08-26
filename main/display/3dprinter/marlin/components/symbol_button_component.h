@@ -20,16 +20,10 @@
 
 #pragma once
 
-#include <stdio.h>
-
-#include <string>
+#include <lvgl.h>
 
 #include "esp3d_styles.h"
-#include "esp3d_values.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 namespace symbolButton {
 extern lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text,
                                       int width = SYMBOL_BUTTON_WIDTH,
@@ -37,7 +31,3 @@ extern lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text,
                                       bool center = true, bool slash = false,
                                       int rotation = 0);
 }  // namespace symbolButton
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

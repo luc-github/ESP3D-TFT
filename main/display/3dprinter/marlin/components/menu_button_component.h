@@ -20,21 +20,10 @@
 
 #pragma once
 
+#include <lvgl.h>
 #include <stdio.h>
 
-#include <string>
-
-#include "esp3d_styles.h"
-#include "esp3d_values.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 namespace menuButton {
 lv_obj_t *create_menu_button(lv_obj_t *container, const char *text);
 
 }  // namespace menuButton
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

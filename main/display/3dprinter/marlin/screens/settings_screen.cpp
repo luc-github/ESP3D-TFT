@@ -20,7 +20,7 @@
 
 #include "settings_screen.h"
 
-#include <string>
+#include <lvgl.h>
 
 #include "components/back_button_component.h"
 #include "components/choice_editor_component.h"
@@ -30,10 +30,10 @@
 #include "components/spinner_component.h"
 #include "components/text_editor_component.h"
 #include "esp3d_client_types.h"
-#include "esp3d_hal.h"
 #include "esp3d_json_settings.h"
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
+#include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "freertos/FreeRTOS.h"
@@ -41,6 +41,7 @@
 #include "menu_screen.h"
 #include "tasks_def.h"
 #include "translations/esp3d_translation_service.h"
+
 
 /**********************
  *  STATIC PROTOTYPES

@@ -20,13 +20,11 @@
 
 #include "splash_screen.h"
 
-#include <string>
+#include <lvgl.h>
 
-#include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
-#include "lvgl.h"
 #include "main_screen.h"
 #include "version.h"
 

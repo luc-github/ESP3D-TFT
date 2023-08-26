@@ -143,7 +143,7 @@ bool network_mode_value_cb(ESP3DValuesIndex index, const char *value,
         apScreen::update_button_ok();
       }
       if (esp3dTftui.get_current_screen() == ESP3DScreenType::station) {
-        staScreen::update_sta_button_ok();
+        staScreen::update_button_ok();
         staScreen::update_sta_button_scan();
       }
       if (esp3dTftui.get_current_screen() == ESP3DScreenType::wifi) {

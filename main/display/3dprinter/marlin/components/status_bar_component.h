@@ -20,22 +20,13 @@
 
 #pragma once
 
-#include <stdio.h>
-
-#include <string>
+#include <lvgl.h>
 
 #include "esp3d_values.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 namespace statusBar {
 extern bool status_bar_cb(ESP3DValuesIndex index, const char *value,
                           ESP3DValuesCbAction action);
 extern lv_obj_t *status_bar(lv_obj_t *screen);
 
 }  // namespace statusBar
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

@@ -20,15 +20,10 @@
 
 #pragma once
 
-#include <stdio.h>
-
-#include <string>
+#include <lvgl.h>
 
 #include "esp3d_values.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 namespace wifiStatus {
 extern lv_obj_t *wifi_status(lv_obj_t *parent, lv_obj_t *backbutton);
 
@@ -38,7 +33,3 @@ extern bool network_mode_value_cb(ESP3DValuesIndex index, const char *value,
                                   ESP3DValuesCbAction action);
 
 }  // namespace wifiStatus
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

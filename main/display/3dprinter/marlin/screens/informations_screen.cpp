@@ -20,9 +20,10 @@
 
 #include "informations_screen.h"
 
+#include <lvgl.h>
+
 #include "components/back_button_component.h"
 #include "components/main_container_component.h"
-#include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
@@ -38,6 +39,7 @@
 #include "sdkconfig.h"
 #include "spi_flash_mmap.h"
 #include "translations/esp3d_translation_service.h"
+
 
 #if CONFIG_SPIRAM
 #include "esp_psram.h"

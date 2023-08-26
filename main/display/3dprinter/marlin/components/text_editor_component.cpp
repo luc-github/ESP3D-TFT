@@ -20,12 +20,10 @@
 
 #include "text_editor_component.h"
 
-#include <string>
-
-#include "esp3d_hal.h"
 #include "esp3d_log.h"
+#include "esp3d_string.h"
 #include "esp3d_styles.h"
-#include "esp3d_tft_ui.h"
+
 
 /**********************
  *  STATIC PROTOTYPES

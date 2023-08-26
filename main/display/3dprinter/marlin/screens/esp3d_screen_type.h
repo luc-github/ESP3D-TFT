@@ -22,10 +22,6 @@
 
 #include <stdio.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 enum class ESP3DScreenType : uint8_t {
   none = 0,
   splash,
@@ -45,7 +41,3 @@ enum class ESP3DScreenType : uint8_t {
   station,
   access_point
 };
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

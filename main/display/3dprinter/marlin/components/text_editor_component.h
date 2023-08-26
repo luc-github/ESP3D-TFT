@@ -20,20 +20,9 @@
 
 #pragma once
 
-#include <stdio.h>
+#include <lvgl.h>
 
-#include <string>
-
-#include "esp3d_values.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 namespace textEditor {
 lv_obj_t *create_text_editor(lv_obj_t *container, const char *text,
                              void (*callbackFn)(const char *));
 }  // namespace textEditor
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

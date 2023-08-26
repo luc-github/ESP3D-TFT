@@ -20,6 +20,8 @@
 #if ESP3D_WIFI_FEATURE
 #include "sta_screen.h"
 
+#include <lvgl.h>
+
 #include <list>
 
 #include "components/back_button_component.h"
@@ -29,7 +31,6 @@
 #include "components/spinner_component.h"
 #include "components/symbol_button_component.h"
 #include "components/wifi_status_component.h"
-#include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
 #include "esp3d_string.h"
@@ -42,6 +43,7 @@
 #include "tasks_def.h"
 #include "translations/esp3d_translation_service.h"
 #include "wifi_screen.h"
+
 
 #if defined __has_include
 #if __has_include("bsp_patch.h")
@@ -252,7 +254,7 @@ void update_sta_button_scan() {
   }
 }
 
-void update_sta_button_ok() {
+void update_button_ok() {
   esp3d_log("Update ok vibility");
   std::string mode =
       esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
@@ -359,7 +361,7 @@ void sta_ta_event_cb(lv_event_t *e) {
       lv_obj_clear_flag(status_component, LV_OBJ_FLAG_HIDDEN);
 
     spinnerScreen::hide_spinner();
-    update_sta_button_ok();
+    update_button_ok();
     update_button_save();
   }
 
@@ -372,7 +374,7 @@ void sta_ta_event_cb(lv_event_t *e) {
     if (ta == sta_ta_password) {
       lv_textarea_set_password_mode(ta, true);
     }
-    update_sta_button_ok();
+    update_button_ok();
     update_button_save();
   } else if (code == LV_EVENT_READY || code == LV_EVENT_DEFOCUSED) {
     if (ta == sta_ta_ssid) {
@@ -382,7 +384,7 @@ void sta_ta_event_cb(lv_event_t *e) {
       esp3d_log("Ready, PASSWORD: %s", lv_textarea_get_text(ta));
       password_current = lv_textarea_get_text(ta);
     }
-    update_sta_button_ok();
+    update_button_ok();
     update_button_save();
   } else if (code == LV_EVENT_VALUE_CHANGED) {
     if (ta == sta_ta_ssid) {
@@ -394,7 +396,7 @@ void sta_ta_event_cb(lv_event_t *e) {
       esp3d_log("Value changed, PASSWORD: %s > %s", password_ini.c_str(),
                 password_current.c_str());
     }
-    update_sta_button_ok();
+    update_button_ok();
     update_button_save();
   }
 }
@@ -582,7 +584,7 @@ void sta_screen() {
     lv_obj_add_flag(ui_sta_ssid_list_ctl, LV_OBJ_FLAG_HIDDEN);
   if (status_component) lv_obj_clear_flag(status_component, LV_OBJ_FLAG_HIDDEN);
 
-  update_sta_button_ok();
+  update_button_ok();
   update_button_save();
   update_sta_button_scan();
   esp3dTftui.set_current_screen(ESP3DScreenType::station);

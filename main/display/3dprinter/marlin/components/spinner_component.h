@@ -27,14 +27,7 @@ spinner_component.h - ESP3D screens definition
 #include "esp3d_styles.h"
 #include "esp3d_values.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 namespace spinnerScreen {
 extern void show_spinner(const char* msg = nullptr);
 extern void hide_spinner();
 }  // namespace spinnerScreen
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

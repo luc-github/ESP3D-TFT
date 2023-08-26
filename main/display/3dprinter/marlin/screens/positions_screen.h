@@ -21,21 +21,12 @@
 
 #include <stdio.h>
 
-#include <string>
-
-#include "esp3d_styles.h"
 #include "esp3d_values.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 namespace positionsScreen {
 extern void positions_screen(uint8_t target = 255);
 extern bool positions_values_cb(ESP3DValuesIndex index, const char *value,
                                 ESP3DValuesCbAction action);
 
 }  // namespace positionsScreen
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

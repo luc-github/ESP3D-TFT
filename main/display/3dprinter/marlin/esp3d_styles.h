@@ -25,10 +25,6 @@
 #include "esp3d_styles_res.h"
 #include "lvgl.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 enum class ESP3DStyleType : uint8_t {
   default_style = 0,
   main_bg,
@@ -53,7 +49,3 @@ enum class ESP3DStyleType : uint8_t {
 extern bool init_styles();
 extern bool apply_style(lv_obj_t* obj, ESP3DStyleType type);
 extern bool apply_outline_pad(lv_obj_t* obj);
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

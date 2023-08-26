@@ -21,13 +21,14 @@
 
 #include "ap_screen.h"
 
+#include <lvgl.h>
+
 #include "components/back_button_component.h"
 #include "components/main_container_component.h"
 #include "components/message_box_component.h"
 #include "components/spinner_component.h"
 #include "components/symbol_button_component.h"
 #include "components/wifi_status_component.h"
-#include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
 #include "esp3d_string.h"
@@ -36,6 +37,7 @@
 #include "network/esp3d_network.h"
 #include "translations/esp3d_translation_service.h"
 #include "wifi_screen.h"
+
 
 #if defined __has_include
 #if __has_include("bsp_patch.h")

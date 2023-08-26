@@ -22,19 +22,7 @@ filament_screen.h - ESP3D screens styles definition
 
 #include <stdio.h>
 
-#include <string>
-
-#include "esp3d_styles.h"
-#include "esp3d_values.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 namespace filamentScreen {
 extern void filament_screen(uint8_t target = 0);
 
 }  // namespace filamentScreen
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

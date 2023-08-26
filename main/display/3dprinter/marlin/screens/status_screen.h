@@ -19,23 +19,10 @@
 
 #pragma once
 
-#include <stdio.h>
-
-#include <string>
-
-#include "esp3d_styles.h"
 #include "esp3d_values.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 namespace statusScreen {
 extern void status_screen();
 extern bool status_list_cb(ESP3DValuesIndex index, const char *value,
                            ESP3DValuesCbAction action);
-
 }  // namespace statusScreen
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

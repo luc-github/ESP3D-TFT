@@ -20,22 +20,12 @@
 
 #pragma once
 
-#include <stdio.h>
-
-#include <string>
+#include <lvgl.h>
 
 #include "esp3d_styles.h"
-#include "esp3d_values.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 namespace mainContainer {
 lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
                                 ESP3DStyleType style);
-
 }  // namespace mainContainer
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

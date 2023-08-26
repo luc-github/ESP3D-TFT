@@ -22,15 +22,6 @@
 
 #include <stdio.h>
 
-#include <string>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 namespace filesScreen {
 extern void files_screen();
 }
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

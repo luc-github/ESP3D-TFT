@@ -20,9 +20,10 @@
 
 #include "temperatures_screen.h"
 
+#include <lvgl.h>
+
 #include "components/back_button_component.h"
 #include "components/symbol_button_component.h"
-#include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_styles.h"

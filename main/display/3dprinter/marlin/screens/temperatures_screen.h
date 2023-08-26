@@ -21,19 +21,7 @@
 
 #include <stdio.h>
 
-#include <string>
-
-#include "esp3d_styles.h"
-#include "esp3d_values.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 namespace temperaturesScreen {
 extern void temperatures_screen(uint8_t target);
 
 }  // namespace temperaturesScreen
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

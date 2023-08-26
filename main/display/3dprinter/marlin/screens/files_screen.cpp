@@ -20,6 +20,8 @@
 #if ESP3D_SD_CARD_FEATURE
 #include "files_screen.h"
 
+#include <lvgl.h>
+
 #include <list>
 #include <vector>
 
@@ -38,6 +40,7 @@
 #include "freertos/task.h"
 #include "main_screen.h"
 #include "tasks_def.h"
+
 
 /**********************
  *  STATIC PROTOTYPES

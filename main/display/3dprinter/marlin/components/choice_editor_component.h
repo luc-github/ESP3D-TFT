@@ -25,19 +25,11 @@
 #include <list>
 #include <string>
 
-#include "esp3d_values.h"
 #include "lvgl.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 namespace choiceEditor {
 lv_obj_t *create_choice_editor(lv_obj_t *container, const char *text,
                                const char *title,
                                std::list<std::string> &choices,
                                void (*callbackFn)(const char *));
 }  // namespace choiceEditor
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

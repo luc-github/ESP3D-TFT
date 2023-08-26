@@ -20,14 +20,13 @@
 
 #include "main_screen.h"
 
-#include <string>
+#include <lvgl.h>
 
 #include "empty_screen.h"
-#include "esp3d_hal.h"
 #include "esp3d_log.h"
+#include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
-#include "esp3d_values.h"
 #include "fan_screen.h"
 #if ESP3D_SD_CARD_FEATURE
 #include "files_screen.h"

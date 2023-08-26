@@ -20,23 +20,11 @@
 
 #pragma once
 
-#include <stdio.h>
-
-#include <string>
-
 #include "esp3d_values.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 namespace menuScreen {
 extern void menu_screen();
 extern void menu_screen_print_status_value_cb(ESP3DValuesIndex index,
                                               const char *value,
                                               ESP3DValuesCbAction action);
-
 }  // namespace menuScreen
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif
