@@ -26,6 +26,7 @@
 #include <string>
 
 #include "esp3d_values.h"
+#include "lvgl.h"
 
 #ifdef __cplusplus
 extern "C" {

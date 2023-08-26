@@ -32,13 +32,13 @@
 #if ESP3D_SD_CARD_FEATURE
 #include "files_screen.h"
 #endif  // ESP3D_SD_CARD_FEATURE
-#include "menu_button_component.h"
+#include "components/menu_button_component.h"
+#include "components/message_box_component.h"
+#include "components/status_bar_component.h"
+#include "components/symbol_button_component.h"
 #include "menu_screen.h"
-#include "message_box_component.h"
 #include "positions_screen.h"
 #include "speed_screen.h"
-#include "status_bar_component.h"
-#include "symbol_button_component.h"
 #include "temperatures_screen.h"
 #include "translations/esp3d_translation_service.h"
 

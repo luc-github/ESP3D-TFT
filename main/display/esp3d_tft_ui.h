@@ -21,7 +21,7 @@
 #pragma once
 #include <stdio.h>
 
-#include "esp3d_screen_type.h"
+#include "screens/esp3d_screen_type.h"
 
 #ifdef __cplusplus
 extern "C" {

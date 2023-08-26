@@ -22,7 +22,10 @@
 
 #include <string>
 
-#include "back_button_component.h"
+#include "components/back_button_component.h"
+#include "components/main_container_component.h"
+#include "components/menu_button_component.h"
+#include "components/symbol_button_component.h"
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_styles.h"
@@ -30,12 +33,10 @@
 #include "filament_screen.h"
 #include "informations_screen.h"
 #include "leveling_screen.h"
-#include "main_container_component.h"
 #include "main_screen.h"
-#include "menu_button_component.h"
 #include "menu_screen.h"
 #include "settings_screen.h"
-#include "symbol_button_component.h"
+
 #if ESP3D_WIFI_FEATURE
 #include "wifi_screen.h"
 #endif  // ESP3D_WIFI_FEATURE

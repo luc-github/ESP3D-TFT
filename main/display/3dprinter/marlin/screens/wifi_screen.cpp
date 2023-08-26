@@ -23,21 +23,22 @@
 #include <string>
 
 #include "ap_screen.h"
-#include "back_button_component.h"
+#include "components/back_button_component.h"
+#include "components/main_container_component.h"
+#include "components/message_box_component.h"
+#include "components/spinner_component.h"
+#include "components/symbol_button_component.h"
+#include "components/wifi_status_component.h"
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
-#include "main_container_component.h"
 #include "menu_screen.h"
-#include "message_box_component.h"
 #include "network/esp3d_network.h"
-#include "spinner_component.h"
 #include "sta_screen.h"
-#include "symbol_button_component.h"
 #include "translations/esp3d_translation_service.h"
-#include "wifi_status_component.h"
+
 #if defined __has_include
 #if __has_include("bsp_patch.h")
 #include "bsp_patch.h"

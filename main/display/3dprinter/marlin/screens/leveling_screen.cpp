@@ -22,12 +22,12 @@ leveling_screen.cpp - esp3d
 
 #include <string>
 
-#include "back_button_component.h"
+#include "components/back_button_component.h"
+#include "components/main_container_component.h"
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
-#include "main_container_component.h"
 #include "menu_screen.h"
 
 /**********************

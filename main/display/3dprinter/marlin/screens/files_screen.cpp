@@ -23,7 +23,10 @@
 #include <list>
 #include <vector>
 
-#include "back_button_component.h"
+#include "components/back_button_component.h"
+#include "components/list_line_component.h"
+#include "components/spinner_component.h"
+#include "components/symbol_button_component.h"
 #include "esp3d_hal.h"
 #include "esp3d_json_settings.h"
 #include "esp3d_log.h"
@@ -33,10 +36,7 @@
 #include "filesystem/esp3d_sd.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "list_line_component.h"
 #include "main_screen.h"
-#include "spinner_component.h"
-#include "symbol_button_component.h"
 #include "tasks_def.h"
 
 /**********************

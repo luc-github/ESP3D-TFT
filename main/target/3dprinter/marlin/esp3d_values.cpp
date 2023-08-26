@@ -23,10 +23,9 @@
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #if ESP3D_DISPLAY_FEATURE
-#include "main_screen.h"
-#include "status_bar_component.h"
-#include "wifi_status_component.h"
-
+#include "components/status_bar_component.h"
+#include "components/wifi_status_component.h"
+#include "screens/main_screen.h"
 #endif  // ESP3D_DISPLAY_FEATURE
 
 bool ESP3DValues::intialize() {

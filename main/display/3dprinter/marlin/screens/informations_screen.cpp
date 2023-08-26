@@ -20,7 +20,8 @@
 
 #include "informations_screen.h"
 
-#include "back_button_component.h"
+#include "components/back_button_component.h"
+#include "components/main_container_component.h"
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
@@ -32,12 +33,12 @@
 #include "esp_heap_caps.h"
 #include "esp_system.h"
 #include "filesystem/esp3d_flash.h"
-#include "main_container_component.h"
 #include "menu_screen.h"
 #include "rom/ets_sys.h"
 #include "sdkconfig.h"
 #include "spi_flash_mmap.h"
 #include "translations/esp3d_translation_service.h"
+
 #if CONFIG_SPIRAM
 #include "esp_psram.h"
 #endif  // CONFIG_SPIRAM

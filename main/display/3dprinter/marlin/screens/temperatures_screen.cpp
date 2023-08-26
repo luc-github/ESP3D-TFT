@@ -20,14 +20,14 @@
 
 #include "temperatures_screen.h"
 
-#include "back_button_component.h"
+#include "components/back_button_component.h"
+#include "components/symbol_button_component.h"
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "main_screen.h"
-#include "symbol_button_component.h"
 #include "translations/esp3d_translation_service.h"
 
 /**********************

@@ -26,7 +26,7 @@
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "esp3d_values.h"
-#include "status_screen.h"
+#include "screens/status_screen.h"
 
 /**********************
  *  STATIC PROTOTYPES

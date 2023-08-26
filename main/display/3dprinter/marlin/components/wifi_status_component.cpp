@@ -20,14 +20,14 @@
 #if ESP3D_WIFI_FEATURE
 #include "wifi_status_component.h"
 
-#include "ap_screen.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "network/esp3d_network.h"
-#include "sta_screen.h"
-#include "wifi_screen.h"
+#include "screens/ap_screen.h"
+#include "screens/sta_screen.h"
+#include "screens/wifi_screen.h"
 
 /**********************
  *  STATIC PROTOTYPES

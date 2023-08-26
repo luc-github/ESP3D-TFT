@@ -26,9 +26,9 @@
 #include "esp3d_log.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "lvgl.h"
 #include "main_screen.h"
 #include "version.h"
-
 
 LV_IMG_DECLARE(logo_esp3d_tft);
 

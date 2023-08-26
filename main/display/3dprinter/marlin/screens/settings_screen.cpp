@@ -22,8 +22,13 @@
 
 #include <string>
 
-#include "back_button_component.h"
-#include "choice_editor_component.h"
+#include "components/back_button_component.h"
+#include "components/choice_editor_component.h"
+#include "components/list_line_component.h"
+#include "components/main_container_component.h"
+#include "components/message_box_component.h"
+#include "components/spinner_component.h"
+#include "components/text_editor_component.h"
 #include "esp3d_client_types.h"
 #include "esp3d_hal.h"
 #include "esp3d_json_settings.h"
@@ -33,13 +38,8 @@
 #include "esp3d_tft_ui.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "list_line_component.h"
-#include "main_container_component.h"
 #include "menu_screen.h"
-#include "message_box_component.h"
-#include "spinner_component.h"
 #include "tasks_def.h"
-#include "text_editor_component.h"
 #include "translations/esp3d_translation_service.h"
 
 /**********************
