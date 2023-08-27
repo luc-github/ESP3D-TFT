@@ -38,6 +38,7 @@ enum class ESP3DStyleType : uint8_t {
   bg_label,
   buttons_matrix,
   read_only_value,
+  read_only_setting,
   message_box,
   buttons_msgbox,
   spinner_screen,

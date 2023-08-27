@@ -48,6 +48,8 @@ uint8_t heater_buttons_map_id = 0;
 
 lv_obj_t *label_current_temperature_value = NULL;
 lv_obj_t *label_current_temperature = NULL;
+lv_obj_t *label_target_temperature_value = NULL;
+lv_obj_t *label_target_temperature = NULL;
 
 lv_timer_t *temperatures_screen_delay_timer = NULL;
 
@@ -157,6 +159,8 @@ void heater_matrix_buttons_event_cb(lv_event_t *e) {
   heater_buttons_map_id = id;
   lv_label_set_text(label_current_temperature,
                     heater_buttons_map[heater_buttons_map_id]);
+  lv_label_set_text(label_target_temperature,
+                    heater_buttons_map[heater_buttons_map_id]);
   esp3d_log("Button %s clicked", heater_buttons_map[id]);
 }
 
@@ -192,7 +196,7 @@ void temperatures_screen(uint8_t target) {
   lv_obj_t *btnm_target = lv_btnmatrix_create(ui_new_screen);
   lv_btnmatrix_set_map(btnm_target, heater_buttons_map);
   apply_style(btnm_target, ESP3DStyleType::buttons_matrix);
-  lv_obj_set_height(btnm_target, MATRIX_BUTTON_HEIGHT);
+  lv_obj_set_size(btnm_target, BACK_BUTTON_WIDTH * 3, MATRIX_BUTTON_HEIGHT);
   lv_btnmatrix_set_btn_ctrl(btnm_target, heater_buttons_map_id,
                             LV_BTNMATRIX_CTRL_CHECKED);
   lv_obj_add_event_cb(btnm_target, heater_matrix_buttons_event_cb,
@@ -238,7 +242,8 @@ void temperatures_screen(uint8_t target) {
   lv_obj_t *btn_up = symbolButton::create_symbol_button(
       ui_new_screen, LV_SYMBOL_UP "\n" LV_SYMBOL_PLUS);
   lv_obj_align_to(btn_up, label_current_temperature_value,
-                  LV_ALIGN_OUT_BOTTOM_MID, 0, CURRENT_BUTTON_PRESSED_OUTLINE);
+                  LV_ALIGN_OUT_BOTTOM_MID, 0,
+                  CURRENT_BUTTON_PRESSED_OUTLINE / 2);
   // Text area
   lv_obj_t *temperatures_ta = lv_textarea_create(ui_new_screen);
   lv_obj_add_event_cb(temperatures_ta, temperatures_ta_event_cb,
@@ -314,6 +319,37 @@ void temperatures_screen(uint8_t target) {
                   CURRENT_BUTTON_PRESSED_OUTLINE / 2);
   lv_obj_add_event_cb(btn_down, temperatures_btn_down_event_cb,
                       LV_EVENT_CLICKED, temperatures_ta);
+
+  // Label target heater e
+  label_target_temperature_value = lv_label_create(ui_new_screen);
+  lv_label_set_text(label_target_temperature_value, "280");
+  apply_style(label_target_temperature_value,
+              ESP3DStyleType::read_only_setting);
+  lv_obj_set_width(label_target_temperature_value, LV_HOR_RES / 6);
+  lv_obj_align_to(label_target_temperature_value, btn_down,
+                  LV_ALIGN_OUT_BOTTOM_MID, 0,
+                  CURRENT_BUTTON_PRESSED_OUTLINE / 2);
+
+  // unit
+  label_unit1 = lv_label_create(ui_new_screen);
+  lv_label_set_text(label_unit1,
+                    esp3dTranslationService.translate(ESP3DLabel::celcius));
+  apply_style(label_unit1, ESP3DStyleType::bg_label);
+  lv_obj_align_to(label_unit1, label_target_temperature_value,
+                  LV_ALIGN_OUT_RIGHT_MID, CURRENT_BUTTON_PRESSED_OUTLINE / 2,
+                  0);
+
+  // Label target heater
+  label_target_temperature = lv_label_create(ui_new_screen);
+  lv_label_set_text(
+      label_target_temperature,
+      heater_buttons_map[heater_buttons_map_id]);  // need to change according
+                                                   // heater
+  apply_style(label_target_temperature, ESP3DStyleType::bg_label);
+
+  lv_obj_align_to(label_target_temperature, label_target_temperature_value,
+                  LV_ALIGN_OUT_LEFT_MID, -CURRENT_BUTTON_PRESSED_OUTLINE / 2,
+                  0);
 
   esp3dTftui.set_current_screen(ESP3DScreenType::temperatures);
 }
