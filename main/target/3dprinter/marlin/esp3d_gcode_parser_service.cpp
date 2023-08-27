@@ -28,6 +28,10 @@ ESP3DGCodeParserService esp3dGcodeParser;
 
 const char* emmergencyGcodeCommand[] = {"M112", "M410", "M999"};
 const char* emmergencyESP3DCommand[] = {"[ESP701]"};
+const char* pollingCommands[] = {"M105", "M114", ""};
+const char** ESP3DGCodeParserService::getPollingCommands() {
+  return pollingCommands;
+}
 
 ESP3DGCodeParserService::ESP3DGCodeParserService() {
   _isMultiLineReportOnGoing = false;

@@ -38,6 +38,7 @@ class ESP3DGCodeParserService final {
   const char* getLastError() { return _lastError.c_str(); }
   uint64_t getLineResend() { return _lineResend; }
   bool processCommand(const char* data);
+  const char** getPollingCommands();
 
  private:
   bool _isMultiLineReportOnGoing;

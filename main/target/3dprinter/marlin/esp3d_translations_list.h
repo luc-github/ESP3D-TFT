@@ -64,6 +64,9 @@ enum class ESP3DLabel : uint16_t {
   absolute,
   relative_short,
   relative,
+  polling,
+  enabled,
+  disabled,
   unknown_index
 };
 

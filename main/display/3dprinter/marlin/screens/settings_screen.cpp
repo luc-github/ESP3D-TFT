@@ -39,8 +39,10 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "menu_screen.h"
+#include "rendering/esp3d_rendering_client.h"
 #include "tasks_def.h"
 #include "translations/esp3d_translation_service.h"
+
 
 /**********************
  *  STATIC PROTOTYPES
@@ -59,6 +61,7 @@ lv_obj_t *output_client_label = NULL;
 lv_obj_t *serial_baud_rate_label = NULL;
 lv_obj_t *usb_serial_baud_rate_label = NULL;
 lv_obj_t *jog_type_label = NULL;
+lv_obj_t *polling_label = NULL;
 
 //
 void settings_screen_delay_timer_cb(lv_timer_t *timer) {
@@ -215,7 +218,7 @@ void outputclient_edit_done_cb(const char *str) {
 void jog_type_edit_done_cb(const char *str) {
   esp3d_log("Saving jog type to: %s\n", str);
 
-  if (strcmp(str, lv_label_get_text(output_client_label)) != 0) {
+  if (strcmp(str, lv_label_get_text(jog_type_label)) != 0) {
     uint8_t val =
         (uint8_t)ESP3DClientType::no_client;  // default value if not found
     if (strcmp(str, esp3dTranslationService.translate(ESP3DLabel::absolute)) ==
@@ -235,6 +238,43 @@ void jog_type_edit_done_cb(const char *str) {
         }
       } else {
         esp3d_log_e("Failed to save jog type");
+        std::string text = esp3dTranslationService.translate(
+            ESP3DLabel::error_applying_setting);
+        msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+      }
+    }
+  } else {
+    esp3d_log("New value is identical do not save it");
+  }
+}
+
+// polling_edit_done_cb
+void polling_edit_done_cb(const char *str) {
+  esp3d_log("Saving polling state to: %s\n", str);
+
+  if (strcmp(str, lv_label_get_text(polling_label)) != 0) {
+    uint8_t val =
+        (uint8_t)ESP3DClientType::no_client;  // default value if not found
+    if (strcmp(str, esp3dTranslationService.translate(ESP3DLabel::enabled)) ==
+        0) {
+      val = 1;
+    } else if (strcmp(str, esp3dTranslationService.translate(
+                               ESP3DLabel::disabled)) == 0) {
+      val = 0;
+    }
+
+    if (esp3dTftsettings.isValidByteSetting(
+            val, ESP3DSettingIndex::esp3d_polling_on)) {
+      esp3d_log("Value %s is valid", str);
+      if (esp3dTftsettings.writeByte(ESP3DSettingIndex::esp3d_polling_on,
+                                     val)) {
+        renderingClient.setPolling(val);
+
+        if (polling_label) {
+          lv_label_set_text(polling_label, str);
+        }
+      } else {
+        esp3d_log_e("Failed to save polling mode");
         std::string text = esp3dTranslationService.translate(
             ESP3DLabel::error_applying_setting);
         msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
@@ -345,6 +385,18 @@ void event_button_edit_jog_type_cb(lv_event_t *e) {
   std::string title = esp3dTranslationService.translate(ESP3DLabel::jog_type);
   choiceEditor::create_choice_editor(lv_scr_act(), text, title.c_str(), choices,
                                      jog_type_edit_done_cb);
+}
+
+// event_button_edit_polling_cb
+void event_button_edit_polling_cb(lv_event_t *e) {
+  esp3d_log("Show component polling editor");
+  const char *text = (const char *)lv_event_get_user_data(e);
+  std::list<std::string> choices;
+  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::disabled));
+  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::enabled));
+  std::string title = esp3dTranslationService.translate(ESP3DLabel::polling);
+  choiceEditor::create_choice_editor(lv_scr_act(), text, title.c_str(), choices,
+                                     polling_edit_done_cb);
 }
 
 // event_button_edit_extensions_cb
@@ -527,6 +579,29 @@ void settings_screen() {
       lv_obj_add_event_cb(btnEdit, event_button_edit_jog_type_cb,
                           LV_EVENT_CLICKED,
                           (void *)(lv_label_get_text(jog_type_label)));
+    }
+  }
+
+  // Polling on
+  line_container = listLine::create_list_line_container(ui_settings_list_ctl);
+  LabelStr = esp3dTranslationService.translate(ESP3DLabel::polling);
+  if (line_container) {
+    listLine::add_label_to_line(LabelStr.c_str(), line_container, true);
+    const ESP3DSettingDescription *settingPtr =
+        esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_polling_on);
+    if (settingPtr) {
+      uint8_t val =
+          esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_polling_on);
+      std::string value =
+          val == 0 ? esp3dTranslationService.translate(ESP3DLabel::disabled)
+                   : esp3dTranslationService.translate(ESP3DLabel::enabled);
+      polling_label =
+          listLine::add_label_to_line(value.c_str(), line_container, false);
+      lv_obj_t *btnEdit =
+          listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
+      lv_obj_add_event_cb(btnEdit, event_button_edit_polling_cb,
+                          LV_EVENT_CLICKED,
+                          (void *)(lv_label_get_text(polling_label)));
     }
   }
 
