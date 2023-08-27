@@ -33,7 +33,6 @@
 #include "rendering/esp3d_rendering_client.h"
 #include "translations/esp3d_translation_service.h"
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -104,26 +103,31 @@ void position_ta_event_cb(lv_event_t *e) {
   lv_event_code_t code = lv_event_get_code(e);
   lv_obj_t *ta = lv_event_get_target(e);
   lv_obj_t *kb = (lv_obj_t *)lv_event_get_user_data(e);
-  if (code == LV_EVENT_FOCUSED) {
+  if (code == LV_EVENT_FOCUSED || code == LV_EVENT_PRESSED) {
+    esp3d_log("Clicked, Value");
     lv_keyboard_set_textarea(kb, ta);
+    lv_obj_add_state(position_ta, LV_STATE_FOCUSED);
     lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_AUTO);
   }
 
   else if (code == LV_EVENT_DEFOCUSED) {
-    lv_textarea_set_cursor_pos(ta, 0);
-    lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_OFF);
+    esp3d_log("Defocused, Value");
+    lv_textarea_set_cursor_pos(position_ta, 0);
+    lv_obj_set_scrollbar_mode(position_ta, LV_SCROLLBAR_MODE_OFF);
     lv_keyboard_set_textarea(kb, NULL);
     lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
     position_value = lv_textarea_get_text(ta);
   } else if (code == LV_EVENT_READY || code == LV_EVENT_CANCEL) {
-    esp3d_log("Ready, Value: %s", lv_textarea_get_text(ta));
-    // No idea how to change ta focus to another control
-    // every tests I did failed
-    // so I refresh all screen ... orz
+    esp3d_log("Ready/Cancel, Value: %s", lv_textarea_get_text(ta));
     position_value = lv_textarea_get_text(ta);
     esp3d_log("Value changed: %s", position_value.c_str());
-    positions_screen(axis_buttons_map_id);
+    lv_textarea_set_cursor_pos(position_ta, 0);
+    lv_obj_set_scrollbar_mode(position_ta, LV_SCROLLBAR_MODE_OFF);
+    lv_keyboard_set_textarea(kb, NULL);
+    lv_obj_clear_state(position_ta, LV_STATE_FOCUSED);
+    lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+    //
   } else if (code == LV_EVENT_VALUE_CHANGED) {
     // position_value = lv_textarea_get_text(ta);
     // esp3d_log("Value changed: %s", position_value.c_str());
