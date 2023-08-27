@@ -39,8 +39,10 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "menu_screen.h"
+#include "rendering/esp3d_rendering_client.h"
 #include "tasks_def.h"
 #include "translations/esp3d_translation_service.h"
+
 
 /**********************
  *  STATIC PROTOTYPES
@@ -266,6 +268,8 @@ void polling_edit_done_cb(const char *str) {
       esp3d_log("Value %s is valid", str);
       if (esp3dTftsettings.writeByte(ESP3DSettingIndex::esp3d_polling_on,
                                      val)) {
+        renderingClient.setPolling(val);
+
         if (polling_label) {
           lv_label_set_text(polling_label, str);
         }

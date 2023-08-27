@@ -34,6 +34,8 @@ ESP3DRenderingClient renderingClient;
 
 #define RX_FLUSH_TIME_OUT 1500  // milliseconds timeout
 
+#define ESP3D_POLLING_INTERVAL 3000  // milliseconds
+
 // this task only collecting rendering RX data and push thenmm to Rx Queue
 static void esp3d_rendering_rx_task(void *pvParameter) {
   (void)pvParameter;
@@ -102,6 +104,11 @@ bool ESP3DRenderingClient::begin() {
     esp3d_log("Created Rendering Task");
     esp3d_log("Rendering client started");
     flush();
+    if (esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_polling_on) == 1) {
+      setPolling(true);
+    } else {
+      setPolling(false);
+    }
     return true;
   } else {
     esp3d_log_e("Rendering Task creation failed");
@@ -111,6 +118,7 @@ bool ESP3DRenderingClient::begin() {
 }
 
 void ESP3DRenderingClient::handle() {
+  static uint64_t now = esp3d_hal::millis();
   if (_started) {
     if (getRxMsgsCount() > 0) {
       if (pdTRUE == xSemaphoreTake(_xGuiSemaphore, portMAX_DELAY)) {
@@ -123,6 +131,17 @@ void ESP3DRenderingClient::handle() {
         xSemaphoreGive(_xGuiSemaphore);
       }
     }
+    if (_polling_on) {
+      if (esp3d_hal::millis() - now > ESP3D_POLLING_INTERVAL) {
+        const char **pollingCommands = esp3dGcodeParser.getPollingCommands();
+        for (uint8_t i = 0; strlen(pollingCommands[i]) != 0; i++) {
+          sendGcode(pollingCommands[i]);
+        }
+        now = esp3d_hal::millis();
+      }
+    }
+  } else {
+    now = esp3d_hal::millis();
   }
 }
 
