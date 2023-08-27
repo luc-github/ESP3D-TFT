@@ -10,15 +10,22 @@ extern "C" {
 #define DISP_HOR_RES_MAX 320
 #define DISP_VER_RES_MAX 240
 
-// 1/10
-#define DISP_BUF_SIZE (DISP_HOR_RES_MAX * 10)
+#if WITH_PSRAM
+  // 1/10 (24-line) buffer (15KB) in external PSRAM
+  #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * DISP_VER_RES_MAX / 10)
+  #define DISP_BUF_MALLOC_TYPE  MALLOC_CAP_SPIRAM
+#else
+  // 1/24 (10-line) buffer (6.25KB) in internal DRAM
+  #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * 10)
+  #define DISP_BUF_MALLOC_TYPE  MALLOC_CAP_DMA
+#endif  // WITH_PSRAM
+
+#define DISP_USE_DOUBLE_BUFFER 1
 
 #define ILI9341_DC 2             // GPIO 2
 #define ILI9341_USE_RST 1        // Flag
 #define ILI9341_RST 4            // GPIO 4
 #define ILI9341_INVERT_COLORS 0  // Flag
-
-#define DISP_USE_DOUBLE_BUFFER 1
 
 /*
 PORTRAIT				0

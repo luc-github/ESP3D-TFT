@@ -20,10 +20,6 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define CURRENT_STATUS_BAR_RADIUS 4
 #define CURRENT_STATUS_BAR_H_PAD 5
 #define CURRENT_STATUS_BAR_V_PAD 5
@@ -59,6 +55,5 @@ extern "C" {
 #define MATRIX_BUTTON_HEIGHT 40
 #define MSGBOX_BUTTON_WIDTH 100
 
-#ifdef __cplusplus
-}  // extern "C"
-#endif
+#define CURRENT_SCROLL_BAR_WIDTH 10
+#define CURRENT_SCROLL_BAR_RADIUS 5

@@ -24,6 +24,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include "nvs.h"
+
+const uint32_t SupportedBaudList[] = {9600,   19200,  38400,  57600,  74880,
+                                      115200, 230400, 250000, 500000, 921600};
 
 #define SIZE_OF_SETTING_VERSION 25
 #define SIZE_OF_SETTING_SSID_ID 32
@@ -77,6 +81,7 @@ enum class ESP3DSettingIndex : uint16_t {
   esp3d_user_password,
   esp3d_session_timeout,
   esp3d_ui_language,
+  esp3d_jog_type,
   unknown_index
 };
 
@@ -120,6 +125,8 @@ class ESP3DSettings final {
   ESP3DSettings();
   ~ESP3DSettings();
   bool isValidSettingsNvs();
+  bool access_nvs(nvs_open_mode_t mode);
+  void release_nvs(nvs_open_mode_t mode);
   uint8_t readByte(ESP3DSettingIndex index, bool* haserror = NULL);
   uint32_t readUint32(ESP3DSettingIndex index, bool* haserror = NULL);
   const char* readIPString(ESP3DSettingIndex index, bool* haserror = NULL);

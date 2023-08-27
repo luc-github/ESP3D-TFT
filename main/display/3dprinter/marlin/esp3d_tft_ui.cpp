@@ -19,7 +19,7 @@
 */
 #include "esp3d_log.h"
 #include "esp3d_styles.h"
-#include "splash_screen.h"
+#include "screens/splash_screen.h"
 /**********************
  *  STATIC PROTOTYPES
  **********************/

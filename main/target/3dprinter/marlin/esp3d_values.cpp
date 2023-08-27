@@ -23,10 +23,9 @@
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #if ESP3D_DISPLAY_FEATURE
-#include "main_screen.h"
-#include "status_bar_component.h"
-#include "wifi_status_component.h"
-
+#include "components/status_bar_component.h"
+#include "components/wifi_status_component.h"
+#include "screens/main_screen.h"
 #endif  // ESP3D_DISPLAY_FEATURE
 
 bool ESP3DValues::intialize() {
@@ -130,7 +129,7 @@ bool ESP3DValues::intialize() {
   //  x position
 
   _values.push_back({
-      ESP3DValuesIndex::x_position,
+      ESP3DValuesIndex::position_x,
       ESP3DValuesType::float_t,
       2,  // precision
       std::string("?"),
@@ -139,7 +138,7 @@ bool ESP3DValues::intialize() {
 
   //  y position
   _values.push_back({
-      ESP3DValuesIndex::y_position,
+      ESP3DValuesIndex::position_y,
       ESP3DValuesType::float_t,
       2,  // precision
       std::string("?"),
@@ -149,7 +148,7 @@ bool ESP3DValues::intialize() {
   //  z position
 
   _values.push_back({
-      ESP3DValuesIndex::z_position,
+      ESP3DValuesIndex::position_z,
       ESP3DValuesType::float_t,
       2,  // precision
       std::string("?"),
@@ -180,6 +179,7 @@ bool ESP3DValues::intialize() {
       std::string(""),
       nullptr,
   });
+#if ESP3D_WIFI_FEATURE
   //  network status
   _values.push_back({
       ESP3DValuesIndex::network_status,
@@ -196,6 +196,7 @@ bool ESP3DValues::intialize() {
       std::string("?"),
       wifiStatus::network_mode_value_cb,
   });
+#endif  // ESP3D_WIFI_FEATURE
 #endif  // ESP3D_DISPLAY_FEATURE
   return true;
 }

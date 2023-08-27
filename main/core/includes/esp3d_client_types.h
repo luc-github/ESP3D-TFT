@@ -35,8 +35,9 @@ enum class ESP3DClientType : uint8_t {
   webui = 5,
   webui_websocket = 6,
   websocket = 7,
-  command = 8,
-  system,
+  rendering = 8,
+  command,  // origin only
+  system,   // origin only
   all_clients
 };
 
