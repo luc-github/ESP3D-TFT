@@ -47,11 +47,138 @@ bool ESP3DGCodeParserService::hasMultiLineReport(const char* data) {
 }
 
 bool ESP3DGCodeParserService::processCommand(const char* data) {
+  esp3d_log("processing Command %s", data);
   if (data != nullptr && strlen(data) > 0) {
     if (strstr(data, "T:") != nullptr) {  // is temperature
+      // ok T:25.00 /120.00 B:25.00 /0.00 @:127 B@:0
+      // T:25.00 /0.00 B:25.00 /50.00 T0:25.00 /0.00 T1:25.00 /0.00 @:0 B@:127
+      char* ptrt = strstr(data, "T:");
+      char* ptrt0 = strstr(data, "T0:");
+      char* ptrt1 = strstr(data, "T1:");
+      char* ptrb = strstr(data, "B:");
+      if (ptrt0 && ptrt1) {  // dual extruder
+        esp3d_log("Temperature dual extruders");
+        ptrt0 += 3;
+        ptrt1 += 3;
+        // Extruder 0 current temperature
+        char* ptre = strstr(ptrt0, " /");
+        if (!ptre) {
+          esp3d_log_e("Error parsing temperature T0 value");
+          return false;
+        }
+        ptre[0] = '\0';
+        // Extruder 0 target temperature
+        char* ptrtt = ptre + 2;
+        ptre = strstr(ptrtt, " ");
+        if (!ptre) {
+          esp3d_log_e("Error parsing temperature T0 target");
+          return false;
+        }
+        ptre[0] = '\0';
+        // Dispatch values
+        esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_0_temperature,
+                                        ptrt0);
+        esp3dTftValues.set_string_value(
+            ESP3DValuesIndex::ext_0_target_temperature, ptrtt);
+        esp3d_log("T0: %s / %s", ptrt0, ptrtt);
 
+        // Extruder 1 current temperature
+        ptre = strstr(ptrt1, " /");
+        if (!ptre) {
+          esp3d_log_e("Error parsing temperature T1 value");
+          esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_temperature,
+                                          "#");
+          esp3dTftValues.set_string_value(
+              ESP3DValuesIndex::ext_1_target_temperature, "#");
+          return false;
+        }
+        ptre[0] = '\0';
+        // Extruder 1 target temperature
+        ptrtt = ptre + 2;
+        ptre = strstr(ptrtt, " ");
+        if (!ptre) {
+          esp3d_log_e("Error parsing temperature T1 target");
+          esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_temperature,
+                                          "#");
+          esp3dTftValues.set_string_value(
+              ESP3DValuesIndex::ext_1_target_temperature, "#");
+          return false;
+        }
+        ptre[0] = '\0';
+        // Dispatch values
+        esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_temperature,
+                                        ptrt1);
+        esp3dTftValues.set_string_value(
+            ESP3DValuesIndex::ext_1_target_temperature, ptrtt);
+        esp3d_log("T1: %s / %s", ptrt1, ptrtt);
+      } else {  // single extruder
+        esp3d_log("Temperature single extruder");
+        esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_temperature,
+                                        "#");
+        esp3dTftValues.set_string_value(
+            ESP3DValuesIndex::ext_1_target_temperature, "#");
+        ptrt += 2;
+        // Extruder 0 current temperature
+        char* ptre = strstr(ptrt, " /");
+        if (!ptre) {
+          esp3d_log_e("Error parsing temperature T0 value");
+          return false;
+        }
+        ptre[0] = '\0';
+        // Extruder 0 target temperature
+        char* ptrtt = ptre + 2;
+        ptre = strstr(ptrtt, " ");
+        if (!ptre) {
+          esp3d_log_e("Error parsing temperature T0 target");
+          return false;
+        }
+        ptre[0] = '\0';
+        // Dispatch values
+        esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_0_temperature,
+                                        ptrt);
+        esp3dTftValues.set_string_value(
+            ESP3DValuesIndex::ext_0_target_temperature, ptrtt);
+        // No second extruder
+        esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_temperature,
+                                        "#");
+        esp3dTftValues.set_string_value(
+            ESP3DValuesIndex::ext_1_target_temperature, "#");
+        esp3d_log("T: %s / %s", ptrt, ptrtt);
+      }
+      if (ptrb) {  // bed
+        esp3d_log("Temperature bed");
+        ptrb += 2;
+        // Bed current temperature
+        char* ptre = strstr(ptrb, " /");
+        if (!ptre) {
+          esp3d_log_e("Error parsing temperature bed value");
+          return false;
+        }
+        ptre[0] = '\0';
+        // Bed target temperature
+        char* ptrtt = ptre + 2;
+        ptre = strstr(ptrtt, " ");
+        if (!ptre) {
+          esp3d_log_e("Error parsing temperature Bed target");
+          return false;
+        }
+        ptre[0] = '\0';
+        // Dispatch values
+        esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_temperature,
+                                        ptrb);
+        esp3dTftValues.set_string_value(
+            ESP3DValuesIndex::bed_target_temperature, ptrtt);
+        esp3d_log("Bed: %s / %s", ptrb, ptrtt);
+      } else {
+        esp3d_log("No Temperature bed");
+        esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_temperature, "#");
+        esp3dTftValues.set_string_value(
+            ESP3DValuesIndex::bed_target_temperature, "#");
+      }
+      return true;
     } else if (strstr(data, "X:") != nullptr) {  // is position
       // X:0.00 Y:0.00 Z:0.00 E:0.00 Count X:0 Y:0 Z:0
+      esp3d_log("Positions");
       char* ptrx = strstr(data, "X:");
       char* ptry = strstr(data, "Y:");
       char* ptrz = strstr(data, "Z:");
@@ -69,6 +196,9 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
         esp3dTftValues.set_string_value(ESP3DValuesIndex::position_x, ptrx);
         esp3dTftValues.set_string_value(ESP3DValuesIndex::position_y, ptry);
         esp3dTftValues.set_string_value(ESP3DValuesIndex::position_z, ptrz);
+        return true;
+      } else {
+        esp3d_log_e("Error parsing positions");
       }
     }
   }

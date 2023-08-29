@@ -89,7 +89,8 @@ bool extruder_0_value_cb(ESP3DValuesIndex index, const char *value,
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
       main_display_extruder_0();
     } else {
-      // Todo : update other screens calling each callback update function
+      // update other screens calling each callback update function
+      temperaturesScreen::extruder_0_value_cb(index, value, action);
     }
   }
   return true;
@@ -101,7 +102,8 @@ bool extruder_1_value_cb(ESP3DValuesIndex index, const char *value,
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
       main_display_extruder_1();
     } else {
-      // Todo : update other screens calling each callback update function
+      //  update other screens calling each callback update function
+      temperaturesScreen::extruder_1_value_cb(index, value, action);
     }
   }
   return true;
@@ -113,7 +115,8 @@ bool bed_value_cb(ESP3DValuesIndex index, const char *value,
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
       main_display_bed();
     } else {
-      // Todo : update other screens calling each callback update function
+      // update other screens calling each callback update function
+      temperaturesScreen::bed_value_cb(index, value, action);
     }
   }
   return true;
