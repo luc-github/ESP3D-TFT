@@ -58,6 +58,9 @@ bool intialization_done = false;
 
 bool positions_values_cb(ESP3DValuesIndex index, const char *value,
                          ESP3DValuesCbAction action) {
+  if (esp3dTftui.get_current_screen() != ESP3DScreenType::positions)
+    return false;
+
   switch (index) {
     case ESP3DValuesIndex::position_x:
       if (action == ESP3DValuesCbAction::Update && axis_buttons_map_id == 0) {
@@ -106,15 +109,13 @@ void position_ta_event_cb(lv_event_t *e) {
   if (code == LV_EVENT_FOCUSED || code == LV_EVENT_PRESSED) {
     esp3d_log("Clicked, Value");
     lv_keyboard_set_textarea(kb, ta);
-    lv_obj_add_state(position_ta, LV_STATE_FOCUSED);
+    lv_obj_add_state(ta, LV_STATE_FOCUSED);
     lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_AUTO);
-  }
-
-  else if (code == LV_EVENT_DEFOCUSED) {
+  } else if (code == LV_EVENT_DEFOCUSED) {
     esp3d_log("Defocused, Value");
-    lv_textarea_set_cursor_pos(position_ta, 0);
-    lv_obj_set_scrollbar_mode(position_ta, LV_SCROLLBAR_MODE_OFF);
+    lv_textarea_set_cursor_pos(ta, 0);
+    lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_OFF);
     lv_keyboard_set_textarea(kb, NULL);
     lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
     position_value = lv_textarea_get_text(ta);
@@ -122,10 +123,10 @@ void position_ta_event_cb(lv_event_t *e) {
     esp3d_log("Ready/Cancel, Value: %s", lv_textarea_get_text(ta));
     position_value = lv_textarea_get_text(ta);
     esp3d_log("Value changed: %s", position_value.c_str());
-    lv_textarea_set_cursor_pos(position_ta, 0);
-    lv_obj_set_scrollbar_mode(position_ta, LV_SCROLLBAR_MODE_OFF);
+    lv_textarea_set_cursor_pos(ta, 0);
+    lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_OFF);
     lv_keyboard_set_textarea(kb, NULL);
-    lv_obj_clear_state(position_ta, LV_STATE_FOCUSED);
+    lv_obj_clear_state(ta, LV_STATE_FOCUSED);
     lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
     //
   } else if (code == LV_EVENT_VALUE_CHANGED) {

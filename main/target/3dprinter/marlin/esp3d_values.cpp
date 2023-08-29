@@ -77,7 +77,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesIndex::ext_0_target_temperature,
       ESP3DValuesType::float_t,
       2,  // precision
-      std::string("0.00"),
+      std::string("0"),
       mainScreen::extruder_0_value_cb,
   });
 
@@ -86,7 +86,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesIndex::ext_1_target_temperature,
       ESP3DValuesType::float_t,
       2,  // precision
-      std::string("0.00"),
+      std::string("0"),
       mainScreen::extruder_1_value_cb,
   });
 
@@ -95,7 +95,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesIndex::bed_target_temperature,
       ESP3DValuesType::float_t,
       2,  // precision
-      std::string("0.00"),
+      std::string("0"),
       mainScreen::bed_value_cb,
   });
 

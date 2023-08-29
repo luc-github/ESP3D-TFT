@@ -19,9 +19,15 @@
 
 #pragma once
 
-#include <stdio.h>
+#include "esp3d_values.h"
 
 namespace temperaturesScreen {
 extern void temperatures_screen(uint8_t target);
+extern bool extruder_0_value_cb(ESP3DValuesIndex index, const char *value,
+                                ESP3DValuesCbAction action);
+extern bool extruder_1_value_cb(ESP3DValuesIndex index, const char *value,
+                                ESP3DValuesCbAction action);
+extern bool bed_value_cb(ESP3DValuesIndex index, const char *value,
+                         ESP3DValuesCbAction action);
 
 }  // namespace temperaturesScreen
