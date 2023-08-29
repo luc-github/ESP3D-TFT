@@ -29,6 +29,7 @@
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "main_screen.h"
+#include "rendering/esp3d_rendering_client.h"
 #include "translations/esp3d_translation_service.h"
 
 /**********************
@@ -217,6 +218,34 @@ void power_all_heaters_event_cb(lv_event_t *e) {
   int temperatures_int = std::stoi(temperatures_value);
   temperatures_value = std::to_string(temperatures_int);
   lv_textarea_set_text(temperatures_ta, temperatures_value.c_str());
+  std::string val =
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::ext_0_temperature);
+
+  if (val == "?") {
+    renderingClient.sendGcode("M104 S0 T0");  // power off extruder 0
+    renderingClient.sendGcode("M104 S0 T1");  // power off extruder 1
+    renderingClient.sendGcode("M140 S0");     // power off bed
+  } else {
+    for (uint8_t i = 0; i < HEATER_COUNT; i++) {
+      if (heater_buttons_visibility_map_id[i] != -1) {
+        std::string gcode;
+        switch (i) {
+          case 0:                  // extruder 0
+            gcode = "M104 S0 T0";  // power off current heater
+            break;
+          case 1:                  // extruder 1
+            gcode = "M104 S0 T1";  // power off current heater
+            break;
+          case 2:               // bed
+            gcode = "M140 S0";  // power off current heater
+            break;
+          default:
+            return;
+        };
+        renderingClient.sendGcode(gcode.c_str());
+      }
+    }
+  }
   esp3d_log("Power off all heaters");
 }
 
@@ -253,6 +282,22 @@ void temperatures_btn_power_off_event_cb(lv_event_t *e) {
   lv_obj_t *temperatures_ta = (lv_obj_t *)lv_event_get_user_data(e);
   esp3d_log("Power off current heater %d", heater_buttons_map_id);
   lv_textarea_set_text(temperatures_ta, "0");
+  std::string gcode;
+  uint8_t target = get_heater_buttons_map_id(heater_buttons_map_id);
+  switch (target) {
+    case 0:                  // extruder 0
+      gcode = "M104 S0 T0";  // power off current heater
+      break;
+    case 1:                  // extruder 1
+      gcode = "M104 S0 T1";  // power off current heater
+      break;
+    case 2:               // bed
+      gcode = "M140 S0";  // power off current heater
+      break;
+    default:
+      return;
+  };
+  renderingClient.sendGcode(gcode.c_str());
 }
 
 void temperatures_matrix_buttons_event_cb(lv_event_t *e) {
