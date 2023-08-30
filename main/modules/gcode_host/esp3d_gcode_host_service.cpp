@@ -386,10 +386,10 @@ bool ESP3DGCodeHostService::_openFile(ESP3DGcodeFileStream* stream) {
   if (globalFs.accessFS((char*)(stream->_fileName))) {
     if (globalFs.exists((char*)(stream->_fileName))) {
       esp3d_log("File exists");
-      stream->streamFile = globalFs.open((char*)stream->_fileName, "r");
-      if ((stream->streamFile) != nullptr) {
+      _File = globalFs.open((char*)stream->_fileName, "r");
+      if (_File != nullptr) {
         if (_current_stream->lineStart != 0) {
-          if (fseek(((ESP3DGcodeFileStream*)_current_stream)->streamFile,
+          if (fseek(_File,
                     (long)_current_stream->lineStart, SEEK_SET) !=
               0) {  // this would need adjusting if concurrrent file access is
                     // implemented (seek to buffer end instead)
@@ -417,13 +417,13 @@ bool ESP3DGCodeHostService::_openFile(ESP3DGcodeFileStream* stream) {
 /// @param stream Pointer to the file stream to be closed.
 /// @return True if file closed and FS released successfully.
 bool ESP3DGCodeHostService::_closeFile(ESP3DGcodeFileStream* stream) {
-  if (stream->streamFile == nullptr) {
+  if (_File == nullptr) {
     esp3d_log_e("No file to close");
     return false;
   }
 
   esp3d_log("Closing File: %s", stream->_fileName);
-  globalFs.close((stream->streamFile), (char*)(stream->_fileName));
+  globalFs.close((_File), (char*)(stream->_fileName));
   globalFs.releaseFS((char*)(stream->_fileName));
 
   return true;
@@ -443,7 +443,7 @@ bool ESP3DGCodeHostService::_updateRingBuffer(ESP3DGcodeFileStream* stream) {
     _bufferFresh = true;
 
     if ((_bufferSeam = fread(_ringBuffer, sizeof(char), RING_BUFFER_LENGTH,
-                             (stream->streamFile))) == RING_BUFFER_LENGTH) {
+                             _File)) == RING_BUFFER_LENGTH) {
       _bufferSeam = 0;
     } else {
       _ringBuffer[_bufferSeam] = 0;
@@ -456,7 +456,7 @@ bool ESP3DGCodeHostService::_updateRingBuffer(ESP3DGcodeFileStream* stream) {
       return false;  // return, buffer is already full of fresh data
     }
     if ((_ringBuffer[_bufferSeam] == 0) || (_ringBuffer[_bufferPos] == 0)) {
-      esp3d_log("File finished");
+      //esp3d_log("File finished");
       return false;  // return, file finished
     }
 
@@ -468,7 +468,7 @@ bool ESP3DGCodeHostService::_updateRingBuffer(ESP3DGcodeFileStream* stream) {
     if (_bufferPos == _bufferSeam) {
       empty = RING_BUFFER_LENGTH;  // maybe not needed
       read = fread(_ringBuffer, sizeof(char), RING_BUFFER_LENGTH,
-                   (stream->streamFile));
+                   _File);
       _bufferPos = 0;
       if (read == empty) {
         _bufferSeam = 0;
@@ -486,7 +486,7 @@ bool ESP3DGCodeHostService::_updateRingBuffer(ESP3DGcodeFileStream* stream) {
     } else if (_bufferPos > _bufferSeam) {
       empty = _bufferPos - _bufferSeam;
       read = fread(&_ringBuffer[_bufferSeam], sizeof(char), empty,
-                   (stream->streamFile));
+                   _File);
       if (read == empty) {
         _bufferSeam = _bufferPos;
         _bufferFresh = true;
@@ -504,10 +504,10 @@ bool ESP3DGCodeHostService::_updateRingBuffer(ESP3DGcodeFileStream* stream) {
     } else {
       empty = RING_BUFFER_LENGTH - _bufferSeam + _bufferPos;
       read = fread(&_ringBuffer[_bufferSeam], sizeof(char),
-                   RING_BUFFER_LENGTH - _bufferSeam, (stream->streamFile));
+                   RING_BUFFER_LENGTH - _bufferSeam, _File);
       if (_bufferPos > 0) {
         read +=
-            fread(_ringBuffer, sizeof(char), _bufferPos, (stream->streamFile));
+            fread(_ringBuffer, sizeof(char), _bufferPos, _File);
       }
       if (read == empty) {
         _bufferSeam = _bufferPos;
@@ -572,14 +572,14 @@ bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
   stream->lineStart = 0;
   if (isFileStream(stream)) {
     if (((ESP3DGcodeFileStream*)stream)->_fileName != nullptr) {
-      int pos = ftell(((ESP3DGcodeFileStream*)stream)->streamFile) +
+      int pos = ftell(_File) +
                 1;  // we can get rid of this if we make sure to update the
                     // buffer after this function is called.
-      fseek(((ESP3DGcodeFileStream*)stream)->streamFile, 0, SEEK_END);
+      fseek(_File, 0, SEEK_END);
       ((ESP3DGcodeCommandStream*)stream)->totalSize =
-          ftell(((ESP3DGcodeFileStream*)stream)->streamFile) +
+          ftell(_File) +
           1;  // +1? for size instead of end index
-      fseek(((ESP3DGcodeFileStream*)stream)->streamFile, pos, SEEK_SET);
+      fseek(_File, pos, SEEK_SET);
       esp3d_log("Size is: %d",
                 (unsigned int)((ESP3DGcodeFileStream*)stream)->totalSize);
       return true;
@@ -830,7 +830,9 @@ bool ESP3DGCodeHostService::_parseResponse(
 }
 
 bool ESP3DGCodeHostService::_processRx(ESP3DMessage* rx) {
-  if (rx->origin == _outputClient){
+  if (_outputClient == ESP3DClientType::no_client){
+    esp3d_log_w("Output client not set, can't send: %s", (char*)(rx->data));
+  }else if (rx->origin == _outputClient){
     esp3d_log("Stream got the response: %s", (char*)(rx->data));
     _parseResponse(rx);
   } else if (rx->origin == ESP3DClientType::stream) {
@@ -915,6 +917,7 @@ void ESP3DGCodeHostService::process(ESP3DMessage* msg) {
 
 void ESP3DGCodeHostService::_updateOutputClient() {
   _outputClient = esp3dCommands.getOutputClient();
+  esp3d_log("Output client is: %d", static_cast<uint8_t>(_outputClient));
 }
 
 bool ESP3DGCodeHostService::begin() {
@@ -995,7 +998,7 @@ bool ESP3DGCodeHostService::_setStream() {
         if (isFileStream(_current_stream)) {
           esp3d_log(
               "Closing current file stream at idx: %d",
-              (int)ftell(((ESP3DGcodeFileStream*)_current_stream)->streamFile));
+              (int)ftell(_File));
           _closeFile((ESP3DGcodeFileStream*)_current_stream);
         }
         if (_currentCommand[0] ==
@@ -1015,12 +1018,12 @@ bool ESP3DGCodeHostService::_setStream() {
         for (int attempt = 0; attempt < 5; attempt++) {
           _openFile((ESP3DGcodeFileStream*)_current_stream);
           esp3d_log("fopen attempt %d", attempt + 1);
-          if (((ESP3DGcodeFileStream*)_current_stream)->streamFile != nullptr)
+          if (_File != nullptr)
             break;
           vTaskDelay(pdTICKS_TO_MS(50));
         }
 
-        if (((ESP3DGcodeFileStream*)_current_stream)->streamFile != nullptr) {
+        if (_File != nullptr) {
           esp3d_log("File Opened, addr: %d",
                     (int)((ESP3DGcodeFileStream*)_current_stream)->_fileName);
         } else {
@@ -1031,7 +1034,7 @@ bool ESP3DGCodeHostService::_setStream() {
           esp3d_log("Seeking to line start at: %d",
                     (int)(_current_stream->lineStart));
 
-          if (fseek(((ESP3DGcodeFileStream*)_current_stream)->streamFile,
+          if (fseek(_File,
                     (long)(_current_stream->lineStart - 1),
                     SEEK_SET) != 0) {  // does this need -1?
             // do error stuff

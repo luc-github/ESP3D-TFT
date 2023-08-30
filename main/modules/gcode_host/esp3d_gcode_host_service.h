@@ -87,9 +87,6 @@ struct ESP3DGcodeFileStream : public ESP3DGcodeStream {
   ESP3DGcodeFileStream(ESP3DGcodeStream& A) : ESP3DGcodeStream(A) {}
   ESP3DGcodeFileStream() = default;
 
-  FILE* streamFile =
-      nullptr;  // pointer to the file to be streamed. Files could be opened and
-                // closed whilst in use if it's helpful
   uint64_t commandNumber =
       0;  // Next command number to send. //This should be a gcodehost variable,
           // as only one print stream is possible
@@ -180,6 +177,11 @@ class ESP3DGCodeHostService : public ESP3DClient {
   std::string _stop_script;
   std::string _pause_script;
   std::string _resume_script;
+
+  //Stream Variables:
+  FILE* _File =
+      nullptr;  // pointer to the file to be streamed. Files could be opened and
+                // closed whilst in use if it's helpful
 
   pthread_mutex_t _tx_mutex;
   pthread_mutex_t _rx_mutex;
