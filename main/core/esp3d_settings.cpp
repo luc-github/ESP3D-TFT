@@ -166,8 +166,13 @@ const ESP3DSettingDescription ESP3DSettingsData[] = {
     {ESP3DSettingIndex::esp3d_session_timeout, ESP3DSettingType::byte_t, 1,
      "3"},
 #endif  // ESP3D_AUTHENTICATION_FEATURE
+#if ESP3D_DISPLAY_FEATURE
+    {ESP3DSettingIndex::esp3d_jog_type, ESP3DSettingType::byte_t, 1, "0"},
+    {ESP3DSettingIndex::esp3d_polling_on, ESP3DSettingType::byte_t, 1, "1"},
+#endif  // ESP3D_DISPLAY_FEATURE
 };
 
+// Is Valid String Setting ?
 bool ESP3DSettings::isValidStringSetting(const char* value,
                                          ESP3DSettingIndex settingElement) {
   const ESP3DSettingDescription* settingPtr = getSettingPtr(settingElement);
@@ -232,6 +237,7 @@ bool ESP3DSettings::isValidStringSetting(const char* value,
   return false;
 }
 
+// Is Valid Integer Setting ?
 bool ESP3DSettings::isValidIntegerSetting(uint32_t value,
                                           ESP3DSettingIndex settingElement) {
   const ESP3DSettingDescription* settingPtr = getSettingPtr(settingElement);
@@ -270,6 +276,7 @@ bool ESP3DSettings::isValidIntegerSetting(uint32_t value,
   return false;
 }
 
+// Is Valid Byte Setting ?
 bool ESP3DSettings::isValidByteSetting(uint8_t value,
                                        ESP3DSettingIndex settingElement) {
   const ESP3DSettingDescription* settingPtr = getSettingPtr(settingElement);
@@ -285,7 +292,10 @@ bool ESP3DSettings::isValidByteSetting(uint8_t value,
     case ESP3DSettingIndex::esp3d_check_update_on_sd:
 #endif  // ESP3D_UPDATE_FEATURE
 #endif  // ESP3D_SD_CARD_FEATURE
-
+#if ESP3D_DISPLAY_FEATURE
+    case ESP3DSettingIndex::esp3d_jog_type:
+    case ESP3DSettingIndex::esp3d_polling_on:
+#endif  // ESP3D_DISPLAY_FEATURE
     case ESP3DSettingIndex::esp3d_setup:
 #if ESP3D_TELNET_FEATURE
     case ESP3DSettingIndex::esp3d_socket_on:

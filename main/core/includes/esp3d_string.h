@@ -21,6 +21,7 @@
 #pragma once
 #include <stdio.h>
 
+#include <cstring>
 #include <string>
 
 #ifdef __cplusplus

@@ -22,16 +22,19 @@
 #include <stdio.h>
 
 #include "esp3d_commands.h"
+#include "esp3d_gcode_parser_service.h"
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
-#include "esp3d_values.h"
+#include "esp3d_string.h"
 #include "freertos/task.h"
 #include "tasks_def.h"
 
 ESP3DRenderingClient renderingClient;
 
 #define RX_FLUSH_TIME_OUT 1500  // milliseconds timeout
+
+#define ESP3D_POLLING_INTERVAL 3000  // milliseconds
 
 // this task only collecting rendering RX data and push thenmm to Rx Queue
 static void esp3d_rendering_rx_task(void *pvParameter) {
@@ -44,6 +47,26 @@ static void esp3d_rendering_rx_task(void *pvParameter) {
   }
   /* A task should NEVER return */
   vTaskDelete(NULL);
+}
+
+// this function is send manually by user interface so no need a queue
+bool ESP3DRenderingClient::sendGcode(const char *data) {
+  if (data == nullptr || strlen(data) == 0) {
+    return false;
+  }
+  // the command must end with \n, so we add it if not present
+  std::string cmd = "";
+  ESP3DRequest requestId = {.id = 0};
+  if (data[strlen(data) - 1] != '\n') {
+    cmd = data;
+    cmd += "\n";
+  } else {
+    cmd = data;
+  }
+  return esp3dCommands.dispatch(cmd.c_str(), esp3dCommands.getOutputClient(),
+                                requestId, ESP3DMessageType::unique,
+                                ESP3DClientType::rendering,
+                                ESP3DAuthenticationLevel::admin);
 }
 
 ESP3DRenderingClient::ESP3DRenderingClient() {
@@ -81,6 +104,11 @@ bool ESP3DRenderingClient::begin() {
     esp3d_log("Created Rendering Task");
     esp3d_log("Rendering client started");
     flush();
+    if (esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_polling_on) == 1) {
+      setPolling(true);
+    } else {
+      setPolling(false);
+    }
     return true;
   } else {
     esp3d_log_e("Rendering Task creation failed");
@@ -90,25 +118,30 @@ bool ESP3DRenderingClient::begin() {
 }
 
 void ESP3DRenderingClient::handle() {
+  static uint64_t now = esp3d_hal::millis();
   if (_started) {
     if (getRxMsgsCount() > 0) {
       if (pdTRUE == xSemaphoreTake(_xGuiSemaphore, portMAX_DELAY)) {
         ESP3DMessage *msg = popRx();
         if (msg) {
           esp3d_log("Rendering client received message: %s", (char *)msg->data);
-          // Todo
-          // Analyse message content
-          esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
-                                          (char *)msg->data);
-          esp3dTftValues.set_string_value(
-              ESP3DValuesIndex::ext_0_target_temperature, "100");
-          esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_0_temperature,
-                                          "80");
+          esp3dGcodeParser.processCommand((char *)msg->data);
           deleteMsg(msg);
         };
         xSemaphoreGive(_xGuiSemaphore);
       }
     }
+    if (_polling_on) {
+      if (esp3d_hal::millis() - now > ESP3D_POLLING_INTERVAL) {
+        const char **pollingCommands = esp3dGcodeParser.getPollingCommands();
+        for (uint8_t i = 0; strlen(pollingCommands[i]) != 0; i++) {
+          sendGcode(pollingCommands[i]);
+        }
+        now = esp3d_hal::millis();
+      }
+    }
+  } else {
+    now = esp3d_hal::millis();
   }
 }
 

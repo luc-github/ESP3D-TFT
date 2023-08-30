@@ -39,12 +39,15 @@ class ESP3DRenderingClient : public ESP3DClient {
   void handle();
   void end();
   void process(ESP3DMessage* msg);
+  bool sendGcode(const char* data);
   void flush();
   bool started() { return _started; }
+  void setPolling(bool polling_on) { _polling_on = polling_on; }
 
  private:
   TaskHandle_t _xHandle;
   bool _started;
+  bool _polling_on;
   SemaphoreHandle_t _xGuiSemaphore;
   pthread_mutex_t _rx_mutex;
 };

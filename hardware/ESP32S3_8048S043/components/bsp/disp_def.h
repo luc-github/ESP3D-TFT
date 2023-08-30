@@ -19,7 +19,7 @@ extern "C" {
 
 #define DISP_BITS_WIDTH (16)  // RGB565 in parallel mode, thus 16bit in width
 
-#define DISP_CLK_FREQ (14 * 1000 * 1000)  // adjusted
+#define DISP_CLK_FREQ (13 * 1000 * 1000)  // adjusted
 
 #define DISP_PCLK_PIN (42)
 #define DISP_VSYNC_PIN (41)

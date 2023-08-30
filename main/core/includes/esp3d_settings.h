@@ -82,9 +82,8 @@ enum class ESP3DSettingIndex : uint16_t {
   esp3d_user_password,
   esp3d_session_timeout,
   esp3d_ui_language,
-  esp3d_pause_script,
-  esp3d_stop_script,
-  esp3d_resume_script,
+  esp3d_jog_type,
+  esp3d_polling_on,
   unknown_index
 };
 

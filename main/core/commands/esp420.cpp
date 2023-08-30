@@ -39,6 +39,9 @@
 #include "sdkconfig.h"
 #include "spi_flash_mmap.h"
 #include "translations/esp3d_translation_service.h"
+#if CONFIG_SPIRAM
+#include "esp_psram.h"
+#endif  // CONFIG_SPIRAM
 
 #if ESP3D_HTTP_FEATURE
 #include "http/esp3d_http_service.h"
@@ -75,6 +78,7 @@ void ESP3DCommands::ESP420(int cmd_params_pos, ESP3DMessage *msg) {
   bool json = hasTag(msg, cmd_params_pos, "json");
   bool addPreTag = hasTag(msg, cmd_params_pos, "addPreTag");
   std::string tmpstr;
+  multi_heap_info_t info;
 #if ESP3D_AUTHENTICATION_FEATURE
   if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
     dispatchAuthenticationError(msg, COMMAND_ID, json);
@@ -128,22 +132,33 @@ void ESP3DCommands::ESP420(int cmd_params_pos, ESP3DMessage *msg) {
     return;
   }
 
+  heap_caps_get_info(&info, MALLOC_CAP_INTERNAL);
+  tmpstr = esp3d_strings::formatBytes(info.total_allocated_bytes);
+  tmpstr += " / ";
+  tmpstr += esp3d_strings::formatBytes(info.total_free_bytes + info.total_allocated_bytes);
+  if (!dispatchIdValue(json, "heap usage", tmpstr.c_str(), target,
+                       requestId)) {
+    return;
+  }
+
 #if CONFIG_SPIRAM
-  multi_heap_info_t info;
-  heap_caps_get_info(&info, MALLOC_CAP_SPIRAM);
-  tmpstr = esp3d_strings::formatBytes(info.total_free_bytes +
-                                      info.total_allocated_bytes);
+
+  tmpstr = esp3d_strings::formatBytes(esp_psram_get_size());
   if (!dispatchIdValue(json, "Total psram mem", tmpstr.c_str(), target,
                        requestId)) {
     return;
   }
-#endif  // CONFIG_SPIRAM
-  // Flash FS
-  tmpstr = flashFs.getFileSystemName();
 
-  if (!dispatchIdValue(json, "flash fs", tmpstr.c_str(), target, requestId)) {
+  heap_caps_get_info(&info, MALLOC_CAP_SPIRAM);
+  tmpstr = esp3d_strings::formatBytes(info.total_allocated_bytes);
+  tmpstr += " / ";
+  tmpstr += esp3d_strings::formatBytes(info.total_free_bytes + info.total_allocated_bytes);
+  if (!dispatchIdValue(json, "psram heap usage", tmpstr.c_str(), target,
+                       requestId)) {
     return;
   }
+#endif  // CONFIG_SPIRAM
+
   // Flash size
   uint32_t flash_size;
   if (esp_flash_get_size(NULL, &flash_size) != ESP_OK) {
@@ -181,14 +196,18 @@ void ESP3DCommands::ESP420(int cmd_params_pos, ESP3DMessage *msg) {
     return;
   }
 #endif  // ESP3D_UPDATE_FEATURE
-
+  // Flash FS
+  tmpstr = flashFs.getFileSystemName();
+  if (!dispatchIdValue(json, "flash fs", tmpstr.c_str(), target, requestId)) {
+    return;
+  }
   // FileSystem
   size_t totalBytes = 0;
   size_t usedBytes = 0;
   flashFs.getSpaceInfo(&totalBytes, &usedBytes);
   tmpstr = esp3d_strings::formatBytes(usedBytes);
-  tmpstr += "/";
-  tmpstr = esp3d_strings::formatBytes(totalBytes);
+  tmpstr += " / ";
+  tmpstr += esp3d_strings::formatBytes(totalBytes);  
   if (!dispatchIdValue(json, "FS usage", tmpstr.c_str(), target, requestId)) {
     return;
   }

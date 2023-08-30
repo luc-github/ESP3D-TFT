@@ -21,11 +21,7 @@
 #pragma once
 #include <stdio.h>
 
-#include "esp3d_screen_type.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "screens/esp3d_screen_type.h"
 
 class ESP3DTftUi final {
  public:
@@ -43,7 +39,3 @@ class ESP3DTftUi final {
 };
 
 extern ESP3DTftUi esp3dTftui;
-
-#ifdef __cplusplus
-}  // extern "C"
-#endif

@@ -55,7 +55,21 @@ enum class ESP3DLabel : uint16_t {
   serial,
   serial_baud_rate,
   usb_baud_rate,
-  unknown_index
+  connecting,
+  not_connected,
+  ap_mode,
+  ip_lost,
+  jog_type,
+  absolute_short,
+  absolute,
+  relative_short,
+  relative,
+  polling,
+  enabled,
+  disabled,
+  unknown_index,
+  motors_disabled,
+  information
 };
 
 #ifdef __cplusplus

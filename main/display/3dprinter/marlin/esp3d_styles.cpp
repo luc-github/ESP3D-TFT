@@ -46,6 +46,7 @@
 lv_style_t style_main_bg;
 lv_style_t style_bg_label;
 lv_style_t style_read_only_value;
+lv_style_t style_read_only_setting;
 lv_style_t style_scrollbar_default;
 lv_style_t style_scrollbar_active;
 
@@ -117,8 +118,7 @@ bool init_styles() {
   */
   lv_style_init(&style_read_only_value);
   lv_style_set_text_opa(&style_read_only_value, LV_OPA_COVER);
-  lv_style_set_text_color(&style_read_only_value,
-                          CURRENT_BUTTON_PRESSED_TEXT_COLOR);
+  lv_style_set_text_color(&style_read_only_value, CURRENT_BG_LABEL_TEXT_COLOR);
   lv_style_set_bg_color(&style_read_only_value, CURRENT_MAIN_BG_COLOR);
   lv_style_set_radius(&style_read_only_value, CURRENT_STATUS_BAR_RADIUS);
   lv_style_set_border_width(&style_read_only_value,
@@ -128,6 +128,23 @@ bool init_styles() {
   lv_style_set_text_align(&style_read_only_value, LV_TEXT_ALIGN_CENTER);
   lv_style_set_pad_top(&style_read_only_value, CURRENT_BUTTON_PAD);
   lv_style_set_pad_bottom(&style_read_only_value, CURRENT_BUTTON_PAD);
+
+  /*
+  read only setting on main background
+  */
+  lv_style_init(&style_read_only_setting);
+  lv_style_set_text_opa(&style_read_only_setting, LV_OPA_COVER);
+  lv_style_set_text_color(&style_read_only_setting,
+                          CURRENT_BUTTON_PRESSED_TEXT_COLOR);
+  lv_style_set_bg_color(&style_read_only_setting, CURRENT_MAIN_BG_COLOR);
+  lv_style_set_radius(&style_read_only_setting, CURRENT_STATUS_BAR_RADIUS);
+  lv_style_set_border_width(&style_read_only_setting,
+                            CURRENT_STATUS_BAR_BORDER_VALUE);
+  lv_style_set_border_color(&style_read_only_setting,
+                            CURRENT_STATUS_BAR_BORDER_COLOR);
+  lv_style_set_text_align(&style_read_only_setting, LV_TEXT_ALIGN_CENTER);
+  lv_style_set_pad_top(&style_read_only_setting, CURRENT_BUTTON_PAD);
+  lv_style_set_pad_bottom(&style_read_only_setting, CURRENT_BUTTON_PAD);
 
   /*
   Status bar
@@ -549,6 +566,9 @@ bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
       break;
     case ESP3DStyleType::read_only_value:
       lv_obj_add_style(obj, &style_read_only_value, LV_STATE_DEFAULT);
+      break;
+    case ESP3DStyleType::read_only_setting:
+      lv_obj_add_style(obj, &style_read_only_setting, LV_STATE_DEFAULT);
       break;
     case ESP3DStyleType::bg_label:
       lv_obj_add_style(obj, &style_bg_label, LV_STATE_DEFAULT);
