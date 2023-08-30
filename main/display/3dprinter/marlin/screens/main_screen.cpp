@@ -151,7 +151,7 @@ bool speed_value_cb(ESP3DValuesIndex index, const char *value,
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
       main_display_speed();
     } else {
-      // Todo : update other screens calling each callback update function
+      speedScreen::speed_value_cb(index, value, action);
     }
   }
   return true;
@@ -273,7 +273,6 @@ void main_display_fan() {
 }
 
 void main_display_speed() {
-  // TODO check if need a fan 2
   lv_label_set_text_fmt(
       lv_obj_get_child(main_btn_speed, 0), "%s%%\n%s",
       esp3dTftValues.get_string_value(ESP3DValuesIndex::speed),

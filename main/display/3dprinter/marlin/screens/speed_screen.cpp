@@ -31,7 +31,6 @@
 #include "esp3d_tft_ui.h"
 #include "main_screen.h"
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -127,6 +126,13 @@ void speed_matrix_buttons_event_cb(lv_event_t *e) {
   uint32_t id = lv_btnmatrix_get_selected_btn(obj);
   speed_buttons_map_id = id;
   esp3d_log("Button %s clicked", speed_buttons_map[id]);
+}
+
+bool speed_value_cb(ESP3DValuesIndex index, const char *value,
+                    ESP3DValuesCbAction action) {
+  if (esp3dTftui.get_current_screen() != ESP3DScreenType::speed) return false;
+  esp3d_log("Speed value  %s", value);
+  return true;
 }
 
 void speed_screen() {
