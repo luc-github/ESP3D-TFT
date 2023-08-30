@@ -24,6 +24,7 @@ message_box_component.h - ESP3D screens styles definition
 
 enum class MsgBoxType : uint8_t {
   error = 0,
+  information,
   confirmation,
 };
 

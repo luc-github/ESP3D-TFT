@@ -67,7 +67,9 @@ enum class ESP3DLabel : uint16_t {
   polling,
   enabled,
   disabled,
-  unknown_index
+  unknown_index,
+  motors_disabled,
+  information
 };
 
 #ifdef __cplusplus
