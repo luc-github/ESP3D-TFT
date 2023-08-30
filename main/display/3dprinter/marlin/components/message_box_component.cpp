@@ -49,6 +49,10 @@ lv_obj_t *messageBoxMain(lv_obj_t *container, MsgBoxType type,
       title = esp3dTranslationService.translate(ESP3DLabel::error);
       btns = (char **)btn_simple;
       break;
+    case MsgBoxType::information:
+      title = esp3dTranslationService.translate(ESP3DLabel::information);
+      btns = (char **)btn_simple;
+      break;
     case MsgBoxType::confirmation:
       title = esp3dTranslationService.translate(ESP3DLabel::confirmation);
       btns = (char **)btn_ok_cancel;

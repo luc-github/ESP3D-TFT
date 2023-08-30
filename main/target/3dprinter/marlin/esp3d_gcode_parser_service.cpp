@@ -138,11 +138,7 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
                                         ptrt);
         esp3dTftValues.set_string_value(
             ESP3DValuesIndex::ext_0_target_temperature, ptrtt);
-        // No second extruder
-        esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_temperature,
-                                        "#");
-        esp3dTftValues.set_string_value(
-            ESP3DValuesIndex::ext_1_target_temperature, "#");
+
         esp3d_log("T: %s / %s", ptrt, ptrtt);
       }
       if (ptrb) {  // bed

@@ -25,18 +25,21 @@
 #include "components/back_button_component.h"
 #include "components/main_container_component.h"
 #include "components/menu_button_component.h"
+#include "components/message_box_component.h"
 #include "components/symbol_button_component.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "esp3d_values.h"
 #include "filament_screen.h"
 #include "informations_screen.h"
 #include "leveling_screen.h"
 #include "main_screen.h"
 #include "menu_screen.h"
+#include "rendering/esp3d_rendering_client.h"
 #include "settings_screen.h"
-
+#include "translations/esp3d_translation_service.h"
 
 #if ESP3D_WIFI_FEATURE
 #include "wifi_screen.h"
@@ -197,6 +200,12 @@ void event_button_informations_handler(lv_event_t *e) {
 
 void event_button_disable_steppers_handler(lv_event_t *e) {
   esp3d_log("Disable Steppers Clicked");
+  renderingClient.sendGcode("M84");
+  std::string text =
+      esp3dTranslationService.translate(ESP3DLabel::motors_disabled);
+  msgBox::messageBox(NULL, MsgBoxType::information, text.c_str());
+  esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
+                                  text.c_str());
 }
 
 void menu_screen() {

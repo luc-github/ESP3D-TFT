@@ -65,5 +65,7 @@ void ESP3DTranslationService::init() {
       {ESP3DLabel::polling, "Polling"},
       {ESP3DLabel::enabled, "Enabled"},
       {ESP3DLabel::disabled, "Disabled"},
+      {ESP3DLabel::motors_disabled, "Motors disabled"},
+      {ESP3DLabel::information, "Information"},
       {ESP3DLabel::serial, "Serial"}};
 }
