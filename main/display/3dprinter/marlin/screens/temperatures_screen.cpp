@@ -645,112 +645,86 @@ void temperatures_screen(uint8_t target) {
 
 bool extruder_0_value_cb(ESP3DValuesIndex index, const char *value,
                          ESP3DValuesCbAction action) {
-  // be sure to be on temperatures screen
-  if (esp3dTftui.get_current_screen() != ESP3DScreenType::temperatures)
-    return false;
-  // does button matrix content need to be updated ?
-  bool visible = strcmp(value, "#") != 0;
-  if (index == ESP3DValuesIndex::ext_0_temperature) {
-    heaters_values[0] = strcmp(value, "?") == 0 ? "0" : value;
-    if (visible != heater_buttons_visibility_map[0]) {
-      updateBtnMatrix();
-      if (label_current_temperature)
-        lv_label_set_text(label_current_temperature,
-                          heater_buttons_map[heater_buttons_map_id]);
-      if (label_target_temperature)
-        lv_label_set_text(label_target_temperature,
-                          heater_buttons_map[heater_buttons_map_id]);
-    }
-  }
-  // is extruder 0 button selected ?
-  if (heater_buttons_map_id != 0) return false;
-  bool res = false;
-  if (strcmp(value, "#") == 0) {
-    heaters_values[0] = "#";
-    // TBD
-  } else {
-    if (index == ESP3DValuesIndex::ext_0_temperature) {
-      esp3d_log("Extruder 0 temperature: %s", value);
-      lv_label_set_text(label_current_temperature_value, value);
-
-    } else if (index == ESP3DValuesIndex::ext_0_target_temperature) {
-      esp3d_log("Extruder 0 target temperature: %s", value);
-      lv_label_set_text(label_target_temperature_value, value);
-    }
-    res = true;
-  }
-  return res;
+  // the callback is ignored because the bed callback will be used instead to
+  // avoid duplicate code
+  return false;
 }
 
 bool extruder_1_value_cb(ESP3DValuesIndex index, const char *value,
                          ESP3DValuesCbAction action) {
-  // be sure to be on temperatures screen
-  if (esp3dTftui.get_current_screen() != ESP3DScreenType::temperatures)
-    return false;
-  // does button matrix content need to be updated ?
-  bool visible = strcmp(value, "#") != 0;
-  if (index == ESP3DValuesIndex::ext_1_temperature) {
-    heaters_values[1] = strcmp(value, "?") == 0 ? "0" : value;
-    if (visible != heater_buttons_visibility_map[1]) {
-      updateBtnMatrix();
-      if (label_current_temperature)
-        lv_label_set_text(label_current_temperature,
-                          heater_buttons_map[heater_buttons_map_id]);
-      if (label_target_temperature)
-        lv_label_set_text(label_target_temperature,
-                          heater_buttons_map[heater_buttons_map_id]);
-    }
-  }
-  // is extruder 1 button selected ?
-  if (heater_buttons_map_id != 1) return false;
-  bool res = false;
-  if (strcmp(value, "#") == 0) {
-    heaters_values[1] = "#";
-    // TBD
-  } else {
-    if (index == ESP3DValuesIndex::ext_1_temperature) {
-      lv_label_set_text(label_current_temperature_value, value);
-    } else if (index == ESP3DValuesIndex::ext_1_target_temperature) {
-      lv_label_set_text(label_target_temperature_value, value);
-    }
-    res = true;
-  }
-  return res;
+  // the callback is ignored because the bed callback will be used instead to
+  // avoid duplicate code
+  return false;
 }
+
+void updateUiValues() {
+  uint8_t target = get_heater_buttons_map_id(heater_buttons_map_id);
+  if (target == 255) {
+    target = 0;
+    heater_buttons_map_id = 0;
+  }
+  switch (target) {
+    case 0:
+      lv_label_set_text(
+          label_current_temperature_value,
+          esp3dTftValues.get_string_value(ESP3DValuesIndex::ext_0_temperature));
+      lv_label_set_text(label_target_temperature_value,
+                        esp3dTftValues.get_string_value(
+                            ESP3DValuesIndex::ext_0_target_temperature));
+      break;
+    case 1:
+      lv_label_set_text(
+          label_current_temperature_value,
+          esp3dTftValues.get_string_value(ESP3DValuesIndex::ext_1_temperature));
+      lv_label_set_text(label_target_temperature_value,
+                        esp3dTftValues.get_string_value(
+                            ESP3DValuesIndex::ext_1_target_temperature));
+      break;
+    case 2:
+      lv_label_set_text(
+          label_current_temperature_value,
+          esp3dTftValues.get_string_value(ESP3DValuesIndex::bed_temperature));
+      lv_label_set_text(label_target_temperature_value,
+                        esp3dTftValues.get_string_value(
+                            ESP3DValuesIndex::bed_target_temperature));
+      break;
+    default:
+      break;
+  }
+  lv_label_set_text(label_current_temperature,
+                    heater_buttons_map[heater_buttons_map_id]);
+
+  lv_label_set_text(label_target_temperature,
+                    heater_buttons_map[heater_buttons_map_id]);
+}
+
 bool bed_value_cb(ESP3DValuesIndex index, const char *value,
                   ESP3DValuesCbAction action) {
   // be sure to be on temperatures screen
   if (esp3dTftui.get_current_screen() != ESP3DScreenType::temperatures)
     return false;
-  // does button matrix content need to be updated ?
-  bool visible = strcmp(value, "#") != 0;
-  if (index == ESP3DValuesIndex::bed_temperature) {
-    heaters_values[2] = strcmp(value, "?") == 0 ? "0" : value;
-    if (visible != heater_buttons_visibility_map[2]) {
-      updateBtnMatrix();
-      if (label_current_temperature)
-        lv_label_set_text(label_current_temperature,
-                          heater_buttons_map[heater_buttons_map_id]);
-      if (label_target_temperature)
-        lv_label_set_text(label_target_temperature,
-                          heater_buttons_map[heater_buttons_map_id]);
-    }
+  std::string vale0 =
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::ext_0_temperature);
+  std::string vale1 =
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::ext_1_temperature);
+  std::string valbed =
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::bed_temperature);
+  esp3d_log("Bed value callback, %s, %s, %s", vale0.c_str(), vale1.c_str(),
+            valbed.c_str());
+  esp3d_log("Check if update needed, E0:%s, E1:%s, Bed:%s",
+            heater_buttons_visibility_map[0] ? "visible" : "hidden",
+            heater_buttons_visibility_map[1] ? "visible" : "hidden",
+            heater_buttons_visibility_map[2] ? "visible" : "hidden");
+  if (((vale0 != "#") != heater_buttons_visibility_map[0]) ||
+      ((vale1 != "#") != heater_buttons_visibility_map[1]) ||
+      ((valbed != "#") != heater_buttons_visibility_map[2])) {
+    esp3d_log("Update needed");
+    heaters_values[0] = vale0;
+    heaters_values[1] = vale1;
+    heaters_values[2] = valbed;
+    updateBtnMatrix();
   }
-  // is bed button selected ?
-  if (heater_buttons_map_id != 2) return false;
-  bool res = false;
-
-  if (strcmp(value, "#") == 0) {
-    // TBD
-  } else {
-    if (index == ESP3DValuesIndex::bed_temperature) {
-      lv_label_set_text(label_current_temperature_value, value);
-    } else if (index == ESP3DValuesIndex::bed_target_temperature) {
-      lv_label_set_text(label_target_temperature_value, value);
-    }
-    res = true;
-  }
-
-  return res;
+  updateUiValues();
+  return true;
 }
 }  // namespace temperaturesScreen
