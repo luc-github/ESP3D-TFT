@@ -19,7 +19,9 @@ fan_screen.h - ESP3D screens styles definition
 */
 
 #pragma once
-
+#include "esp3d_values.h"
 namespace fanScreen {
 extern void fan_screen();
+extern bool fan_value_cb(ESP3DValuesIndex index, const char *value,
+                         ESP3DValuesCbAction action);
 }  // namespace fanScreen

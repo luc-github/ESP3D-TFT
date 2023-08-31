@@ -63,6 +63,7 @@ void main_display_menu();
 uint8_t main_screen_temperature_target = 0;
 lv_timer_t *main_screen_delay_timer = NULL;
 ESP3DScreenType next_screen = ESP3DScreenType::none;
+uint8_t nb_fans = 2;
 
 /**********************
  *   STATIC VARIABLES
@@ -101,9 +102,11 @@ bool extruder_1_value_cb(ESP3DValuesIndex index, const char *value,
   if (action == ESP3DValuesCbAction::Update) {
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
       main_display_extruder_1();
+      fan_value_cb(index, value, action);
     } else {
       //  update other screens calling each callback update function
       temperaturesScreen::extruder_1_value_cb(index, value, action);
+      fanScreen::fan_value_cb(index, value, action);
     }
   }
   return true;
@@ -140,7 +143,7 @@ bool fan_value_cb(ESP3DValuesIndex index, const char *value,
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
       main_display_fan();
     } else {
-      // Todo : update other screens calling each callback update function
+      fanScreen::fan_value_cb(index, value, action);
     }
   }
   return true;
@@ -267,9 +270,10 @@ void main_display_status_area() {
 void main_display_fan() {
   // TODO check if need a fan 2
   lv_label_set_text_fmt(
-      lv_obj_get_child(main_btn_fan, 0), "%s%%\n%s",
+      lv_obj_get_child(main_btn_fan, 0), "%s%%\n%s\n%s%%",
       esp3dTftValues.get_string_value(ESP3DValuesIndex::ext_0_fan),
-      LV_SYMBOL_FAN);
+      LV_SYMBOL_FAN,
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::ext_0_fan));
 }
 
 void main_display_speed() {
