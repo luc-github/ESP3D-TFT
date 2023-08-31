@@ -145,9 +145,31 @@ bool position_value_cb(ESP3DValuesIndex index, const char *value,
 
 bool fan_value_cb(ESP3DValuesIndex index, const char *value,
                   ESP3DValuesCbAction action) {
+  esp3d_log("fan_value_cb");
   if (!show_fan_button) return false;
+  esp3d_log("No control to show");
   if (action == ESP3DValuesCbAction::Update) {
+    esp3d_log("Check if main screen");
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
+      // this call back is called for each fan value, so check if need to update
+      // and for each extruder 1 update, so check if need to update nb of fans
+      if (index == ESP3DValuesIndex::ext_1_temperature ||
+          index == ESP3DValuesIndex::ext_1_target_temperature) {
+        esp3d_log("Check if extruder 1 data %s:", value);
+        uint nb_fans_tmp = 2;
+        if (strcmp(value, "#") == 0) {
+          esp3d_log("No extruder 1, only one fan");
+          nb_fans_tmp = 1;
+        }
+        if (nb_fans_tmp != nb_fans) {
+          esp3d_log("Update nb of fans");
+          nb_fans = nb_fans_tmp;
+        } else {
+          // no update needed
+          esp3d_log("No update needed");
+          return false;
+        }
+      }
       main_display_fan();
     } else {
       fanScreen::fan_value_cb(index, value, action);
@@ -275,12 +297,27 @@ void main_display_status_area() {
 }
 
 void main_display_fan() {
-  // TODO check if need a fan 2
-  lv_label_set_text_fmt(
-      lv_obj_get_child(main_btn_fan, 0), "%s%%\n%s\n%s%%",
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::ext_0_fan),
-      LV_SYMBOL_FAN,
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::ext_0_fan));
+  esp3d_log("main_display_fan");
+  if (!show_fan_button) {
+    esp3d_log("No control to show");
+    return;
+  }
+  if (nb_fans == 2) {
+    esp3d_log("Update button with 2 fans");
+    lv_label_set_text_fmt(
+        lv_obj_get_child(main_btn_fan, 0), "%s%%\n%s%%\n%s",
+        esp3dTftValues.get_string_value(ESP3DValuesIndex::ext_0_fan),
+
+        esp3dTftValues.get_string_value(ESP3DValuesIndex::ext_1_fan),
+        LV_SYMBOL_FAN);
+  } else {
+    esp3d_log("Update button with 1 fan");
+    lv_label_set_text_fmt(
+
+        lv_obj_get_child(main_btn_fan, 0), "%s%%\n%s",
+        esp3dTftValues.get_string_value(ESP3DValuesIndex::ext_0_fan),
+        LV_SYMBOL_FAN);
+  }
 }
 
 void main_display_speed() {
