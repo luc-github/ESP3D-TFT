@@ -23,7 +23,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define ESP3D_TFT_VERSION "1.0.0.a12"
+#define ESP3D_TFT_VERSION "1.0.0.a13"
 #define ESP3D_TFT_FW_URL "https://github.com/luc-github/ESP3D-TFT"
 
 #ifdef __cplusplus

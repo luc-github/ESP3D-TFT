@@ -38,11 +38,11 @@
 #include "esp3d_tft_ui.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "main_screen.h"
 #include "menu_screen.h"
 #include "rendering/esp3d_rendering_client.h"
 #include "tasks_def.h"
 #include "translations/esp3d_translation_service.h"
-
 
 /**********************
  *  STATIC PROTOTYPES
@@ -57,13 +57,18 @@ lv_timer_t *settings_screen_apply_timer = NULL;
 lv_obj_t *ui_settings_list_ctl = NULL;
 lv_obj_t *hostname_label = NULL;
 lv_obj_t *extensions_label = NULL;
+lv_obj_t *show_fan_controls_label = NULL;
 lv_obj_t *output_client_label = NULL;
 lv_obj_t *serial_baud_rate_label = NULL;
 lv_obj_t *usb_serial_baud_rate_label = NULL;
 lv_obj_t *jog_type_label = NULL;
 lv_obj_t *polling_label = NULL;
 
-//
+struct ESP3DJSONSettingsData {
+  std::string entry = "";
+  std::string value = "";
+};
+
 void settings_screen_delay_timer_cb(lv_timer_t *timer) {
   if (settings_screen_delay_timer) {
     lv_timer_del(settings_screen_delay_timer);
@@ -86,14 +91,23 @@ void refresh_settings_list_cb(lv_timer_t *timer) {
   if (refresh) settings_screen();
 }
 
-// bgLoadExtensionsSettingsTask
-static void bgLoadExtensionsSettingsTask(void *pvParameter) {
+// bgLoadJSONSettingsTask
+static void bgLoadJSONSettingsTask(void *pvParameter) {
   (void)pvParameter;
   vTaskDelay(pdMS_TO_TICKS(100));
-  std::string values =
+  std::string value =
       esp3dTftJsonSettings.readString("settings", "filesfilter");
   if (extensions_label) {
-    lv_label_set_text(extensions_label, values.c_str());
+    lv_label_set_text(extensions_label, value.c_str());
+  }
+  value = esp3dTftJsonSettings.readString("settings", "showfanctrls");
+  if (show_fan_controls_label) {
+    if (value == "true") {
+      value = esp3dTranslationService.translate(ESP3DLabel::enabled);
+    } else {
+      value = esp3dTranslationService.translate(ESP3DLabel::disabled);
+    }
+    lv_label_set_text(show_fan_controls_label, value.c_str());
   }
   static bool refresh = false;
   if (!settings_screen_apply_timer) {
@@ -103,21 +117,29 @@ static void bgLoadExtensionsSettingsTask(void *pvParameter) {
   vTaskDelete(NULL);
 }
 
-// bgSettingsTask
-static void bgSettingsTask(void *pvParameter) {
-  (void)pvParameter;
+// bgSaveJSONSettingsTask
+static void bgSaveJSONSettingsTask(void *pvParameter) {
   vTaskDelay(pdMS_TO_TICKS(100));
-  const char *str = (const char *)pvParameter;
-  esp3d_log("Got value %s in task", str);
+  ESP3DJSONSettingsData *data = (ESP3DJSONSettingsData *)pvParameter;
+  esp3d_log("Got value %s in task", data->value.c_str());
   // do the change
 
-  esp3d_log("Value %s is valid", str);
-  if (esp3dTftJsonSettings.writeString("settings", "filesfilter", str)) {
-    if (extensions_label) {
-      lv_label_set_text(extensions_label, str);
+  esp3d_log("Value %s is valid", data->value.c_str());
+  if (esp3dTftJsonSettings.writeString("settings", data->entry.c_str(),
+                                       data->value.c_str())) {
+    if (data->entry == "filesfilter") {
+      if (extensions_label) {
+        lv_label_set_text(extensions_label, data->value.c_str());
+      }
     }
+    if (data->entry == "showfanctrls") {
+      if (show_fan_controls_label) {
+        lv_label_set_text(show_fan_controls_label, data->value.c_str());
+      }
+    }
+
   } else {
-    esp3d_log_e("Failed to save extensions");
+    esp3d_log_e("Failed to save %s", data->entry.c_str());
     std::string text =
         esp3dTranslationService.translate(ESP3DLabel::error_applying_setting);
     msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
@@ -309,23 +331,46 @@ void hostname_edit_done_cb(const char *str) {
   }
 }
 
+void CreateSaveSettingTask(const char *entry, const char *value) {
+  spinnerScreen::show_spinner();
+  TaskHandle_t xHandle = NULL;
+  static ESP3DJSONSettingsData data;
+  data.entry = entry;
+  data.value = value ? value : "";
+  BaseType_t res = xTaskCreatePinnedToCore(
+      bgSaveJSONSettingsTask, "savesettingsTask", STACKDEPTH, (void *)(&data),
+      TASKPRIORITY, &xHandle, TASKCORE);
+  if (res == pdPASS && xHandle) {
+    esp3d_log("Created Settings Task");
+  } else {
+    esp3d_log_e("Settings Task creation failed");
+  }
+}
+
 // extensions_edit_done_cb
 void extensions_edit_done_cb(const char *str) {
   esp3d_log("Saving extensions to: %s\n", str);
-  static std::string value;
-  value = "";
-  if (str && strlen(str) > 0) value = str;
   if (strcmp(str, lv_label_get_text(extensions_label)) != 0) {
-    spinnerScreen::show_spinner();
-    TaskHandle_t xHandle = NULL;
-    BaseType_t res = xTaskCreatePinnedToCore(
-        bgSettingsTask, "settingsTask", STACKDEPTH, (void *)(value.c_str()),
-        TASKPRIORITY, &xHandle, TASKCORE);
-    if (res == pdPASS && xHandle) {
-      esp3d_log("Created Settings Task");
+    CreateSaveSettingTask("filesfilter", str);
+  } else {
+    esp3d_log("New value is identical do not save it");
+  }
+}
+
+// showfanctrls_edit_done_cb
+void showfanctrls_edit_done_cb(const char *str) {
+  esp3d_log("Saving Show fan controls to: %s\n", str);
+  if (strcmp(str, lv_label_get_text(show_fan_controls_label)) != 0) {
+    // now convert to boolean string
+    std::string value = "false";
+    if (strcmp(str, esp3dTranslationService.translate(ESP3DLabel::enabled)) ==
+        0) {
+      value = "true";
+      mainScreen::update_show_fan_controls(true);
     } else {
-      esp3d_log_e("Settings Task creation failed");
+      mainScreen::update_show_fan_controls(false);
     }
+    CreateSaveSettingTask("showfanctrls", value.c_str());
   } else {
     esp3d_log("New value is identical do not save it");
   }
@@ -406,6 +451,19 @@ void event_button_edit_extensions_cb(lv_event_t *e) {
   textEditor::create_text_editor(lv_scr_act(), text, extensions_edit_done_cb);
 }
 
+// event_button_edit_show_fan_controls_cb
+void event_button_edit_show_fan_controls_cb(lv_event_t *e) {
+  esp3d_log("Show component");
+  const char *text = (const char *)lv_label_get_text(show_fan_controls_label);
+  std::list<std::string> choices;
+  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::disabled));
+  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::enabled));
+  std::string title =
+      esp3dTranslationService.translate(ESP3DLabel::fan_controls);
+  choiceEditor::create_choice_editor(lv_scr_act(), text, title.c_str(), choices,
+                                     showfanctrls_edit_done_cb);
+}
+
 // event_button_edit_hostname_cb
 void event_button_edit_hostname_cb(lv_event_t *e) {
   esp3d_log("Show component");
@@ -478,8 +536,6 @@ void settings_screen() {
   LabelStr = esp3dTranslationService.translate(ESP3DLabel::extensions);
   if (line_container) {
     listLine::add_label_to_line(LabelStr.c_str(), line_container, true);
-    /* std::string values =
-         esp3dTftJsonSettings.readString("settings", "filesfilter");*/
     extensions_label = listLine::add_label_to_line("", line_container, false);
     lv_obj_t *btnEdit =
         listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
@@ -605,11 +661,24 @@ void settings_screen() {
     }
   }
 
+  // show fan controls
+  line_container = listLine::create_list_line_container(ui_settings_list_ctl);
+  LabelStr = esp3dTranslationService.translate(ESP3DLabel::fan_controls);
+  if (line_container) {
+    listLine::add_label_to_line(LabelStr.c_str(), line_container, true);
+    show_fan_controls_label =
+        listLine::add_label_to_line("", line_container, false);
+    lv_obj_t *btnEdit =
+        listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
+    lv_obj_add_event_cb(btnEdit, event_button_edit_show_fan_controls_cb,
+                        LV_EVENT_CLICKED, NULL);
+  }
+
   esp3dTftui.set_current_screen(ESP3DScreenType::settings);
   spinnerScreen::show_spinner();
   TaskHandle_t xHandle = NULL;
   BaseType_t res = xTaskCreatePinnedToCore(
-      bgLoadExtensionsSettingsTask, "extensionsettingsTask", STACKDEPTH, NULL,
+      bgLoadJSONSettingsTask, "loadjsonsettingsTask", STACKDEPTH, NULL,
       TASKPRIORITY, &xHandle, TASKCORE);
   if (res == pdPASS && xHandle) {
     esp3d_log("Created Settings Task");

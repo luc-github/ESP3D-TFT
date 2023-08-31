@@ -18,8 +18,11 @@
 */
 
 #pragma once
+#include "esp3d_values.h"
 
 namespace speedScreen {
 extern void speed_screen();
+extern bool speed_value_cb(ESP3DValuesIndex index, const char *value,
+                           ESP3DValuesCbAction action);
 
 }  // namespace speedScreen

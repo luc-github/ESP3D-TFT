@@ -49,7 +49,8 @@ bool ESP3DGCodeParserService::hasMultiLineReport(const char* data) {
 bool ESP3DGCodeParserService::processCommand(const char* data) {
   esp3d_log("processing Command %s", data);
   if (data != nullptr && strlen(data) > 0) {
-    if (strstr(data, "T:") != nullptr) {  // is temperature
+    // is temperature
+    if (strstr(data, "T:") != nullptr) {
       // ok T:25.00 /120.00 B:25.00 /0.00 @:127 B@:0
       // T:25.00 /0.00 B:25.00 /50.00 T0:25.00 /0.00 T1:25.00 /0.00 @:0 B@:127
       char* ptrt = strstr(data, "T:");
@@ -172,7 +173,8 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
             ESP3DValuesIndex::bed_target_temperature, "#");
       }
       return true;
-    } else if (strstr(data, "X:") != nullptr) {  // is position
+      // is position
+    } else if (strstr(data, "X:") != nullptr) {
       // X:0.00 Y:0.00 Z:0.00 E:0.00 Count X:0 Y:0 Z:0
       esp3d_log("Positions");
       char* ptrx = strstr(data, "X:");
@@ -195,6 +197,90 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
         return true;
       } else {
         esp3d_log_e("Error parsing positions");
+      }
+    } else if (strstr(data, "FR:") != nullptr) {
+      char* ptrfr = strstr(data, "FR:");
+      char* ptrpc = strstr(data, "%");
+      if (ptrfr && ptrpc) {
+        ptrfr += 3;
+        ptrpc[0] = '\0';
+        esp3dTftValues.set_string_value(ESP3DValuesIndex::speed, ptrfr);
+        return true;
+      } else {
+        esp3d_log_e("Error parsing progress");
+      }
+      // is fan speed ?
+    } else if (strstr(data, "M106") != nullptr ||
+               strstr(data, "M107") != nullptr) {
+      char* ptr106 = strstr(data, "M106");
+      char* ptr107 = strstr(data, "M107");
+      if (ptr106) {
+        ptr106 += 4;
+        char* ptrS = strstr(ptr106, "S");
+        if (!ptrS) {
+          esp3d_log_e("Error parsing fan speed");
+          return false;
+        }
+
+        ptrS++;
+        // get fan speed
+        std::string fanSpeed = "";
+        for (uint8_t i = 0; i < 3; i++) {
+          if (ptrS[i] >= '0' && ptrS[i] <= '9') {
+            fanSpeed += ptrS[i];
+          } else {
+            break;
+          }
+        }
+        // is there an index ?
+        esp3d_log("Check index in %s", ptr106);
+        uint8_t index = 0;
+        char* ptrI = strstr(ptr106, "P");
+        if (ptrI) {
+          esp3d_log("Index found %s", ptrI);
+          if (ptrI[1] == '1') {
+            index = 1;
+          }
+        }
+        // conversion 0~255 to 0~100
+        uint ispeed = atoi(fanSpeed.c_str());
+        ispeed = ispeed * 100 / 255;
+        // limit to 100%
+        if (ispeed > 100) {
+          ispeed = 100;
+        }
+
+        fanSpeed = std::to_string(ispeed);
+        // set fan speed according index
+        esp3d_log("Fan speed 106, index: %d, %s", index, fanSpeed.c_str());
+        if (index == 0) {
+          esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_0_fan,
+                                          fanSpeed.c_str());
+        } else {
+          esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_fan,
+                                          fanSpeed.c_str());
+        }
+        return true;
+      } else if (ptr107) {
+        ptr107 += 4;
+        char* ptrI = strstr(ptr107, "P");
+        uint8_t index = 0;
+        // is there an index ?
+        if (ptrI) {
+          if (ptrI[1] == '1') {
+            index = 1;
+          }
+        }
+        esp3d_log("Fan speed 107, index: %d", index);
+        // set fan speed to 0 according index
+        if (index == 0) {
+          esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_0_fan, "0");
+        } else {
+          esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_fan, "0");
+        }
+        return true;
+      } else {
+        esp3d_log_e("Error parsing fan speed");
       }
     }
   }
@@ -285,7 +371,7 @@ ESP3DDataType ESP3DGCodeParserService::getType(const char* data) {
     "echo:Print time:"
     "echo:E"
     "Current file:"
-    "FR:"
+    "FR:xxx%"
     "Cap:"
     "FIRMWARE_NAME:"
     "ok T:25.00 /120.00 B:25.00 /0.00 @:127 B@:0"

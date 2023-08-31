@@ -191,13 +191,8 @@ void temperatures_ta_event_cb(lv_event_t *e) {
     lv_obj_add_state(ta, LV_STATE_FOCUSED);
     lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_AUTO);
-  } else if (code == LV_EVENT_DEFOCUSED) {
-    lv_textarea_set_cursor_pos(ta, 0);
-    lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_OFF);
-    lv_keyboard_set_textarea(kb, NULL);
-    lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
-    temperatures_value = lv_textarea_get_text(ta);
-  } else if (code == LV_EVENT_READY || code == LV_EVENT_CANCEL) {
+  } else if (code == LV_EVENT_DEFOCUSED || code == LV_EVENT_READY ||
+             code == LV_EVENT_CANCEL) {
     esp3d_log("Ready, Value: %s", lv_textarea_get_text(ta));
     lv_textarea_set_cursor_pos(ta, 0);
     lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_OFF);
@@ -205,6 +200,12 @@ void temperatures_ta_event_cb(lv_event_t *e) {
     lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_state(ta, LV_STATE_FOCUSED);
     temperatures_value = lv_textarea_get_text(ta);
+    if (std::atoi(temperatures_value.c_str()) > 400) {
+      lv_textarea_set_text(ta, "400");
+    }
+    if (temperatures_value.length() == 0) {
+      lv_textarea_set_text(ta, "0");
+    }
   } else if (code == LV_EVENT_VALUE_CHANGED) {
     temperatures_value = lv_textarea_get_text(ta);
     esp3d_log("Value changed: %s", temperatures_value.c_str());
@@ -256,6 +257,7 @@ void temperatures_btn_up_event_cb(lv_event_t *e) {
   int temperatures_int = std::stoi(temperatures_value);
   int step = atoi(temperatures_buttons_map[temperatures_buttons_map_id]);
   temperatures_int += step;
+  if (temperatures_int > 400) temperatures_int = 400;
   temperatures_value = std::to_string(temperatures_int);
   lv_textarea_set_text(temperatures_ta, temperatures_value.c_str());
 }

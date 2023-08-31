@@ -38,5 +38,6 @@ extern bool speed_value_cb(ESP3DValuesIndex index, const char *value,
                            ESP3DValuesCbAction action);
 extern bool print_status_value_cb(ESP3DValuesIndex index, const char *value,
                                   ESP3DValuesCbAction action);
+extern void update_show_fan_controls(bool show);
 
 }  // namespace mainScreen
