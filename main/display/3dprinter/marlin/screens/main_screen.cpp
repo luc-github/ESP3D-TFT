@@ -146,8 +146,11 @@ bool position_value_cb(ESP3DValuesIndex index, const char *value,
 bool fan_value_cb(ESP3DValuesIndex index, const char *value,
                   ESP3DValuesCbAction action) {
   esp3d_log("fan_value_cb");
-  if (!show_fan_button) return false;
-  esp3d_log("No control to show");
+  if (!show_fan_button) {
+    esp3d_log("No control to show");
+    return false;
+  }
+
   if (action == ESP3DValuesCbAction::Update) {
     esp3d_log("Check if main screen");
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
