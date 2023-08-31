@@ -35,6 +35,7 @@
 #include "components/message_box_component.h"
 #include "components/status_bar_component.h"
 #include "components/symbol_button_component.h"
+#include "esp3d_json_settings.h"
 #include "menu_screen.h"
 #include "positions_screen.h"
 #include "speed_screen.h"
@@ -64,6 +65,8 @@ uint8_t main_screen_temperature_target = 0;
 lv_timer_t *main_screen_delay_timer = NULL;
 ESP3DScreenType next_screen = ESP3DScreenType::none;
 uint8_t nb_fans = 2;
+bool show_fan_button = true;
+bool intialization_done = false;
 
 /**********************
  *   STATIC VARIABLES
@@ -84,6 +87,9 @@ lv_obj_t *main_btn_menu = nullptr;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
+void update_show_fan_controls(bool show) { show_fan_button = show; }
+
 bool extruder_0_value_cb(ESP3DValuesIndex index, const char *value,
                          ESP3DValuesCbAction action) {
   if (action == ESP3DValuesCbAction::Update) {
@@ -139,6 +145,7 @@ bool position_value_cb(ESP3DValuesIndex index, const char *value,
 
 bool fan_value_cb(ESP3DValuesIndex index, const char *value,
                   ESP3DValuesCbAction action) {
+  if (!show_fan_button) return false;
   if (action == ESP3DValuesCbAction::Update) {
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
       main_display_fan();
@@ -523,6 +530,17 @@ void main_screen() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Main screen creation");
+  if (!intialization_done) {
+    esp3d_log("main screen initialization");
+    std::string value =
+        esp3dTftJsonSettings.readString("settings", "showfanctrls");
+    if (value == "true") {
+      show_fan_button = true;
+    } else {
+      show_fan_button = false;
+    }
+    intialization_done = true;
+  }
   // Background
   lv_obj_t *ui_main_screen = lv_obj_create(NULL);
   // Display new screen and delete old one
@@ -599,13 +617,14 @@ void main_screen() {
   lv_obj_center(main_label_progression_area);
   lv_obj_set_size(main_label_progression_area, CURRENT_STATUS_AREA_WIDTH,
                   CURRENT_STATUS_AREA_HEIGHT);
+  if (show_fan_button) {
+    // Create button and label for fan
+    main_btn_fan =
+        menuButton::create_menu_button(ui_bottom_buttons_container, "");
 
-  // Create button and label for fan
-  main_btn_fan =
-      menuButton::create_menu_button(ui_bottom_buttons_container, "");
-
-  lv_obj_add_event_cb(main_btn_fan, event_button_fan_handler, LV_EVENT_CLICKED,
-                      NULL);
+    lv_obj_add_event_cb(main_btn_fan, event_button_fan_handler,
+                        LV_EVENT_CLICKED, NULL);
+  }
 
   // Create button and label for speed
   main_btn_speed =
@@ -658,6 +677,6 @@ void main_screen() {
   main_display_stop();
   main_display_menu();
   main_display_speed();
-  main_display_fan();
+  if (show_fan_button) main_display_fan();
 }
 }  // namespace mainScreen
