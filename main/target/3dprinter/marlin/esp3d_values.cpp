@@ -104,7 +104,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesIndex::ext_0_fan,
       ESP3DValuesType::integer_t,
       0,  // precision
-      std::string("100"),
+      std::string("0"),
       mainScreen::fan_value_cb,
   });
 
@@ -113,7 +113,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesIndex::ext_1_fan,
       ESP3DValuesType::integer_t,
       0,  // precision
-      std::string("100"),
+      std::string("0"),
       mainScreen::fan_value_cb,
   });
 
