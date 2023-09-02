@@ -39,7 +39,7 @@ void ESP3DTranslationService::init() {
       {ESP3DLabel::on, "On"},
       {ESP3DLabel::off, "Off"},
       {ESP3DLabel::millimeters, "mm"},
-      {ESP3DLabel::celcius, "°C"},
+      {ESP3DLabel::celsius, "°C"},
       {ESP3DLabel::flash_type, "Flash Filesystem"},
       {ESP3DLabel::confirmation, "Please confirm"},
       {ESP3DLabel::stop_print, "Do you want to stop current print?"},

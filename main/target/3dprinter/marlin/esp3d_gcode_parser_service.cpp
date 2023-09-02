@@ -52,7 +52,7 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
     // is temperature
     if (strstr(data, "T:") != nullptr) {
       // ok T:25.00 /120.00 B:25.00 /0.00 @:127 B@:0
-      // T:25.00 /0.00 B:25.00 /50.00 T0:25.00 /0.00 T1:25.00 /0.00 @:0 B@:127
+      // T:25.00 /0.00 B:25.00 /50.00 T0:25.00 /0.00 T1:105.00 /0.00 @:0 B@:127
       char* ptrt = strstr(data, "T:");
       char* ptrt0 = strstr(data, "T0:");
       char* ptrt1 = strstr(data, "T1:");
