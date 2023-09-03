@@ -25,7 +25,6 @@
 #include "esp3d_styles.h"
 #include "translations/esp3d_translation_service.h"
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -33,7 +32,7 @@ namespace spinnerScreen {
 lv_obj_t* spinnerObj = NULL;
 size_t spinner_index = 0;
 
-void show_spinner(const char* msg) {
+void show_spinner(const char* msg, lv_obj_t* backtbn) {
   // to avoid multiple call to show spinner
 
   if (spinnerObj != NULL) {
@@ -63,6 +62,9 @@ void show_spinner(const char* msg) {
     lv_label_set_text(lblextra, msg);
     lv_obj_align_to(lblextra, lbl, LV_ALIGN_OUT_BOTTOM_MID, 0,
                     CURRENT_BUTTON_PRESSED_OUTLINE);
+  }
+  if (backtbn != nullptr) {
+    lv_obj_move_foreground(backtbn);
   }
 }
 

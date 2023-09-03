@@ -71,7 +71,9 @@ symbols_array = [
 [0xf287,'USB'],
 [0xf0a1,'MORE_INFO'],
 [0xf055,'PLUS'],
-[0xf056,'MINUS']
+[0xf056,'MINUS'],
+[0xf256,'MANUAL'],
+[0xf544,'AUTOMATIC']
 ]
 total_items = len(symbols_array)
 
