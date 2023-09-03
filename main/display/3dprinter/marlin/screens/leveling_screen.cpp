@@ -41,6 +41,9 @@
 namespace levelingScreen {
 lv_timer_t *leveling_screen_delay_timer = NULL;
 lv_obj_t *btnback = nullptr;
+bool auto_leveling = false;
+
+void leveling_screen_auto_on(bool auto_on) { auto_leveling = auto_on; }
 
 ESP3DScreenType leveling_next_screen = ESP3DScreenType::none;
 
@@ -55,7 +58,7 @@ void leveling_screen_delay_timer_cb(lv_timer_t *timer) {
       autoLevelingScreen::auto_leveling_screen();
       break;
     case ESP3DScreenType::manual_leveling:
-      manualLevelingScreen::manual_leveling_screen();
+      manualLevelingScreen::manual_leveling_screen(auto_leveling);
       break;
     case ESP3DScreenType::menu:
       menuScreen::menu_screen();
@@ -104,8 +107,9 @@ void event_button_auto_handler(lv_event_t *e) {
   }
 }
 
-void leveling_screen() {
+void leveling_screen(bool autoleveling) {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
+  auto_leveling = autoleveling;
   // Screen creation
   esp3d_log("Leveling screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);

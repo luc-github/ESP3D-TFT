@@ -43,7 +43,6 @@
 #include "temperatures_screen.h"
 #include "translations/esp3d_translation_service.h"
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/

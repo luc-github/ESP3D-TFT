@@ -68,5 +68,7 @@ void ESP3DTranslationService::init() {
       {ESP3DLabel::motors_disabled, "Motors disabled"},
       {ESP3DLabel::information, "Information"},
       {ESP3DLabel::fan_controls, "Fan controls"},
-      {ESP3DLabel::serial, "Serial"}};
+      {ESP3DLabel::serial, "Serial"},
+      {ESP3DLabel::auto_leveling, "Auto leveling"},
+  };
 }

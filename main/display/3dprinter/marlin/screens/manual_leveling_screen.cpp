@@ -26,17 +26,25 @@
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "leveling_screen.h"
+#include "menu_screen.h"
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 namespace manualLevelingScreen {
+bool auto_leveling = false;
+
 void event_button_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
-  levelingScreen::leveling_screen();
+  if (auto_leveling) {
+    levelingScreen::leveling_screen(auto_leveling);
+  } else {
+    menuScreen::menu_screen();
+  }
 }
 
-void manual_leveling_screen() {
+void manual_leveling_screen(bool autoleveling) {
+  auto_leveling = autoleveling;
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Main screen creation");

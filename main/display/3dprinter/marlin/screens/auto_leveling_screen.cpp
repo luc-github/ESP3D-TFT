@@ -33,7 +33,7 @@
 namespace autoLevelingScreen {
 void event_button_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
-  levelingScreen::leveling_screen();
+  levelingScreen::leveling_screen(true);
 }
 
 void auto_leveling_screen() {

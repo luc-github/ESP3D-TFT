@@ -20,5 +20,5 @@
 #pragma once
 
 namespace manualLevelingScreen {
-extern void manual_leveling_screen();
+extern void manual_leveling_screen(bool auto_leveling);
 }  // namespace manualLevelingScreen

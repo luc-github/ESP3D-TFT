@@ -70,6 +70,7 @@ enum class ESP3DLabel : uint16_t {
   motors_disabled,
   fan_controls,
   information,
+  auto_leveling,
   unknown_index,  // must be last
 };
 

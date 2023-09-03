@@ -28,11 +28,10 @@
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
-#include "main_screen.h"
+#include "menu_screen.h"
 #include "rendering/esp3d_rendering_client.h"
 #include "temperatures_screen.h"
 #include "translations/esp3d_translation_service.h"
-
 
 /**********************
  *  STATIC PROTOTYPES
@@ -111,7 +110,7 @@ void filament_screen_delay_timer_cb(lv_timer_t *timer) {
     lv_timer_del(filament_screen_delay_timer);
     filament_screen_delay_timer = NULL;
   }
-  mainScreen::main_screen();
+  menuScreen::menu_screen();
 }
 
 void filament_screen_edit_delay_timer_cb(lv_timer_t *timer) {
