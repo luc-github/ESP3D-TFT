@@ -115,7 +115,7 @@ esp_err_t bsp_init(void) {
 
   /* Touch controller initialization */
   esp3d_log("Initializing touch controller");
-if (gt911_init(i2c_bus_handle) != ESP_OK) {
+  if (gt911_init(i2c_bus_handle) != ESP_OK) {
     return ESP_FAIL;
   }
 
