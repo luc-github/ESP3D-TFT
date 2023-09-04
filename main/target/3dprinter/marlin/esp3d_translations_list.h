@@ -71,6 +71,8 @@ enum class ESP3DLabel : uint16_t {
   fan_controls,
   information,
   auto_leveling,
+  manual_leveling_help,
+  manual_leveling_text,
   unknown_index,  // must be last
 };
 

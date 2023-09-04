@@ -70,5 +70,12 @@ void ESP3DTranslationService::init() {
       {ESP3DLabel::fan_controls, "Fan controls"},
       {ESP3DLabel::serial, "Serial"},
       {ESP3DLabel::auto_leveling, "Auto leveling"},
+      {ESP3DLabel::manual_leveling_help,
+       "Adjust each  knobs corresponding to active position until a sheet of "
+       "paper just slides amid nozzle and plate.\n"
+       "Repeat operation for each point until no correction is needed."},
+      {ESP3DLabel::manual_leveling_text,
+       "Adjust knobs to level, then click on next.\nYou can also select "
+       "manually each point."},
   };
 }

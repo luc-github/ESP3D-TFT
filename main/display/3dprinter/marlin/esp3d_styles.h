@@ -45,6 +45,7 @@ enum class ESP3DStyleType : uint8_t {
   spinner_text,
   radio_button,
   list_container,
+  text_container,
 };
 
 extern bool init_styles();
