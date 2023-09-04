@@ -27,6 +27,7 @@ extern "C" {
 #include "esp_lcd_panel_interface.h"
 #include "esp_lcd_panel_commands.h"
 #include "driver/gpio.h"
+#include "driver/spi_master.h"
 #include "disp_def.h"
 
 

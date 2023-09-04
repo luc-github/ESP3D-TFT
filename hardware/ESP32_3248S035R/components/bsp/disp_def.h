@@ -14,9 +14,9 @@ LANDSCAPE				2
 LANDSCAPE_INVERTED		3
 */
 
-#define ST7796_DISPLAY_ORIENTATION 3  // landscape inverted
+#define DISP_ORIENTATION 3  // landscape inverted
 
-#if ST7796_DISPLAY_ORIENTATION == 2 || ST7796_DISPLAY_ORIENTATION == 3  // landscape mode
+#if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
 #define DISP_HOR_RES_MAX (480)
 #define DISP_VER_RES_MAX (320)
 #else  // portrait mode

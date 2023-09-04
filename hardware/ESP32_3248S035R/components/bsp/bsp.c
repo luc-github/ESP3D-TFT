@@ -24,6 +24,7 @@
 #include "bsp.h"
 
 #include "esp3d_log.h"
+#include "spi_bus.h"
 
 #if ESP3D_DISPLAY_FEATURE
 #include "esp_lcd_backlight.h"
@@ -33,7 +34,6 @@
 #include "xpt2046.h"
 
 #endif  // ESP3D_DISPLAY_FEATURE
-#include "spi_bus.h"
 
 /*********************
  *      DEFINES
@@ -97,6 +97,7 @@ esp_err_t bsp_init(void) {
   disp_backlight_h bckl_handle = disp_backlight_new(&bckl_config);
   disp_backlight_set(bckl_handle, DISP_BCKL_DEFAULT_DUTY);
 #endif
+
   /* Touch controller initialization */
   esp3d_log("Initializing touch controller");
   // SPI is shared between touch and display so no need to init SPI again

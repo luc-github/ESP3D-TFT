@@ -114,12 +114,12 @@ esp_err_t st7796_init(lv_disp_drv_t  * disp_drv){
 #if ST7796_INVERT_COLORS == 1
     esp_lcd_panel_invert_color(panel_handle, true);
 #endif //ST7796_INVERT_COLORS
-#if ST7796_DISPLAY_ORIENTATION == 2 || ST7796_DISPLAY_ORIENTATION == 3  // landscape mode
+#if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
     panel_st7796_swap_xy(panel_handle,true);
-#endif //ST7796_DISPLAY_ORIENTATION
-#if ST7796_DISPLAY_ORIENTATION == 1 || ST7796_DISPLAY_ORIENTATION == 3  // mirrored
+#endif //DISP_ORIENTATION
+#if DISP_ORIENTATION == 1 || DISP_ORIENTATION == 3  // mirrored
     panel_st7796_mirror(panel_handle, true, true);
-#endif //ST7796_DISPLAY_ORIENTATION
+#endif //DISP_ORIENTATION
     esp3d_log("Turn on LCD backlight");
     gpio_set_level(DISP_PIN_BCKL, DISP_BL_ON);
 
