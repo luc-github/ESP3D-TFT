@@ -38,7 +38,7 @@ LANDSCAPE_INVERTED		3
 
 #define ST7796_INVERT_COLORS 0  // Flag
 
-#define ST7796_RST 4            // GPIO 4
+#define ST7796_RST -1           // (Not connected to GPIO)
 #define ST7796_DC 2             // GPIO 2
 
 // SPI Shared with Touch
