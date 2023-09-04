@@ -39,5 +39,8 @@ enum class ESP3DScreenType : uint8_t {
   menu,
   informations,
   station,
-  access_point
+  access_point,
+  manual_leveling,
+  auto_leveling,
+  empty
 };

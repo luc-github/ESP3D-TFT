@@ -36,6 +36,7 @@
 #include "informations_screen.h"
 #include "leveling_screen.h"
 #include "main_screen.h"
+#include "manual_leveling_screen.h"
 #include "menu_screen.h"
 #include "rendering/esp3d_rendering_client.h"
 #include "settings_screen.h"
@@ -53,6 +54,10 @@ lv_timer_t *menu_screen_delay_timer = NULL;
 ESP3DScreenType menu_next_screen = ESP3DScreenType::none;
 lv_obj_t *main_btn_leveling = NULL;
 lv_obj_t *main_btn_disable_steppers = NULL;
+bool intialization_done = false;
+bool auto_leveling = false;
+
+void enable_auto_leveling(bool enable) { auto_leveling = enable; }
 
 void menu_display_leveling() {
   std::string label_text =
@@ -106,7 +111,11 @@ void menu_screen_delay_timer_cb(lv_timer_t *timer) {
       settingsScreen::settings_screen();
       break;
     case ESP3DScreenType::leveling:
-      levelingScreen::leveling_screen();
+      if (auto_leveling) {
+        levelingScreen::leveling_screen(auto_leveling);
+      } else {
+        manualLevelingScreen::manual_leveling_screen(auto_leveling);
+      }
       break;
     case ESP3DScreenType::informations:
       informationsScreen::informations_screen();
@@ -210,6 +219,13 @@ void event_button_disable_steppers_handler(lv_event_t *e) {
 
 void menu_screen() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
+  if (!intialization_done) {
+    esp3d_log("menu screen initialization");
+    uint8_t byteValue =
+        esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_auto_level_on);
+    auto_leveling = byteValue == 1 ? true : false;
+    intialization_done = true;
+  }
   // Screen creation
   esp3d_log("menu screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);

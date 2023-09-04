@@ -16,18 +16,28 @@ OPTION(ESP32S3_CUSTOM "HARDWARE TARGET is ESP32S3 custom board" OFF)
 OPTION(ESP32_CUSTOM "HARDWARE TARGET is ESP32 custom board" OFF)
 
 # WARNING:
-#   Limited help or support available for this target.
+#   Limited help or support available for these targets.
 #   PSRAM hardware mod is REQUIRED for full functionality and performance.
-OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R 2.8inches" OFF)
+OPTION(ESP32_3248S035C "TFT TARGET is ESP32_3248S035C 3.5inches (Capacitive)" OFF)
+OPTION(ESP32_3248S035R "TFT TARGET is ESP32_3248S035R 3.5inches (Resistive)" OFF)
+OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R 2.8inches (Resistive)" OFF)
 
 
 # #######################################
 # Optionally select a hardware variant
 # #######################################
-if(ESP32_2432S028R)
-    OPTION(ESP32_2432S028R_ORIGINAL "ESP32 2.8inches - Original hardware with 4MB Flash, without PSRAM" OFF)
-    OPTION(ESP32_2432S028R_4MB_WITH_PSRAM "ESP32 2.8inches - 4MB Flash, with External PSRAM mod" OFF)
-    OPTION(ESP32_2432S028R_16MB_WITH_PSRAM "ESP32 2.8inches - 16MB Flash mod, with External PSRAM mod" ON)
+if(ESP32_3248S035C)
+    OPTION(ESP32_3248S035C_ORIGINAL "ESP32 3.5inches (Capacitive)  - Original hardware with 4MB Flash, without PSRAM" ON)
+    OPTION(ESP32_3248S035C_4MB_WITH_PSRAM "ESP32 3.5inches (Capacitive) - 4MB Flash, with External PSRAM mod" OFF)
+    OPTION(ESP32_3248S035C_16MB_WITH_PSRAM "ESP32 3.5inches (Capacitive) - 16MB Flash mod, with External PSRAM mod" OFF)
+elseif(ESP32_3248S035R)
+    OPTION(ESP32_3248S035R_ORIGINAL "ESP32 3.5inches (Resistive)  - Original hardware with 4MB Flash, without PSRAM" ON)
+    OPTION(ESP32_3248S035R_4MB_WITH_PSRAM "ESP32 3.5inches (Resistive) - 4MB Flash, with External PSRAM mod" OFF)
+    OPTION(ESP32_3248S035R_16MB_WITH_PSRAM "ESP32 3.5inches (Resistive) - 16MB Flash mod, with External PSRAM mod" OFF)
+elseif(ESP32_2432S028R)
+    OPTION(ESP32_2432S028R_ORIGINAL "ESP32 2.8inches (Resistive) - Original hardware with 4MB Flash, without PSRAM" OFF)
+    OPTION(ESP32_2432S028R_4MB_WITH_PSRAM "ESP32 2.8inches (Resistive) - 4MB Flash, with External PSRAM mod" OFF)
+    OPTION(ESP32_2432S028R_16MB_WITH_PSRAM "ESP32 2.8inches (Resistive) - 16MB Flash mod, with External PSRAM mod" ON)
 endif()
 
 
@@ -82,6 +92,40 @@ elseif(ESP32S3_8048S043)
 elseif(ESP32S3_4827S043)
     set(SDKCONFIG hardware/ESP32S3_4827S043/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_4827S043/components)
+    elseif(ESP32_3248S035C)
+    if(ESP32_3248S035C_16MB_WITH_PSRAM)
+        set(SDKCONFIG hardware/ESP32_3248S035C/variants/16MB_with_PSRAM/sdkconfig)
+        set(EXTRA_COMPONENT_DIRS hardware/ESP32_3248S035C/variants/16MB_with_PSRAM/components)
+        add_compile_options(-DWITH_PSRAM=1)
+    elseif(ESP32_3248S035C_4MB_WITH_PSRAM)
+        set(SDKCONFIG hardware/ESP32_3248S035C/variants/4MB_with_PSRAM/sdkconfig)
+        set(EXTRA_COMPONENT_DIRS hardware/ESP32_3248S035C/variants/4MB_with_PSRAM/components)
+        add_compile_options(-DWITH_PSRAM=1)
+    else()
+        set(SDKCONFIG hardware/ESP32_3248S035C/variants/4MB_original/sdkconfig)
+        set(EXTRA_COMPONENT_DIRS hardware/ESP32_3248S035C/variants/4MB_original/components)
+        message(DEPRECATION
+            "\n"
+            "Target is missing PSRAM and is not officially supported due to known performance and functionality issues."
+            "\n")
+    endif()
+elseif(ESP32_3248S035R)
+    if(ESP32_3248S035R_16MB_WITH_PSRAM)
+        set(SDKCONFIG hardware/ESP32_3248S035R/variants/16MB_with_PSRAM/sdkconfig)
+        set(EXTRA_COMPONENT_DIRS hardware/ESP32_3248S035R/variants/16MB_with_PSRAM/components)
+        add_compile_options(-DWITH_PSRAM=1)
+    elseif(ESP32_3248S035R_4MB_WITH_PSRAM)
+        set(SDKCONFIG hardware/ESP32_3248S035R/variants/4MB_with_PSRAM/sdkconfig)
+        set(EXTRA_COMPONENT_DIRS hardware/ESP32_3248S035R/variants/4MB_with_PSRAM/components)
+        add_compile_options(-DWITH_PSRAM=1)
+    else()
+        set(SDKCONFIG hardware/ESP32_3248S035R/variants/4MB_original/sdkconfig)
+        set(EXTRA_COMPONENT_DIRS hardware/ESP32_3248S035R/variants/4MB_original/components)
+        message(DEPRECATION
+            "\n"
+            "Target is missing PSRAM and is not officially supported due to known performance and functionality issues."
+            "\n")
+    endif()
 elseif(ESP32_2432S028R)
     if(ESP32_2432S028R_16MB_WITH_PSRAM)
         set(SDKCONFIG hardware/ESP32_2432S028R/variants/16MB_with_PSRAM/sdkconfig)
@@ -247,6 +291,14 @@ if(ESP32_2432S028R)
     add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32_2432S028R/components/bsp")
     set(EXTRA_COMPONENT_DIRS hardware/ESP32_2432S028R/components)
     set(TFT_TARGET "ESP32_2432S028R")
+elseif(ESP32_3248S035C)
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32_3248S035C/components/bsp")
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32_3248S035C/components)
+    set(TFT_TARGET "ESP32_3248S035C")
+elseif(ESP32_3248S035R)
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32_3248S035R/components/bsp")
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32_3248S035R/components)
+    set(TFT_TARGET "ESP32_3248S035R")
 elseif(ESP32S3_HMI43V3)
     add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32S3_HMI43V3/components/bsp")
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_HMI43V3/components)

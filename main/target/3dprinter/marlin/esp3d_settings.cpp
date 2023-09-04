@@ -161,6 +161,7 @@ const ESP3DSettingDescription ESP3DSettingsData[] = {
 #if ESP3D_DISPLAY_FEATURE
     {ESP3DSettingIndex::esp3d_jog_type, ESP3DSettingType::byte_t, 1, "0"},
     {ESP3DSettingIndex::esp3d_polling_on, ESP3DSettingType::byte_t, 1, "1"},
+    {ESP3DSettingIndex::esp3d_auto_level_on, ESP3DSettingType::byte_t, 1, "0"},
 #endif  // ESP3D_DISPLAY_FEATURE
 };
 
@@ -281,6 +282,7 @@ bool ESP3DSettings::isValidByteSetting(uint8_t value,
 #if ESP3D_DISPLAY_FEATURE
     case ESP3DSettingIndex::esp3d_jog_type:
     case ESP3DSettingIndex::esp3d_polling_on:
+    case ESP3DSettingIndex::esp3d_auto_level_on:
 #endif  // ESP3D_DISPLAY_FEATURE
     case ESP3DSettingIndex::esp3d_setup:
 #if ESP3D_TELNET_FEATURE

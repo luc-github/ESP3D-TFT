@@ -40,7 +40,7 @@ enum class ESP3DLabel : uint16_t {
   on,
   off,
   millimeters,
-  celcius,
+  celsius,
   flash_type,
   confirmation,
   stop_print,
@@ -67,10 +67,13 @@ enum class ESP3DLabel : uint16_t {
   polling,
   enabled,
   disabled,
-  unknown_index,
   motors_disabled,
   fan_controls,
-  information
+  information,
+  auto_leveling,
+  manual_leveling_help,
+  manual_leveling_text,
+  unknown_index,  // must be last
 };
 
 #ifdef __cplusplus

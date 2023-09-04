@@ -36,6 +36,7 @@
 #include "components/status_bar_component.h"
 #include "components/symbol_button_component.h"
 #include "esp3d_json_settings.h"
+#include "filament_screen.h"
 #include "menu_screen.h"
 #include "positions_screen.h"
 #include "speed_screen.h"
@@ -98,6 +99,7 @@ bool extruder_0_value_cb(ESP3DValuesIndex index, const char *value,
     } else {
       // update other screens calling each callback update function
       temperaturesScreen::extruder_0_value_cb(index, value, action);
+      filamentScreen::filament_value_cb(index, value, action);
     }
   }
   return true;
@@ -113,6 +115,7 @@ bool extruder_1_value_cb(ESP3DValuesIndex index, const char *value,
       //  update other screens calling each callback update function
       temperaturesScreen::extruder_1_value_cb(index, value, action);
       fanScreen::fan_value_cb(index, value, action);
+      filamentScreen::filament_value_cb(index, value, action);
     }
   }
   return true;

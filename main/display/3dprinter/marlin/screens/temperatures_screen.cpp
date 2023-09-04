@@ -28,6 +28,7 @@
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "filament_screen.h"
 #include "main_screen.h"
 #include "rendering/esp3d_rendering_client.h"
 #include "translations/esp3d_translation_service.h"
@@ -39,6 +40,7 @@ namespace temperaturesScreen {
 std::string temperatures_value = "0";
 const char *temperatures_buttons_map[] = {"1", "10", "50", "100", ""};
 uint8_t temperatures_buttons_map_id = 0;
+ESP3DScreenType screen_return = ESP3DScreenType::main;
 
 lv_obj_t *btnm_target = NULL;
 
@@ -168,7 +170,13 @@ void temperatures_screen_delay_timer_cb(lv_timer_t *timer) {
     lv_timer_del(temperatures_screen_delay_timer);
     temperatures_screen_delay_timer = NULL;
   }
-  mainScreen::main_screen();
+  if (screen_return == ESP3DScreenType::main) {
+    mainScreen::main_screen();
+  } else if (screen_return == ESP3DScreenType::filament) {
+    filamentScreen::filament_screen();
+  } else {
+    esp3d_log_e("Screen return not supported");
+  }
 }
 
 void event_button_temperatures_back_handler(lv_event_t *e) {
@@ -396,8 +404,9 @@ void heater_matrix_buttons_event_cb(lv_event_t *e) {
   }
 }
 
-void temperatures_screen(uint8_t target) {
+void temperatures_screen(uint8_t target, ESP3DScreenType screenreturn) {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
+  screen_return = screenreturn;
   if (!intialization_done) {
     esp3d_log("Temperatures screen initialization");
     // by default all heater are detected
@@ -517,7 +526,7 @@ void temperatures_screen(uint8_t target) {
   // unit
   lv_obj_t *label_unit1 = lv_label_create(ui_new_screen);
   lv_label_set_text(label_unit1,
-                    esp3dTranslationService.translate(ESP3DLabel::celcius));
+                    esp3dTranslationService.translate(ESP3DLabel::celsius));
   apply_style(label_unit1, ESP3DStyleType::bg_label);
   lv_obj_align_to(label_unit1, label_current_temperature_value,
                   LV_ALIGN_OUT_RIGHT_MID, CURRENT_BUTTON_PRESSED_OUTLINE / 2,
@@ -566,7 +575,7 @@ void temperatures_screen(uint8_t target) {
   // Unit
   lv_obj_t *label_unit2 = lv_label_create(ui_new_screen);
   lv_label_set_text(label_unit2,
-                    esp3dTranslationService.translate(ESP3DLabel::celcius));
+                    esp3dTranslationService.translate(ESP3DLabel::celsius));
   apply_style(label_unit2, ESP3DStyleType::bg_label);
 
   lv_obj_align_to(label_unit2, temperatures_ta, LV_ALIGN_OUT_RIGHT_MID,
@@ -624,7 +633,7 @@ void temperatures_screen(uint8_t target) {
   // unit
   label_unit1 = lv_label_create(ui_new_screen);
   lv_label_set_text(label_unit1,
-                    esp3dTranslationService.translate(ESP3DLabel::celcius));
+                    esp3dTranslationService.translate(ESP3DLabel::celsius));
   apply_style(label_unit1, ESP3DStyleType::bg_label);
   lv_obj_align_to(label_unit1, label_target_temperature_value,
                   LV_ALIGN_OUT_RIGHT_MID, CURRENT_BUTTON_PRESSED_OUTLINE / 2,

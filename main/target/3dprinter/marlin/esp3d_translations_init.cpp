@@ -39,7 +39,7 @@ void ESP3DTranslationService::init() {
       {ESP3DLabel::on, "On"},
       {ESP3DLabel::off, "Off"},
       {ESP3DLabel::millimeters, "mm"},
-      {ESP3DLabel::celcius, "°C"},
+      {ESP3DLabel::celsius, "°C"},
       {ESP3DLabel::flash_type, "Flash Filesystem"},
       {ESP3DLabel::confirmation, "Please confirm"},
       {ESP3DLabel::stop_print, "Do you want to stop current print?"},
@@ -68,5 +68,14 @@ void ESP3DTranslationService::init() {
       {ESP3DLabel::motors_disabled, "Motors disabled"},
       {ESP3DLabel::information, "Information"},
       {ESP3DLabel::fan_controls, "Fan controls"},
-      {ESP3DLabel::serial, "Serial"}};
+      {ESP3DLabel::serial, "Serial"},
+      {ESP3DLabel::auto_leveling, "Auto leveling"},
+      {ESP3DLabel::manual_leveling_help,
+       "Adjust each knobs corresponding to active position until a sheet of "
+       "paper just slides amid nozzle and plate.\n"
+       "Repeat operation for each point until no correction is needed."},
+      {ESP3DLabel::manual_leveling_text,
+       "Adjust knobs to level, then click on next.\nYou can also select "
+       "manually each point."},
+  };
 }

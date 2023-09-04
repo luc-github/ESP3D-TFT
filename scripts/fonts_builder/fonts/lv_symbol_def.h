@@ -28,7 +28,7 @@ extern "C" {
       61618,61559,61560,61523,61524,61728,63012,61867,
       63587,62603,63275,61829,62913,62973,58552,62683,
       58557,61442,62679,62156,61758,61842,58563,62437,
-      62099,62087,61601,61525,61526
+      62099,62087,61601,61525,61526,62038,62788
 */
 
 /* These symbols can be prefined in the lv_conf.h file.
@@ -311,6 +311,14 @@ extern "C" {
 #define LV_SYMBOL_MINUS           "\xEF\x81\x96" /*61526, 0xF056*/
 #endif
 
+#if !defined LV_SYMBOL_MANUAL
+#define LV_SYMBOL_MANUAL           "\xEF\x89\x96" /*62038, 0xF256*/
+#endif
+
+#if !defined LV_SYMBOL_AUTOMATIC
+#define LV_SYMBOL_AUTOMATIC           "\xEF\x95\x84" /*62788, 0xF544*/
+#endif
+
 #if !defined LV_SYMBOL_DUMMY
 /** Invalid symbol at (U+F8FF). If written before a string then `lv_img` will show it as a label*/
 #define LV_SYMBOL_DUMMY           "\xEF\xA3\xBF"
@@ -386,6 +394,8 @@ enum {
     _LV_STR_SYMBOL_MORE_INFO,
     _LV_STR_SYMBOL_PLUS,
     _LV_STR_SYMBOL_MINUS,
+    _LV_STR_SYMBOL_MANUAL,
+    _LV_STR_SYMBOL_AUTOMATIC,
     _LV_STR_SYMBOL_DUMMY,
 };
  

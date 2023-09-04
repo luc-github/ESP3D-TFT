@@ -39,7 +39,6 @@
 #include "sta_screen.h"
 #include "translations/esp3d_translation_service.h"
 
-
 #if defined __has_include
 #if __has_include("bsp_patch.h")
 #include "bsp_patch.h"
@@ -51,6 +50,7 @@
  **********************/
 namespace wifiScreen {
 lv_timer_t *wifi_screen_delay_timer = NULL;
+lv_obj_t *btnback = nullptr;
 #if ESP3D_PATCH_DELAY_REFRESH
 lv_timer_t *wifi_screen_delay_refresh_timer = NULL;
 void wifi_screen_delay_refresh_timer_cb(lv_timer_t *timer) {
@@ -64,6 +64,13 @@ void wifi_screen_delay_refresh_timer_cb(lv_timer_t *timer) {
 lv_timer_t *wifi_screen_delay_connecting_timer = nullptr;
 
 void wifi_screen_delay_connecting_timer_cb(lv_timer_t *timer) {
+  if (esp3dTftui.get_current_screen() != ESP3DScreenType::wifi) {
+    if (wifi_screen_delay_connecting_timer) {
+      lv_timer_del(wifi_screen_delay_connecting_timer);
+      wifi_screen_delay_connecting_timer = NULL;
+    }
+    return;
+  }
   std::string mode =
       esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
   std::string status =
@@ -113,6 +120,10 @@ void wifi_screen_delay_timer_cb(lv_timer_t *timer) {
   if (wifi_screen_delay_timer) {
     lv_timer_del(wifi_screen_delay_timer);
     wifi_screen_delay_timer = NULL;
+  }
+  if (wifi_screen_delay_connecting_timer) {
+    lv_timer_del(wifi_screen_delay_connecting_timer);
+    wifi_screen_delay_connecting_timer = NULL;
   }
   switch (wifi_next_screen) {
     case ESP3DScreenType::access_point:
@@ -193,7 +204,7 @@ void wifi_screen() {
   lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
 
-  lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
+  btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_wifi_back_handler, LV_EVENT_CLICKED,
                       NULL);
   wifiStatus::wifi_status(ui_new_screen, btnback);
@@ -239,7 +250,7 @@ void wifi_screen() {
   if (mode == LV_SYMBOL_WIFI && status == "x") {
     std::string text =
         esp3dTranslationService.translate(ESP3DLabel::connecting);
-    spinnerScreen::show_spinner(text.c_str());
+    spinnerScreen::show_spinner(text.c_str(), btnback);
     wifi_screen_delay_connecting_timer =
         lv_timer_create(wifi_screen_delay_connecting_timer_cb, 500, NULL);
   } else {

@@ -28,7 +28,10 @@ ESP3DGCodeParserService esp3dGcodeParser;
 
 const char* emmergencyGcodeCommand[] = {"M112", "M410", "M999"};
 const char* emmergencyESP3DCommand[] = {"[ESP701]"};
-const char* pollingCommands[] = {"M105", "M114", ""};
+const char* pollingCommands[] = {"M105",  // Temperatures
+                                 "M114",  // Positions
+                                 "M220",  // Speed
+                                 ""};
 const char** ESP3DGCodeParserService::getPollingCommands() {
   return pollingCommands;
 }
@@ -52,7 +55,7 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
     // is temperature
     if (strstr(data, "T:") != nullptr) {
       // ok T:25.00 /120.00 B:25.00 /0.00 @:127 B@:0
-      // T:25.00 /0.00 B:25.00 /50.00 T0:25.00 /0.00 T1:25.00 /0.00 @:0 B@:127
+      // T:25.00 /0.00 B:25.00 /50.00 T0:25.00 /0.00 T1:105.00 /0.00 @:0 B@:127
       char* ptrt = strstr(data, "T:");
       char* ptrt0 = strstr(data, "T0:");
       char* ptrt1 = strstr(data, "T1:");
