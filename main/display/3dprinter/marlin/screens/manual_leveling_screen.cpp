@@ -30,6 +30,7 @@
 #include "esp3d_tft_ui.h"
 #include "leveling_screen.h"
 #include "menu_screen.h"
+#include "rendering/esp3d_rendering_client.h"
 #include "translations/esp3d_translation_service.h"
 
 /**********************
@@ -59,7 +60,7 @@ lv_obj_t *status_container = NULL;
 double intialization_done = false;
 double bed_width = 100;
 double bed_depth = 100;
-
+#define DEFAULT_Z_DISTANCE 15
 lv_timer_t *manual_leveling_screen_delay_timer = NULL;
 void update_bed_width(double value) { bed_width = value; }
 
@@ -91,50 +92,78 @@ void event_button_manual_leveling_back_handler(lv_event_t *e) {
 void move_to_position(int pos) {
   if (!homing_done) {
     esp3d_log("Homing not done, doing now...");
-    // Todo : send G28
-
+    renderingClient.sendGcode("G28");
     homing_done = true;
   }
+  std::string gcode_command = "G1 Z" + std::to_string(DEFAULT_Z_DISTANCE);
+  renderingClient.sendGcode(gcode_command.c_str());
+  double x = 0;
+  double y = 0;
+  double x_pad = bed_width / 10;
+  double y_pad = bed_depth / 10;
   switch (pos) {
     case 0:
       // Move to position 0
       esp3d_log("Move to position 0");
+      x = x_pad;
+      y = y_pad;
       break;
     case 1:
       // Move to position 1
       esp3d_log("Move to position 1");
+      x = bed_width / 2;
+      y = y_pad;
       break;
     case 2:
       // Move to position 2
       esp3d_log("Move to position 2");
+      x = bed_width - x_pad;
+      y = y_pad;
       break;
     case 3:
       // Move to position 3
       esp3d_log("Move to position 3");
+      x = x_pad;
+      y = bed_depth / 2;
       break;
     case 4:
       // Move to position 4
       esp3d_log("Move to position 4");
+      x = bed_width / 2;
+      y = bed_depth / 2;
       break;
     case 5:
       // Move to position 5
       esp3d_log("Move to position 5");
+      x = bed_width - x_pad;
+      y = bed_depth / 2;
       break;
     case 6:
       // Move to position 6
       esp3d_log("Move to position 6");
+      x = x_pad;
+      y = bed_depth - y_pad;
       break;
     case 7:
       // Move to position 7
       esp3d_log("Move to position 7");
+      x = bed_width / 2;
+      y = bed_depth - y_pad;
       break;
     case 8:
       // Move to position 8
       esp3d_log("Move to position 8");
+      x = bed_width - x_pad;
+      y = bed_depth - y_pad;
       break;
     default:
       break;
   }
+  // Move to position
+  gcode_command = "G1 X" + std::to_string(x) + " Y" + std::to_string(y);
+  renderingClient.sendGcode(gcode_command.c_str());
+  // Move to Z0
+  renderingClient.sendGcode("G1 Z0");
 }
 
 void event_button_manual_leveling_next_handler(lv_event_t *e) {
