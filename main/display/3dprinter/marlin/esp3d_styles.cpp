@@ -78,6 +78,7 @@ lv_style_t style_embedded_btn_pressed;
 lv_style_t style_col_container_default;
 lv_style_t style_row_container_default;
 lv_style_t style_simple_container_default;
+lv_style_t style_text_container;
 lv_style_t style_spinner_screen;
 lv_style_t style_spinner_text;
 
@@ -542,6 +543,11 @@ bool init_styles() {
   lv_style_set_bg_opa(&style_simple_container_default, LV_OPA_COVER);
   lv_style_set_bg_color(&style_simple_container_default, CURRENT_MAIN_BG_COLOR);
 
+  // Text Container
+  lv_style_init(&style_text_container);
+  lv_style_set_bg_opa(&style_text_container, LV_OPA_COVER);
+  lv_style_set_bg_color(&style_text_container, CURRENT_MAIN_BG_COLOR);
+
   return true;
 }
 
@@ -661,6 +667,10 @@ bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
                        LV_PART_SCROLLBAR | LV_STATE_SCROLLED);
 #pragma GCC diagnostic pop
       lv_obj_set_style_radius(obj, 0, LV_PART_MAIN);
+      break;
+    case ESP3DStyleType::text_container:
+      lv_obj_add_style(obj, &style_text_container, LV_STATE_DEFAULT);
+      lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_ELASTIC);
       break;
     case ESP3DStyleType::simple_container:
       lv_obj_add_style(obj, &style_simple_container_default, LV_STATE_DEFAULT);
