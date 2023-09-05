@@ -17,7 +17,7 @@ extern "C" {
 #define XPT2046_Y_INV           1
 #define XPT2046_XY_SWAP		    0
 #define XPT2046_TOUCH_THRESHOLD 400 // Threshold for touch detection
-#define XPT2046_TOUCH_IRQ       36 //GPIO 36
+#define XPT2046_TOUCH_IRQ       36  // GPIO 36
 #define XPT2046_TOUCH_IRQ_PRESS 1
 #define XPT2046_TOUCH_PRESS     1
 
@@ -30,7 +30,6 @@ extern "C" {
 #define TOUCH_SPI_HOST SPI2_HOST
 //#define TOUCH_SPI_HOST SPI3_HOST
 
-//#define SHARED_SPI_BUS
 #define TOUCH_SPI_CLOCK_SPEED_HZ    (2*1000*1000)
 #define TOUCH_SPI_MODE          (0)
 
