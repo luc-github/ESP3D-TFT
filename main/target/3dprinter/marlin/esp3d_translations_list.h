@@ -73,6 +73,8 @@ enum class ESP3DLabel : uint16_t {
   auto_leveling,
   manual_leveling_help,
   manual_leveling_text,
+  bed_width,
+  bed_depth,
   unknown_index,  // must be last
 };
 

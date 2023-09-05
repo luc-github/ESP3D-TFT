@@ -77,5 +77,7 @@ void ESP3DTranslationService::init() {
       {ESP3DLabel::manual_leveling_text,
        "Adjust knobs to level, then click on next.\nYou can also select "
        "manually each point."},
+      {ESP3DLabel::bed_width, "Bed width"},
+      {ESP3DLabel::bed_depth, "Bed depth"},
   };
 }

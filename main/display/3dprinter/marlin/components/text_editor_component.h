@@ -24,5 +24,8 @@
 
 namespace textEditor {
 lv_obj_t *create_text_editor(lv_obj_t *container, const char *text,
-                             void (*callbackFn)(const char *));
+                             void (*callbackFn)(const char *),
+                             size_t max_length = 0,
+                             const char *accepted_chars = NULL,
+                             bool is_number = false);
 }  // namespace textEditor
