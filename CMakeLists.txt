@@ -16,9 +16,9 @@ OPTION(ESP32_CUSTOM "HARDWARE TARGET is ESP32 custom board" OFF)
 # WARNING:
 #   Limited help or support available for these targets.
 #   PSRAM hardware mod is REQUIRED for full functionality and performance.
-OPTION(ESP32_3248S035C "TFT TARGET is ESP32_3248S035C 3.5in. 480x320 (Capacitive)" OFF)
-OPTION(ESP32_3248S035R "TFT TARGET is ESP32_3248S035R 3.5in. 480x320 (Resistive)" OFF)
-OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R 2.8in. 320x240 (Resistive)" OFF)
+OPTION(ESP32_3248S035C "TFT TARGET is ESP32_3248S035C - 3.5in. 480x320 (Capacitive)" OFF)
+OPTION(ESP32_3248S035R "TFT TARGET is ESP32_3248S035R - 3.5in. 480x320 (Resistive)" OFF)
+OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R - 2.8in. 320x240 (Resistive)" OFF)
 
 
 # #######################################
@@ -28,7 +28,9 @@ if(ESP32_3248S035C)
     OPTION(HARDWARE_MOD_GT911_INT "Hardware Mod: GT911 INT pin (GPIO21)" OFF)
 endif()
 if(ESP32_3248S035C OR ESP32_3248S035R OR ESP32_2432S028R)
-    OPTION(HARDWARE_MOD_16MB_FLASH "Hardware Mod: 16MB Flash" OFF)
+    # 4MB Flash, no PSRAM by default
+    OPTION(HARDWARE_MOD_8MB_FLASH "Hardware Mod: 8MB Flash Upgrade" OFF)
+    OPTION(HARDWARE_MOD_16MB_FLASH "Hardware Mod: 16MB Flash Upgrade" OFF)
     OPTION(HARDWARE_MOD_EXT_PSRAM "Hardware Mod: External PSRAM" OFF)
 endif()
 
@@ -85,56 +87,14 @@ elseif(ESP32S3_4827S043)
     set(SDKCONFIG hardware/ESP32S3_4827S043/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_4827S043/components)
 elseif(ESP32_3248S035C)
+    set(SDKCONFIG hardware/common/sdkconfig/ESP32/no_PSRAM/4MB_Flash)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32_3248S035C/components)
-    if(HARDWARE_MOD_GT911_INT)
-        add_compile_options(-DWITH_GT911_INT=1)
-    endif()
-    if(HARDWARE_MOD_EXT_PSRAM)
-        add_compile_options(-DWITH_PSRAM=1)
-        if(HARDWARE_MOD_16MB_FLASH)
-            set(SDKCONFIG hardware/ESP32_3248S035C/variants/16MB_with_PSRAM/sdkconfig)        
-        else()
-            set(SDKCONFIG hardware/ESP32_3248S035C/variants/4MB_with_PSRAM/sdkconfig)
-        endif()
-    else()
-        set(SDKCONFIG hardware/ESP32_3248S035C/variants/4MB_original/sdkconfig)
-        message(DEPRECATION
-            "\n"
-            "Target is missing PSRAM and is not officially supported due to known performance and functionality issues."
-            "\n")
-    endif()
 elseif(ESP32_3248S035R)
+    set(SDKCONFIG hardware/common/sdkconfig/ESP32/no_PSRAM/4MB_Flash)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32_3248S035R/components)
-    if(HARDWARE_MOD_EXT_PSRAM)
-        add_compile_options(-DWITH_PSRAM=1)
-        if(HARDWARE_MOD_16MB_FLASH)
-            set(SDKCONFIG hardware/ESP32_3248S035R/variants/16MB_with_PSRAM/sdkconfig)        
-        else()
-            set(SDKCONFIG hardware/ESP32_3248S035R/variants/4MB_with_PSRAM/sdkconfig)
-        endif()
-    else()
-        set(SDKCONFIG hardware/ESP32_3248S035R/variants/4MB_original/sdkconfig)
-        message(DEPRECATION
-            "\n"
-            "Target is missing PSRAM and is not officially supported due to known performance and functionality issues."
-            "\n")
-    endif()
 elseif(ESP32_2432S028R)
+    set(SDKCONFIG hardware/common/sdkconfig/ESP32/no_PSRAM/4MB_Flash)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32_2432S028R/components)
-    if(HARDWARE_MOD_EXT_PSRAM)
-        add_compile_options(-DWITH_PSRAM=1)
-        if(HARDWARE_MOD_16MB_FLASH)
-            set(SDKCONFIG hardware/ESP32_2432S028R/variants/16MB_with_PSRAM/sdkconfig)        
-        else()
-            set(SDKCONFIG hardware/ESP32_2432S028R/variants/4MB_with_PSRAM/sdkconfig)
-        endif()
-    else()
-        set(SDKCONFIG hardware/ESP32_2432S028R/variants/4MB_original/sdkconfig)
-        message(DEPRECATION
-            "\n"
-            "Target is missing PSRAM and is not officially supported due to known performance and functionality issues."
-            "\n")
-    endif()
 elseif(ESP32S3_HMI43V3)
     set(SDKCONFIG hardware/ESP32S3_HMI43V3/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_HMI43V3/components)
@@ -156,6 +116,29 @@ else()
         "No hardware target defined, please define a target in CMakeLists.txt"
         "\n"
         "Now cmake will exit")
+endif()
+
+if(ESP32_3248S035C)
+    if(HARDWARE_MOD_GT911_INT)
+        add_compile_options(-DWITH_GT911_INT=1)
+    endif()
+endif()
+if(ESP32_3248S035C OR ESP32_3248S035R OR ESP32_2432S028R)
+    if(HARDWARE_MOD_EXT_PSRAM)
+        add_compile_options(-DWITH_PSRAM=1)
+        if(HARDWARE_MOD_16MB_FLASH)
+            set(SDKCONFIG hardware/common/sdkconfig/ESP32/with_PSRAM/16MB_Flash)
+        elseif(HARDWARE_MOD_8MB_FLASH)
+            set(SDKCONFIG hardware/common/sdkconfig/ESP32/with_PSRAM/8MB_Flash)
+        else()
+            set(SDKCONFIG hardware/common/sdkconfig/ESP32/with_PSRAM/4MB_Flash)
+        endif()
+    else()        
+        message(DEPRECATION
+            "\n"
+            "Target is missing PSRAM and is not officially supported due to known performance and functionality issues."
+            "\n")
+    endif()
 endif()
 
 if(USE_FAT_INSTEAD_OF_LITTLEFS)
