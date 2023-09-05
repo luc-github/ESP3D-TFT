@@ -101,7 +101,6 @@ esp_err_t bsp_init(void) {
   /* Touch controller initialization */
   esp3d_log("Initializing touch controller");
   // SPI is shared between touch and display so no need to init SPI again
-
   xpt2046_init();
 
   // Lvgl initialization

@@ -223,6 +223,7 @@ void menu_screen() {
     esp3d_log("menu screen initialization");
     uint8_t byteValue =
         esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_auto_level_on);
+
     auto_leveling = byteValue == 1 ? true : false;
     intialization_done = true;
   }

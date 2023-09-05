@@ -162,6 +162,10 @@ const ESP3DSettingDescription ESP3DSettingsData[] = {
     {ESP3DSettingIndex::esp3d_jog_type, ESP3DSettingType::byte_t, 1, "0"},
     {ESP3DSettingIndex::esp3d_polling_on, ESP3DSettingType::byte_t, 1, "1"},
     {ESP3DSettingIndex::esp3d_auto_level_on, ESP3DSettingType::byte_t, 1, "0"},
+    {ESP3DSettingIndex::esp3d_bed_width, ESP3DSettingType::float_t, 3,
+     "100.00"},
+    {ESP3DSettingIndex::esp3d_bed_depth, ESP3DSettingType::float_t, 3,
+     "100.00"},
 #endif  // ESP3D_DISPLAY_FEATURE
 };
 
@@ -171,6 +175,23 @@ bool ESP3DSettings::isValidStringSetting(const char* value,
   const ESP3DSettingDescription* settingPtr = getSettingPtr(settingElement);
   if (!settingPtr) {
     return false;
+  }
+  if (settingPtr->type == ESP3DSettingType::float_t) {
+    // check if it is a float stored as string
+    if (strlen(value) > 15 || strlen(value) == 0) {
+      return false;
+    }
+    // check if any alpha char not supposed to be here
+    for (uint8_t i = 0; i < strlen(value); i++) {
+      if (value[i] == '.' || value[i] == ',' || value[i] == ' ' ||
+          value[i] == '-' || value[i] == '+' || value[i] == 'e' ||
+          value[i] == 'E' || (value[i] >= '0' && value[i] <= '9')) {
+        continue;
+      } else {
+        return false;
+      }
+    }
+    return true;
   }
   if (!(settingPtr->type == ESP3DSettingType::string_t)) {
     return false;
@@ -434,6 +455,7 @@ uint32_t ESP3DSettings::getDefaultIntegerSetting(
   }
   return 0;
 }
+
 const char* ESP3DSettings::getDefaultStringSetting(
     ESP3DSettingIndex settingElement) {
   const ESP3DSettingDescription* query = getSettingPtr(settingElement);
@@ -442,6 +464,7 @@ const char* ESP3DSettings::getDefaultStringSetting(
   }
   return nullptr;
 }
+
 uint8_t ESP3DSettings::getDefaultByteSetting(ESP3DSettingIndex settingElement) {
   const ESP3DSettingDescription* query = getSettingPtr(settingElement);
   if (query) {
@@ -687,9 +710,17 @@ const char* ESP3DSettings::readString(ESP3DSettingIndex index, char* out_str,
                                       size_t len, bool* haserror) {
   const ESP3DSettingDescription* query = getSettingPtr(index);
   if (query) {
-    if (query->type == ESP3DSettingType::string_t) {
+    if (query->type == ESP3DSettingType::string_t ||
+        query->type == ESP3DSettingType::float_t) {
       esp_err_t err;
-      if (out_str && len >= (query->size)) {
+      size_t setting_size = (query->size);
+      if (query->type == ESP3DSettingType::float_t) {
+        setting_size = 16;  // 15 digit + 1 (0x0) is the max size of a float
+        // query->size is the precision in that case
+        esp3d_log("read float setting");
+      }
+
+      if (out_str && len >= setting_size) {
         access_nvs(NVS_READONLY);
         std::shared_ptr<nvs::NVSHandle> handle =
             nvs::open_nvs_handle(STORAGE_NAME, NVS_READONLY, &err);
@@ -697,7 +728,7 @@ const char* ESP3DSettings::readString(ESP3DSettingIndex index, char* out_str,
           esp3d_log_e("Failling accessing NVS");
         } else {
           std::string key = "p_" + std::to_string((uint)query->index);
-          err = handle->get_string(key.c_str(), out_str, query->size);
+          err = handle->get_string(key.c_str(), out_str, setting_size);
           if (err == ESP_OK) {
             if (haserror) {
               *haserror = false;
@@ -737,7 +768,8 @@ const char* ESP3DSettings::readString(ESP3DSettingIndex index, char* out_str,
   if (haserror) {
     *haserror = true;
   }
-  esp3d_log_e("Error reading setting value");
+  esp3d_log_e("Error reading setting value %d, type %d",
+              static_cast<uint16_t>(index), static_cast<uint8_t>(query->type));
   return "";
 }
 
@@ -804,8 +836,14 @@ bool ESP3DSettings::writeString(ESP3DSettingIndex index,
             strlen(byte_buffer), byte_buffer);
   const ESP3DSettingDescription* query = getSettingPtr(index);
   if (query) {
-    if (query->type == ESP3DSettingType::string_t &&
-        strlen(byte_buffer) <= query->size) {
+    size_t setting_size = (query->size);
+    if (query->type == ESP3DSettingType::float_t) {
+      setting_size = 16;  // 15 digit + 1 (0x0) is the max size of a float
+      // query->size is the precision in that case
+    }
+    if ((query->type == ESP3DSettingType::string_t ||
+         query->type == ESP3DSettingType::float_t) &&
+        strlen(byte_buffer) <= setting_size) {
       esp_err_t err;
       access_nvs(NVS_READWRITE);
       std::shared_ptr<nvs::NVSHandle> handle =

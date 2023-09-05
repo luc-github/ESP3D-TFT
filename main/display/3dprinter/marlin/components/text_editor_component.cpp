@@ -24,7 +24,6 @@
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -55,7 +54,9 @@ void input_area_cb(lv_event_t *e) {
 }
 
 lv_obj_t *create_text_editor(lv_obj_t *container, const char *text,
-                             void (*callbackFn)(const char *)) {
+                             void (*callbackFn)(const char *),
+                             size_t max_length, const char *accepted_chars,
+                             bool is_number) {
   inputValue = text;
 
   main_container = lv_obj_create(container);
@@ -68,11 +69,20 @@ lv_obj_t *create_text_editor(lv_obj_t *container, const char *text,
   lv_textarea_set_one_line(input_area, true);
   lv_obj_add_event_cb(input_area, input_area_cb, LV_EVENT_ALL,
                       (void *)callbackFn);
-  lv_textarea_set_max_length(input_area, 200);
+  lv_textarea_set_max_length(input_area, max_length ? max_length : 200);
+  esp3d_log("max length: %d", max_length);
+  if (accepted_chars) {
+    esp3d_log("accepted_chars: %s", accepted_chars);
+    lv_textarea_set_accepted_chars(input_area, accepted_chars);
+  }
+
   lv_obj_set_scrollbar_mode(input_area, LV_SCROLLBAR_MODE_AUTO);
   esp3d_log("value: %s", text);
   lv_textarea_set_text(input_area, text);
   lv_obj_t *kb = lv_keyboard_create(main_container);
+  if (is_number) {
+    lv_keyboard_set_mode(kb, LV_KEYBOARD_MODE_NUMBER);
+  }
   lv_keyboard_set_textarea(kb, input_area);
   return main_container;
 }

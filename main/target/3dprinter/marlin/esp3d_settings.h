@@ -84,6 +84,8 @@ enum class ESP3DSettingIndex : uint16_t {
   esp3d_jog_type,
   esp3d_polling_on,
   esp3d_auto_level_on,
+  esp3d_bed_width,
+  esp3d_bed_depth,
   unknown_index
 };
 

@@ -28,11 +28,53 @@
 #include "esp3d_tft_ui.h"
 #include "leveling_screen.h"
 
+/*
+Command
+G29 V4
+*/
+/*
+Response:
+G29 Auto Bed Leveling
+Bed X: 50.000 Y: 50.000 Z: -0.013
+Bed X: 133.000 Y: 50.000 Z: 0.009
+Bed X: 216.000 Y: 50.000 Z: -0.020
+Bed X: 299.000 Y: 50.000 Z: -0.056
+Bed X: 299.000 Y: 133.000 Z: -0.010
+Bed X: 216.000 Y: 133.000 Z: -0.055
+Bed X: 133.000 Y: 133.000 Z: -0.040
+Bed X: 50.000 Y: 133.000 Z: -0.049
+Bed X: 50.000 Y: 216.000 Z: -0.055
+Bed X: 133.000 Y: 216.000 Z: 0.044
+Bed X: 216.000 Y: 216.000 Z: 0.044
+Bed X: 299.000 Y: 216.000 Z: 0.025
+Bed X: 299.000 Y: 299.000 Z: -0.023
+Bed X: 216.000 Y: 299.000 Z: -0.058
+Bed X: 133.000 Y: 299.000 Z: -0.036
+Bed X: 50.000 Y: 299.000 Z: -0.054
+Bilinear Leveling Grid:
+       0       1       2       3
+ 0 -0.0125 +0.0087 -0.0200 -0.0563
+ 1 -0.0488 -0.0400 -0.0550 -0.0100
+ 2 -0.0550 +0.0437 +0.0437 +0.0250
+ 3 -0.0538 -0.0363 -0.0575 -0.0225
+echo:enqueueing "G0 F3600 X180 Y180"
+echo:Settings Stored (526 bytes; crc 45727)
+X:50.00 Y:299.00 Z:13.55 E:0.00 Count X:4000 Y:23920 Z:10800
+ok
+*/
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 namespace autoLevelingScreen {
 lv_timer_t *auto_leveling_screen_delay_timer = NULL;
+
+bool auto_leveling_value_cb(ESP3DValuesIndex index, const char *value,
+                            ESP3DValuesCbAction action) {
+  esp3d_log("auto_leveling_value_cb %d, action: %d, value: %s", (uint16_t)index,
+            (uint16_t)action, value);
+  return true;
+}
 
 void auto_leveling_screen_delay_timer_cb(lv_timer_t *timer) {
   if (auto_leveling_screen_delay_timer) {
