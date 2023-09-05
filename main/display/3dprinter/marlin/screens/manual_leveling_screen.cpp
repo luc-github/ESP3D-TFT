@@ -93,6 +93,8 @@ void move_to_position(int pos) {
   if (!homing_done) {
     esp3d_log("Homing not done, doing now...");
     renderingClient.sendGcode("G28");
+    // In theory when homing, if 2 extruders, E0 is set by default
+    // TBC if need to explicilty set it to E0 using T0 command
     homing_done = true;
   }
   std::string gcode_command = "G1 Z" + std::to_string(DEFAULT_Z_DISTANCE);
