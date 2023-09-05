@@ -39,6 +39,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "main_screen.h"
+#include "manual_leveling_screen.h"
 #include "menu_screen.h"
 #include "rendering/esp3d_rendering_client.h"
 #include "tasks_def.h"
@@ -64,6 +65,8 @@ lv_obj_t *usb_serial_baud_rate_label = NULL;
 lv_obj_t *jog_type_label = NULL;
 lv_obj_t *polling_label = NULL;
 lv_obj_t *auto_leveling_label = NULL;
+lv_obj_t *bed_width_label = NULL;
+lv_obj_t *bed_depth_label = NULL;
 
 struct ESP3DJSONSettingsData {
   std::string entry = "";
@@ -368,6 +371,58 @@ void hostname_edit_done_cb(const char *str) {
   }
 }
 
+//  bed_width_edit_done_cb
+void bed_width_edit_done_cb(const char *str) {
+  esp3d_log("Saving bed width to: %s\n", str);
+  if (strcmp(str, lv_label_get_text(bed_width_label)) != 0) {
+    if (esp3dTftsettings.isValidStringSetting(
+            str, ESP3DSettingIndex::esp3d_bed_width) &&
+        strlen(str) != 0 && strtod(str, NULL) != 0) {
+      esp3d_log("Value %s is valid", str);
+      if (esp3dTftsettings.writeString(ESP3DSettingIndex::esp3d_bed_width,
+                                       str)) {
+        manualLevelingScreen::update_bed_width(strtod(str, NULL));
+        if (bed_width_label) {
+          lv_label_set_text(bed_width_label, str);
+        }
+      } else {
+        esp3d_log_e("Failed to save bed width");
+        std::string text = esp3dTranslationService.translate(
+            ESP3DLabel::error_applying_setting);
+        msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+      }
+    }
+  } else {
+    esp3d_log("New value is identical do not save it");
+  }
+}
+
+//  bed_depth_edit_done_cb
+void bed_depth_edit_done_cb(const char *str) {
+  esp3d_log("Saving bed depth to: %s\n", str);
+  if (strcmp(str, lv_label_get_text(bed_depth_label)) != 0) {
+    if (esp3dTftsettings.isValidStringSetting(
+            str, ESP3DSettingIndex::esp3d_bed_depth) &&
+        strlen(str) != 0 && strtod(str, NULL) != 0) {
+      esp3d_log("Value %s is valid", str);
+      if (esp3dTftsettings.writeString(ESP3DSettingIndex::esp3d_bed_depth,
+                                       str)) {
+        manualLevelingScreen::update_bed_depth(strtod(str, NULL));
+        if (bed_depth_label) {
+          lv_label_set_text(bed_depth_label, str);
+        }
+      } else {
+        esp3d_log_e("Failed to save bed depth");
+        std::string text = esp3dTranslationService.translate(
+            ESP3DLabel::error_applying_setting);
+        msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+      }
+    }
+  } else {
+    esp3d_log("New value is identical do not save it");
+  }
+}
+
 void CreateSaveSettingTask(const char *entry, const char *value) {
   spinnerScreen::show_spinner();
   TaskHandle_t xHandle = NULL;
@@ -518,7 +573,36 @@ void event_button_edit_show_fan_controls_cb(lv_event_t *e) {
 void event_button_edit_hostname_cb(lv_event_t *e) {
   esp3d_log("Show component");
   const char *text = (const char *)lv_event_get_user_data(e);
-  textEditor::create_text_editor(lv_scr_act(), text, hostname_edit_done_cb);
+  const ESP3DSettingDescription *settingPtr =
+      esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_hostname);
+  if (settingPtr) {
+    textEditor::create_text_editor(lv_scr_act(), text, hostname_edit_done_cb,
+                                   settingPtr->size);
+  }
+}
+
+// event_button_edit_bed_width_cb
+void event_button_edit_bed_width_cb(lv_event_t *e) {
+  esp3d_log("Show component for bed width");
+  const char *text = (const char *)lv_event_get_user_data(e);
+  const ESP3DSettingDescription *settingPtr =
+      esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_bed_width);
+  if (settingPtr) {
+    textEditor::create_text_editor(lv_scr_act(), text, bed_width_edit_done_cb,
+                                   15, "0123456789.", true);
+  }
+}
+
+// event_button_edit_bed_depth_cb
+void event_button_edit_bed_depth_cb(lv_event_t *e) {
+  esp3d_log("Show component for bed depth");
+  const char *text = (const char *)lv_event_get_user_data(e);
+  const ESP3DSettingDescription *settingPtr =
+      esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_bed_depth);
+  if (settingPtr) {
+    textEditor::create_text_editor(lv_scr_act(), text, bed_depth_edit_done_cb,
+                                   15, "0123456789.", true);
+  }
 }
 
 // event_button_settings_back_handler
@@ -568,7 +652,7 @@ void settings_screen() {
     const ESP3DSettingDescription *settingPtr =
         esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_hostname);
     if (settingPtr) {
-      char out_str[33] = {0};
+      char out_str[(settingPtr->size) + 1] = {0};
       hostname = esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_hostname,
                                              out_str, settingPtr->size);
     }
@@ -745,6 +829,54 @@ void settings_screen() {
                           LV_EVENT_CLICKED,
                           (void *)(lv_label_get_text(auto_leveling_label)));
     }
+  }
+
+  // Bed width
+  line_container = listLine::create_list_line_container(ui_settings_list_ctl);
+  LabelStr = esp3dTranslationService.translate(ESP3DLabel::bed_width);
+  if (line_container) {
+    std::string bed_width_str;
+    listLine::add_label_to_line(LabelStr.c_str(), line_container, true);
+    const ESP3DSettingDescription *settingPtr =
+        esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_bed_width);
+    if (settingPtr) {
+      char out_str[15 + 1] = {0};
+      bed_width_str = esp3dTftsettings.readString(
+          ESP3DSettingIndex::esp3d_bed_width, out_str, 16);
+    } else {
+      esp3d_log_e("Failed to get bed width setting");
+    }
+    bed_width_label = listLine::add_label_to_line(bed_width_str.c_str(),
+                                                  line_container, false);
+    lv_obj_t *btnEdit =
+        listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
+    lv_obj_add_event_cb(btnEdit, event_button_edit_bed_width_cb,
+                        LV_EVENT_CLICKED,
+                        (void *)(lv_label_get_text(bed_width_label)));
+  }
+
+  // Bed depth
+  line_container = listLine::create_list_line_container(ui_settings_list_ctl);
+  LabelStr = esp3dTranslationService.translate(ESP3DLabel::bed_depth);
+  if (line_container) {
+    std::string bed_depth_str;
+    listLine::add_label_to_line(LabelStr.c_str(), line_container, true);
+    const ESP3DSettingDescription *settingPtr =
+        esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_bed_depth);
+    if (settingPtr) {
+      char out_str[15 + 1] = {0};
+      bed_depth_str = esp3dTftsettings.readString(
+          ESP3DSettingIndex::esp3d_bed_depth, out_str, 16);
+    } else {
+      esp3d_log_e("Failed to get bed depth setting");
+    }
+    bed_depth_label = listLine::add_label_to_line(bed_depth_str.c_str(),
+                                                  line_container, false);
+    lv_obj_t *btnEdit =
+        listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
+    lv_obj_add_event_cb(btnEdit, event_button_edit_bed_depth_cb,
+                        LV_EVENT_CLICKED,
+                        (void *)(lv_label_get_text(bed_depth_label)));
   }
 
   esp3dTftui.set_current_screen(ESP3DScreenType::settings);

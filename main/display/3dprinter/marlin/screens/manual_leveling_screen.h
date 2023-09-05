@@ -21,4 +21,6 @@
 
 namespace manualLevelingScreen {
 extern void manual_leveling_screen(bool auto_leveling);
+extern void update_bed_width(double value);
+extern void update_bed_depth(double value);
 }  // namespace manualLevelingScreen

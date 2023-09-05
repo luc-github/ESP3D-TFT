@@ -56,8 +56,14 @@ lv_obj_t *btn_next = NULL;
 lv_obj_t *btn_previous = NULL;
 lv_obj_t *btn_start = NULL;
 lv_obj_t *status_container = NULL;
+double intialization_done = false;
+double bed_width = 100;
+double bed_depth = 100;
 
 lv_timer_t *manual_leveling_screen_delay_timer = NULL;
+void update_bed_width(double value) { bed_width = value; }
+
+void update_bed_depth(double value) { bed_depth = value; }
 
 void manual_leveling_screen_delay_timer_cb(lv_timer_t *timer) {
   if (manual_leveling_screen_delay_timer) {
@@ -257,6 +263,19 @@ void manual_leveling_screen(bool autoleveling) {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Manual leveling screen creation");
+  if (!intialization_done) {
+    esp3d_log("Manual leveling screen initialization");
+    char buffer[16];
+    std::string str_value = esp3dTftsettings.readString(
+        ESP3DSettingIndex::esp3d_bed_width, buffer, 16);
+    update_bed_width(std::strtod(str_value.c_str(),
+                                 NULL));  // update width value
+    str_value = esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_bed_depth,
+                                            buffer, 16);
+    update_bed_depth(std::strtod(str_value.c_str(),
+                                 NULL));  // update depth value
+    intialization_done = true;
+  }
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
