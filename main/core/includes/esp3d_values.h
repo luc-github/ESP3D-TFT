@@ -71,7 +71,9 @@ class ESP3DValues final {
   void clear();
   const ESP3DValuesDescription* get_description(ESP3DValuesIndex index);
   const char* get_string_value(ESP3DValuesIndex index);
-  bool set_string_value(ESP3DValuesIndex index, const char* value);
+  bool set_string_value(
+      ESP3DValuesIndex index, const char* value,
+      ESP3DValuesCbAction action = ESP3DValuesCbAction::Update);
 
  private:
   std::list<ESP3DValuesDescription> _values;

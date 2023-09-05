@@ -58,6 +58,7 @@ enum class ESP3DValuesIndex : uint16_t {
   file_name,
   network_status,
   network_mode,
+  bed_leveling,
   unknown_index
 };
 

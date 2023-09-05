@@ -176,16 +176,17 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
             ESP3DValuesIndex::bed_target_temperature, "#");
       }
       return true;
-      // is position
-    } else if (strstr(data, "X:") != nullptr) {
+      // is position but not bed leveling
+    } else if (strstr(data, "X:") != nullptr &&
+               strstr(data, "Bed X:") == nullptr) {
       // X:0.00 Y:0.00 Z:0.00 E:0.00 Count X:0 Y:0 Z:0
       esp3d_log("Positions");
       char* ptrx = strstr(data, "X:");
       char* ptry = strstr(data, "Y:");
       char* ptrz = strstr(data, "Z:");
+      char* ptre = strstr(data, "E:");
 
-      if (ptrx && ptry && ptrz) {
-        char* ptre = strstr(data, "E:");
+      if (ptrx && ptry && ptrz && ptre) {
         ptrx += 2;
         ptry[0] = '\0';
         ptry += 2;
@@ -284,6 +285,28 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
         return true;
       } else {
         esp3d_log_e("Error parsing fan speed");
+      }
+      // G29 Auto Bed Leveling
+    } else if (strstr(data, "G29 Auto Bed Leveling") != nullptr ||
+               strstr(data, "Bed X:") != nullptr ||
+               strstr(data, "Bilinear Leveling Grid:") != nullptr) {
+      static bool isLeveling = false;
+      if (strstr(data, "G29 Auto Bed Leveling") != nullptr) {
+        isLeveling = true;
+        // Send start of leveling
+        esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_leveling, "Start",
+                                        ESP3DValuesCbAction::Add);
+      } else if (isLeveling) {
+        if (strstr(data, "Bilinear Leveling Grid:") != nullptr) {
+          isLeveling = false;
+          // Send end of leveling
+          esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_leveling, "End",
+                                          ESP3DValuesCbAction::Delete);
+        } else {
+          // Send leveling data
+          esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_leveling, data,
+                                          ESP3DValuesCbAction::Update);
+        }
       }
     }
   }
