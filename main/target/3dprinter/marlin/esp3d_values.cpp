@@ -25,7 +25,9 @@
 #if ESP3D_DISPLAY_FEATURE
 #include "components/status_bar_component.h"
 #include "components/wifi_status_component.h"
+#include "screens/auto_leveling_screen.h"
 #include "screens/main_screen.h"
+
 #endif  // ESP3D_DISPLAY_FEATURE
 
 bool ESP3DValues::intialize() {
@@ -153,6 +155,16 @@ bool ESP3DValues::intialize() {
       2,  // precision
       std::string("?"),
       mainScreen::position_value_cb,
+  });
+
+  //  bed leveling
+
+  _values.push_back({
+      ESP3DValuesIndex::bed_leveling,
+      ESP3DValuesType::string_t,
+      100,  // precision
+      std::string("?"),
+      autoLevelingScreen::auto_leveling_value_cb,
   });
 
   //  print status

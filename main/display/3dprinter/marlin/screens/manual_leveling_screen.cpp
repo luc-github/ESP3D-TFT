@@ -60,11 +60,15 @@ lv_obj_t *status_container = NULL;
 double intialization_done = false;
 double bed_width = 100;
 double bed_depth = 100;
+bool invert_x = false;
+bool invert_y = false;
 #define DEFAULT_Z_DISTANCE 15
 lv_timer_t *manual_leveling_screen_delay_timer = NULL;
 void update_bed_width(double value) { bed_width = value; }
 
 void update_bed_depth(double value) { bed_depth = value; }
+void update_invert_x(bool value) { invert_x = value; }
+void update_invert_y(bool value) { invert_y = value; }
 
 void manual_leveling_screen_delay_timer_cb(lv_timer_t *timer) {
   if (manual_leveling_screen_delay_timer) {
@@ -107,25 +111,49 @@ void move_to_position(int pos) {
     case 0:
       // Move to position 0
       esp3d_log("Move to position 0");
-      x = x_pad;
-      y = y_pad;
+      if (invert_x) {
+        x = bed_width - x_pad;
+      } else {
+        x = x_pad;
+      }
+      if (invert_y) {
+        y = y_pad;
+      } else {
+        y = bed_depth - y_pad;
+      }
       break;
     case 1:
       // Move to position 1
       esp3d_log("Move to position 1");
       x = bed_width / 2;
-      y = y_pad;
+      if (invert_y) {
+        y = y_pad;
+      } else {
+        y = bed_depth - y_pad;
+      }
       break;
     case 2:
       // Move to position 2
       esp3d_log("Move to position 2");
-      x = bed_width - x_pad;
-      y = y_pad;
+      if (invert_x) {
+        x = x_pad;
+      } else {
+        x = bed_width - x_pad;
+      }
+      if (invert_y) {
+        y = y_pad;
+      } else {
+        y = bed_depth - y_pad;
+      }
       break;
     case 3:
       // Move to position 3
       esp3d_log("Move to position 3");
-      x = x_pad;
+      if (invert_x) {
+        x = bed_width - x_pad;
+      } else {
+        x = x_pad;
+      }
       y = bed_depth / 2;
       break;
     case 4:
@@ -137,26 +165,50 @@ void move_to_position(int pos) {
     case 5:
       // Move to position 5
       esp3d_log("Move to position 5");
-      x = bed_width - x_pad;
+      if (invert_x) {
+        x = x_pad;
+      } else {
+        x = bed_width - x_pad;
+      }
       y = bed_depth / 2;
       break;
     case 6:
       // Move to position 6
       esp3d_log("Move to position 6");
-      x = x_pad;
-      y = bed_depth - y_pad;
+      if (invert_x) {
+        x = bed_width - x_pad;
+      } else {
+        x = x_pad;
+      }
+      if (invert_y) {
+        y = bed_depth - y_pad;
+      } else {
+        y = y_pad;
+      }
       break;
     case 7:
       // Move to position 7
       esp3d_log("Move to position 7");
       x = bed_width / 2;
-      y = bed_depth - y_pad;
+      if (invert_y) {
+        y = bed_depth - y_pad;
+      } else {
+        y = y_pad;
+      }
       break;
     case 8:
       // Move to position 8
       esp3d_log("Move to position 8");
-      x = bed_width - x_pad;
-      y = bed_depth - y_pad;
+      if (invert_x) {
+        x = x_pad;
+      } else {
+        x = bed_width - x_pad;
+      }
+      if (invert_y) {
+        y = bed_depth - y_pad;
+      } else {
+        y = y_pad;
+      }
       break;
     default:
       break;
@@ -297,6 +349,11 @@ void manual_leveling_screen(bool autoleveling) {
   if (!intialization_done) {
     esp3d_log("Manual leveling screen initialization");
     char buffer[16];
+    uint8_t byte_value =
+        esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_inverved_x);
+    update_invert_x(byte_value == 1 ? true : false);
+    byte_value = esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_inverved_y);
+    update_invert_y(byte_value == 1 ? true : false);
     std::string str_value = esp3dTftsettings.readString(
         ESP3DSettingIndex::esp3d_bed_width, buffer, 16);
     update_bed_width(std::strtod(str_value.c_str(),

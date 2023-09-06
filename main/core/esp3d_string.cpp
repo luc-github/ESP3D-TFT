@@ -23,40 +23,32 @@
 #include <string.h>
 
 #include <algorithm>
+#include <cmath>
 
 // helper to format string float to readable string with precision
-std::string esp3d_strings::set_precision(std::string str_value,
-                                         uint8_t precision) {
+std::string esp3d_string::set_precision(std::string str_value,
+                                        uint8_t precision) {
   static std::string tmp;
   tmp = str_value;
+  double value = std::stod(str_value);
+  double rounded =
+      std::round(value * std::pow(10, precision)) / std::pow(10, precision);
+  tmp = std::to_string(rounded);
+
   int pos = tmp.find(".");
-  if (pos != std::string::npos) {
-    for (uint8_t i = 0; i < precision; i++) {
-      tmp += "0";
-    }
-    if (pos == 0) {
-      tmp = "0" + tmp;
-    }
-    int pos = tmp.find(".");
-    for (uint i = pos + 1; i < tmp.length(); i++) {
-      if (tmp[i] == '.') {
-        tmp[i] = '0';
-      }
-    }
-    tmp = tmp.substr(0, pos + precision + 1);
+  if (precision == 0) {
+    tmp = tmp.substr(0, pos);
   } else {
-    tmp += ".";
-    for (uint8_t i = 0; i < precision; i++) {
-      tmp += "0";
-    }
+    tmp = tmp.substr(0, pos + precision + 1);
   }
+
   return tmp;
 }
 
 // Replace all occurrences of oldsubstr by newsubstr and return new string
-const char* esp3d_strings::str_replace(const char* currentstr,
-                                       const char* oldsubstr,
-                                       const char* newsubstr) {
+const char* esp3d_string::str_replace(const char* currentstr,
+                                      const char* oldsubstr,
+                                      const char* newsubstr) {
   static std::string resstr;
   resstr = currentstr;
   std::string oldstr = oldsubstr;
@@ -71,7 +63,7 @@ const char* esp3d_strings::str_replace(const char* currentstr,
 }
 
 // Trim string function
-const char* esp3d_strings::str_trim(const char* str) {
+const char* esp3d_string::str_trim(const char* str) {
   static std::string s;
   s = str;
   auto start = s.begin();
@@ -86,17 +78,17 @@ const char* esp3d_strings::str_trim(const char* str) {
   return s.c_str();
 }
 // Upper case string
-void esp3d_strings::str_toUpperCase(std::string* str) {
+void esp3d_string::str_toUpperCase(std::string* str) {
   std::transform(str->begin(), str->end(), str->begin(), ::toupper);
 }
 
 // Lower case string
-void esp3d_strings::str_toLowerCase(std::string* str) {
+void esp3d_string::str_toLowerCase(std::string* str) {
   std::transform(str->begin(), str->end(), str->begin(), ::tolower);
 }
 
 // helper to format size to readable string
-const char* esp3d_strings::formatBytes(uint64_t bytes) {
+const char* esp3d_string::formatBytes(uint64_t bytes) {
   static char buffer[32];
   memset(buffer, 0, sizeof(buffer));
   int res = 0;
@@ -118,7 +110,7 @@ const char* esp3d_strings::formatBytes(uint64_t bytes) {
   return buffer;
 }
 
-const char* esp3d_strings::urlDecode(const char* text) {
+const char* esp3d_string::urlDecode(const char* text) {
   static char* decoded = nullptr;
   if (decoded) {
     free(decoded);
@@ -152,7 +144,7 @@ const char* esp3d_strings::urlDecode(const char* text) {
   }
 }
 
-bool esp3d_strings::endsWith(const char* str, const char* endpart) {
+bool esp3d_string::endsWith(const char* str, const char* endpart) {
   if (!str || !endpart) {
     return false;
   }
@@ -169,7 +161,7 @@ bool esp3d_strings::endsWith(const char* str, const char* endpart) {
   return true;
 }
 
-bool esp3d_strings::startsWith(const char* str, const char* startPart) {
+bool esp3d_string::startsWith(const char* str, const char* startPart) {
   if (!str || !startPart) {
     return false;
   }
@@ -186,10 +178,10 @@ bool esp3d_strings::startsWith(const char* str, const char* startPart) {
   return true;
 }
 
-const char* esp3d_strings::getContentType(const char* filename) {
+const char* esp3d_string::getContentType(const char* filename) {
   std::string file_name;
   file_name = filename;
-  esp3d_strings::str_toLowerCase(&file_name);
+  esp3d_string::str_toLowerCase(&file_name);
   std::size_t found = file_name.find_last_of(".");
   if (found) {
     std::string extension = file_name.substr(found + 1);
@@ -226,25 +218,25 @@ const char* esp3d_strings::getContentType(const char* filename) {
   return "application/octet-stream";
 }
 
-int esp3d_strings::find(const char* str, const char* subStr, size_t start) {
+int esp3d_string::find(const char* str, const char* subStr, size_t start) {
   if (!str || !subStr || start + strlen(subStr) > strlen(str)) {
     return -1;
   }
   for (int i = start; i < strlen(str); i++) {
-    if (esp3d_strings::startsWith(&str[i], subStr)) {
+    if (esp3d_string::startsWith(&str[i], subStr)) {
       return i;
     }
   }
   return -1;
 }
 
-int esp3d_strings::rfind(const char* str, const char* subStr, int start) {
+int esp3d_string::rfind(const char* str, const char* subStr, int start) {
   if (!str || !subStr || strlen(subStr) > strlen(str)) {
     return -1;
   }
   if (start == -1) start = strlen(str) - 1;
   for (int i = start; i >= 0; i--) {
-    if (esp3d_strings::startsWith(&str[i], subStr)) {
+    if (esp3d_string::startsWith(&str[i], subStr)) {
       return i;
     }
   }

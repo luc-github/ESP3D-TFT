@@ -141,7 +141,7 @@ void ESP3DCommands::ESP720(int cmd_params_pos, ESP3DMessage *msg) {
             ok_msg += "{\"name\":\"";
             ok_msg += entry->d_name;
             ok_msg += "\",\"size\":\"";
-            ok_msg += esp3d_strings::formatBytes(entry_stat.st_size);
+            ok_msg += esp3d_string::formatBytes(entry_stat.st_size);
 #if ESP3D_TIMESTAMP_FEATURE
             ok_msg += "\",\"time\":\"";
             ok_msg += buff;
@@ -161,7 +161,7 @@ void ESP3DCommands::ESP720(int cmd_params_pos, ESP3DMessage *msg) {
             ok_msg += buff;
             ok_msg += "\t";
 #endif  // ESP3D_TIMESTAMP_FEATURE
-            ok_msg += esp3d_strings::formatBytes(entry_stat.st_size);
+            ok_msg += esp3d_string::formatBytes(entry_stat.st_size);
 
             ok_msg += "\n";
           }
@@ -174,9 +174,9 @@ void ESP3DCommands::ESP720(int cmd_params_pos, ESP3DMessage *msg) {
       }
       if (json) {
         ok_msg = "], \"total\":\"";
-        ok_msg += esp3d_strings::formatBytes(totalSpace);
+        ok_msg += esp3d_string::formatBytes(totalSpace);
         ok_msg += "\",\"used\":\"";
-        ok_msg += esp3d_strings::formatBytes(usedSpace);
+        ok_msg += esp3d_string::formatBytes(usedSpace);
         ok_msg += "\",\"occupation\":\"";
         if (totalSpace == 0) {
           totalSpace = 1;
@@ -194,11 +194,11 @@ void ESP3DCommands::ESP720(int cmd_params_pos, ESP3DMessage *msg) {
         ok_msg += ", Dirs :";
         ok_msg += std::to_string(nbDirs);
         ok_msg += "\nTotal: ";
-        ok_msg += esp3d_strings::formatBytes(totalSpace);
+        ok_msg += esp3d_string::formatBytes(totalSpace);
         ok_msg += ", Used: ";
-        ok_msg += esp3d_strings::formatBytes(usedSpace);
+        ok_msg += esp3d_string::formatBytes(usedSpace);
         ok_msg += ", Available: ";
-        ok_msg += esp3d_strings::formatBytes(freeSpace);
+        ok_msg += esp3d_string::formatBytes(freeSpace);
         ok_msg += "\n";
       }
       ESP3DMessage *newMsg = ESP3DClient::copyMsgInfos(msgInfo);

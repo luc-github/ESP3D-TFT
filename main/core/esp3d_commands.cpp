@@ -655,7 +655,7 @@ bool ESP3DCommands::hasTag(ESP3DMessage* msg, uint start, const char* label) {
   if (lbl.length() != 0) {
     // esp3d_log("Label is used with parameter %s", lbl.c_str());
     // make result uppercase
-    esp3d_strings::str_toUpperCase(&lbl);
+    esp3d_string::str_toUpperCase(&lbl);
     return (lbl == "YES" || lbl == "1" || lbl == "TRUE");
   }
   bool prevCharIsEscaped = false;
@@ -768,9 +768,8 @@ const char* ESP3DCommands::get_clean_param(ESP3DMessage* msg, uint start) {
     }
     if (std::isspace(c) && !prevCharIsEscaped) {
       // esp3d_log("testing *%s*", value.c_str());
-      if (value == "json" ||
-          esp3d_strings::startsWith(value.c_str(), "json=") ||
-          esp3d_strings::startsWith(value.c_str(), "pwd=")) {
+      if (value == "json" || esp3d_string::startsWith(value.c_str(), "json=") ||
+          esp3d_string::startsWith(value.c_str(), "pwd=")) {
         value.clear();
       } else {
         return value.c_str();
@@ -784,8 +783,8 @@ const char* ESP3DCommands::get_clean_param(ESP3DMessage* msg, uint start) {
     }
   }
   // for empty value
-  if (value == "json" || esp3d_strings::startsWith(value.c_str(), "json=") ||
-      esp3d_strings::startsWith(value.c_str(), "pwd=")) {
+  if (value == "json" || esp3d_string::startsWith(value.c_str(), "json=") ||
+      esp3d_string::startsWith(value.c_str(), "pwd=")) {
     value.clear();
   }
   return value.c_str();

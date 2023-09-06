@@ -162,7 +162,7 @@ void positions_btn_up_event_cb(lv_event_t *e) {
     position_double += step;
     esp3d_log("Up: %f, new pos: %f", step, position_double);
     position_value =
-        esp3d_strings::set_precision(std::to_string(position_double), 2);
+        esp3d_string::set_precision(std::to_string(position_double), 2);
     lv_textarea_set_text(position_ta, position_value.c_str());
   }
   send_gcode_position(position_value.c_str());
@@ -178,7 +178,7 @@ void positions_btn_down_event_cb(lv_event_t *e) {
     position_double -= step;
     esp3d_log("Down: %f, new pos: %f", step, position_double);
     position_value =
-        esp3d_strings::set_precision(std::to_string(position_double), 2);
+        esp3d_string::set_precision(std::to_string(position_double), 2);
     lv_textarea_set_text(position_ta, position_value.c_str());
   } else {
     position_value = "-" + position_value;
@@ -284,7 +284,7 @@ void axis_matrix_buttons_event_cb(lv_event_t *e) {
   lv_label_set_text(label_current_position_value,
                     current_position_value_init.c_str());
   if (!absolute_position) return;
-  std::string position_value_init = esp3d_strings::set_precision(
+  std::string position_value_init = esp3d_string::set_precision(
       current_position_value_init == "?" ? "0.00" : current_position_value_init,
       2);
   lv_textarea_set_text(position_ta, position_value_init.c_str());
@@ -406,7 +406,7 @@ void positions_screen(uint8_t target_id) {
   lv_textarea_set_max_length(position_ta, 7);
   lv_textarea_set_one_line(position_ta, true);
   esp3d_log("value: %s", position_value.c_str());
-  std::string position_value_init = esp3d_strings::set_precision(
+  std::string position_value_init = esp3d_string::set_precision(
       current_position_value_init == "?" ? "0.00" : current_position_value_init,
       2);
   lv_textarea_set_text(position_ta, position_value_init.c_str());

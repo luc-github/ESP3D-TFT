@@ -138,8 +138,8 @@ uint16_t ESP3DTranslationService::getLanguagesList() {
         if (entry->d_type == DT_DIR) {
           continue;
         } else {
-          if (esp3d_strings::startsWith(entry->d_name, LANGUAGE_PACK_HEAD) &&
-              esp3d_strings::endsWith(entry->d_name, LANGUAGE_PACK_TAIL)) {
+          if (esp3d_string::startsWith(entry->d_name, LANGUAGE_PACK_HEAD) &&
+              esp3d_string::endsWith(entry->d_name, LANGUAGE_PACK_TAIL)) {
             esp3d_log("Found file: %s", entry->d_name);
             std::string languageCode = entry->d_name;
             languageCode.erase(0, strlen(LANGUAGE_PACK_HEAD));

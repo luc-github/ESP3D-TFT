@@ -196,7 +196,7 @@ esp_err_t ESP3DHttpService::post_multipart_handler(httpd_req_t *req) {
             if (packet[pIndex] == '\n') {
               if (prevChar == '\r') {
                 esp3d_log("Got %s", contentBuffer.c_str());
-                if (!esp3d_strings::startsWith(
+                if (!esp3d_string::startsWith(
                         contentBuffer.c_str(),
                         "Content-Disposition: form-data; ")) {
                   esp3d_log_e(
@@ -208,7 +208,7 @@ esp_err_t ESP3DHttpService::post_multipart_handler(httpd_req_t *req) {
                 }
                 // check name parameter
                 int startPos =
-                    esp3d_strings::find(contentBuffer.c_str(), "name=");
+                    esp3d_string::find(contentBuffer.c_str(), "name=");
                 if (startPos == -1) {
                   esp3d_log_e(
                       "Error parsing content disposition,missing name "
@@ -219,7 +219,7 @@ esp_err_t ESP3DHttpService::post_multipart_handler(httpd_req_t *req) {
                 }
                 startPos += 6;  // size of name="
                 int endPos =
-                    esp3d_strings::find(contentBuffer.c_str(), "\"", startPos);
+                    esp3d_string::find(contentBuffer.c_str(), "\"", startPos);
                 if (endPos == -1) {
                   esp3d_log_e(
                       "Error parsing content disposition,missing name "
@@ -233,11 +233,11 @@ esp_err_t ESP3DHttpService::post_multipart_handler(httpd_req_t *req) {
 
                 // check fileName parameter
                 startPos =
-                    esp3d_strings::find(contentBuffer.c_str(), "filename=");
+                    esp3d_string::find(contentBuffer.c_str(), "filename=");
                 if (startPos != -1) {
                   startPos += 10;  // size of filename="
-                  int endPos = esp3d_strings::find(contentBuffer.c_str(), "\"",
-                                                   startPos);
+                  int endPos =
+                      esp3d_string::find(contentBuffer.c_str(), "\"", startPos);
                   if (endPos == -1) {
                     esp3d_log_e(
                         "Error parsing content disposition,missing name "
@@ -376,8 +376,7 @@ esp_err_t ESP3DHttpService::post_multipart_handler(httpd_req_t *req) {
               if (esp3dHttpService.hasArg(req, "path")) {
                 std::string path = esp3dHttpService.getArg(req, "path");
                 esp3d_log("Path from post: %s", path.c_str());
-                if (!esp3d_strings::startsWith(fileName.c_str(),
-                                               path.c_str())) {
+                if (!esp3d_string::startsWith(fileName.c_str(), path.c_str())) {
                   if (path[path.length() - 1] != '/') {
                     path += "/";
                   }

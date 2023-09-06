@@ -40,8 +40,8 @@ esp_err_t ESP3DHttpService::root_get_handler(httpd_req_t *req) {
       char value[255] = {0};
       esp3d_log("query string: %s", buf);
       if (httpd_query_key_value(buf, "forcefallback", value, 254) == ESP_OK) {
-        std::string forcefallbacksval = esp3d_strings::urlDecode(value);
-        esp3d_strings::str_toUpperCase(&forcefallbacksval);
+        std::string forcefallbacksval = esp3d_string::urlDecode(value);
+        esp3d_string::str_toUpperCase(&forcefallbacksval);
         esp3d_log("forcefallback value: %s", forcefallbacksval.c_str());
 
         if (forcefallbacksval == "TRUE" || forcefallbacksval == "1" ||

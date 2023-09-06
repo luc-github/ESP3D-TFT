@@ -41,7 +41,7 @@ esp_err_t ESP3DHttpService::file_not_found_handler(httpd_req_t *req,
 
   std::string path;
 #if ESP3D_SD_CARD_FEATURE
-  if (esp3d_strings::startsWith(req->uri, ESP3D_SD_FS_HEADER)) {
+  if (esp3d_string::startsWith(req->uri, ESP3D_SD_FS_HEADER)) {
     path = uri;
   } else
 #endif  // ESP3D_SD_CARD_FEATURE

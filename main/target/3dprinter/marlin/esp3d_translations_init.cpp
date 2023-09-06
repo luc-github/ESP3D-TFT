@@ -79,5 +79,8 @@ void ESP3DTranslationService::init() {
        "manually each point."},
       {ESP3DLabel::bed_width, "Bed width"},
       {ESP3DLabel::bed_depth, "Bed depth"},
+      {ESP3DLabel::auto_bed_probing, "Probing location: %s"},
+      {ESP3DLabel::invert_axis, "Invert %s axis"},
+      {ESP3DLabel::start_probing, "Start probing"},
   };
 }

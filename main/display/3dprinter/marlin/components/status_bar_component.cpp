@@ -37,9 +37,9 @@ lv_obj_t *status_bar_label = nullptr;
 
 bool status_bar_cb(ESP3DValuesIndex index, const char *value,
                    ESP3DValuesCbAction action) {
-  std::string svalue_one_line = esp3d_strings::str_replace(value, "\n", "");
+  std::string svalue_one_line = esp3d_string::str_replace(value, "\n", "");
   svalue_one_line =
-      esp3d_strings::str_replace(svalue_one_line.c_str(), "\r", "");
+      esp3d_string::str_replace(svalue_one_line.c_str(), "\r", "");
   if (action == ESP3DValuesCbAction::Add ||
       action == ESP3DValuesCbAction::Update) {
     if (status_bar_label != nullptr &&
@@ -72,9 +72,9 @@ lv_obj_t *status_bar(lv_obj_t *screen) {
 
   } else {
     std::string svalue_one_line =
-        esp3d_strings::str_replace(status_bar_desc->value.c_str(), "\n", "");
+        esp3d_string::str_replace(status_bar_desc->value.c_str(), "\n", "");
     svalue_one_line =
-        esp3d_strings::str_replace(svalue_one_line.c_str(), "\r", "");
+        esp3d_string::str_replace(svalue_one_line.c_str(), "\r", "");
     lv_label_set_text(status_bar_label, svalue_one_line.c_str());
   }
 

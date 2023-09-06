@@ -2,9 +2,11 @@
 # Select the targeted hardware
 # #######################################
 
+
 OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" ON)
 OPTION(ESP32_ROTRICS_DEXARM35 "TFT TARGET is ESP32 Rotrics DexArm 3.5inches" OFF)
 OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-SRC-4832 3.5inches" OFF)
+OPTION(ESP32S3_BZM_TFT35_GT911 "TFT TARGET is ESP32S3 Panlee BZM 3.5inches" OFF)
 OPTION(ESP32S3_8048S070 "TFT TARGET is ESP32S3 7.0inches" OFF)
 OPTION(ESP32S3_8048S050 "TFT TARGET is ESP32S3 5.0inches" OFF)
 OPTION(ESP32S3_8048S043 "TFT TARGET is ESP32S3 4.3inches (800x480)" OFF)
@@ -104,6 +106,9 @@ elseif(ESP32_ROTRICS_DEXARM35)
 elseif(ESP32S3_ZX3D50CE02S_USRC_4832)
     set(SDKCONFIG hardware/ESP32S3_ZX3D50CE02S_USRC_4832/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_ZX3D50CE02S_USRC_4832/components)
+elseif(ESP32S3_BZM_TFT35_GT911)
+    set(SDKCONFIG hardware/ESP32S3_BZM_TFT35_GT911/sdkconfig)
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_BZM_TFT35_GT911/components)
 elseif(ESP32S3_CUSTOM)
     set(SDKCONFIG hardware/ESP32S3_CUSTOM/sdkconfig)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_CUSTOM/components)
@@ -182,7 +187,7 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 # All  = 2
 # Error only = 1
 # Disabled = 0
-add_compile_options(-DESP3D_TFT_LOG=2)
+add_compile_options(-DESP3D_TFT_LOG=0)
 # Disable ANSI color to fit some serial terminals 
 add_compile_options(-DDISABLE_COLOR_LOG=0)
 
@@ -301,6 +306,10 @@ elseif(ESP32S3_ZX3D50CE02S_USRC_4832)
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_ZX3D50CE02S_USRC_4832/components)
     set(TFT_TARGET "ESP32S3_ZX3D50CE02S_USRC_4832")
     add_compile_options(-DESP3D_USB_SERIAL_FEATURE=1)
+elseif(ESP32S3_BZM_TFT35_GT911)
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32S3_BZM_TFT35_GT911/components/bsp")
+    set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_BZM_TFT35_GT911/components)
+    set(TFT_TARGET "ESP32S3_BZM_TFT35_GT911")
 elseif(ESP32S3_FREENOVE_1_1)
     add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32S3_FREENOVE_1_1/components/bsp")
     set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_FREENOVE_1_1/components)

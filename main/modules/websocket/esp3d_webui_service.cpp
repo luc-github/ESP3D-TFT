@@ -118,7 +118,7 @@ esp_err_t ESP3DWebUiService::onMessage(httpd_req_t *req) {
       int currentFd = httpd_req_to_sockfd(req);
       esp3d_log("Got packet with message: %s on socket %d", ws_pkt.payload,
                 currentFd);
-      if (esp3d_strings::startsWith((const char *)buf, "PING:")) {
+      if (esp3d_string::startsWith((const char *)buf, "PING:")) {
         esp3d_log("Got PING on sessionID %s", (const char *)&buf[5]);
         ESP3DAuthenticationRecord *rec =
             esp3dAuthenthicationService.getRecord((const char *)&buf[5]);

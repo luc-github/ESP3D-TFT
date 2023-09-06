@@ -86,7 +86,7 @@ void ESP3DCommands::ESP460(int cmd_params_pos, ESP3DMessage* msg) {
       error_msg = "This setting is unknown";
     }
   } else {
-    if (esp3d_strings::startsWith(tmpstr.c_str(), "DUMP=")) {
+    if (esp3d_string::startsWith(tmpstr.c_str(), "DUMP=")) {
       hasError = true;
       error_msg = "Set value failed";
     } else {
