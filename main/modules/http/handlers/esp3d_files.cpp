@@ -58,7 +58,7 @@ esp_err_t ESP3DHttpService::files_handler(httpd_req_t *req) {
     if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) {
       esp3d_log("query string: %s", buf);
       if (httpd_query_key_value(buf, "path", param, 255) == ESP_OK) {
-        path = esp3d_strings::urlDecode(param);
+        path = esp3d_string::urlDecode(param);
         esp3d_log("path is: %s", path.c_str());
       }
       if (httpd_query_key_value(buf, "action", param, 255) == ESP_OK) {
@@ -66,7 +66,7 @@ esp_err_t ESP3DHttpService::files_handler(httpd_req_t *req) {
         esp3d_log("action is: %s", action.c_str());
       }
       if (httpd_query_key_value(buf, "filename", param, 255) == ESP_OK) {
-        filename = esp3d_strings::urlDecode(param);
+        filename = esp3d_string::urlDecode(param);
         esp3d_log("filename is: %s", filename.c_str());
       }
     }
@@ -162,7 +162,7 @@ esp_err_t ESP3DHttpService::files_handler(httpd_req_t *req) {
           tmpstr += "{\"name\":\"";
           tmpstr += entry->d_name;
           tmpstr += "\",\"size\":\"";
-          tmpstr += esp3d_strings::formatBytes(entry_stat.st_size);
+          tmpstr += esp3d_string::formatBytes(entry_stat.st_size);
 #if ESP3D_TIMESTAMP_FEATURE
           tmpstr += "\",\"time\":\"";
           tmpstr += buff;
@@ -186,9 +186,9 @@ esp_err_t ESP3DHttpService::files_handler(httpd_req_t *req) {
     tmpstr += "\",\"status\":\"";
     tmpstr += status;
     tmpstr += "\",\"total\":\"";
-    tmpstr += esp3d_strings::formatBytes(totalSpace);
+    tmpstr += esp3d_string::formatBytes(totalSpace);
     tmpstr += "\",\"used\":\"";
-    tmpstr += esp3d_strings::formatBytes(usedSpace);
+    tmpstr += esp3d_string::formatBytes(usedSpace);
     tmpstr += "\"}";
     if (esp3dHttpService.sendStringChunk(req, tmpstr.c_str()) != ESP_OK) {
       flashFs.releaseFS();

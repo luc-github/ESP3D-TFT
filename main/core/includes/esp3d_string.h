@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-namespace esp3d_strings {
+namespace esp3d_string {
 // TODO:
 // some functions do internal change and others do copy of original string and
 // modify it need to review for consistency  or allows both copy and insite of
@@ -46,7 +46,7 @@ int rfind(const char* str, const char* subStr, int start = -1);
 const char* formatBytes(uint64_t bytes);
 const char* urlDecode(const char* text);
 const char* getContentType(const char* filename);
-}  // namespace esp3d_strings
+}  // namespace esp3d_string
 #ifdef __cplusplus
 }  // extern "C"
 #endif

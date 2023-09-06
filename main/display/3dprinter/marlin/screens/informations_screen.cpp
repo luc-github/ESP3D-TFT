@@ -40,7 +40,6 @@
 #include "spi_flash_mmap.h"
 #include "translations/esp3d_translation_service.h"
 
-
 #if CONFIG_SPIRAM
 #include "esp_psram.h"
 #endif  // CONFIG_SPIRAM
@@ -127,11 +126,11 @@ void informations_screen() {
   addInformationToList(ui_info_list_ctl, ESP3DLabel::cpu_freq, tmpstr.c_str());
 
   // Free memory
-  tmpstr = esp3d_strings::formatBytes(esp_get_free_heap_size());
+  tmpstr = esp3d_string::formatBytes(esp_get_free_heap_size());
   addInformationToList(ui_info_list_ctl, ESP3DLabel::free_heap, tmpstr.c_str());
 
 #if CONFIG_SPIRAM
-  tmpstr = esp3d_strings::formatBytes(esp_psram_get_size());
+  tmpstr = esp3d_string::formatBytes(esp_psram_get_size());
   addInformationToList(ui_info_list_ctl, ESP3DLabel::total_psram,
                        tmpstr.c_str());
 #endif  // CONFIG_SPIRAM
@@ -142,13 +141,13 @@ void informations_screen() {
     esp3d_log_e("Get flash size failed");
     flash_size = 0;
   }
-  tmpstr = esp3d_strings::formatBytes(flash_size);
+  tmpstr = esp3d_string::formatBytes(flash_size);
   addInformationToList(ui_info_list_ctl, ESP3DLabel::flash_size,
                        tmpstr.c_str());
 
 #if ESP3D_UPDATE_FEATURE
   // Update max
-  tmpstr = esp3d_strings::formatBytes(esp3dUpdateService.maxUpdateSize());
+  tmpstr = esp3d_string::formatBytes(esp3dUpdateService.maxUpdateSize());
   addInformationToList(ui_info_list_ctl, ESP3DLabel::size_for_update,
                        tmpstr.c_str());
 #if ESP3D_SD_CARD_FEATURE

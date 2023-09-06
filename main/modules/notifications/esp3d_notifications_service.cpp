@@ -127,9 +127,9 @@ bool ESP3DNotificationsService::sendMSG(const char* title,
   std::string formated_title = title;
 
   if (formated_message.find('%') != std::string::npos) {
-    formated_message = esp3d_strings::str_replace(
+    formated_message = esp3d_string::str_replace(
         formated_message.c_str(), "%ESP_IP%", esp3dNetwork.getLocalIpString());
-    formated_message = esp3d_strings::str_replace(
+    formated_message = esp3d_string::str_replace(
         formated_message.c_str(), "%ESP_NAME%", esp3dNetwork.getHostName());
   }
   if (formated_message.length() == 0) {
@@ -138,9 +138,9 @@ bool ESP3DNotificationsService::sendMSG(const char* title,
     return false;
   }
   if (formated_title.find('%') != std::string::npos) {
-    formated_title = esp3d_strings::str_replace(
+    formated_title = esp3d_string::str_replace(
         formated_message.c_str(), "%ESP_IP%", esp3dNetwork.getLocalIpString());
-    formated_title = esp3d_strings::str_replace(
+    formated_title = esp3d_string::str_replace(
         formated_message.c_str(), "%ESP_NAME%", esp3dNetwork.getHostName());
   }
   if (formated_title.length() == 0) {

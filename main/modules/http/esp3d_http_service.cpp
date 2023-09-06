@@ -495,7 +495,7 @@ ESP3DAuthenticationLevel ESP3DHttpService::getAuthenticationLevel(
         esp3dHttpService.hasArg(req, "USER") &&
         esp3dHttpService.hasArg(req, "PASSWORD")) {
       std::string tmpstr = esp3dHttpService.getArg(req, "SUBMIT");
-      esp3d_strings::str_toUpperCase(&tmpstr);
+      esp3d_string::str_toUpperCase(&tmpstr);
       esp3d_log("SUBMIT is %s", tmpstr.c_str());
       if (tmpstr == "YES") {
         esp3dHttpService.onClose(socketId);
@@ -764,7 +764,7 @@ esp_err_t ESP3DHttpService::streamFile(const char *path, httpd_req_t *req) {
         if (fstype == ESP3DFileSystemType::unknown) {
           filename = globalFs.mount_point(ESP3DFileSystemType::flash);
         }
-        filename += esp3d_strings::urlDecode((const char *)buf);
+        filename += esp3d_string::urlDecode((const char *)buf);
         filenameGz = filename + ".gz";
       }
       free(buf);
@@ -792,8 +792,7 @@ esp_err_t ESP3DHttpService::streamFile(const char *path, httpd_req_t *req) {
             globalFs.open(isGzip ? filenameGz.c_str() : filename.c_str(), "r");
         if (fd) {
           // stream file
-          std::string mimeType =
-              esp3d_strings::getContentType(filename.c_str());
+          std::string mimeType = esp3d_string::getContentType(filename.c_str());
 
           httpd_resp_set_type(req, mimeType.c_str());
           if (isGzip) {
@@ -885,10 +884,10 @@ const char *ESP3DHttpService::getBoundaryString(httpd_req_t *req) {
           req, "Content-Type", boundaryStr, contentTypeHeaderSize + 1);
       if (ESP_OK == r) {
         // esp3d_log("Content-Type %s", boundaryStr);
-        if (esp3d_strings::startsWith(boundaryStr, "multipart/form-data")) {
+        if (esp3d_string::startsWith(boundaryStr, "multipart/form-data")) {
           for (uint i = strlen("multipart/form-data");
                i < contentTypeHeaderSize; i++) {
-            if (esp3d_strings::startsWith(&boundaryStr[i], "boundary=")) {
+            if (esp3d_string::startsWith(&boundaryStr[i], "boundary=")) {
               return &boundaryStr[i + strlen("boundary=")];
             }
           }

@@ -46,7 +46,7 @@ esp_err_t ESP3DHttpService::command_handler(httpd_req_t *req) {
     if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) {
       esp3d_log("query string: %s", buf);
       if (httpd_query_key_value(buf, "cmd", cmd, 255) == ESP_OK) {
-        strcpy(cmd, esp3d_strings::urlDecode(cmd));
+        strcpy(cmd, esp3d_string::urlDecode(cmd));
         esp3d_log("command is: %s", cmd);
       } else if (httpd_query_key_value(buf, "PING", cmd, 255) == ESP_OK) {
         if (strcmp(cmd, "PING") == 0) {
@@ -83,7 +83,7 @@ esp_err_t ESP3DHttpService::command_handler(httpd_req_t *req) {
       httpd_resp_sendstr(req, "ESP3D says: command forwarded");
       requestId.id = 0;
       // check format is correct
-      if (!esp3d_strings::endsWith(cmd, "\n")) {
+      if (!esp3d_string::endsWith(cmd, "\n")) {
         if (!esp3dCommands.formatCommand(cmd, 255)) {
           esp3d_log_e("Error command is too long");
           return ESP_FAIL;

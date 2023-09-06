@@ -72,9 +72,9 @@ bool ESP3DFlash::mount() {
     size_t usedBytes;
     size_t freeBytes;
     if (getSpaceInfo(&totalBytes, &usedBytes, &freeBytes, true)) {
-      esp3d_log("Total:%s", esp3d_strings::formatBytes(totalBytes));
-      esp3d_log("Used:%s", esp3d_strings::formatBytes(usedBytes));
-      esp3d_log("Free:%s", esp3d_strings::formatBytes(freeBytes));
+      esp3d_log("Total:%s", esp3d_string::formatBytes(totalBytes));
+      esp3d_log("Used:%s", esp3d_string::formatBytes(usedBytes));
+      esp3d_log("Free:%s", esp3d_string::formatBytes(freeBytes));
     }
 #endif  // ESP3D_TFT_LOG
   }

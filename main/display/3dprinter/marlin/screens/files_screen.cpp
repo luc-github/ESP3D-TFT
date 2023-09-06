@@ -41,7 +41,6 @@
 #include "main_screen.h"
 #include "tasks_def.h"
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -85,10 +84,10 @@ static void bgFilesTask(void *pvParameter) {
 
 bool playable_file(const char *name) {
   if (files_extensions.size() == 0) return true;
-  int pos = esp3d_strings::rfind(name, ".", -1);
+  int pos = esp3d_string::rfind(name, ".", -1);
   if (pos != -1) {
     std::string ext = name + pos + 1;
-    esp3d_strings::str_toLowerCase(&ext);
+    esp3d_string::str_toLowerCase(&ext);
     for (auto &extension : files_extensions) {
       if (ext == extension) {
         return true;
@@ -110,7 +109,7 @@ void fill_files_list() {
   std::string extensionvalues =
       esp3dTftJsonSettings.readString("settings", "filesfilter");
   files_extensions.clear();
-  esp3d_strings::str_toLowerCase(&extensionvalues);
+  esp3d_string::str_toLowerCase(&extensionvalues);
   if (extensionvalues.length() > 0) {
     char str[extensionvalues.length() + 1];
     char *p;
@@ -155,7 +154,7 @@ void fill_files_list() {
             continue;
           }
           esp3d_log("File size is %ld", entry_stat.st_size);
-          file.size = esp3d_strings::formatBytes(entry_stat.st_size);
+          file.size = esp3d_string::formatBytes(entry_stat.st_size);
           files_list.push_back(file);
         }
         esp3d_log("Found %s, %s", file.name.c_str(), file.size.c_str());
@@ -191,7 +190,7 @@ void event_button_files_refresh_handler(lv_event_t *e) {
 }
 
 void event_button_files_up_handler(lv_event_t *e) {
-  int pos = esp3d_strings::rfind(files_path.c_str(), "/", -1);
+  int pos = esp3d_string::rfind(files_path.c_str(), "/", -1);
   esp3d_log("up Clicked %d", pos);
   std::string newpath = files_path.substr(0, pos);
   if (newpath == "") newpath = "/";
