@@ -67,6 +67,8 @@ lv_obj_t *polling_label = NULL;
 lv_obj_t *auto_leveling_label = NULL;
 lv_obj_t *bed_width_label = NULL;
 lv_obj_t *bed_depth_label = NULL;
+lv_obj_t *inverted_x_label = NULL;
+lv_obj_t *inverted_y_label = NULL;
 
 struct ESP3DJSONSettingsData {
   std::string entry = "";
@@ -311,6 +313,80 @@ void polling_edit_done_cb(const char *str) {
   }
 }
 
+// inverted_x_edit_done_cb
+void inverted_x_edit_done_cb(const char *str) {
+  esp3d_log("Saving inverted x state to: %s\n", str);
+
+  if (strcmp(str, lv_label_get_text(inverted_x_label)) != 0) {
+    uint8_t val =
+        (uint8_t)ESP3DClientType::no_client;  // default value if not found
+    if (strcmp(str, esp3dTranslationService.translate(ESP3DLabel::enabled)) ==
+        0) {
+      val = 1;
+    } else if (strcmp(str, esp3dTranslationService.translate(
+                               ESP3DLabel::disabled)) == 0) {
+      val = 0;
+    }
+
+    if (esp3dTftsettings.isValidByteSetting(
+            val, ESP3DSettingIndex::esp3d_inverved_x)) {
+      esp3d_log("Value %s is valid", str);
+      if (esp3dTftsettings.writeByte(ESP3DSettingIndex::esp3d_inverved_x,
+                                     val)) {
+        manualLevelingScreen::update_invert_x(val == 1 ? true : false);
+
+        if (inverted_x_label) {
+          lv_label_set_text(inverted_x_label, str);
+        }
+      } else {
+        esp3d_log_e("Failed to save invert x axis mode");
+        std::string text = esp3dTranslationService.translate(
+            ESP3DLabel::error_applying_setting);
+        msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+      }
+    }
+  } else {
+    esp3d_log("New value is identical do not save it");
+  }
+}
+
+// inverted_y_edit_done_cb
+void inverted_y_edit_done_cb(const char *str) {
+  esp3d_log("Saving inverted y state to: %s\n", str);
+
+  if (strcmp(str, lv_label_get_text(inverted_y_label)) != 0) {
+    uint8_t val =
+        (uint8_t)ESP3DClientType::no_client;  // default value if not found
+    if (strcmp(str, esp3dTranslationService.translate(ESP3DLabel::enabled)) ==
+        0) {
+      val = 1;
+    } else if (strcmp(str, esp3dTranslationService.translate(
+                               ESP3DLabel::disabled)) == 0) {
+      val = 0;
+    }
+
+    if (esp3dTftsettings.isValidByteSetting(
+            val, ESP3DSettingIndex::esp3d_inverved_y)) {
+      esp3d_log("Value %s is valid", str);
+      if (esp3dTftsettings.writeByte(ESP3DSettingIndex::esp3d_inverved_y,
+                                     val)) {
+        manualLevelingScreen::update_invert_x(val == 1 ? true : false);
+
+        if (inverted_y_label) {
+          lv_label_set_text(inverted_y_label, str);
+        }
+      } else {
+        esp3d_log_e("Failed to save invert y axis mode");
+        std::string text = esp3dTranslationService.translate(
+            ESP3DLabel::error_applying_setting);
+        msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+      }
+    }
+  } else {
+    esp3d_log("New value is identical do not save it");
+  }
+}
+
 // auto_levling_edit_done_cb
 void auto_leveling_edit_done_cb(const char *str) {
   esp3d_log("Saving auto leveling state to: %s\n", str);
@@ -539,6 +615,32 @@ void event_button_edit_polling_cb(lv_event_t *e) {
   std::string title = esp3dTranslationService.translate(ESP3DLabel::polling);
   choiceEditor::create_choice_editor(lv_scr_act(), text.c_str(), title.c_str(),
                                      choices, polling_edit_done_cb);
+}
+
+// event_button_edit_inverted_x_cb
+void event_button_edit_inverted_x_cb(lv_event_t *e) {
+  esp3d_log("Show component invert x editor");
+  std::string text = (const char *)lv_event_get_user_data(e);
+  std::list<std::string> choices;
+  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::disabled));
+  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::enabled));
+  std::string title =
+      esp3dTranslationService.translate(ESP3DLabel::invert_axis, "X");
+  choiceEditor::create_choice_editor(lv_scr_act(), text.c_str(), title.c_str(),
+                                     choices, inverted_x_edit_done_cb);
+}
+
+// event_button_edit_inverted_y_cb
+void event_button_edit_inverted_y_cb(lv_event_t *e) {
+  esp3d_log("Show component invert y editor");
+  std::string text = (const char *)lv_event_get_user_data(e);
+  std::list<std::string> choices;
+  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::disabled));
+  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::enabled));
+  std::string title =
+      esp3dTranslationService.translate(ESP3DLabel::invert_axis, "Y");
+  choiceEditor::create_choice_editor(lv_scr_act(), text.c_str(), title.c_str(),
+                                     choices, inverted_y_edit_done_cb);
 }
 
 // event_button_edit_auto_leveling_cb
@@ -885,6 +987,52 @@ void settings_screen() {
     lv_obj_add_event_cb(btnEdit, event_button_edit_bed_depth_cb,
                         LV_EVENT_CLICKED,
                         (void *)(lv_label_get_text(bed_depth_label)));
+  }
+
+  // Invert X axis
+  line_container = listLine::create_list_line_container(ui_settings_list_ctl);
+  LabelStr = esp3dTranslationService.translate(ESP3DLabel::invert_axis, "X");
+  if (line_container) {
+    listLine::add_label_to_line(LabelStr.c_str(), line_container, true);
+    const ESP3DSettingDescription *settingPtr =
+        esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_inverved_x);
+    if (settingPtr) {
+      uint8_t val =
+          esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_inverved_x);
+      std::string value =
+          val == 0 ? esp3dTranslationService.translate(ESP3DLabel::disabled)
+                   : esp3dTranslationService.translate(ESP3DLabel::enabled);
+      inverted_x_label =
+          listLine::add_label_to_line(value.c_str(), line_container, false);
+      lv_obj_t *btnEdit =
+          listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
+      lv_obj_add_event_cb(btnEdit, event_button_edit_inverted_x_cb,
+                          LV_EVENT_CLICKED,
+                          (void *)(lv_label_get_text(inverted_x_label)));
+    }
+  }
+
+  // Invert Y axis
+  line_container = listLine::create_list_line_container(ui_settings_list_ctl);
+  LabelStr = esp3dTranslationService.translate(ESP3DLabel::invert_axis, "Y");
+  if (line_container) {
+    listLine::add_label_to_line(LabelStr.c_str(), line_container, true);
+    const ESP3DSettingDescription *settingPtr =
+        esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_inverved_y);
+    if (settingPtr) {
+      uint8_t val =
+          esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_inverved_y);
+      std::string value =
+          val == 0 ? esp3dTranslationService.translate(ESP3DLabel::disabled)
+                   : esp3dTranslationService.translate(ESP3DLabel::enabled);
+      inverted_y_label =
+          listLine::add_label_to_line(value.c_str(), line_container, false);
+      lv_obj_t *btnEdit =
+          listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
+      lv_obj_add_event_cb(btnEdit, event_button_edit_inverted_y_cb,
+                          LV_EVENT_CLICKED,
+                          (void *)(lv_label_get_text(inverted_y_label)));
+    }
   }
 
   esp3dTftui.set_current_screen(ESP3DScreenType::settings);

@@ -161,6 +161,8 @@ const ESP3DSettingDescription ESP3DSettingsData[] = {
 #if ESP3D_DISPLAY_FEATURE
     {ESP3DSettingIndex::esp3d_jog_type, ESP3DSettingType::byte_t, 1, "0"},
     {ESP3DSettingIndex::esp3d_polling_on, ESP3DSettingType::byte_t, 1, "1"},
+    {ESP3DSettingIndex::esp3d_inverved_x, ESP3DSettingType::byte_t, 1, "0"},
+    {ESP3DSettingIndex::esp3d_inverved_y, ESP3DSettingType::byte_t, 1, "0"},
     {ESP3DSettingIndex::esp3d_auto_level_on, ESP3DSettingType::byte_t, 1, "0"},
     {ESP3DSettingIndex::esp3d_bed_width, ESP3DSettingType::float_t, 3,
      "100.00"},
@@ -301,6 +303,8 @@ bool ESP3DSettings::isValidByteSetting(uint8_t value,
 #endif  // ESP3D_UPDATE_FEATURE
 #endif  // ESP3D_SD_CARD_FEATURE
 #if ESP3D_DISPLAY_FEATURE
+    case ESP3DSettingIndex::esp3d_inverved_x:
+    case ESP3DSettingIndex::esp3d_inverved_y:
     case ESP3DSettingIndex::esp3d_jog_type:
     case ESP3DSettingIndex::esp3d_polling_on:
     case ESP3DSettingIndex::esp3d_auto_level_on:

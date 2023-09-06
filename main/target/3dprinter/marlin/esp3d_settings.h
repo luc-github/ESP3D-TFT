@@ -86,6 +86,8 @@ enum class ESP3DSettingIndex : uint16_t {
   esp3d_auto_level_on,
   esp3d_bed_width,
   esp3d_bed_depth,
+  esp3d_inverved_x,
+  esp3d_inverved_y,
   unknown_index
 };
 

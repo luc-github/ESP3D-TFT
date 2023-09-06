@@ -60,11 +60,15 @@ lv_obj_t *status_container = NULL;
 double intialization_done = false;
 double bed_width = 100;
 double bed_depth = 100;
+bool invert_x = false;
+bool invert_y = false;
 #define DEFAULT_Z_DISTANCE 15
 lv_timer_t *manual_leveling_screen_delay_timer = NULL;
 void update_bed_width(double value) { bed_width = value; }
 
 void update_bed_depth(double value) { bed_depth = value; }
+void update_invert_x(bool value) { invert_x = value; }
+void update_invert_y(bool value) { invert_y = value; }
 
 void manual_leveling_screen_delay_timer_cb(lv_timer_t *timer) {
   if (manual_leveling_screen_delay_timer) {
@@ -297,6 +301,11 @@ void manual_leveling_screen(bool autoleveling) {
   if (!intialization_done) {
     esp3d_log("Manual leveling screen initialization");
     char buffer[16];
+    uint8_t byte_value =
+        esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_inverved_x);
+    update_invert_x(byte_value == 1 ? true : false);
+    byte_value = esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_inverved_y);
+    update_invert_y(byte_value == 1 ? true : false);
     std::string str_value = esp3dTftsettings.readString(
         ESP3DSettingIndex::esp3d_bed_width, buffer, 16);
     update_bed_width(std::strtod(str_value.c_str(),
