@@ -78,6 +78,7 @@ lv_obj_t *auto_leveling_screen_table = NULL;
 lv_obj_t *btn_back = NULL;
 lv_obj_t *btn_start = NULL;
 lv_obj_t *label_status = nullptr;
+bool homing_done = false;
 
 double get_value(const char *str, const char *value) {
   char *pstr = strstr(str, value);
@@ -226,6 +227,10 @@ void auto_leveling_screen_delay_timer_cb(lv_timer_t *timer) {
 void event_button_auto_leveling_start_handler(lv_event_t *e) {
   esp3d_log("start Clicked");
   if (auto_leveling_started) return;
+  if (!homing_done) {
+    renderingClient.sendGcode("G28");
+    homing_done = true;
+  }
   esp3d_log("start leveling");
   lv_obj_add_flag(btn_start, LV_OBJ_FLAG_HIDDEN);
   // clear table
@@ -256,7 +261,7 @@ void auto_leveling_screen() {
   lv_scr_load(ui_new_screen);
   lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
-
+  homing_done = false;
   btn_back = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btn_back, event_button_fan_back_handler, LV_EVENT_CLICKED,
                       NULL);

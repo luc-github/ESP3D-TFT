@@ -379,11 +379,13 @@ void bed_width_edit_done_cb(const char *str) {
             str, ESP3DSettingIndex::esp3d_bed_width) &&
         strlen(str) != 0 && strtod(str, NULL) != 0) {
       esp3d_log("Value %s is valid", str);
+      std::string str_formated = esp3d_string::set_precision(str, 2);
       if (esp3dTftsettings.writeString(ESP3DSettingIndex::esp3d_bed_width,
-                                       str)) {
-        manualLevelingScreen::update_bed_width(strtod(str, NULL));
+                                       str_formated.c_str())) {
+        manualLevelingScreen::update_bed_width(
+            strtod(str_formated.c_str(), NULL));
         if (bed_width_label) {
-          lv_label_set_text(bed_width_label, str);
+          lv_label_set_text(bed_width_label, str_formated.c_str());
         }
       } else {
         esp3d_log_e("Failed to save bed width");
@@ -405,11 +407,13 @@ void bed_depth_edit_done_cb(const char *str) {
             str, ESP3DSettingIndex::esp3d_bed_depth) &&
         strlen(str) != 0 && strtod(str, NULL) != 0) {
       esp3d_log("Value %s is valid", str);
+      std::string str_formated = esp3d_string::set_precision(str, 2);
       if (esp3dTftsettings.writeString(ESP3DSettingIndex::esp3d_bed_depth,
-                                       str)) {
-        manualLevelingScreen::update_bed_depth(strtod(str, NULL));
+                                       str_formated.c_str())) {
+        manualLevelingScreen::update_bed_depth(
+            strtod(str_formated.c_str(), NULL));
         if (bed_depth_label) {
-          lv_label_set_text(bed_depth_label, str);
+          lv_label_set_text(bed_depth_label, str_formated.c_str());
         }
       } else {
         esp3d_log_e("Failed to save bed depth");
