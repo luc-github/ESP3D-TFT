@@ -23,33 +23,25 @@
 #include <string.h>
 
 #include <algorithm>
+#include <cmath>
 
 // helper to format string float to readable string with precision
 std::string esp3d_string::set_precision(std::string str_value,
                                         uint8_t precision) {
   static std::string tmp;
   tmp = str_value;
+  double value = std::stod(str_value);
+  double rounded =
+      std::round(value * std::pow(10, precision)) / std::pow(10, precision);
+  tmp = std::to_string(rounded);
+
   int pos = tmp.find(".");
-  if (pos != std::string::npos) {
-    for (uint8_t i = 0; i < precision; i++) {
-      tmp += "0";
-    }
-    if (pos == 0) {
-      tmp = "0" + tmp;
-    }
-    int pos = tmp.find(".");
-    for (uint i = pos + 1; i < tmp.length(); i++) {
-      if (tmp[i] == '.') {
-        tmp[i] = '0';
-      }
-    }
-    tmp = tmp.substr(0, pos + precision + 1);
+  if (precision == 0) {
+    tmp = tmp.substr(0, pos);
   } else {
-    tmp += ".";
-    for (uint8_t i = 0; i < precision; i++) {
-      tmp += "0";
-    }
+    tmp = tmp.substr(0, pos + precision + 1);
   }
+
   return tmp;
 }
 

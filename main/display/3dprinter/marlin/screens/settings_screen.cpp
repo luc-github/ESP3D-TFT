@@ -475,20 +475,20 @@ void showfanctrls_edit_done_cb(const char *str) {
 // event_button_edit_output_client_cb
 void event_button_edit_output_client_cb(lv_event_t *e) {
   esp3d_log("Show component output client editor");
-  const char *text = (const char *)lv_event_get_user_data(e);
+  std::string text = (const char *)lv_event_get_user_data(e);
   std::list<std::string> choices;
   choices.push_back(esp3dTranslationService.translate(ESP3DLabel::serial));
   choices.push_back(esp3dTranslationService.translate(ESP3DLabel::usb));
   std::string title =
       esp3dTranslationService.translate(ESP3DLabel::output_client);
-  choiceEditor::create_choice_editor(lv_scr_act(), text, title.c_str(), choices,
-                                     outputclient_edit_done_cb);
+  choiceEditor::create_choice_editor(lv_scr_act(), text.c_str(), title.c_str(),
+                                     choices, outputclient_edit_done_cb);
 }
 
 // event_button_edit_usb_serial_baud_rate_cb
 void event_button_edit_usb_serial_baud_rate_cb(lv_event_t *e) {
   esp3d_log("Show component usb serial baud rate editor");
-  const char *text = (const char *)lv_event_get_user_data(e);
+  std::string text = (const char *)lv_event_get_user_data(e);
   std::list<std::string> choices;
   uint8_t list_size = sizeof(SupportedBaudList) / sizeof(uint32_t);
   for (uint8_t i = 0; i < list_size; i++) {
@@ -497,14 +497,15 @@ void event_button_edit_usb_serial_baud_rate_cb(lv_event_t *e) {
   std::string title =
       esp3dTranslationService.translate(ESP3DLabel::usb_baud_rate);
 
-  choiceEditor::create_choice_editor(lv_scr_act(), text, title.c_str(), choices,
+  choiceEditor::create_choice_editor(lv_scr_act(), text.c_str(), title.c_str(),
+                                     choices,
                                      usb_serial_baud_rate_edit_done_cb);
 }
 
 // event_button_edit_serial_baud_rate_cb
 void event_button_edit_serial_baud_rate_cb(lv_event_t *e) {
   esp3d_log("Show component serial baud rate editor");
-  const char *text = (const char *)lv_event_get_user_data(e);
+  std::string text = (const char *)lv_event_get_user_data(e);
   std::list<std::string> choices;
   uint8_t list_size = sizeof(SupportedBaudList) / sizeof(uint32_t);
   for (uint8_t i = 0; i < list_size; i++) {
@@ -512,100 +513,103 @@ void event_button_edit_serial_baud_rate_cb(lv_event_t *e) {
   }
   std::string title =
       esp3dTranslationService.translate(ESP3DLabel::serial_baud_rate);
-  choiceEditor::create_choice_editor(lv_scr_act(), text, title.c_str(), choices,
-                                     serial_baud_rate_edit_done_cb);
+  choiceEditor::create_choice_editor(lv_scr_act(), text.c_str(), title.c_str(),
+                                     choices, serial_baud_rate_edit_done_cb);
 }
 
 // event_button_edit_jog_type_cb
 void event_button_edit_jog_type_cb(lv_event_t *e) {
   esp3d_log("Show component jog type editor");
-  const char *text = (const char *)lv_event_get_user_data(e);
+  std::string text = (const char *)lv_event_get_user_data(e);
   std::list<std::string> choices;
   choices.push_back(esp3dTranslationService.translate(ESP3DLabel::relative));
   choices.push_back(esp3dTranslationService.translate(ESP3DLabel::absolute));
   std::string title = esp3dTranslationService.translate(ESP3DLabel::jog_type);
-  choiceEditor::create_choice_editor(lv_scr_act(), text, title.c_str(), choices,
-                                     jog_type_edit_done_cb);
+  choiceEditor::create_choice_editor(lv_scr_act(), text.c_str(), title.c_str(),
+                                     choices, jog_type_edit_done_cb);
 }
 
 // event_button_edit_polling_cb
 void event_button_edit_polling_cb(lv_event_t *e) {
   esp3d_log("Show component polling editor");
-  const char *text = (const char *)lv_event_get_user_data(e);
+  std::string text = (const char *)lv_event_get_user_data(e);
   std::list<std::string> choices;
   choices.push_back(esp3dTranslationService.translate(ESP3DLabel::disabled));
   choices.push_back(esp3dTranslationService.translate(ESP3DLabel::enabled));
   std::string title = esp3dTranslationService.translate(ESP3DLabel::polling);
-  choiceEditor::create_choice_editor(lv_scr_act(), text, title.c_str(), choices,
-                                     polling_edit_done_cb);
+  choiceEditor::create_choice_editor(lv_scr_act(), text.c_str(), title.c_str(),
+                                     choices, polling_edit_done_cb);
 }
 
 // event_button_edit_auto_leveling_cb
 void event_button_edit_auto_leveling_cb(lv_event_t *e) {
   esp3d_log("Show component eveling editor");
-  const char *text = (const char *)lv_event_get_user_data(e);
+  std::string text = (const char *)lv_event_get_user_data(e);
   std::list<std::string> choices;
   choices.push_back(esp3dTranslationService.translate(ESP3DLabel::disabled));
   choices.push_back(esp3dTranslationService.translate(ESP3DLabel::enabled));
   std::string title =
       esp3dTranslationService.translate(ESP3DLabel::auto_leveling);
-  choiceEditor::create_choice_editor(lv_scr_act(), text, title.c_str(), choices,
-                                     auto_leveling_edit_done_cb);
+  choiceEditor::create_choice_editor(lv_scr_act(), text.c_str(), title.c_str(),
+                                     choices, auto_leveling_edit_done_cb);
 }
 
 // event_button_edit_extensions_cb
 void event_button_edit_extensions_cb(lv_event_t *e) {
   esp3d_log("Show component");
-  const char *text = (const char *)lv_label_get_text(extensions_label);
-  textEditor::create_text_editor(lv_scr_act(), text, extensions_edit_done_cb);
+  std::string text = (const char *)lv_label_get_text(extensions_label);
+  textEditor::create_text_editor(lv_scr_act(), text.c_str(),
+                                 extensions_edit_done_cb);
 }
 
 // event_button_edit_show_fan_controls_cb
 void event_button_edit_show_fan_controls_cb(lv_event_t *e) {
   esp3d_log("Show component");
-  const char *text = (const char *)lv_label_get_text(show_fan_controls_label);
+  std::string text = (const char *)lv_label_get_text(show_fan_controls_label);
   std::list<std::string> choices;
   choices.push_back(esp3dTranslationService.translate(ESP3DLabel::disabled));
   choices.push_back(esp3dTranslationService.translate(ESP3DLabel::enabled));
   std::string title =
       esp3dTranslationService.translate(ESP3DLabel::fan_controls);
-  choiceEditor::create_choice_editor(lv_scr_act(), text, title.c_str(), choices,
-                                     showfanctrls_edit_done_cb);
+  choiceEditor::create_choice_editor(lv_scr_act(), text.c_str(), title.c_str(),
+                                     choices, showfanctrls_edit_done_cb);
 }
 
 // event_button_edit_hostname_cb
 void event_button_edit_hostname_cb(lv_event_t *e) {
   esp3d_log("Show component");
-  const char *text = (const char *)lv_event_get_user_data(e);
+  std::string text = (const char *)lv_event_get_user_data(e);
   const ESP3DSettingDescription *settingPtr =
       esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_hostname);
   if (settingPtr) {
-    textEditor::create_text_editor(lv_scr_act(), text, hostname_edit_done_cb,
-                                   settingPtr->size);
+    textEditor::create_text_editor(lv_scr_act(), text.c_str(),
+                                   hostname_edit_done_cb, settingPtr->size);
   }
 }
 
 // event_button_edit_bed_width_cb
 void event_button_edit_bed_width_cb(lv_event_t *e) {
   esp3d_log("Show component for bed width");
-  const char *text = (const char *)lv_event_get_user_data(e);
+  std::string text = (const char *)lv_event_get_user_data(e);
   const ESP3DSettingDescription *settingPtr =
       esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_bed_width);
   if (settingPtr) {
-    textEditor::create_text_editor(lv_scr_act(), text, bed_width_edit_done_cb,
-                                   15, "0123456789.", true);
+    textEditor::create_text_editor(lv_scr_act(), text.c_str(),
+                                   bed_width_edit_done_cb, 15, "0123456789.",
+                                   true);
   }
 }
 
 // event_button_edit_bed_depth_cb
 void event_button_edit_bed_depth_cb(lv_event_t *e) {
   esp3d_log("Show component for bed depth");
-  const char *text = (const char *)lv_event_get_user_data(e);
+  std::string text = (const char *)lv_event_get_user_data(e);
   const ESP3DSettingDescription *settingPtr =
       esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_bed_depth);
   if (settingPtr) {
-    textEditor::create_text_editor(lv_scr_act(), text, bed_depth_edit_done_cb,
-                                   15, "0123456789.", true);
+    textEditor::create_text_editor(lv_scr_act(), text.c_str(),
+                                   bed_depth_edit_done_cb, 15, "0123456789.",
+                                   true);
   }
 }
 
