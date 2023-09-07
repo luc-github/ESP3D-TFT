@@ -317,21 +317,19 @@ ESP3DDataType ESP3DGCodeParserService::getType(const char* data) {
   if (data == nullptr) {
     return ESP3DDataType::empty_line;
   }
-  char* ptr = (char*)data;
-
-  // remove leading spaces and tabs
-  for (uint8_t i = 0; i < strlen(data); i++) {
-    if (data[i] == ' ' || data[i] == '\t') {
-      ptr++;
-    } else {
+  uint8_t i = 0;
+  uint8_t size = strlen(data);
+  // remove leading spaces and tabs and empty lines
+  for (i = 0; i < size; i++) {
+    if (!(data[i] == ' ' || data[i] == '\t' || data[i] == '\n' || data[i] == '\r' )) {
       break;
     }
   }
-
-  // is empty line ?
-  if (ptr[0] == '\n' || ptr[0] == '\r') {
+  //if we reached the end, it was an empty
+  if (i == size){
     return ESP3DDataType::empty_line;
   }
+  char* ptr = (char*)data + i;
 
   // is it ack ?
   if ((ptr[0] == 'o' && ptr[1] == 'k') &&
@@ -348,7 +346,7 @@ ESP3DDataType ESP3DGCodeParserService::getType(const char* data) {
   if (ptr[0] == 'M' || ptr[0] == 'G' || ptr[0] == 'T') {
     char* ptr2 = ptr;
     int hasNumber = 0;
-    for (uint8_t i = 0; i < strlen(ptr2); i++) {
+    for (i = 0; i < strlen(ptr2); i++) {
       if (ptr2[i] >= '0' && ptr2[i] <= '9') {
         hasNumber++;
       } else if ((ptr2[i] == ' ' || ptr2[i] == '\t' || ptr2[i] == '\n' ||
