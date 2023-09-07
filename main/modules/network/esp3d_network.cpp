@@ -412,7 +412,7 @@ bool ESP3DNetwork::startStaMode() {
   }
   std::string stmp;
   ESP3DRequest requestId = {.id = 0};
-  stmp = "Connection to ";
+  stmp = "Connecting to ";
   stmp += ssid_str;
   stmp += "\n";
   esp3dCommands.dispatch(stmp.c_str(), ESP3DClientType::all_clients, requestId,

@@ -89,9 +89,15 @@ esp_err_t ESP3DHttpService::command_handler(httpd_req_t *req) {
           return ESP_FAIL;
         }
       }
+      /* change may be redundant
       esp3dCommands.dispatch(cmd, esp3dCommands.getOutputClient(), requestId,
                              ESP3DMessageType::unique, ESP3DClientType::webui,
                              authentication_level);
+        */                     
+      esp3dCommands.dispatch(cmd, ESP3DClientType::stream, requestId,
+                             ESP3DMessageType::unique, ESP3DClientType::webui,
+                             authentication_level);
+                             
       return ESP_OK;
     }
 
