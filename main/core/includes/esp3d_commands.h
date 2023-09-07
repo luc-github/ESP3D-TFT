@@ -136,7 +136,6 @@ class ESP3DCommands {
 #if ESP3D_GCODE_HOST_FEATURE
   void ESP700(int cmd_params_pos, ESP3DMessage* msg);
   void ESP701(int cmd_params_pos, ESP3DMessage* msg);
-  void ESP702(int cmd_params_pos, ESP3DMessage* msg);
 #endif  // ESP3D_GCODE_HOST_FEATURE
   void ESP710(int cmd_params_pos, ESP3DMessage* msg);
   void ESP720(int cmd_params_pos, ESP3DMessage* msg);
@@ -154,10 +153,9 @@ class ESP3DCommands {
   void ESP902(int cmd_params_pos, ESP3DMessage* msg);
   void ESP950(int cmd_params_pos, ESP3DMessage* msg);
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
-  const char* get_param(ESP3DMessage* msg, uint start, const char* label,
-                        bool* found = nullptr);
+  const char* get_param(ESP3DMessage* msg, uint start, const char* label);
   const char* get_param(const char* data, uint size, uint start,
-                        const char* label, bool* found = nullptr);
+                        const char* label);
   const char* get_clean_param(ESP3DMessage* msg, uint start);
   bool has_param(ESP3DMessage* msg, uint start);
   bool hasTag(ESP3DMessage* msg, uint start, const char* label);

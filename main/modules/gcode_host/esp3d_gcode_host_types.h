@@ -26,34 +26,30 @@
 extern "C" {
 #endif
 
-enum class ESP3DGcodeStreamState : uint8_t {
-  // no_stream = 0,
-  start,
-  end,
-  read_line,      // maybe should rename
-  wait_for_send,  // wait for currentCommand to be sent, so we can read the next
-                  // command ready.
-  pause,  // only needed for file stream, maybe better to have another class?
-  resume,
-  abort,
-  stop,    // stop vs abort?
-  paused,  // do nothing until resumed
-  error,
-  undefined,
+enum class ESP3DGcodeHostWait : uint8_t {
+  no_wait = 0,
+  wait_ack,
+  busy,
   processing,
+  heating
 };
 
-enum class ESP3DGcodeHostState : uint8_t {  // maybe need stream state and host
-                                            // state?
-  idle = 0,                                 // wait for a command to send
-  send_gcode_command,  // if waiting not waiting for ack send command
-  send_esp_command,    //
+enum class ESP3DGcodeHostState : uint8_t {
+  no_stream = 0,
+  start,
+  end,
+  read_line,
+  process_line,
   wait_for_ack,
+  pause,
+  paused,
+  resume,
+  stop,
   error,
   abort,
+  wait,
+  next_state,
   undefined,
-  paused,  // only used to indicate print stream is paused outside of gcodehost,
-           // not used here
   processing,
 };
 
@@ -74,19 +70,14 @@ enum class ESP3DGcodeHostError : uint8_t {
   aborted
 };
 
-enum class ESP3DGcodeHostFileType : uint8_t {
+enum class ESP3DGcodeHostScriptType : uint8_t {
   single_command,
-  multiple_commands,  // no real difference between single and multiple in
-                      // practice
+  multiple_commands,
+  file_commands,
   filesystem,
-  script,
-#if ESP3D_SD_CARD_FEATURE
   sd_card,
-  sd_script,
-#endif  // ESP3D_SD_CARD_FEATURE
   active,
-  unknown,
-  invalid
+  unknown
 };
 
 #ifdef __cplusplus
