@@ -80,7 +80,7 @@ bool ESP3DSd::mount() {
   host.max_freq_khz = ESP3D_SD_FREQ / _spi_speed_divider;
   esp_vfs_fat_sdmmc_mount_config_t mount_config = {
       .format_if_mount_failed = false,
-      .max_files = 10,
+      .max_files = 2,
       .allocation_unit_size = SPI_ALLOCATION_SIZE,
       /** New IDF 5.0, Try to enable if you need to handle situations when SD
        * cards are not unmounted properly before physical removal or you are
