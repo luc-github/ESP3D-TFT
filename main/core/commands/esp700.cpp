@@ -51,14 +51,12 @@ void ESP3DCommands::ESP700(int cmd_params_pos, ESP3DMessage* msg) {
     error_msg = "Missing parameter";
     esp3d_log_e("Error missing");
   } else {
-    if (gcodeHostService.getCurrentStream() == nullptr) {
-      ESP3DMessage *newMsgPtr = ESP3DClient::newMsg( target, ESP3DClientType::stream,
-          (const uint8_t*)tmpstr.c_str(), tmpstr.length(), msg -> authentication_level);
-      if (newMsgPtr) {
-        newMsgPtr->request_id = requestId;
-        esp3dCommands.process(newMsgPtr);
-      } else {
-        esp3d_log_e("Message creation failed");
+    if (gcodeHostService.getState() == ESP3DGcodeHostState::no_stream) {
+      if (!gcodeHostService.processScript(tmpstr.c_str(),
+                                          msg->authentication_level)) {
+        hasError = false;
+        error_msg = "Error processing script";
+        esp3d_log_e("Error processing script");
       }
     } else {
       hasError = false;
