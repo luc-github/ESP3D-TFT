@@ -53,9 +53,12 @@ lv_obj_t *add_label_to_line(const char *lbl, lv_obj_t *line_container,
   lv_obj_t *label_txt = lv_label_create(line_container);
   lv_label_set_text(label_txt, lbl);
   lv_obj_update_layout(label_txt);
-  size_t header_height = lv_obj_get_height(label_txt);
-  size_t pad_top = (LIST_LINE_HEIGHT - header_height) / 2;
-  lv_obj_set_style_pad_top(label_txt, pad_top, LV_PART_MAIN);
+  
+  size_t label_height = lv_obj_get_height(label_txt);
+  size_t pad_v = (LIST_LINE_HEIGHT - label_height) / 2;
+  lv_obj_set_style_pad_top(label_txt, pad_v, LV_PART_MAIN);
+  lv_obj_set_style_pad_bottom(label_txt, pad_v, LV_PART_MAIN);
+  
   if (grow) {
     lv_obj_set_flex_grow(label_txt, 1);
     lv_label_set_long_mode(label_txt, LV_LABEL_LONG_SCROLL_CIRCULAR);
@@ -66,6 +69,12 @@ lv_obj_t *add_label_to_line(const char *lbl, lv_obj_t *line_container,
 lv_obj_t *add_button_to_line(const char *lbl, lv_obj_t *line_container) {
   lv_obj_t *button_list = symbolButton::create_symbol_button(
       line_container, lbl, LIST_LINE_BUTTON_WIDTH, -1);
+
+  size_t button_height = lv_obj_get_height(button_list);
+  size_t pad_v = (LIST_LINE_HEIGHT - button_height) / 2;
+  lv_obj_set_style_pad_top(button_list, pad_v, LV_PART_MAIN);
+  lv_obj_set_style_pad_bottom(button_list, pad_v, LV_PART_MAIN);
+
   return button_list;
 }
 }  // namespace listLine

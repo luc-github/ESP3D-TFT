@@ -173,7 +173,8 @@ void speed_screen() {
   lv_obj_t *btnm = lv_btnmatrix_create(ui_new_screen);
   lv_btnmatrix_set_map(btnm, speed_buttons_map);
   apply_style(btnm, ESP3DStyleType::buttons_matrix);
-  lv_obj_set_size(btnm, LV_HOR_RES / 2, MATRIX_BUTTON_HEIGHT);
+  size_t i = (sizeof(speed_buttons_map) / sizeof(speed_buttons_map[0])) - 1;
+  lv_obj_set_size(btnm, MATRIX_BUTTON_WIDTH * i, MATRIX_BUTTON_HEIGHT);
   lv_obj_align(btnm, LV_ALIGN_TOP_RIGHT, -CURRENT_BUTTON_PRESSED_OUTLINE,
                CURRENT_BUTTON_PRESSED_OUTLINE / 2);
   lv_btnmatrix_set_btn_ctrl(btnm, speed_buttons_map_id,
