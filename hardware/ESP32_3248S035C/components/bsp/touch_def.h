@@ -1,25 +1,23 @@
-// Pins definition for ESP32_3248S035C
-// Touch driver GT911 I2C
+// Touch definitions for ESP32_3248S035C
+// Touch driver GT911 (I2C)
 #pragma once
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define TOUCH_CONTROLLER "GT911"
 
-#define GT911_ADDR        0x5D
-#define GT911_CLK_SPEED   400000
-#define GT911_RESET_PIN   25 // GPIO 25
-#if WITH_GT911_INT
-  #define GT911_INT_PIN   21 // GPIO 21
-#endif
-#define GT911_TOUCH_PRESS 1
-#define GT911_HOR_RES_MAX 480
-#define GT911_VER_RES_MAX 320
-#define GT911_SWAP_XY     1
-#define GT911_X_INV       1
-#define GT911_Y_INV       0
+#include "gt911.h"
+
+gt911_config_t gt911_cfg = {
+    .i2c_addr = 0x5D,
+    .i2c_clk_speed = 400*1000,
+    .rst_pin = 25, // GPIO 25
+    .int_pin = -1, // INT pin not connected (by default)
+    .swap_xy = true,
+    .invert_x = true,
+    .invert_y = false,    
+};
 
 #ifdef __cplusplus
 } /* extern "C" */
