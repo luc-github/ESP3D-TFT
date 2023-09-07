@@ -1,4 +1,0 @@
-# Generic component
-
-COMPONENT_SRCDIRS := . 
-COMPONENT_ADD_INCLUDEDIRS := .

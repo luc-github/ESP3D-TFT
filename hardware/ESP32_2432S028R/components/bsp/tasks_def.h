@@ -1,4 +1,4 @@
-// Task definition for ESP32 2332S028R
+// Task definition for ESP32_2432S028R
 
 #pragma once
 

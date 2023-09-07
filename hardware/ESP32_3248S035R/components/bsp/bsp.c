@@ -22,17 +22,13 @@
  *      INCLUDES
  *********************/
 #include "bsp.h"
-
 #include "esp3d_log.h"
-#include "spi_bus.h"
 
 #if ESP3D_DISPLAY_FEATURE
-#include "esp_lcd_backlight.h"
-#include "st7796.h"
 #include "lvgl.h"
-#include "touch_spi.h"
-#include "xpt2046.h"
-
+#include "shared_spi_def.h"
+#include "disp_def.h"
+#include "touch_def.h"
 #endif  // ESP3D_DISPLAY_FEATURE
 
 /*********************
@@ -46,10 +42,21 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+#if ESP3D_DISPLAY_FEATURE
+static bool disp_flush_ready(esp_lcd_panel_io_handle_t panel_io, esp_lcd_panel_io_event_data_t *edata, void *user_ctx);
+static void lv_disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
+static uint16_t touch_spi_read_reg12(uint8_t reg);
+static void lv_touch_read(lv_indev_drv_t * drv, lv_indev_data_t * data);
+#endif
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+#if ESP3D_DISPLAY_FEATURE
+static lv_disp_drv_t disp_drv;
+static esp_lcd_panel_handle_t disp_panel;
+static spi_device_handle_t touch_spi;
+#endif
 
 /**********************
  *      MACROS
@@ -61,95 +68,124 @@
 
 esp_err_t bsp_init(void) {
 #if ESP3D_DISPLAY_FEATURE
-  static lv_disp_drv_t disp_drv;    /*Descriptor of a display driver*/
+  /* Display backlight initialization */
+  disp_backlight_h bcklt_handle = disp_backlight_new(&disp_bcklt_cfg);
+  disp_backlight_set(bcklt_handle, 0);
 
-  // Driver initialization
-  esp3d_log("Display buffer size: %1.2f KB", DISP_BUF_SIZE * sizeof(lv_color_t) / 1024.0);
+  /* SPI master initialization */
+  esp3d_log("Initializing SPI master (display,touch)...");
+  spi_bus_init(SHARED_SPI_HOST, SHARED_SPI_MISO, SHARED_SPI_MOSI, SHARED_SPI_CLK,
+               DISP_BUF_SIZE_BYTES, 1, -1, -1);  
 
-  /* Display controller initialization */
-  esp3d_log("Initializing shared SPI master");
+  esp3d_log("Attaching display panel to SPI bus...");
+  esp_lcd_panel_io_handle_t disp_io_handle;
+  disp_spi_cfg.on_color_trans_done = disp_flush_ready;  
+  ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi(
+      (esp_lcd_spi_bus_handle_t)SHARED_SPI_HOST, &disp_spi_cfg, &disp_io_handle));
 
-  spi_driver_init(DISP_SPI_HOST, TOUCH_SPI_MISO, DISP_SPI_MOSI, DISP_SPI_CLK,
-                  DISP_SPI_BUS_MAX_TRANSFER_SZ, 1, -1, -1);
+  esp3d_log("Attaching touch controller to SPI bus...");
+  ESP_ERROR_CHECK(spi_bus_add_device(SHARED_SPI_HOST, &touch_spi_cfg, &touch_spi));
 
-  //disp_spi_add_device(DISP_SPI_HOST);
-  tp_spi_add_device(TOUCH_SPI_HOST);
-
-  esp3d_log("Initializing display controller");
-  st7796_init(&disp_drv);
-#if (defined(DISP_BACKLIGHT_SWITCH) || defined(DISP_BACKLIGHT_PWM))
-  const disp_backlight_config_t bckl_config = {
-    .gpio_num = DISP_PIN_BCKL,
-#if defined DISP_BACKLIGHT_PWM
-    .pwm_control = true,
-#else
-    .pwm_control = false,
-#endif
-#if defined BACKLIGHT_ACTIVE_LVL
-    .output_invert = false,  // Backlight on high
-#else
-    .output_invert = true,  // Backlight on low
-#endif
-    .timer_idx = 0,
-    .channel_idx =
-        0  // @todo this prevents us from having two PWM controlled displays
-  };
-  disp_backlight_h bckl_handle = disp_backlight_new(&bckl_config);
-  disp_backlight_set(bckl_handle, DISP_BCKL_DEFAULT_DUTY);
-#endif
+  /* Display panel initialization */
+  esp3d_log("Initializing display...");
+  ESP_ERROR_CHECK(esp_lcd_new_panel_st7796(disp_io_handle, &disp_panel_cfg, &disp_panel));
+  esp_lcd_panel_reset(disp_panel);
+  esp_lcd_panel_init(disp_panel);
+  //esp_lcd_panel_invert_color(disp_panel, true);
+#if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
+  esp_lcd_panel_swap_xy(disp_panel, true);
+#endif //DISP_ORIENTATION
+#if DISP_ORIENTATION == 1 || DISP_ORIENTATION == 3  // mirrored
+  esp_lcd_panel_mirror(disp_panel, true, true);
+#endif //DISP_ORIENTATION
 
   /* Touch controller initialization */
-  esp3d_log("Initializing touch controller");
-  // SPI is shared between touch and display so no need to init SPI again
-  xpt2046_init();
+  esp3d_log("Initializing touch controller...");
+  xpt2046_cfg.read_reg12_fn = touch_spi_read_reg12;
+  ESP_ERROR_CHECK(xpt2046_init(&xpt2046_cfg));
+
+  disp_backlight_set(bcklt_handle, 100);
 
   // Lvgl initialization
+  esp3d_log("Initializing LVGL...");
   lv_init();
 
-  // Lvgl setup
-  esp3d_log("Setup Lvgl");
-  lv_color_t *buf1 = (lv_color_t *)heap_caps_malloc(
-      DISP_BUF_SIZE * sizeof(lv_color_t), DISP_BUF_MALLOC_TYPE);
+  /* Initialize the working buffer(s) depending on the selected display.*/
+  static lv_disp_draw_buf_t draw_buf;
+  esp3d_log("Display buffer size: %1.2f KB", DISP_BUF_SIZE_BYTES / 1024.0);
+  lv_color_t *buf1 = (lv_color_t *)heap_caps_malloc(DISP_BUF_SIZE_BYTES, DISP_BUF_MALLOC_TYPE);
   if (buf1 == NULL) {
     esp3d_log_e("Failed to allocate LVGL draw buffer 1");
     return ESP_FAIL;
   }
-
-  /* Use double buffered when not working with monochrome displays */
   lv_color_t *buf2 = NULL;
 #if DISP_USE_DOUBLE_BUFFER
-  buf2 = (lv_color_t *)heap_caps_malloc(DISP_BUF_SIZE * sizeof(lv_color_t),
-                                        DISP_BUF_MALLOC_TYPE);
+  buf2 = (lv_color_t *)heap_caps_malloc(DISP_BUF_SIZE_BYTES, DISP_BUF_MALLOC_TYPE);
   if (buf2 == NULL) {
     esp3d_log_e("Failed to allocate LVGL draw buffer 2");
     return ESP_FAIL;
   }
 #endif  // DISP_USE_DOUBLE_BUFFER
+  lv_disp_draw_buf_init(&draw_buf, buf1, buf2, DISP_BUF_SIZE);
 
-  static lv_disp_draw_buf_t draw_buf;
+  /* Register the display device */
+  lv_disp_drv_init(&disp_drv);
+  disp_drv.flush_cb = lv_disp_flush;
+  disp_drv.draw_buf = &draw_buf;
+  disp_drv.hor_res = DISP_HOR_RES_MAX;
+  disp_drv.ver_res = DISP_VER_RES_MAX;
+  lv_disp_drv_register(&disp_drv);
 
-  uint32_t size_in_px = DISP_BUF_SIZE;
-
-  /* Initialize the working buffer depending on the selected display.*/
-  lv_disp_draw_buf_init(&draw_buf, buf1, buf2, size_in_px);
-
-  esp_lcd_panel_handle_t* panel_handle = st7796_panel_handle();
-  lv_disp_drv_init(&disp_drv);      /*Basic initialization*/
-  disp_drv.flush_cb = st7796_flush; /*Set your driver function*/
-  disp_drv.draw_buf = &draw_buf;    /*Assign the buffer to the display*/
-  disp_drv.hor_res =
-      DISP_HOR_RES_MAX; /*Set the horizontal resolution of the display*/
-  disp_drv.ver_res =
-      DISP_VER_RES_MAX; /*Set the vertical resolution of the display*/
-  disp_drv.user_data = *panel_handle;
-  lv_disp_drv_register(&disp_drv); /*Finally register the driver*/
-
-  /* Register an input device */
-  static lv_indev_drv_t indev_drv; /*Descriptor of a input device driver*/
-  lv_indev_drv_init(&indev_drv);   /*Basic initialization*/
-  indev_drv.type = LV_INDEV_TYPE_POINTER; /*Touch pad is a pointer-like device*/
-  indev_drv.read_cb = xpt2046_read;       /*Set your driver function*/
-  lv_indev_drv_register(&indev_drv);      /*Finally register the driver*/
-#endif                                    // ESP3D_DISPLAY_FEATURE
+  /* Register the touch input device */
+  static lv_indev_drv_t indev_drv;
+  lv_indev_drv_init(&indev_drv);
+  indev_drv.type = LV_INDEV_TYPE_POINTER;
+  indev_drv.read_cb = lv_touch_read;
+  lv_indev_drv_register(&indev_drv);
+#endif // ESP3D_DISPLAY_FEATURE
   return ESP_OK;
 }
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+#if ESP3D_DISPLAY_FEATURE
+
+static bool disp_flush_ready(esp_lcd_panel_io_handle_t panel_io, esp_lcd_panel_io_event_data_t *edata, void *user_ctx) {
+  lv_disp_flush_ready(&disp_drv);
+  return false;
+}
+
+static void lv_disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p) {
+  esp_lcd_panel_draw_bitmap(disp_panel, area->x1, area->y1, area->x2 + 1, area->y2 + 1, color_p);
+}
+
+static uint16_t touch_spi_read_reg12(uint8_t reg) {
+  uint8_t data[2];
+  spi_transaction_t t = {	
+      .length = sizeof(reg) + 16,
+      .rxlength = 16,
+      .cmd = reg,
+      .rx_buffer = data,
+      .flags = 0
+  };	
+  ESP_ERROR_CHECK(spi_device_transmit(touch_spi, &t));	
+  return ((data[0] << 8) | data[1]) >> 3;
+}
+
+#define MAP(n,min,max,range)  (uint32_t)((uint32_t)((n > min) ? (n-min) : 0) * range) / (max - min);
+
+static void lv_touch_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
+  static uint16_t last_x, last_y;
+  xpt2046_data_t touch_data = xpt2046_read();
+  if (touch_data.is_pressed) {
+    last_x = MAP(touch_data.x, TOUCH_X_MIN, TOUCH_X_MAX, DISP_HOR_RES_MAX);
+    last_y = MAP(touch_data.y, TOUCH_Y_MIN, TOUCH_Y_MAX, DISP_VER_RES_MAX);
+    esp3d_log("Touch x=%d, y=%d", last_x, last_y);
+  }
+  data->point.x = last_x;
+  data->point.y = last_y;
+  data->state = touch_data.is_pressed ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
+}
+
+#endif
