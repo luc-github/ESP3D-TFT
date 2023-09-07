@@ -43,7 +43,7 @@ LANDSCAPE_INVERTED      3
 
 esp_lcd_panel_dev_config_t disp_panel_cfg = {
     .reset_gpio_num = -1, // st7796 RST not connected to GPIO
-    .color_space = ESP_LCD_COLOR_SPACE_RGB,
+    .color_space = ESP_LCD_COLOR_SPACE_BGR,
     .bits_per_pixel = 16,
 };
 

@@ -26,7 +26,7 @@ typedef struct {
     int y_gap;
     unsigned int bits_per_pixel;
     uint8_t madctl_val; // save current value of LCD_CMD_MADCTL register
-    uint8_t colmod_cal; // save surrent value of LCD_CMD_COLMOD register
+    uint8_t colmod_cal; // save current value of LCD_CMD_COLMOD register
 } st7796_panel_t;
 
 
