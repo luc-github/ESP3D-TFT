@@ -31,8 +31,6 @@
 extern "C" lv_img_dsc_t *get_splash_logo();
 extern "C" void release_splash_logo(lv_img_dsc_t *splash_logo);
 
-//LV_IMG_DECLARE(logo_esp3d_tft);
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/

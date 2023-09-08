@@ -34,27 +34,27 @@ static img_dsc_t logo_img_desc = {
   .data = NULL,
 };
 
-// Simple RLE image decoder
+// Simple RLE image decoder (assumes array of <count, data> pairs)
 img_dsc_t *get_splash_logo() {
   logo_img_desc.data = (uint8_t*) malloc(logo_img_desc.data_size);
   if (logo_img_desc.data != NULL) {
-    uint16_t i = 0;
+    int i = 0;
     for (; i < sizeof(logo_color_map); i++) {
       logo_img_desc.data[i] = logo_color_map[i];
     }
-    for (uint16_t j=0; j < sizeof(logo_rle_data)-1; j+=2) {
+    for (int j=0; j < sizeof(logo_rle_data)-1; j+=2) {
       uint8_t ctr = logo_rle_data[j];
       uint8_t data = logo_rle_data[j+1];
       do {
         logo_img_desc.data[i++] = data;
       } while (--ctr && i<logo_img_desc.data_size);
     }
-    return (img_dsc_t*) &logo_img_desc;
+    return (img_dsc_t *) &logo_img_desc;
   }
   return NULL;
 }
 
-// Free the data we allocated when done
+// De-allocate the data we had previously allocated
 void release_splash_logo(img_dsc_t *splash_logo) {
   if (splash_logo->data != NULL) {
     free(splash_logo->data);
