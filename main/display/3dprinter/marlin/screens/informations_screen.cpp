@@ -106,8 +106,6 @@ void informations_screen() {
                              LV_FLEX_ALIGN_SPACE_EVENLY);
   lv_obj_t *ui_info_list_ctl = lv_list_create(ui_main_container);
   apply_style(ui_info_list_ctl, ESP3DStyleType::status_list);
-  lv_obj_set_style_pad_left(ui_main_container, CURRENT_BUTTON_PRESSED_OUTLINE,
-                            LV_PART_MAIN);
 
   lv_obj_update_layout(ui_main_container);
   lv_obj_set_size(ui_info_list_ctl,
@@ -115,6 +113,8 @@ void informations_screen() {
                   lv_obj_get_height(ui_main_container) -
                       CURRENT_BUTTON_PRESSED_OUTLINE * 2);
   lv_obj_set_style_radius(ui_info_list_ctl, CURRENT_CONTAINER_RADIUS, 0);
+  lv_obj_set_style_pad_left(ui_info_list_ctl, LIST_CONTAINER_LR_PAD, LV_PART_MAIN);
+  lv_obj_set_style_pad_right(ui_info_list_ctl, LIST_CONTAINER_LR_PAD, LV_PART_MAIN);
 
   addInformationToList(ui_info_list_ctl, ESP3DLabel::screen, TFT_TARGET);
   addInformationToList(ui_info_list_ctl, ESP3DLabel::version,

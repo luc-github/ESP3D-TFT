@@ -583,6 +583,8 @@ void sta_screen() {
   if (ui_sta_ssid_list_ctl)
     lv_obj_add_flag(ui_sta_ssid_list_ctl, LV_OBJ_FLAG_HIDDEN);
   if (status_component) lv_obj_clear_flag(status_component, LV_OBJ_FLAG_HIDDEN);
+  lv_obj_set_style_pad_left(ui_sta_ssid_list_ctl, LIST_CONTAINER_LR_PAD, LV_PART_MAIN);
+  lv_obj_set_style_pad_right(ui_sta_ssid_list_ctl, LIST_CONTAINER_LR_PAD, LV_PART_MAIN);
 
   update_button_ok();
   update_button_save();
