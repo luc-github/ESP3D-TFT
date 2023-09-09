@@ -1,13 +1,5 @@
 #include "lvgl.h"
 
-#ifndef LV_ATTRIBUTE_MEM_ALIGN
-#define LV_ATTRIBUTE_MEM_ALIGN
-#endif
-
-#ifndef LV_ATTRIBUTE_IMG_LOGO_ESP3D_TFT
-#define LV_ATTRIBUTE_IMG_LOGO_ESP3D_TFT
-#endif
-
 typedef struct {
     lv_img_header_t header;
     uint32_t data_size;
