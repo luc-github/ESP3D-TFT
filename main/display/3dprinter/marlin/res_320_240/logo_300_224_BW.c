@@ -93,57 +93,59 @@ void release_splash_logo(img_dsc_t *splash_logo) {
 }
 
 
-/* RLE encoder (array of <count, data> pairs)
+/*
+// RLE encoder (8-bit <count, data> pairs)
 const data = [...];
 const rle = [];
 
-let i=1;
-let ctr=1;
-let prev_d = data[0];
-do {
-  const d = data[i++];  
-  if (prev_d == d) {    
+function push_rle(count, data) {
+  if (count > 0) {
+    rle.push(count);
+    rle.push(data);
+  }
+}
+
+let i=0;
+let ctr=0;
+let prev_d=0;
+do {		
+  let d = data[i];	
+  if (d == prev_d) {
     ctr++;
     if (ctr == 255) {
-      rle.push(ctr);
-      rle.push(prev_d);
-      ctr = 1;
-      prev_d = data[i++];
-    }    
+      push_rle(ctr, prev_d);
+      ctr = 0;
+    }
   } else {
-    rle.push(ctr);
-    rle.push(prev_d);
+    push_rle(ctr, prev_d);
     ctr = 1;
     prev_d = d;
-  }
-} while (i < data.length);
-if (ctr > 0) {
-  rle.push(ctr);
-  rle.push(prev_d);
-}
+  }  
+} while (++i < data.length);
+push_rle(ctr, prev_d);
 
 console.log(data.length);
 console.log(rle);
 console.log(rle.length);
 */
 
-/* RLE encoder (4-bit optimized)
+/*
+// RLE encoder (4-bit optimized)
 const data = [...];
 const rle = [];
+
+function push_rle(count, data) {
+  if (count > 0 && count < 8) {
+    rle.push((data << 4) | count);
+  } else if (count > 0) {
+    rle.push((data << 4) | (0b1000) | (count >> 8));
+    rle.push(count & 0xFF);
+  }
+}
 
 let i=0;
 let ctr=0;
 let prev_d4=0;
-
-function push_rle() {
-  if (ctr > 0 && ctr < 8) {
-    rle.push((prev_d4 << 4) | ctr);
-  } else if (ctr > 0) {
-    rle.push((prev_d4 << 4) | (0b1000) | (ctr >> 8));
-    rle.push(ctr & 0xFF);
-  }
-}
-
 do {	
 	let i4 = 0;
   let d = data[i];
@@ -152,38 +154,38 @@ do {
     if (d4 == prev_d4) {
       ctr++; 
     } else {
-      push_rle();
+      push_rle(ctr, prev_d4);
       ctr = 1;
       prev_d4 = d4;
     }
     d <<= 4;
   } while (++i4 < 2);
 } while (++i < data.length);
-push_rle();
+push_rle(ctr, prev_d4);
 
 console.log(data.length);
 console.log(rle);
 console.log(rle.length);
 */
 
-/* RLE encoder (2-bit optimized)
+/* 
+// RLE encoder (2-bit optimized)
 const data = [...];
 const rle = [];
+
+function push_rle(count, data) {
+  if (count > 0 && count < 32) {
+    rle.push((data << 6) | count);
+  } else if (count > 0) {
+    rle.push((data << 6) | (0b100000) | (count >> 8));
+    rle.push(count & 0xFF);
+  }
+}
 
 let i=0;
 let ctr=0;
 let prev_d2=0;
-
-function push_rle() {
-  if (ctr > 0 && ctr < 32) {
-    rle.push((prev_d2 << 6) | ctr);
-  } else if (ctr > 0) {
-    rle.push((prev_d2 << 6) | (0b100000) | (ctr >> 8));
-    rle.push(ctr & 0xFF);       
-  }
-}
-
-do {	
+do {
 	let i2 = 0;
   let d = data[i];
 	do {		
@@ -191,14 +193,14 @@ do {
     if (d2 == prev_d2) {
       ctr++; 
     } else {
-      push_rle();
+      push_rle(ctr, prev_d2);
       ctr = 1;
       prev_d2 = d2;
     }
     d <<= 2;
   } while (++i2 < 4);  
 } while (++i < data.length);
-push_rle();
+push_rle(ctr, prev_d2);
 
 console.log(data.length);
 console.log(rle);
