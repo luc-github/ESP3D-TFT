@@ -88,7 +88,7 @@ esp_err_t gt911_init(i2c_bus_handle_t i2c_bus_handle) {
   if (NULL != gt911_handle || i2c_bus_handle == NULL) {
     return ESP_FAIL;
   }
-  esp3d_log("GT911 init");
+  esp3d_log("GT911 init using address 0x%02x", GT911_ADDR);
   gt911_handle =
       i2c_bus_device_create(i2c_bus_handle, GT911_ADDR, GT911_CLK_SPEED);
 
@@ -98,32 +98,18 @@ esp_err_t gt911_init(i2c_bus_handle_t i2c_bus_handle) {
   } else {
     esp3d_log("GT911 device created");
   }
-#if GT911_RESET_PIN && GT911_RESET_PIN != -1
-  esp3d_log("GT911 reset pin %d", GT911_RESET_PIN);
-  gpio_config_t rst_gpio_config = {.mode = GPIO_MODE_OUTPUT,
-                                   .pin_bit_mask = BIT64(GT911_RESET_PIN)};
-  ESP_ERROR_CHECK(gpio_config(&rst_gpio_config));
 
   if (gt911_reset(gt911_handle) != ESP_OK) {
     esp3d_log_e("GT911 reset fail");
     return ESP_FAIL;
   }
-#endif  // GT911_RESET_PIN
 
-#if GT911_TOUCH_IRQ || GT911_TOUCH_IRQ_PRESS
-  gpio_config_t irq_config = {
-      .pin_bit_mask = BIT64(GT911_TOUCH_IRQ),
-      .mode = GPIO_MODE_INPUT,
-      .pull_up_en = GPIO_PULLUP_DISABLE,
-      .pull_down_en = GPIO_PULLDOWN_DISABLE,
-      .intr_type = GPIO_INTR_DISABLE,
-  };
-  esp_err_t result = gpio_config(&irq_config);
-  assert(result == ESP_OK);
-#endif
   // Read config and product id
   esp_err_t ret = gt911_read_config(gt911_handle);
-
+  if (ret != ESP_OK) {
+    esp3d_log_e("GT911 read config fail");
+    return ESP_FAIL;
+  }
   if (pthread_mutex_init(&gt911_mutex, NULL) != 0) {
     esp3d_log_e("Mutex creation for GT911 failed");
     ret = ESP_FAIL;
@@ -137,6 +123,7 @@ void gt911_read(lv_indev_drv_t* indev_drv, lv_indev_data_t* data) {
   static lv_coord_t last_x = 0;
   static lv_coord_t last_y = 0;
   static uint8_t dataArray[41];
+  // esp3d_log("GT911 read");
   if (gt911_is_touch_detected() == TOUCH_DETECTED) {
     data->state = LV_INDEV_STATE_REL;
     esp_err_t err = i2c_bus_read_bytes_16(
@@ -159,7 +146,7 @@ void gt911_read(lv_indev_drv_t* indev_drv, lv_indev_data_t* data) {
       esp3d_log_e("no mutex available");
     }
 
-    // esp3d_log("X %d Y %d", last_x, last_y);
+    esp3d_log("X %d Y %d", last_x, last_y);
   } else {
     data->state = LV_INDEV_STATE_REL;
   }
@@ -181,24 +168,80 @@ void gt911_read(lv_indev_drv_t* indev_drv, lv_indev_data_t* data) {
  **********************/
 
 esp_err_t gt911_reset(i2c_bus_device_handle_t devHandle) {
-  if (devHandle == NULL || GT911_RESET_PIN == -1 || !GT911_RESET_PIN) {
+  if (devHandle == NULL) {
     return ESP_FAIL;
   }
   esp_err_t err = ESP_OK;
-  if (gpio_set_level(GT911_RESET_PIN, 0) == ESP_OK) {
-    esp3d_log("GT911 reset pin %d set to 0", GT911_RESET_PIN);
-    vTaskDelay(pdMS_TO_TICKS(10));
-    if (gpio_set_level(GT911_RESET_PIN, 1) == ESP_OK) {
-      esp3d_log("GT911 reset pin %d set to 1", GT911_RESET_PIN);
-      vTaskDelay(pdMS_TO_TICKS(10));
-    } else {
-      esp3d_log_e("GT911 reset pin %d set to 1 fail", GT911_RESET_PIN);
-      err = ESP_FAIL;
-    }
+#if GT911_TOUCH_INT_PIN && GT911_TOUCH_INT_PIN != -1
+  gpio_config_t irq_config = {.pin_bit_mask = BIT64(GT911_TOUCH_INT_PIN),
+                              .mode = GPIO_MODE_OUTPUT};
+  esp3d_log("GT911 configure int pin %d", GT911_TOUCH_INT_PIN);
+  esp_err_t result = gpio_config(&irq_config);
+  assert(result == ESP_OK);
+  if (gpio_set_level(GT911_TOUCH_INT_PIN, 0) != ESP_OK) {
+    esp3d_log_e("GT911 irq pin %d set to 0 fail", GT911_TOUCH_INT_PIN);
+    return ESP_FAIL;
   } else {
-    esp3d_log_e("GT911 reset pin %d set to 0 fail", GT911_RESET_PIN);
-    err = ESP_FAIL;
+    esp3d_log("GT911 irq pin %d set to 0", GT911_TOUCH_INT_PIN);
   }
+#endif  // GT911_TOUCH_INT_PIN && GT911_TOUCH_INT_PIN!= -1
+
+#if GT911_RESET_PIN && GT911_RESET_PIN != -1
+  esp3d_log("GT911 configure reset pin %d", GT911_RESET_PIN);
+  gpio_config_t rst_gpio_config = {.mode = GPIO_MODE_OUTPUT,
+                                   .pin_bit_mask = BIT64(GT911_RESET_PIN)};
+  ESP_ERROR_CHECK(gpio_config(&rst_gpio_config));
+  if (gpio_set_level(GT911_RESET_PIN, 0) != ESP_OK) {
+    esp3d_log_e("GT911 reset pin %d set to 0 fail", GT911_RESET_PIN);
+    return ESP_FAIL;
+  } else {
+    esp3d_log("GT911 reset pin %d set to 0", GT911_RESET_PIN);
+  }
+#endif  // GT911_RESET_PIN && GT911_RESET_PIN!= -1
+  vTaskDelay(pdMS_TO_TICKS(10));
+#if GT911_TOUCH_INT_PIN && GT911_TOUCH_INT_PIN != -1 && GT911_TOUCH_INT_ACTIVE
+  if (gpio_set_level(GT911_TOUCH_INT_PIN, GT911_ADDR == 0x14 ? 1 : 0) !=
+      ESP_OK) {
+    esp3d_log_e("GT911 irq pin %d set to %d fail", GT911_TOUCH_INT_PIN,
+                GT911_ADDR == 0x14 ? 1 : 0);
+    return ESP_FAIL;
+  } else {
+    esp3d_log("GT911 irq pin %d set to %d", GT911_TOUCH_INT_PIN,
+              GT911_ADDR == 0x14 ? 1 : 0);
+  }
+#endif  // GT911_TOUCH_INT_PIN && GT911_TOUCH_INT_PIN!= -1
+  vTaskDelay(pdMS_TO_TICKS(1));
+#if GT911_RESET_PIN && GT911_RESET_PIN != -1
+  if (gpio_set_level(GT911_RESET_PIN, 1) != ESP_OK) {
+    esp3d_log_e("GT911 reset pin %d set to 0 fail", GT911_RESET_PIN);
+    return ESP_FAIL;
+  } else {
+    esp3d_log("GT911 reset pin %d set to 1", GT911_RESET_PIN);
+  }
+#endif  // GT911_RESET_PIN && GT911_RESET_PIN!= -1
+  vTaskDelay(pdMS_TO_TICKS(5));
+#if GT911_TOUCH_INT_PIN && GT911_TOUCH_INT_PIN != -1 && GT911_TOUCH_INT_ACTIVE
+  if (gpio_set_level(GT911_TOUCH_INT_PIN, 0) != ESP_OK) {
+    esp3d_log_e("GT911 irq pin %d set to 0 fail", GT911_TOUCH_INT_PIN);
+    return ESP_FAIL;
+  } else {
+    esp3d_log("GT911 irq pin %d set to 0", GT911_TOUCH_INT_PIN);
+  }
+#endif  // GT911_TOUCH_INT_PIN && GT911_TOUCH_INT_PIN!= -1
+  vTaskDelay(pdMS_TO_TICKS(50));
+
+#if GT911_TOUCH_INT_PIN && GT911_TOUCH_INT_PIN != -1 && GT911_TOUCH_INT_ACTIVE
+  gpio_config_t irq_config_input = {
+      .pin_bit_mask = BIT64(GT911_TOUCH_INT_PIN),
+      .mode = GPIO_MODE_INPUT,
+      .pull_up_en = GPIO_PULLUP_DISABLE,
+      .pull_down_en = GPIO_PULLDOWN_DISABLE,
+      .intr_type = GPIO_INTR_DISABLE,
+  };
+  esp3d_log("GT911 set int pin %d as input", GT911_TOUCH_INT_PIN);
+  err = gpio_config(&irq_config_input);
+#endif  // GT911_TOUCH_INT_PIN && GT911_TOUCH_INT_PIN != -1
+  vTaskDelay(pdMS_TO_TICKS(50));
   return err;
 }
 
@@ -225,8 +268,9 @@ esp_err_t gt911_read_config(i2c_bus_device_handle_t devHandle) {
 
 static gt911_touch_detect_t gt911_is_touch_detected() {
   // check IRQ pin if we IRQ or IRQ and preessure
-#if GT911_TOUCH_IRQ && GT911_TOUCH_IRQ_PRESS
-  uint8_t irq = gpio_get_level(GT911_TOUCH_IRQ);
+#if GT911_TOUCH_INT_PIN && GT911_TOUCH_INT_PIN != -1 && 0
+  uint8_t irq = gpio_get_level(GT911_TOUCH_INT_PIN);
+  esp3d_log("GT911 irq pin %d level %d", GT911_TOUCH_INT_PIN, irq);
   if (irq == 0) {
     return TOUCH_NOT_DETECTED;
   }
@@ -235,11 +279,12 @@ static gt911_touch_detect_t gt911_is_touch_detected() {
     return TOUCH_NOT_DETECTED;
   }
   // check pressure if we are pressure or IRQ and pressure
-#if GT911_TOUCH_PRESS || GT911_TOUCH_IRQ_PRESS
+#if GT911_TOUCH_PRESS || GT911_TOUCH_INT_PIN_PRESS
   uint8_t touch_points_num = 0;
   esp_err_t err;
   uint8_t buf[1];
   err = i2c_bus_read_bytes_16(gt911_handle, GT911_READ_XY_REG, 1, &buf[0]);
+  esp3d_log("GT911 touch read %d", buf[0]);
   if (err == ESP_OK) {
     if ((buf[0] & 0x80) == 0x00) {
       i2c_bus_write_byte_16(gt911_handle, GT911_READ_XY_REG, 0);
@@ -248,7 +293,7 @@ static gt911_touch_detect_t gt911_is_touch_detected() {
       if (touch_points_num == 0 || touch_points_num > 5) {
         i2c_bus_write_byte_16(gt911_handle, GT911_READ_XY_REG, 0);
       } else {
-        // esp3d_log("GT911 touch detected");
+        esp3d_log("GT911 touch detected");
         return TOUCH_DETECTED;
       }
     }

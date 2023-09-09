@@ -35,7 +35,6 @@
 #include "st7262.h"
 #include "touch_def.h"
 
-
 #endif  // ESP3D_DISPLAY_FEATURE
 
 static i2c_bus_handle_t i2c_bus_handle = NULL;
@@ -120,10 +119,12 @@ esp_err_t bsp_init(void) {
   disp_backlight_set(bckl_handle, DISP_BCKL_DEFAULT_DUTY);
 #endif
 
+  bool has_touch_init = true;
   /* Touch controller initialization */
   esp3d_log("Initializing touch controller");
   if (gt911_init(i2c_bus_handle) != ESP_OK) {
-    return ESP_FAIL;
+    esp3d_log_e("Touch controller initialization failed");
+    has_touch_init = false;
   }
 
   // Lvgl initialization
@@ -181,15 +182,15 @@ esp_err_t bsp_init(void) {
 #else
   disp_drv.full_refresh = false;
 #endif
-  lv_disp_drv_register(&disp_drv); /*Finally register the driver*/
-
-  /* Register an input device */
-  static lv_indev_drv_t indev_drv; /*Descriptor of a input device driver*/
-  lv_indev_drv_init(&indev_drv);   /*Basic initialization*/
-  indev_drv.type = LV_INDEV_TYPE_POINTER; /*Touch pad is a pointer-like device*/
-  indev_drv.read_cb = gt911_read;         /*Set your driver function*/
-  lv_indev_drv_register(&indev_drv);      /*Finally register the driver*/
-
+  lv_disp_drv_register(&disp_drv);   /*Finally register the driver*/
+  if (has_touch_init) {              /* Register an input device */
+    static lv_indev_drv_t indev_drv; /*Descriptor of a input device driver*/
+    lv_indev_drv_init(&indev_drv);   /*Basic initialization*/
+    indev_drv.type =
+        LV_INDEV_TYPE_POINTER;         /*Touch pad is a pointer-like device*/
+    indev_drv.read_cb = gt911_read;    /*Set your driver function*/
+    lv_indev_drv_register(&indev_drv); /*Finally register the driver*/
+  }
 #endif  // ESP3D_DISPLAY_FEATURE
   return ESP_OK;
 }
