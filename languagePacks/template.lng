@@ -52,6 +52,7 @@ l_48=Bed depth
 l_49=Probing location: %s
 l_50=Start probing
 l_51=Invert %s axis
+l_52=Language
 
 [info]
 creator=<creator>

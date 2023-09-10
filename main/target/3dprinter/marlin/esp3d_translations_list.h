@@ -24,7 +24,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+// Do not change order and avoid comment
 enum class ESP3DLabel : uint16_t {
   language = 0,
   size_for_update,
@@ -78,6 +78,7 @@ enum class ESP3DLabel : uint16_t {
   auto_bed_probing,
   start_probing,
   invert_axis,
+  language_menu,
   unknown_index,  // must be last
 };
 

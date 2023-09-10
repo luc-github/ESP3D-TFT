@@ -67,7 +67,7 @@ for line in Lines:
         else:
             multilines = False
             line = multilines_data.replace ("\"\"","").strip()
-            print ("Multilines: "+line)
+            #print ("Multilines: "+line)
     
     p = line.find("{ESP3DLabel::")
     if p != -1:
