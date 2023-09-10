@@ -31,12 +31,13 @@ namespace textEditor {
 
 std::string inputValue;
 lv_obj_t *main_container = nullptr;
+void *user_data_ptr = NULL;
 
 void input_area_cb(lv_event_t *e) {
   lv_event_code_t code = lv_event_get_code(e);
   lv_obj_t *ta = lv_event_get_target(e);
-  void (*callbackFn)(const char *str) =
-      (void (*)(const char *))lv_event_get_user_data(e);
+  void (*callbackFn)(const char *str, void *user_data) =
+      (void (*)(const char *, void *))lv_event_get_user_data(e);
 
   if (code == LV_EVENT_FOCUSED) {
   } else if (code == LV_EVENT_DEFOCUSED) {
@@ -44,7 +45,7 @@ void input_area_cb(lv_event_t *e) {
   } else if (code == LV_EVENT_READY || code == LV_EVENT_CANCEL) {
     esp3d_log("Ready, Value: %s", lv_textarea_get_text(ta));
     if (code == LV_EVENT_READY) {
-      callbackFn(lv_textarea_get_text(ta));
+      callbackFn(lv_textarea_get_text(ta), user_data_ptr);
     }
     lv_obj_del(main_container);
   } else if (code == LV_EVENT_VALUE_CHANGED) {
@@ -54,11 +55,11 @@ void input_area_cb(lv_event_t *e) {
 }
 
 lv_obj_t *create_text_editor(lv_obj_t *container, const char *text,
-                             void (*callbackFn)(const char *),
+                             void (*callbackFn)(const char *, void *),
                              size_t max_length, const char *accepted_chars,
-                             bool is_number) {
+                             bool is_number, void *user_data) {
   inputValue = text;
-
+  user_data_ptr = user_data;
   main_container = lv_obj_create(container);
   lv_obj_move_foreground(main_container);
   lv_obj_set_size(main_container, LV_HOR_RES, LV_VER_RES);
