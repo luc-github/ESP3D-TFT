@@ -1,11 +1,63 @@
-#Translation pack for french language
+#Translation pack for <language> language
 [translations]
-l_0=Français
+l_0=English
+l_1=Size for updates
+l_2=Screen
+l_3=Arch
+l_4=SDK
+l_5=Freq
+l_6=Flash Size
+l_7=Free Heap
+l_8=PSRAM Size
+l_9=Version
+l_10=SD updater
+l_11=On
+l_12=Off
+l_13=mm
+l_14=°C
+l_15=Flash Filesystem
+l_16=Please confirm
+l_17=Do you want to stop current print?
+l_18=Error
+l_19=Apply mode failed!
+l_20=Apply setting failed!
+l_21=Hostname
+l_22=Extensions
+l_23=Please wait...
+l_24=Output port
+l_25=USB
+l_26=Serial
+l_27=Serial baud rate
+l_28=USB serial baud rate
+l_29=Connecting to wifi...
+l_30=Not connected
+l_31=Set as access point
+l_32=IP lost
+l_33=Jog type
+l_34=abs
+l_35=Absolute
+l_36=rel
+l_37=Relative
+l_38=Polling
+l_39=Enabled
+l_40=Disabled
+l_41=Motors disabled
+l_42=Fan controls
+l_43=Information
+l_44=Auto leveling
+l_45=Adjust each knobs corresponding to active position until a sheet of paper just slides amid nozzle and plate.\nRepeat operation for each point until no correction is needed.
+l_46=Adjust knobs to level, then click on next.\nYou can also select manually each point.
+l_47=Bed width
+l_48=Bed depth
+l_49=Probing location: %s
+l_50=Start probing
+l_51=Invert %s axis
+l_52=Language
 
 [info]
-creator=luc@tech-hunter.com
-creation_date=2023-05-16
-maintainer==luc@tech-hunter.com
-last_update=2023-05-16
-target_language=French
-target_version=3.0
+creator=<creator>
+creation_date=<creation_date>
+maintainer=<maintainer>
+last_update=<last_update>
+target_language=<target_language>
+target_version=<target_version>

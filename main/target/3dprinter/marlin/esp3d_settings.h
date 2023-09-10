@@ -88,6 +88,8 @@ enum class ESP3DSettingIndex : uint16_t {
   esp3d_bed_depth,
   esp3d_inverved_x,
   esp3d_inverved_y,
+  esp3d_extensions,         // json setting, in preferences.json
+  esp3d_show_fan_controls,  // json setting, in preferences.json
   unknown_index
 };
 

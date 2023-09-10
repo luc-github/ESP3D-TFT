@@ -56,16 +56,31 @@ fi_handle.close()
 #read translation file to get proper translations
 fi_handle = open(input_translation_file, "r")
 Lines = fi_handle.readlines()
+multilines = False
+multilines_data = ""
 for line in Lines:
-     p = line.find("{ESP3DLabel::")
-     if p != -1:
-        p2 = line.find("}")
+    if multilines:
+        multilines_data += line.strip()
+        p2 = multilines_data.find("}")
+        if p2 == -1:
+           continue
+        else:
+            multilines = False
+            line = multilines_data.replace ("\"\"","").strip()
+            #print ("Multilines: "+line)
+    
+    p = line.find("{ESP3DLabel::")
+    if p != -1:
+        p2 = line.find("\"}")
         if p2 != -1:
-            entry = line[p+13:p2]
-            data = entry.split(",")
+            entry = line[p+13:p2].replace(",\"", ", \"")
+            data = entry.split(", \"")
             for trans in translation_label_array:
                 if data[0].strip()==trans[0]:
                     trans[2]=data[1].strip()
+        else:
+            multilines = True
+            multilines_data = line.strip() +" "
 fi_handle.close()
 #save all to file
 for line in translation_label_array:

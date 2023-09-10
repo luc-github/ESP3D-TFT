@@ -35,10 +35,11 @@ std::string choiceValue;
 lv_obj_t *main_container = nullptr;
 lv_timer_t *choice_editor_delay_timer = NULL;
 uint32_t active_index = 0;
+void *user_data_ptr = NULL;
 
 void choice_editor_delay_timer_cb(lv_timer_t *timer) {
-  void (*callbackFn)(const char *str) =
-      (void (*)(const char *))timer->user_data;
+  void (*callbackFn)(const char *str, void *user_data) =
+      (void (*)(const char *, void *))timer->user_data;
 
   if (choice_editor_delay_timer) {
     lv_timer_del(choice_editor_delay_timer);
@@ -50,7 +51,7 @@ void choice_editor_delay_timer_cb(lv_timer_t *timer) {
   }
   if (callbackFn) {
     esp3d_log("Ok");
-    callbackFn(choiceValue.c_str());
+    callbackFn(choiceValue.c_str(), user_data_ptr);
   } else {
     esp3d_log("Cancel");
   }
@@ -93,9 +94,10 @@ void choice_editor_radio_event_handler(lv_event_t *e) {
 lv_obj_t *create_choice_editor(lv_obj_t *container, const char *text,
                                const char *title,
                                std::list<std::string> &choices,
-                               void (*callbackFn)(const char *)) {
+                               void (*callbackFn)(const char *, void *),
+                               void *user_data) {
   choiceValue = text;
-
+  user_data_ptr = user_data;
   main_container = lv_obj_create(container);
   lv_obj_move_foreground(main_container);
   lv_obj_set_size(main_container, LV_HOR_RES, LV_VER_RES);
