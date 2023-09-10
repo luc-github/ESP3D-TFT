@@ -70,9 +70,12 @@ lv_obj_t *bed_depth_label = NULL;
 lv_obj_t *inverted_x_label = NULL;
 lv_obj_t *inverted_y_label = NULL;
 
-struct ESP3DJSONSettingsData {
+struct ESP3DSettingsData {
+  ESP3DSettingIndex index;
+  std::string value;
+  lv_obj_t *label;
+  std::list<std::string> choices;
   std::string entry = "";
-  std::string value = "";
 };
 
 void settings_screen_delay_timer_cb(lv_timer_t *timer) {
@@ -126,22 +129,36 @@ static void bgLoadJSONSettingsTask(void *pvParameter) {
 // bgSaveJSONSettingsTask
 static void bgSaveJSONSettingsTask(void *pvParameter) {
   vTaskDelay(pdMS_TO_TICKS(100));
-  ESP3DJSONSettingsData *data = (ESP3DJSONSettingsData *)pvParameter;
+  ESP3DSettingsData *data = (ESP3DSettingsData *)pvParameter;
   esp3d_log("Got value %s in task", data->value.c_str());
   // do the change
 
   esp3d_log("Value %s is valid", data->value.c_str());
   if (esp3dTftJsonSettings.writeString("settings", data->entry.c_str(),
                                        data->value.c_str())) {
-    if (data->entry == "filesfilter") {
-      if (extensions_label) {
-        lv_label_set_text(extensions_label, data->value.c_str());
-      }
-    }
-    if (data->entry == "showfanctrls") {
-      if (show_fan_controls_label) {
-        lv_label_set_text(show_fan_controls_label, data->value.c_str());
-      }
+    switch (data->index) {
+      case ESP3DSettingIndex::esp3d_extensions:
+        if (data->label) {
+          lv_label_set_text(data->label, data->value.c_str());
+        }
+        break;
+      case ESP3DSettingIndex::esp3d_show_fan_controls:
+        if (strcmp(data->value.c_str(), "true") == 0) {
+          mainScreen::update_show_fan_controls(true);
+          if (data->label) {
+            lv_label_set_text(data->label, esp3dTranslationService.translate(
+                                               ESP3DLabel::enabled));
+          }
+        } else {
+          mainScreen::update_show_fan_controls(false);
+          if (data->label) {
+            lv_label_set_text(data->label, esp3dTranslationService.translate(
+                                               ESP3DLabel::disabled));
+          }
+        }
+        break;
+      default:
+        break;
     }
 
   } else {
@@ -158,360 +175,13 @@ static void bgSaveJSONSettingsTask(void *pvParameter) {
   vTaskDelete(NULL);
 }
 
-// serial_baud_rate_edit_done_cb
-void serial_baud_rate_edit_done_cb(const char *str) {
-  esp3d_log("Saving baud rate to: %s\n", str);
-  if (strcmp(str, lv_label_get_text(serial_baud_rate_label)) != 0) {
-    uint32_t val = atoi(str);
-    if (esp3dTftsettings.isValidIntegerSetting(
-            val, ESP3DSettingIndex::esp3d_baud_rate)) {
-      esp3d_log("Value %s is valid", str);
-      if (esp3dTftsettings.writeUint32(ESP3DSettingIndex::esp3d_baud_rate,
-                                       val)) {
-        if (serial_baud_rate_label) {
-          lv_label_set_text(serial_baud_rate_label, str);
-        }
-      } else {
-        esp3d_log_e("Failed to save output client");
-        std::string text = esp3dTranslationService.translate(
-            ESP3DLabel::error_applying_setting);
-        msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
-      }
-    }
-  } else {
-    esp3d_log("New value is identical do not save it");
-  }
-}
-
-// usb_serial_baud_rate_edit_done_cb
-void usb_serial_baud_rate_edit_done_cb(const char *str) {
-  esp3d_log("Saving usb baud rate to: %s\n", str);
-  if (strcmp(str, lv_label_get_text(usb_serial_baud_rate_label)) != 0) {
-    uint32_t val = atoi(str);
-    if (esp3dTftsettings.isValidIntegerSetting(
-            val, ESP3DSettingIndex::esp3d_usb_serial_baud_rate)) {
-      esp3d_log("Value %s is valid", str);
-      if (esp3dTftsettings.writeUint32(
-              ESP3DSettingIndex::esp3d_usb_serial_baud_rate, val)) {
-        if (usb_serial_baud_rate_label) {
-          lv_label_set_text(usb_serial_baud_rate_label, str);
-        }
-      } else {
-        esp3d_log_e("Failed to save output client");
-        std::string text = esp3dTranslationService.translate(
-            ESP3DLabel::error_applying_setting);
-        msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
-      }
-    }
-  } else {
-    esp3d_log("New value is identical do not save it");
-  }
-}
-
-// outputclient_edit_done_cb
-void outputclient_edit_done_cb(const char *str) {
-  esp3d_log("Saving output client to: %s\n", str);
-
-  if (strcmp(str, lv_label_get_text(output_client_label)) != 0) {
-    uint8_t val =
-        (uint8_t)ESP3DClientType::no_client;  // default value if not found
-    if (strcmp(str, esp3dTranslationService.translate(ESP3DLabel::usb)) == 0) {
-      val = (uint8_t)ESP3DClientType::usb_serial;
-    } else if (strcmp(str, esp3dTranslationService.translate(
-                               ESP3DLabel::serial)) == 0) {
-      val = (uint8_t)ESP3DClientType::serial;
-    }
-
-    if (esp3dTftsettings.isValidByteSetting(
-            val, ESP3DSettingIndex::esp3d_output_client)) {
-      esp3d_log("Value %s is valid", str);
-      if (esp3dTftsettings.writeByte(ESP3DSettingIndex::esp3d_output_client,
-                                     val)) {
-        if (output_client_label) {
-          lv_label_set_text(output_client_label, str);
-        }
-      } else {
-        esp3d_log_e("Failed to save output client");
-        std::string text = esp3dTranslationService.translate(
-            ESP3DLabel::error_applying_setting);
-        msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
-      }
-    }
-  } else {
-    esp3d_log("New value is identical do not save it");
-  }
-}
-
-// jog_type_edit_done_cb
-void jog_type_edit_done_cb(const char *str) {
-  esp3d_log("Saving jog type to: %s\n", str);
-
-  if (strcmp(str, lv_label_get_text(jog_type_label)) != 0) {
-    uint8_t val =
-        (uint8_t)ESP3DClientType::no_client;  // default value if not found
-    if (strcmp(str, esp3dTranslationService.translate(ESP3DLabel::absolute)) ==
-        0) {
-      val = 1;
-    } else if (strcmp(str, esp3dTranslationService.translate(
-                               ESP3DLabel::relative)) == 0) {
-      val = 0;
-    }
-
-    if (esp3dTftsettings.isValidByteSetting(
-            val, ESP3DSettingIndex::esp3d_jog_type)) {
-      esp3d_log("Value %s is valid", str);
-      if (esp3dTftsettings.writeByte(ESP3DSettingIndex::esp3d_jog_type, val)) {
-        if (jog_type_label) {
-          lv_label_set_text(jog_type_label, str);
-        }
-      } else {
-        esp3d_log_e("Failed to save jog type");
-        std::string text = esp3dTranslationService.translate(
-            ESP3DLabel::error_applying_setting);
-        msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
-      }
-    }
-  } else {
-    esp3d_log("New value is identical do not save it");
-  }
-}
-
-// polling_edit_done_cb
-void polling_edit_done_cb(const char *str) {
-  esp3d_log("Saving polling state to: %s\n", str);
-
-  if (strcmp(str, lv_label_get_text(polling_label)) != 0) {
-    uint8_t val =
-        (uint8_t)ESP3DClientType::no_client;  // default value if not found
-    if (strcmp(str, esp3dTranslationService.translate(ESP3DLabel::enabled)) ==
-        0) {
-      val = 1;
-    } else if (strcmp(str, esp3dTranslationService.translate(
-                               ESP3DLabel::disabled)) == 0) {
-      val = 0;
-    }
-
-    if (esp3dTftsettings.isValidByteSetting(
-            val, ESP3DSettingIndex::esp3d_polling_on)) {
-      esp3d_log("Value %s is valid", str);
-      if (esp3dTftsettings.writeByte(ESP3DSettingIndex::esp3d_polling_on,
-                                     val)) {
-        renderingClient.setPolling(val);
-
-        if (polling_label) {
-          lv_label_set_text(polling_label, str);
-        }
-      } else {
-        esp3d_log_e("Failed to save polling mode");
-        std::string text = esp3dTranslationService.translate(
-            ESP3DLabel::error_applying_setting);
-        msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
-      }
-    }
-  } else {
-    esp3d_log("New value is identical do not save it");
-  }
-}
-
-// inverted_x_edit_done_cb
-void inverted_x_edit_done_cb(const char *str) {
-  esp3d_log("Saving inverted x state to: %s\n", str);
-
-  if (strcmp(str, lv_label_get_text(inverted_x_label)) != 0) {
-    uint8_t val =
-        (uint8_t)ESP3DClientType::no_client;  // default value if not found
-    if (strcmp(str, esp3dTranslationService.translate(ESP3DLabel::enabled)) ==
-        0) {
-      val = 1;
-    } else if (strcmp(str, esp3dTranslationService.translate(
-                               ESP3DLabel::disabled)) == 0) {
-      val = 0;
-    }
-
-    if (esp3dTftsettings.isValidByteSetting(
-            val, ESP3DSettingIndex::esp3d_inverved_x)) {
-      esp3d_log("Value %s is valid", str);
-      if (esp3dTftsettings.writeByte(ESP3DSettingIndex::esp3d_inverved_x,
-                                     val)) {
-        manualLevelingScreen::update_invert_x(val == 1 ? true : false);
-
-        if (inverted_x_label) {
-          lv_label_set_text(inverted_x_label, str);
-        }
-      } else {
-        esp3d_log_e("Failed to save invert x axis mode");
-        std::string text = esp3dTranslationService.translate(
-            ESP3DLabel::error_applying_setting);
-        msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
-      }
-    }
-  } else {
-    esp3d_log("New value is identical do not save it");
-  }
-}
-
-// inverted_y_edit_done_cb
-void inverted_y_edit_done_cb(const char *str) {
-  esp3d_log("Saving inverted y state to: %s\n", str);
-
-  if (strcmp(str, lv_label_get_text(inverted_y_label)) != 0) {
-    uint8_t val =
-        (uint8_t)ESP3DClientType::no_client;  // default value if not found
-    if (strcmp(str, esp3dTranslationService.translate(ESP3DLabel::enabled)) ==
-        0) {
-      val = 1;
-    } else if (strcmp(str, esp3dTranslationService.translate(
-                               ESP3DLabel::disabled)) == 0) {
-      val = 0;
-    }
-
-    if (esp3dTftsettings.isValidByteSetting(
-            val, ESP3DSettingIndex::esp3d_inverved_y)) {
-      esp3d_log("Value %s is valid", str);
-      if (esp3dTftsettings.writeByte(ESP3DSettingIndex::esp3d_inverved_y,
-                                     val)) {
-        manualLevelingScreen::update_invert_x(val == 1 ? true : false);
-
-        if (inverted_y_label) {
-          lv_label_set_text(inverted_y_label, str);
-        }
-      } else {
-        esp3d_log_e("Failed to save invert y axis mode");
-        std::string text = esp3dTranslationService.translate(
-            ESP3DLabel::error_applying_setting);
-        msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
-      }
-    }
-  } else {
-    esp3d_log("New value is identical do not save it");
-  }
-}
-
-// auto_levling_edit_done_cb
-void auto_leveling_edit_done_cb(const char *str) {
-  esp3d_log("Saving auto leveling state to: %s\n", str);
-
-  if (strcmp(str, lv_label_get_text(auto_leveling_label)) != 0) {
-    uint8_t val =
-        (uint8_t)ESP3DClientType::no_client;  // default value if not found
-    if (strcmp(str, esp3dTranslationService.translate(ESP3DLabel::enabled)) ==
-        0) {
-      val = 1;
-    } else if (strcmp(str, esp3dTranslationService.translate(
-                               ESP3DLabel::disabled)) == 0) {
-      val = 0;
-    }
-
-    if (esp3dTftsettings.isValidByteSetting(
-            val, ESP3DSettingIndex::esp3d_auto_level_on)) {
-      esp3d_log("Value %s is valid", str);
-      if (esp3dTftsettings.writeByte(ESP3DSettingIndex::esp3d_auto_level_on,
-                                     val)) {
-        menuScreen::enable_auto_leveling(val == 1 ? true : false);
-        if (auto_leveling_label) {
-          lv_label_set_text(auto_leveling_label, str);
-        }
-      } else {
-        esp3d_log_e("Failed to save auto leveling mode");
-        std::string text = esp3dTranslationService.translate(
-            ESP3DLabel::error_applying_setting);
-        msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
-      }
-    }
-  } else {
-    esp3d_log("New value is identical do not save it");
-  }
-}
-
-// hostname_edit_done_cb
-void hostname_edit_done_cb(const char *str) {
-  esp3d_log("Saving hostname to: %s\n", str);
-  if (strcmp(str, lv_label_get_text(hostname_label)) != 0) {
-    if (esp3dTftsettings.isValidStringSetting(
-            str, ESP3DSettingIndex::esp3d_hostname)) {
-      esp3d_log("Value %s is valid", str);
-      if (esp3dTftsettings.writeString(ESP3DSettingIndex::esp3d_hostname,
-                                       str)) {
-        if (hostname_label) {
-          lv_label_set_text(hostname_label, str);
-        }
-      } else {
-        esp3d_log_e("Failed to save hostname");
-        std::string text = esp3dTranslationService.translate(
-            ESP3DLabel::error_applying_setting);
-        msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
-      }
-    }
-  } else {
-    esp3d_log("New value is identical do not save it");
-  }
-}
-
-//  bed_width_edit_done_cb
-void bed_width_edit_done_cb(const char *str) {
-  esp3d_log("Saving bed width to: %s\n", str);
-  if (strcmp(str, lv_label_get_text(bed_width_label)) != 0) {
-    if (esp3dTftsettings.isValidStringSetting(
-            str, ESP3DSettingIndex::esp3d_bed_width) &&
-        strlen(str) != 0 && strtod(str, NULL) != 0) {
-      esp3d_log("Value %s is valid", str);
-      std::string str_formated = esp3d_string::set_precision(str, 2);
-      if (esp3dTftsettings.writeString(ESP3DSettingIndex::esp3d_bed_width,
-                                       str_formated.c_str())) {
-        manualLevelingScreen::update_bed_width(
-            strtod(str_formated.c_str(), NULL));
-        if (bed_width_label) {
-          lv_label_set_text(bed_width_label, str_formated.c_str());
-        }
-      } else {
-        esp3d_log_e("Failed to save bed width");
-        std::string text = esp3dTranslationService.translate(
-            ESP3DLabel::error_applying_setting);
-        msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
-      }
-    }
-  } else {
-    esp3d_log("New value is identical do not save it");
-  }
-}
-
-//  bed_depth_edit_done_cb
-void bed_depth_edit_done_cb(const char *str) {
-  esp3d_log("Saving bed depth to: %s\n", str);
-  if (strcmp(str, lv_label_get_text(bed_depth_label)) != 0) {
-    if (esp3dTftsettings.isValidStringSetting(
-            str, ESP3DSettingIndex::esp3d_bed_depth) &&
-        strlen(str) != 0 && strtod(str, NULL) != 0) {
-      esp3d_log("Value %s is valid", str);
-      std::string str_formated = esp3d_string::set_precision(str, 2);
-      if (esp3dTftsettings.writeString(ESP3DSettingIndex::esp3d_bed_depth,
-                                       str_formated.c_str())) {
-        manualLevelingScreen::update_bed_depth(
-            strtod(str_formated.c_str(), NULL));
-        if (bed_depth_label) {
-          lv_label_set_text(bed_depth_label, str_formated.c_str());
-        }
-      } else {
-        esp3d_log_e("Failed to save bed depth");
-        std::string text = esp3dTranslationService.translate(
-            ESP3DLabel::error_applying_setting);
-        msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
-      }
-    }
-  } else {
-    esp3d_log("New value is identical do not save it");
-  }
-}
-
-void CreateSaveSettingTask(const char *entry, const char *value) {
+void CreateSaveJSONSettingTask(ESP3DSettingsData *settingData) {
   spinnerScreen::show_spinner();
   TaskHandle_t xHandle = NULL;
-  static ESP3DJSONSettingsData data;
-  data.entry = entry;
-  data.value = value ? value : "";
+
   BaseType_t res = xTaskCreatePinnedToCore(
-      bgSaveJSONSettingsTask, "savesettingsTask", STACKDEPTH, (void *)(&data),
-      TASKPRIORITY, &xHandle, TASKCORE);
+      bgSaveJSONSettingsTask, "savesettingsTask", STACKDEPTH,
+      (void *)(settingData), TASKPRIORITY, &xHandle, TASKCORE);
   if (res == pdPASS && xHandle) {
     esp3d_log("Created Settings Task");
   } else {
@@ -519,199 +189,345 @@ void CreateSaveSettingTask(const char *entry, const char *value) {
   }
 }
 
-// extensions_edit_done_cb
-void extensions_edit_done_cb(const char *str) {
-  esp3d_log("Saving extensions to: %s\n", str);
-  if (strcmp(str, lv_label_get_text(extensions_label)) != 0) {
-    CreateSaveSettingTask("filesfilter", str);
-  } else {
-    esp3d_log("New value is identical do not save it");
+// setting_edit_done_cb
+void setting_edit_done_cb(const char *str, void *data) {
+  if (!data) {
+    esp3d_log_e("No data provided");
+    return;
   }
-}
-
-// showfanctrls_edit_done_cb
-void showfanctrls_edit_done_cb(const char *str) {
-  esp3d_log("Saving Show fan controls to: %s\n", str);
-  if (strcmp(str, lv_label_get_text(show_fan_controls_label)) != 0) {
-    // now convert to boolean string
-    std::string value = "false";
-    if (strcmp(str, esp3dTranslationService.translate(ESP3DLabel::enabled)) ==
-        0) {
-      value = "true";
-      mainScreen::update_show_fan_controls(true);
-    } else {
-      mainScreen::update_show_fan_controls(false);
+  esp3d_log("Saving setting to: %s\n", str);
+  ESP3DSettingsData *settingData = (ESP3DSettingsData *)data;
+  if (settingData->value != str) {
+    // get value type
+    const ESP3DSettingDescription *settingPtr = NULL;
+    if (settingData->entry != "") {
+      esp3dTftsettings.getSettingPtr(settingData->index);
     }
-    CreateSaveSettingTask("showfanctrls", value.c_str());
+    bool isValid = false;
+    bool success_saving = false;
+    uint8_t val_byte = 0;
+    uint32_t val_uint32 = 0;
+    std::string val_string = str;
+    if (settingPtr != NULL) {
+      switch (settingPtr->type) {
+        case ESP3DSettingType::byte_t:
+          switch (settingData->index) {
+            case ESP3DSettingIndex::esp3d_output_client:
+              if (strcmp(str, esp3dTranslationService.translate(
+                                  ESP3DLabel::usb)) == 0) {
+                val_byte = (uint8_t)ESP3DClientType::usb_serial;
+              } else if (strcmp(str, esp3dTranslationService.translate(
+                                         ESP3DLabel::serial)) == 0) {
+                val_byte = (uint8_t)ESP3DClientType::serial;
+              }
+              break;
+            case ESP3DSettingIndex::esp3d_jog_type:
+              if (strcmp(str, esp3dTranslationService.translate(
+                                  ESP3DLabel::absolute)) == 0) {
+                val_byte = 1;
+              } else if (strcmp(str, esp3dTranslationService.translate(
+                                         ESP3DLabel::relative)) == 0) {
+                val_byte = 0;
+              } else {
+                esp3d_log_e("Unknown jog type %s", str);
+                return;
+              }
+              break;
+            case ESP3DSettingIndex::esp3d_auto_level_on:
+            case ESP3DSettingIndex::esp3d_inverved_x:
+            case ESP3DSettingIndex::esp3d_inverved_y:
+            case ESP3DSettingIndex::esp3d_polling_on:
+              if (strcmp(str, esp3dTranslationService.translate(
+                                  ESP3DLabel::enabled)) == 0) {
+                val_byte = 1;
+              } else if (strcmp(str, esp3dTranslationService.translate(
+                                         ESP3DLabel::disabled)) == 0) {
+                val_byte = 0;
+              } else {
+                esp3d_log_e("Unknown state %s", str);
+                return;
+              }
+              break;
+            default:
+              esp3d_log_e("Unknown setting index %d",
+                          (uint16_t)settingData->index);
+              return;
+          }
+
+          isValid =
+              esp3dTftsettings.isValidByteSetting(val_byte, settingData->index);
+          if (isValid) {
+            success_saving =
+                esp3dTftsettings.writeByte(settingData->index, val_byte);
+          }
+          break;
+        case ESP3DSettingType::integer_t:
+          switch (settingData->index) {
+            case ESP3DSettingIndex::esp3d_baud_rate:
+            case ESP3DSettingIndex::esp3d_usb_serial_baud_rate:
+              val_uint32 = (uint32_t)atoi(str);
+              break;
+            default:
+              esp3d_log_e("Unknown setting index %d",
+                          (uint16_t)settingData->index);
+              return;
+          }
+          isValid = esp3dTftsettings.isValidIntegerSetting(val_uint32,
+                                                           settingData->index);
+          if (isValid) {
+            success_saving =
+                esp3dTftsettings.writeUint32(settingData->index, val_uint32);
+          }
+          break;
+        case ESP3DSettingType::float_t:
+        case ESP3DSettingType::string_t:
+          isValid =
+              esp3dTftsettings.isValidStringSetting(str, settingData->index);
+          if (isValid) {
+            switch (settingData->index) {
+              case ESP3DSettingIndex::esp3d_hostname:
+                // use string as it is
+                break;
+              case ESP3DSettingIndex::esp3d_bed_width:
+              case ESP3DSettingIndex::esp3d_bed_depth:
+                val_string = esp3d_string::set_precision(str, 2);
+                break;
+              default:
+                esp3d_log_e("Unknown setting index %d",
+                            (uint16_t)settingData->index);
+                return;
+            }
+
+            success_saving = esp3dTftsettings.writeString(settingData->index,
+                                                          val_string.c_str());
+          }
+          break;
+        case ESP3DSettingType::ip:
+        case ESP3DSettingType::mask:
+        case ESP3DSettingType::bitsfield:
+          esp3d_log_e("This type %d, is not yet supported",
+                      (uint8_t)settingPtr->type);
+          return;
+        default:
+          esp3d_log_e("Unknown type %d", (uint8_t)settingPtr->type);
+          return;
+      }
+    } else {
+      switch (settingData->index) {
+        case ESP3DSettingIndex::esp3d_extensions:
+          val_string = str;
+          break;
+        case ESP3DSettingIndex::esp3d_show_fan_controls:
+          if (strcmp(str, esp3dTranslationService.translate(
+                              ESP3DLabel::enabled)) == 0) {
+            val_string = "true";
+          } else if (strcmp(str, esp3dTranslationService.translate(
+                                     ESP3DLabel::disabled)) == 0) {
+            val_string = "false";
+          } else {
+            esp3d_log_e("Unknown state %s", str);
+            return;
+          }
+          break;
+        default:
+          esp3d_log_e("Unknown setting index %d", (uint16_t)settingData->index);
+          return;
+      }
+      settingData->value = val_string;
+      CreateSaveJSONSettingTask(settingData);
+      return;
+    }
+
+    if (!isValid) {
+      esp3d_log_e("Invalid value %s", str);
+      std::string text =
+          esp3dTranslationService.translate(ESP3DLabel::error_applying_setting);
+      msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+      return;
+    }
+    if (!success_saving) {
+      esp3d_log_e("Failed to save setting %s", str);
+      std::string text =
+          esp3dTranslationService.translate(ESP3DLabel::error_applying_setting);
+      msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+      return;
+    }
+    if (settingData->label) {
+      lv_label_set_text(settingData->label, val_string.c_str());
+    }
+    // now apply the setting if needed
+    switch (settingData->index) {
+      case ESP3DSettingIndex::esp3d_polling_on:
+        renderingClient.setPolling(val_byte);
+        break;
+      case ESP3DSettingIndex::esp3d_inverved_x:
+        manualLevelingScreen::update_invert_x(val_byte);
+        break;
+      case ESP3DSettingIndex::esp3d_inverved_y:
+        manualLevelingScreen::update_invert_y(val_byte);
+        break;
+      case ESP3DSettingIndex::esp3d_auto_level_on:
+        menuScreen::enable_auto_leveling(val_byte);
+        break;
+      case ESP3DSettingIndex::esp3d_bed_width:
+        manualLevelingScreen::update_bed_width(
+            strtod(val_string.c_str(), NULL));
+        break;
+      case ESP3DSettingIndex::esp3d_bed_depth:
+        manualLevelingScreen::update_bed_depth(
+            strtod(val_string.c_str(), NULL));
+        break;
+      default:
+        break;
+    }
   } else {
     esp3d_log("New value is identical do not save it");
   }
 }
 
-// event_button_edit_output_client_cb
-void event_button_edit_output_client_cb(lv_event_t *e) {
-  esp3d_log("Show component output client editor");
-  std::string text = (const char *)lv_event_get_user_data(e);
-  std::list<std::string> choices;
-  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::serial));
-  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::usb));
-  std::string title =
-      esp3dTranslationService.translate(ESP3DLabel::output_client);
-  choiceEditor::create_choice_editor(lv_scr_act(), text.c_str(), title.c_str(),
-                                     choices, outputclient_edit_done_cb);
-}
-
-// event_button_edit_usb_serial_baud_rate_cb
-void event_button_edit_usb_serial_baud_rate_cb(lv_event_t *e) {
-  esp3d_log("Show component usb serial baud rate editor");
-  std::string text = (const char *)lv_event_get_user_data(e);
-  std::list<std::string> choices;
-  uint8_t list_size = sizeof(SupportedBaudList) / sizeof(uint32_t);
-  for (uint8_t i = 0; i < list_size; i++) {
-    choices.push_back(std::to_string(SupportedBaudList[i]));
+// event_button_edit_setting
+void event_button_edit_setting_cb(lv_event_t *e) {
+  esp3d_log("Show component editor");
+  static ESP3DSettingsData data;
+  data.index = *((ESP3DSettingIndex *)(lv_event_get_user_data(e)));
+  data.choices.clear();
+  data.entry = "";
+  data.label = NULL;
+  std::string title;
+  uint8_t list_size = 0;
+  switch (data.index) {
+    case ESP3DSettingIndex::esp3d_baud_rate:
+      data.label = serial_baud_rate_label;
+      title = esp3dTranslationService.translate(ESP3DLabel::serial_baud_rate);
+      list_size = sizeof(SupportedBaudList) / sizeof(uint32_t);
+      for (uint8_t i = 0; i < list_size; i++) {
+        data.choices.push_back(std::to_string(SupportedBaudList[i]));
+      }
+      break;
+    case ESP3DSettingIndex::esp3d_usb_serial_baud_rate:
+      data.label = usb_serial_baud_rate_label;
+      title = esp3dTranslationService.translate(ESP3DLabel::usb_baud_rate);
+      list_size = sizeof(SupportedBaudList) / sizeof(uint32_t);
+      for (uint8_t i = 0; i < list_size; i++) {
+        data.choices.push_back(std::to_string(SupportedBaudList[i]));
+      }
+      break;
+    case ESP3DSettingIndex::esp3d_output_client:
+      data.label = output_client_label;
+      title = esp3dTranslationService.translate(ESP3DLabel::output_client);
+      data.choices.push_back(
+          esp3dTranslationService.translate(ESP3DLabel::serial));  // serial
+      data.choices.push_back(
+          esp3dTranslationService.translate(ESP3DLabel::usb));  // usb
+      break;
+    case ESP3DSettingIndex::esp3d_jog_type:
+      data.label = jog_type_label;
+      title = esp3dTranslationService.translate(ESP3DLabel::jog_type);
+      data.choices.push_back(
+          esp3dTranslationService.translate(ESP3DLabel::relative));  // relative
+      data.choices.push_back(
+          esp3dTranslationService.translate(ESP3DLabel::absolute));  // absolute
+      break;
+    case ESP3DSettingIndex::esp3d_polling_on:
+      data.label = polling_label;
+      title = esp3dTranslationService.translate(ESP3DLabel::polling);
+      data.choices.push_back(
+          esp3dTranslationService.translate(ESP3DLabel::disabled));  // disabled
+      data.choices.push_back(
+          esp3dTranslationService.translate(ESP3DLabel::enabled));  // enabled
+      break;
+    case ESP3DSettingIndex::esp3d_inverved_x:
+      data.label = inverted_x_label;
+      title = esp3dTranslationService.translate(ESP3DLabel::invert_axis, "X");
+      data.choices.push_back(
+          esp3dTranslationService.translate(ESP3DLabel::disabled));  // disabled
+      data.choices.push_back(
+          esp3dTranslationService.translate(ESP3DLabel::enabled));  // enabled
+      break;
+    case ESP3DSettingIndex::esp3d_inverved_y:
+      data.label = inverted_y_label;
+      title = esp3dTranslationService.translate(ESP3DLabel::invert_axis, "Y");
+      data.choices.push_back(
+          esp3dTranslationService.translate(ESP3DLabel::disabled));  // disabled
+      data.choices.push_back(
+          esp3dTranslationService.translate(ESP3DLabel::enabled));  // enabled
+      break;
+    case ESP3DSettingIndex::esp3d_auto_level_on:
+      data.label = auto_leveling_label;
+      title = esp3dTranslationService.translate(ESP3DLabel::auto_leveling);
+      data.choices.push_back(
+          esp3dTranslationService.translate(ESP3DLabel::disabled));  // disabled
+      data.choices.push_back(
+          esp3dTranslationService.translate(ESP3DLabel::enabled));  // enabled
+      break;
+    case ESP3DSettingIndex::esp3d_hostname:
+      data.label = hostname_label;
+      title = esp3dTranslationService.translate(ESP3DLabel::hostname);
+      break;
+    case ESP3DSettingIndex::esp3d_bed_width:
+      data.label = bed_width_label;
+      title = esp3dTranslationService.translate(ESP3DLabel::bed_width);
+      break;
+    case ESP3DSettingIndex::esp3d_bed_depth:
+      data.label = bed_depth_label;
+      title = esp3dTranslationService.translate(ESP3DLabel::bed_depth);
+      break;
+    case ESP3DSettingIndex::esp3d_extensions:
+      data.label = extensions_label;
+      title = esp3dTranslationService.translate(ESP3DLabel::extensions);
+      data.entry = "filesfilter";
+      break;
+    case ESP3DSettingIndex::esp3d_show_fan_controls:
+      data.label = show_fan_controls_label;
+      title = esp3dTranslationService.translate(ESP3DLabel::fan_controls);
+      data.entry = "showfanctrls";
+      data.choices.push_back(
+          esp3dTranslationService.translate(ESP3DLabel::disabled));  // disabled
+      data.choices.push_back(
+          esp3dTranslationService.translate(ESP3DLabel::enabled));  // enabled
+      break;
+    default:
+      esp3d_log_e("Unknown setting index %d", (uint16_t)data.index);
+      return;
   }
-  std::string title =
-      esp3dTranslationService.translate(ESP3DLabel::usb_baud_rate);
-
-  choiceEditor::create_choice_editor(lv_scr_act(), text.c_str(), title.c_str(),
-                                     choices,
-                                     usb_serial_baud_rate_edit_done_cb);
-}
-
-// event_button_edit_serial_baud_rate_cb
-void event_button_edit_serial_baud_rate_cb(lv_event_t *e) {
-  esp3d_log("Show component serial baud rate editor");
-  std::string text = (const char *)lv_event_get_user_data(e);
-  std::list<std::string> choices;
-  uint8_t list_size = sizeof(SupportedBaudList) / sizeof(uint32_t);
-  for (uint8_t i = 0; i < list_size; i++) {
-    choices.push_back(std::to_string(SupportedBaudList[i]));
-  }
-  std::string title =
-      esp3dTranslationService.translate(ESP3DLabel::serial_baud_rate);
-  choiceEditor::create_choice_editor(lv_scr_act(), text.c_str(), title.c_str(),
-                                     choices, serial_baud_rate_edit_done_cb);
-}
-
-// event_button_edit_jog_type_cb
-void event_button_edit_jog_type_cb(lv_event_t *e) {
-  esp3d_log("Show component jog type editor");
-  std::string text = (const char *)lv_event_get_user_data(e);
-  std::list<std::string> choices;
-  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::relative));
-  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::absolute));
-  std::string title = esp3dTranslationService.translate(ESP3DLabel::jog_type);
-  choiceEditor::create_choice_editor(lv_scr_act(), text.c_str(), title.c_str(),
-                                     choices, jog_type_edit_done_cb);
-}
-
-// event_button_edit_polling_cb
-void event_button_edit_polling_cb(lv_event_t *e) {
-  esp3d_log("Show component polling editor");
-  std::string text = (const char *)lv_event_get_user_data(e);
-  std::list<std::string> choices;
-  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::disabled));
-  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::enabled));
-  std::string title = esp3dTranslationService.translate(ESP3DLabel::polling);
-  choiceEditor::create_choice_editor(lv_scr_act(), text.c_str(), title.c_str(),
-                                     choices, polling_edit_done_cb);
-}
-
-// event_button_edit_inverted_x_cb
-void event_button_edit_inverted_x_cb(lv_event_t *e) {
-  esp3d_log("Show component invert x editor");
-  std::string text = (const char *)lv_event_get_user_data(e);
-  std::list<std::string> choices;
-  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::disabled));
-  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::enabled));
-  std::string title =
-      esp3dTranslationService.translate(ESP3DLabel::invert_axis, "X");
-  choiceEditor::create_choice_editor(lv_scr_act(), text.c_str(), title.c_str(),
-                                     choices, inverted_x_edit_done_cb);
-}
-
-// event_button_edit_inverted_y_cb
-void event_button_edit_inverted_y_cb(lv_event_t *e) {
-  esp3d_log("Show component invert y editor");
-  std::string text = (const char *)lv_event_get_user_data(e);
-  std::list<std::string> choices;
-  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::disabled));
-  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::enabled));
-  std::string title =
-      esp3dTranslationService.translate(ESP3DLabel::invert_axis, "Y");
-  choiceEditor::create_choice_editor(lv_scr_act(), text.c_str(), title.c_str(),
-                                     choices, inverted_y_edit_done_cb);
-}
-
-// event_button_edit_auto_leveling_cb
-void event_button_edit_auto_leveling_cb(lv_event_t *e) {
-  esp3d_log("Show component eveling editor");
-  std::string text = (const char *)lv_event_get_user_data(e);
-  std::list<std::string> choices;
-  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::disabled));
-  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::enabled));
-  std::string title =
-      esp3dTranslationService.translate(ESP3DLabel::auto_leveling);
-  choiceEditor::create_choice_editor(lv_scr_act(), text.c_str(), title.c_str(),
-                                     choices, auto_leveling_edit_done_cb);
-}
-
-// event_button_edit_extensions_cb
-void event_button_edit_extensions_cb(lv_event_t *e) {
-  esp3d_log("Show component");
-  std::string text = (const char *)lv_label_get_text(extensions_label);
-  textEditor::create_text_editor(lv_scr_act(), text.c_str(),
-                                 extensions_edit_done_cb);
-}
-
-// event_button_edit_show_fan_controls_cb
-void event_button_edit_show_fan_controls_cb(lv_event_t *e) {
-  esp3d_log("Show component");
-  std::string text = (const char *)lv_label_get_text(show_fan_controls_label);
-  std::list<std::string> choices;
-  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::disabled));
-  choices.push_back(esp3dTranslationService.translate(ESP3DLabel::enabled));
-  std::string title =
-      esp3dTranslationService.translate(ESP3DLabel::fan_controls);
-  choiceEditor::create_choice_editor(lv_scr_act(), text.c_str(), title.c_str(),
-                                     choices, showfanctrls_edit_done_cb);
-}
-
-// event_button_edit_hostname_cb
-void event_button_edit_hostname_cb(lv_event_t *e) {
-  esp3d_log("Show component");
-  std::string text = (const char *)lv_event_get_user_data(e);
-  const ESP3DSettingDescription *settingPtr =
-      esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_hostname);
-  if (settingPtr) {
-    textEditor::create_text_editor(lv_scr_act(), text.c_str(),
-                                   hostname_edit_done_cb, settingPtr->size);
-  }
-}
-
-// event_button_edit_bed_width_cb
-void event_button_edit_bed_width_cb(lv_event_t *e) {
-  esp3d_log("Show component for bed width");
-  std::string text = (const char *)lv_event_get_user_data(e);
-  const ESP3DSettingDescription *settingPtr =
-      esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_bed_width);
-  if (settingPtr) {
-    textEditor::create_text_editor(lv_scr_act(), text.c_str(),
-                                   bed_width_edit_done_cb, 15, "0123456789.",
-                                   true);
-  }
-}
-
-// event_button_edit_bed_depth_cb
-void event_button_edit_bed_depth_cb(lv_event_t *e) {
-  esp3d_log("Show component for bed depth");
-  std::string text = (const char *)lv_event_get_user_data(e);
-  const ESP3DSettingDescription *settingPtr =
-      esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_bed_depth);
-  if (settingPtr) {
-    textEditor::create_text_editor(lv_scr_act(), text.c_str(),
-                                   bed_depth_edit_done_cb, 15, "0123456789.",
-                                   true);
+  data.value = lv_label_get_text(data.label);
+  if (data.choices.size() > 0) {
+    choiceEditor::create_choice_editor(lv_scr_act(), data.value.c_str(),
+                                       title.c_str(), data.choices,
+                                       setting_edit_done_cb, (void *)(&data));
+  } else {
+    // it is json setting so no getSettingPtr
+    if (data.entry != "") {
+      switch (data.index) {
+        case ESP3DSettingIndex::esp3d_extensions:
+          textEditor::create_text_editor(lv_scr_act(), data.value.c_str(),
+                                         setting_edit_done_cb, 0, NULL, false,
+                                         (void *)(&data));
+          break;
+        default:
+          esp3d_log_e("Unknown setting index %d", (uint16_t)data.index);
+          return;
+      }
+    } else {
+      const ESP3DSettingDescription *settingPtr =
+          esp3dTftsettings.getSettingPtr(data.index);
+      switch (data.index) {
+        case ESP3DSettingIndex::esp3d_hostname:
+          textEditor::create_text_editor(lv_scr_act(), data.value.c_str(),
+                                         setting_edit_done_cb, settingPtr->size,
+                                         NULL, false, (void *)(&data));
+          break;
+        case ESP3DSettingIndex::esp3d_bed_width:
+        case ESP3DSettingIndex::esp3d_bed_depth:
+          textEditor::create_text_editor(lv_scr_act(), data.value.c_str(),
+                                         setting_edit_done_cb, 15,
+                                         "0123456789.", true, (void *)(&data));
+          break;
+        default:
+          esp3d_log_e("Unknown setting index %d", (uint16_t)data.index);
+          return;
+      }
+    }
   }
 }
 
@@ -751,11 +567,11 @@ void settings_screen() {
 
   lv_obj_set_pos(ui_settings_list_ctl, CURRENT_BUTTON_PRESSED_OUTLINE,
                  CURRENT_BUTTON_PRESSED_OUTLINE);
+  lv_obj_t *line_container = NULL;
+  std::string LabelStr = "";
   // Hostname
-  lv_obj_t *line_container =
-      listLine::create_list_line_container(ui_settings_list_ctl);
-  std::string LabelStr =
-      esp3dTranslationService.translate(ESP3DLabel::hostname);
+  line_container = listLine::create_list_line_container(ui_settings_list_ctl);
+  LabelStr = esp3dTranslationService.translate(ESP3DLabel::hostname);
   if (line_container) {
     std::string hostname;
     listLine::add_label_to_line(LabelStr.c_str(), line_container, true);
@@ -770,12 +586,13 @@ void settings_screen() {
         listLine::add_label_to_line(hostname.c_str(), line_container, false);
     lv_obj_t *btnEdit =
         listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
-    lv_obj_add_event_cb(btnEdit, event_button_edit_hostname_cb,
-                        LV_EVENT_CLICKED,
-                        (void *)(lv_label_get_text(hostname_label)));
+    lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb, LV_EVENT_CLICKED,
+                        (void *)(&(settingPtr->index)));
   }
 
   // Extensions
+  static ESP3DSettingIndex extensions_setting_index =
+      ESP3DSettingIndex::esp3d_extensions;
   line_container = listLine::create_list_line_container(ui_settings_list_ctl);
   LabelStr = esp3dTranslationService.translate(ESP3DLabel::extensions);
   if (line_container) {
@@ -783,8 +600,8 @@ void settings_screen() {
     extensions_label = listLine::add_label_to_line("", line_container, false);
     lv_obj_t *btnEdit =
         listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
-    lv_obj_add_event_cb(btnEdit, event_button_edit_extensions_cb,
-                        LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb, LV_EVENT_CLICKED,
+                        (void *)&(extensions_setting_index));
   }
 
 #if ESP3D_USB_SERIAL_FEATURE
@@ -808,9 +625,8 @@ void settings_screen() {
           listLine::add_label_to_line(value.c_str(), line_container, false);
       lv_obj_t *btnEdit =
           listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
-      lv_obj_add_event_cb(btnEdit, event_button_edit_output_client_cb,
-                          LV_EVENT_CLICKED,
-                          (void *)(lv_label_get_text(output_client_label)));
+      lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb,
+                          LV_EVENT_CLICKED, (void *)(&(settingPtr->index)));
     }
   }
 #endif  // ESP3D_USB_SERIAL_FEATURE
@@ -830,9 +646,8 @@ void settings_screen() {
           listLine::add_label_to_line(value.c_str(), line_container, false);
       lv_obj_t *btnEdit =
           listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
-      lv_obj_add_event_cb(btnEdit, event_button_edit_serial_baud_rate_cb,
-                          LV_EVENT_CLICKED,
-                          (void *)(lv_label_get_text(serial_baud_rate_label)));
+      lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb,
+                          LV_EVENT_CLICKED, (void *)(&(settingPtr->index)));
     }
   }
 
@@ -852,9 +667,8 @@ void settings_screen() {
           listLine::add_label_to_line(value.c_str(), line_container, false);
       lv_obj_t *btnEdit =
           listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
-      lv_obj_add_event_cb(
-          btnEdit, event_button_edit_usb_serial_baud_rate_cb, LV_EVENT_CLICKED,
-          (void *)(lv_label_get_text(usb_serial_baud_rate_label)));
+      lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb,
+                          LV_EVENT_CLICKED, (void *)(&(settingPtr->index)));
     }
   }
 #endif  // ESP3D_USB_SERIAL_FEATURE
@@ -876,9 +690,8 @@ void settings_screen() {
           listLine::add_label_to_line(value.c_str(), line_container, false);
       lv_obj_t *btnEdit =
           listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
-      lv_obj_add_event_cb(btnEdit, event_button_edit_jog_type_cb,
-                          LV_EVENT_CLICKED,
-                          (void *)(lv_label_get_text(jog_type_label)));
+      lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb,
+                          LV_EVENT_CLICKED, (void *)(&(settingPtr->index)));
     }
   }
 
@@ -899,13 +712,15 @@ void settings_screen() {
           listLine::add_label_to_line(value.c_str(), line_container, false);
       lv_obj_t *btnEdit =
           listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
-      lv_obj_add_event_cb(btnEdit, event_button_edit_polling_cb,
-                          LV_EVENT_CLICKED,
-                          (void *)(lv_label_get_text(polling_label)));
+      lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb,
+                          LV_EVENT_CLICKED, (void *)(&(settingPtr->index)));
     }
   }
 
-  // show fan controls
+  // JSON
+  //  show fan controls
+  static ESP3DSettingIndex show_fan_controls_setting_index =
+      ESP3DSettingIndex::esp3d_show_fan_controls;
   line_container = listLine::create_list_line_container(ui_settings_list_ctl);
   LabelStr = esp3dTranslationService.translate(ESP3DLabel::fan_controls);
   if (line_container) {
@@ -914,8 +729,8 @@ void settings_screen() {
         listLine::add_label_to_line("", line_container, false);
     lv_obj_t *btnEdit =
         listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
-    lv_obj_add_event_cb(btnEdit, event_button_edit_show_fan_controls_cb,
-                        LV_EVENT_CLICKED, NULL);
+    lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb, LV_EVENT_CLICKED,
+                        (void *)&(show_fan_controls_setting_index));
   }
 
   // Auto level on
@@ -935,9 +750,8 @@ void settings_screen() {
           listLine::add_label_to_line(value.c_str(), line_container, false);
       lv_obj_t *btnEdit =
           listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
-      lv_obj_add_event_cb(btnEdit, event_button_edit_auto_leveling_cb,
-                          LV_EVENT_CLICKED,
-                          (void *)(lv_label_get_text(auto_leveling_label)));
+      lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb,
+                          LV_EVENT_CLICKED, (void *)(&(settingPtr->index)));
     }
   }
 
@@ -960,9 +774,8 @@ void settings_screen() {
                                                   line_container, false);
     lv_obj_t *btnEdit =
         listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
-    lv_obj_add_event_cb(btnEdit, event_button_edit_bed_width_cb,
-                        LV_EVENT_CLICKED,
-                        (void *)(lv_label_get_text(bed_width_label)));
+    lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb, LV_EVENT_CLICKED,
+                        (void *)(&(settingPtr->index)));
   }
 
   // Bed depth
@@ -984,9 +797,8 @@ void settings_screen() {
                                                   line_container, false);
     lv_obj_t *btnEdit =
         listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
-    lv_obj_add_event_cb(btnEdit, event_button_edit_bed_depth_cb,
-                        LV_EVENT_CLICKED,
-                        (void *)(lv_label_get_text(bed_depth_label)));
+    lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb, LV_EVENT_CLICKED,
+                        (void *)(&(settingPtr->index)));
   }
 
   // Invert X axis
@@ -1006,9 +818,8 @@ void settings_screen() {
           listLine::add_label_to_line(value.c_str(), line_container, false);
       lv_obj_t *btnEdit =
           listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
-      lv_obj_add_event_cb(btnEdit, event_button_edit_inverted_x_cb,
-                          LV_EVENT_CLICKED,
-                          (void *)(lv_label_get_text(inverted_x_label)));
+      lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb,
+                          LV_EVENT_CLICKED, (void *)(&(settingPtr->index)));
     }
   }
 
@@ -1029,9 +840,8 @@ void settings_screen() {
           listLine::add_label_to_line(value.c_str(), line_container, false);
       lv_obj_t *btnEdit =
           listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
-      lv_obj_add_event_cb(btnEdit, event_button_edit_inverted_y_cb,
-                          LV_EVENT_CLICKED,
-                          (void *)(lv_label_get_text(inverted_y_label)));
+      lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb,
+                          LV_EVENT_CLICKED, (void *)(&(settingPtr->index)));
     }
   }
 

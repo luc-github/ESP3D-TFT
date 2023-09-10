@@ -183,6 +183,16 @@ bool ESP3DSettings::isValidStringSetting(const char* value,
     if (strlen(value) > 15 || strlen(value) == 0) {
       return false;
     }
+    switch (settingElement) {
+      case ESP3DSettingIndex::esp3d_bed_width:
+      case ESP3DSettingIndex::esp3d_bed_depth:
+        if (strtod(value, NULL) == 0) {
+          return false;
+        }
+        break;
+      default:
+        break;
+    }
     // check if any alpha char not supposed to be here
     for (uint8_t i = 0; i < strlen(value); i++) {
       if (value[i] == '.' || value[i] == ',' || value[i] == ' ' ||
