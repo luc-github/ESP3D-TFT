@@ -123,23 +123,25 @@ esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config) {
 
   gt911_handle = i2c_bus_device_create(i2c_bus, 0x5D, 400*1000);
   if (gt911_handle == NULL) {
-    esp3d_log_e("Failed create GT911 device");
+    esp3d_log_e("Failed creating GT911 device!");
     return ESP_FAIL;
   }
   err = i2c_bus_read_bytes_16(gt911_handle, GT911_PRODUCT_ID_REG, 4, &buf[0]);
   if (err == ESP_OK) {
-    esp3d_log("Found GT911 at addr: 0x5D");
+    esp3d_log("GT911 device found at addr: 0x5D");
   } else {
+    // Floating or mis-configured INT pin may cause GT911 to come up
+    //   at address 0x14 instead of 0x5D, so check there as well.
     gt911_handle = i2c_bus_device_create(i2c_bus, 0x14, 400*1000);
     if (gt911_handle == NULL) {
-      esp3d_log_e("Failed create GT911 device");
+      esp3d_log_e("Failed creating GT911 device!");
       return ESP_FAIL;
     }
     err = i2c_bus_read_bytes_16(gt911_handle, GT911_PRODUCT_ID_REG, 4, &buf[0]);
     if (err == ESP_OK) {
-      esp3d_log("Found GT911 at addr: 0x14");
+      esp3d_log("GT911 device found at addr: 0x14");
     } else {
-      esp3d_log_e("Failed create GT911 device");
+      esp3d_log_e("GT911 device not found!");
       return err;
     }
   }
