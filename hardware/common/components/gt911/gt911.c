@@ -70,21 +70,16 @@ static void IRAM_ATTR gt911_interrupt_handler(void *args) {
  *   GLOBAL FUNCTIONS
  **********************/
 
-esp_err_t gt911_init(const gt911_config_t *config) {
-  if (NULL != gt911_handle || config == NULL || config->i2c_bus == NULL) {
+esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config) {
+  if (NULL != gt911_handle || i2c_bus == NULL || config == NULL) {
     return ESP_ERR_INVALID_ARG;
   }
   gt911_config = config;
 
   esp3d_log("GT911 init");
-  gt911_handle = i2c_bus_device_create(config->i2c_bus, config->i2c_addr, config->i2c_clk_speed);
-  if (gt911_handle == NULL) {
-    esp3d_log_e("Failed create GT911 device");
-    return ESP_FAIL;
-  }
 
   if (GPIO_IS_VALID_OUTPUT_GPIO(config->int_pin)) {
-    // Make sure INT pin is low before reset procedure (ensures 0x5D i2c address instead of 0x14)
+    // Make sure INT pin is low before reset procedure (Sets i2c address to 0x5D)
     esp3d_log("GT911 INT pin: %d", config->int_pin);
     gpio_config_t int_gpio_cfg = {
         .mode = GPIO_MODE_OUTPUT,
@@ -125,10 +120,31 @@ esp_err_t gt911_init(const gt911_config_t *config) {
 
   uint8_t buf[4];
   esp_err_t err;
+
+  gt911_handle = i2c_bus_device_create(i2c_bus, 0x5D, 400*1000);
+  if (gt911_handle == NULL) {
+    esp3d_log_e("Failed create GT911 device");
+    return ESP_FAIL;
+  }
+  err = i2c_bus_read_bytes_16(gt911_handle, GT911_PRODUCT_ID_REG, 4, &buf[0]);
+  if (err == ESP_OK) {
+    esp3d_log("Found GT911 at addr: 0x5D");
+  } else {
+    gt911_handle = i2c_bus_device_create(i2c_bus, 0x14, 400*1000);
+    if (gt911_handle == NULL) {
+      esp3d_log_e("Failed create GT911 device");
+      return ESP_FAIL;
+    }
+    err = i2c_bus_read_bytes_16(gt911_handle, GT911_PRODUCT_ID_REG, 4, &buf[0]);
+    if (err == ESP_OK) {
+      esp3d_log("Found GT911 at addr: 0x14");
+    } else {
+      esp3d_log_e("Failed create GT911 device");
+      return err;
+    }
+  }
   
   // Display Product ID
-  err = i2c_bus_read_bytes_16(gt911_handle, GT911_PRODUCT_ID_REG, 4, &buf[0]);
-  if (err != ESP_OK) return err;
   esp3d_log("GT911 Product ID: 0x%02x,0x%02x,0x%02x,0x%02x", buf[0], buf[1], buf[2], buf[3]);
 
   // Display Config

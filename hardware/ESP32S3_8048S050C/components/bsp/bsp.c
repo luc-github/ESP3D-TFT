@@ -123,12 +123,11 @@ esp_err_t bsp_init(void) {
   }
 
   /* Touch controller initialization */
-  esp3d_log("Initializing touch controller...");
-  gt911_cfg.i2c_bus = i2c_bus_handle;
+  esp3d_log("Initializing touch controller...");  
 #if WITH_GT911_INT
   gt911_cfg.int_pin = 18; // GPIO 18
 #endif
-  ESP_ERROR_CHECK(gt911_init(&gt911_cfg));
+  ESP_ERROR_CHECK(gt911_init(i2c_bus_handle, &gt911_cfg));
 
   disp_backlight_set(bcklt_handle, 100);
 
