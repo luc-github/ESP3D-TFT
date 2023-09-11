@@ -299,6 +299,8 @@ void files_screen() {
       LV_VER_RES -
           ((1.5 * CURRENT_BUTTON_PRESSED_OUTLINE) + lv_obj_get_height(btnback) +
            lv_obj_get_height(labelpath) + (2 * CURRENT_STATUS_BAR_V_PAD)));
+  lv_obj_set_style_pad_left(ui_files_list_ctl, LIST_CONTAINER_LR_PAD, LV_PART_MAIN);
+  lv_obj_set_style_pad_right(ui_files_list_ctl, LIST_CONTAINER_LR_PAD, LV_PART_MAIN);
 
   if (files_path != "/") {
     std::string tmplabel = ".." LV_SYMBOL_NEW_LINE;

@@ -94,7 +94,7 @@ bool updateBtnMatrix() {
   apply_style(btnm_target, ESP3DStyleType::buttons_matrix);
   lv_obj_update_layout(btnm_target);
   size_t i = get_map_size();
-  lv_obj_set_size(btnm_target, BACK_BUTTON_WIDTH * i, MATRIX_BUTTON_HEIGHT);
+  lv_obj_set_size(btnm_target, MATRIX_BUTTON_WIDTH * i, MATRIX_BUTTON_HEIGHT);
   esp3d_log("child count: %d", i);
   // lv_obj_add_state(obj, LV_STATE_DISABLED);
   if (filament_buttons_map_id > i) filament_buttons_map_id = 0;
@@ -300,7 +300,8 @@ void filament_screen() {
   lv_obj_t *btnm = lv_btnmatrix_create(ui_new_screen);
   lv_btnmatrix_set_map(btnm, filament_distance_steps_buttons_map);
   apply_style(btnm, ESP3DStyleType::buttons_matrix);
-  lv_obj_set_size(btnm, LV_HOR_RES / 2, MATRIX_BUTTON_HEIGHT);
+  size_t i = (sizeof(filament_distance_steps_buttons_map) / sizeof(filament_distance_steps_buttons_map[0])) - 1;
+  lv_obj_set_size(btnm, MATRIX_BUTTON_WIDTH * i, MATRIX_BUTTON_HEIGHT);
   lv_obj_align(btnm, LV_ALIGN_TOP_RIGHT, -CURRENT_BUTTON_PRESSED_OUTLINE,
                CURRENT_BUTTON_PRESSED_OUTLINE / 2);
   lv_btnmatrix_set_btn_ctrl(btnm, filament_distance_steps_buttons_map_id,

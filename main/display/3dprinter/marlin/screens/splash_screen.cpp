@@ -28,13 +28,15 @@
 #include "main_screen.h"
 #include "version.h"
 
-LV_IMG_DECLARE(logo_esp3d_tft);
+extern "C" lv_img_dsc_t *get_splash_logo();
+extern "C" void release_splash_logo(lv_img_dsc_t *splash_logo);
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 namespace splashScreen {
 lv_timer_t *boot_timer = NULL;
+lv_img_dsc_t *splash_logo = NULL;
 
 void splash_screen();
 
@@ -54,6 +56,9 @@ void main_screen_timer_cb(lv_timer_t *timer) {
     lv_timer_del(boot_timer);
     boot_timer = NULL;
   }
+  if (splash_logo != NULL) {
+    release_splash_logo(splash_logo);
+  }
   // Call main screen
   mainScreen::main_screen();
 }
@@ -67,17 +72,22 @@ void splash_screen() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Get active screen
   lv_obj_t *ui_Screen = lv_scr_act();
-  // Create logo object
-  lv_obj_t *logo = lv_img_create(ui_Screen);
-  // Set logo image
-  lv_img_set_src(logo, &logo_esp3d_tft);
+  
+  splash_logo = get_splash_logo();
+  if (splash_logo != NULL) {
+    // Create logo object
+    lv_obj_t *logo = lv_img_create(ui_Screen);
+    // Set logo image
+    lv_img_set_src(logo, splash_logo);
+    // align object in screen
+    lv_obj_center(logo);
+  }
+
   // Create version text object
   lv_obj_t *label = lv_label_create(ui_Screen);
   // Set version text
   lv_label_set_text(label, "V" ESP3D_TFT_VERSION);
   apply_style(label, ESP3DStyleType::bg_label);
-  // align object in screen
-  lv_obj_center(logo);
   lv_obj_align(label, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
   // Set timer to switch to main screen
   boot_timer = lv_timer_create(main_screen_timer_cb, 2000, NULL);
