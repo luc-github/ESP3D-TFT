@@ -82,6 +82,6 @@ void ESP3DTranslationService::init() {
       {ESP3DLabel::auto_bed_probing, "Probing location: %s"},
       {ESP3DLabel::invert_axis, "Invert %s axis"},
       {ESP3DLabel::start_probing, "Start probing"},
-      {ESP3DLabel::language_menu, "Language"},
+      {ESP3DLabel::ui_language, "Language"},
   };
 }
