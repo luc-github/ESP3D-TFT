@@ -88,8 +88,11 @@ def generateFont(sizefont):
 	mainfont = "Montserrat-Medium.ttf"
 	fontname = "lv_font_montserrat_"
 	rangemain= "0x20-0x7F,0xB0"
+	#add French characters accute and grave accent and cedilla for small case, no accent for capital case
+	rangemain+=",0xE0,0xE7,0xE8,0xE9,0xEA,0xF4"
 	source = "lv_font_conv --no-compress --no-prefilter --bpp 4 --size "+sizefont+" --font " + mainfont + " -r "+rangemain + " --font FreeSerifBold.ttf -r 0x2022" +symboles+" --format lvgl -o fonts/"+fontname+sizefont+".c --force-fast-kern-format"
 	print("Generating "+sizefont+" px, "+fontname+sizefont+".c" )
+	print(source)
 	os.system(source)
 
 #list all font files

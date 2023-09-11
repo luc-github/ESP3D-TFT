@@ -44,7 +44,7 @@ l_40=Désactivé
 l_41=Moteurs désactivés
 l_42=Commandes du ventilateur
 l_43=Informations
-l_44=Niveau automatique
+l_44=Nivellement automatique
 l_45=Ajustez chaque vis de nivellement correspondant à la position active jusqu'à ce qu'une feuille de papier glisse entre la buse et la plaque.\nRépétez l'opération pour chaque point jusqu'à ce qu'aucune correction ne soit nécessaire.
 l_46=Ajustez les vis de nivellement, puis cliquez sur suivant.\nVous pouvez également sélectionner manuellement chaque point.
 l_47=Largeur du lit 
@@ -53,6 +53,7 @@ l_49=Emplacement de la mesure : %s
 l_50=Démarrer les mesures
 l_51=Inverser l'axe %s
 l_52=Langue
+l_53=Pas de SD card
 
 [info]
 creator=luc@tech-hunter.com

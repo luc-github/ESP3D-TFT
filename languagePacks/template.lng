@@ -53,6 +53,7 @@ l_49=Probing location: %s
 l_50=Start probing
 l_51=Invert %s axis
 l_52=Language
+l_53=No SD card
 
 [info]
 creator=<creator>

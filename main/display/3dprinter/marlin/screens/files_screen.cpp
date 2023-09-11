@@ -40,6 +40,7 @@
 #include "freertos/task.h"
 #include "main_screen.h"
 #include "tasks_def.h"
+#include "translations/esp3d_translation_service.h"
 
 /**********************
  *  STATIC PROTOTYPES
@@ -53,6 +54,7 @@ lv_timer_t *files_screen_delay_timer = NULL;
 lv_obj_t *refresh_button = NULL;
 lv_obj_t *ui_files_list_ctl = NULL;
 lv_timer_t *start_files_list_timer = NULL;
+lv_obj_t *msg = NULL;
 bool files_has_sd = false;
 std::string files_path = "/";
 std::vector<std::string> files_extensions;
@@ -171,6 +173,7 @@ void fill_files_list() {
 
 void do_files_list_now() {
   spinnerScreen::show_spinner();
+  if (msg) lv_label_set_text(msg, "");
   TaskHandle_t xHandle = NULL;
   BaseType_t res =
       xTaskCreatePinnedToCore(bgFilesTask, "filesTask", STACKDEPTH, NULL,
@@ -252,6 +255,7 @@ void event_file_handler(lv_event_t *e) {
 bool first_fill_needed = true;
 void files_screen() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
+  msg = NULL;
   // Screen creation
   esp3d_log("Files screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
@@ -299,8 +303,10 @@ void files_screen() {
       LV_VER_RES -
           ((1.5 * CURRENT_BUTTON_PRESSED_OUTLINE) + lv_obj_get_height(btnback) +
            lv_obj_get_height(labelpath) + (2 * CURRENT_STATUS_BAR_V_PAD)));
-  lv_obj_set_style_pad_left(ui_files_list_ctl, LIST_CONTAINER_LR_PAD, LV_PART_MAIN);
-  lv_obj_set_style_pad_right(ui_files_list_ctl, LIST_CONTAINER_LR_PAD, LV_PART_MAIN);
+  lv_obj_set_style_pad_left(ui_files_list_ctl, LIST_CONTAINER_LR_PAD,
+                            LV_PART_MAIN);
+  lv_obj_set_style_pad_right(ui_files_list_ctl, LIST_CONTAINER_LR_PAD,
+                             LV_PART_MAIN);
 
   if (files_path != "/") {
     std::string tmplabel = ".." LV_SYMBOL_NEW_LINE;
@@ -346,9 +352,10 @@ void files_screen() {
     }
   } else {
     lv_obj_del(ui_files_list_ctl);
-    lv_obj_t *msg = lv_label_create(ui_new_screen);
+    msg = lv_label_create(ui_new_screen);
     lv_obj_del(labelpath);
-    lv_label_set_text(msg, "No SD card");
+    lv_label_set_text(
+        msg, esp3dTranslationService.translate(ESP3DLabel::no_sd_card));
     lv_obj_center(msg);
   }
 

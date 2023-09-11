@@ -36,6 +36,7 @@
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "filesystem/esp3d_flash.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "main_screen.h"
@@ -56,6 +57,7 @@ namespace settingsScreen {
 lv_timer_t *settings_screen_delay_timer = NULL;
 lv_timer_t *settings_screen_apply_timer = NULL;
 lv_obj_t *ui_settings_list_ctl = NULL;
+lv_obj_t *language_label = NULL;
 lv_obj_t *hostname_label = NULL;
 lv_obj_t *extensions_label = NULL;
 lv_obj_t *show_fan_controls_label = NULL;
@@ -84,6 +86,16 @@ void settings_screen_delay_timer_cb(lv_timer_t *timer) {
     settings_screen_delay_timer = NULL;
   }
   menuScreen::menu_screen();
+}
+
+void settings_ui_update_delay_timer_cb(lv_timer_t *timer) {
+  if (settings_screen_delay_timer) {
+    lv_timer_del(settings_screen_delay_timer);
+    settings_screen_delay_timer = NULL;
+  }
+  esp3dTranslationService.begin();
+  spinnerScreen::hide_spinner();
+  settings_screen();
 }
 
 // refresh_settings_list_cb
@@ -197,11 +209,20 @@ void setting_edit_done_cb(const char *str, void *data) {
   }
   esp3d_log("Saving setting to: %s\n", str);
   ESP3DSettingsData *settingData = (ESP3DSettingsData *)data;
+  esp3d_log("Got index %d", (uint16_t)settingData->index);
   if (settingData->value != str) {
+    esp3d_log("New value is different");
     // get value type
     const ESP3DSettingDescription *settingPtr = NULL;
-    if (settingData->entry != "") {
-      esp3dTftsettings.getSettingPtr(settingData->index);
+    if (settingData->entry == "") {
+      esp3d_log("Setting is not json setting");
+      settingPtr = esp3dTftsettings.getSettingPtr(settingData->index);
+    } else {
+      esp3d_log("Setting is json setting");
+    }
+    if (settingPtr == NULL && settingData->entry == "") {
+      esp3d_log_e("Unknown setting index %d", (uint16_t)settingData->index);
+      return;
     }
     bool isValid = false;
     bool success_saving = false;
@@ -285,6 +306,11 @@ void setting_edit_done_cb(const char *str, void *data) {
               esp3dTftsettings.isValidStringSetting(str, settingData->index);
           if (isValid) {
             switch (settingData->index) {
+              case ESP3DSettingIndex::esp3d_ui_language:
+                if (val_string == "English") {
+                  val_string = "default";
+                }
+                break;
               case ESP3DSettingIndex::esp3d_hostname:
                 // use string as it is
                 break;
@@ -357,6 +383,12 @@ void setting_edit_done_cb(const char *str, void *data) {
     }
     // now apply the setting if needed
     switch (settingData->index) {
+      case ESP3DSettingIndex::esp3d_ui_language:
+        spinnerScreen::show_spinner();
+        if (settings_screen_delay_timer) return;
+        settings_screen_delay_timer =
+            lv_timer_create(settings_ui_update_delay_timer_cb, 100, NULL);
+        break;
       case ESP3DSettingIndex::esp3d_polling_on:
         renderingClient.setPolling(val_byte);
         break;
@@ -395,7 +427,39 @@ void event_button_edit_setting_cb(lv_event_t *e) {
   data.label = NULL;
   std::string title;
   uint8_t list_size = 0;
+  esp3d_log("Got index %d", (uint16_t)data.index);
   switch (data.index) {
+    case ESP3DSettingIndex::esp3d_ui_language:
+      data.label = language_label;
+      title = esp3dTranslationService.translate(ESP3DLabel::ui_language);
+      // Translate default to english
+      data.choices.push_back("English");  // english
+      // search for ui_xxx.lng files in root
+      if (flashFs.accessFS()) {
+        DIR *dir = flashFs.opendir("/");
+        if (dir) {
+          struct dirent *entry;
+          while ((entry = flashFs.readdir(dir)) != NULL) {
+            if (entry->d_type == DT_DIR) {
+              continue;
+            } else {
+              std::string filename = entry->d_name;
+              if (filename.length() > 4) {
+                if (filename.substr(filename.length() - 4) == ".lng" &&
+                    filename.substr(0, 3) == "ui_" && filename.length() != 7) {
+                  data.choices.push_back(
+                      filename.substr(3, filename.length() - 7));  // remove ui_
+                                                                   // and .lng
+                }
+              }
+            }
+          }
+          flashFs.closedir(dir);
+        }
+        flashFs.releaseFS();
+      }
+      break;
+
     case ESP3DSettingIndex::esp3d_baud_rate:
       data.label = serial_baud_rate_label;
       title = esp3dTranslationService.translate(ESP3DLabel::serial_baud_rate);
@@ -559,8 +623,10 @@ void settings_screen() {
 
   ui_settings_list_ctl = lv_list_create(ui_new_screen);
   lv_obj_clear_flag(ui_settings_list_ctl, LV_OBJ_FLAG_SCROLL_ELASTIC);
-  lv_obj_set_style_pad_left(ui_settings_list_ctl, LIST_CONTAINER_LR_PAD, LV_PART_MAIN);
-  lv_obj_set_style_pad_right(ui_settings_list_ctl, LIST_CONTAINER_LR_PAD, LV_PART_MAIN);
+  lv_obj_set_style_pad_left(ui_settings_list_ctl, LIST_CONTAINER_LR_PAD,
+                            LV_PART_MAIN);
+  lv_obj_set_style_pad_right(ui_settings_list_ctl, LIST_CONTAINER_LR_PAD,
+                             LV_PART_MAIN);
 
   lv_obj_set_size(
       ui_settings_list_ctl, LV_HOR_RES - CURRENT_BUTTON_PRESSED_OUTLINE * 2,
@@ -571,6 +637,33 @@ void settings_screen() {
                  CURRENT_BUTTON_PRESSED_OUTLINE);
   lv_obj_t *line_container = NULL;
   std::string LabelStr = "";
+  // Language
+  line_container = listLine::create_list_line_container(ui_settings_list_ctl);
+  LabelStr = esp3dTranslationService.translate(ESP3DLabel::ui_language);
+  if (line_container) {
+    std::string ui_language;
+    listLine::add_label_to_line(LabelStr.c_str(), line_container, true);
+    const ESP3DSettingDescription *settingPtr =
+        esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_ui_language);
+    esp3d_log("Looking for index %d",
+              (uint16_t)ESP3DSettingIndex::esp3d_ui_language);
+    if (settingPtr) {
+      esp3d_log("Found setting description for %d",
+                (uint16_t)settingPtr->index);
+      char out_str[(settingPtr->size) + 1] = {0};
+      ui_language = esp3dTftsettings.readString(
+          ESP3DSettingIndex::esp3d_ui_language, out_str, settingPtr->size);
+    } else {
+      esp3d_log_e("Failed to get setting description");
+    }
+    language_label =
+        listLine::add_label_to_line(ui_language.c_str(), line_container, true);
+    lv_obj_t *btnEdit =
+        listLine::add_button_to_line(LV_SYMBOL_EDIT, line_container);
+    lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb, LV_EVENT_CLICKED,
+                        (void *)(&(settingPtr->index)));
+  }
+
   // Hostname
   line_container = listLine::create_list_line_container(ui_settings_list_ctl);
   LabelStr = esp3dTranslationService.translate(ESP3DLabel::hostname);
