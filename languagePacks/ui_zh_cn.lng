@@ -1,13 +1,63 @@
-#Translation pack for simplified language
+#Translation pack for <language> language
 [translations]
 l_0=简体中文
-l_1=更新 
-l_2=版本
+l_1=更新大小
+l_2=屏幕
+l_3=拱形
+l_4=SDK
+l_5=频率
+l_6=闪存大小
+l_7=空闲堆
+l_8=PSRAM大小
+l_9=版本
+l_10=SD 更新程序
+l_11=开
+l_12=关闭
+l_13=毫米
+l_14=°C
+l_15=闪存文件系统
+l_16=请确认
+l_17=您想停止当前打印吗？
+l_18=错误
+l_19=应用模式失败！
+l_20=应用设置失败！
+l_21=主机名
+l_22=扩展
+l_23=请稍等...
+l_24=输出端口
+l_25=USB
+l_26=串行
+l_27=串口波特率
+l_28=USB串口波特率
+l_29=正在连接无线网络...
+l_30=未连接
+l_31=设置为接入点
+l_32=IP丢失
+l_33=点动类型
+l_34=腹肌
+l_35=绝对
+l_36=相对
+l_37=相对
+l_38=轮询
+l_39=已启用
+l_40=禁用
+l_41=电机禁用
+l_42=风扇控制
+l_43=信息
+l_44=自动调平
+l_45=调节对应激活位置的各个旋钮，直到一张纸恰好在喷嘴和板之间滑动。\n对每个点重复操作，直到不需要校正。
+l_46=将旋钮调节至水平，然后单击“下一步”。\n您也可以手动选择每个点。
+l_47=床宽
+l_48=床层深度
+l_49=探测位置：%s
+l_50=开始探测
+l_51=反转 %s 轴
+l_52=语言
 
 [info]
-creator=luc@tech-hunter.com
-creation_date=2023-05-16
-maintainer==luc@tech-hunter.com
-last_update=2023-05-16
-target_language=Simplified Chinese
-target_version=3.0
+creator=<creator>
+creation_date=<creation_date>
+maintainer=<maintainer>
+last_update=<last_update>
+target_language=<target_language>
+target_version=<target_version>
