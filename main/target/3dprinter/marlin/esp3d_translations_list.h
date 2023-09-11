@@ -79,6 +79,7 @@ enum class ESP3DLabel : uint16_t {
   start_probing,
   invert_axis,
   ui_language,
+  no_sd_card,
   unknown_index,  // must be last
 };
 

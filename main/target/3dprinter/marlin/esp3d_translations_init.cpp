@@ -83,5 +83,6 @@ void ESP3DTranslationService::init() {
       {ESP3DLabel::invert_axis, "Invert %s axis"},
       {ESP3DLabel::start_probing, "Start probing"},
       {ESP3DLabel::ui_language, "Language"},
+      {ESP3DLabel::no_sd_card, "No SD card"},
   };
 }
