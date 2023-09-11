@@ -94,7 +94,7 @@ esp_err_t bsp_init(void) {
   esp3d_log("Initializing LVGL...");
   lv_init();
   
-  /* Initialize the working buffer(s) depending on the selected display.*/
+  /* Initialize the working buffer(s) depending on the selected display. */
   static lv_disp_draw_buf_t draw_buf;
   esp3d_log("Display buffer size: %1.2f KB", DISP_BUF_SIZE_BYTES / 1024.0);
   lv_color_t *buf1 = (lv_color_t *)heap_caps_malloc(DISP_BUF_SIZE_BYTES, DISP_BUF_MALLOC_TYPE);

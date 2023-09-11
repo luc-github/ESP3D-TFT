@@ -29,6 +29,8 @@ LANDSCAPE_INVERTED      3
 #define DISP_VER_RES_MAX 320
 #endif
 
+#define DISP_USE_DOUBLE_BUFFER (true)
+
 #if WITH_PSRAM
   // 1/10 (24-line) buffer (15KB) in external PSRAM
   #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * DISP_VER_RES_MAX / 10)
@@ -38,8 +40,6 @@ LANDSCAPE_INVERTED      3
   #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * 10)
   #define DISP_BUF_MALLOC_TYPE  MALLOC_CAP_DMA
 #endif  // WITH_PSRAM
-
-#define DISP_USE_DOUBLE_BUFFER 1
 #define DISP_BUF_SIZE_BYTES    (DISP_BUF_SIZE * 2)
 
 ili9341_config_t ili9341_cfg = {

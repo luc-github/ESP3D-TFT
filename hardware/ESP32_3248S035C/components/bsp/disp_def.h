@@ -28,6 +28,8 @@ LANDSCAPE_INVERTED      3
 #define DISP_VER_RES_MAX 480
 #endif
 
+#define DISP_USE_DOUBLE_BUFFER (true)
+
 #if WITH_PSRAM
   // 1/10 (32-line) buffer (30KB) in external PSRAM
   #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * DISP_VER_RES_MAX / 10)
@@ -37,8 +39,6 @@ LANDSCAPE_INVERTED      3
   #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * 8)
   #define DISP_BUF_MALLOC_TYPE  MALLOC_CAP_DMA
 #endif  // WITH_PSRAM
-
-#define DISP_USE_DOUBLE_BUFFER 1
 #define DISP_BUF_SIZE_BYTES    (DISP_BUF_SIZE * 2)
 
 esp_lcd_panel_dev_config_t disp_panel_cfg = {

@@ -85,14 +85,14 @@ esp_err_t bsp_init(void) {
   /* Display panel initialization */
   esp3d_log("Initializing display...");
   ESP_ERROR_CHECK(esp_lcd_new_panel_st7796(disp_io_handle, &disp_panel_cfg, &disp_panel));
-  esp_lcd_panel_reset(disp_panel);
-  esp_lcd_panel_init(disp_panel);
-  //esp_lcd_panel_invert_color(disp_panel, true);
+  ESP_ERROR_CHECK(esp_lcd_panel_reset(disp_panel));
+  ESP_ERROR_CHECK(esp_lcd_panel_init(disp_panel));
+  //ESP_ERROR_CHECK(esp_lcd_panel_invert_color(disp_panel, true));
 #if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
-  esp_lcd_panel_swap_xy(disp_panel, true);
+  ESP_ERROR_CHECK(esp_lcd_panel_swap_xy(disp_panel, true));
 #endif //DISP_ORIENTATION
 #if DISP_ORIENTATION == 1 || DISP_ORIENTATION == 3  // mirrored
-  esp_lcd_panel_mirror(disp_panel, true, true);
+  ESP_ERROR_CHECK(esp_lcd_panel_mirror(disp_panel, true, true));
 #endif //DISP_ORIENTATION
 
   /* i2c controller initialization */
