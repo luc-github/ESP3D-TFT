@@ -146,7 +146,7 @@ lv_obj_t *create_choice_editor(lv_obj_t *container, const char *text,
     index++;
   }
 
-  lv_obj_set_size(choice_container, LV_SIZE_CONTENT, heigth);
+  lv_obj_set_size(choice_container, CURRENT_CHOICE_LIST_WIDTH, heigth);
   lv_obj_update_layout(choice_container);
   size_t width = lv_obj_get_width(choice_container);
   lv_obj_set_x(choice_container, LV_HOR_RES / 2 - width / 2);
