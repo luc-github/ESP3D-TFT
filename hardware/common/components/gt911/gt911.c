@@ -121,7 +121,7 @@ esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config) {
   uint8_t buf[4];
   esp_err_t err;
 
-  gt911_handle = i2c_bus_device_create(i2c_bus, 0x5D, 400*1000);
+  gt911_handle = i2c_bus_device_create(i2c_bus, 0x5D, config->i2c_clk_speed);
   if (gt911_handle == NULL) {
     esp3d_log_e("Failed creating GT911 device!");
     return ESP_FAIL;
@@ -132,7 +132,7 @@ esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config) {
   } else {
     // Floating or mis-configured INT pin may cause GT911 to come up
     //   at address 0x14 instead of 0x5D, so check there as well.
-    gt911_handle = i2c_bus_device_create(i2c_bus, 0x14, 400*1000);
+    gt911_handle = i2c_bus_device_create(i2c_bus, 0x14, config->i2c_clk_speed);
     if (gt911_handle == NULL) {
       esp3d_log_e("Failed creating GT911 device!");
       return ESP_FAIL;

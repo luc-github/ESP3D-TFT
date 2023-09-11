@@ -34,6 +34,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 typedef struct {
+  uint32_t i2c_clk_speed;
   int8_t rst_pin;
   int8_t int_pin;
   bool swap_xy;
