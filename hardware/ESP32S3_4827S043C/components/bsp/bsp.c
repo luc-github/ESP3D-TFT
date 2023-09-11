@@ -128,7 +128,7 @@ esp_err_t bsp_init(void) {
   gt911_cfg.int_pin = 18; // GPIO 18
 #endif
   bool has_touch_init = true;
-  if(gt911_init(i2c_bus_handle, &gt911_cfg) != ESP_OK) {
+  if (gt911_init(i2c_bus_handle, &gt911_cfg) != ESP_OK) {
     esp3d_log_e("Touch controller initialization failed!");
     has_touch_init = false;
   }
