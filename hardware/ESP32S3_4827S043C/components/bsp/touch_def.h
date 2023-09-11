@@ -14,7 +14,7 @@ gt911_config_t gt911_cfg = {
     .i2c_clk_speed = 400*1000,
     .rst_pin = 38, // GPIO 38
     .int_pin = -1, // INT pin not connected (by default)
-    .swap_xy = true,
+    .swap_xy = false,
     .invert_x = false,
     .invert_y = false,    
 };

@@ -87,7 +87,7 @@ esp_err_t bsp_init(void) {
   ESP_ERROR_CHECK(esp_lcd_panel_reset(disp_panel));
   ESP_ERROR_CHECK(esp_lcd_panel_init(disp_panel));
   //ESP_ERROR_CHECK(esp_lcd_panel_invert_color(disp_panel, true));
-#if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
+#if DISP_ORIENTATION == 0 || DISP_ORIENTATION == 1  // portrait mode
   ESP_ERROR_CHECK(esp_lcd_panel_swap_xy(disp_panel, true));
 #endif //DISP_ORIENTATION
 #if DISP_ORIENTATION == 1 || DISP_ORIENTATION == 3  // mirrored
@@ -194,6 +194,7 @@ esp_err_t bsp_accessFs(void) {
 #endif  // ESP3D_DISPLAY_FEATURE
   return ESP_OK;
 }
+
 esp_err_t bsp_releaseFs(void) {
 #if ESP3D_DISPLAY_FEATURE  
   esp_err_t ret = esp_lcd_rgb_panel_set_pclk(disp_panel, DISP_CLK_FREQ);
