@@ -49,6 +49,7 @@ lv_obj_t *btnback = nullptr;
 #if ESP3D_PATCH_DELAY_REFRESH
 lv_timer_t *wifi_screen_delay_refresh_timer = NULL;
 void wifi_screen_delay_refresh_timer_cb(lv_timer_t *timer) {
+  esp3d_log("wifi_screen_delay_refresh_timer_cb");
   if (wifi_screen_delay_refresh_timer) {
     lv_timer_del(wifi_screen_delay_refresh_timer);
     wifi_screen_delay_refresh_timer = NULL;
@@ -59,6 +60,7 @@ void wifi_screen_delay_refresh_timer_cb(lv_timer_t *timer) {
 lv_timer_t *wifi_screen_delay_connecting_timer = nullptr;
 
 void wifi_screen_delay_connecting_timer_cb(lv_timer_t *timer) {
+  esp3d_log("wifi_screen_delay_connecting_timer_cb");
   if (esp3dTftui.get_current_screen() != ESP3DScreenType::wifi) {
     if (wifi_screen_delay_connecting_timer) {
       lv_timer_del(wifi_screen_delay_connecting_timer);
@@ -92,6 +94,8 @@ ESP3DScreenType wifi_next_screen = ESP3DScreenType::none;
 lv_obj_t *btn_no_wifi = nullptr;
 
 void update_button_no_wifi() {
+  if (esp3dTftui.get_current_screen() != ESP3DScreenType::wifi) return;
+  esp3d_log("update_button_no_wifi");
   std::string mode =
       esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
   if (mode == LV_SYMBOL_WIFI) {
@@ -112,6 +116,7 @@ void update_button_no_wifi() {
 }
 
 void wifi_screen_delay_timer_cb(lv_timer_t *timer) {
+  esp3d_log("wifi_screen_delay_timer_cb");
   if (wifi_screen_delay_timer) {
     lv_timer_del(wifi_screen_delay_timer);
     wifi_screen_delay_timer = NULL;
@@ -196,8 +201,8 @@ void wifi_screen() {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
-  lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
+  lv_obj_del(ui_current_screen);
 
   btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_wifi_back_handler, LV_EVENT_CLICKED,

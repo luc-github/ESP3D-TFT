@@ -56,6 +56,7 @@ lv_timer_t *sta_screen_delay_timer = NULL;
 #if ESP3D_PATCH_DELAY_REFRESH
 lv_timer_t *sta_screen_delay_refresh_timer = NULL;
 void sta_screen_delay_refresh_timer_cb(lv_timer_t *timer) {
+  esp3d_log("Refresh timer_cb");
   if (sta_screen_delay_refresh_timer) {
     lv_timer_del(sta_screen_delay_refresh_timer);
     sta_screen_delay_refresh_timer = NULL;
@@ -88,6 +89,7 @@ std::list<ESP3DSSIDDescriptor> ssid_scanned_list;
 void fill_ssid_scanned_list();
 void fill_ui_sta_ssid_list();
 void refresh_ssid_scanned_list_cb(lv_timer_t *timer) {
+  esp3d_log("Refresh list");
   if (start_scan_timer) {
     lv_timer_del(start_scan_timer);
     start_scan_timer = NULL;
@@ -95,12 +97,14 @@ void refresh_ssid_scanned_list_cb(lv_timer_t *timer) {
   fill_ui_sta_ssid_list();
 }
 static void bgScanTask(void *pvParameter) {
+  esp3d_log("Scan task");
   (void)pvParameter;
   vTaskDelay(pdMS_TO_TICKS(100));
   fill_ssid_scanned_list();
   if (!start_scan_timer) {
     start_scan_timer = lv_timer_create(refresh_ssid_scanned_list_cb, 100, NULL);
   }
+  esp3d_log("Scan task end");
   vTaskDelete(NULL);
 }
 
@@ -211,6 +215,7 @@ void start_scan_timer_cb(lv_timer_t *timer) {
 }
 
 bool save_parameters() {
+  esp3d_log("Save parameters");
   bool res = true;
   if (!esp3dTftsettings.writeString(ESP3DSettingIndex::esp3d_sta_ssid,
                                     ssid_current.c_str())) {
@@ -239,6 +244,7 @@ bool save_parameters() {
 }
 
 void update_sta_button_scan() {
+  if (esp3dTftui.get_current_screen() != ESP3DScreenType::station) return;
   std::string mode =
       esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
   if (mode == LV_SYMBOL_WIFI) {
@@ -249,6 +255,7 @@ void update_sta_button_scan() {
 }
 
 void update_button_ok() {
+  if (esp3dTftui.get_current_screen() != ESP3DScreenType::station) return;
   esp3d_log("Update ok vibility");
   std::string mode =
       esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
@@ -448,8 +455,8 @@ void sta_screen() {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
-  lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
+  lv_obj_del(ui_current_screen);
 
   lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_sta_back_handler, LV_EVENT_CLICKED,

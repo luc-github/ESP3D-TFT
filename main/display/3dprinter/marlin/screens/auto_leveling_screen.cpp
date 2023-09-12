@@ -259,8 +259,9 @@ void auto_leveling_screen() {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
-  lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
+  lv_obj_del(ui_current_screen);
+
   homing_done = false;
   btn_back = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btn_back, event_button_fan_back_handler, LV_EVENT_CLICKED,

@@ -589,8 +589,8 @@ void main_screen() {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_main_screen);
-  lv_obj_del(ui_current_screen);
   apply_style(ui_main_screen, ESP3DStyleType::main_bg);
+  lv_obj_del(ui_current_screen);
 
   lv_obj_t *ui_status_bar_container = statusBar::status_bar(ui_main_screen);
   lv_obj_update_layout(ui_status_bar_container);

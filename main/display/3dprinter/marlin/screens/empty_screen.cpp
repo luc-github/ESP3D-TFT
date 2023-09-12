@@ -44,8 +44,9 @@ void empty_screen() {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
-  lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
+  lv_obj_del(ui_current_screen);
+
   lv_obj_add_event_cb(ui_new_screen, event_button_handler, LV_EVENT_CLICKED,
                       NULL);
 }

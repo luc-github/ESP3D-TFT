@@ -289,8 +289,8 @@ void filament_screen() {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
-  lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
+  lv_obj_del(ui_current_screen);
 
   btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_filament_back_handler,
@@ -300,7 +300,9 @@ void filament_screen() {
   lv_obj_t *btnm = lv_btnmatrix_create(ui_new_screen);
   lv_btnmatrix_set_map(btnm, filament_distance_steps_buttons_map);
   apply_style(btnm, ESP3DStyleType::buttons_matrix);
-  size_t i = (sizeof(filament_distance_steps_buttons_map) / sizeof(filament_distance_steps_buttons_map[0])) - 1;
+  size_t i = (sizeof(filament_distance_steps_buttons_map) /
+              sizeof(filament_distance_steps_buttons_map[0])) -
+             1;
   lv_obj_set_size(btnm, MATRIX_BUTTON_WIDTH * i, MATRIX_BUTTON_HEIGHT);
   lv_obj_align(btnm, LV_ALIGN_TOP_RIGHT, -CURRENT_BUTTON_PRESSED_OUTLINE,
                CURRENT_BUTTON_PRESSED_OUTLINE / 2);

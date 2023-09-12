@@ -308,8 +308,9 @@ void positions_screen(uint8_t target_id) {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
-  lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
+  lv_obj_del(ui_current_screen);
+
   // back button
   lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_positions_back_handler,
@@ -319,7 +320,8 @@ void positions_screen(uint8_t target_id) {
   lv_obj_t *btnm = lv_btnmatrix_create(ui_new_screen);
   lv_btnmatrix_set_map(btnm, positions_buttons_map);
   apply_style(btnm, ESP3DStyleType::buttons_matrix);
-  size_t i = (sizeof(positions_buttons_map) / sizeof(positions_buttons_map[0])) -1;
+  size_t i =
+      (sizeof(positions_buttons_map) / sizeof(positions_buttons_map[0])) - 1;
   lv_obj_set_size(btnm, MATRIX_BUTTON_WIDTH * i, MATRIX_BUTTON_HEIGHT);
   lv_obj_align(btnm, LV_ALIGN_TOP_RIGHT, -CURRENT_BUTTON_PRESSED_OUTLINE,
                CURRENT_BUTTON_PRESSED_OUTLINE / 2);
@@ -331,7 +333,7 @@ void positions_screen(uint8_t target_id) {
   // Target selector button matrix
   lv_obj_t *btnm_target = lv_btnmatrix_create(ui_new_screen);
   lv_btnmatrix_set_map(btnm_target, axis_buttons_map);
-  apply_style(btnm_target, ESP3DStyleType::buttons_matrix);  
+  apply_style(btnm_target, ESP3DStyleType::buttons_matrix);
   size_t i2 = (sizeof(axis_buttons_map) / sizeof(axis_buttons_map[0])) - 1;
   lv_obj_set_size(btnm_target, MATRIX_BUTTON_WIDTH * i2, MATRIX_BUTTON_HEIGHT);
   lv_btnmatrix_set_btn_ctrl(btnm_target, axis_buttons_map_id,
@@ -341,7 +343,8 @@ void positions_screen(uint8_t target_id) {
                   -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
   // Home all axis
   lv_obj_t *btn_home_all = symbolButton::create_symbol_button(
-      ui_new_screen, LV_SYMBOL_HOME "xyz", MATRIX_BUTTON_WIDTH, MATRIX_BUTTON_HEIGHT);
+      ui_new_screen, LV_SYMBOL_HOME "xyz", MATRIX_BUTTON_WIDTH,
+      MATRIX_BUTTON_HEIGHT);
   lv_obj_align_to(btn_home_all, btnm_target, LV_ALIGN_OUT_LEFT_BOTTOM,
                   -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
 

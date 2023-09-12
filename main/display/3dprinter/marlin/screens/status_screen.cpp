@@ -31,7 +31,6 @@
 #include "esp3d_values.h"
 #include "main_screen.h"
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -89,10 +88,10 @@ void status_screen() {
   lv_obj_t *ui_status_screen = lv_obj_create(NULL);
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
-  lv_scr_load(ui_status_screen);
-  lv_obj_del(ui_current_screen);
-  // Apply background color
+  lv_scr_load(ui_status_screen);  // Apply background color
   apply_style(ui_status_screen, ESP3DStyleType::main_bg);
+  lv_obj_del(ui_current_screen);
+
   // Create screen container
   lv_obj_t *ui_status_screen_container = lv_obj_create(ui_status_screen);
   apply_style(ui_status_screen_container, ESP3DStyleType::col_container);

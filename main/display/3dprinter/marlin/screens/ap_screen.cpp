@@ -52,6 +52,7 @@ lv_obj_t *btn_save = nullptr;
 #if ESP3D_PATCH_DELAY_REFRESH
 lv_timer_t *ap_screen_delay_refresh_timer = NULL;
 void ap_screen_delay_refresh_timer_cb(lv_timer_t *timer) {
+  esp3d_log("ap_screen_delay_refresh_timer_cb");
   if (ap_screen_delay_refresh_timer) {
     lv_timer_del(ap_screen_delay_refresh_timer);
     ap_screen_delay_refresh_timer = NULL;
@@ -67,6 +68,7 @@ void update_button_save();
 
 bool save_parameters() {
   bool res = true;
+  esp3d_log("Save parameters");
   if (!esp3dTftsettings.writeString(ESP3DSettingIndex::esp3d_ap_ssid,
                                     ssid_current.c_str())) {
     std::string text =
@@ -94,6 +96,7 @@ bool save_parameters() {
 }
 
 void update_button_ok() {
+  if (esp3dTftui.get_current_screen() != ESP3DScreenType::access_point) return;
   esp3d_log("Update ok vibility");
   std::string mode =
       esp3dTftValues.get_string_value(ESP3DValuesIndex::network_mode);
@@ -247,9 +250,8 @@ void ap_screen() {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
-  lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
-
+  lv_obj_del(ui_current_screen);
   lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_ap_back_handler, LV_EVENT_CLICKED,
                       NULL);

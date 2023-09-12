@@ -442,8 +442,9 @@ void temperatures_screen(uint8_t target, ESP3DScreenType screenreturn) {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
-  lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
+  lv_obj_del(ui_current_screen);
+
   // back button
   btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_temperatures_back_handler,
@@ -453,7 +454,9 @@ void temperatures_screen(uint8_t target, ESP3DScreenType screenreturn) {
   lv_obj_t *btnm = lv_btnmatrix_create(ui_new_screen);
   lv_btnmatrix_set_map(btnm, temperatures_buttons_map);
   apply_style(btnm, ESP3DStyleType::buttons_matrix);
-  size_t i = (sizeof(temperatures_buttons_map) / sizeof(temperatures_buttons_map[0])) - 1;
+  size_t i =
+      (sizeof(temperatures_buttons_map) / sizeof(temperatures_buttons_map[0])) -
+      1;
   lv_obj_set_size(btnm, MATRIX_BUTTON_WIDTH * i, MATRIX_BUTTON_HEIGHT);
   lv_obj_align(btnm, LV_ALIGN_TOP_RIGHT, -CURRENT_BUTTON_PRESSED_OUTLINE,
                CURRENT_BUTTON_PRESSED_OUTLINE / 2);
@@ -469,7 +472,8 @@ void temperatures_screen(uint8_t target, ESP3DScreenType screenreturn) {
 
   // Power off all heater
   lv_obj_t *btn_power_off_all = symbolButton::create_symbol_button(
-      ui_new_screen, LV_SYMBOL_POWER "...", MATRIX_BUTTON_WIDTH, MATRIX_BUTTON_HEIGHT);
+      ui_new_screen, LV_SYMBOL_POWER "...", MATRIX_BUTTON_WIDTH,
+      MATRIX_BUTTON_HEIGHT);
   lv_obj_align_to(btn_power_off_all, btnm_target, LV_ALIGN_OUT_LEFT_BOTTOM,
                   -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
 

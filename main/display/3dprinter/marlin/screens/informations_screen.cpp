@@ -94,8 +94,8 @@ void informations_screen() {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
-  lv_obj_del(ui_current_screen);
   apply_style(ui_new_screen, ESP3DStyleType::main_bg);
+  lv_obj_del(ui_current_screen);
 
   lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_informations_back_handler,
@@ -113,8 +113,10 @@ void informations_screen() {
                   lv_obj_get_height(ui_main_container) -
                       CURRENT_BUTTON_PRESSED_OUTLINE * 2);
   lv_obj_set_style_radius(ui_info_list_ctl, CURRENT_CONTAINER_RADIUS, 0);
-  lv_obj_set_style_pad_left(ui_info_list_ctl, LIST_CONTAINER_LR_PAD, LV_PART_MAIN);
-  lv_obj_set_style_pad_right(ui_info_list_ctl, LIST_CONTAINER_LR_PAD, LV_PART_MAIN);
+  lv_obj_set_style_pad_left(ui_info_list_ctl, LIST_CONTAINER_LR_PAD,
+                            LV_PART_MAIN);
+  lv_obj_set_style_pad_right(ui_info_list_ctl, LIST_CONTAINER_LR_PAD,
+                             LV_PART_MAIN);
 
   addInformationToList(ui_info_list_ctl, ESP3DLabel::screen, TFT_TARGET);
   addInformationToList(ui_info_list_ctl, ESP3DLabel::version,

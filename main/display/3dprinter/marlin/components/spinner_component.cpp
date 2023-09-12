@@ -32,8 +32,10 @@ namespace spinnerScreen {
 lv_obj_t* spinnerObj = NULL;
 size_t spinner_index = 0;
 lv_obj_t* lblextra = NULL;
+lv_obj_t* screen_displaying_spinner = NULL;
 
 void update_spinner(const char* msg) {
+  esp3d_log("Update spinner %s", msg);
   if (spinnerObj == NULL) {
     esp3d_log_w("Spinner not displayed");
     return;
@@ -47,14 +49,15 @@ void update_spinner(const char* msg) {
 
 void show_spinner(const char* msg, lv_obj_t* backtbn) {
   // to avoid multiple call to show spinner
-
+  esp3d_log("Show spinner");
   if (spinnerObj != NULL) {
     esp3d_log_w("Spinner already displayed");
     return;
   }
   spinner_index++;
   esp3d_log("Spinner index is %d", spinner_index);
-  spinnerObj = lv_obj_create(lv_scr_act());
+  screen_displaying_spinner = lv_scr_act();
+  spinnerObj = lv_obj_create(screen_displaying_spinner);
   apply_style(spinnerObj, ESP3DStyleType::spinner_screen);
   lv_obj_move_foreground(spinnerObj);
   lv_obj_set_size(spinnerObj, LV_HOR_RES, LV_VER_RES);
@@ -83,13 +86,18 @@ void show_spinner(const char* msg, lv_obj_t* backtbn) {
 }
 
 void hide_spinner() {
+  esp3d_log("Hide spinner, index is %d", spinner_index);
   if (spinnerObj != NULL) {
-    try {
+    lv_obj_add_flag(spinnerObj, LV_OBJ_FLAG_HIDDEN);
+    if (screen_displaying_spinner != lv_scr_act()) {
+      esp3d_log_e("Spinner not displayed on current screen");
+      // so screen may be already deleted ?
+    } else {
+      esp3d_log("Spinner displayed on current screen");
       lv_obj_del(spinnerObj);
-      spinnerObj = NULL;
-    } catch (...) {
-      esp3d_log_e("Error deleting spinner");
     }
+    spinnerObj = NULL;
+    screen_displaying_spinner = NULL;
     spinner_index--;
     esp3d_log("Spinner index is %d", spinner_index);
   } else {
