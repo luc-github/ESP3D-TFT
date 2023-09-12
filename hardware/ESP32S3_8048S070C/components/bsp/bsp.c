@@ -94,12 +94,6 @@ esp_err_t bsp_init(void) {
   ESP_ERROR_CHECK(esp_lcd_panel_mirror(disp_panel, true, true));
 #endif //DISP_ORIENTATION  
 
-  esp3d_log("Register VSync event callback");
-  esp_lcd_rgb_panel_event_callbacks_t cbs = {
-      .on_vsync = disp_on_vsync_event,
-  };
-  ESP_ERROR_CHECK(esp_lcd_rgb_panel_register_event_callbacks(disp_panel, &cbs, &disp_drv));
-
 #if DISP_AVOID_TEAR_EFFECT_WITH_SEM
   esp3d_log("Create semaphores");
   _sem_vsync_end = xSemaphoreCreateBinary();
@@ -113,6 +107,12 @@ esp_err_t bsp_init(void) {
     return ESP_FAIL;
   }
 #endif  // DISP_AVOID_TEAR_EFFECT_WITH_SEM
+
+  esp3d_log("Register VSync event callback");
+  esp_lcd_rgb_panel_event_callbacks_t cbs = {
+      .on_vsync = disp_on_vsync_event,
+  };
+  ESP_ERROR_CHECK(esp_lcd_rgb_panel_register_event_callbacks(disp_panel, &cbs, &disp_drv));
 
   /* i2c controller initialization */
   esp3d_log("Initializing i2C controller...");
