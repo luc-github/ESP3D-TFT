@@ -234,8 +234,10 @@ static void lv_touch_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
   static uint16_t last_x, last_y;
   gt911_data_t touch_data = gt911_read(); 
   if (touch_data.is_pressed) {
-    last_x = touch_data.x;
-    last_y = touch_data.y;
+    // Touch seems to have a resolution of 480x272 for some reason.
+    // So, we need to map the touch coords to the display coords.
+    last_x = touch_data.x * DISP_HOR_RES_MAX / gt911_x_max;
+    last_y = touch_data.y * DISP_VER_RES_MAX / gt911_y_max;
     esp3d_log("Touch x=%d, y=%d", last_x, last_y);
   }
   data->point.x = last_x;

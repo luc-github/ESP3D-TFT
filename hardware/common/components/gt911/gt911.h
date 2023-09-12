@@ -51,6 +51,9 @@ typedef struct {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+extern uint16_t gt911_x_max;
+extern uint16_t gt911_y_max;
+
 esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config);
 gt911_data_t gt911_read();
 

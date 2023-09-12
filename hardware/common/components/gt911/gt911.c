@@ -54,8 +54,6 @@ static gt911_touch_detect_t gt911_is_touch_detected();
  **********************/
 static i2c_bus_device_handle_t _i2c_dev = NULL;
 static const gt911_config_t *_config = NULL;
-static uint16_t x_max;
-static uint16_t y_max;
 
 static volatile bool _gt911_INT = false;
 static void IRAM_ATTR gt911_interrupt_handler(void *args) {
@@ -69,6 +67,9 @@ static void IRAM_ATTR gt911_interrupt_handler(void *args) {
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
+uint16_t gt911_x_max;
+uint16_t gt911_y_max;
 
 esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config) {
   if (NULL != _i2c_dev || i2c_bus == NULL || config == NULL) {
@@ -160,15 +161,15 @@ esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config) {
   // Read X/Y Limits  
   err = i2c_bus_read_bytes_16(_i2c_dev, GT911_XY_MAX_REG, 4, &buf[0]);
   if (err != ESP_OK) return err;
-  x_max = ((uint16_t)buf[1] << 8) + buf[0];
-  y_max = ((uint16_t)buf[3] << 8) + buf[2];
+  gt911_x_max = ((uint16_t)buf[1] << 8) + buf[0];
+  gt911_y_max = ((uint16_t)buf[3] << 8) + buf[2];
   if (config->swap_xy) {
-    uint16_t swap_tmp = x_max;
-    x_max = y_max;
-    y_max = swap_tmp;
+    uint16_t swap_tmp = gt911_x_max;
+    gt911_x_max = gt911_y_max;
+    gt911_y_max = swap_tmp;
   }
-  esp3d_log("GT911 Limits x=%d, y=%d", x_max, y_max);
-  
+  esp3d_log("GT911 Limits x=%d, y=%d", gt911_x_max, gt911_y_max);
+
   return ESP_OK;
 }
 
@@ -195,10 +196,10 @@ gt911_data_t gt911_read() {
         data.y = swap_tmp;
     }
     if (_config->invert_x) {
-        data.x = x_max - data.x;
+        data.x = gt911_x_max - data.x;
     }
     if (_config->invert_y) {
-        data.y = y_max - data.y;
+        data.y = gt911_y_max - data.y;
     }
     esp3d_log("P(%d,%d)", data.x, data.y);
   }
