@@ -34,10 +34,6 @@
 /*********************
  *      DEFINES
  *********************/
-#if ESP3D_DISPLAY_FEATURE
-#define ESP3D_PATCH_FS_ACCESS_RELEASE 1
-#define ESP3D_PATCH_DELAY_REFRESH 1
-#endif  // ESP3D_DISPLAY_FEATURE
 
 /**********************
  *      TYPEDEFS
