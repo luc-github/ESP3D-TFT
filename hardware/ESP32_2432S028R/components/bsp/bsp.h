@@ -32,6 +32,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#define ESP3D_PATCH_DELAY_REFRESH 1
 
 /**********************
  * GLOBAL PROTOTYPES

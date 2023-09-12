@@ -58,7 +58,8 @@ void wifi_screen_delay_refresh_timer_cb(lv_timer_t *timer) {
 }
 #endif  // ESP3D_PATCH_DELAY_REFRESH
 lv_timer_t *wifi_screen_delay_connecting_timer = nullptr;
-
+ESP3DScreenType wifi_next_screen = ESP3DScreenType::none;
+void wifi_screen_delay_timer_cb(lv_timer_t *timer);
 void wifi_screen_delay_connecting_timer_cb(lv_timer_t *timer) {
   esp3d_log("wifi_screen_delay_connecting_timer_cb");
   if (esp3dTftui.get_current_screen() != ESP3DScreenType::wifi) {
@@ -85,11 +86,11 @@ void wifi_screen_delay_connecting_timer_cb(lv_timer_t *timer) {
       wifi_screen_delay_connecting_timer = NULL;
     }
     spinnerScreen::hide_spinner();
-    wifi_screen();
+    wifi_next_screen = ESP3DScreenType::wifi;
+    wifi_screen_delay_timer =
+        lv_timer_create(wifi_screen_delay_timer_cb, 50, NULL);
   }
 }
-
-ESP3DScreenType wifi_next_screen = ESP3DScreenType::none;
 
 lv_obj_t *btn_no_wifi = nullptr;
 
@@ -134,6 +135,9 @@ void wifi_screen_delay_timer_cb(lv_timer_t *timer) {
       break;
     case ESP3DScreenType::menu:
       menuScreen::menu_screen();
+      break;
+    case ESP3DScreenType::wifi:
+      wifiScreen::wifi_screen();
       break;
     default:
       break;
