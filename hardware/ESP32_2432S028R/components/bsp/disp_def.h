@@ -62,10 +62,14 @@ spi_device_interface_config_t disp_spi_cfg = {
     .input_delay_ns = 0,
 };
 
+#define DISP_BCKL_DEFAULT_DUTY 100  //%
+
 const disp_backlight_config_t disp_bcklt_cfg = {
     .gpio_num = 21, // GPIO 21
     .pwm_control = false,
     .output_invert = false,
+    .timer_idx = 0,
+    .channel_idx = 0
 };
 
 #ifdef __cplusplus

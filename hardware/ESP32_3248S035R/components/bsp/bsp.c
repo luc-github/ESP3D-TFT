@@ -104,7 +104,7 @@ esp_err_t bsp_init(void) {
   xpt2046_cfg.read_reg12_fn = touch_spi_read_reg12;
   ESP_ERROR_CHECK(xpt2046_init(&xpt2046_cfg));
 
-  disp_backlight_set(bcklt_handle, 100);
+  disp_backlight_set(bcklt_handle, DISP_BCKL_DEFAULT_DUTY);
 
   // Lvgl initialization
   esp3d_log("Initializing LVGL...");
