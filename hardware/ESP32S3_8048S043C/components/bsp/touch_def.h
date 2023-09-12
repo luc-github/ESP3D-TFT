@@ -9,10 +9,14 @@ extern "C" {
 
 #include "gt911.h"
 
-gt911_config_t gt911_cfg = {
+const gt911_config_t gt911_cfg = {
     .i2c_clk_speed = 400*1000,
     .rst_pin = 38, // GPIO 38
+#if WITH_GT911_INT
+    .int_pin = 18, // GPIO 18
+#else
     .int_pin = -1, // INT pin not connected (by default)
+#endif
     .swap_xy = false,
     .invert_x = false,
     .invert_y = false,    
