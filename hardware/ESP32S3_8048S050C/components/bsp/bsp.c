@@ -126,7 +126,7 @@ esp_err_t bsp_init(void) {
     has_touch_init = false;
   }
 
-  disp_backlight_set(bcklt_handle, 100);
+  disp_backlight_set(bcklt_handle, DISP_BCKL_DEFAULT_DUTY);
 
   // Lvgl initialization
   esp3d_log("Initializing LVGL...");

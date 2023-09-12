@@ -108,10 +108,14 @@ const esp_lcd_rgb_panel_config_t disp_panel_cfg = {
     }
 };
 
+#define DISP_BCKL_DEFAULT_DUTY 20  //%
+
 const disp_backlight_config_t disp_bcklt_cfg = {
     .gpio_num = 2, // GPIO 2
-    .pwm_control = false,
-    .output_invert = false,
+    .pwm_control = true,
+    .output_invert = true,
+    .timer_idx = 0,
+    .channel_idx = 0
 };
 
 #ifdef __cplusplus
