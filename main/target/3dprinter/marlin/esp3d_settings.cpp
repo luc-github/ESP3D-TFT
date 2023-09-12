@@ -46,13 +46,9 @@
 #include "notifications/esp3d_notifications_service.h"
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 
-#if defined __has_include
-#if __has_include("bsp_patch.h")
-#include "bsp_patch.h"
-#endif  // __has_include("bsp_patch.h")
-#endif  // defined __has_include
-
 #include "authentication/esp3d_authentication.h"
+#include "bsp.h"
+
 
 #define STORAGE_NAME "ESP3D_TFT"
 #define SETTING_VERSION "ESP3D_TFT-V1.0.0"

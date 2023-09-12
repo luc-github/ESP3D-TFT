@@ -23,12 +23,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "bsp.h"
 #include "esp3d_log.h"
-#if defined __has_include
-#if __has_include("bsp_patch.h")
-#include "bsp_patch.h"
-#endif  // __has_include("bsp_patch.h")
-#endif  // defined __has_include
 
 ESP3DFlash flashFs;
 

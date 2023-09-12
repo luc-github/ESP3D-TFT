@@ -23,6 +23,7 @@
 
 #include <lvgl.h>
 
+#include "bsp.h"
 #include "components/back_button_component.h"
 #include "components/main_container_component.h"
 #include "components/message_box_component.h"
@@ -37,13 +38,6 @@
 #include "network/esp3d_network.h"
 #include "translations/esp3d_translation_service.h"
 #include "wifi_screen.h"
-
-
-#if defined __has_include
-#if __has_include("bsp_patch.h")
-#include "bsp_patch.h"
-#endif  // __has_include("bsp_patch.h")
-#endif  // defined __has_include
 
 /**********************
  *  STATIC PROTOTYPES

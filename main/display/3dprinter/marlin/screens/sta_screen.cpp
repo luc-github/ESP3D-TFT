@@ -24,6 +24,7 @@
 
 #include <list>
 
+#include "bsp.h"
 #include "components/back_button_component.h"
 #include "components/list_line_component.h"
 #include "components/main_container_component.h"
@@ -43,13 +44,6 @@
 #include "tasks_def.h"
 #include "translations/esp3d_translation_service.h"
 #include "wifi_screen.h"
-
-
-#if defined __has_include
-#if __has_include("bsp_patch.h")
-#include "bsp_patch.h"
-#endif  // __has_include("bsp_patch.h")
-#endif  // defined __has_include
 
 /**********************
  *  STATIC PROTOTYPES
@@ -583,8 +577,10 @@ void sta_screen() {
   if (ui_sta_ssid_list_ctl)
     lv_obj_add_flag(ui_sta_ssid_list_ctl, LV_OBJ_FLAG_HIDDEN);
   if (status_component) lv_obj_clear_flag(status_component, LV_OBJ_FLAG_HIDDEN);
-  lv_obj_set_style_pad_left(ui_sta_ssid_list_ctl, LIST_CONTAINER_LR_PAD, LV_PART_MAIN);
-  lv_obj_set_style_pad_right(ui_sta_ssid_list_ctl, LIST_CONTAINER_LR_PAD, LV_PART_MAIN);
+  lv_obj_set_style_pad_left(ui_sta_ssid_list_ctl, LIST_CONTAINER_LR_PAD,
+                            LV_PART_MAIN);
+  lv_obj_set_style_pad_right(ui_sta_ssid_list_ctl, LIST_CONTAINER_LR_PAD,
+                             LV_PART_MAIN);
 
   update_button_ok();
   update_button_save();
