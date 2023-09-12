@@ -85,33 +85,33 @@ esp_err_t bsp_init(void) {
   /* Display panel initialization */
   esp3d_log("Initializing display...");
   ESP_ERROR_CHECK(esp_lcd_new_panel_st7796(disp_io_handle, &disp_panel_cfg, &disp_panel));
-  esp_lcd_panel_reset(disp_panel);
-  esp_lcd_panel_init(disp_panel);
-  //esp_lcd_panel_invert_color(disp_panel, true);
+  ESP_ERROR_CHECK(esp_lcd_panel_reset(disp_panel));
+  ESP_ERROR_CHECK(esp_lcd_panel_init(disp_panel));
+  //ESP_ERROR_CHECK(esp_lcd_panel_invert_color(disp_panel, true));
 #if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
-  esp_lcd_panel_swap_xy(disp_panel, true);
+  ESP_ERROR_CHECK(esp_lcd_panel_swap_xy(disp_panel, true));
 #endif //DISP_ORIENTATION
 #if DISP_ORIENTATION == 1 || DISP_ORIENTATION == 3  // mirrored
-  esp_lcd_panel_mirror(disp_panel, true, true);
+  ESP_ERROR_CHECK(esp_lcd_panel_mirror(disp_panel, true, true));
 #endif //DISP_ORIENTATION
 
   /* i2c controller initialization */
   esp3d_log("Initializing i2C controller...");
   i2c_bus_handle = i2c_bus_create(I2C_PORT_NUMBER, &i2c_cfg);
   if (i2c_bus_handle == NULL) {
-    esp3d_log_e("I2C bus failed to be initialized.");
+    esp3d_log_e("I2C bus initialization failed!");
     return ESP_FAIL;
   }
 
   /* Touch controller initialization */
   esp3d_log("Initializing touch controller...");
-  gt911_cfg.i2c_bus = i2c_bus_handle;
-#if WITH_GT911_INT
-  gt911_cfg.int_pin = 21; // GPIO 21
-#endif
-  ESP_ERROR_CHECK(gt911_init(&gt911_cfg));
+  bool has_touch_init = true;
+  if (gt911_init(i2c_bus_handle, &gt911_cfg) != ESP_OK) {
+    esp3d_log_e("Touch controller initialization failed!");
+    has_touch_init = false;
+  }
 
-  disp_backlight_set(bcklt_handle, 100);
+  disp_backlight_set(bcklt_handle, DISP_BCKL_DEFAULT_DUTY);
 
   // Lvgl initialization
   esp3d_log("Initializing LVGL...");
@@ -143,12 +143,14 @@ esp_err_t bsp_init(void) {
   disp_drv.ver_res = DISP_VER_RES_MAX;
   lv_disp_drv_register(&disp_drv);
 
-  /* Register the touch input device */
-  static lv_indev_drv_t indev_drv;
-  lv_indev_drv_init(&indev_drv);
-  indev_drv.type = LV_INDEV_TYPE_POINTER;
-  indev_drv.read_cb = lv_touch_read;
-  lv_indev_drv_register(&indev_drv);
+  if (has_touch_init) {
+    /* Register the touch input device */
+    static lv_indev_drv_t indev_drv;
+    lv_indev_drv_init(&indev_drv);
+    indev_drv.type = LV_INDEV_TYPE_POINTER;
+    indev_drv.read_cb = lv_touch_read;
+    lv_indev_drv_register(&indev_drv);
+  }
 #endif // ESP3D_DISPLAY_FEATURE
   return ESP_OK;
 }

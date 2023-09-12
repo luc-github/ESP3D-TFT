@@ -29,6 +29,8 @@ LANDSCAPE_INVERTED      3
 #define DISP_VER_RES_MAX 320
 #endif
 
+#define DISP_USE_DOUBLE_BUFFER (true)
+
 #if WITH_PSRAM
   // 1/10 (24-line) buffer (15KB) in external PSRAM
   #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * DISP_VER_RES_MAX / 10)
@@ -38,8 +40,6 @@ LANDSCAPE_INVERTED      3
   #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * 10)
   #define DISP_BUF_MALLOC_TYPE  MALLOC_CAP_DMA
 #endif  // WITH_PSRAM
-
-#define DISP_USE_DOUBLE_BUFFER 1
 #define DISP_BUF_SIZE_BYTES    (DISP_BUF_SIZE * 2)
 
 ili9341_config_t ili9341_cfg = {
@@ -62,10 +62,14 @@ spi_device_interface_config_t disp_spi_cfg = {
     .input_delay_ns = 0,
 };
 
+#define DISP_BCKL_DEFAULT_DUTY 100  //%
+
 const disp_backlight_config_t disp_bcklt_cfg = {
     .gpio_num = 21, // GPIO 21
     .pwm_control = false,
     .output_invert = false,
+    .timer_idx = 0,
+    .channel_idx = 0
 };
 
 #ifdef __cplusplus

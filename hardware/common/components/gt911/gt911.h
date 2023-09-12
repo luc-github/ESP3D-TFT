@@ -34,8 +34,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 typedef struct {
-  i2c_bus_handle_t i2c_bus;
-  uint8_t i2c_addr;
   uint32_t i2c_clk_speed;
   int8_t rst_pin;
   int8_t int_pin;
@@ -53,7 +51,10 @@ typedef struct {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-esp_err_t gt911_init(const gt911_config_t *config);
+extern uint16_t gt911_x_max;
+extern uint16_t gt911_y_max;
+
+esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config);
 gt911_data_t gt911_read();
 
 #ifdef __cplusplus

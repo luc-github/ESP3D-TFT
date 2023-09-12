@@ -88,13 +88,13 @@ esp_err_t bsp_init(void) {
   xpt2046_cfg.read_reg12_fn = touch_spi_read_reg12;
   ESP_ERROR_CHECK(xpt2046_init(&xpt2046_cfg));
 
-  disp_backlight_set(bcklt_handle, 100);
+  disp_backlight_set(bcklt_handle, DISP_BCKL_DEFAULT_DUTY);
 
   // Lvgl initialization
   esp3d_log("Initializing LVGL...");
   lv_init();
   
-  /* Initialize the working buffer(s) depending on the selected display.*/
+  /* Initialize the working buffer(s) depending on the selected display. */
   static lv_disp_draw_buf_t draw_buf;
   esp3d_log("Display buffer size: %1.2f KB", DISP_BUF_SIZE_BYTES / 1024.0);
   lv_color_t *buf1 = (lv_color_t *)heap_caps_malloc(DISP_BUF_SIZE_BYTES, DISP_BUF_MALLOC_TYPE);

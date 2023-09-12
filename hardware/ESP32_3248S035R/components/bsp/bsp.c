@@ -89,14 +89,14 @@ esp_err_t bsp_init(void) {
   /* Display panel initialization */
   esp3d_log("Initializing display...");
   ESP_ERROR_CHECK(esp_lcd_new_panel_st7796(disp_io_handle, &disp_panel_cfg, &disp_panel));
-  esp_lcd_panel_reset(disp_panel);
-  esp_lcd_panel_init(disp_panel);
-  //esp_lcd_panel_invert_color(disp_panel, true);
+  ESP_ERROR_CHECK(esp_lcd_panel_reset(disp_panel));
+  ESP_ERROR_CHECK(esp_lcd_panel_init(disp_panel));
+  //ESP_ERROR_CHECK(esp_lcd_panel_invert_color(disp_panel, true));
 #if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
-  esp_lcd_panel_swap_xy(disp_panel, true);
+  ESP_ERROR_CHECK(esp_lcd_panel_swap_xy(disp_panel, true));
 #endif //DISP_ORIENTATION
 #if DISP_ORIENTATION == 1 || DISP_ORIENTATION == 3  // mirrored
-  esp_lcd_panel_mirror(disp_panel, true, true);
+  ESP_ERROR_CHECK(esp_lcd_panel_mirror(disp_panel, true, true));
 #endif //DISP_ORIENTATION
 
   /* Touch controller initialization */
@@ -104,13 +104,13 @@ esp_err_t bsp_init(void) {
   xpt2046_cfg.read_reg12_fn = touch_spi_read_reg12;
   ESP_ERROR_CHECK(xpt2046_init(&xpt2046_cfg));
 
-  disp_backlight_set(bcklt_handle, 100);
+  disp_backlight_set(bcklt_handle, DISP_BCKL_DEFAULT_DUTY);
 
   // Lvgl initialization
   esp3d_log("Initializing LVGL...");
   lv_init();
 
-  /* Initialize the working buffer(s) depending on the selected display.*/
+  /* Initialize the working buffer(s) depending on the selected display. */
   static lv_disp_draw_buf_t draw_buf;
   esp3d_log("Display buffer size: %1.2f KB", DISP_BUF_SIZE_BYTES / 1024.0);
   lv_color_t *buf1 = (lv_color_t *)heap_caps_malloc(DISP_BUF_SIZE_BYTES, DISP_BUF_MALLOC_TYPE);

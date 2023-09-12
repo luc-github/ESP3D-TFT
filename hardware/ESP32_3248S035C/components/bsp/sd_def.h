@@ -18,7 +18,7 @@ extern "C" {
 
 // #define ESP3D_SD_DETECT_PIN (-1) //GPIO -1
 // #define ESP3D_SD_DETECT_VALUE (0) //LOW
-#define MAX_TRANSFER_SZ (4000)
+#define MAX_TRANSFER_SZ (4096)
 
 #define SPI_ALLOCATION_SIZE (4 * 1024)
 //(range 400kHz - 20MHz for SDSPI, less for other devices)

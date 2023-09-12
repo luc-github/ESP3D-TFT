@@ -155,16 +155,38 @@ static esp_err_t panel_st7796_init(esp_lcd_panel_t *panel)
 {
     st7796_panel_t *st7796 = __containerof(panel, st7796_panel_t, base);
     esp_lcd_panel_io_handle_t io = st7796->io;
+
     // LCD goes into sleep mode and display will be turned off after power on reset, exit sleep mode first
     esp_lcd_panel_io_tx_param(io, LCD_CMD_SLPOUT, NULL, 0);
     vTaskDelay(pdMS_TO_TICKS(100));
+    
+    // Memory Data Access Control
     esp_lcd_panel_io_tx_param(io, LCD_CMD_MADCTL, (uint8_t[]) {
         st7796->madctl_val,
     }, 1);
+    // Interface Pixel Format
     esp_lcd_panel_io_tx_param(io, LCD_CMD_COLMOD, (uint8_t[]) {
         st7796->colmod_cal,
     }, 1);
-    // turn on display
+
+    // Command Set Control - Enable Extension Command 2 part I
+    esp_lcd_panel_io_tx_param(io, 0xF0, (uint8_t[]){0xC3}, 1);
+    
+    // Positive Gamma Control
+    esp_lcd_panel_io_tx_param(io, 0xE0, (uint8_t[]) {
+        0xF0, 0x09, 0x0B, 0x06, 0x04, 0x15, 0x2F,
+        0x54, 0x42, 0x3C, 0x17, 0x14, 0x18, 0x1B
+    }, 14);
+    // Negative Gamma Control
+    esp_lcd_panel_io_tx_param(io, 0xE1, (uint8_t[]) {
+        0xE0, 0x09, 0x0B, 0x06, 0x04, 0x03, 0x2B,
+        0x43, 0x42, 0x3B, 0x16, 0x14, 0x17, 0x1B
+    }, 14);
+    
+    // Command Set Control - Disable Extension Command 2 part I
+    esp_lcd_panel_io_tx_param(io, 0xF0, (uint8_t[]){0x3C}, 1);
+
+    // Turn on display
     esp_lcd_panel_io_tx_param(io, LCD_CMD_DISPON, NULL, 0);
 
     return ESP_OK;
