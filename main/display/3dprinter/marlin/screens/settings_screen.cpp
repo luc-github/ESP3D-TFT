@@ -656,6 +656,9 @@ void settings_screen() {
     } else {
       esp3d_log_e("Failed to get setting description");
     }
+    if (ui_language == "default") {
+      ui_language = "English";
+    }
     language_label =
         listLine::add_label_to_line(ui_language.c_str(), line_container, true);
     lv_obj_t *btnEdit =
