@@ -100,18 +100,19 @@ void informations_screen() {
   lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_informations_back_handler,
                       LV_EVENT_CLICKED, NULL);
-  lv_obj_t *ui_main_container = mainContainer::create_main_container(
-      ui_new_screen, btnback, ESP3DStyleType::col_container);
-  lv_obj_set_style_flex_flow(ui_main_container, LV_FLEX_FLOW_ROW,
+  lv_obj_update_layout(btnback);
+  lv_obj_set_style_flex_flow(ui_new_screen, LV_FLEX_FLOW_ROW,
                              LV_FLEX_ALIGN_SPACE_EVENLY);
-  lv_obj_t *ui_info_list_ctl = lv_list_create(ui_main_container);
+  lv_obj_t *ui_info_list_ctl = lv_list_create(ui_new_screen);
   apply_style(ui_info_list_ctl, ESP3DStyleType::status_list);
 
-  lv_obj_update_layout(ui_main_container);
-  lv_obj_set_size(ui_info_list_ctl,
-                  LV_HOR_RES - CURRENT_BUTTON_PRESSED_OUTLINE * 2,
-                  lv_obj_get_height(ui_main_container) -
-                      CURRENT_BUTTON_PRESSED_OUTLINE * 2);
+  lv_obj_update_layout(ui_new_screen);
+  lv_obj_set_pos(ui_info_list_ctl, CURRENT_BUTTON_PRESSED_OUTLINE,
+                 CURRENT_BUTTON_PRESSED_OUTLINE);
+  lv_obj_set_size(
+      ui_info_list_ctl, LV_HOR_RES - CURRENT_BUTTON_PRESSED_OUTLINE * 2,
+      lv_obj_get_height(ui_new_screen) - (CURRENT_BUTTON_PRESSED_OUTLINE * 3) -
+          lv_obj_get_height(btnback));
   lv_obj_set_style_radius(ui_info_list_ctl, CURRENT_CONTAINER_RADIUS, 0);
   lv_obj_set_style_pad_left(ui_info_list_ctl, LIST_CONTAINER_LR_PAD,
                             LV_PART_MAIN);
