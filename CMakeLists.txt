@@ -2,7 +2,7 @@
 # Select the targeted hardware
 # #######################################
 
-
+# With TFT:
 OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" ON)
 OPTION(ESP32_ROTRICS_DEXARM35 "TFT TARGET is ESP32 Rotrics DexArm 3.5inches" OFF)
 OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-SRC-4832 3.5inches" OFF)
@@ -11,17 +11,14 @@ OPTION(ESP32S3_8048S070C "TFT TARGET is ESP32S3_8048S070C - 7.0in. 800x480 (Capa
 OPTION(ESP32S3_8048S050C "TFT TARGET is ESP32S3_8048S050C - 5.0in. 800x480 (Capacitive)" OFF)
 OPTION(ESP32S3_8048S043C "TFT TARGET is ESP32S3_8048S043C - 4.3in. 800x480 (Capacitive)" OFF)
 OPTION(ESP32S3_4827S043C "TFT TARGET is ESP32S3_4827S043C - 4.3in. 480x272 (Capacitive)" OFF)
-
-OPTION(ESP32S3_FREENOVE_1_1 "HARDWARE TARGET is ESP32S3 Freenove v1.1" OFF)
-OPTION(ESP32S3_CUSTOM "HARDWARE TARGET is ESP32S3 custom board" OFF)
-OPTION(ESP32_CUSTOM "HARDWARE TARGET is ESP32 custom board" OFF)
-
-# WARNING:
-#   Limited help or support available for these targets.
-#   PSRAM hardware mod is REQUIRED for full functionality and performance.
 OPTION(ESP32_3248S035C "TFT TARGET is ESP32_3248S035C - 3.5in. 480x320 (Capacitive)" OFF)
 OPTION(ESP32_3248S035R "TFT TARGET is ESP32_3248S035R - 3.5in. 480x320 (Resistive)" OFF)
 OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R - 2.8in. 320x240 (Resistive)" OFF)
+
+# Without TFT:
+OPTION(ESP32S3_FREENOVE_1_1 "HARDWARE TARGET is ESP32S3 Freenove v1.1" OFF)
+OPTION(ESP32S3_CUSTOM "HARDWARE TARGET is ESP32S3 custom board" OFF)
+OPTION(ESP32_CUSTOM "HARDWARE TARGET is ESP32 custom board" OFF)
 
 
 # #######################################
@@ -172,11 +169,6 @@ if(ESP32_3248S035C OR ESP32_3248S035R OR ESP32_2432S028R)
         else()
             set(SDKCONFIG hardware/common/sdkconfig/ESP32/with_PSRAM/4MB_Flash)
         endif()
-    else()        
-        message(DEPRECATION
-            "\n"
-            "Target is missing PSRAM and is not officially supported due to known performance and functionality issues."
-            "\n")
     endif()
 endif()
 
