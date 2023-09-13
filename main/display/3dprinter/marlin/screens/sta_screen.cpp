@@ -348,10 +348,11 @@ void sta_ta_event_cb(lv_event_t *e) {
   lv_event_code_t code = lv_event_get_code(e);
   lv_obj_t *ta = lv_event_get_target(e);
   lv_obj_t *kb = (lv_obj_t *)lv_event_get_user_data(e);
-  if (code == LV_EVENT_FOCUSED) {
+  if (code == LV_EVENT_FOCUSED || code == LV_EVENT_CLICKED) {
     lv_obj_add_flag(btn_scan, LV_OBJ_FLAG_HIDDEN);
     lv_keyboard_set_textarea(kb, ta);
     lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_state(ta, LV_STATE_FOCUSED);
     lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_AUTO);
     if (ta == sta_ta_password) {
       lv_textarea_set_password_mode(ta, false);
@@ -366,10 +367,11 @@ void sta_ta_event_cb(lv_event_t *e) {
     update_button_save();
   }
 
-  else if (code == LV_EVENT_DEFOCUSED) {
+  else if (code == LV_EVENT_DEFOCUSED || code == LV_EVENT_CANCEL) {
     lv_obj_clear_flag(btn_scan, LV_OBJ_FLAG_HIDDEN);
     lv_textarea_set_cursor_pos(ta, 0);
     lv_obj_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_clear_state(ta, LV_STATE_FOCUSED);
     lv_keyboard_set_textarea(kb, NULL);
     lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
     if (ta == sta_ta_password) {
@@ -377,7 +379,8 @@ void sta_ta_event_cb(lv_event_t *e) {
     }
     update_button_ok();
     update_button_save();
-  } else if (code == LV_EVENT_READY || code == LV_EVENT_DEFOCUSED) {
+  } else if (code == LV_EVENT_READY) {
+    lv_obj_clear_state(ta, LV_STATE_FOCUSED);
     if (ta == sta_ta_ssid) {
       ssid_current = lv_textarea_get_text(ta);
       esp3d_log("Ready, SSID: %s", lv_textarea_get_text(ta));
@@ -461,22 +464,21 @@ void sta_screen() {
   lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_sta_back_handler, LV_EVENT_CLICKED,
                       NULL);
-  lv_obj_t *ui_main_container = mainContainer::create_main_container(
-      ui_new_screen, btnback, ESP3DStyleType::simple_container);
-  lv_obj_add_event_cb(ui_main_container, event_bg_touched_cb, LV_EVENT_CLICKED,
+  lv_obj_add_event_cb(ui_new_screen, event_bg_touched_cb, LV_EVENT_CLICKED,
                       NULL);
   // SSID
-  lv_obj_t *label_ssid = lv_label_create(ui_main_container);
+  lv_obj_t *label_ssid = lv_label_create(ui_new_screen);
   lv_label_set_text(label_ssid, LV_SYMBOL_ACCESS_POINT);
   apply_style(label_ssid, ESP3DStyleType::bg_label);
   lv_obj_update_layout(label_ssid);
   int width_label = lv_obj_get_width(label_ssid);
   esp3d_log("width_label %d", lv_obj_get_width(label_ssid));
-  sta_ta_ssid = lv_textarea_create(ui_main_container);
+  sta_ta_ssid = lv_textarea_create(ui_new_screen);
   lv_textarea_set_one_line(sta_ta_ssid, true);
   lv_textarea_set_max_length(sta_ta_ssid, 32);
   lv_obj_align(sta_ta_ssid, LV_ALIGN_TOP_LEFT,
-               width_label + (CURRENT_BUTTON_PRESSED_OUTLINE * 2), 0);
+               width_label + (CURRENT_BUTTON_PRESSED_OUTLINE * 3),
+               CURRENT_BUTTON_PRESSED_OUTLINE);
   lv_obj_set_width(sta_ta_ssid, (LV_HOR_RES / 2));
   lv_obj_align_to(label_ssid, sta_ta_ssid, LV_ALIGN_OUT_LEFT_MID,
                   -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
@@ -494,11 +496,11 @@ void sta_screen() {
   }
 
   // Password
-  lv_obj_t *label_pwd = lv_label_create(ui_main_container);
+  lv_obj_t *label_pwd = lv_label_create(ui_new_screen);
   lv_label_set_text(label_pwd, LV_SYMBOL_UNLOCK);
   apply_style(label_pwd, ESP3DStyleType::bg_label);
 
-  sta_ta_password = lv_textarea_create(ui_main_container);
+  sta_ta_password = lv_textarea_create(ui_new_screen);
   lv_textarea_set_password_mode(sta_ta_password, false);
   lv_textarea_set_password_bullet(sta_ta_password, "•");
   lv_textarea_set_max_length(sta_ta_password, 64);
@@ -534,27 +536,26 @@ void sta_screen() {
   lv_obj_add_event_cb(sta_ta_password, sta_ta_event_cb, LV_EVENT_ALL, kb);
 
   // Create button and label for ok
-  btn_ok = symbolButton::create_symbol_button(ui_main_container, LV_SYMBOL_OK,
-                                              SYMBOL_BUTTON_WIDTH,
-                                              SYMBOL_BUTTON_WIDTH);
+  btn_ok = symbolButton::create_symbol_button(
+      ui_new_screen, LV_SYMBOL_OK, SYMBOL_BUTTON_WIDTH, SYMBOL_BUTTON_WIDTH);
 
   lv_obj_add_event_cb(btn_ok, sta_event_button_ok_handler, LV_EVENT_CLICKED,
                       NULL);
-  lv_obj_align(btn_ok, LV_ALIGN_TOP_RIGHT, 0, CURRENT_BUTTON_PRESSED_OUTLINE);
+  lv_obj_align(btn_ok, LV_ALIGN_TOP_RIGHT, -CURRENT_BUTTON_PRESSED_OUTLINE,
+               CURRENT_BUTTON_PRESSED_OUTLINE);
 
   // Create button and label for ok
   btn_save = symbolButton::create_symbol_button(
-      ui_main_container, LV_SYMBOL_SAVE, SYMBOL_BUTTON_WIDTH,
-      SYMBOL_BUTTON_WIDTH);
+      ui_new_screen, LV_SYMBOL_SAVE, SYMBOL_BUTTON_WIDTH, SYMBOL_BUTTON_WIDTH);
   lv_obj_add_event_cb(btn_save, sta_event_button_save_handler, LV_EVENT_CLICKED,
                       NULL);
 
   lv_obj_align_to(btn_save, btn_ok, LV_ALIGN_OUT_LEFT_MID,
                   -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
 
-  btn_scan = symbolButton::create_symbol_button(
-      ui_main_container, LV_SYMBOL_SEARCH, SYMBOL_BUTTON_WIDTH,
-      SYMBOL_BUTTON_WIDTH);
+  btn_scan = symbolButton::create_symbol_button(ui_new_screen, LV_SYMBOL_SEARCH,
+                                                SYMBOL_BUTTON_WIDTH,
+                                                SYMBOL_BUTTON_WIDTH);
 
   lv_obj_add_event_cb(btn_scan, sta_event_button_scan_handler, LV_EVENT_CLICKED,
                       NULL);
