@@ -178,11 +178,6 @@ if(ESP32_3248S035C OR ESP32_3248S035R OR ESP32_2432S028R)
         else()
             set(SDKCONFIG hardware/common/sdkconfig/ESP32/with_PSRAM/4MB_Flash)
         endif()
-    else()        
-        message(DEPRECATION
-            "\n"
-            "Target is missing PSRAM and is not officially supported due to known performance and functionality issues."
-            "\n")
     endif()
 endif()
 
