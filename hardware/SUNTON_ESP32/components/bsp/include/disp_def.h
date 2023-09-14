@@ -24,50 +24,38 @@ extern "C" {
 #endif
 
 // ---------------- Display SPI device configuration ----------------
-#if TARGET_ESP32_3248S035C || TARGET_ESP32_3248S035R
-  #include "esp_lcd_panel_io.h"
+#include "esp_lcd_panel_io.h"
 
-  esp_lcd_panel_io_spi_config_t disp_spi_cfg = {
-      .dc_gpio_num = 2, // GPIO 2
-      .cs_gpio_num = 15, // GPIO 15
-      .pclk_hz = 40 * 1000 * 1000,
-      .lcd_cmd_bits = 8,
-      .lcd_param_bits = 8,
-      .spi_mode = 0,
-      .trans_queue_depth = 10,
-  };
-#elif TARGET_ESP32_2432S028R
-  #include "disp_spi.h"
-
-  spi_device_interface_config_t disp_spi_cfg = {
-      .clock_speed_hz = 40 * 1000 * 1000,
-      .mode = 0,
-      .spics_io_num = 15, // GPIO 15
-      .input_delay_ns = 0,
-  };
-#endif
+esp_lcd_panel_io_spi_config_t disp_spi_cfg = {
+    .dc_gpio_num = 2, // GPIO 2
+    .cs_gpio_num = 15, // GPIO 15
+    .pclk_hz = 40 * 1000 * 1000,
+    .lcd_cmd_bits = 8,
+    .lcd_param_bits = 8,
+    .spi_mode = 0,
+    .trans_queue_depth = 10,
+};
 
 // ------------------ Display Controller settings ------------------
 #if TARGET_ESP32_3248S035C || TARGET_ESP32_3248S035R
   #define TFT_DISPLAY_CONTROLLER "ST7796"
   #define DISP_ST7796   1
   #include "st7796.h"
-
-  esp_lcd_panel_dev_config_t disp_panel_cfg = {
-      .reset_gpio_num = -1, // st7796 RST not connected to GPIO
-      .color_space = ESP_LCD_COLOR_SPACE_BGR,
-      .bits_per_pixel = 16,
-  };
 #elif TARGET_ESP32_2432S028R
   #define TFT_DISPLAY_CONTROLLER "ILI9341"
   #define DISP_ILI9341  1
   #include "ili9341.h"
-
-  ili9341_config_t ili9341_cfg = {
-      .rst_pin = 4, // GPIO 4
-      .dc_pin = 2, // GPIO 2
-  };
 #endif
+
+esp_lcd_panel_dev_config_t disp_panel_cfg = {
+  #if TARGET_ESP32_3248S035C || TARGET_ESP32_3248S035R
+    .reset_gpio_num = -1, // st7796 RST not connected to GPIO
+  #elif TARGET_ESP32_2432S028R
+    .reset_gpio_num = 4, // GPIO 4
+  #endif
+    .color_space = ESP_LCD_COLOR_SPACE_BGR,
+    .bits_per_pixel = 16,
+};
 
 // --------------- Display Resolution/Buffer settings ---------------
 #include "disp_res_def.h"

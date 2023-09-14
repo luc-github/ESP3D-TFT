@@ -42,11 +42,7 @@
  *  STATIC PROTOTYPES
  **********************/
 #if ESP3D_DISPLAY_FEATURE
-  #if DISP_ST7796
-    static bool disp_flush_ready(esp_lcd_panel_io_handle_t panel_io, esp_lcd_panel_io_event_data_t *edata, void *user_ctx);
-  #elif DISP_ILI9341
-    static void disp_flush_ready();
-  #endif
+  static bool disp_flush_ready(esp_lcd_panel_io_handle_t panel_io, esp_lcd_panel_io_event_data_t *edata, void *user_ctx);
   static void lv_disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
   #if TOUCH_XPT2046
     static uint16_t touch_spi_read_reg12(uint8_t reg);
@@ -59,9 +55,7 @@
  **********************/
 #if ESP3D_DISPLAY_FEATURE
   static lv_disp_drv_t disp_drv;
-  #if DISP_ST7796
-    static esp_lcd_panel_handle_t disp_panel;
-  #endif
+  static esp_lcd_panel_handle_t disp_panel;
   #if TOUCH_GT911
     static i2c_bus_handle_t i2c_bus_handle = NULL;
   #elif TOUCH_XPT2046 && !TOUCH_SW_SPI
@@ -95,14 +89,10 @@ esp_err_t bsp_init(void) {
 #endif
 
 esp3d_log("Attaching display panel to SPI bus...");
-#if DISP_ST7796  
-  esp_lcd_panel_io_handle_t disp_io_handle;
-  disp_spi_cfg.on_color_trans_done = disp_flush_ready;
-  ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi(
-      (esp_lcd_spi_bus_handle_t)DISP_SPI_HOST, &disp_spi_cfg, &disp_io_handle));
-#else
-  disp_spi_add_device(DISP_SPI_HOST, &disp_spi_cfg, disp_flush_ready);
-#endif
+esp_lcd_panel_io_handle_t disp_io_handle;
+disp_spi_cfg.on_color_trans_done = disp_flush_ready;
+ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi(
+    (esp_lcd_spi_bus_handle_t)DISP_SPI_HOST, &disp_spi_cfg, &disp_io_handle));
 
 #if TOUCH_XPT2046
   #if TOUCH_SW_SPI
@@ -118,6 +108,9 @@ esp3d_log("Attaching display panel to SPI bus...");
   esp3d_log("Initializing display...");
 #if DISP_ST7796
   ESP_ERROR_CHECK(esp_lcd_new_panel_st7796(disp_io_handle, &disp_panel_cfg, &disp_panel));
+#elif DISP_ILI9341
+  ESP_ERROR_CHECK(esp_lcd_new_panel_ili9341(disp_io_handle, &disp_panel_cfg, &disp_panel));
+#endif
   ESP_ERROR_CHECK(esp_lcd_panel_reset(disp_panel));
   ESP_ERROR_CHECK(esp_lcd_panel_init(disp_panel));
   //ESP_ERROR_CHECK(esp_lcd_panel_invert_color(disp_panel, true));
@@ -127,10 +120,6 @@ esp3d_log("Attaching display panel to SPI bus...");
   #if DISP_MIRRORED
     ESP_ERROR_CHECK(esp_lcd_panel_mirror(disp_panel, true, true));
   #endif
-#elif DISP_ILI9341
-  ili9341_init(&ili9341_cfg);  
-  ili9341_set_orientation(DISP_ORIENTATION);
-#endif
 
 #if TOUCH_GT911
   /* i2c controller initialization */
@@ -205,23 +194,13 @@ esp3d_log("Attaching display panel to SPI bus...");
  **********************/
 #if ESP3D_DISPLAY_FEATURE
 
-#if DISP_ST7796
-  static bool disp_flush_ready(esp_lcd_panel_io_handle_t panel_io, esp_lcd_panel_io_event_data_t *edata, void *user_ctx) {
-    lv_disp_flush_ready(&disp_drv);
-    return false;
-  }
-#elif DISP_ILI9341
-  static void disp_flush_ready() {
-    lv_disp_flush_ready(&disp_drv);
-  }
-#endif
+static bool disp_flush_ready(esp_lcd_panel_io_handle_t panel_io, esp_lcd_panel_io_event_data_t *edata, void *user_ctx) {
+  lv_disp_flush_ready(&disp_drv);
+  return false;
+}
 
 static void lv_disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p) {
-  #if DISP_ST7796
-    esp_lcd_panel_draw_bitmap(disp_panel, area->x1, area->y1, area->x2 + 1, area->y2 + 1, color_p);
-  #elif DISP_ILI9341
-    ili9341_draw_bitmap(area->x1, area->y1, area->x2 + 1, area->y2 + 1, color_p);  
-  #endif
+  esp_lcd_panel_draw_bitmap(disp_panel, area->x1, area->y1, area->x2 + 1, area->y2 + 1, color_p);
 }
 
 #if TOUCH_XPT2046
