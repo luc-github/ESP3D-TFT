@@ -39,6 +39,9 @@
 #endif  // ESP3D_DISPLAY_FEATURE
 
 #include <stdio.h>
+#if ESP3D_GCODE_HOST_FEATURE
+#include "gcode_host/esp3d_gcode_host_service.h"
+#endif  // ESP3D_GCODE_HOST_FEATURE
 
 #include <string>
 
@@ -46,7 +49,9 @@
 
 ESP3DCommands esp3dCommands;
 
-ESP3DCommands::ESP3DCommands() { _output_client = ESP3DClientType::serial; }
+ESP3DCommands::ESP3DCommands() {
+  _output_client = ESP3DClientType::stream;
+}  //_output_client = ESP3DClientType::serial; }
 ESP3DCommands::~ESP3DCommands() {}
 bool ESP3DCommands::is_esp_command(uint8_t* sbuf, size_t len) {
   if (len < 5) {
@@ -471,6 +476,18 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
       }
       break;
 #endif  // ESP3D_TELNET_FEATURE
+
+#if ESP3D_GCODE_HOST_FEATURE
+    case ESP3DClientType::stream:
+      if (gcodeHostService.started()) {
+        gcodeHostService.process(msg);
+      } else {
+        sendOk = false;
+        esp3d_log_w("gcodeHostService not started for message size  %d",
+                    msg->size);
+      }
+      break;
+#endif  // ESP3D_GCODE_HOST_FEATURE
 #if ESP3D_DISPLAY_FEATURE
     case ESP3DClientType::rendering:
       if (renderingClient.started()) {
@@ -507,43 +524,28 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
 
     case ESP3DClientType::all_clients:
       // msg need to be duplicate for each target
-      // Do not broadcast to printer output
+      // Do not broadcast system messages to printer output
       // printer may receive unwhished messages
-      /* //ESP3DClientType::serial
-       if (msg->origin!=ESP3DClientType::serial) {
-           if (msg->target==ESP3DClientType::all_clients) {
-               //become the reference message
-               msg->target=ESP3DClientType::serial;
-           } else {
-               //duplicate message because current is  already pending
-               ESP3DMessage * copy_msg = ESP3DClient::copyMsg(*msg);
-               if (copy_msg) {
-                   copy_msg->target = ESP3DClientType::serial;
-                   dispatch(copy_msg);
-               } else {
-                   esp3d_log_e("Cannot duplicate message for Serial");
-               }
-           }
-       }*/
-      /*
-      #if ESP3D_USB_SERIAL_FEATURE
-      //ESP3DClientType::usb_serial
-      if (msg->origin!=ESP3DClientType::usb_serial) {
-          if (msg->target==ESP3DClientType::all_clients) {
-              //become the reference message
-              msg->target=ESP3DClientType::usb_serial;
+#if ESP3D_GCODE_HOST_FEATURE
+      // ESP3DClientType::serial
+      if (msg->origin != ESP3DClientType::stream &&
+          msg->origin != ESP3DClientType::system) {
+        if (msg->target == ESP3DClientType::all_clients) {
+          // become the reference message
+          msg->target = ESP3DClientType::stream;
+        } else {
+          // duplicate message because current is already pending
+          ESP3DMessage* copy_msg =
+              gcodeHostService.copyMsg(*msg);  // ESP3DClient::copyMsg(*msg);
+          if (copy_msg) {
+            copy_msg->target = ESP3DClientType::stream;
+            dispatch(copy_msg);
           } else {
-              //duplicate message because current is  already pending
-              ESP3DMessage * copy_msg = ESP3DClient::copyMsg(*msg);
-              if (copy_msg) {
-                  copy_msg->target = ESP3DClientType::usb_serial;
-                  dispatch(copy_msg);
-              } else {
-                  esp3d_log_e("Cannot duplicate message for USB Serial");
-              }
+            esp3d_log_e("Cannot duplicate message for stream");
           }
+        }
       }
-      #endif //#if ESP3D_USB_SERIAL_FEATURE*/
+#endif
 #if ESP3D_HTTP_FEATURE
       // ESP3DClientType::webui_websocket
       if (msg->origin != ESP3DClientType::webui_websocket) {
@@ -696,15 +698,15 @@ bool ESP3DCommands::hasTag(ESP3DMessage* msg, uint start, const char* label) {
 }
 
 const char* ESP3DCommands::get_param(ESP3DMessage* msg, uint start,
-                                     const char* label) {
+                                     const char* label, bool* found) {
   if (!msg) {
     return "";
   }
-  return get_param((const char*)msg->data, msg->size, start, label);
+  return get_param((const char*)msg->data, msg->size, start, label, found);
 }
 
 const char* ESP3DCommands::get_param(const char* data, uint size, uint start,
-                                     const char* label) {
+                                     const char* label, bool* found) {
   int startPos = -1;
   uint lenLabel = strlen(label);
   static std::string value;
@@ -712,6 +714,9 @@ const char* ESP3DCommands::get_param(const char* data, uint size, uint start,
   bool prevCharIsspace = true;
   value.clear();
   uint startp = start;
+  if (found) {
+    *found = false;
+  }
   while (char(data[startp]) == ' ' && startp < size) {
     startp++;
   }
@@ -728,6 +733,9 @@ const char* ESP3DCommands::get_param(const char* data, uint size, uint start,
       }
       if (p == lenLabel) {
         startPos = i;
+        if (found) {
+          *found = true;
+        }
       }
     }
     if (std::isspace(c) && !prevCharIsEscaped) {
@@ -768,7 +776,8 @@ const char* ESP3DCommands::get_clean_param(ESP3DMessage* msg, uint start) {
     }
     if (std::isspace(c) && !prevCharIsEscaped) {
       // esp3d_log("testing *%s*", value.c_str());
-      if (value == "json" || esp3d_string::startsWith(value.c_str(), "json=") ||
+      if (value == "json" ||
+          esp3d_string::startsWith(value.c_str(), "json=") ||
           esp3d_string::startsWith(value.c_str(), "pwd=")) {
         value.clear();
       } else {
@@ -972,6 +981,9 @@ void ESP3DCommands::execute_internal_command(int cmd, int cmd_params_pos,
       break;
     case 701:
       ESP701(cmd_params_pos, msg);
+      break;
+    case 702:
+      ESP702(cmd_params_pos, msg);
       break;
 #endif  // ESP3D_GCODE_HOST_FEATURE
     case 710:

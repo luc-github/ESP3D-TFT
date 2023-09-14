@@ -28,6 +28,7 @@
 #if ESP3D_SD_CARD_FEATURE
 #include "filesystem/esp3d_sd.h"
 #endif  // ESP3D_SD_CARD_FEATURE
+#include "gcode_host/esp3d_gcode_host_service.h"
 #include "gcode_host/esp3d_tft_stream.h"
 #include "notifications/esp3d_notifications_service.h"
 #include "translations/esp3d_translation_service.h"
@@ -207,8 +208,14 @@ void ESP3DCommands::ESP401(int cmd_params_pos, ESP3DMessage* msg) {
           break;
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 #if ESP3D_GCODE_HOST_FEATURE
+        case ESP3DSettingIndex::esp3d_pause_script:
+        case ESP3DSettingIndex::esp3d_stop_script:
+        case ESP3DSettingIndex::esp3d_resume_script:
+          gcodeHostService.updateScripts();
+          break;
         case ESP3DSettingIndex::esp3d_target_firmware:
           esp3dTftstream.getTargetFirmware(true);
+
           break;
 #endif  // ESP3D_GCODE_HOST_FEATURE
         default:

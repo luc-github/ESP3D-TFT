@@ -404,7 +404,29 @@ void ESP3DCommands::ESP400(int cmd_params_pos, ESP3DMessage* msg) {
     esp3d_log_e("Error sending response to clients");
   }
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
-
+#if ESP3D_GCODE_HOST_FEATURE
+  // Gcode host pause script
+  if (!dispatchSetting(json, "service/gcodehost",
+                       ESP3DSettingIndex::esp3d_pause_script, "pause_script",
+                       nullptr, nullptr, SIZE_OF_SCRIPT, 0, 0, -1, nullptr,
+                       false, target, requestId)) {
+    esp3d_log_e("Error sending response to clients");
+  }
+  // Gcode host resume script
+  if (!dispatchSetting(json, "service/gcodehost",
+                       ESP3DSettingIndex::esp3d_resume_script, "resume_script",
+                       nullptr, nullptr, SIZE_OF_SCRIPT, 0, 0, -1, nullptr,
+                       false, target, requestId)) {
+    esp3d_log_e("Error sending response to clients");
+  }
+  // Gcode host stop script
+  if (!dispatchSetting(json, "service/gcodehost",
+                       ESP3DSettingIndex::esp3d_stop_script, "stop_script",
+                       nullptr, nullptr, SIZE_OF_SCRIPT, 0, 0, -1, nullptr,
+                       false, target, requestId)) {
+    esp3d_log_e("Error sending response to clients");
+  }
+#endif  // ESP3D_GCODE_HOST_FEATURE
 #if ESP3D_SD_CARD_FEATURE
 #if ESP3D_SD_IS_SPI
   // SPI Divider factor

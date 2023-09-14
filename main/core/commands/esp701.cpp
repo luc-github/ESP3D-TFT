@@ -49,7 +49,7 @@ void ESP3DCommands::ESP701(int cmd_params_pos, ESP3DMessage* msg) {
   ESP3DGcodeHostState status = gcodeHostService.getState();
   ESP3DGcodeHostError errorNum = gcodeHostService.getErrorNum();
   if (tmpstr.length() == 0) {
-    if (status == ESP3DGcodeHostState::no_stream) {
+    if (status == ESP3DGcodeHostState::idle) {
       if (json) {
         ok_msg = "{\"status\":\"no stream\"";
         if (errorNum != ESP3DGcodeHostError::no_error) {
@@ -66,7 +66,14 @@ void ESP3DCommands::ESP701(int cmd_params_pos, ESP3DMessage* msg) {
         }
       }
     } else {
-      ESP3DScript* script = gcodeHostService.getCurrentScript();
+      ESP3DGcodeStream* script = gcodeHostService.getCurrentStream(); //Passing pointers between threads seems like a bad idea
+      /*What info do we need?
+      1. Stream ID - filepath
+      2. Nothing else really?*/
+
+
+
+
       if (script) {
         if (status == ESP3DGcodeHostState::paused) {
           if (json) {
@@ -83,15 +90,15 @@ void ESP3DCommands::ESP701(int cmd_params_pos, ESP3DMessage* msg) {
         }
         if (json) {
           ok_msg += ",\"total\":\"";
-          ok_msg += std::to_string(script->total);
+          ok_msg += std::to_string(script->totalSize);
           ok_msg += "\",\"processed\":\"";
-          ok_msg += std::to_string(script->progress);
+          ok_msg += std::to_string(script->processedSize);
           ok_msg += "\",\"type\":\"";
           ok_msg += std::to_string(static_cast<uint8_t>(script->type));
-          if (script->type == ESP3DGcodeHostScriptType::sd_card ||
-              script->type == ESP3DGcodeHostScriptType::filesystem) {
+          if (script->type == ESP3DGcodeHostFileType::sd_card ||
+              script->type == ESP3DGcodeHostFileType::filesystem) {
             ok_msg += "\",\"name\":\"";
-            ok_msg += script->script;
+            ok_msg += (char*)((((ESP3DGcodeFileStream*)script)->_fileName));
             ok_msg += "\"";
           }
           ok_msg += "\"}";
