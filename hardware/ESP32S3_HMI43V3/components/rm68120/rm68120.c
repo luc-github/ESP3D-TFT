@@ -11,13 +11,15 @@
 #include <stdlib.h>
 #include <sys/cdefs.h>
 
-#include "disp_def.h"
 #include "driver/gpio.h"
 #include "esp3d_log.h"
 #include "esp_check.h"
+#include "esp_lcd_panel_commands.h"
+#include "esp_lcd_panel_interface.h"
+#include "esp_lcd_panel_io.h"
+#include "esp_lcd_panel_vendor.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-
 
 /* Define all screen direction */
 typedef enum {
@@ -189,8 +191,8 @@ esp_err_t rm68120_init(lv_disp_drv_t *disp_drv) {
       .on_color_trans_done =
           rm68120_notify_flush_ready,  // Callback invoked when color data
                                        // transfer has finished
-      .user_ctx = disp_drv,  // User private data, passed directly to
-                             // on_color_trans_done’s user_ctx
+      .user_ctx = disp_drv,            // User private data, passed directly to
+                                       // on_color_trans_done’s user_ctx
       .lcd_cmd_bits = DISP_CMD_BITS_WIDTH,
       .lcd_param_bits = DISP_PARAM_BITS_WIDTH,
   };
