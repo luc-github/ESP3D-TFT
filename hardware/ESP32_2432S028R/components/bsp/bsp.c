@@ -42,7 +42,7 @@
  *  STATIC PROTOTYPES
  **********************/
 #if ESP3D_DISPLAY_FEATURE
-static void disp_flush_ready();
+static bool disp_flush_ready(esp_lcd_panel_io_handle_t panel_io, esp_lcd_panel_io_event_data_t *edata, void *user_ctx);
 static void lv_disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 static uint16_t touch_spi_read_reg12(uint8_t reg);
 static void lv_touch_read(lv_indev_drv_t * drv, lv_indev_data_t * data);
@@ -53,6 +53,7 @@ static void lv_touch_read(lv_indev_drv_t * drv, lv_indev_data_t * data);
  **********************/
 #if ESP3D_DISPLAY_FEATURE
 static lv_disp_drv_t disp_drv;
+static esp_lcd_panel_handle_t disp_panel;
 #endif
 
 /**********************
@@ -74,13 +75,24 @@ esp_err_t bsp_init(void) {
   spi_bus_init(DISP_SPI_HOST, -1, DISP_SPI_MOSI, DISP_SPI_CLK,
                DISP_BUF_SIZE_BYTES, 1, -1, -1);
 
-  disp_spi_add_device(DISP_SPI_HOST, &disp_spi_cfg, disp_flush_ready);
-
+  esp3d_log("Attaching display panel to SPI bus...");
+  esp_lcd_panel_io_handle_t disp_io_handle;
+  disp_spi_cfg.on_color_trans_done = disp_flush_ready;  
+  ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi(
+      (esp_lcd_spi_bus_handle_t)DISP_SPI_HOST, &disp_spi_cfg, &disp_io_handle));
+  
   /* Display panel initialization */
   esp3d_log("Initializing display...");
-  ili9341_init(&ili9341_cfg);
-  //ili9341_set_invert_color(true);
-  ili9341_set_orientation(DISP_ORIENTATION);
+  ESP_ERROR_CHECK(esp_lcd_new_panel_ili9341(disp_io_handle, &disp_panel_cfg, &disp_panel));
+  ESP_ERROR_CHECK(esp_lcd_panel_reset(disp_panel));
+  ESP_ERROR_CHECK(esp_lcd_panel_init(disp_panel));
+  //ESP_ERROR_CHECK(esp_lcd_panel_invert_color(disp_panel, true));
+#if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
+  ESP_ERROR_CHECK(esp_lcd_panel_swap_xy(disp_panel, true));
+#endif //DISP_ORIENTATION
+#if DISP_ORIENTATION == 1 || DISP_ORIENTATION == 3  // mirrored
+  ESP_ERROR_CHECK(esp_lcd_panel_mirror(disp_panel, true, true));
+#endif //DISP_ORIENTATION
 
   /* Touch controller initialization */  
   esp3d_log("Initializing touch controller...");
@@ -135,12 +147,13 @@ esp_err_t bsp_init(void) {
  **********************/
 #if ESP3D_DISPLAY_FEATURE
 
-static void disp_flush_ready() {
+static bool disp_flush_ready(esp_lcd_panel_io_handle_t panel_io, esp_lcd_panel_io_event_data_t *edata, void *user_ctx) {
   lv_disp_flush_ready(&disp_drv);
+return false;
 }
 
 static void lv_disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p) {
-  ili9341_draw_bitmap(area->x1, area->y1, area->x2 + 1, area->y2 + 1, color_p);  
+  esp_lcd_panel_draw_bitmap(disp_panel, area->x1, area->y1, area->x2 + 1, area->y2 + 1, color_p);  
 }
 
 static uint16_t touch_spi_read_reg12(uint8_t reg) {

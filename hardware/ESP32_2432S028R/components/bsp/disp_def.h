@@ -8,7 +8,6 @@ extern "C" {
 #define TFT_DISPLAY_CONTROLLER "ILI9341"
 
 #include "spi_bus.h"
-#include "disp_spi.h"
 #include "ili9341.h"
 #include "disp_backlight.h"
 
@@ -36,15 +35,16 @@ LANDSCAPE_INVERTED      3
   #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * DISP_VER_RES_MAX / 10)
   #define DISP_BUF_MALLOC_TYPE  MALLOC_CAP_SPIRAM
 #else
-  // 1/24 (10-line) buffer (6.25KB) in internal DRAM
-  #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * 10)
+  // 1/20 (12-line) buffer (7.5KB) in internal DRAM
+  #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * 12)
   #define DISP_BUF_MALLOC_TYPE  MALLOC_CAP_DMA
 #endif  // WITH_PSRAM
 #define DISP_BUF_SIZE_BYTES    (DISP_BUF_SIZE * 2)
 
-ili9341_config_t ili9341_cfg = {
-    .rst_pin = 4, // GPIO 4
-    .dc_pin = 2, // GPIO 2
+esp_lcd_panel_dev_config_t disp_panel_cfg = {
+    .reset_gpio_num = 4, // GPIO 4
+    .color_space = ESP_LCD_COLOR_SPACE_BGR,
+    .bits_per_pixel = 16,
 };
 
 // SPI (dedicated)
@@ -55,11 +55,14 @@ ili9341_config_t ili9341_cfg = {
 #define DISP_SPI_MOSI 13  // GPIO 13
 //#define DISP_SPI_MISO 12  // GPIO 12
 
-spi_device_interface_config_t disp_spi_cfg = {
-    .clock_speed_hz = 40 * 1000 * 1000,
-    .mode = 0,
-    .spics_io_num = 15, // GPIO 15
-    .input_delay_ns = 0,
+esp_lcd_panel_io_spi_config_t disp_spi_cfg = {
+    .dc_gpio_num = 2, // GPIO 2
+    .cs_gpio_num = 15, // GPIO 15
+    .pclk_hz = 40 * 1000 * 1000,
+    .lcd_cmd_bits = 8,
+    .lcd_param_bits = 8,
+    .spi_mode = 0,
+    .trans_queue_depth = 10,
 };
 
 #define DISP_BCKL_DEFAULT_DUTY 100  //%
