@@ -38,6 +38,7 @@ const uint32_t SupportedBaudList[] = {9600,   19200,  38400,  57600,  74880,
 #define SIZE_OF_SETTING_NOFIFICATION_T1 64
 #define SIZE_OF_SETTING_NOFIFICATION_T2 64
 #define SIZE_OF_SETTING_NOFIFICATION_TS 128
+#define SIZE_OF_SCRIPT 255
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 #define SIZE_OF_LOCAL_PASSWORD 20
 #define HIDDEN_SETTING_VALUE "********"
@@ -90,6 +91,9 @@ enum class ESP3DSettingIndex : uint16_t {
   esp3d_inverved_y,
   esp3d_extensions,         // json setting, in preferences.json
   esp3d_show_fan_controls,  // json setting, in preferences.json
+  esp3d_pause_script,
+  esp3d_stop_script,
+  esp3d_resume_script,
   unknown_index
 };
 

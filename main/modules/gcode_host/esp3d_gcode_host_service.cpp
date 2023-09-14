@@ -389,8 +389,7 @@ bool ESP3DGCodeHostService::_openFile(ESP3DGcodeFileStream* stream) {
       _File = globalFs.open((char*)stream->_fileName, "r");
       if (_File != nullptr) {
         if (_current_stream->lineStart != 0) {
-          if (fseek(_File,
-                    (long)_current_stream->lineStart, SEEK_SET) !=
+          if (fseek(_File, (long)_current_stream->lineStart, SEEK_SET) !=
               0) {  // this would need adjusting if concurrrent file access is
                     // implemented (seek to buffer end instead)
             esp3d_log_e("Failed to seek to correct position in file: %s",
@@ -456,7 +455,7 @@ bool ESP3DGCodeHostService::_updateRingBuffer(ESP3DGcodeFileStream* stream) {
       return false;  // return, buffer is already full of fresh data
     }
     if ((_ringBuffer[_bufferSeam] == 0) || (_ringBuffer[_bufferPos] == 0)) {
-      //esp3d_log("File finished");
+      // esp3d_log("File finished");
       return false;  // return, file finished
     }
 
@@ -467,8 +466,7 @@ bool ESP3DGCodeHostService::_updateRingBuffer(ESP3DGcodeFileStream* stream) {
     // if we've reached the seam we need to read a whole buffer
     if (_bufferPos == _bufferSeam) {
       empty = RING_BUFFER_LENGTH;  // maybe not needed
-      read = fread(_ringBuffer, sizeof(char), RING_BUFFER_LENGTH,
-                   _File);
+      read = fread(_ringBuffer, sizeof(char), RING_BUFFER_LENGTH, _File);
       _bufferPos = 0;
       if (read == empty) {
         _bufferSeam = 0;
@@ -485,8 +483,7 @@ bool ESP3DGCodeHostService::_updateRingBuffer(ESP3DGcodeFileStream* stream) {
       // position
     } else if (_bufferPos > _bufferSeam) {
       empty = _bufferPos - _bufferSeam;
-      read = fread(&_ringBuffer[_bufferSeam], sizeof(char), empty,
-                   _File);
+      read = fread(&_ringBuffer[_bufferSeam], sizeof(char), empty, _File);
       if (read == empty) {
         _bufferSeam = _bufferPos;
         _bufferFresh = true;
@@ -506,8 +503,7 @@ bool ESP3DGCodeHostService::_updateRingBuffer(ESP3DGcodeFileStream* stream) {
       read = fread(&_ringBuffer[_bufferSeam], sizeof(char),
                    RING_BUFFER_LENGTH - _bufferSeam, _File);
       if (_bufferPos > 0) {
-        read +=
-            fread(_ringBuffer, sizeof(char), _bufferPos, _File);
+        read += fread(_ringBuffer, sizeof(char), _bufferPos, _File);
       }
       if (read == empty) {
         _bufferSeam = _bufferPos;
@@ -572,13 +568,12 @@ bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
   stream->lineStart = 0;
   if (isFileStream(stream)) {
     if (((ESP3DGcodeFileStream*)stream)->_fileName != nullptr) {
-      int pos = ftell(_File) +
-                1;  // we can get rid of this if we make sure to update the
-                    // buffer after this function is called.
+      int pos =
+          ftell(_File) + 1;  // we can get rid of this if we make sure to update
+                             // the buffer after this function is called.
       fseek(_File, 0, SEEK_END);
       ((ESP3DGcodeCommandStream*)stream)->totalSize =
-          ftell(_File) +
-          1;  // +1? for size instead of end index
+          ftell(_File) + 1;  // +1? for size instead of end index
       fseek(_File, pos, SEEK_SET);
       esp3d_log("Size is: %d",
                 (unsigned int)((ESP3DGcodeFileStream*)stream)->totalSize);
@@ -830,9 +825,9 @@ bool ESP3DGCodeHostService::_parseResponse(
 }
 
 bool ESP3DGCodeHostService::_processRx(ESP3DMessage* rx) {
-  if (_outputClient == ESP3DClientType::no_client){
+  if (_outputClient == ESP3DClientType::no_client) {
     esp3d_log_w("Output client not set, can't send: %s", (char*)(rx->data));
-  }else if (rx->origin == _outputClient){
+  } else if (rx->origin == _outputClient) {
     esp3d_log("Stream got the response: %s", (char*)(rx->data));
     _parseResponse(rx);
   } else if (rx->origin == ESP3DClientType::stream) {
@@ -996,9 +991,8 @@ bool ESP3DGCodeHostService::_setStream() {
       esp3d_log("Switching streams");
       if (_current_stream != nullptr) {
         if (isFileStream(_current_stream)) {
-          esp3d_log(
-              "Closing current file stream at idx: %d",
-              (int)ftell(_File));
+          esp3d_log("Closing current file stream at idx: %d",
+                    (int)ftell(_File));
           _closeFile((ESP3DGcodeFileStream*)_current_stream);
         }
         if (_currentCommand[0] ==
@@ -1018,8 +1012,7 @@ bool ESP3DGCodeHostService::_setStream() {
         for (int attempt = 0; attempt < 5; attempt++) {
           _openFile((ESP3DGcodeFileStream*)_current_stream);
           esp3d_log("fopen attempt %d", attempt + 1);
-          if (_File != nullptr)
-            break;
+          if (_File != nullptr) break;
           vTaskDelay(pdTICKS_TO_MS(50));
         }
 
@@ -1034,8 +1027,7 @@ bool ESP3DGCodeHostService::_setStream() {
           esp3d_log("Seeking to line start at: %d",
                     (int)(_current_stream->lineStart));
 
-          if (fseek(_File,
-                    (long)(_current_stream->lineStart - 1),
+          if (fseek(_File, (long)(_current_stream->lineStart - 1),
                     SEEK_SET) != 0) {  // does this need -1?
             // do error stuff
             esp3d_log_e("Failed to seek to correct line in file stream: %s",
@@ -1089,7 +1081,7 @@ void ESP3DGCodeHostService::handle() {
           _currentPrintStream.state = ESP3DGcodeStreamState::abort;
         }
       }
-      if (ulTaskNotifyTakeIndexed(_xOutputChangeNotifyIndex, pdTRUE, 0)){
+      if (ulTaskNotifyTakeIndexed(_xOutputChangeNotifyIndex, pdTRUE, 0)) {
         _updateOutputClient();
       }
     }
@@ -1214,15 +1206,15 @@ void ESP3DGCodeHostService::handle() {
                               // it should end up in the wait for ack state.
                               // just a precaution for now, remove later.
           esp3d_log("Sending to output client: %s", &_currentCommand[0]);
-          if (_outputClient == ESP3DClientType::serial){
+          if (_outputClient == ESP3DClientType::serial) {
             uart_write_bytes(ESP3D_SERIAL_PORT, &_currentCommand,
-                           strlen((char*)&(_currentCommand[0])));
+                             strlen((char*)&(_currentCommand[0])));
 #if ESP3D_USB_SERIAL_FEATURE
-          } else if (_outputClient == ESP3DClientType::usb_serial){
-            ESP3DMessage* msg = newMsg(
-              ESP3DClientType::stream, _outputClient,
-              (uint8_t*)(&(_currentCommand[0])),
-              strlen((char*)&(_currentCommand[0])), _current_stream->auth_type);
+          } else if (_outputClient == ESP3DClientType::usb_serial) {
+            ESP3DMessage* msg = newMsg(ESP3DClientType::stream, _outputClient,
+                                       (uint8_t*)(&(_currentCommand[0])),
+                                       strlen((char*)&(_currentCommand[0])),
+                                       _current_stream->auth_type);
             usbSerialClient.process(msg);  // may just dispatch to output client
 #endif
           }
