@@ -11,7 +11,7 @@ B_target = 0.0
 X_current = 10.0
 Y_current = 0.0
 Z_current = 0.0
-F_R = 0
+F_R = "0"
 mode_absolute = True
 
 def send_echo(ser, msg):
@@ -84,7 +84,10 @@ def processLine(line,ser):
           val = "X:"+ "{:.2f}".format(X_current)+ " Y:"+ "{:.2f}".format(Y_current)+" Z:"+ "{:.2f}".format(Z_current)+" E:0.00 Count X:0 Y:0 Z:0"
           return val
      if (line.startswith("M220")):
-          return "FR:"+str(F_R)+"%\nok"
+           val = re.findall('S\d+', line)
+           if(len(val) > 0):
+               F_R = val[0][1:]
+               return "FR:"+F_R+"%\nok"
      return "ok"
 
 
