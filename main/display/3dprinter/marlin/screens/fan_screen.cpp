@@ -129,7 +129,9 @@ void send_gcode_fan() {
   } else {
     fan_value_str += "1 S";
   }
-  fan_value_str += fan_value;
+  // convert % to 0-255
+  double vfan = (std::stod(fan_value.c_str()) * 255) / 100;
+  fan_value_str += esp3d_string::set_precision(std::to_string(vfan), 0);
   renderingClient.sendGcode(fan_value_str.c_str());
 }
 
@@ -234,7 +236,11 @@ void fan_matrix_buttons_event_cb(lv_event_t *e) {
 
 bool fan_value_cb(ESP3DValuesIndex index, const char *value,
                   ESP3DValuesCbAction action) {
-  if (esp3dTftui.get_current_screen() != ESP3DScreenType::fan) return false;
+  esp3d_log("fan_value_cb %s", value);
+  if (esp3dTftui.get_current_screen() != ESP3DScreenType::fan) {
+    esp3d_log("Not current screen");
+    return false;
+  }
   if (index == ESP3DValuesIndex::ext_1_temperature ||
       index == ESP3DValuesIndex::ext_1_target_temperature) {
     esp3d_log("Check if extruder 1 data %s:", value);
@@ -252,20 +258,25 @@ bool fan_value_cb(ESP3DValuesIndex index, const char *value,
       return false;
     }
     // update needed for fan buttons
+    esp3d_log("Update fan buttons matrix");
     updateBtnMatrix();
     return true;
   }
-  if (index == ESP3DValuesIndex::ext_0_fan && fan_steps_buttons_map_id == 0) {
-    esp3d_log("Update fan value %s", value);
-    lv_label_set_text(label_current_fan_value, value);
-    return true;
-  }
-  if (index == ESP3DValuesIndex::ext_1_fan && fan_steps_buttons_map_id == 1) {
-    esp3d_log("Update fan value %s", value);
-    lv_label_set_text(label_current_fan_value, value);
-    return true;
-  }
 
+  esp3d_log("index %d (E0:%d, E1:%d), fan_steps_buttons_map_id %d",
+            (uint16_t)index, (uint16_t)ESP3DValuesIndex::ext_0_fan,
+            (uint16_t)ESP3DValuesIndex::ext_1_fan, (uint8_t)fan_buttons_map_id);
+  if (index == ESP3DValuesIndex::ext_0_fan && fan_buttons_map_id == 0) {
+    esp3d_log("Update fan value %s", value);
+    lv_label_set_text(label_current_fan_value, value);
+    return true;
+  }
+  if (index == ESP3DValuesIndex::ext_1_fan && fan_buttons_map_id == 1) {
+    esp3d_log("Update fan value %s", value);
+    lv_label_set_text(label_current_fan_value, value);
+    return true;
+  }
+  esp3d_log("No update needed");
   return false;
 }
 

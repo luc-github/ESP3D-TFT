@@ -219,7 +219,8 @@ endif()
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
 # ESP3D-TFT specific log level
-# All  = 2
+# All  = 3
+# Debug = 2
 # Error only = 1
 # Disabled = 0
 add_compile_options(-DESP3D_TFT_LOG=0)

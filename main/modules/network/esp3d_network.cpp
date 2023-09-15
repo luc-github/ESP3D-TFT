@@ -35,7 +35,6 @@
 #include "esp3d_values.h"
 #include "translations/esp3d_translation_service.h"
 
-
 ESP3DNetwork esp3dNetwork;
 
 /* The event group allows multiple bits for each event, but we only care about
@@ -53,7 +52,7 @@ ESP3DNetwork esp3dNetwork;
 static void wifi_ap_event_handler(void* arg, esp_event_base_t event_base,
                                   int32_t event_id, void* event_data) {
   if (event_id == WIFI_EVENT_AP_STACONNECTED) {
-#if ESP3D_TFT_LOG && ESP3D_TFT_LOG == 2
+#if ESP3D_TFT_LOG && ESP3D_TFT_LOG == ESP3D_TFT_LOG_LEVEL_ALL
     wifi_event_ap_staconnected_t* event =
         (wifi_event_ap_staconnected_t*)event_data;
     esp3d_log("station " MACSTR " join, AID=%d", MAC2STR(event->mac),
@@ -62,7 +61,7 @@ static void wifi_ap_event_handler(void* arg, esp_event_base_t event_base,
     // TODO: TBD
 #endif  // ESP3D_TFT_LOG
   } else if (event_id == WIFI_EVENT_AP_STADISCONNECTED) {
-#if ESP3D_TFT_LOG && ESP3D_TFT_LOG == 2
+#if ESP3D_TFT_LOG && ESP3D_TFT_LOG == ESP3D_TFT_LOG_LEVEL_ALL
     wifi_event_ap_stadisconnected_t* event =
         (wifi_event_ap_stadisconnected_t*)event_data;
     esp3d_log("station " MACSTR " leave, AID=%d", MAC2STR(event->mac),
@@ -118,7 +117,7 @@ static void wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
     }
 
   } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
-#if ESP3D_TFT_LOG && ESP3D_TFT_LOG == 2
+#if ESP3D_TFT_LOG && ESP3D_TFT_LOG == ESP3D_TFT_LOG_LEVEL_ALL
     ip_event_got_ip_t* event = (ip_event_got_ip_t*)event_data;
     esp3d_log("got ip:" IPSTR, IP2STR(&event->ip_info.ip));
 #else
