@@ -228,7 +228,9 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
 
         ptrS++;
         // get fan speed
-        std::string fanSpeed = "";
+        static std::string fanSpeed = "";
+        fanSpeed = "";
+
         for (uint8_t i = 0; i < 3; i++) {
           if (ptrS[i] >= '0' && ptrS[i] <= '9') {
             fanSpeed += ptrS[i];

@@ -39,7 +39,6 @@
 #include "sdkconfig.h"
 #include "sdmmc_cmd.h"
 
-
 sdmmc_card_t *card;
 sdmmc_host_t host = SDSPI_HOST_DEFAULT();
 
@@ -113,7 +112,7 @@ bool ESP3DSd::begin() {
   _started = false;
   esp_err_t ret;
   esp3d_log("Initializing SD card");
-#if ESP3D_TFT_LOG && ESP3D_TFT_LOG == 2
+#if ESP3D_TFT_LOG && ESP3D_TFT_LOG == ESP3D_TFT_LOG_LEVEL_ALL
   const char *spi_names[] = {"SPI1_HOST", "SPI2_HOST", "SPI3_HOST"};
 #endif  // ESP3D_TFT_LOG
 #if defined(SD_SPI_HOST)

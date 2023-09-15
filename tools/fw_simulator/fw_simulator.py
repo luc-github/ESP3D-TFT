@@ -19,6 +19,7 @@ def send_echo(ser, msg):
      print(msg)
 
 def processLine(line,ser):
+     time.sleep(0.01)
      global X_current, Y_current, Z_current,mode_absolute,E0_current,E0_target,B_current,B_target
      X_val = ""
      Y_val = ""
