@@ -88,6 +88,8 @@ def processLine(line,ser):
            if(len(val) > 0):
                F_R = val[0][1:]
                return "FR:"+F_R+"%\nok"
+     if (line.startswith("M106")):
+           return line+"\nok"
      return "ok"
 
 

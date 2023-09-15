@@ -247,14 +247,13 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
           }
         }
         // conversion 0~255 to 0~100
-        uint ispeed = atoi(fanSpeed.c_str());
-        ispeed = ispeed * 100 / 255;
+        double fspeed = (std::stod(fanSpeed.c_str()) * 100) / 255;
         // limit to 100%
-        if (ispeed > 100) {
-          ispeed = 100;
+        if (fspeed > 100) {
+          fspeed = 100;
         }
 
-        fanSpeed = std::to_string(ispeed);
+        fanSpeed = esp3d_string::set_precision(std::to_string(fspeed), 0);
         // set fan speed according index
         esp3d_log("Fan speed 106, index: %d, %s", index, fanSpeed.c_str());
         if (index == 0) {

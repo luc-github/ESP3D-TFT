@@ -129,7 +129,9 @@ void send_gcode_fan() {
   } else {
     fan_value_str += "1 S";
   }
-  fan_value_str += fan_value;
+  // convert % to 0-255
+  double vfan = (std::stod(fan_value.c_str()) * 255) / 100;
+  fan_value_str += esp3d_string::set_precision(std::to_string(vfan), 0);
   renderingClient.sendGcode(fan_value_str.c_str());
 }
 
