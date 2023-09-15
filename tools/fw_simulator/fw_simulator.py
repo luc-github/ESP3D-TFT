@@ -61,11 +61,11 @@ def processLine(line,ser):
                return "ok"
      if(line.startswith("G28")):
           #let simulate the output processing
-          send_echo(ser, "echo:busy processing:")
+          send_echo(ser, "echo:busy: processing")
           time.sleep(1)
-          send_echo(ser, "echo:busy processing:")
+          send_echo(ser, "echo:busy: processing")
           time.sleep(1)
-          send_echo(ser, "echo:busy processing:")
+          send_echo(ser, "echo:busy: processing")
           time.sleep(1)
           if (line.find("X") != -1):
                X_current = 0.00
