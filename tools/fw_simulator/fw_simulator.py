@@ -31,15 +31,16 @@ def processLine(line,ser):
           return "ok"
      if(line.startswith("G1") or line.startswith("G0")):
           #extract X
-          X = re.findall('X[+]*[-]*\d+[\.]*\d+', line)
+          X = re.findall('X[+]*[-]*\d+[\.]*\d*', line)
+
           if(len(X) > 0):
                X_val = X[0][1:]
           #extract Y
-          Y = re.findall('Y[+]*[-]*\d+[\.]*\d+', line)
+          Y = re.findall('Y[+]*[-]*\d+[\.]*\d*', line)
           if(len(Y) > 0):
                Y_val = Y[0][1:]
           #extract Z
-          Z = re.findall('Z[+]*[-]*\d+[\.]*\d+', line)
+          Z = re.findall('Z[+]*[-]*\d+[\.]*\d*', line)
           if(len(Z) > 0):
                Z_val = Z[0][1:]
           if(mode_absolute):
@@ -73,7 +74,6 @@ def processLine(line,ser):
           if (line.find("Z")!= -1):
                Z_current = 0.00
           if (line== "G28"):
-               
                X_current = 0.00
                Y_current = 0.00
                Z_current = 0.00
@@ -81,7 +81,8 @@ def processLine(line,ser):
      if(line.startswith("M105")):
           return "ok T:25.00 /120.00 B:25.00 /0.00 @:127 B@:0"
      if (line.startswith("M114")):
-          return "X:"+str(X_current)+ " Y:"+str(Y_current)+" Z:"+str(Z_current)+" E:0.00 Count X:0 Y:0 Z:0"
+          val = "X:"+ "{:.2f}".format(X_current)+ " Y:"+ "{:.2f}".format(Y_current)+" Z:"+ "{:.2f}".format(Z_current)+" E:0.00 Count X:0 Y:0 Z:0"
+          return val
      if (line.startswith("M220")):
           return "FR:"+str(F_R)+"%\nok"
      return "ok"
