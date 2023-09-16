@@ -77,7 +77,7 @@ def generateTemperatureResponse(withok):
 
 def send_echo(ser, msg):
     ser.write((msg + "\n").encode('utf-8'))
-    print(bcolors.HEADER + msg + bcolors.END_COL)
+    print(bcolors.END_COL + msg + bcolors.END_COL)
 
 
 def display_busy(ser, nb):
