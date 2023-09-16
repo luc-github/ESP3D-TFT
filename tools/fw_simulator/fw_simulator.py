@@ -51,6 +51,13 @@ def generateTemperatureResponse(withok):
 def send_echo(ser, msg):
      ser.write((msg + "\n").encode('utf-8'))
      print(msg)
+     
+def display_busy(ser, nb):
+     v= nb
+     while (v > 0):
+          send_echo(ser, "echo:busy: processing")
+          time.sleep(1)
+          v = v - 1
 
 def processLine(line,ser):
      time.sleep(0.01)
@@ -68,7 +75,6 @@ def processLine(line,ser):
      if(line.startswith("G1") or line.startswith("G0")):
           #extract X
           X = re.findall('X[+]*[-]*\d+[\.]*\d*', line)
-
           if(len(X) > 0):
                X_val = X[0][1:]
           #extract Y
@@ -179,9 +185,58 @@ def processLine(line,ser):
                return "FR:"+F_R+"%\nok"
      if (line.startswith("M106")):
            return line+"\nok"
+     if (line.startswith("M107")):
+          val = re.findall('P\d+', line)
+          if (len(val) > 0):
+               return "M106 P" +val[0][1:]+ " S0\nok"
+          else:
+               return "M106 P0 S0\nok" 
+     if (line.startswith("G29 V4")):
+          send_echo(ser, " G29 Auto Bed Leveling")
+          display_busy(ser, 3)
+          send_echo(ser, "Bed X: 50.000 Y: 50.000 Z: 0.000")
+          display_busy(ser, 3)
+          send_echo(ser, "Bed X: 133.000 Y: 50.000 Z: 0.016")
+          display_busy(ser, 3)
+          send_echo(ser, "Bed X: 216.000 Y: 50.000 Z: -0.013")
+          display_busy(ser, 3)
+          send_echo(ser, "Bed X: 299.000 Y: 50.000 Z: -0.051")
+          display_busy(ser, 3)
+          send_echo(ser, "Bed X: 299.000 Y: 133.000 Z: -0.005")
+          display_busy(ser, 3)
+          send_echo(ser, "Bed X: 216.000 Y: 133.000 Z: -0.041")
+          display_busy(ser, 3)
+          send_echo(ser, "Bed X: 133.000 Y: 133.000 Z: -0.031")
+          display_busy(ser, 3)
+          send_echo(ser, "Bed X: 50.000 Y: 133.000 Z: -0.036")
+          display_busy(ser, 3)
+          send_echo(ser, "Bed X: 50.000 Y: 216.000 Z: -0.050")
+          display_busy(ser, 3)
+          send_echo(ser, "Bed X: 133.000 Y: 216.000 Z: 0.055")
+          display_busy(ser, 3)
+          send_echo(ser, "Bed X: 216.000 Y: 216.000 Z: 0.051")
+          display_busy(ser, 3)
+          send_echo(ser, "Bed X: 299.000 Y: 216.000 Z: 0.026")
+          display_busy(ser, 3)
+          send_echo(ser, "Bed X: 299.000 Y: 299.000 Z: -0.018")
+          display_busy(ser, 3)
+          send_echo(ser, "Bed X: 216.000 Y: 299.000 Z: -0.064")
+          display_busy(ser, 3)
+          send_echo(ser, "Bed X: 133.000 Y: 299.000 Z: -0.036")
+          display_busy(ser, 3)
+          send_echo(ser, "Bed X: 50.000 Y: 299.000 Z: -0.046")
+          display_busy(ser, 3)
+          send_echo(ser, "Bilinear Leveling Grid:")
+          send_echo(ser, "      0      1      2      3")
+          send_echo(ser, " 0 +0.0000 +0.0162 -0.0125 -0.0512")
+          send_echo(ser, " 1 -0.0363 -0.0313 -0.0412 -0.0050")
+          send_echo(ser, " 2 -0.0500 +0.0550 +0.0512 +0.0262")
+          send_echo(ser, " 3 -0.0463 -0.0363 -0.0638 -0.0175")
+          return "ok"
+
+   
      return "ok"
-
-
+    
 def main():
     ports = serial.tools.list_ports.comports()
     portTFT=""
