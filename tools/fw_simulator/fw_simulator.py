@@ -3,24 +3,59 @@ import serial
 import serial.tools.list_ports
 import time
 import re
+import random
 
-E0_current = 0.0
-E0_target = 0.0
-B_current = 0.0
-B_target = 0.0
-X_current = 10.0
+X_current = 0.0
 Y_current = 0.0
 Z_current = 0.0
-F_R = "0"
 mode_absolute = True
 
+temperatures = {"E0":{ "value": 0.0, "target": 0.0, "lastTime": -1,"heatspeed": 0.6,"coolspeed": 0.8, "variation": 0.5}, "B":{ "value": 0.0, "target": 0.0, "lastTime": -1,"heatspeed": 0.2,"coolspeed": 0.8,"variation": 0.5}}
+
+def current_milli_time():
+     return round(time.time() * 1000)
+
+def updateTemperatures(entry, timestp):
+     global temperatures
+     roomtemp = 20.0
+     v = random.random()*5
+     target = temperatures[entry]["target"]
+     if target==0:
+          target = roomtemp
+     if (temperatures[entry]["value"] == 0):
+          temperatures[entry]["value"] = roomtemp + v / 2
+     if (temperatures[entry]["lastTime"] == -1):
+          temperatures[entry]["lastTime"] = timestp
+     if temperatures[entry]["value"] + 5 < target:
+          temperatures[entry]["value"] = temperatures[entry]["value"] + (temperatures[entry]["heatspeed"] * (timestp - temperatures[entry]["lastTime"])) / 1000
+     elif temperatures[entry]["value"] - 5 > target:
+          temperatures[entry]["value"] = temperatures[entry]["value"] - (temperatures[entry]["coolspeed"] * (timestp - temperatures[entry]["lastTime"])) / 1000
+     elif target - 2 < temperatures[entry]["value"] and temperatures[entry]["value"] < target + 2:
+          temperatures[entry]["value"] = target + temperatures[entry]["variation"] * (random.random() - 0.5)
+     elif temperatures[entry]["value"] < target:
+          temperatures[entry]["value"] = temperatures[entry]["value"] + ((temperatures[entry]["heatspeed"]/3) * (timestp - temperatures[entry]["lastTime"])) / 1000
+     else:
+          temperatures[entry]["value"] = temperatures[entry]["value"] - ((temperatures[entry]["coolspeed"]/3) * (timestp - temperatures[entry]["lastTime"])) / 1000
+      
+     temperatures[entry]["lastTime"] = timestp
+
+      
+          
+def generateTemperatureResponse(withok):
+     global temperatures
+     response = " "
+     if (withok):
+          response = "ok "
+     response += "T:" + "{:.2f}".format(temperatures["E0"]["value"]) + " /" + "{:.2f}".format(temperatures["E0"]["target"]) + " B:" + "{:.2f}".format(temperatures["B"]["value"]) + " /" + "{:.2f}".format(temperatures["B"]["target"]) + " @:127 B@:0"
+     return response
 def send_echo(ser, msg):
      ser.write((msg + "\n").encode('utf-8'))
      print(msg)
 
 def processLine(line,ser):
      time.sleep(0.01)
-     global X_current, Y_current, Z_current,mode_absolute,E0_current,E0_target,B_current,B_target
+     global X_current, Y_current, Z_current,mode_absolute
+     global temperatures
      X_val = ""
      Y_val = ""
      Z_val = ""
@@ -79,8 +114,61 @@ def processLine(line,ser):
                Y_current = 0.00
                Z_current = 0.00
           return "ok"
+     if(line.startswith("M104")):
+         targettemp = re.findall('S\d+[\.]*\d*', line)
+         if(len(targettemp) > 0):
+               temperatures["E0"]["target"] = float(targettemp[0][1:])
+         return "ok"
+     if(line.startswith("M109")):
+         targettemp = re.findall('[SR]\d+[\.]*\d*', line)
+         if(len(targettemp) > 0):
+               temperatures["E0"]["target"] = float(targettemp[0][1:])
+               target = 20.0
+               if (temperatures["E0"]["target"] !=0):
+                    target = temperatures["E0"]["target"]
+               while (temperatures["E0"]["value"] < target-2 or temperatures["E0"]["value"] > target+2):
+                    send_echo(ser, "echo:busy: processing")
+                    time.sleep(1)
+                    updateTemperatures("E0", current_milli_time())
+                    updateTemperatures("B", current_milli_time())
+                    val = generateTemperatureResponse(False)
+                    send_echo(ser, val)
+                    time.sleep(1)
+                    updateTemperatures("E0", current_milli_time())
+                    updateTemperatures("B", current_milli_time())
+                    val = generateTemperatureResponse(False)
+                    send_echo(ser, val)
+               return ""
+     if(line.startswith("M190")):
+         targettemp = re.findall('[SR]\d+[\.]*\d*', line)
+         if(len(targettemp) > 0):
+               temperatures["B"]["target"] = float(targettemp[0][1:])
+               target = 20.0
+               if (temperatures["E0"]["target"] !=0):
+                    target = temperatures["E0"]["target"]
+               while (temperatures["B"]["value"] < target-2 or temperatures["B"]["value"] > target+2):
+                    send_echo(ser, "echo:busy: processing")
+                    time.sleep(1)
+                    updateTemperatures("E0", current_milli_time())
+                    updateTemperatures("B", current_milli_time())
+                    val = generateTemperatureResponse(False)
+                    send_echo(ser, val)
+                    time.sleep(1)
+                    updateTemperatures("E0", current_milli_time())
+                    updateTemperatures("B", current_milli_time())
+                    val = generateTemperatureResponse(False)
+                    send_echo(ser, val)
+               return ""    
+     if(line.startswith("M140")):
+         targettemp = re.findall('S\d+[\.]*\d*', line)
+         if(len(targettemp) > 0):
+               temperatures["B"]["target"] = float(targettemp[0][1:])
+         return "ok"
      if(line.startswith("M105")):
-          return "ok T:25.00 /120.00 B:25.00 /0.00 @:127 B@:0"
+          updateTemperatures("E0", current_milli_time())
+          updateTemperatures("B", current_milli_time())
+          val = generateTemperatureResponse(True)
+          return val
      if (line.startswith("M114")):
           val = "X:"+ "{:.2f}".format(X_current)+ " Y:"+ "{:.2f}".format(Y_current)+" Z:"+ "{:.2f}".format(Z_current)+" E:0.00 Count X:0 Y:0 Z:0"
           return val
@@ -111,7 +199,7 @@ def main():
          exit(0)
     ser = serial.Serial(portTFT, 115200)
 
-    starttime = time.time()
+    starttime = current_milli_time()
     #loop forever, just unplug the port to stop the program
     while True:
         #try:
@@ -119,7 +207,8 @@ def main():
             line = ser.readline().decode('utf-8').strip()
             print(line)
             response = processLine(line, ser)
-            send_echo(ser, response)
+            if (response != ""):
+               send_echo(ser, response)
         #except :
         #     print("End of program")
         #     exit(0)
