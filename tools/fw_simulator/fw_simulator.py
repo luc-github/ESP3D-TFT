@@ -255,18 +255,18 @@ def main():
     ser = serial.Serial(portTFT, 115200)
 
     starttime = current_milli_time()
-    #loop forever, just unplug the port to stop the program
+    #loop forever, just unplug the port to stop the program or do ctrl-c
     while True:
-        #try:
-        if ser.in_waiting:
-            line = ser.readline().decode('utf-8').strip()
-            print(line)
-            response = processLine(line, ser)
-            if (response != ""):
-               send_echo(ser, response)
-        #except :
-        #     print("End of program")
-        #     exit(0)
+        try:
+          if ser.in_waiting:
+               line = ser.readline().decode('utf-8').strip()
+               print(line)
+               response = processLine(line, ser)
+               if (response != ""):
+                    send_echo(ser, response)
+        except :
+             print("End of program")
+             exit(0)
 
 #call main function        
 main()
