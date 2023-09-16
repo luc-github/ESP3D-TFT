@@ -270,7 +270,7 @@ def processLine(line, ser):
 def main():
     ports = serial.tools.list_ports.comports()
     portTFT = ""
-    print("Serial ports:")
+    print(bcolors.COL_GREEN+"Serial ports:"+bcolors.END_COL)
     for port, desc, hwid in sorted(ports):
         print(bcolors.COL_GREEN+"{}: {} ".format(port, desc)+bcolors.END_COL)
         desc.capitalize()
