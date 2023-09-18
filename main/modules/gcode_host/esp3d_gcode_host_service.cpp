@@ -148,6 +148,26 @@ bool ESP3DGCodeHostService::newStream(
   return true;
 }
 
+// Do we need semaphores here?
+// In theory no because each command [ESP700] is processed in a single task and
+// each commands are process one after the others
+bool ESP3DGCodeHostService::addStream(const char* filename,
+                                      ESP3DAuthenticationLevel auth_type,
+                                      bool executeAsMacro) {
+  bool isfirst = false;
+  if (executeAsMacro)
+    isfirst = true;
+  else {
+    if (getState() == ESP3DGcodeHostState::idle) {
+      esp3d_log_w("Stream already in progress");
+      // FIXME: we should just put at the end of list
+      return false;
+    }
+  }
+
+  return _streamFile(filename, auth_type, executeAsMacro, isfirst);
+}
+
 bool ESP3DGCodeHostService::_streamFile(const char* file,
                                         ESP3DAuthenticationLevel auth_type,
                                         bool executeAsMacro,
@@ -789,8 +809,6 @@ bool ESP3DGCodeHostService::_processRx(ESP3DMessage* rx) {
   } else if (rx->origin == _outputClient) {
     esp3d_log("Stream got the response: %s", (char*)(rx->data));
     _parseResponse(rx);
-  } else if (rx->origin == ESP3DClientType::stream) {
-    _streamFile((char*)&(rx->data[4]), rx->authentication_level);
   } else {
     esp3d_log("Forwarding message from: %d", static_cast<uint8_t>(rx->origin));
     newStream((const char*)rx->data, rx->size,

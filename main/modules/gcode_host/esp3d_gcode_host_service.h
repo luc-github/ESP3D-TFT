@@ -105,6 +105,8 @@ class ESP3DGCodeHostService : public ESP3DClient {
   ESP3DGcodeHostError getErrorNum();
   ESP3DGcodeStream* getCurrentStream(
       ESP3DGcodeHostFileType type = ESP3DGcodeHostFileType::active);
+  bool addStream(const char* filename, ESP3DAuthenticationLevel auth_type,
+                 bool executeAsMacro);
 
  private:
   void _updateOutputClient();

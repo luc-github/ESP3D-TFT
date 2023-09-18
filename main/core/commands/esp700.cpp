@@ -50,22 +50,18 @@ void ESP3DCommands::ESP700(int cmd_params_pos, ESP3DMessage* msg) {
     error_msg = "Missing parameter";
     esp3d_log_e("Error missing");
   } else {
-    // FIXME: check if script is Macro of main file
-    if (gcodeHostService.getState() == ESP3DGcodeHostState::idle) {
-      // FIXME: do not use msg for that
-      ESP3DMessage* newMsgPtr = ESP3DClient::newMsg(
-          target, ESP3DClientType::stream, (const uint8_t*)tmpstr.c_str(),
-          tmpstr.length(), msg->authentication_level);
-      if (newMsgPtr) {
-        newMsgPtr->request_id = requestId;
-        esp3dCommands.process(newMsgPtr);
-      } else {
-        esp3d_log_e("Message creation failed");
-      }
+    bool isMacro = true;
+    std::string filename = get_param(msg, cmd_params_pos, "stream=");
+    if (filename.length() > 0) {  // it is a stream
+      isMacro = false;
+    } else {  // it is a macro
+      filename = get_clean_param(msg, cmd_params_pos);
+    }
+    if (gcodeHostService.addStream(filename.c_str(), msg->authentication_level,
+                                   isMacro)) {
+      esp3d_log("Stream: %s added as %s", filename.c_str(),
+                isMacro ? "Macro" : "File");
     } else {
-      // FIXME: check if it a macro of main file
-      // if Macro it should be added to top of queue
-      // if main file it should be added to bottom of queue
       hasError = false;
       error_msg = "Streaming already in progress";
       esp3d_log_e("Error streaming already in progress");
