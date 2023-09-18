@@ -78,11 +78,10 @@ enum class ESP3DGcodeHostFileType : uint8_t {
   single_command,
   multiple_commands,  // no real difference between single and multiple in
                       // practice
-  filesystem,
-  script,
-  sd_card,
+  fs_stream,
+  fs_script,
+  sd_stream,
   sd_script,
-  active,
   unknown,
   invalid
 };

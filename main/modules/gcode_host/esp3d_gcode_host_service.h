@@ -36,11 +36,10 @@
 #define isWhiteSpace(ch)                                       \
   ((char)ch == '\n' || (char)ch == '\r' || (char)ch == '\t' || \
    (char)ch == '\v' || (char)ch == '\f' || (char)ch == ' ')
-#define isFileStream(stream)                                                 \
-  ((((ESP3DGcodeStream*)stream)->type ==                                     \
-    ESP3DGcodeHostFileType::filesystem) ||                                   \
-   (((ESP3DGcodeStream*)stream)->type == ESP3DGcodeHostFileType::sd_card) || \
-   (((ESP3DGcodeStream*)stream)->type == ESP3DGcodeHostFileType::script) ||  \
+#define isFileStream(stream)                                                   \
+  ((((ESP3DGcodeStream*)stream)->type == ESP3DGcodeHostFileType::fs_stream) || \
+   (((ESP3DGcodeStream*)stream)->type == ESP3DGcodeHostFileType::sd_stream) || \
+   (((ESP3DGcodeStream*)stream)->type == ESP3DGcodeHostFileType::fs_script) || \
    (((ESP3DGcodeStream*)stream)->type == ESP3DGcodeHostFileType::sd_script))
 #define isCommandStream(stream)                \
   ((((ESP3DGcodeStream*)stream)->type ==       \
@@ -103,8 +102,7 @@ class ESP3DGCodeHostService : public ESP3DClient {
   bool updateOutputClient();
   ESP3DGcodeHostState getState();
   ESP3DGcodeHostError getErrorNum();
-  ESP3DGcodeStream* getCurrentStream(
-      ESP3DGcodeHostFileType type = ESP3DGcodeHostFileType::active);
+  ESP3DGcodeStream* getCurrentStream();
   bool addStream(const char* filename, ESP3DAuthenticationLevel auth_type,
                  bool executeAsMacro);
 

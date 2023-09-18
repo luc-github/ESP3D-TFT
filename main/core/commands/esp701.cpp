@@ -94,8 +94,8 @@ void ESP3DCommands::ESP701(int cmd_params_pos, ESP3DMessage* msg) {
           ok_msg += std::to_string(script->processedSize);
           ok_msg += "\",\"type\":\"";
           ok_msg += std::to_string(static_cast<uint8_t>(script->type));
-          if (script->type == ESP3DGcodeHostFileType::sd_card ||
-              script->type == ESP3DGcodeHostFileType::filesystem) {
+          if (script->type == ESP3DGcodeHostFileType::sd_stream ||
+              script->type == ESP3DGcodeHostFileType::fs_stream) {
             ok_msg += "\",\"name\":\"";
             ok_msg += ((ESP3DGcodeStream*)script)->fileName.c_str();
             ok_msg += "\"";

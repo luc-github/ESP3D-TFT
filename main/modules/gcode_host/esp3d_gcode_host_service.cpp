@@ -72,10 +72,10 @@ ESP3DGcodeHostFileType ESP3DGCodeHostService::_getStreamType(
     const char* file) {  // maybe this can also check for invalid file
                          // extensions if not done elsewhere
   if (file[0] == '/') {
-    ESP3DGcodeHostFileType type = ESP3DGcodeHostFileType::filesystem;
+    ESP3DGcodeHostFileType type = ESP3DGcodeHostFileType::fs_stream;
     if (strstr(file, "/sd/") == file) {
 #if ESP3D_SD_CARD_FEATURE
-      type = ESP3DGcodeHostFileType::sd_card;
+      type = ESP3DGcodeHostFileType::sd_stream;
 
 #endif  // ESP3D_SD_CARD_FEATURE
     }
@@ -182,21 +182,23 @@ bool ESP3DGCodeHostService::_streamFile(const char* file,
   esp3d_log("File type: %d", static_cast<uint8_t>(type));
 
   if (executeAsMacro) {
-    if (type == ESP3DGcodeHostFileType::filesystem) {
-      type = ESP3DGcodeHostFileType::script;
+    if (type == ESP3DGcodeHostFileType::fs_stream) {
+      type = ESP3DGcodeHostFileType::fs_script;
 #if ESP3D_SD_CARD_FEATURE
-    } else if (type == ESP3DGcodeHostFileType::sd_card) {
+    } else if (type == ESP3DGcodeHostFileType::sd_stream) {
       type = ESP3DGcodeHostFileType::sd_script;
 #endif  // ESP3D_SD_CARD_FEATURE
     }
   }
 
   switch (type) {
-    case ESP3DGcodeHostFileType::filesystem:
+    case ESP3DGcodeHostFileType::fs_stream:
 #if ESP3D_SD_CARD_FEATURE
-    case ESP3DGcodeHostFileType::sd_card:
+    case ESP3DGcodeHostFileType::sd_stream:
 #endif  // ESP3D_SD_CARD_FEATURE
     {
+      // FIXME: we should add the stream to the end of list
+      // so once creent strean is finished it start a new one
       if (getCurrentStream() != nullptr) return false;
       _currentPrintStream.fileName = file;
       _currentPrintStream.type = type;
@@ -216,7 +218,7 @@ bool ESP3DGCodeHostService::_streamFile(const char* file,
       return true;
     } break;
 
-    case ESP3DGcodeHostFileType::script:
+    case ESP3DGcodeHostFileType::fs_script:
 #if ESP3D_SD_CARD_FEATURE
     case ESP3DGcodeHostFileType::sd_script:
 #endif  // ESP3D_SD_CARD_FEATURE
@@ -834,29 +836,13 @@ ESP3DGcodeHostState ESP3DGCodeHostService::getState() {
   return ESP3DGcodeHostState::idle;
 }
 
-ESP3DGcodeStream*
-ESP3DGCodeHostService::getCurrentStream(  /// CHECK OVER THIS FUNCTION -- Not
-                                          /// very thread safe, what is best way
-                                          /// to send string? Msg?
-    ESP3DGcodeHostFileType type) {
-  // Do we care about reporting the number of terminal commands in the queue?
-
-  if (type == ESP3DGcodeHostFileType::active) {
-    if (_currentPrintStream.fileName == "") {
-      return nullptr;
-    } else {
-      return &_currentPrintStream;
-    }
-  }
-
+ESP3DGcodeStream* ESP3DGCodeHostService::getCurrentStream() {
+  // get the first stream in the queue
   esp3d_log("There are currently %d scripts", _scripts.size());
   for (auto script = _scripts.begin(); script != _scripts.end(); ++script) {
     esp3d_log("Script type: %d", static_cast<uint8_t>((*script)->type));
-
-    if ((type == ESP3DGcodeHostFileType::filesystem &&
-         ((*script)->type == ESP3DGcodeHostFileType::sd_card ||
-          (*script)->type == ESP3DGcodeHostFileType::filesystem)) ||
-        (type == (*script)->type)) {
+    if ((*script)->type == ESP3DGcodeHostFileType::sd_stream ||
+        (*script)->type == ESP3DGcodeHostFileType::fs_stream) {
       return (*script);
     }
   }
