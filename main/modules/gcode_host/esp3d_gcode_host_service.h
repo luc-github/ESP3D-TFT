@@ -73,25 +73,13 @@ struct ESP3DGcodeStream {
   ESP3DAuthenticationLevel auth_type =
       ESP3DAuthenticationLevel::guest;  // the authentication level of the user
                                         // requesting the stream
-};
-
-struct ESP3DGcodeCommandStream : public ESP3DGcodeStream {
-  ESP3DGcodeCommandStream(ESP3DGcodeStream& A) : ESP3DGcodeStream(A) {}
-  ESP3DGcodeCommandStream() = default;
-
   uint32_t bufferPos = 0;
   uint8_t* commandBuffer = nullptr;
-};
-
-struct ESP3DGcodeFileStream : public ESP3DGcodeStream {
-  ESP3DGcodeFileStream(ESP3DGcodeStream& A) : ESP3DGcodeStream(A) {}
-  ESP3DGcodeFileStream() = default;
-
   uint64_t commandNumber =
       0;  // Next command number to send. //This should be a gcodehost variable,
           // as only one print stream is possible
   uint64_t resendCommandNumber = 0;  // Requested command to resend.
-  uint8_t* _fileName = nullptr;      // this could be a flexible array too.
+  std::string fileName = "";         // the name of the file to stream
 };
 
 class ESP3DGCodeHostService : public ESP3DClient {
@@ -124,7 +112,7 @@ class ESP3DGCodeHostService : public ESP3DClient {
                    bool executeAsMacro = false, bool executeFirst = false);
   uint8_t _currentCommand[ESP_GCODE_HOST_COMMAND_LINE_BUFFER];
   char _ringBuffer[RING_BUFFER_LENGTH];  // maybe change this to uint8_t
-  ESP3DGcodeFileStream* _bufferedStream = nullptr;
+  ESP3DGcodeStream* _bufferedStream = nullptr;
   uint32_t _bufferSeam =
       0;  // the position of the earliest byte in the ring buffer
   uint32_t _bufferPos = 0;  // the position of the next byte to be read from the
@@ -139,14 +127,14 @@ class ESP3DGCodeHostService : public ESP3DClient {
   bool _isEmergencyParse(const char* cmd);
 
   bool _isAckNeeded() { return _awaitingAck; };
-  bool _openFile(ESP3DGcodeFileStream* stream);
-  bool _closeFile(ESP3DGcodeFileStream* stream);
+  bool _openFile(ESP3DGcodeStream* stream);
+  bool _closeFile(ESP3DGcodeStream* stream);
   bool _startStream(ESP3DGcodeStream* stream);
   bool _setStream();
 
-  bool _updateRingBuffer(ESP3DGcodeFileStream* stream);
-  char _readCharFromRingBuffer(ESP3DGcodeFileStream* stream);
-  char _readCharFromCommandBuffer(ESP3DGcodeCommandStream* stream);
+  bool _updateRingBuffer(ESP3DGcodeStream* stream);
+  char _readCharFromRingBuffer(ESP3DGcodeStream* stream);
+  char _readCharFromCommandBuffer(ESP3DGcodeStream* stream);
 
   bool _readNextCommand(ESP3DGcodeStream* stream);
   uint8_t _Checksum(const char* command, uint32_t commandSize);
@@ -173,15 +161,14 @@ class ESP3DGCodeHostService : public ESP3DClient {
   ESP3DGcodeHostState _next_state = ESP3DGcodeHostState::idle;
   std::list<ESP3DGcodeStream*> _scripts;
   ESP3DGcodeStream* _current_stream = nullptr;
-  ESP3DGcodeFileStream _currentPrintStream;
+  ESP3DGcodeStream _currentPrintStream;
   std::string _stop_script;
   std::string _pause_script;
   std::string _resume_script;
 
-  //Stream Variables:
-  FILE* _File =
-      nullptr;  // pointer to the file to be streamed. Files could be opened and
-                // closed whilst in use if it's helpful
+  // Stream Variables:
+  FILE* _File = nullptr;  // pointer to the file to be streamed. Files could be
+                          // opened and closed whilst in use if it's helpful
 
   pthread_mutex_t _tx_mutex;
   pthread_mutex_t _rx_mutex;
