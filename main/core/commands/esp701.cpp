@@ -65,14 +65,15 @@ void ESP3DCommands::ESP701(int cmd_params_pos, ESP3DMessage* msg) {
         }
       }
     } else {
-      ESP3DGcodeStream* script =
-          gcodeHostService.getCurrentStream();  // Passing pointers between
-                                                // threads seems like a bad idea
       /*What info do we need?
       1. Stream ID - filepath
       2. Nothing else really?*/
 
-      if (script) {
+      if (status != ESP3DGcodeHostState::idle) {
+        ESP3DGcodeStream* script =
+            gcodeHostService
+                .getCurrentStream();  // Passing pointers between
+                                      // threads seems like a bad idea
         if (status == ESP3DGcodeHostState::paused) {
           if (json) {
             ok_msg = "{\"status\":\"paused\"";

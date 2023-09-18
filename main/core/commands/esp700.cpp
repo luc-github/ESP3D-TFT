@@ -50,7 +50,9 @@ void ESP3DCommands::ESP700(int cmd_params_pos, ESP3DMessage* msg) {
     error_msg = "Missing parameter";
     esp3d_log_e("Error missing");
   } else {
-    if (gcodeHostService.getCurrentStream() == nullptr) {
+    // FIXME: check if script is Macro of main file
+    if (gcodeHostService.getState() == ESP3DGcodeHostState::idle) {
+      // FIXME: do not use msg for that
       ESP3DMessage* newMsgPtr = ESP3DClient::newMsg(
           target, ESP3DClientType::stream, (const uint8_t*)tmpstr.c_str(),
           tmpstr.length(), msg->authentication_level);
@@ -61,6 +63,9 @@ void ESP3DCommands::ESP700(int cmd_params_pos, ESP3DMessage* msg) {
         esp3d_log_e("Message creation failed");
       }
     } else {
+      // FIXME: check if it a macro of main file
+      // if Macro it should be added to top of queue
+      // if main file it should be added to bottom of queue
       hasError = false;
       error_msg = "Streaming already in progress";
       esp3d_log_e("Error streaming already in progress");
