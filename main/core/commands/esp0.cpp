@@ -102,7 +102,8 @@ const char* help[] = {
     "[ESP610](type=NONE/PUSHOVER/EMAIL/LINE/IFTTT) (AUTO=YES/NO) (T1=token1) "
     "(T2=token2) (TS=Settings)",
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
-    "[ESP700](script / file name) - read and process/stream script/file",
+    "[ESP700](stream=file name) or (macro name) - read and process/stream "
+    "file/macro",
     "[ESP701]action=(PAUSE/RESUME/ABORT) - query and control ESP700 stream",
     "[ESP702](pause/stop/resume)=(script) - display/set ESP700 stream scripts",
     "[ESP710]FORMATFS - Format ESP3D Filesystem",

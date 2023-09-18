@@ -80,10 +80,8 @@ enum class ESP3DGcodeHostFileType : uint8_t {
                       // practice
   filesystem,
   script,
-#if ESP3D_SD_CARD_FEATURE
   sd_card,
   sd_script,
-#endif  // ESP3D_SD_CARD_FEATURE
   active,
   unknown,
   invalid

@@ -72,15 +72,14 @@ ESP3DGcodeHostFileType ESP3DGCodeHostService::_getStreamType(
     const char* file) {  // maybe this can also check for invalid file
                          // extensions if not done elsewhere
   if (file[0] == '/') {
+    ESP3DGcodeHostFileType type = ESP3DGcodeHostFileType::filesystem;
     if (strstr(file, "/sd/") == file) {
 #if ESP3D_SD_CARD_FEATURE
-      return ESP3DGcodeHostFileType::sd_card;
-#else
-      return ESP3DGcodeHostFileType::invalid;  // maybe should return error?
+      type = ESP3DGcodeHostFileType::sd_card;
+
 #endif  // ESP3D_SD_CARD_FEATURE
-    } else {
-      return ESP3DGcodeHostFileType::filesystem;
     }
+    return type;
   } else {
     if (strstr(file, "\n") != nullptr || (strstr(file, ";") != nullptr)) {
       return ESP3DGcodeHostFileType::multiple_commands;
@@ -154,6 +153,10 @@ bool ESP3DGCodeHostService::newStream(
 bool ESP3DGCodeHostService::addStream(const char* filename,
                                       ESP3DAuthenticationLevel auth_type,
                                       bool executeAsMacro) {
+  ESP3DGcodeHostFileType type = _getStreamType(filename);
+  // ESP700 only accepts file names, not commands
+  // as commands can be sent directly, no need to use ESP700
+  if (!isFileStream(type)) return false;
   bool isfirst = false;
   if (executeAsMacro)
     isfirst = true;
