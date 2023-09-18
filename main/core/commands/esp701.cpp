@@ -16,7 +16,6 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#if ESP3D_GCODE_HOST_FEATURE
 #include "authentication/esp3d_authentication.h"
 #include "esp3d_client.h"
 #include "esp3d_commands.h"
@@ -66,13 +65,12 @@ void ESP3DCommands::ESP701(int cmd_params_pos, ESP3DMessage* msg) {
         }
       }
     } else {
-      ESP3DGcodeStream* script = gcodeHostService.getCurrentStream(); //Passing pointers between threads seems like a bad idea
+      ESP3DGcodeStream* script =
+          gcodeHostService.getCurrentStream();  // Passing pointers between
+                                                // threads seems like a bad idea
       /*What info do we need?
       1. Stream ID - filepath
       2. Nothing else really?*/
-
-
-
 
       if (script) {
         if (status == ESP3DGcodeHostState::paused) {
@@ -137,4 +135,3 @@ void ESP3DCommands::ESP701(int cmd_params_pos, ESP3DMessage* msg) {
     esp3d_log_e("Error sending response to clients");
   }
 }
-#endif  // ESP3D_GCODE_HOST_FEATURE

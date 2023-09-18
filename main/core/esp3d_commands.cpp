@@ -39,13 +39,11 @@
 #endif  // ESP3D_DISPLAY_FEATURE
 
 #include <stdio.h>
-#if ESP3D_GCODE_HOST_FEATURE
-#include "gcode_host/esp3d_gcode_host_service.h"
-#endif  // ESP3D_GCODE_HOST_FEATURE
 
 #include <string>
 
 #include "esp3d_string.h"
+#include "gcode_host/esp3d_gcode_host_service.h"
 
 ESP3DCommands esp3dCommands;
 
@@ -477,7 +475,6 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
       break;
 #endif  // ESP3D_TELNET_FEATURE
 
-#if ESP3D_GCODE_HOST_FEATURE
     case ESP3DClientType::stream:
       if (gcodeHostService.started()) {
         gcodeHostService.process(msg);
@@ -487,7 +484,7 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
                     msg->size);
       }
       break;
-#endif  // ESP3D_GCODE_HOST_FEATURE
+
 #if ESP3D_DISPLAY_FEATURE
     case ESP3DClientType::rendering:
       if (renderingClient.started()) {
@@ -526,8 +523,7 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
       // msg need to be duplicate for each target
       // Do not broadcast system messages to printer output
       // printer may receive unwhished messages
-#if ESP3D_GCODE_HOST_FEATURE
-      // ESP3DClientType::serial
+
       if (msg->origin != ESP3DClientType::stream &&
           msg->origin != ESP3DClientType::system) {
         if (msg->target == ESP3DClientType::all_clients) {
@@ -545,7 +541,7 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
           }
         }
       }
-#endif
+
 #if ESP3D_HTTP_FEATURE
       // ESP3DClientType::webui_websocket
       if (msg->origin != ESP3DClientType::webui_websocket) {
@@ -776,8 +772,7 @@ const char* ESP3DCommands::get_clean_param(ESP3DMessage* msg, uint start) {
     }
     if (std::isspace(c) && !prevCharIsEscaped) {
       // esp3d_log("testing *%s*", value.c_str());
-      if (value == "json" ||
-          esp3d_string::startsWith(value.c_str(), "json=") ||
+      if (value == "json" || esp3d_string::startsWith(value.c_str(), "json=") ||
           esp3d_string::startsWith(value.c_str(), "pwd=")) {
         value.clear();
       } else {
@@ -975,7 +970,6 @@ void ESP3DCommands::execute_internal_command(int cmd, int cmd_params_pos,
       ESP610(cmd_params_pos, msg);
       break;
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
-#if ESP3D_GCODE_HOST_FEATURE
     case 700:
       ESP700(cmd_params_pos, msg);
       break;
@@ -985,7 +979,6 @@ void ESP3DCommands::execute_internal_command(int cmd, int cmd_params_pos,
     case 702:
       ESP702(cmd_params_pos, msg);
       break;
-#endif  // ESP3D_GCODE_HOST_FEATURE
     case 710:
       ESP710(cmd_params_pos, msg);
       break;

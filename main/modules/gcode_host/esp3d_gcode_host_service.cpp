@@ -17,8 +17,6 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-// #define ESP3D_GCODE_HOST_FEATURE
-#ifdef ESP3D_GCODE_HOST_FEATURE
 #include "esp3d_gcode_host_service.h"
 
 #include <stdio.h>
@@ -1294,4 +1292,3 @@ void ESP3DGCodeHostService::end() {
   _current_stream = nullptr;
   _scripts.clear();
 }
-#endif  // ESP3D_GCODE_HOST_FEATURE

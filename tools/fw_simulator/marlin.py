@@ -244,7 +244,7 @@ def M109_response(line, ser):
 def M114_response(line, ser):
     global positions
     val = "X:" + "{:.2f}".format(positions["X"]) + " Y:" + "{:.2f}".format(
-        positions["Y"]) + " Z:" + "{:.2f}".format(positions["Z"])+" E:0.00 Count X:0 Y:0 Z:0"
+        positions["Y"]) + " Z:" + "{:.2f}".format(positions["Z"])+" E:0.00 Count X:0 Y:0 Z:0\nok"
     return val
 
 # M140 bed control not waiting

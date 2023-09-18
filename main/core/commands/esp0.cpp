@@ -102,11 +102,9 @@ const char* help[] = {
     "[ESP610](type=NONE/PUSHOVER/EMAIL/LINE/IFTTT) (AUTO=YES/NO) (T1=token1) "
     "(T2=token2) (TS=Settings)",
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
-#if ESP3D_GCODE_HOST_FEATURE
     "[ESP700](script / file name) - read and process/stream script/file",
     "[ESP701]action=(PAUSE/RESUME/ABORT) - query and control ESP700 stream",
     "[ESP702](pause/stop/resume)=(script) - display/set ESP700 stream scripts",
-#endif  // ESP3D_GCODE_HOST_FEATURE
     "[ESP710]FORMATFS - Format ESP3D Filesystem",
     "[ESP720](path) - List ESP3D Filesystem",
     "[ESP730](Action)=(path) - rmdir / remove / mkdir / exists / create on "
@@ -180,10 +178,7 @@ const uint cmdlist[] = {
 #if ESP3D_NOTIFICATIONS_FEATURE
     600, 610,
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
-#if ESP3D_GCODE_HOST_FEATURE
-    700, 701, 702,
-#endif  // ESP3D_GCODE_HOST_FEATURE
-    710, 720, 730,
+    700, 701, 702, 710, 720, 730,
 #if ESP3D_SD_CARD_FEATURE
     740, 750,
 #endif  // ESP3D_SD_CARD_FEATURE

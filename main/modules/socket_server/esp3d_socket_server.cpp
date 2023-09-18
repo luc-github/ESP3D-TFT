@@ -465,7 +465,7 @@ bool ESP3DSocketServer::pushMsgToRxQueue(uint index, const uint8_t *msg,
     if (ESP3DClient::setDataContent(newMsgPtr, msg, size)) {
       newMsgPtr->origin = ESP3DClientType::telnet;
       newMsgPtr->authentication_level = authentication_level;
-      newMsgPtr->target = esp3dCommands.getOutputClient();
+      newMsgPtr->target = ESP3DClientType::stream;
       newMsgPtr->type = ESP3DMessageType::unique;
       newMsgPtr->request_id.id = client->socket_id;
       if (!addRxData(newMsgPtr)) {

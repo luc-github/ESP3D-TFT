@@ -133,11 +133,9 @@ class ESP3DCommands {
   void ESP600(int cmd_params_pos, ESP3DMessage* msg);
   void ESP610(int cmd_params_pos, ESP3DMessage* msg);
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
-#if ESP3D_GCODE_HOST_FEATURE
   void ESP700(int cmd_params_pos, ESP3DMessage* msg);
   void ESP701(int cmd_params_pos, ESP3DMessage* msg);
   void ESP702(int cmd_params_pos, ESP3DMessage* msg);
-#endif  // ESP3D_GCODE_HOST_FEATURE
   void ESP710(int cmd_params_pos, ESP3DMessage* msg);
   void ESP720(int cmd_params_pos, ESP3DMessage* msg);
   void ESP730(int cmd_params_pos, ESP3DMessage* msg);

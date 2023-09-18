@@ -67,19 +67,7 @@ void ESP3DCommands::ESP950(int cmd_params_pos, ESP3DMessage* msg) {
         hasError = true;
         error_msg = "Set value failed";
       }  // hot change not yet supported
-      /*else {
 
-          if (esp3dCommands.getOutputClient() != newoutput) {
-              //hot change only if different
-              if (esp3dCommands.getOutputClient()==ESP3DClientType::usb_serial)
-      { usbSerialClient.end(); serialClient.begin(); } else {
-                  serialClient.end();
-                  usbSerialClient.begin();
-              }
-              //set new client output
-              esp3dCommands.setOutputClient(newoutput);
-          }
-      }*/
       has_param = true;
     }
     if (!has_param) {

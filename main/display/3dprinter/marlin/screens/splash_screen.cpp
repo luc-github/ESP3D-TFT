@@ -25,8 +25,8 @@
 #include "esp3d_log.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
+#include "esp3d_version.h"
 #include "main_screen.h"
-#include "version.h"
 
 extern "C" lv_img_dsc_t *get_splash_logo();
 extern "C" void release_splash_logo(lv_img_dsc_t *splash_logo);
@@ -72,7 +72,7 @@ void splash_screen() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Get active screen
   lv_obj_t *ui_Screen = lv_scr_act();
-  
+
   splash_logo = get_splash_logo();
   if (splash_logo != NULL) {
     // Create logo object

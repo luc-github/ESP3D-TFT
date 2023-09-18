@@ -207,7 +207,6 @@ void ESP3DCommands::ESP401(int cmd_params_pos, ESP3DMessage* msg) {
           esp3dNotificationsService.begin();
           break;
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
-#if ESP3D_GCODE_HOST_FEATURE
         case ESP3DSettingIndex::esp3d_pause_script:
         case ESP3DSettingIndex::esp3d_stop_script:
         case ESP3DSettingIndex::esp3d_resume_script:
@@ -217,7 +216,7 @@ void ESP3DCommands::ESP401(int cmd_params_pos, ESP3DMessage* msg) {
           esp3dTftstream.getTargetFirmware(true);
 
           break;
-#endif  // ESP3D_GCODE_HOST_FEATURE
+
         default:
           break;
       }

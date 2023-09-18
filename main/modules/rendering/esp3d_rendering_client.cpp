@@ -63,10 +63,9 @@ bool ESP3DRenderingClient::sendGcode(const char *data) {
   } else {
     cmd = data;
   }
-  return esp3dCommands.dispatch(cmd.c_str(), esp3dCommands.getOutputClient(),
-                                requestId, ESP3DMessageType::unique,
-                                ESP3DClientType::rendering,
-                                ESP3DAuthenticationLevel::admin);
+  return esp3dCommands.dispatch(
+      cmd.c_str(), ESP3DClientType::stream, requestId, ESP3DMessageType::unique,
+      ESP3DClientType::rendering, ESP3DAuthenticationLevel::admin);
 }
 
 ESP3DRenderingClient::ESP3DRenderingClient() {

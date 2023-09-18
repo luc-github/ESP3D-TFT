@@ -61,7 +61,6 @@ OPTION(TFT_UI_SERVICE "TFT UI service" ON)
 OPTION(SD_CARD_SERVICE "SD card service" ON)
 OPTION(NOTIFICATIONS_SERVICE "Notifications service" ON)
 OPTION(UPDATE_SERVICE "Update service" ON)
-OPTION(GCODE_HOST_SERVICE "GCode Streaming service" ON)
 OPTION(USE_FAT_INSTEAD_OF_LITTLEFS "Use FAT instead of LittleFS" OFF)
 
 # #######################################
@@ -285,10 +284,6 @@ if(SD_CARD_SERVICE)
     endif()
 else()
 unset(UPDATE_SERVICE CACHE)
-endif()
-
-if(GCODE_HOST_SERVICE)
-    add_compile_options(-DESP3D_GCODE_HOST_FEATURE=1)
 endif()
 
 # Add entry point for customizations headers
