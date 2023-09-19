@@ -87,9 +87,6 @@ class ESP3DGCodeHostService : public ESP3DClient {
   void flush();
   bool started() { return _started; }
 
-  bool newStream(const char* command, size_t length,
-                 ESP3DAuthenticationLevel authentication_level,
-                 bool isPrintStream = false);
   void updateScripts();
   bool abort();
   bool pause();
@@ -100,11 +97,13 @@ class ESP3DGCodeHostService : public ESP3DClient {
   ESP3DGcodeStream* getCurrentStream();
   bool addStream(const char* filename, ESP3DAuthenticationLevel auth_type,
                  bool executeAsMacro);
+  bool addStream(const char* command, size_t length,
+                 ESP3DAuthenticationLevel authentication_level);
 
  private:
   void _updateOutputClient();
-  bool _streamFile(const char* file, ESP3DAuthenticationLevel auth_type,
-                   bool executeAsMacro = false, bool executeFirst = false);
+  bool _streamData(const char* data, ESP3DAuthenticationLevel auth_type,
+                   bool executeFirst = false);
   uint8_t _currentCommand[ESP_GCODE_HOST_COMMAND_LINE_BUFFER];
   char _ringBuffer[RING_BUFFER_LENGTH];  // maybe change this to uint8_t
   ESP3DGcodeStream* _bufferedStream = nullptr;
@@ -139,7 +138,7 @@ class ESP3DGCodeHostService : public ESP3DClient {
   bool _processRx(ESP3DMessage* rx);
   bool _parseResponse(ESP3DMessage* rx);
   bool _endStream(ESP3DGcodeStream* stream);
-  ESP3DGcodeHostFileType _getStreamType(const char* file);
+  ESP3DGcodeHostFileType _getStreamType(const char* data);
 
   TaskHandle_t _xHandle;
   bool _started;
