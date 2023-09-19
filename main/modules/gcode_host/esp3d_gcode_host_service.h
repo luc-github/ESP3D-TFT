@@ -62,7 +62,7 @@ struct ESP3DGcodeStream {
                     // millis
   uint64_t totalSize = 0;      // this will correspond to the end file index+1
   uint64_t processedSize = 0;  // this will correspond to the position in a file
-  uint64_t lineStart =
+  uint64_t cursorPos =
       0;  // index of the first character on the line to send. used for
           // switching between streams as new streams are added.
   ESP3DGcodeHostFileType type =
@@ -72,13 +72,8 @@ struct ESP3DGcodeStream {
   ESP3DAuthenticationLevel auth_type =
       ESP3DAuthenticationLevel::guest;  // the authentication level of the user
                                         // requesting the stream
-  uint32_t bufferPos = 0;
-  uint8_t* commandBuffer = nullptr;
-  uint64_t commandNumber =
-      0;  // Next command number to send. //This should be a gcodehost variable,
-          // as only one print stream is possible
-  uint64_t resendCommandNumber = 0;  // Requested command to resend.
-  std::string fileName = "";         // the name of the file to stream
+
+  std::string dataStream = "";  // the name of the file to stream
 };
 
 class ESP3DGCodeHostService : public ESP3DClient {
@@ -115,7 +110,7 @@ class ESP3DGCodeHostService : public ESP3DClient {
   ESP3DGcodeStream* _bufferedStream = nullptr;
   uint32_t _bufferSeam =
       0;  // the position of the earliest byte in the ring buffer
-  uint32_t _bufferPos = 0;  // the position of the next byte to be read from the
+  uint32_t _cursorPos = 0;  // the position of the next byte to be read from the
                             // ring buffer (becomes start on next update)
   bool _bufferFresh =
       true;  // Flag to know if start == pos because the buffer is new or
@@ -160,8 +155,8 @@ class ESP3DGCodeHostService : public ESP3DClient {
   ESP3DGcodeHostState _current_state = ESP3DGcodeHostState::idle;
   ESP3DGcodeHostState _next_state = ESP3DGcodeHostState::idle;
   std::list<ESP3DGcodeStream*> _scripts;
-  ESP3DGcodeStream* _current_stream = nullptr;
-  ESP3DGcodeStream _currentPrintStream;
+  ESP3DGcodeStream* _current_stream_ptr = nullptr;
+  ESP3DGcodeStream _current_stream;
   std::string _stop_script;
   std::string _pause_script;
   std::string _resume_script;
@@ -169,7 +164,10 @@ class ESP3DGCodeHostService : public ESP3DClient {
   // Stream Variables:
   FILE* _File = nullptr;  // pointer to the file to be streamed. Files could be
                           // opened and closed whilst in use if it's helpful
-
+  uint64_t _command_number =
+      0;  // Next command number to send. //This should be a gcodehost variable,
+          // as only one print stream is possible
+  uint64_t _resend_command_number = 0;  // Requested command to resend.
   pthread_mutex_t _tx_mutex;
   pthread_mutex_t _rx_mutex;
 };
