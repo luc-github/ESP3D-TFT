@@ -94,7 +94,7 @@ class ESP3DGCodeHostService : public ESP3DClient {
   bool abort();
   bool pause();
   bool resume();
-  bool updateOutputClient();
+
   ESP3DGcodeHostState getState();
   ESP3DGcodeHostError getErrorNum();
   ESP3DGcodeStream *getCurrentStream();
@@ -108,7 +108,6 @@ class ESP3DGCodeHostService : public ESP3DClient {
   void _handle_notifications();
   void _handle_msgs();
   void _handle_states();
-  void _updateOutputClient();
   bool _streamData(const char *data, ESP3DAuthenticationLevel auth_type,
                    bool executeFirst = false);
   uint8_t _currentCommand[ESP_GCODE_HOST_COMMAND_LINE_BUFFER];
@@ -152,7 +151,6 @@ class ESP3DGCodeHostService : public ESP3DClient {
   const UBaseType_t _xPauseNotifyIndex = 1;
   const UBaseType_t _xResumeNotifyIndex = 2;
   const UBaseType_t _xAbortNotifyIndex = 3;
-  const UBaseType_t _xOutputChangeNotifyIndex = 4;
 
   ESP3DClientType _outputClient = ESP3DClientType::no_client;
   bool _awaitingAck = false;

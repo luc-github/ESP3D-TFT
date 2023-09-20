@@ -217,12 +217,6 @@ bool ESP3DGCodeHostService::resume() {
   return true;
 }
 
-bool ESP3DGCodeHostService::updateOutputClient() {
-  xTaskNotifyGive(_xHandle);
-  xTaskNotifyGiveIndexed(_xHandle, _xOutputChangeNotifyIndex);
-  return true;
-}
-
 // ##################### Parsing Functions ########################
 // FIXME: use the GCODE parser to get this command
 bool ESP3DGCodeHostService::_isAck(const char* cmd) {
@@ -783,11 +777,6 @@ void ESP3DGCodeHostService::process(ESP3DMessage* msg) {
   //}
 }
 
-void ESP3DGCodeHostService::_updateOutputClient() {
-  _outputClient = esp3dCommands.getOutputClient();
-  esp3d_log("Output client is: %d", static_cast<uint8_t>(_outputClient));
-}
-
 bool ESP3DGCodeHostService::begin() {
   end();
   if (pthread_mutex_init(&_rx_mutex, NULL) != 0) {
@@ -809,7 +798,10 @@ bool ESP3DGCodeHostService::begin() {
 
   // Task is never stopped so no need to kill the task from outside
   _started = true;
-  _updateOutputClient();
+  // this is done once because it is not possible to change the output client
+  // after the fw is started
+  _outputClient = esp3dCommands.getOutputClient(true);
+  esp3d_log("Output client is: %d", static_cast<uint8_t>(_outputClient));
   BaseType_t res = xTaskCreatePinnedToCore(
       esp3d_gcode_host_task, "esp3d_gcode_host_task",
       ESP3D_GCODE_HOST_TASK_SIZE, NULL, ESP3D_GCODE_HOST_TASK_PRIORITY,
@@ -970,9 +962,6 @@ void ESP3DGCodeHostService::_handle_notifications() {
       if (_current_stream.dataStream != "") {
         _current_stream.state = ESP3DGcodeStreamState::abort;
       }
-    }
-    if (ulTaskNotifyTakeIndexed(_xOutputChangeNotifyIndex, pdTRUE, 0)) {
-      _updateOutputClient();
     }
   }
 }
