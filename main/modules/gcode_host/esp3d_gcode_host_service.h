@@ -97,7 +97,7 @@ class ESP3DGCodeHostService : public ESP3DClient {
 
   ESP3DGcodeHostState getState();
   ESP3DGcodeHostError getErrorNum();
-  ESP3DGcodeStream *getCurrentStream();
+  ESP3DGcodeStream *getCurrentMainStream();
   bool addStream(const char *filename, ESP3DAuthenticationLevel auth_type,
                  bool executeAsMacro);
   bool addStream(const char *command, size_t length,
@@ -160,6 +160,7 @@ class ESP3DGCodeHostService : public ESP3DClient {
   ESP3DGcodeHostState _next_state = ESP3DGcodeHostState::idle;
   std::list<ESP3DGcodeStream *> _scripts;
   ESP3DGcodeStream *_current_stream_ptr = nullptr;
+  ESP3DGcodeStream *_current_main_stream_ptr = nullptr;
   ESP3DGcodeStream _current_stream;
   std::string _stop_script;
   std::string _pause_script;

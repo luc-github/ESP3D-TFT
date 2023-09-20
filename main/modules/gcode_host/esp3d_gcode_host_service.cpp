@@ -726,7 +726,7 @@ bool ESP3DGCodeHostService::_processRx(ESP3DMessage* rx) {
 
 // needs reworking for however states end up
 ESP3DGcodeHostState ESP3DGCodeHostService::getState() {
-  ESP3DGcodeStream* stream = getCurrentStream();
+  ESP3DGcodeStream* stream = getCurrentMainStream();
   if (stream) {
     if (stream->state == ESP3DGcodeStreamState::paused)
       return ESP3DGcodeHostState::paused;
@@ -737,7 +737,7 @@ ESP3DGcodeHostState ESP3DGCodeHostService::getState() {
 }
 
 // Get top active stream even it is paused
-ESP3DGcodeStream* ESP3DGCodeHostService::getCurrentStream() {
+ESP3DGcodeStream* ESP3DGCodeHostService::getCurrentMainStream() {
   // get the first stream in the queue
   esp3d_log("There are currently %d scripts", _scripts.size());
   for (auto script = _scripts.begin(); script != _scripts.end(); ++script) {
