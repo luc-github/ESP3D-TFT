@@ -108,6 +108,7 @@ class ESP3DGCodeHostService : public ESP3DClient {
   ESP3DGcodeStream *_get_front_stream();
   ESP3DGcodeStreamState _getStreamState();
   bool _setStreamState(ESP3DGcodeStreamState state);
+  bool _setStreamRequestState(ESP3DGcodeStreamState state);
   void _handle_notifications();
   void _handle_msgs();
   void _handle_stream_selection();
@@ -162,6 +163,7 @@ class ESP3DGCodeHostService : public ESP3DClient {
   uint64_t _timeoutInterval = ESP_HOST_OK_TIMEOUT;
   ESP3DGcodeHostState _current_state = ESP3DGcodeHostState::idle;
   ESP3DGcodeHostState _next_state = ESP3DGcodeHostState::idle;
+  ESP3DGcodeStreamState _requested_state = ESP3DGcodeStreamState::read_line;
   std::list<ESP3DGcodeStream *> _scripts;
   ESP3DGcodeStream *_current_stream_ptr = nullptr;
   ESP3DGcodeStream *_current_main_stream_ptr = nullptr;

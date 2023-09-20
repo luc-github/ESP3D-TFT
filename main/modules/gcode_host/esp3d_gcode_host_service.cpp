@@ -964,6 +964,18 @@ bool ESP3DGCodeHostService::_setStreamState(ESP3DGcodeStreamState state) {
   return false;
 }
 
+// this state is not applied immediately, but is used to determine the next
+// state when reading the next command
+bool ESP3DGCodeHostService::_setStreamRequestState(
+    ESP3DGcodeStreamState state) {
+  if (_current_main_stream_ptr) {
+    _requested_state = state;
+    return true;
+  }
+  _requested_state = ESP3DGcodeStreamState::read_line;
+  return false;
+}
+
 // Give the current state of the active main stream, if any
 ESP3DGcodeStreamState ESP3DGCodeHostService::_getStreamState() {
   if (_current_main_stream_ptr) {
@@ -980,14 +992,11 @@ void ESP3DGCodeHostService::_handle_notifications() {
     ESP3DGcodeStreamState state = _getStreamState();
     if (ulTaskNotifyTakeIndexed(_xPauseNotifyIndex, pdTRUE, 0)) {
       esp3d_log("Received pause notification");
-      if (state != ESP3DGcodeStreamState::paused &&
-          state != ESP3DGcodeStreamState::undefined &&
-          state != ESP3DGcodeStreamState::error) {
-        if (!_setStreamState(ESP3DGcodeStreamState::pause)) {
-          esp3d_log_e("Failed to pause stream");
-        }
+      if (!_setStreamState(ESP3DGcodeStreamState::pause)) {
+        esp3d_log_e("Failed to pause stream");
       }
     }
+
     if (ulTaskNotifyTakeIndexed(_xResumeNotifyIndex, pdTRUE, 0)) {
       esp3d_log("Received resume notification");
       if (state == ESP3DGcodeStreamState::paused) {
