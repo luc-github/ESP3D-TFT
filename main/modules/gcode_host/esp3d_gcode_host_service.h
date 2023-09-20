@@ -36,15 +36,18 @@
 #define isWhiteSpace(ch)                                       \
   ((char)ch == '\n' || (char)ch == '\r' || (char)ch == '\t' || \
    (char)ch == '\v' || (char)ch == '\f' || (char)ch == ' ')
-#define isFileStream(stream)                                                   \
-  ((((ESP3DGcodeStream*)stream)->type == ESP3DGcodeHostFileType::fs_stream) || \
-   (((ESP3DGcodeStream*)stream)->type == ESP3DGcodeHostFileType::sd_stream) || \
-   (((ESP3DGcodeStream*)stream)->type == ESP3DGcodeHostFileType::fs_script) || \
-   (((ESP3DGcodeStream*)stream)->type == ESP3DGcodeHostFileType::sd_script))
+#define isFileStream(stream)              \
+  ((((ESP3DGcodeStream *)stream)->type == \
+    ESP3DGcodeHostFileType::fs_stream) || \
+   (((ESP3DGcodeStream *)stream)->type == \
+    ESP3DGcodeHostFileType::sd_stream) || \
+   (((ESP3DGcodeStream *)stream)->type == \
+    ESP3DGcodeHostFileType::fs_script) || \
+   (((ESP3DGcodeStream *)stream)->type == ESP3DGcodeHostFileType::sd_script))
 #define isCommandStream(stream)                \
-  ((((ESP3DGcodeStream*)stream)->type ==       \
+  ((((ESP3DGcodeStream *)stream)->type ==      \
     ESP3DGcodeHostFileType::single_command) || \
-   (((ESP3DGcodeStream*)stream)->type ==       \
+   (((ESP3DGcodeStream *)stream)->type ==      \
     ESP3DGcodeHostFileType::multiple_commands))
 
 #define ESP_HOST_OK_TIMEOUT 60000
@@ -83,7 +86,7 @@ class ESP3DGCodeHostService : public ESP3DClient {
   bool begin();
   void end();
   void handle();
-  void process(ESP3DMessage* msg);
+  void process(ESP3DMessage *msg);
   void flush();
   bool started() { return _started; }
 
@@ -94,19 +97,23 @@ class ESP3DGCodeHostService : public ESP3DClient {
   bool updateOutputClient();
   ESP3DGcodeHostState getState();
   ESP3DGcodeHostError getErrorNum();
-  ESP3DGcodeStream* getCurrentStream();
-  bool addStream(const char* filename, ESP3DAuthenticationLevel auth_type,
+  ESP3DGcodeStream *getCurrentStream();
+  bool addStream(const char *filename, ESP3DAuthenticationLevel auth_type,
                  bool executeAsMacro);
-  bool addStream(const char* command, size_t length,
+  bool addStream(const char *command, size_t length,
                  ESP3DAuthenticationLevel authentication_level);
 
  private:
+  ESP3DGcodeStream *_get_front_stream();
+  void _handle_notifications();
+  void _handle_msgs();
+  void _handle_states();
   void _updateOutputClient();
-  bool _streamData(const char* data, ESP3DAuthenticationLevel auth_type,
+  bool _streamData(const char *data, ESP3DAuthenticationLevel auth_type,
                    bool executeFirst = false);
   uint8_t _currentCommand[ESP_GCODE_HOST_COMMAND_LINE_BUFFER];
   char _ringBuffer[RING_BUFFER_LENGTH];  // maybe change this to uint8_t
-  ESP3DGcodeStream* _bufferedStream = nullptr;
+  ESP3DGcodeStream *_bufferedStream = nullptr;
   uint32_t _bufferSeam =
       0;  // the position of the earliest byte in the ring buffer
   uint32_t _cursorPos = 0;  // the position of the next byte to be read from the
@@ -114,31 +121,31 @@ class ESP3DGCodeHostService : public ESP3DClient {
   bool _bufferFresh =
       true;  // Flag to know if start == pos because the buffer is new or
              // finished. -- should rename to _bufferFull
-  bool _isAck(const char* cmd);
-  bool _isBusy(const char* cmd);
-  bool _isError(const char* cmd);
-  uint64_t _resendCommandNumber(const char* cmd);
-  bool _isEmergencyParse(const char* cmd);
+  bool _isAck(const char *cmd);
+  bool _isBusy(const char *cmd);
+  bool _isError(const char *cmd);
+  uint64_t _resendCommandNumber(const char *cmd);
+  bool _isEmergencyParse(const char *cmd);
 
   bool _isAckNeeded() { return _awaitingAck; };
-  bool _openFile(ESP3DGcodeStream* stream);
-  bool _closeFile(ESP3DGcodeStream* stream);
-  bool _startStream(ESP3DGcodeStream* stream);
-  bool _setStream();
+  bool _openFile(ESP3DGcodeStream *stream);
+  bool _closeFile(ESP3DGcodeStream *stream);
+  bool _startStream(ESP3DGcodeStream *stream);
+  bool _handle_stream();
 
-  bool _updateRingBuffer(ESP3DGcodeStream* stream);
-  char _readCharFromRingBuffer(ESP3DGcodeStream* stream);
-  char _readCharFromCommandBuffer(ESP3DGcodeStream* stream);
+  bool _updateRingBuffer(ESP3DGcodeStream *stream);
+  char _readCharFromRingBuffer(ESP3DGcodeStream *stream);
+  char _readCharFromCommandBuffer(ESP3DGcodeStream *stream);
 
-  bool _readNextCommand(ESP3DGcodeStream* stream);
-  uint8_t _Checksum(const char* command, uint32_t commandSize);
-  bool _CheckSumCommand(char* command, uint32_t commandnb);
+  bool _readNextCommand(ESP3DGcodeStream *stream);
+  uint8_t _Checksum(const char *command, uint32_t commandSize);
+  bool _CheckSumCommand(char *command, uint32_t commandnb);
 
   bool _gotoLine(uint64_t line);
-  bool _processRx(ESP3DMessage* rx);
-  bool _parseResponse(ESP3DMessage* rx);
-  bool _endStream(ESP3DGcodeStream* stream);
-  ESP3DGcodeHostFileType _getStreamType(const char* data);
+  bool _processRx(ESP3DMessage *rx);
+  bool _parseResponse(ESP3DMessage *rx);
+  bool _endStream(ESP3DGcodeStream *stream);
+  ESP3DGcodeHostFileType _getStreamType(const char *data);
 
   TaskHandle_t _xHandle;
   bool _started;
@@ -153,15 +160,15 @@ class ESP3DGCodeHostService : public ESP3DClient {
   uint64_t _timeoutInterval = ESP_HOST_OK_TIMEOUT;
   ESP3DGcodeHostState _current_state = ESP3DGcodeHostState::idle;
   ESP3DGcodeHostState _next_state = ESP3DGcodeHostState::idle;
-  std::list<ESP3DGcodeStream*> _scripts;
-  ESP3DGcodeStream* _current_stream_ptr = nullptr;
+  std::list<ESP3DGcodeStream *> _scripts;
+  ESP3DGcodeStream *_current_stream_ptr = nullptr;
   ESP3DGcodeStream _current_stream;
   std::string _stop_script;
   std::string _pause_script;
   std::string _resume_script;
 
   // Stream Variables:
-  FILE* _File = nullptr;  // pointer to the file to be streamed. Files could be
+  FILE *_File = nullptr;  // pointer to the file to be streamed. Files could be
                           // opened and closed whilst in use if it's helpful
   uint64_t _command_number =
       0;  // Next command number to send. //This should be a gcodehost variable,
@@ -169,6 +176,7 @@ class ESP3DGCodeHostService : public ESP3DClient {
   uint64_t _resend_command_number = 0;  // Requested command to resend.
   pthread_mutex_t _tx_mutex;
   pthread_mutex_t _rx_mutex;
+  pthread_mutex_t _stream_list_mutex;
 };
 
 extern ESP3DGCodeHostService gcodeHostService;

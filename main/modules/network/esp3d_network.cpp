@@ -58,7 +58,7 @@ static void wifi_ap_event_handler(void* arg, esp_event_base_t event_base,
     esp3d_log("station " MACSTR " join, AID=%d", MAC2STR(event->mac),
               event->aid);
 #else
-    // TODO: TBD
+    // TODO: What need to be done here ?
 #endif  // ESP3D_TFT_LOG
   } else if (event_id == WIFI_EVENT_AP_STADISCONNECTED) {
 #if ESP3D_TFT_LOG && ESP3D_TFT_LOG == ESP3D_TFT_LOG_LEVEL_ALL
@@ -67,7 +67,7 @@ static void wifi_ap_event_handler(void* arg, esp_event_base_t event_base,
     esp3d_log("station " MACSTR " leave, AID=%d", MAC2STR(event->mac),
               event->aid);
 #else
-    // TODO: TBD
+    // TODO: What need to be done here ?
 #endif  // ESP3D_TFT_LOG
   }
 }
@@ -121,7 +121,7 @@ static void wifi_sta_event_handler(void* arg, esp_event_base_t event_base,
     ip_event_got_ip_t* event = (ip_event_got_ip_t*)event_data;
     esp3d_log("got ip:" IPSTR, IP2STR(&event->ip_info.ip));
 #else
-    // TODO: TBD
+    // TODO: What need to be done here ?
 #endif  // ESP3D_TFT_LOG
     s_retry_num = 0;
     xEventGroupSetBits(esp3dNetwork.getEventGroup(), WIFI_CONNECTED_BIT);

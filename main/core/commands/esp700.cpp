@@ -63,8 +63,8 @@ void ESP3DCommands::ESP700(int cmd_params_pos, ESP3DMessage* msg) {
                 isMacro ? "Macro" : "File");
     } else {
       hasError = false;
-      error_msg = "Streaming already in progress";
-      esp3d_log_e("Error streaming already in progress");
+      error_msg = "Failed to add stream";
+      esp3d_log_e("Failed to add stream");
     }
   }
   if (!dispatchAnswer(msg, COMMAND_ID, json, hasError,

@@ -39,7 +39,7 @@ if(WIFI_SERVICE)
 endif()
 
 if(BT_SERVICE)
-    # TODO
+    # TODO: add bluetooth support?
 endif()
 
 if(SD_CARD_SERVICE)

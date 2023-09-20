@@ -127,7 +127,7 @@ void ESP3DTftStream::handle() {
 }
 
 bool ESP3DTftStream::end() {
-  // TODO
+  // TODO: need code review
   // this part is never called
   //  if called need to kill task also
   serialClient.end();

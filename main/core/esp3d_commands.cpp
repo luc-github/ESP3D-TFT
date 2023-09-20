@@ -1042,7 +1042,7 @@ bool isRealTimeCommand(char* cmd, size_t len) { return false; }
 
 bool ESP3DCommands::formatCommand(char* cmd, size_t len) {
   if (isRealTimeCommand(cmd, len)) {
-    // TODO
+    // TODO: what if is realtime command ?
     return true;
   }
   uint sizestr = strlen(cmd);
