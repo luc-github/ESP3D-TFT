@@ -175,8 +175,28 @@ bool ESP3DGCodeHostService::_streamData(const char* data,
   if (_stream_list_mutex) {
     if (pthread_mutex_lock(&_stream_list_mutex) == 0) {
       if (executeFirst) {
-        _scripts.push_front(new_stream);
+        // the new stream is just before the current main stream if any
+        if (_current_main_stream_ptr != nullptr) {
+          bool found = false;
+          for (auto it = _scripts.begin(); it != _scripts.end(); ++it) {
+            if (*it == _current_main_stream_ptr) {
+              esp3d_log_w("Inster new stream before current main stream");
+              _scripts.insert(it, new_stream);
+              found = true;
+              break;
+            }
+            if (!found) {
+              esp3d_log_w("No main stream found, add at the end");
+              _scripts.push_back(new_stream);
+            }
+          }
+        } else {  // no main stream, add at the end
+          esp3d_log("No main stream, add at the end");
+          _scripts.push_back(new_stream);
+        }
       } else {
+        // the new stream is just after the current stream if any
+        esp3d_log("Add stream at the end of the list");
         _scripts.push_back(new_stream);
       }
       pthread_mutex_unlock(&_stream_list_mutex);
@@ -825,7 +845,7 @@ ESP3DGcodeStream* ESP3DGCodeHostService::_get_front_stream() {
   return _scripts.front();
 }
 
-bool ESP3DGCodeHostService::_handle_stream() {
+void ESP3DGCodeHostService::_handle_stream_selection() {
   if (!_scripts.empty()) {
     // esp3d_log("Processing %d script(s)", _scripts.size());
 
@@ -930,8 +950,6 @@ bool ESP3DGCodeHostService::_handle_stream() {
     // esp3d_log("No Stream");
     _current_stream_ptr = nullptr;
   }
-
-  return true;
 }
 
 // all changes of state must use this one so sanity checks can be done
@@ -1185,7 +1203,7 @@ void ESP3DGCodeHostService::handle() {
   _handle_notifications();
 
   // Handle the stream
-  _handle_stream();
+  _handle_stream_selection();
 
   // Handle the state machine
   _handle_stream_states();

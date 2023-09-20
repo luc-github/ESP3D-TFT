@@ -110,6 +110,7 @@ class ESP3DGCodeHostService : public ESP3DClient {
   bool _setStreamState(ESP3DGcodeStreamState state);
   void _handle_notifications();
   void _handle_msgs();
+  void _handle_stream_selection();
   void _handle_stream_states();
   void _handle_host_states();
   bool _streamData(const char *data, ESP3DAuthenticationLevel auth_type,
@@ -134,7 +135,6 @@ class ESP3DGCodeHostService : public ESP3DClient {
   bool _openFile(ESP3DGcodeStream *stream);
   bool _closeFile(ESP3DGcodeStream *stream);
   bool _startStream(ESP3DGcodeStream *stream);
-  bool _handle_stream();
 
   bool _updateRingBuffer(ESP3DGcodeStream *stream);
   char _readCharFromRingBuffer(ESP3DGcodeStream *stream);
