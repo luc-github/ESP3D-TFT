@@ -110,7 +110,7 @@ bool ESP3DGCodeHostService::addStream(
   // the command has a 0x0 terminal so we should be able to ignore the length
   // because it is msg we should consider it as a command so we can execute it
   // first
-  return _streamData(command, authentication_level, true);
+  return _add_stream(command, authentication_level, true);
 }
 
 // Add stream from ESP700 command
@@ -121,10 +121,10 @@ bool ESP3DGCodeHostService::addStream(const char* filename,
   //  ESP700 only accepts file names, not commands
   //  as commands can be sent directly, no need to use ESP700
   if (!isFileStream(type)) return false;
-  return _streamData(filename, auth_type, executeAsMacro);
+  return _add_stream(filename, auth_type, executeAsMacro);
 }
 
-bool ESP3DGCodeHostService::_streamData(const char* data,
+bool ESP3DGCodeHostService::_add_stream(const char* data,
                                         ESP3DAuthenticationLevel auth_type,
                                         bool executeFirst) {
   esp3d_log("Processing stream request: %s, with authentication level=%d", data,
@@ -161,6 +161,7 @@ bool ESP3DGCodeHostService::_streamData(const char* data,
   new_stream->cursorPos = 0;
   new_stream->processedSize = 0;
   new_stream->totalSize = 0;
+  new_stream->active = false;
   new_stream->state = ESP3DGcodeStreamState::start;
   new_stream->dataStream = data;
   // Sanity check for multiple commands
@@ -214,7 +215,7 @@ bool ESP3DGCodeHostService::_streamData(const char* data,
   //  FIXME: Use gcode parser to get this command
   // const char lineno_reset[] =
   //     "M110 N0\n";  // Is there a better way to store this const?
-  //_streamData(lineno_reset, auth_type, true);
+  //_add_stream(lineno_reset, auth_type, true);
 
   return true;
 }
@@ -1085,7 +1086,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
         // add pause script to _scripts
         //_current_stream_ptr -> state = ESP3DGcodeStreamState::paused;
         _current_stream.state = ESP3DGcodeStreamState::paused;
-        _streamData(_pause_script.c_str(), _current_stream_ptr->auth_type,
+        _add_stream(_pause_script.c_str(), _current_stream_ptr->auth_type,
                     true);
         break;
 
@@ -1093,7 +1094,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
         // add resume script to _scripts
         //_current_stream_ptr -> state = ESP3DGcodeStreamState::read_line;
         _current_stream.state = ESP3DGcodeStreamState::read_line;
-        _streamData(_resume_script.c_str(), _current_stream_ptr->auth_type,
+        _add_stream(_resume_script.c_str(), _current_stream_ptr->auth_type,
                     true);
         break;
 
@@ -1103,7 +1104,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
         // this
         // need to apply only to currentPrintStream?
         _current_stream.state = ESP3DGcodeStreamState::end;
-        _streamData(_stop_script.c_str(), _current_stream_ptr->auth_type, true);
+        _add_stream(_stop_script.c_str(), _current_stream_ptr->auth_type, true);
         break;
 
       case ESP3DGcodeStreamState::paused:  // might be worth updating the

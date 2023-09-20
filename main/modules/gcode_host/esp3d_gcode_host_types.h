@@ -40,7 +40,6 @@ enum class ESP3DGcodeStreamState : uint8_t {
   paused,  // do nothing until resumed
   error,
   undefined,
-  processing,
 };
 
 enum class ESP3DGcodeHostState : uint8_t {  // maybe need stream state and host
@@ -55,7 +54,7 @@ enum class ESP3DGcodeHostState : uint8_t {  // maybe need stream state and host
   paused,  // only used to indicate print stream is paused outside of gcodehost,
            // not used here
   processing,
-  on_hold,
+
 };
 
 enum class ESP3DGcodeHostError : uint8_t {
