@@ -934,33 +934,65 @@ bool ESP3DGCodeHostService::_handle_stream() {
   return true;
 }
 
+// all changes of state must use this one so sanity checks can be done
+// if necessary
+// returns true if state change is successful
+bool ESP3DGCodeHostService::_setStreamState(ESP3DGcodeStreamState state) {
+  if (_current_main_stream_ptr) {
+    _current_main_stream_ptr->state = state;
+    return true;
+  }
+  return false;
+}
+
+// Give the current state of the active main stream, if any
+ESP3DGcodeStreamState ESP3DGCodeHostService::_getStreamState() {
+  if (_current_main_stream_ptr) {
+    return _current_main_stream_ptr->state;
+  }
+  return ESP3DGcodeStreamState::undefined;
+}
+
 // Handle the notifications
+// be sure sdkconfig has CONFIG_FREERTOS_TASK_NOTIFICATION_ARRAY_ENTRIES>=3
 void ESP3DGCodeHostService::_handle_notifications() {
+  // entry 0
   if (ulTaskNotifyTake(pdTRUE, 0)) {
+    ESP3DGcodeStreamState state = _getStreamState();
     if (ulTaskNotifyTakeIndexed(_xPauseNotifyIndex, pdTRUE, 0)) {
       esp3d_log("Received pause notification");
-      if (_current_stream.dataStream != "") {
-        _current_stream.state = ESP3DGcodeStreamState::pause;
+      if (state != ESP3DGcodeStreamState::paused &&
+          state != ESP3DGcodeStreamState::undefined &&
+          state != ESP3DGcodeStreamState::error) {
+        if (!_setStreamState(ESP3DGcodeStreamState::pause)) {
+          esp3d_log_e("Failed to pause stream");
+        }
       }
     }
     if (ulTaskNotifyTakeIndexed(_xResumeNotifyIndex, pdTRUE, 0)) {
       esp3d_log("Received resume notification");
-      if (_current_stream.state == ESP3DGcodeStreamState::paused) {
-        _current_stream.state = ESP3DGcodeStreamState::resume;
-      } else if (_current_stream.state ==
+      if (state == ESP3DGcodeStreamState::paused) {
+        if (!_setStreamState(ESP3DGcodeStreamState::resume)) {
+          esp3d_log_e("Failed to resume stream");
+        }
+      } else if (state ==
                  ESP3DGcodeStreamState::pause) {  // if we haven't done pause
                                                   // actions yet, we don't
                                                   // need to do resume actions
                                                   // - just cancel the pause.
-        _current_stream.state = ESP3DGcodeStreamState::read_line;
+        if (!_setStreamState(ESP3DGcodeStreamState::read_line)) {
+          esp3d_log_e("Failed to cancel pause");
+        }
       } else {
         esp3d_log_w("No paused stream - nothing to resume");
       }
     }
     if (ulTaskNotifyTakeIndexed(_xAbortNotifyIndex, pdTRUE, 0)) {
       esp3d_log("Received abort notification");
-      if (_current_stream.dataStream != "") {
-        _current_stream.state = ESP3DGcodeStreamState::abort;
+      if (state != ESP3DGcodeStreamState::undefined) {
+        if (!_setStreamState(ESP3DGcodeStreamState::abort)) {
+          esp3d_log_e("Failed to abort stream");
+        }
       }
     }
   }
@@ -977,8 +1009,8 @@ void ESP3DGCodeHostService::_handle_msgs() {
   }
 }
 
-// Handle the state machine
-void ESP3DGCodeHostService::_handle_states() {
+// handle stream state changes
+void ESP3DGCodeHostService::_handle_stream_states() {
   if (_current_stream_ptr != nullptr) {
     switch (_current_stream_ptr->state) {
       case ESP3DGcodeStreamState::end:
@@ -1067,6 +1099,10 @@ void ESP3DGCodeHostService::_handle_states() {
         break;
     }
   }
+}
+
+// handle host state changes
+void ESP3DGCodeHostService::_handle_host_states() {
   switch (_current_state) {
     case ESP3DGcodeHostState::idle:
       // esp3d_log("Idling");
@@ -1140,6 +1176,7 @@ void ESP3DGCodeHostService::_handle_states() {
       break;
   }
 }
+
 void ESP3DGCodeHostService::handle() {
   if (!_started) {
     return;
@@ -1151,7 +1188,9 @@ void ESP3DGCodeHostService::handle() {
   _handle_stream();
 
   // Handle the state machine
-  _handle_states();
+  _handle_stream_states();
+
+  _handle_host_states();
 
   // esp3d_log("Host state: %d", static_cast<uint8_t>(state));
   // handle the messages in the queue

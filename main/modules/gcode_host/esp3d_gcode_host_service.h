@@ -96,6 +96,7 @@ class ESP3DGCodeHostService : public ESP3DClient {
   bool resume();
 
   ESP3DGcodeHostState getState();
+
   ESP3DGcodeHostError getErrorNum();
   ESP3DGcodeStream *getCurrentMainStream();
   bool addStream(const char *filename, ESP3DAuthenticationLevel auth_type,
@@ -105,9 +106,12 @@ class ESP3DGCodeHostService : public ESP3DClient {
 
  private:
   ESP3DGcodeStream *_get_front_stream();
+  ESP3DGcodeStreamState _getStreamState();
+  bool _setStreamState(ESP3DGcodeStreamState state);
   void _handle_notifications();
   void _handle_msgs();
-  void _handle_states();
+  void _handle_stream_states();
+  void _handle_host_states();
   bool _streamData(const char *data, ESP3DAuthenticationLevel auth_type,
                    bool executeFirst = false);
   uint8_t _currentCommand[ESP_GCODE_HOST_COMMAND_LINE_BUFFER];
