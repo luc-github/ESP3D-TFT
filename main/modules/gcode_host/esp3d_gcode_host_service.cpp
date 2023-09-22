@@ -469,7 +469,6 @@ char ESP3DGCodeHostService::_readCharFromCommandBuffer(
 
 bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
   esp3d_log("Starting stream");
-
   if (isFileStream(stream)) {
     if (_file_handle) {
       _closeFile(stream);
@@ -492,6 +491,7 @@ bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
     }
     return true;
   } else if (isCommandStream(stream)) {
+    stream->totalSize = stream->dataStream.size();
     esp3d_log("Is command stream");
     return true;
   }
@@ -517,6 +517,7 @@ bool ESP3DGCodeHostService::_endStream(ESP3DGcodeStream* stream) {
           }
           free(stream);
           _scripts.erase(streamPtr++);
+          _current_command_str = "";
           res = true;
           break;
         }
@@ -719,6 +720,7 @@ bool ESP3DGCodeHostService::_parseResponse(ESP3DMessage* rx) {
     _timeoutInterval = ESP_HOST_BUSY_TIMEOUT;
   } else if ((_resend_command_number = _resendCommandNumber((char*)rx->data)) !=
              0) {
+    // use _current_command_str and resend it to the printer
     //_gotoLine(_current_stream.resendCommandNumber);
     if (_awaitingAck) {
       _awaitingAck = false;

@@ -29,6 +29,7 @@
 #include "esp3d_gcode_host_types.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
+#include "tasks_def.h"
 
 #define isEndLine(ch) ((char)ch == '\n' || (char)ch == '\r')
 #define isEndLineEndFile(ch) \
@@ -52,8 +53,9 @@
 
 #define ESP_HOST_OK_TIMEOUT 60000
 #define ESP_HOST_BUSY_TIMEOUT 10000
-#define RING_BUFFER_LENGTH 256
 
+// FIXME: Remove this when we have a better way to handle this
+#define RING_BUFFER_LENGTH 256
 #define ESP_GCODE_HOST_COMMAND_LINE_BUFFER 96  // matches marlin MAX_CMD_SIZE
 
 #ifdef __cplusplus
@@ -63,8 +65,10 @@ extern "C" {
 struct ESP3DGcodeStream {
   uint64_t id = 0;  // this is currently the time the stream is created in
                     // millis
-  uint64_t totalSize = 0;      // this will correspond to the end file index+1
-  uint64_t processedSize = 0;  // this will correspond to the position in a file
+  uint64_t totalSize =
+      0;  // this will correspond to file size or commands line length
+  uint64_t processedSize =
+      0;  // this will correspond to the position in a file for next read
   uint64_t cursorPos =
       0;  // index of the first character on the line to send. used for
           // switching between streams as new streams are added.
@@ -105,11 +109,16 @@ class ESP3DGCodeHostService : public ESP3DClient {
                  ESP3DAuthenticationLevel authentication_level);
 
  private:
+  ESP3DGcodeHostFileType _getStreamType(const char *data);
   ESP3DGcodeStream *_get_front_stream();
   ESP3DGcodeStreamState _getStreamState();
   bool _setStreamState(ESP3DGcodeStreamState state);
   bool _setMainStreamState(ESP3DGcodeStreamState state);
   bool _setStreamRequestState(ESP3DGcodeStreamState state);
+  bool _startStream(ESP3DGcodeStream *stream);
+  bool _endStream(ESP3DGcodeStream *stream);
+  bool _openFile(ESP3DGcodeStream *stream);
+  bool _closeFile(ESP3DGcodeStream *stream);
 
   void _handle_notifications();
   void _handle_msgs();
@@ -117,24 +126,11 @@ class ESP3DGCodeHostService : public ESP3DClient {
   void _handle_stream_states();
   bool _add_stream(const char *data, ESP3DAuthenticationLevel auth_type,
                    bool executeFirst = false);
-  uint8_t _currentCommand[ESP_GCODE_HOST_COMMAND_LINE_BUFFER];
-  char _ringBuffer[RING_BUFFER_LENGTH];  // maybe change this to uint8_t
-  ESP3DGcodeStream *_bufferedStream = nullptr;
-  uint32_t _bufferSeam =
-      0;  // the position of the earliest byte in the ring buffer
-  uint32_t _cursorPos = 0;  // the position of the next byte to be read from the
-                            // ring buffer (becomes start on next update)
-  bool _bufferFresh =
-      true;  // Flag to know if start == pos because the buffer is new or
-             // finished. -- should rename to _bufferFull
+
   bool _isAck(const char *cmd);
   bool _isBusy(const char *cmd);
   bool _isError(const char *cmd);
   uint64_t _resendCommandNumber(const char *cmd);
-
-  bool _openFile(ESP3DGcodeStream *stream);
-  bool _closeFile(ESP3DGcodeStream *stream);
-  bool _startStream(ESP3DGcodeStream *stream);
 
   bool _updateRingBuffer(ESP3DGcodeStream *stream);
   char _readCharFromRingBuffer(ESP3DGcodeStream *stream);
@@ -147,21 +143,32 @@ class ESP3DGCodeHostService : public ESP3DClient {
   bool _gotoLine(uint64_t line);
   bool _processRx(ESP3DMessage *rx);
   bool _parseResponse(ESP3DMessage *rx);
-  bool _endStream(ESP3DGcodeStream *stream);
-  ESP3DGcodeHostFileType _getStreamType(const char *data);
 
-  TaskHandle_t _xHandle;
-  bool _started;
+  std::string _current_command_str;
+  size_t _file_buffer_length = 0;
+  char _file_buffer[STREAM_CHUNK_SIZE];
+
+  uint8_t _currentCommand[ESP_GCODE_HOST_COMMAND_LINE_BUFFER];
+  char _ringBuffer[RING_BUFFER_LENGTH];  // maybe change this to uint8_t
+  ESP3DGcodeStream *_bufferedStream = nullptr;
+  uint32_t _bufferSeam =
+      0;  // the position of the earliest byte in the ring buffer
+  uint32_t _cursorPos = 0;  // the position of the next byte to be read from the
+                            // ring buffer (becomes start on next update)
+  bool _bufferFresh =
+      true;  // Flag to know if start == pos because the buffer is new or
+             // finished. -- should rename to _bufferFull
+
+  TaskHandle_t _xHandle = NULL;
+  bool _started = false;
   const UBaseType_t _xPauseNotifyIndex = 1;
   const UBaseType_t _xResumeNotifyIndex = 2;
   const UBaseType_t _xAbortNotifyIndex = 3;
 
   ESP3DClientType _outputClient = ESP3DClientType::no_client;
   bool _awaitingAck = false;
-  uint64_t _startTimeout;
+  uint64_t _startTimeout = 0;
   uint64_t _timeoutInterval = ESP_HOST_OK_TIMEOUT;
-  // ESP3DGcodeHostState _current_state = ESP3DGcodeHostState::idle;
-  // ESP3DGcodeHostState _next_state = ESP3DGcodeHostState::idle;
 
   ESP3DGcodeStreamState _requested_state = ESP3DGcodeStreamState::undefined;
   std::list<ESP3DGcodeStream *> _scripts;
