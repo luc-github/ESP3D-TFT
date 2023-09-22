@@ -108,12 +108,13 @@ class ESP3DGCodeHostService : public ESP3DClient {
   ESP3DGcodeStream *_get_front_stream();
   ESP3DGcodeStreamState _getStreamState();
   bool _setStreamState(ESP3DGcodeStreamState state);
+  bool _setMainStreamState(ESP3DGcodeStreamState state);
   bool _setStreamRequestState(ESP3DGcodeStreamState state);
+
   void _handle_notifications();
   void _handle_msgs();
   void _handle_stream_selection();
   void _handle_stream_states();
-  void _handle_host_states();
   bool _add_stream(const char *data, ESP3DAuthenticationLevel auth_type,
                    bool executeFirst = false);
   uint8_t _currentCommand[ESP_GCODE_HOST_COMMAND_LINE_BUFFER];
@@ -130,9 +131,7 @@ class ESP3DGCodeHostService : public ESP3DClient {
   bool _isBusy(const char *cmd);
   bool _isError(const char *cmd);
   uint64_t _resendCommandNumber(const char *cmd);
-  bool _isEmergencyParse(const char *cmd);
 
-  bool _isAckNeeded() { return _awaitingAck; };
   bool _openFile(ESP3DGcodeStream *stream);
   bool _closeFile(ESP3DGcodeStream *stream);
   bool _startStream(ESP3DGcodeStream *stream);
@@ -161,20 +160,25 @@ class ESP3DGCodeHostService : public ESP3DClient {
   bool _awaitingAck = false;
   uint64_t _startTimeout;
   uint64_t _timeoutInterval = ESP_HOST_OK_TIMEOUT;
-  ESP3DGcodeHostState _current_state = ESP3DGcodeHostState::idle;
-  ESP3DGcodeHostState _next_state = ESP3DGcodeHostState::idle;
-  ESP3DGcodeStreamState _requested_state = ESP3DGcodeStreamState::read_line;
+  // ESP3DGcodeHostState _current_state = ESP3DGcodeHostState::idle;
+  // ESP3DGcodeHostState _next_state = ESP3DGcodeHostState::idle;
+
+  ESP3DGcodeStreamState _requested_state = ESP3DGcodeStreamState::undefined;
   std::list<ESP3DGcodeStream *> _scripts;
   ESP3DGcodeStream *_current_stream_ptr = nullptr;
   ESP3DGcodeStream *_current_main_stream_ptr = nullptr;
-  ESP3DGcodeStream _current_stream;
+  ESP3DGcodeStream *_current_front_stream_ptr = nullptr;
+
   std::string _stop_script;
   std::string _pause_script;
   std::string _resume_script;
 
+  ESP3DGcodeHostError _error = ESP3DGcodeHostError::no_error;
+
   // Stream Variables:
-  FILE *_File = nullptr;  // pointer to the file to be streamed. Files could be
-                          // opened and closed whilst in use if it's helpful
+  FILE *_file_handle =
+      nullptr;  // pointer to the file to be streamed. Files could be
+                // opened and closed whilst in use if it's helpful
   uint64_t _command_number =
       0;  // Next command number to send. //This should be a gcodehost variable,
           // as only one print stream is possible

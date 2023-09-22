@@ -27,34 +27,26 @@ extern "C" {
 #endif
 
 enum class ESP3DGcodeStreamState : uint8_t {
-  // no_stream = 0,
-  start,
-  end,
-  read_line,      // maybe should rename
+  undefined = 0,
+  start,          // start of stream / or resume it
+  read_cursor,    // read cursor position
   wait_for_send,  // wait for currentCommand to be sent, so we can read the next
-                  // command ready.
-  pause,  // only needed for file stream, maybe better to have another class?
-  resume,
-  abort,
-  stop,    // stop vs abort?
-  paused,  // do nothing until resumed
-  error,
-  undefined,
-};
-
-enum class ESP3DGcodeHostState : uint8_t {  // maybe need stream state and host
-                                            // state?
-  idle = 0,                                 // wait for a command to send
   send_gcode_command,  // if waiting not waiting for ack send command
   send_esp_command,    //
-  wait_for_ack,
-  error,
-  abort,
-  undefined,
-  paused,  // only used to indicate print stream is paused outside of gcodehost,
-           // not used here
-  processing,
+  wait_for_ack,        // wait for ack from pr
+  pause,               // pause action
+  resume,              // resume action
+  abort,               // abort action
+  end,                 // end of stream reached
+  paused,              // do nothing until resumed
+  error,               // error state, FIXEME: should be more specific
+};
 
+enum class ESP3DGcodeHostState : uint8_t {
+  idle = 0,
+  processing,
+  paused,
+  error,
 };
 
 enum class ESP3DGcodeHostError : uint8_t {
@@ -67,10 +59,13 @@ enum class ESP3DGcodeHostError : uint8_t {
   resend,
   number_mismatch,
   line_ignored,
-  file_system,
   check_sum,
   unknow,
   file_not_found,
+  file_system,
+  empty_file,
+  access_denied,
+  cursor_out_of_range,
   aborted
 };
 

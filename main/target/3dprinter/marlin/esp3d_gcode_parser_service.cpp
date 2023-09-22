@@ -32,6 +32,12 @@ const char* pollingCommands[] = {"M105",  // Temperatures
                                  "M114",  // Positions
                                  "M220",  // Speed
                                  ""};
+
+const char* fwFommands[] = {"M110 N0",  // reset stream numbering
+                            ""};
+const char* ESP3DGCodeParserService::getFwCommandString(FW_GCodeCommand cmd) {
+  return fwFommands[(uint8_t)cmd];
+}
 const char** ESP3DGCodeParserService::getPollingCommands() {
   return pollingCommands;
 }

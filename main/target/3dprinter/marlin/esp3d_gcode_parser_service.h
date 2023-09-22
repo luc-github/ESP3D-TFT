@@ -28,17 +28,21 @@
 extern "C" {
 #endif
 
+enum class FW_GCodeCommand : uint8_t {
+  reset_stream_numbering = 0,
+};
 class ESP3DGCodeParserService final {
  public:
   ESP3DGCodeParserService();
   ~ESP3DGCodeParserService();
-  ESP3DDataType getType(const char* data);
-  bool hasOkAck(const char* data);
-  bool hasMultiLineReport(const char* data);
-  const char* getLastError() { return _lastError.c_str(); }
+  ESP3DDataType getType(const char *data);
+  bool hasOkAck(const char *data);
+  bool hasMultiLineReport(const char *data);
+  const char *getLastError() { return _lastError.c_str(); }
   uint64_t getLineResend() { return _lineResend; }
-  bool processCommand(const char* data);
-  const char** getPollingCommands();
+  bool processCommand(const char *data);
+  const char **getPollingCommands();
+  const char *getFwCommandString(FW_GCodeCommand cmd);
 
  private:
   bool _isMultiLineReportOnGoing;
