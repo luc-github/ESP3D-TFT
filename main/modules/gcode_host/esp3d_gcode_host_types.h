@@ -28,17 +28,18 @@ extern "C" {
 
 enum class ESP3DGcodeStreamState : uint8_t {
   undefined = 0,
-  start,               // start of stream / or resume it
-  read_cursor,         // read command at cursor position
-  send_gcode_command,  // gcode command to send
-  send_esp_command,    // esp command to send
-  wait_for_ack,        // wait for ack from pr
-  pause,               // pause action
-  resume,              // resume action
-  abort,               // abort action
-  end,                 // end of stream reached
-  paused,              // do nothing until resumed
-  error,               // error state
+  start,                 // start of stream / or resume it
+  read_cursor,           // read command at cursor position
+  send_gcode_command,    // gcode command to send
+  resend_gcode_command,  // gcode command to resend
+  send_esp_command,      // esp command to send
+  wait_for_ack,          // wait for ack from pr
+  pause,                 // pause action
+  resume,                // resume action
+  abort,                 // abort action
+  end,                   // end of stream reached
+  paused,                // do nothing until resumed
+  error,                 // error state
 };
 
 enum class ESP3DGcodeHostState : uint8_t {
@@ -55,7 +56,7 @@ enum class ESP3DGcodeHostError : uint8_t {
   line_number,
   ack_number,
   memory_allocation,
-  resend,
+  too_many_resend,
   number_mismatch,
   line_ignored,
   check_sum,

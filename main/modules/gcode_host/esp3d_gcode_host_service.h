@@ -111,7 +111,6 @@ class ESP3DGCodeHostService : public ESP3DClient {
                         const char *command, uint32_t commandnb);
   bool _stripCommand();
 
-  bool _gotoLine(uint64_t line);
   bool _processRx(ESP3DMessage *rx);
   bool _parseResponse(ESP3DMessage *rx);
 
@@ -149,6 +148,8 @@ class ESP3DGCodeHostService : public ESP3DClient {
       0;  // Next command number to send. //This should be a gcodehost variable,
           // as only one print stream is possible
   uint64_t _resend_command_number = 0;  // Requested command to resend.
+  uint8_t _resend_command_counter =
+      0;  // Number of times the resend command has been requested
   pthread_mutex_t _tx_mutex;
   pthread_mutex_t _rx_mutex;
   pthread_mutex_t _stream_list_mutex;

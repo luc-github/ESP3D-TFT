@@ -31,6 +31,7 @@
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
+#include "esp3d_values.h"
 #include "filesystem/esp3d_flash.h"
 #include "filesystem/esp3d_globalfs.h"
 #include "serial_def.h"
@@ -44,6 +45,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "tasks_def.h"
+#include "translations/esp3d_translation_service.h"
 
 // Macro/command behaviour:
 // to be executed regardless of streaming state (ie paused)
@@ -55,6 +57,7 @@ ESP3DGCodeHostService gcodeHostService;
 #define RX_FLUSH_TIME_OUT 1500  // milliseconds timeout
 #define MAX_COMMAND_LENGTH 255
 #define ESP3D_COMMAND_TIMEOUT 10000  // milliseconds timeout
+#define ESP3D_MAX_RETRY 5
 
 #define isFileStreamType(type)                      \
   ((type == ESP3DGcodeHostStreamType::fs_stream) || \
@@ -557,38 +560,54 @@ bool ESP3DGCodeHostService::_CheckSumCommand(char* result_buffer,
   return true;
 }
 
-/// @brief Go to the specified line start in the current print stream. For
-/// use with resend requests.
-/// @param line The line to move to.
-/// @return True if line found and set correctly.
-bool ESP3DGCodeHostService::_gotoLine(
-    uint64_t line) {  // remember to account for M110 Nx commands
-  // Not yet implemented
-  return false;
-}
-
 bool ESP3DGCodeHostService::_parseResponse(ESP3DMessage* rx) {
-  // FIXME: use the GCODE parser to get this command
-  if (_isAck((char*)(rx->data))) {
-    if (_awaitingAck) {
-      _awaitingAck = false;
-    } else {
-      esp3d_log_w("Got ok but out of the query");
-    }
-  } else if (_isBusy((char*)(rx->data))) {
-    esp3d_log("Has busy protocol, shorten timeout");
-    _startTimeout = esp3d_hal::millis();
-  } else if ((_resend_command_number = _resendCommandNumber((char*)rx->data)) !=
-             0) {
-    // use _current_command_str and resend it to the printer
-    //_gotoLine(_current_stream.resendCommandNumber);
-    if (_awaitingAck) {
-      _awaitingAck = false;
-    } else {
-      esp3d_log_w("Got resend but out of the query");
-    }
-  } else if (_isError((char*)(rx->data))) {
-    esp3d_log_e("Got Error: %s", ((char*)(rx->data)));
+  ESP3DDataType response_type = esp3dGcodeParser.getType((char*)(rx->data));
+  switch (response_type) {
+    case ESP3DDataType::ack:  // ack
+      if (_awaitingAck) {
+        // we got an ack for the current command
+        _awaitingAck = false;
+        _setStreamState(ESP3DGcodeStreamState::read_cursor);
+      } else {
+        esp3d_log_w("Got ack but out of the query");
+      }
+      break;
+    case ESP3DDataType::status:  // can be busy or idle
+      // just reset the timeout
+      _startTimeout = esp3d_hal::millis();
+      break;
+    case ESP3DDataType::error:  // error
+      esp3d_log_e("Got Error: %s", ((char*)(rx->data)));
+      if (_awaitingAck) {
+        _awaitingAck = false;
+        // TODO: handle error ?
+        // e.g: Marlin raise error first then ask for resend
+      } else {
+        std::string text = esp3dTranslationService.translate(ESP3DLabel::error);
+        text += ": P";
+        text += esp3dGcodeParser.getLastError();
+        esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
+                                        text.c_str());
+        esp3d_log_w("Got error but out of the query");
+      }
+      break;
+    case ESP3DDataType::resend:  // resend
+      // use _current_command_str and resend it to the printer
+      esp3d_log("Got resend");
+      if (_awaitingAck) {
+        _resend_command_number = esp3dGcodeParser.getLineResend();
+        _resend_command_counter++;
+        esp3d_log("Got resend %ld", _resend_command_number);
+        _setStreamState(ESP3DGcodeStreamState::resend_gcode_command);
+      } else {
+        esp3d_log_w("Got resend but out of the query");
+      }
+      break;
+    default:  // esp_command, gcode, response,  comment, empty_line,
+              // emergency_command, unknown break
+              // the response is ignored by gcode host
+      return false;
+      break;
   }
   return true;
 }
@@ -874,6 +893,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
   }
   ESP3DMessage* msg = nullptr;
   char buffer_str[MAX_COMMAND_LENGTH + 1] = {0};
+  std::string text;
 
   if (!_current_stream_ptr->active) {
     esp3d_log_w("Stream not active");
@@ -907,6 +927,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       // ready to read next command, so reset the current command
       // and mark command as processed
       _current_command_str = "";
+      _awaitingAck = false;
       if (_current_stream_ptr->cursorPos !=
           _current_stream_ptr->processedSize) {
         _current_stream_ptr->processedSize = _current_stream_ptr->cursorPos;
@@ -947,10 +968,28 @@ void ESP3DGCodeHostService::_handle_stream_states() {
         break;
       }
       break;
-
       /////////////////////////////////////////////////////////
-      // send_gcode_command
+      // resend_gcode_command
       /////////////////////////////////////////////////////////
+    case ESP3DGcodeStreamState::resend_gcode_command:
+      if (_resend_command_counter >= ESP3D_MAX_RETRY) {
+        esp3d_log_e("Too many resend, aborting");
+        _error = ESP3DGcodeHostError::too_many_resend;
+        _setStreamState(ESP3DGcodeStreamState::error);
+        break;
+      }
+      if (_command_number == _resend_command_number) {
+        _command_number = _resend_command_number - 1;
+        _setStreamState(ESP3DGcodeStreamState::read_cursor);
+      } else {
+        // Commmand is not the last one
+        // how to handle this case ?
+        break;
+      }
+      /* fall through */
+    /////////////////////////////////////////////////////////
+    // send_gcode_command
+    /////////////////////////////////////////////////////////
     case ESP3DGcodeStreamState::send_gcode_command:
       _startTimeout = 0;
       msg = nullptr;
@@ -1107,6 +1146,10 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       // should we abort the stream? or go to next command in stream if any
       // ?
       // how to notify to user ?
+      text = esp3dTranslationService.translate(ESP3DLabel::error);
+      text += ": S" + std::to_string(static_cast<uint8_t>(_error));
+      esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
+                                      text.c_str());
       _setStreamState(ESP3DGcodeStreamState::read_cursor);
       break;
     default:
