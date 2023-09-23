@@ -251,41 +251,6 @@ bool ESP3DGCodeHostService::resume() {
   return true;
 }
 
-// ##################### Parsing Functions ########################
-// FIXME: use the GCODE parser to get this command
-bool ESP3DGCodeHostService::_isAck(const char* cmd) {
-  if ((strstr(cmd, "ok") != nullptr)) {
-    esp3d_log("Got ok");
-    return true;
-  }
-  return false;
-}
-
-// FIXME: use the GCODE parser to get this command
-bool ESP3DGCodeHostService::_isBusy(const char* cmd) {
-  if ((strstr(cmd, "busy:") != nullptr)) {
-    esp3d_log("Got busy");
-    return true;
-  }
-  return false;
-}
-
-// FIXME: use the GCODE parser to get this command
-bool ESP3DGCodeHostService::_isError(const char* cmd) {
-  return false;  // need info on printer error formats
-}
-
-// FIXME: use the GCODE parser to get this command
-uint64_t ESP3DGCodeHostService::_resendCommandNumber(
-    const char* cmd) {  // we should rename this
-  char* p = nullptr;
-  if (((p = strstr(cmd, "resend:")) != nullptr)) {
-    esp3d_log("Got resend");
-    return atoi(p + 7);
-  }
-  return 0;
-}
-
 /// @brief Opens the file assosciated with the provided file stream, and seeks
 /// to the correct position.
 /// set the total size of the file if not already set.

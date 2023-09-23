@@ -100,11 +100,6 @@ class ESP3DGCodeHostService : public ESP3DClient {
   bool _add_stream(const char *data, ESP3DAuthenticationLevel auth_type,
                    bool executeFirst = false);
 
-  bool _isAck(const char *cmd);
-  bool _isBusy(const char *cmd);
-  bool _isError(const char *cmd);
-  uint64_t _resendCommandNumber(const char *cmd);
-
   bool _readNextCommand(ESP3DGcodeStream *stream);
   uint8_t _Checksum(const char *command, uint32_t commandSize);
   bool _CheckSumCommand(char *result_buffer, size_t max_result_size,
