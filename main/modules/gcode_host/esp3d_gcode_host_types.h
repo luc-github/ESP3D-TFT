@@ -28,18 +28,17 @@ extern "C" {
 
 enum class ESP3DGcodeStreamState : uint8_t {
   undefined = 0,
-  start,          // start of stream / or resume it
-  read_cursor,    // read cursor position
-  wait_for_send,  // wait for currentCommand to be sent, so we can read the next
-  send_gcode_command,  // if waiting not waiting for ack send command
-  send_esp_command,    //
+  start,               // start of stream / or resume it
+  read_cursor,         // read command at cursor position
+  send_gcode_command,  // gcode command to send
+  send_esp_command,    // esp command to send
   wait_for_ack,        // wait for ack from pr
   pause,               // pause action
   resume,              // resume action
   abort,               // abort action
   end,                 // end of stream reached
   paused,              // do nothing until resumed
-  error,               // error state, FIXEME: should be more specific
+  error,               // error state
 };
 
 enum class ESP3DGcodeHostState : uint8_t {
@@ -69,16 +68,15 @@ enum class ESP3DGcodeHostError : uint8_t {
   aborted
 };
 
-enum class ESP3DGcodeHostFileType : uint8_t {
+enum class ESP3DGcodeHostStreamType : uint8_t {
+  unknown,
   single_command,
-  multiple_commands,  // no real difference between single and multiple in
-                      // practice
+  multiple_commands,
   fs_stream,
   fs_script,
   sd_stream,
   sd_script,
-  unknown,
-  invalid
+  invalid,
 };
 
 #ifdef __cplusplus
