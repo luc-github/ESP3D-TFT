@@ -26,7 +26,6 @@
 #include "usb_serial/esp3d_usb_serial_client.h"
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
 
-#include "driver/uart.h"
 #include "esp3d_commands.h"
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
@@ -34,7 +33,6 @@
 #include "esp3d_values.h"
 #include "filesystem/esp3d_flash.h"
 #include "filesystem/esp3d_globalfs.h"
-#include "serial_def.h"
 
 #if ESP3D_SD_CARD_FEATURE
 #include "filesystem/esp3d_sd.h"
