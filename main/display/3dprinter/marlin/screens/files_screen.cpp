@@ -38,9 +38,11 @@
 #include "filesystem/esp3d_sd.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "gcode_host/esp3d_gcode_host_service.h"
 #include "main_screen.h"
 #include "tasks_def.h"
 #include "translations/esp3d_translation_service.h"
+
 
 /**********************
  *  STATIC PROTOTYPES
@@ -237,18 +239,24 @@ void event_file_handler(lv_event_t *e) {
   ESP3DFileDescriptor *file = (ESP3DFileDescriptor *)lv_event_get_user_data(e);
 
   esp3d_log("file Clicked: %s", file->name.c_str());
-  std::string file_path_to_play = files_path;
+
+  std::string file_path_to_play = sd.mount_point();
+  file_path_to_play += files_path;
+
   if (file_path_to_play != "/") {
     file_path_to_play = std::string("/") + file->name;
   } else {
     file_path_to_play = file->name;
   }
-  // todo play file and go to main screen
-  esp3dTftValues.set_string_value(ESP3DValuesIndex::file_path,
-                                  file_path_to_play.c_str());
-  esp3dTftValues.set_string_value(ESP3DValuesIndex::file_name,
-                                  file->name.c_str());
-  esp3dTftValues.set_string_value(ESP3DValuesIndex::job_status, "processing");
+  esp3d_log("file path : %s", file_path_to_play.c_str());
+  if (gcodeHostService.addStream(file_path_to_play.c_str(),
+                                 ESP3DAuthenticationLevel::admin, false)) {
+    esp3d_log("Stream: %s added as main File", file_path_to_play.c_str());
+  } else {
+    esp3d_log_e("Failed to add stream");
+  }
+  // Should we force the main screen to update the file name  and status ?
+  //
   mainScreen::main_screen();
 }
 

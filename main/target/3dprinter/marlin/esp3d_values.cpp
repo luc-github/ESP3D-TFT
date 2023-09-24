@@ -209,6 +209,30 @@ bool ESP3DValues::intialize() {
       wifiStatus::network_mode_value_cb,
   });
 #endif  // ESP3D_WIFI_FEATURE
+  //  job progress
+  _values.push_back({
+      ESP3DValuesIndex::job_progress,
+      ESP3DValuesType::float_t,
+      2,  // precision
+      std::string("0"),
+      mainScreen::job_status_value_cb,
+  });
+  //  job elapsed duration
+  _values.push_back({
+      ESP3DValuesIndex::job_duration,
+      ESP3DValuesType::integer_t,
+      0,  // precision
+      std::string("0"),
+      nullptr,
+  });
+  //  progression display
+  _values.push_back({
+      ESP3DValuesIndex::progression_display,
+      ESP3DValuesType::string_t,
+      200,  // precision
+      std::string(""),
+      mainScreen::job_status_value_cb,
+  });
 #endif  // ESP3D_DISPLAY_FEATURE
   return true;
 }

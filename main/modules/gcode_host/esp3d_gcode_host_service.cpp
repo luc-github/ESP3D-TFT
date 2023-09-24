@@ -333,6 +333,7 @@ bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
       esp3d_log_e("Previous File handle not closed!");
     }
     // only for main stream we need to reset the command line number
+    // and set the file name and stream status
     if (stream->totalSize == 0 &&
         (stream->type == ESP3DGcodeHostStreamType::fs_stream ||
          stream->type == ESP3DGcodeHostStreamType::sd_stream)) {
@@ -346,6 +347,8 @@ bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
       _command_number = 0;
       esp3dTftValues.set_string_value(ESP3DValuesIndex::job_status,
                                       "processing");
+      esp3dTftValues.set_string_value(ESP3DValuesIndex::file_name,
+                                      &(stream->dataStream.c_str()[2]));
     }
     // open file take care of cursor position
     // and total size

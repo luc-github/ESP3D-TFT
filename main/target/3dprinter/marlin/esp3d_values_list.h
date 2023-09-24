@@ -59,6 +59,9 @@ enum class ESP3DValuesIndex : uint16_t {
   network_status,
   network_mode,
   bed_leveling,
+  job_progress,
+  job_duration,
+  progression_display,
   unknown_index
 };
 

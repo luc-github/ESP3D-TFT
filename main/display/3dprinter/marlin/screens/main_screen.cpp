@@ -37,6 +37,7 @@
 #include "components/symbol_button_component.h"
 #include "esp3d_json_settings.h"
 #include "filament_screen.h"
+#include "gcode_host/esp3d_gcode_host_service.h"
 #include "menu_screen.h"
 #include "positions_screen.h"
 #include "speed_screen.h"
@@ -196,6 +197,7 @@ bool speed_value_cb(ESP3DValuesIndex index, const char *value,
 }
 bool job_status_value_cb(ESP3DValuesIndex index, const char *value,
                          ESP3DValuesCbAction action) {
+  // any change that need to be recorded ?
   if (action == ESP3DValuesCbAction::Update) {
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
       main_display_status_area();
@@ -544,12 +546,12 @@ void event_button_menu_handler(lv_event_t *e) {
 
 void event_button_resume_handler(lv_event_t *e) {
   esp3d_log("Resume Clicked");
-  esp3dTftValues.set_string_value(ESP3DValuesIndex::job_status, "processing");
+  gcodeHostService.resume();
 }
 
 void event_button_pause_handler(lv_event_t *e) {
   esp3d_log("Pause Clicked");
-  esp3dTftValues.set_string_value(ESP3DValuesIndex::job_status, "paused");
+  gcodeHostService.pause();
 }
 
 void event_confirm_stop_cb(lv_event_t *e) {
@@ -557,7 +559,7 @@ void event_confirm_stop_cb(lv_event_t *e) {
   std::string rep = lv_msgbox_get_active_btn_text(mbox);
   esp3d_log("Button selectionned : %s", rep == LV_SYMBOL_OK ? "Ok" : "Cancel");
   if (rep == LV_SYMBOL_OK) {
-    esp3dTftValues.set_string_value(ESP3DValuesIndex::job_status, "idle");
+    gcodeHostService.abort();
   }
   lv_msgbox_close(mbox);
 }
