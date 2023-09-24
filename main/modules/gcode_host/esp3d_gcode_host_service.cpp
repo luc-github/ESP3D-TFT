@@ -530,7 +530,14 @@ bool ESP3DGCodeHostService::_parseResponse(ESP3DMessage* rx) {
       if (_awaitingAck) {
         // we got an ack for the current command
         _awaitingAck = false;
-        _setStreamState(ESP3DGcodeStreamState::read_cursor);
+        // save one cycle for single command
+        if (_current_stream_ptr->type ==
+            ESP3DGcodeHostStreamType::single_command) {
+          _setStreamState(ESP3DGcodeStreamState::end);
+        } else {
+          _setStreamState(ESP3DGcodeStreamState::read_cursor);
+        }
+
       } else {
         esp3d_log_w("Got ack but out of the query");
       }
@@ -919,7 +926,13 @@ void ESP3DGCodeHostService::_handle_stream_states() {
           // now string can be stripped if necessary
           if (!_stripCommand()) {
             esp3d_log("Command is empty");
-            _setStreamState(ESP3DGcodeStreamState::read_cursor);
+            // save one cycle for single command
+            if (_current_stream_ptr->type ==
+                ESP3DGcodeHostStreamType::single_command) {
+              _setStreamState(ESP3DGcodeStreamState::end);
+            } else {
+              _setStreamState(ESP3DGcodeStreamState::read_cursor);
+            }
             break;
           }
           _setStreamState(ESP3DGcodeStreamState::send_gcode_command);
@@ -1010,10 +1023,9 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       if (msg) {
         esp3dCommands.process(msg);
         // no ack to wait for esp commands
+        // save one cycle for single command
         if (_current_stream_ptr->type ==
-            ESP3DGcodeHostStreamType::single_command) {  // single command
-                                                         // stream is
-                                                         // finished
+            ESP3DGcodeHostStreamType::single_command) {
           _setStreamState(ESP3DGcodeStreamState::end);
         } else {
           // continue and read the next command
