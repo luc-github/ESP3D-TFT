@@ -169,11 +169,11 @@ bool ESP3DValues::intialize() {
 
   //  print status
   _values.push_back({
-      ESP3DValuesIndex::print_status,
+      ESP3DValuesIndex::job_status,
       ESP3DValuesType::string_t,
       200,  // precision
       std::string("idle"),
-      mainScreen::print_status_value_cb,
+      mainScreen::job_status_value_cb,
   });
   //  file path
   _values.push_back({

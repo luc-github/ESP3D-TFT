@@ -344,6 +344,8 @@ bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
       // add command on top of current stream
       addStream(cmd.c_str(), stream->auth_type, true);
       _command_number = 0;
+      esp3dTftValues.set_string_value(ESP3DValuesIndex::job_status,
+                                      "processing");
     }
     // open file take care of cursor position
     // and total size
@@ -819,8 +821,12 @@ void ESP3DGCodeHostService::_handle_notifications() {
     ESP3DGcodeStreamState state = _getStreamState();
     if (ulTaskNotifyTakeIndexed(_xPauseNotifyIndex, pdTRUE, 0)) {
       esp3d_log("Received pause notification");
-      if (!_setStreamState(ESP3DGcodeStreamState::pause)) {
-        esp3d_log_e("Failed to pause stream");
+      if (!_setStreamRequestState(ESP3DGcodeStreamState::pause)) {
+        esp3d_log_e("Failed to request pause stream");
+      } else {  // do not wait to set the state to paused to avoid to confuse
+                // the
+                //  user
+        esp3dTftValues.set_string_value(ESP3DValuesIndex::job_status, "paused");
       }
     }
 
@@ -829,6 +835,10 @@ void ESP3DGCodeHostService::_handle_notifications() {
       if (state == ESP3DGcodeStreamState::paused) {
         if (!_setStreamState(ESP3DGcodeStreamState::resume)) {
           esp3d_log_e("Failed to resume stream");
+        } else {  // do not wait to set the state to processing to avoid to
+                  // confuse the user
+          esp3dTftValues.set_string_value(ESP3DValuesIndex::job_status,
+                                          "processing");
         }
       } else {
         esp3d_log_w("No paused stream - nothing to resume");
@@ -839,6 +849,9 @@ void ESP3DGCodeHostService::_handle_notifications() {
       if (state != ESP3DGcodeStreamState::undefined) {
         if (!_setStreamState(ESP3DGcodeStreamState::abort)) {
           esp3d_log_e("Failed to abort stream");
+        } else {  // do not wait to set the state to processing to avoid to
+                  // confuse the user
+          esp3dTftValues.set_string_value(ESP3DValuesIndex::job_status, "idle");
         }
       }
     }
@@ -1096,13 +1109,15 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       // end
       /////////////////////////////////////////////////////////
     case ESP3DGcodeStreamState::end:
+      // sanity check, reset main stream pointer if it is the current stream
+      if (_current_stream_ptr == _current_main_stream_ptr) {
+        _current_main_stream_ptr = nullptr;
+        esp3dTftValues.set_string_value(ESP3DValuesIndex::job_status, "idle");
+      }
       if (!_endStream(_current_stream_ptr)) {
         esp3d_log_e("Failed to end stream");
       }
       // current stream to null ptr
-      if (_current_stream_ptr == _current_main_stream_ptr) {
-        _current_main_stream_ptr = nullptr;
-      }
       _current_stream_ptr = nullptr;
       break;
 

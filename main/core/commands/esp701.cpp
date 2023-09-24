@@ -19,6 +19,7 @@
 #include "authentication/esp3d_authentication.h"
 #include "esp3d_client.h"
 #include "esp3d_commands.h"
+#include "esp3d_hal.h"
 #include "esp3d_string.h"
 #include "gcode_host/esp3d_gcode_host_service.h"
 
@@ -65,10 +66,6 @@ void ESP3DCommands::ESP701(int cmd_params_pos, ESP3DMessage* msg) {
         }
       }
     } else {
-      /*What info do we need?
-      1. Stream ID - filepath
-      2. Nothing else really?*/
-
       if (status != ESP3DGcodeHostState::idle) {
         ESP3DGcodeStream* script =
             gcodeHostService
@@ -92,6 +89,8 @@ void ESP3DCommands::ESP701(int cmd_params_pos, ESP3DMessage* msg) {
           ok_msg += std::to_string(script->totalSize);
           ok_msg += "\",\"processed\":\"";
           ok_msg += std::to_string(script->processedSize);
+          ok_msg += "\",\"elapsed\":\"";
+          ok_msg += std::to_string(esp3d_hal::millis() - script->id);
           ok_msg += "\",\"type\":\"";
           ok_msg += std::to_string(static_cast<uint8_t>(script->type));
           if (script->type == ESP3DGcodeHostStreamType::sd_stream ||
@@ -102,7 +101,7 @@ void ESP3DCommands::ESP701(int cmd_params_pos, ESP3DMessage* msg) {
           }
           ok_msg += "\"}";
         } else {
-          // Nothing to say ?
+          // TODO: add more info ?
         }
       } else {
         hasError = true;

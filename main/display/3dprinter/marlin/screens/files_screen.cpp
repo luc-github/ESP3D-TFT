@@ -248,7 +248,7 @@ void event_file_handler(lv_event_t *e) {
                                   file_path_to_play.c_str());
   esp3dTftValues.set_string_value(ESP3DValuesIndex::file_name,
                                   file->name.c_str());
-  esp3dTftValues.set_string_value(ESP3DValuesIndex::print_status, "printing");
+  esp3dTftValues.set_string_value(ESP3DValuesIndex::job_status, "processing");
   mainScreen::main_screen();
 }
 

@@ -194,8 +194,8 @@ bool speed_value_cb(ESP3DValuesIndex index, const char *value,
   }
   return true;
 }
-bool print_status_value_cb(ESP3DValuesIndex index, const char *value,
-                           ESP3DValuesCbAction action) {
+bool job_status_value_cb(ESP3DValuesIndex index, const char *value,
+                         ESP3DValuesCbAction action) {
   if (action == ESP3DValuesCbAction::Update) {
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
       main_display_status_area();
@@ -207,7 +207,7 @@ bool print_status_value_cb(ESP3DValuesIndex index, const char *value,
 #endif  // ESP3D_SD_CARD_FEATURE
       main_display_menu();
     } else {
-      menuScreen::menu_screen_print_status_value_cb(index, value, action);
+      menuScreen::menu_screen_job_status_value_cb(index, value, action);
       // Todo : update other screens calling each callback update function
     }
   }
@@ -288,7 +288,7 @@ void main_display_positions() {
 
 void main_display_status_area() {
   std::string label_text =
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::print_status);
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::job_status);
   if (label_text == "idle") {
     label_text = "Not printing";
   } else {
@@ -335,10 +335,10 @@ void main_display_speed() {
 
 void main_display_pause() {
   std::string label_text =
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::print_status);
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::job_status);
   if (label_text == "paused") {
     lv_obj_add_flag(main_btn_pause, LV_OBJ_FLAG_HIDDEN);
-  } else if (label_text == "printing") {
+  } else if (label_text == "processing") {
     lv_obj_clear_flag(main_btn_pause, LV_OBJ_FLAG_HIDDEN);
   } else {
     lv_obj_add_flag(main_btn_pause, LV_OBJ_FLAG_HIDDEN);
@@ -347,10 +347,10 @@ void main_display_pause() {
 
 void main_display_resume() {
   std::string label_text =
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::print_status);
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::job_status);
   if (label_text == "paused") {
     lv_obj_clear_flag(main_btn_resume, LV_OBJ_FLAG_HIDDEN);
-  } else if (label_text == "printing") {
+  } else if (label_text == "processing") {
     lv_obj_add_flag(main_btn_resume, LV_OBJ_FLAG_HIDDEN);
   } else {
     lv_obj_add_flag(main_btn_resume, LV_OBJ_FLAG_HIDDEN);
@@ -359,10 +359,10 @@ void main_display_resume() {
 
 void main_display_stop() {
   std::string label_text =
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::print_status);
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::job_status);
   if (label_text == "paused") {
     lv_obj_clear_flag(main_btn_stop, LV_OBJ_FLAG_HIDDEN);
-  } else if (label_text == "printing") {
+  } else if (label_text == "processing") {
     lv_obj_clear_flag(main_btn_stop, LV_OBJ_FLAG_HIDDEN);
   } else {
     lv_obj_add_flag(main_btn_stop, LV_OBJ_FLAG_HIDDEN);
@@ -373,10 +373,10 @@ void main_display_stop() {
 
 void main_display_files() {
   std::string label_text =
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::print_status);
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::job_status);
   if (label_text == "paused") {
     lv_obj_add_flag(main_btn_files, LV_OBJ_FLAG_HIDDEN);
-  } else if (label_text == "printing") {
+  } else if (label_text == "processing") {
     lv_obj_add_flag(main_btn_files, LV_OBJ_FLAG_HIDDEN);
   } else {
     lv_obj_clear_flag(main_btn_files, LV_OBJ_FLAG_HIDDEN);
@@ -386,10 +386,10 @@ void main_display_files() {
 
 void main_display_menu() {
   std::string label_text =
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::print_status);
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::job_status);
   if (label_text == "paused") {
     lv_obj_clear_flag(main_btn_menu, LV_OBJ_FLAG_HIDDEN);
-  } else if (label_text == "printing") {
+  } else if (label_text == "processing") {
     lv_obj_add_flag(main_btn_menu, LV_OBJ_FLAG_HIDDEN);
   } else {
     lv_obj_clear_flag(main_btn_menu, LV_OBJ_FLAG_HIDDEN);
@@ -544,12 +544,12 @@ void event_button_menu_handler(lv_event_t *e) {
 
 void event_button_resume_handler(lv_event_t *e) {
   esp3d_log("Resume Clicked");
-  esp3dTftValues.set_string_value(ESP3DValuesIndex::print_status, "printing");
+  esp3dTftValues.set_string_value(ESP3DValuesIndex::job_status, "processing");
 }
 
 void event_button_pause_handler(lv_event_t *e) {
   esp3d_log("Pause Clicked");
-  esp3dTftValues.set_string_value(ESP3DValuesIndex::print_status, "paused");
+  esp3dTftValues.set_string_value(ESP3DValuesIndex::job_status, "paused");
 }
 
 void event_confirm_stop_cb(lv_event_t *e) {
@@ -557,7 +557,7 @@ void event_confirm_stop_cb(lv_event_t *e) {
   std::string rep = lv_msgbox_get_active_btn_text(mbox);
   esp3d_log("Button selectionned : %s", rep == LV_SYMBOL_OK ? "Ok" : "Cancel");
   if (rep == LV_SYMBOL_OK) {
-    esp3dTftValues.set_string_value(ESP3DValuesIndex::print_status, "idle");
+    esp3dTftValues.set_string_value(ESP3DValuesIndex::job_status, "idle");
   }
   lv_msgbox_close(mbox);
 }
