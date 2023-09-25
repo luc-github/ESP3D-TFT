@@ -176,6 +176,7 @@ bool ESP3DGCodeHostService::_add_stream(const char* data,
     return false;
   }
   esp3d_log("New stream type: %d", static_cast<uint8_t>(type));
+
   new_stream->type = type;
   new_stream->id = esp3d_hal::millis();
   new_stream->auth_type = auth_type;
@@ -184,10 +185,17 @@ bool ESP3DGCodeHostService::_add_stream(const char* data,
   new_stream->totalSize = 0;
   new_stream->active = false;
   new_stream->state = ESP3DGcodeStreamState::start;
-  new_stream->dataStream = data;
+  new_stream->dataStream = (char*)malloc(strlen(data) + 1);
+  if (new_stream->dataStream == nullptr) {
+    esp3d_log_e("Failed to allocate memory for new stream");
+    free(new_stream);
+    return false;
+  }
+  strcpy(new_stream->dataStream, data);
+  esp3d_log("New stream data: %s", new_stream->dataStream);
   // Sanity check for multiple commands
   if (type == ESP3DGcodeHostStreamType::multiple_commands) {
-    for (int i = 0; i < new_stream->dataStream.length(); i++) {
+    for (int i = 0; i < strlen(new_stream->dataStream); i++) {
       if (new_stream->dataStream[i] == ';') {
         new_stream->dataStream[i] = '\n';
       }
@@ -255,11 +263,11 @@ bool ESP3DGCodeHostService::resume() {
 /// @param stream Pointer to the file stream to be opened.
 /// @return True if file opened successfully.
 bool ESP3DGCodeHostService::_openFile(ESP3DGcodeStream* stream) {
-  esp3d_log("File name is %s", stream->dataStream.c_str());
-  if (globalFs.accessFS(stream->dataStream.c_str())) {
-    if (globalFs.exists(stream->dataStream.c_str())) {
+  esp3d_log("File name is %s", stream->dataStream);
+  if (globalFs.accessFS(stream->dataStream)) {
+    if (globalFs.exists(stream->dataStream)) {
       esp3d_log("File exists");
-      _file_handle = globalFs.open(stream->dataStream.c_str(), "r");
+      _file_handle = globalFs.open(stream->dataStream, "r");
       if (_file_handle != nullptr) {
         if (_current_stream_ptr->cursorPos != 0) {
           if (fseek(_file_handle, (long)stream->cursorPos,
@@ -267,7 +275,7 @@ bool ESP3DGCodeHostService::_openFile(ESP3DGcodeStream* stream) {
               0) {  // this would need adjusting if concurrrent file access is
                     // implemented (seek to buffer end instead)
             esp3d_log_e("Failed to seek to correct position in file: %s",
-                        stream->dataStream.c_str());
+                        stream->dataStream);
             _error = ESP3DGcodeHostError::cursor_out_of_range;
             return false;
           }
@@ -276,7 +284,7 @@ bool ESP3DGCodeHostService::_openFile(ESP3DGcodeStream* stream) {
         // get file size if not set
         if (stream->totalSize == 0) {
           struct stat file_stat;
-          if (globalFs.stat(stream->dataStream.c_str(), &file_stat) == -1) {
+          if (globalFs.stat(stream->dataStream, &file_stat) == -1) {
             esp3d_log_e("Failed to get file size");
             _error = ESP3DGcodeHostError::file_system;
             return false;
@@ -314,10 +322,10 @@ bool ESP3DGCodeHostService::_closeFile(ESP3DGcodeStream* stream) {
     esp3d_log_e("No file to close");
     return false;
   }
-  esp3d_log("Closing File: %s", stream->dataStream.c_str());
-  globalFs.close((_file_handle), stream->dataStream.c_str());
+  esp3d_log("Closing File: %s", stream->dataStream);
+  globalFs.close((_file_handle), stream->dataStream);
   _file_handle = nullptr;
-  globalFs.releaseFS(stream->dataStream.c_str());
+  globalFs.releaseFS(stream->dataStream);
   return true;
 }
 
@@ -348,7 +356,7 @@ bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
       esp3dTftValues.set_string_value(ESP3DValuesIndex::job_status,
                                       "processing");
       esp3dTftValues.set_string_value(ESP3DValuesIndex::file_name,
-                                      &(stream->dataStream.c_str()[2]));
+                                      &(stream->dataStream[2]));
     }
     // open file take care of cursor position
     // and total size
@@ -358,7 +366,7 @@ bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
     }
     return true;
   } else if (isCommandStream(stream)) {
-    stream->totalSize = stream->dataStream.size();
+    stream->totalSize = strlen(stream->dataStream);
     esp3d_log("Is command stream");
     return true;
   }
@@ -382,6 +390,7 @@ bool ESP3DGCodeHostService::_endStream(ESP3DGcodeStream* stream) {
           if (isFileStream(stream)) {
             _closeFile(stream);  // Behaviour may need altering depending
           }
+          free(stream->dataStream);
           free(stream);
           _scripts.erase(streamPtr++);
           _current_command_str = "";
@@ -409,14 +418,14 @@ bool ESP3DGCodeHostService::_readNextCommand(ESP3DGcodeStream* stream) {
   if (stream->type == ESP3DGcodeHostStreamType::single_command) {
     esp3d_log("Single command");
     // this is manual command it should not have any comment
-    _current_command_str = stream->dataStream.c_str();
-    stream->cursorPos = stream->dataStream.length();
+    _current_command_str = stream->dataStream;
+    stream->cursorPos = strlen(stream->dataStream);
   } else if (stream->type == ESP3DGcodeHostStreamType::multiple_commands) {
     esp3d_log("Multiple command");
     // read from buffer = dataStream
     // reset content
     _current_command_str = "";
-    for (int i = stream->cursorPos; i < stream->dataStream.length(); i++) {
+    for (int i = stream->cursorPos; i < strlen(stream->dataStream); i++) {
       stream->cursorPos++;
       if (stream->dataStream[i] == '\n') {
         break;
@@ -630,6 +639,7 @@ ESP3DGcodeStream* ESP3DGCodeHostService::getCurrentMainStream() {
     esp3d_log("Script type: %d", static_cast<uint8_t>((*script)->type));
     if ((*script)->type == ESP3DGcodeHostStreamType::fs_stream ||
         (*script)->type == ESP3DGcodeHostStreamType::sd_stream) {
+      esp3d_log("Found main stream");
       return (*script);
     }
   }

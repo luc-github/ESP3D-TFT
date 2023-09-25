@@ -96,7 +96,7 @@ void ESP3DCommands::ESP701(int cmd_params_pos, ESP3DMessage* msg) {
           if (script->type == ESP3DGcodeHostStreamType::sd_stream ||
               script->type == ESP3DGcodeHostStreamType::fs_stream) {
             ok_msg += "\",\"name\":\"";
-            ok_msg += ((ESP3DGcodeStream*)script)->dataStream.c_str();
+            ok_msg += ((ESP3DGcodeStream*)script)->dataStream;
             ok_msg += "\"";
           }
           ok_msg += "\"}";

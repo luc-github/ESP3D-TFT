@@ -52,8 +52,8 @@ struct ESP3DGcodeStream {
   ESP3DAuthenticationLevel auth_type =
       ESP3DAuthenticationLevel::guest;  // the authentication level of the user
                                         // requesting the stream
-  bool active = false;          // is the stream currently being processed
-  std::string dataStream = "";  // the name of the file to stream
+  bool active = false;      // is the stream currently being processed
+  char *dataStream = NULL;  // the name of the file to stream
 };
 
 class ESP3DGCodeHostService : public ESP3DClient {
