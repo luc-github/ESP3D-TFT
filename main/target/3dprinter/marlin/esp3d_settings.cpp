@@ -49,7 +49,6 @@
 #include "authentication/esp3d_authentication.h"
 #include "bsp.h"
 
-
 #define STORAGE_NAME "ESP3D_TFT"
 #define SETTING_VERSION "ESP3D_TFT-V1.0.0"
 
@@ -720,6 +719,8 @@ const char* ESP3DSettings::readString(ESP3DSettingIndex index, char* out_str,
                                       size_t len, bool* haserror) {
   const ESP3DSettingDescription* query = getSettingPtr(index);
   if (query) {
+    esp3d_log("read setting %d, type: %d : %s", (uint16_t)index,
+              (uint8_t)query->type, query->default_val);
     if (query->type == ESP3DSettingType::string_t ||
         query->type == ESP3DSettingType::float_t) {
       esp_err_t err;
@@ -770,7 +771,7 @@ const char* ESP3DSettings::readString(ESP3DSettingIndex index, char* out_str,
         }
       }
     } else {
-      esp3d_log_e("Error setting is not a string");
+      esp3d_log_e("Error setting is not a string / float");
     }
   } else {
     esp3d_log_e("Cannot find %d entry", static_cast<uint16_t>(index));
@@ -778,8 +779,7 @@ const char* ESP3DSettings::readString(ESP3DSettingIndex index, char* out_str,
   if (haserror) {
     *haserror = true;
   }
-  esp3d_log_e("Error reading setting value %d, type %d",
-              static_cast<uint16_t>(index), static_cast<uint8_t>(query->type));
+  esp3d_log_e("Error reading setting value %d", static_cast<uint16_t>(index));
   return "";
 }
 

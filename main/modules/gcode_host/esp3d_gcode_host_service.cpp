@@ -175,7 +175,7 @@ bool ESP3DGCodeHostService::_add_stream(const char* data,
     esp3d_log_e("Failed to allocate memory for new stream");
     return false;
   }
-  esp3d_log("New stream type: %d", static_cast<uint8_t>(_current_stream.type));
+  esp3d_log("New stream type: %d", static_cast<uint8_t>(type));
   new_stream->type = type;
   new_stream->id = esp3d_hal::millis();
   new_stream->auth_type = auth_type;
@@ -378,7 +378,7 @@ bool ESP3DGCodeHostService::_endStream(ESP3DGcodeStream* stream) {
       for (auto streamPtr = _scripts.begin(); streamPtr != _scripts.end();
            ++streamPtr) {
         if ((*streamPtr)->id == stream->id) {
-          esp3d_log("Clear session %s succeed", sessionId);
+          esp3d_log("Clear id %lld succeed", stream->id);
           if (isFileStream(stream)) {
             _closeFile(stream);  // Behaviour may need altering depending
           }
@@ -572,7 +572,7 @@ bool ESP3DGCodeHostService::_parseResponse(ESP3DMessage* rx) {
       if (_awaitingAck) {
         _resend_command_number = esp3dGcodeParser.getLineResend();
         _resend_command_counter++;
-        esp3d_log("Got resend %ld", _resend_command_number);
+        esp3d_log("Got resend %lld", _resend_command_number);
         _setStreamState(ESP3DGcodeStreamState::resend_gcode_command);
       } else {
         esp3d_log_w("Got resend but out of the query");

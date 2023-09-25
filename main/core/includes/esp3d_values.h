@@ -58,9 +58,6 @@ struct ESP3DValuesDescription {
   size_t size = 0;
   std::string value = "";
   callbackFunction_t callbackFn = nullptr;
-#if ESP3D_DISPLAY_FEATURE
-  lv_obj_t* obj = nullptr;
-#endif  // ESP3D_DISPLAY_FEATURE
 };
 
 class ESP3DValues final {
