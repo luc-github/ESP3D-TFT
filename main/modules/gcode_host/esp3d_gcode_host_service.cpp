@@ -510,7 +510,8 @@ uint8_t ESP3DGCodeHostService::_Checksum(const char* command,
 /// @param max_result_size Size of the result buffer
 /// @param command Pointer to the command to be checksummed.
 /// @param commandnb Line number of the command.
-/// @return True if altered. False if command is empty or overflow result buffer
+/// @return True if altered. False if command is empty or overflow result
+/// buffer
 bool ESP3DGCodeHostService::_CheckSumCommand(char* result_buffer,
                                              size_t max_result_size,
                                              const char* command,
@@ -681,7 +682,7 @@ bool ESP3DGCodeHostService::begin() {
   }
 
   // Task is never stopped so no need to kill the task from outside
-  _started = true;
+
   // this is done once because it is not possible to change the output client
   // after the fw is started
   _outputClient = esp3dCommands.getOutputClient(true);
@@ -693,7 +694,9 @@ bool ESP3DGCodeHostService::begin() {
 
   if (res == pdPASS && _xHandle) {
     esp3d_log("Created GCode Host Task");
+    esp3d_hal::wait(100);
     esp3d_log("GCode Host service started");
+    _started = true;
     flush();
     return true;
   } else {
