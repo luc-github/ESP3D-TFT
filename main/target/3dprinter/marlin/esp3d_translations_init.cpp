@@ -84,5 +84,7 @@ void ESP3DTranslationService::init() {
       {ESP3DLabel::start_probing, "Start probing"},
       {ESP3DLabel::ui_language, "Language"},
       {ESP3DLabel::no_sd_card, "No SD card"},
+      {ESP3DLabel::communication_lost, "Communication lost"},
+      {ESP3DLabel::communication_recovered, "Communication recovered"},
   };
 }

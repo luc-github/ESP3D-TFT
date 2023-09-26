@@ -81,6 +81,9 @@ class ESP3DGCodeHostService : public ESP3DClient {
   bool addStream(const char *command, size_t length,
                  ESP3DAuthenticationLevel authentication_level);
 
+  size_t getStreamListSize() { return _scripts.size(); }
+  bool hasStreamListCommand(const char *command);
+
  private:
   ESP3DGcodeHostStreamType _getStreamType(const char *data);
   ESP3DGcodeStream *_get_front_stream();
@@ -132,6 +135,7 @@ class ESP3DGCodeHostService : public ESP3DClient {
   std::string _stop_script;
   std::string _pause_script;
   std::string _resume_script;
+  bool _connection_lost = false;
 
   ESP3DGcodeHostError _error = ESP3DGcodeHostError::no_error;
 

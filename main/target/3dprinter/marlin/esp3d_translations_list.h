@@ -80,6 +80,8 @@ enum class ESP3DLabel : uint16_t {
   invert_axis,
   ui_language,
   no_sd_card,
+  communication_lost,
+  communication_recovered,
   unknown_index,  // must be last
 };
 

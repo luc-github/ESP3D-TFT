@@ -28,6 +28,7 @@
 #include "esp3d_settings.h"
 #include "esp3d_string.h"
 #include "freertos/task.h"
+#include "gcode_host/esp3d_gcode_host_service.h"
 #include "tasks_def.h"
 
 ESP3DRenderingClient renderingClient;
@@ -134,7 +135,12 @@ void ESP3DRenderingClient::handle() {
       if (esp3d_hal::millis() - now > ESP3D_POLLING_INTERVAL) {
         const char **pollingCommands = esp3dGcodeParser.getPollingCommands();
         for (uint8_t i = 0; strlen(pollingCommands[i]) != 0; i++) {
-          sendGcode(pollingCommands[i]);
+          // check if command is not aleready in queue
+          if (!gcodeHostService.hasStreamListCommand(pollingCommands[i])) {
+            sendGcode(pollingCommands[i]);
+          } else {
+            esp3d_log_w("Command %s already in queue", pollingCommands[i]);
+          }
         }
         now = esp3d_hal::millis();
       }

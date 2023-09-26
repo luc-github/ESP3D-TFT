@@ -142,6 +142,17 @@ bool ESP3DGCodeHostService::addStream(
                      true);
 }
 
+bool ESP3DGCodeHostService::hasStreamListCommand(const char* command) {
+  for (auto it = _scripts.begin(); it != _scripts.end(); ++it) {
+    if (((*it)->type == ESP3DGcodeHostStreamType::single_command) &&
+        (strcmp((*it)->dataStream, command) == 0)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 // Add stream from ESP700 command
 bool ESP3DGCodeHostService::addStream(const char* filename,
                                       ESP3DAuthenticationLevel auth_type,
@@ -621,6 +632,14 @@ bool ESP3DGCodeHostService::_processRx(ESP3DMessage* rx) {
     esp3d_log_w("Output client not set, can't send: %s", (char*)(rx->data));
   } else if (rx->origin == _outputClient) {
     esp3d_log("Stream got the response: %s", (char*)(rx->data));
+    if (_connection_lost) {
+      std::string text = esp3dTranslationService.translate(
+          ESP3DLabel::communication_recovered);
+      esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
+                                      text.c_str());
+    }
+    _connection_lost = false;
+
     _parseResponse(rx);
   } else {
     esp3d_log("Forwarding message from: %d", static_cast<uint8_t>(rx->origin));
@@ -1100,6 +1119,13 @@ void ESP3DGCodeHostService::_handle_stream_states() {
         esp3d_log_e("Timeout waiting for ack");
         _error = ESP3DGcodeHostError::time_out;
         _setStreamState(ESP3DGcodeStreamState::error);
+        if (!_connection_lost) {
+          std::string text =
+              esp3dTranslationService.translate(ESP3DLabel::communication_lost);
+          esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
+                                          text.c_str());
+        }
+        _connection_lost = true;
       }
       break;
 
@@ -1174,10 +1200,12 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       // should we abort the stream? or go to next command in stream if any
       // ?
       // how to notify to user ?
-      text = esp3dTranslationService.translate(ESP3DLabel::error);
-      text += ": S" + std::to_string(static_cast<uint8_t>(_error));
-      esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
-                                      text.c_str());
+      if (_error != ESP3DGcodeHostError::time_out) {
+        text = esp3dTranslationService.translate(ESP3DLabel::error);
+        text += ": S" + std::to_string(static_cast<uint8_t>(_error));
+        esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
+                                        text.c_str());
+      }
       _setStreamState(ESP3DGcodeStreamState::read_cursor);
       break;
     default:
