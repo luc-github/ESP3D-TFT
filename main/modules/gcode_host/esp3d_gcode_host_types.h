@@ -66,6 +66,7 @@ enum class ESP3DGcodeHostError : uint8_t {
   empty_file,
   access_denied,
   cursor_out_of_range,
+  list_full,
   aborted
 };
 
@@ -79,6 +80,12 @@ enum class ESP3DGcodeHostStreamType : uint8_t {
   sd_script,
   invalid,
 };
+
+#if ESP3D_TFT_LOG
+const char ESP3DGcodeHostStreamTypeStr[][20] = {
+    "unknown",   "single_command", "multiple_commands", "fs_stream",
+    "fs_script", "sd_stream",      "sd_script",         "invalid"};
+#endif  // ESP3D_TFT_LOG
 
 #ifdef __cplusplus
 }  // extern "C"

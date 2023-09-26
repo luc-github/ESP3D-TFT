@@ -56,6 +56,7 @@ ESP3DGCodeHostService gcodeHostService;
 #define MAX_COMMAND_LENGTH 255
 #define ESP3D_COMMAND_TIMEOUT 10000  // milliseconds timeout
 #define ESP3D_MAX_RETRY 5
+#define ESP3D_MAX_STREAM_SIZE 50
 
 #define isFileStreamType(type)                      \
   ((type == ESP3DGcodeHostStreamType::fs_stream) || \
@@ -105,6 +106,11 @@ ESP3DGcodeHostStreamType ESP3DGCodeHostService::_getStreamType(
     }
     return type;
   } else {
+    // FIXME:
+    //  That part is problematic [ESPXXX] can contain ; in password / parameters
+    //  so we should not consider it as a multiple command
+    // so for the moment multiple commands line delimited by ; do not support
+    // command with ';' in it
     if (strstr(data, "\n") != nullptr || (strstr(data, ";") != nullptr)) {
       return ESP3DGcodeHostStreamType::multiple_commands;
     } else {
@@ -131,7 +137,9 @@ bool ESP3DGCodeHostService::addStream(
   // the command has a 0x0 terminal so we should be able to ignore the length
   // because it is msg we should consider it as a command so we can execute it
   // first
-  return _add_stream(command, authentication_level, true);
+  // so let's trim it to remove any space or \n
+  return _add_stream(esp3d_string::str_trim(command), authentication_level,
+                     true);
 }
 
 // Add stream from ESP700 command
@@ -153,7 +161,8 @@ bool ESP3DGCodeHostService::_add_stream(const char* data,
   // Macro should be executed first like any other command
   // only file stream is executed after current stream is finished
   ESP3DGcodeHostStreamType type = _getStreamType(data);
-  esp3d_log("File type: %d", static_cast<uint8_t>(type));
+  esp3d_log_d("File type: %d , %s", static_cast<uint8_t>(type),
+              ESP3DGcodeHostStreamTypeStr[static_cast<uint8_t>(type)]);
   if (type == ESP3DGcodeHostStreamType::invalid) {
     esp3d_log_e("Invalid file type");
     return false;
@@ -167,6 +176,15 @@ bool ESP3DGCodeHostService::_add_stream(const char* data,
       type = ESP3DGcodeHostStreamType::sd_script;
 #endif  // ESP3D_SD_CARD_FEATURE
     }
+  }
+  if (_scripts.size() >= ESP3D_MAX_STREAM_SIZE) {
+    esp3d_log_e("Stream list is full");
+    std::string text = esp3dTranslationService.translate(ESP3DLabel::error);
+    text += ": S";
+    text += std::to_string((uint8_t)ESP3DGcodeHostError::list_full);
+    esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
+                                    text.c_str());
+    return false;
   }
   // Create a new stream
   ESP3DGcodeStream* new_stream =
@@ -229,6 +247,7 @@ bool ESP3DGCodeHostService::_add_stream(const char* data,
         esp3d_log("Add stream at the end of the list");
         _scripts.push_back(new_stream);
       }
+      esp3d_log_d("Stream size is now %d", _scripts.size());
       pthread_mutex_unlock(&_stream_list_mutex);
     }
   } else {
@@ -1012,6 +1031,9 @@ void ESP3DGCodeHostService::_handle_stream_states() {
             newMsg(ESP3DClientType::stream, _outputClient, (uint8_t*)buffer_str,
                    strlen(buffer_str), _current_stream_ptr->auth_type);
       } else {
+        // TBA:
+        // this part is arguable for command that are not direct command
+        //  and so do not have a \n at the end
         if (_current_command_str[_current_command_str.length() - 1] != '\n') {
           _current_command_str += "\n";
         }
