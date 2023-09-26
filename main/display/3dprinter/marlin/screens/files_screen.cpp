@@ -43,7 +43,6 @@
 #include "tasks_def.h"
 #include "translations/esp3d_translation_service.h"
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -327,11 +326,10 @@ void files_screen() {
   if (first_fill_needed) {
     if (files_list.size() == 0) {
       event_button_files_refresh_handler(nullptr);
+      lv_obj_add_flag(ui_files_list_ctl, LV_OBJ_FLAG_HIDDEN);
     }
     first_fill_needed = false;
-  }
-
-  if (files_has_sd) {
+  } else if (files_has_sd) {
     // dir first
     for (auto &file : files_list) {
       if (file.size == "-1") {
