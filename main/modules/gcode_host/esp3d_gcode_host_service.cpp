@@ -392,7 +392,7 @@ bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
       esp3dTftValues.set_string_value(ESP3DValuesIndex::job_status,
                                       "processing");
       esp3dTftValues.set_string_value(ESP3DValuesIndex::file_name,
-                                      &(stream->dataStream[2]));
+                                      stream->dataStream);
     }
     // open file take care of cursor position
     // and total size
@@ -936,6 +936,10 @@ void ESP3DGCodeHostService::_handle_msgs() {
 
 // handle stream state changes
 void ESP3DGCodeHostService::_handle_stream_states() {
+  static std::string progress_str;
+  double new_progress;
+  std::string new_progress_str;
+
   if (_current_stream_ptr == nullptr) {
     return;  // nothing to be done if no stream
   }
@@ -979,10 +983,36 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       if (_current_stream_ptr->cursorPos !=
           _current_stream_ptr->processedSize) {
         _current_stream_ptr->processedSize = _current_stream_ptr->cursorPos;
+        if (_current_stream_ptr->totalSize != 0 &&
+            ((_current_stream_ptr->type ==
+              ESP3DGcodeHostStreamType::fs_stream) ||
+             (_current_stream_ptr->type ==
+              ESP3DGcodeHostStreamType::sd_stream))) {
+          esp3dTftValues.set_string_value(
+              ESP3DValuesIndex::job_duration,
+              std::to_string(esp3d_hal::millis() - _current_stream_ptr->id)
+                  .c_str());
+
+          new_progress = (1.0 * _current_stream_ptr->processedSize) /
+                         _current_stream_ptr->totalSize;
+          new_progress = (new_progress)*100;
+          new_progress_str = esp3d_string::set_precision(
+              std::to_string(_current_stream_ptr->processedSize).c_str(), 2);
+          if (progress_str != new_progress_str) {
+            progress_str = new_progress_str;
+            esp3dTftValues.set_string_value(ESP3DValuesIndex::job_progress,
+                                            progress_str.c_str());
+          }
+        }
       }
       if (_current_stream_ptr->processedSize ==
           _current_stream_ptr->totalSize) {
         esp3d_log("Stream is finished");
+        esp3dTftValues.set_string_value(ESP3DValuesIndex::job_progress, "100");
+        esp3dTftValues.set_string_value(
+            ESP3DValuesIndex::job_duration,
+            std::to_string(esp3d_hal::millis() - _current_stream_ptr->id)
+                .c_str());
         _setStreamState(ESP3DGcodeStreamState::end);
         break;
       }

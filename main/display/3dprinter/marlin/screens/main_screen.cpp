@@ -23,11 +23,13 @@
 #include <lvgl.h>
 
 #include "empty_screen.h"
+#include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "fan_screen.h"
+
 #if ESP3D_SD_CARD_FEATURE
 #include "files_screen.h"
 #endif  // ESP3D_SD_CARD_FEATURE
@@ -89,7 +91,7 @@ lv_obj_t *main_btn_menu = nullptr;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
+std::string progression_area_str = "";
 void update_show_fan_controls(bool show) { show_fan_button = show; }
 
 bool extruder_0_value_cb(ESP3DValuesIndex index, const char *value,
@@ -197,13 +199,81 @@ bool speed_value_cb(ESP3DValuesIndex index, const char *value,
 }
 bool job_status_value_cb(ESP3DValuesIndex index, const char *value,
                          ESP3DValuesCbAction action) {
-  // any change that need to be recorded ?
   if (action == ESP3DValuesCbAction::Update) {
+    // ESP3DValuesIndex::job_duration, (X)
+    // ESP3DValuesIndex::job_progress, (u)
+    // ESP3DValuesIndex::job_status (U)
+    if (index == ESP3DValuesIndex::job_progress) {
+      progression_area_str = "";
+      // Display file name
+      progression_area_str =
+          esp3dTftValues.get_string_value(ESP3DValuesIndex::file_name);
+      progression_area_str += " ";
+      progression_area_str += value;
+      progression_area_str += "%\n";
+
+      // Display time elapsed
+      uint64_t time_elapsed = std::stoull(
+          esp3dTftValues.get_string_value(ESP3DValuesIndex::job_duration));
+      if (time_elapsed > 0) {
+        int seconds = time_elapsed / 1000;
+        time_elapsed %= 1000;
+
+        int minutes = seconds / 60;
+        seconds %= 60;
+
+        int hours = minutes / 60;
+        minutes %= 60;
+
+        int days = hours / 24;
+        hours %= 24;
+        if (days > 0 || hours > 0 || minutes > 0 || seconds > 0) {
+          progression_area_str += std::to_string(days);
+          if (days > 0) {
+            progression_area_str += std::to_string(days);
+            // FIXME: add translation
+            progression_area_str += "d ";
+          }
+          if (hours > 0) {
+            if (hours < 10) progression_area_str += "0";
+            progression_area_str += std::to_string(hours);
+            progression_area_str += ":";
+          } else {
+            progression_area_str += "00:";
+          }
+
+          if (minutes > 0) {
+            if (minutes < 10) progression_area_str += "0";
+            progression_area_str += std::to_string(minutes);
+            progression_area_str += ":";
+          } else {
+            progression_area_str += "00:";
+          }
+
+          if (seconds > 0) {
+            if (seconds < 10) progression_area_str += "0";
+            progression_area_str += std::to_string(seconds);
+          }
+        } else {
+          progression_area_str += std::to_string(time_elapsed);
+          // FIXME: add translation
+          progression_area_str += "ms";
+        }
+
+        esp3d_log_d("Time elapsed %02dH:%02dMin:%02ds%lld", hours, minutes,
+                    seconds, time_elapsed);
+      }
+    }
+
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
-      main_display_status_area();
-      main_display_pause();
-      main_display_resume();
-      main_display_stop();
+      if (index == ESP3DValuesIndex::job_progress) {
+        main_display_status_area();
+      }
+      if (index == ESP3DValuesIndex::job_status) {
+        main_display_pause();
+        main_display_resume();
+        main_display_stop();
+      }
 #if ESP3D_SD_CARD_FEATURE
       main_display_files();
 #endif  // ESP3D_SD_CARD_FEATURE
@@ -289,19 +359,9 @@ void main_display_positions() {
 }
 
 void main_display_status_area() {
-  std::string label_text =
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::job_status);
-  if (label_text == "idle") {
-    label_text = "Not printing";
-  } else {
-    if (label_text == "paused")
-      label_text = "Printing paused: ";
-    else
-      label_text = "Printing: ";
-    label_text += esp3dTftValues.get_string_value(ESP3DValuesIndex::file_name);
-  }
-  // To DO : add progress
-  lv_label_set_text_fmt(main_label_progression_area, "%s", label_text.c_str());
+  if (main_label_progression_area)
+    lv_label_set_text(main_label_progression_area,
+                      progression_area_str.c_str());
 }
 
 void main_display_fan() {

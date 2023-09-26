@@ -61,7 +61,7 @@ enum class ESP3DValuesIndex : uint16_t {
   bed_leveling,
   job_progress,
   job_duration,
-  progression_display,
+  job_id,
   unknown_index
 };
 

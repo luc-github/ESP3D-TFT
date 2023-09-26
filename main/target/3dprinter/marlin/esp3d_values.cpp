@@ -225,14 +225,7 @@ bool ESP3DValues::intialize() {
       std::string("0"),
       nullptr,
   });
-  //  progression display
-  _values.push_back({
-      ESP3DValuesIndex::progression_display,
-      ESP3DValuesType::string_t,
-      200,  // precision
-      std::string(""),
-      mainScreen::job_status_value_cb,
-  });
+
 #endif  // ESP3D_DISPLAY_FEATURE
   return true;
 }
