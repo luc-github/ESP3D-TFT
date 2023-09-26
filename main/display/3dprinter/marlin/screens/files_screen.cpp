@@ -256,7 +256,7 @@ void event_file_handler(lv_event_t *e) {
   }
   // Should we force the main screen to update the file name  and status ?
   //
-  mainScreen::main_screen();
+  event_button_files_back_handler(e);
 }
 
 bool first_fill_needed = true;
