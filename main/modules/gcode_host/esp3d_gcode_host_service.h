@@ -30,6 +30,7 @@
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "tasks_def.h"
+#define ESP3D_MAX_STREAM_SIZE 50
 
 #ifdef __cplusplus
 extern "C" {

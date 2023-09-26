@@ -34,11 +34,13 @@
 #include "esp_system.h"
 #include "esp_wifi_ap_get_sta_list.h"
 #include "filesystem/esp3d_flash.h"
+#include "gcode_host/esp3d_gcode_host_service.h"
 #include "network/esp3d_network.h"
 #include "rom/ets_sys.h"
 #include "sdkconfig.h"
 #include "spi_flash_mmap.h"
 #include "translations/esp3d_translation_service.h"
+
 #if CONFIG_SPIRAM
 #include "esp_psram.h"
 #endif  // CONFIG_SPIRAM
@@ -243,6 +245,20 @@ void ESP3DCommands::ESP420(int cmd_params_pos, ESP3DMessage *msg) {
     }
   }
 #endif  // #if ESP3D_USB_SERIAL
+  // Streaming buffer
+  size_t stream_size = gcodeHostService.getStreamListSize();
+  float perct = 100.0 * stream_size / ESP3D_MAX_STREAM_SIZE;
+  tmpstr = std::to_string(perct);
+  tmpstr = esp3d_string::set_precision(tmpstr.c_str(), 1);
+  tmpstr += "% (";
+  tmpstr += std::to_string(stream_size);
+  tmpstr += "/";
+  tmpstr += std::to_string(ESP3D_MAX_STREAM_SIZE);
+  tmpstr += ")";
+  if (!dispatchIdValue(json, "Streaming buffer", tmpstr.c_str(), target,
+                       requestId)) {
+    return;
+  }
 
   // wifi
   if (esp3dNetwork.getMode() == ESP3DRadioMode::off ||

@@ -56,7 +56,6 @@ ESP3DGCodeHostService gcodeHostService;
 #define MAX_COMMAND_LENGTH 255
 #define ESP3D_COMMAND_TIMEOUT 10000  // milliseconds timeout
 #define ESP3D_MAX_RETRY 5
-#define ESP3D_MAX_STREAM_SIZE 50
 
 #define isFileStreamType(type)                      \
   ((type == ESP3DGcodeHostStreamType::fs_stream) || \
