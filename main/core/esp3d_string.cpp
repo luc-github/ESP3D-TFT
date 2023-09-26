@@ -50,9 +50,12 @@ const char* esp3d_string::str_replace(const char* currentstr,
                                       const char* oldsubstr,
                                       const char* newsubstr) {
   static std::string resstr;
+  if (!currentstr || !oldsubstr) {
+    return nullptr;
+  }
   resstr = currentstr;
   std::string oldstr = oldsubstr;
-  std::string newstr = newsubstr;
+  std::string newstr = newsubstr ? newsubstr : "";
 
   size_t pos = 0;
   while ((pos = resstr.find(oldstr, pos)) != std::string::npos) {

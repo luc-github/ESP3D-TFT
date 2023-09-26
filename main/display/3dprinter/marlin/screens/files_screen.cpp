@@ -239,14 +239,14 @@ void event_file_handler(lv_event_t *e) {
 
   esp3d_log("file Clicked: %s", file->name.c_str());
 
-  std::string file_path_to_play = sd.mount_point();
+  std::string file_path_to_play = ESP3D_SD_FS_HEADER;
   file_path_to_play += files_path;
-
-  if (file_path_to_play != "/") {
-    file_path_to_play = std::string("/") + file->name;
-  } else {
-    file_path_to_play = file->name;
+  if (esp3d_string::endsWith(file_path_to_play.c_str(), "/") == false) {
+    file_path_to_play += "/";
   }
+  file_path_to_play += file->name;
+  file_path_to_play =
+      esp3d_string::str_replace(file_path_to_play.c_str(), "//", "/");
   esp3d_log("file path : %s", file_path_to_play.c_str());
   if (gcodeHostService.addStream(file_path_to_play.c_str(),
                                  ESP3DAuthenticationLevel::admin, false)) {

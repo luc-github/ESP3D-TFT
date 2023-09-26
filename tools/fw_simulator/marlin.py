@@ -309,6 +309,9 @@ def processLine(line, ser):
     time.sleep(0.01)
     global methods
     for method in methods:
-        if line.startswith(method["str"]):
+        if line.startswith(method["str"]) or (line.startswith("N") and line.find(method["str"]) != 0):
             return method["fn"](line, ser)
-    return "ok"
+    if line.startswith("M") or line.startswith("G")  or line.startswith("N"):
+        return "ok"
+    
+    return ""

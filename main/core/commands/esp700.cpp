@@ -57,6 +57,7 @@ void ESP3DCommands::ESP700(int cmd_params_pos, ESP3DMessage* msg) {
     } else {  // it is a macro
       filename = get_clean_param(msg, cmd_params_pos);
     }
+    esp3d_log("Stream: %s", filename.c_str());
     if (gcodeHostService.addStream(filename.c_str(), msg->authentication_level,
                                    isMacro)) {
       esp3d_log("Stream: %s added as %s", filename.c_str(),

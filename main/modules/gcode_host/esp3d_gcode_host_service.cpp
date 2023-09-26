@@ -93,23 +93,26 @@ static void esp3d_gcode_host_task(void* pvParameter) {
 ESP3DGcodeHostStreamType ESP3DGCodeHostService::_getStreamType(
     const char* data) {  // maybe this can also check for invalid file
                          // extensions if not done elsewhere
+  esp3d_log("Get stream type for %s", data);
   if (strlen(data) == 0) {
+    esp3d_log_e("Invalid data stream");
     return ESP3DGcodeHostStreamType::invalid;
   }
   if (data[0] == '/') {
-    ESP3DGcodeHostStreamType type = ESP3DGcodeHostStreamType::fs_stream;
-    if (strstr(data, "/sd/") == data) {
-#if ESP3D_SD_CARD_FEATURE
-      type = ESP3DGcodeHostStreamType::sd_stream;
-
-#endif  // ESP3D_SD_CARD_FEATURE
+    if (strstr(data, ESP3D_FLASH_FS_HEADER) == data) {
+      return ESP3DGcodeHostStreamType::fs_stream;
     }
-    return type;
+#if ESP3D_SD_CARD_FEATURE
+    if (strstr(data, ESP3D_SD_FS_HEADER) == data) {
+      return ESP3DGcodeHostStreamType::sd_stream;
+    }
+#endif  // ESP3D_SD_CARD_FEATURE
+
   } else {
     // FIXME:
-    //  That part is problematic [ESPXXX] can contain ; in password / parameters
-    //  so we should not consider it as a multiple command
-    // so for the moment multiple commands line delimited by ; do not support
+    //  That part is problematic [ESPXXX] can contain ';' in password /
+    //  parameters so we should not consider it as a multiple command
+    // so for the moment multiple commands line delimited by ';' do not support
     // command with ';' in it
     if (strstr(data, "\n") != nullptr || (strstr(data, ";") != nullptr)) {
       return ESP3DGcodeHostStreamType::multiple_commands;
@@ -117,6 +120,8 @@ ESP3DGcodeHostStreamType ESP3DGCodeHostService::_getStreamType(
       return ESP3DGcodeHostStreamType::single_command;
     }
   }
+  esp3d_log_e("Invalid data stream");
+  return ESP3DGcodeHostStreamType::invalid;
 }
 
 // Update scripts from settings
@@ -157,6 +162,7 @@ bool ESP3DGCodeHostService::hasStreamListCommand(const char* command) {
 bool ESP3DGCodeHostService::addStream(const char* filename,
                                       ESP3DAuthenticationLevel auth_type,
                                       bool executeAsMacro) {
+  esp3d_log("Add stream: %s", filename);
   ESP3DGcodeHostStreamType type = _getStreamType(filename);
   //  ESP700 only accepts file names, not commands
   //  as commands can be sent directly, no need to use ESP700
@@ -172,10 +178,10 @@ bool ESP3DGCodeHostService::_add_stream(const char* data,
   // Macro should be executed first like any other command
   // only file stream is executed after current stream is finished
   ESP3DGcodeHostStreamType type = _getStreamType(data);
-  esp3d_log_d("File type: %d , %s", static_cast<uint8_t>(type),
-              ESP3DGcodeHostStreamTypeStr[static_cast<uint8_t>(type)]);
+  esp3d_log("File type: %d , %s", static_cast<uint8_t>(type),
+            ESP3DGcodeHostStreamTypeStr[static_cast<uint8_t>(type)]);
   if (type == ESP3DGcodeHostStreamType::invalid) {
-    esp3d_log_e("Invalid file type");
+    esp3d_log_e("Invalid data stream");
     return false;
   }
   // any stream that is first is a macro/script
@@ -258,7 +264,7 @@ bool ESP3DGCodeHostService::_add_stream(const char* data,
         esp3d_log("Add stream at the end of the list");
         _scripts.push_back(new_stream);
       }
-      esp3d_log_d("Stream size is now %d", _scripts.size());
+      esp3d_log("Stream size is now %d", _scripts.size());
       pthread_mutex_unlock(&_stream_list_mutex);
     }
   } else {
@@ -381,6 +387,7 @@ bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
       std::string cmd = esp3dGcodeParser.getFwCommandString(
           FW_GCodeCommand::reset_stream_numbering);
       // add command on top of current stream
+      esp3d_log("Add command: %s", cmd.c_str());
       addStream(cmd.c_str(), stream->auth_type, true);
       _command_number = 0;
       esp3dTftValues.set_string_value(ESP3DValuesIndex::job_status,
@@ -393,6 +400,11 @@ bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
     if (!_openFile(stream)) {
       esp3d_log_e("Failed to open file");
       return false;
+    }
+    if (!stream->active) {
+      // we close the file because it will be reopen when the stream will be
+      // active
+      _closeFile(stream);
     }
     return true;
   } else if (isCommandStream(stream)) {
@@ -1036,6 +1048,10 @@ void ESP3DGCodeHostService::_handle_stream_states() {
     case ESP3DGcodeStreamState::send_gcode_command:
       _startTimeout = 0;
       msg = nullptr;
+      // do we need to forward to screen ?
+      if (esp3dGcodeParser.forwardToScreen(_current_command_str.c_str())) {
+        esp3d_log("Forwarding to screen %s", _current_command_str.c_str());
+      }
       if (_current_stream_ptr->type == ESP3DGcodeHostStreamType::sd_stream ||
           _current_stream_ptr->type == ESP3DGcodeHostStreamType::fs_stream) {
         _command_number++;
@@ -1139,8 +1155,10 @@ void ESP3DGCodeHostService::_handle_stream_states() {
         break;
       }
       _current_main_stream_ptr->active = false;
-      _add_stream(_pause_script.c_str(), _current_main_stream_ptr->auth_type,
-                  true);
+      if (_pause_script.length() > 0) {
+        _add_stream(_pause_script.c_str(), _current_main_stream_ptr->auth_type,
+                    true);
+      }
       break;
 
       /////////////////////////////////////////////////////////
@@ -1152,8 +1170,10 @@ void ESP3DGCodeHostService::_handle_stream_states() {
         esp3d_log_e("Resume only valid for main stream");
         break;
       }
-      _add_stream(_resume_script.c_str(), _current_main_stream_ptr->auth_type,
-                  true);
+      if (_resume_script.length() > 0) {
+        _add_stream(_resume_script.c_str(), _current_main_stream_ptr->auth_type,
+                    true);
+      }
       break;
 
       /////////////////////////////////////////////////////////
@@ -1165,14 +1185,19 @@ void ESP3DGCodeHostService::_handle_stream_states() {
         esp3d_log_e("Abort only valid for main stream");
         break;
       }
-      _add_stream(_stop_script.c_str(), _current_main_stream_ptr->auth_type,
-                  true);
+      if (_stop_script.length() > 0) {
+        _add_stream(_stop_script.c_str(), _current_main_stream_ptr->auth_type,
+                    true);
+      }
       break;
 
       /////////////////////////////////////////////////////////
       // end
       /////////////////////////////////////////////////////////
     case ESP3DGcodeStreamState::end:
+      esp3d_log("Stream is ended for type: %d, %s",
+                static_cast<uint8_t>(_current_stream_ptr->type),
+                _current_stream_ptr->dataStream);
       // sanity check, reset main stream pointer if it is the current stream
       if (_current_stream_ptr == _current_main_stream_ptr) {
         _current_main_stream_ptr = nullptr;
@@ -1206,7 +1231,8 @@ void ESP3DGCodeHostService::_handle_stream_states() {
         esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
                                         text.c_str());
       }
-      _setStreamState(ESP3DGcodeStreamState::read_cursor);
+      // abort the stream because we are in error and we do not know what to do
+      _setStreamState(ESP3DGcodeStreamState::end);
       break;
     default:
       break;
@@ -1265,6 +1291,13 @@ void ESP3DGCodeHostService::end() {
     _xHandle = NULL;
   }
   _scripts.clear();
+  if (_current_front_stream_ptr) {
+    if (isFileStreamType(_current_front_stream_ptr->type)) {
+      _closeFile(_current_front_stream_ptr);
+    }
+  } else {
+    _file_handle = nullptr;
+  }
   _current_front_stream_ptr = nullptr;
   _current_main_stream_ptr = nullptr;
   _current_stream_ptr = nullptr;
