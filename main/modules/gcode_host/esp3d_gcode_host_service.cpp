@@ -92,7 +92,7 @@ static void esp3d_gcode_host_task(void* pvParameter) {
 ESP3DGcodeHostStreamType ESP3DGCodeHostService::_getStreamType(
     const char* data) {  // maybe this can also check for invalid file
                          // extensions if not done elsewhere
-  esp3d_log("Get stream type for %s", data);
+  esp3d_log_d("Get stream type for %s", data);
   if (strlen(data) == 0) {
     esp3d_log_e("Invalid data stream");
     return ESP3DGcodeHostStreamType::invalid;
@@ -161,24 +161,28 @@ bool ESP3DGCodeHostService::hasStreamListCommand(const char* command) {
 bool ESP3DGCodeHostService::addStream(const char* filename,
                                       ESP3DAuthenticationLevel auth_type,
                                       bool executeAsMacro) {
-  esp3d_log("Add stream: %s", filename);
+  esp3d_log_d("Add stream: %s", filename);
   ESP3DGcodeHostStreamType type = _getStreamType(filename);
   //  ESP700 only accepts file names, not commands
   //  as commands can be sent directly, no need to use ESP700
-  if (!isFileStreamType(type)) return false;
+  if (!isFileStreamType(type)) {
+    esp3d_log_e("Invalid data stream %s",
+                ESP3DGcodeHostStreamTypeStr[static_cast<uint8_t>(type)]);
+    return false;
+  }
   return _add_stream(filename, auth_type, executeAsMacro);
 }
 
 bool ESP3DGCodeHostService::_add_stream(const char* data,
                                         ESP3DAuthenticationLevel auth_type,
                                         bool executeFirst) {
-  esp3d_log("Processing stream request: %s, with authentication level=%d", data,
-            static_cast<uint8_t>(auth_type));
+  esp3d_log_d("Processing stream request: %s, with authentication level=%d",
+              data, static_cast<uint8_t>(auth_type));
   // Macro should be executed first like any other command
   // only file stream is executed after current stream is finished
   ESP3DGcodeHostStreamType type = _getStreamType(data);
-  esp3d_log("File type: %d , %s", static_cast<uint8_t>(type),
-            ESP3DGcodeHostStreamTypeStr[static_cast<uint8_t>(type)]);
+  esp3d_log_d("File type: %d , %s", static_cast<uint8_t>(type),
+              ESP3DGcodeHostStreamTypeStr[static_cast<uint8_t>(type)]);
   if (type == ESP3DGcodeHostStreamType::invalid) {
     esp3d_log_e("Invalid data stream");
     return false;
@@ -209,7 +213,7 @@ bool ESP3DGCodeHostService::_add_stream(const char* data,
     esp3d_log_e("Failed to allocate memory for new stream");
     return false;
   }
-  esp3d_log("New stream type: %d", static_cast<uint8_t>(type));
+  esp3d_log_d("New stream type: %d", static_cast<uint8_t>(type));
 
   new_stream->type = type;
   new_stream->id = esp3d_hal::millis();
@@ -226,7 +230,7 @@ bool ESP3DGCodeHostService::_add_stream(const char* data,
     return false;
   }
   strcpy(new_stream->dataStream, data);
-  esp3d_log("New stream data: %s", new_stream->dataStream);
+  esp3d_log_d("New stream data: %s", new_stream->dataStream);
   // Sanity check for multiple commands
   if (type == ESP3DGcodeHostStreamType::multiple_commands) {
     for (int i = 0; i < strlen(new_stream->dataStream); i++) {
@@ -244,26 +248,26 @@ bool ESP3DGCodeHostService::_add_stream(const char* data,
           bool found = false;
           for (auto it = _scripts.begin(); it != _scripts.end(); ++it) {
             if (*it == _current_main_stream_ptr) {
-              esp3d_log_w("Inster new stream before current main stream");
+              esp3d_log_d("Inster new stream before current main stream");
               _scripts.insert(it, new_stream);
               found = true;
               break;
             }
             if (!found) {
-              esp3d_log_w("No main stream found, add at the end");
+              esp3d_log_d("No main stream found, add at the end");
               _scripts.push_back(new_stream);
             }
           }
         } else {  // no main stream, add at the end
-          esp3d_log("No main stream, add at the end");
+          esp3d_log_d("No main stream, add at the end");
           _scripts.push_back(new_stream);
         }
       } else {
         // the new stream is just after the current stream if any
-        esp3d_log("Add stream at the end of the list");
+        esp3d_log_d("Add stream at the end of the list");
         _scripts.push_back(new_stream);
       }
-      esp3d_log("Stream size is now %d", _scripts.size());
+      esp3d_log_d("Stream size is now %d", _scripts.size());
       pthread_mutex_unlock(&_stream_list_mutex);
     }
   } else {
@@ -298,10 +302,10 @@ bool ESP3DGCodeHostService::resume() {
 /// @param stream Pointer to the file stream to be opened.
 /// @return True if file opened successfully.
 bool ESP3DGCodeHostService::_openFile(ESP3DGcodeStream* stream) {
-  esp3d_log("File name is %s", stream->dataStream);
+  esp3d_log_d("File name is %s", stream->dataStream);
   if (globalFs.accessFS(stream->dataStream)) {
     if (globalFs.exists(stream->dataStream)) {
-      esp3d_log("File exists");
+      esp3d_log_d("File exists");
       _file_handle = globalFs.open(stream->dataStream, "r");
       if (_file_handle != nullptr) {
         if (_current_stream_ptr->cursorPos != 0) {
@@ -315,7 +319,7 @@ bool ESP3DGCodeHostService::_openFile(ESP3DGcodeStream* stream) {
             return false;
           }
         }
-        esp3d_log("File opened");
+        esp3d_log_d("File opened");
         // get file size if not set
         if (stream->totalSize == 0) {
           struct stat file_stat;
@@ -354,10 +358,10 @@ bool ESP3DGCodeHostService::_openFile(ESP3DGcodeStream* stream) {
 /// @return True if file closed and FS released successfully.
 bool ESP3DGCodeHostService::_closeFile(ESP3DGcodeStream* stream) {
   if (_file_handle == nullptr) {
-    esp3d_log_e("No file to close");
+    esp3d_log_w("No file to close");
     return false;
   }
-  esp3d_log("Closing File: %s", stream->dataStream);
+  esp3d_log_d("Closing File: %s", stream->dataStream);
   globalFs.close((_file_handle), stream->dataStream);
   _file_handle = nullptr;
   globalFs.releaseFS(stream->dataStream);
@@ -367,11 +371,12 @@ bool ESP3DGCodeHostService::_closeFile(ESP3DGcodeStream* stream) {
 // ##################### Stream Handling Functions ########################
 
 bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
-  esp3d_log("Starting stream");
+  esp3d_log_d("Starting stream");
   _file_buffer_length = 0;
   _current_command_str = "";
   if (isFileStream(stream)) {
     if (_file_handle) {
+      esp3d_log_d("File handle is not null, close it");
       _closeFile(stream);
       esp3d_log_e("Previous File handle not closed!");
     }
@@ -386,8 +391,8 @@ bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
       std::string cmd = esp3dGcodeParser.getFwCommandString(
           FW_GCodeCommand::reset_stream_numbering);
       // add command on top of current stream
-      esp3d_log("Add command: %s", cmd.c_str());
-      addStream(cmd.c_str(), stream->auth_type, true);
+      esp3d_log_d("Add command: %s", cmd.c_str());
+      _add_stream(cmd.c_str(), stream->auth_type, true);
       _command_number = 0;
       esp3dTftValues.set_string_value(ESP3DValuesIndex::job_status,
                                       "processing");
@@ -400,15 +405,10 @@ bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
       esp3d_log_e("Failed to open file");
       return false;
     }
-    if (!stream->active) {
-      // we close the file because it will be reopen when the stream will be
-      // active
-      _closeFile(stream);
-    }
     return true;
   } else if (isCommandStream(stream)) {
     stream->totalSize = strlen(stream->dataStream);
-    esp3d_log("Is command stream");
+    esp3d_log_d("Is command stream");
     return true;
   }
   esp3d_log_e("Unknown stream type");
@@ -420,21 +420,21 @@ bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
 /// @param stream Pointer to the stream to end and free.
 /// @return true if stream is ended and freed successfully.
 bool ESP3DGCodeHostService::_endStream(ESP3DGcodeStream* stream) {
-  esp3d_log("Freeing stream");
+  esp3d_log_d("Freeing stream");
   if (_stream_list_mutex) {
     if (pthread_mutex_lock(&_stream_list_mutex) == 0) {
       bool res = false;
       for (auto streamPtr = _scripts.begin(); streamPtr != _scripts.end();
            ++streamPtr) {
         if ((*streamPtr)->id == stream->id) {
-          esp3d_log("Clear id %lld succeed", stream->id);
+          esp3d_log_d("Clear id %lld succeed", stream->id);
           if (isFileStream(stream)) {
+            esp3d_log_d("Close stream");
             _closeFile(stream);  // Behaviour may need altering depending
           }
           free(stream->dataStream);
           free(stream);
           _scripts.erase(streamPtr++);
-          _current_command_str = "";
           res = true;
           break;
         }
@@ -455,14 +455,16 @@ bool ESP3DGCodeHostService::_endStream(ESP3DGcodeStream* stream) {
 /// @return True if command is read, False if no command read (end of
 /// stream).
 bool ESP3DGCodeHostService::_readNextCommand(ESP3DGcodeStream* stream) {
-  esp3d_log("Reading next command");
+  // No need to put this in class scope
+  static size_t buffer_cursor = 0;
+  esp3d_log_d("Reading next command");
   if (stream->type == ESP3DGcodeHostStreamType::single_command) {
-    esp3d_log("Single command");
+    esp3d_log_d("Single command");
     // this is manual command it should not have any comment
     _current_command_str = stream->dataStream;
     stream->cursorPos = strlen(stream->dataStream);
   } else if (stream->type == ESP3DGcodeHostStreamType::multiple_commands) {
-    esp3d_log("Multiple command");
+    esp3d_log_d("Multiple command");
     // read from buffer = dataStream
     // reset content
     _current_command_str = "";
@@ -474,48 +476,80 @@ bool ESP3DGCodeHostService::_readNextCommand(ESP3DGcodeStream* stream) {
       _current_command_str += stream->dataStream[i];
     }
     if (_current_command_str.length() == 0) {
-      esp3d_log("No command read");
+      esp3d_log_d("No command read");
       return false;
     }
   } else if (isFileStream(stream)) {
-    esp3d_log("File commands");
-    // No need to put this in class scope
-    static size_t buffer_cursor = 0;
+    esp3d_log_d("File commands cursor pos is %lld", stream->cursorPos);
+    if (_file_handle == nullptr) {
+      esp3d_log_e("No file handle");
+      return false;
+    }
+
     // read from file
     bool is_done = false;
     while (!is_done) {
+      esp3d_log_d("Buffer pos: %d, in buffer of %d,  for %lld/%lld",
+                  buffer_cursor, _file_buffer_length, stream->cursorPos,
+                  stream->totalSize);
+      if (buffer_cursor >= _file_buffer_length) {
+        _file_buffer_length = 0;
+      }
       if (_file_buffer_length == 0) {
+        esp3d_log_d("Buffer is empty, read from file");
         buffer_cursor = 0;
         _file_buffer_length = fread(_file_buffer, sizeof(char),
                                     STREAM_CHUNK_SIZE - 1, _file_handle);
+
         _file_buffer[_file_buffer_length] = 0;
+        esp3d_log_d("Read %d bytes from file: %s", _file_buffer_length,
+                    _file_buffer);
         if (_file_buffer_length == 0 && _current_command_str.length() == 0) {
-          esp3d_log("No command read");
+          esp3d_log_d("No command read");
           return false;
         }
         if (_file_buffer_length == 0) {
           is_done = true;
           break;
         }
-        if (!is_done) {
-          for (buffer_cursor = buffer_cursor;
-               buffer_cursor < _file_buffer_length; buffer_cursor++) {
-            // What ever we read it increase the cursor pos
-            stream->cursorPos++;
-            // do not add the `\n` on purpose for triming the command
-            if (_file_buffer[buffer_cursor] == '\n') {
-              is_done = true;
+      }
+      if (!is_done) {
+        // esp3d_log_d("Parsing buffer");
+        for (buffer_cursor = buffer_cursor; buffer_cursor < _file_buffer_length;
+             buffer_cursor++) {
+          // What ever we read it increase the cursor pos
+          (stream->cursorPos)++;
+          // esp3d_log_d("Parsing buffer at index:%d, cursor is now %lld",
+          //             buffer_cursor, stream->cursorPos);
+          //  do not add the `\n` on purpose for triming the command
+          if (_file_buffer[buffer_cursor] == '\n' ||
+              _file_buffer[buffer_cursor] == '\r') {
+            is_done = true;
+            esp3d_log_d("End of line %s", _current_command_str.c_str());
+            buffer_cursor++;
+            // is it en empty line ?
+            //  if yes we need to continue to read
+            if (_current_command_str.length() > 0) {
               break;
-            }
-            _current_command_str += _file_buffer[buffer_cursor];
-
-            if (_current_command_str.length() > MAX_COMMAND_LENGTH) {
-              esp3d_log_e("Command too long > 255, %s",
-                          _current_command_str.c_str());
-              return false;
+            } else {
+              continue;
             }
           }
+          _current_command_str += _file_buffer[buffer_cursor];
+          // esp3d_log_d("Command is now: %s", _current_command_str.c_str());
+          if (_current_command_str.length() > MAX_COMMAND_LENGTH) {
+            esp3d_log_e("Command too long > 255, %s",
+                        _current_command_str.c_str());
+            buffer_cursor++;
+            _error = ESP3DGcodeHostError::command_too_long;
+            _setStreamState(ESP3DGcodeStreamState::error);
+            return false;
+          }
         }
+      }
+      if (stream->cursorPos == stream->totalSize) {
+        esp3d_log_d("End of file");
+        is_done = true;
       }
     }
   } else {
@@ -524,10 +558,13 @@ bool ESP3DGCodeHostService::_readNextCommand(ESP3DGcodeStream* stream) {
   }
   // No other string manipulation is done on the command string because
   // need to know what kind of command it is first
+  esp3d_log_d("Command read: %s", _current_command_str.c_str());
+  esp3d_log_d("Cursor pos is now %lld / %lld, %lld", stream->cursorPos,
+              stream->totalSize, 100 * stream->cursorPos / stream->totalSize);
   _current_command_str = esp3d_string::str_trim(_current_command_str.c_str());
-  esp3d_log("Command read: %s", _current_command_str.c_str());
+  esp3d_log_d("Trimmed command read: %s", _current_command_str.c_str());
   if (_current_command_str.length() == 0) {
-    esp3d_log("No command read");
+    esp3d_log_d("No command read");
     return false;
   }
   return true;
@@ -569,13 +606,14 @@ bool ESP3DGCodeHostService::_CheckSumCommand(char* result_buffer,
   if (strlen(command) == 0) {
     return false;
   }
-  uint8_t crc = _Checksum(command, strlen(command));
-  int res = snprintf(result_buffer, max_result_size, "N%u %s *%u\n",
-                     (unsigned int)commandnb, command, (unsigned int)crc);
-  if (res < 0) {
-    esp3d_log_e("Failed to format command");
+  std::string cmd = "N" + std::to_string(commandnb) + " " + command;
+  uint8_t chksm = _Checksum(cmd.c_str(), cmd.length());
+  cmd += "*" + std::to_string(chksm);
+  if (cmd.length() > max_result_size) {
+    esp3d_log_e("Command too long");
     return false;
   }
+  strcpy(result_buffer, cmd.c_str());
   return true;
 }
 
@@ -583,7 +621,10 @@ bool ESP3DGCodeHostService::_parseResponse(ESP3DMessage* rx) {
   ESP3DDataType response_type = esp3dGcodeParser.getType((char*)(rx->data));
   switch (response_type) {
     case ESP3DDataType::ack:  // ack
+      esp3d_log_d("Got ack %s for %s", (char*)rx->data,
+                  _current_command_str.c_str());
       if (_awaitingAck) {
+        esp3d_log_d("When having awaiting ack");
         // we got an ack for the current command
         _awaitingAck = false;
         // save one cycle for single command
@@ -595,7 +636,7 @@ bool ESP3DGCodeHostService::_parseResponse(ESP3DMessage* rx) {
         }
 
       } else {
-        esp3d_log_w("Got ack but out of the query");
+        esp3d_log_d("Got ack but out of the query");
       }
       break;
     case ESP3DDataType::status:  // can be busy or idle
@@ -614,19 +655,19 @@ bool ESP3DGCodeHostService::_parseResponse(ESP3DMessage* rx) {
         text += esp3dGcodeParser.getLastError();
         esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
                                         text.c_str());
-        esp3d_log_w("Got error but out of the query");
+        esp3d_log_d("Got error but out of the query");
       }
       break;
     case ESP3DDataType::resend:  // resend
       // use _current_command_str and resend it to the printer
-      esp3d_log("Got resend");
+      esp3d_log_d("Got resend");
       if (_awaitingAck) {
         _resend_command_number = esp3dGcodeParser.getLineResend();
         _resend_command_counter++;
-        esp3d_log("Got resend %lld", _resend_command_number);
+        esp3d_log_d("Got resend %lld", _resend_command_number);
         _setStreamState(ESP3DGcodeStreamState::resend_gcode_command);
       } else {
-        esp3d_log_w("Got resend but out of the query");
+        esp3d_log_d("Got resend but out of the query");
       }
       break;
     default:  // esp_command, gcode, response,  comment, empty_line,
@@ -640,9 +681,9 @@ bool ESP3DGCodeHostService::_parseResponse(ESP3DMessage* rx) {
 
 bool ESP3DGCodeHostService::_processRx(ESP3DMessage* rx) {
   if (_outputClient == ESP3DClientType::no_client) {
-    esp3d_log_w("Output client not set, can't send: %s", (char*)(rx->data));
+    esp3d_log_d("Output client not set, can't send: %s", (char*)(rx->data));
   } else if (rx->origin == _outputClient) {
-    esp3d_log("Stream got the response: %s", (char*)(rx->data));
+    esp3d_log_d("Stream got the response: %s", (char*)(rx->data));
     if (_connection_lost) {
       std::string text = esp3dTranslationService.translate(
           ESP3DLabel::communication_recovered);
@@ -653,7 +694,8 @@ bool ESP3DGCodeHostService::_processRx(ESP3DMessage* rx) {
 
     _parseResponse(rx);
   } else {
-    esp3d_log("Forwarding message from: %d", static_cast<uint8_t>(rx->origin));
+    esp3d_log_d("Forwarding message from: %d",
+                static_cast<uint8_t>(rx->origin));
     addStream((const char*)rx->data, rx->size, rx->authentication_level);
   }
   deleteMsg(rx);
@@ -692,7 +734,7 @@ ESP3DGcodeStream* ESP3DGCodeHostService::getCurrentMainStream() {
       return (*script);
     }
   }
-  esp3d_log("No script found");
+  esp3d_log_d("No script found");
   return nullptr;
 }
 
@@ -708,9 +750,11 @@ ESP3DGCodeHostService::ESP3DGCodeHostService() {
 ESP3DGCodeHostService::~ESP3DGCodeHostService() { end(); }
 
 void ESP3DGCodeHostService::process(ESP3DMessage* msg) {
-  esp3d_log("Add message to queue");
+  esp3d_log_d("Add message to queue");
+  // FIXME: the flush is used to avoid the queue to be full
+  // removing it
   if (!addRxData(msg)) {
-    // flush();
+    flush();
     if (!addRxData(msg)) {
       esp3d_log_e("Cannot add msg to client queue");
       deleteMsg(msg);
@@ -745,16 +789,16 @@ bool ESP3DGCodeHostService::begin() {
   // this is done once because it is not possible to change the output client
   // after the fw is started
   _outputClient = esp3dCommands.getOutputClient(true);
-  esp3d_log("Output client is: %d", static_cast<uint8_t>(_outputClient));
+  esp3d_log_d("Output client is: %d", static_cast<uint8_t>(_outputClient));
   BaseType_t res = xTaskCreatePinnedToCore(
       esp3d_gcode_host_task, "esp3d_gcode_host_task",
       ESP3D_GCODE_HOST_TASK_SIZE, NULL, ESP3D_GCODE_HOST_TASK_PRIORITY,
       &_xHandle, ESP3D_GCODE_HOST_TASK_CORE);
 
   if (res == pdPASS && _xHandle) {
-    esp3d_log("Created GCode Host Task");
+    esp3d_log_d("Created GCode Host Task");
     esp3d_hal::wait(100);
-    esp3d_log("GCode Host service started");
+    esp3d_log_d("GCode Host service started");
     _started = true;
     flush();
     return true;
@@ -799,44 +843,87 @@ ESP3DGcodeStream* ESP3DGCodeHostService::_get_front_stream() {
 void ESP3DGCodeHostService::_handle_stream_selection() {
   // if list is empty nothing to do
   if (_scripts.empty()) {
+    // esp3d_log_d("No stream to handle");
+    //  reset all pointers as sanity check
+    _current_main_stream_ptr = nullptr;
+    _current_stream_ptr = nullptr;
+    _current_front_stream_ptr = nullptr;
     return;
   }
-  // if we are not streaming the front script
-  if (_current_stream_ptr == nullptr) {
-    _current_stream_ptr = _get_front_stream();
-    if (_current_main_stream_ptr == nullptr) {
-      _current_main_stream_ptr = getCurrentMainStream();
-    }
-  }
-  // update the front script
+
+  // update the front stream
   _current_front_stream_ptr = _get_front_stream();
-  // the script is active
-  _current_front_stream_ptr->active = true;
 
-  // if the front script is the main script
-  if (_current_front_stream_ptr == _current_main_stream_ptr) {
-    // the current stream is the main stream
-    _current_stream_ptr = _current_main_stream_ptr;
-    // if paused there is nothing to do
-    if (getState() == ESP3DGcodeHostState::paused) {
-      return;
-    }
-  }
-
-  // the front script is not the main script
-  // and the main script is ready to be put in hold
-  if (_current_main_stream_ptr == _current_stream_ptr &&
-      _current_main_stream_ptr->active &&
-      (_getStreamState() == ESP3DGcodeStreamState::read_cursor)) {
-    _current_main_stream_ptr->active = false;
-    // close the file if needed
-    _closeFile(_current_main_stream_ptr);
-    // put current stream (_current_main_stream_ptr) in state ready to reopen
-    // file
-    _setStreamState(ESP3DGcodeStreamState::start);
-    // new current stream is the front stream
+  // if we are not streaming the front stream
+  if (_current_stream_ptr == nullptr) {
+    esp3d_log_d("No current stream, get the front one");
     _current_stream_ptr = _current_front_stream_ptr;
   }
+  // check what is the main stream
+  if (_current_main_stream_ptr == nullptr) {
+    esp3d_log_d("No main stream, get the first one");
+    _current_main_stream_ptr = getCurrentMainStream();
+  }
+
+  // if it is a script do not change the current stream
+  if (_current_stream_ptr->type == ESP3DGcodeHostStreamType::fs_script ||
+      _current_stream_ptr->type == ESP3DGcodeHostStreamType::sd_script) {
+    esp3d_log_d(
+        "Current stream is a script %lld, state:%s : type: %s , command: %s, "
+        "keep it active",
+        _current_stream_ptr->id,
+        ESP3DGcodeStreamStateStr[static_cast<uint8_t>(
+            _current_stream_ptr->state)],
+        ESP3DGcodeHostStreamTypeStr[static_cast<uint8_t>(
+            _current_stream_ptr->type)],
+        _current_command_str.c_str());
+    return;
+  }
+
+  // current stream cannot be interrupted unless it is paused or reading next
+  // command or starting
+  if (!(_current_stream_ptr->state == ESP3DGcodeStreamState::start ||
+        _current_stream_ptr->state == ESP3DGcodeStreamState::read_cursor ||
+        _current_stream_ptr->state == ESP3DGcodeStreamState::paused)) {
+    esp3d_log_d(
+        "Current stream is processing %lld, state:%s : type: %s , command: %s, "
+        "keep it active",
+        _current_stream_ptr->id,
+        ESP3DGcodeStreamStateStr[static_cast<uint8_t>(
+            _current_stream_ptr->state)],
+        ESP3DGcodeHostStreamTypeStr[static_cast<uint8_t>(
+            _current_stream_ptr->type)],
+        _current_command_str.c_str());
+    return;
+  }
+
+  // the current stream is main one but there are other streams in the queue in
+  // front of it
+  if (_current_stream_ptr == _current_main_stream_ptr &&
+      _current_stream_ptr != _current_front_stream_ptr) {
+    if (_current_main_stream_ptr) {
+      esp3d_log_d(
+          "Current stream is the main stream put it in hold because "
+          "there are other streams in front of it");
+      _current_main_stream_ptr->active = false;
+      // close the file if needed
+      if (_file_handle) {
+        esp3d_log_d("File handle is not null, close it");
+        _closeFile(_current_main_stream_ptr);
+      }
+    }
+  }
+  _current_stream_ptr = _current_front_stream_ptr;
+  esp3d_log_d("Current stream is now the front stream");
+  _current_stream_ptr->active = true;
+
+  esp3d_log_d("Current stream is now %lld, state:%s : type: %s , command: %s",
+              _current_stream_ptr->id,
+              ESP3DGcodeStreamStateStr[static_cast<uint8_t>(
+                  _current_stream_ptr->state)],
+              ESP3DGcodeHostStreamTypeStr[static_cast<uint8_t>(
+                  _current_stream_ptr->type)],
+              _current_command_str.c_str());
 }
 
 // all changes of state must use this one so sanity checks can be done
@@ -885,7 +972,7 @@ void ESP3DGCodeHostService::_handle_notifications() {
   if (ulTaskNotifyTake(pdTRUE, 0)) {
     ESP3DGcodeStreamState state = _getStreamState();
     if (ulTaskNotifyTakeIndexed(_xPauseNotifyIndex, pdTRUE, 0)) {
-      esp3d_log("Received pause notification");
+      esp3d_log_d("Received pause notification");
       if (!_setStreamRequestState(ESP3DGcodeStreamState::pause)) {
         esp3d_log_e("Failed to request pause stream");
       } else {  // do not wait to set the state to paused to avoid to confuse
@@ -896,7 +983,7 @@ void ESP3DGCodeHostService::_handle_notifications() {
     }
 
     if (ulTaskNotifyTakeIndexed(_xResumeNotifyIndex, pdTRUE, 0)) {
-      esp3d_log("Received resume notification");
+      esp3d_log_d("Received resume notification");
       if (state == ESP3DGcodeStreamState::paused) {
         if (!_setStreamState(ESP3DGcodeStreamState::resume)) {
           esp3d_log_e("Failed to resume stream");
@@ -906,11 +993,11 @@ void ESP3DGCodeHostService::_handle_notifications() {
                                           "processing");
         }
       } else {
-        esp3d_log_w("No paused stream - nothing to resume");
+        esp3d_log_d("No paused stream - nothing to resume");
       }
     }
     if (ulTaskNotifyTakeIndexed(_xAbortNotifyIndex, pdTRUE, 0)) {
-      esp3d_log("Received abort notification");
+      esp3d_log_d("Received abort notification");
       if (state != ESP3DGcodeStreamState::undefined) {
         if (!_setStreamState(ESP3DGcodeStreamState::abort)) {
           esp3d_log_e("Failed to abort stream");
@@ -927,7 +1014,7 @@ void ESP3DGCodeHostService::_handle_notifications() {
 void ESP3DGCodeHostService::_handle_msgs() {
   while (getRxMsgsCount() > 0) {
     ESP3DMessage* msg = popRx();
-    esp3d_log("RX popped");
+    esp3d_log_d("RX popped");
     if (msg) {
       _processRx(msg);
     }
@@ -948,7 +1035,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
   std::string text;
 
   if (!_current_stream_ptr->active) {
-    esp3d_log_w("Stream not active");
+    esp3d_log_d("Stream not active");
     return;  // nothing to be done if stream is not active
   }
   // stream is active
@@ -963,7 +1050,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
         break;
       } else {
         if (!_current_stream_ptr->active) {
-          esp3d_log_w("Stream not yet active, need reset line");
+          esp3d_log_d("Stream not yet active, need reset line");
           break;
         } else {
           _setStreamState(ESP3DGcodeStreamState::read_cursor);
@@ -980,6 +1067,8 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       // and mark command as processed
       _current_command_str = "";
       _awaitingAck = false;
+      esp3d_log_d("Processed %lld bytes / %lld", _current_stream_ptr->cursorPos,
+                  _current_stream_ptr->totalSize);
       if (_current_stream_ptr->cursorPos !=
           _current_stream_ptr->processedSize) {
         _current_stream_ptr->processedSize = _current_stream_ptr->cursorPos;
@@ -997,7 +1086,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
                          _current_stream_ptr->totalSize;
           new_progress = (new_progress)*100;
           new_progress_str = esp3d_string::set_precision(
-              std::to_string(_current_stream_ptr->processedSize).c_str(), 2);
+              std::to_string(new_progress).c_str(), 2);
           if (progress_str != new_progress_str) {
             progress_str = new_progress_str;
             esp3dTftValues.set_string_value(ESP3DValuesIndex::job_progress,
@@ -1007,7 +1096,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       }
       if (_current_stream_ptr->processedSize ==
           _current_stream_ptr->totalSize) {
-        esp3d_log("Stream is finished");
+        esp3d_log_d("Stream is finished");
         esp3dTftValues.set_string_value(ESP3DValuesIndex::job_progress, "100");
         esp3dTftValues.set_string_value(
             ESP3DValuesIndex::job_duration,
@@ -1033,7 +1122,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
         } else {
           // now string can be stripped if necessary
           if (!_stripCommand()) {
-            esp3d_log("Command is empty");
+            esp3d_log_d("Command is empty");
             // save one cycle for single command
             if (_current_stream_ptr->type ==
                 ESP3DGcodeHostStreamType::single_command) {
@@ -1047,7 +1136,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
           break;
         }
       } else {
-        esp3d_log("Stream is starved");
+        esp3d_log_d("Stream is ended");
         _setStreamState(ESP3DGcodeStreamState::end);
         break;
       }
@@ -1079,11 +1168,13 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       msg = nullptr;
       // do we need to forward to screen ?
       if (esp3dGcodeParser.forwardToScreen(_current_command_str.c_str())) {
-        esp3d_log("Forwarding to screen %s", _current_command_str.c_str());
+        esp3d_log_d("Forwarding to screen %s", _current_command_str.c_str());
       }
-      if (_current_stream_ptr->type == ESP3DGcodeHostStreamType::sd_stream ||
-          _current_stream_ptr->type == ESP3DGcodeHostStreamType::fs_stream) {
+      if (esp3dGcodeParser.isAckNeeded() &&
+          (_current_stream_ptr->type == ESP3DGcodeHostStreamType::sd_stream ||
+           _current_stream_ptr->type == ESP3DGcodeHostStreamType::fs_stream)) {
         _command_number++;
+        esp3d_log_d("Command number: %lld, need checksum", _command_number);
         if (!_CheckSumCommand(buffer_str, MAX_COMMAND_LENGTH,
                               _current_command_str.c_str(), _command_number)) {
           esp3d_log_e("Failed to format command");
@@ -1091,11 +1182,12 @@ void ESP3DGCodeHostService::_handle_stream_states() {
           _setStreamState(ESP3DGcodeStreamState::error);
           break;
         }
+        esp3d_log_d("Sending: %s", buffer_str);
         msg =
             newMsg(ESP3DClientType::stream, _outputClient, (uint8_t*)buffer_str,
                    strlen(buffer_str), _current_stream_ptr->auth_type);
       } else {
-        // TBA:
+        // FIXME:
         // this part is arguable for command that are not direct command
         //  and so do not have a \n at the end
         if (_current_command_str[_current_command_str.length() - 1] != '\n') {
@@ -1109,10 +1201,14 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       if (msg) {
         esp3dCommands.process(msg);
         _awaitingAck = esp3dGcodeParser.hasAck(_current_command_str.c_str());
+        esp3d_log_d("Awaiting ack: %s for %s", _awaitingAck ? "true" : "false",
+                    _current_command_str.c_str());
         if (_awaitingAck) {
+          esp3d_log_d("change state to Waiting for ack");
           _setStreamState(ESP3DGcodeStreamState::wait_for_ack);
           _startTimeout = esp3d_hal::millis();
         } else {
+          esp3d_log_d("change state to read cursor");
           _setStreamState(
               ESP3DGcodeStreamState::read_cursor);  // no ack to wait for this
                                                     // gcode commands
@@ -1224,9 +1320,9 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       // end
       /////////////////////////////////////////////////////////
     case ESP3DGcodeStreamState::end:
-      esp3d_log("Stream is ended for type: %d, %s",
-                static_cast<uint8_t>(_current_stream_ptr->type),
-                _current_stream_ptr->dataStream);
+      esp3d_log_d("Stream is ended for type: %d, %s",
+                  static_cast<uint8_t>(_current_stream_ptr->type),
+                  _current_stream_ptr->dataStream);
       // sanity check, reset main stream pointer if it is the current stream
       if (_current_stream_ptr == _current_main_stream_ptr) {
         _current_main_stream_ptr = nullptr;
@@ -1237,6 +1333,9 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       }
       // current stream to null ptr
       _current_stream_ptr = nullptr;
+      _current_command_str = "";
+      _file_handle = nullptr;
+      _file_buffer_length = 0;
       break;
 
       /////////////////////////////////////////////////////////
@@ -1281,7 +1380,7 @@ void ESP3DGCodeHostService::handle() {
   // Handle the state machine
   _handle_stream_states();
 
-  // esp3d_log("Host state: %d", static_cast<uint8_t>(state));
+  // esp3d_log_d("Host state: %d", static_cast<uint8_t>(state));
   // handle the messages in the queue
   _handle_msgs();
 }
@@ -1290,9 +1389,9 @@ void ESP3DGCodeHostService::flush() {  // should only be called when no handle
                                        // task is running
   uint8_t loopCount = 10;
   while (loopCount && ((getRxMsgsCount() > 0) || (getTxMsgsCount() > 0))) {
-    esp3d_log("flushing Tx messages");
+    esp3d_log_d("flushing Tx messages");
     loopCount--;
-    handle();
+    _handle_msgs();
   }
 }
 
@@ -1300,19 +1399,19 @@ void ESP3DGCodeHostService::end() {
   if (_started) {
     flush();
     _started = false;
-    esp3d_log("Clearing queue Rx messages");
+    esp3d_log_d("Clearing queue Rx messages");
     clearRxQueue();
-    esp3d_log("Clearing queue Tx messages");
+    esp3d_log_d("Clearing queue Tx messages");
     clearTxQueue();
     vTaskDelay(pdMS_TO_TICKS(1000));
     if (pthread_mutex_destroy(&_tx_mutex) != 0) {
-      esp3d_log_w("Mutex destruction for tx failed");
+      esp3d_log_d("Mutex destruction for tx failed");
     }
     if (pthread_mutex_destroy(&_rx_mutex) != 0) {
-      esp3d_log_w("Mutex destruction for rx failed");
+      esp3d_log_d("Mutex destruction for rx failed");
     }
     if (pthread_mutex_destroy(&_stream_list_mutex) != 0) {
-      esp3d_log_w("Mutex destruction for stream list failed");
+      esp3d_log_d("Mutex destruction for stream list failed");
     }
   }
   if (_xHandle) {
@@ -1322,6 +1421,7 @@ void ESP3DGCodeHostService::end() {
   _scripts.clear();
   if (_current_front_stream_ptr) {
     if (isFileStreamType(_current_front_stream_ptr->type)) {
+      esp3d_log_d("File handle is not null, close it");
       _closeFile(_current_front_stream_ptr);
     }
   } else {

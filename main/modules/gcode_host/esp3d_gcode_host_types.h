@@ -67,7 +67,8 @@ enum class ESP3DGcodeHostError : uint8_t {
   access_denied,
   cursor_out_of_range,
   list_full,
-  aborted
+  aborted,
+  command_too_long,
 };
 
 enum class ESP3DGcodeHostStreamType : uint8_t {
@@ -82,9 +83,27 @@ enum class ESP3DGcodeHostStreamType : uint8_t {
 };
 
 #if ESP3D_TFT_LOG
+// be sure size is the same as max length of ESP3DGcodeHostStreamTypeStr
+// Be sure the order is the same as ESP3DGcodeHostStreamType
 const char ESP3DGcodeHostStreamTypeStr[][20] = {
     "unknown",   "single_command", "multiple_commands", "fs_stream",
     "fs_script", "sd_stream",      "sd_script",         "invalid"};
+
+// be sure size is the same as max length of ESP3DGcodeHostStateStr
+// Be sure the order is the same as ESP3DGcodeStreamState
+const char ESP3DGcodeStreamStateStr[][30] = {"undefined",
+                                             "start",
+                                             "read_cursor",
+                                             "send_gcode_command",
+                                             "resend_gcode_command",
+                                             "send_esp_command",
+                                             "wait_for_ack",
+                                             "pause",
+                                             "resume",
+                                             "abort",
+                                             "end",
+                                             "paused",
+                                             "error"};
 #endif  // ESP3D_TFT_LOG
 
 #ifdef __cplusplus

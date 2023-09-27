@@ -208,9 +208,9 @@ bool job_status_value_cb(ESP3DValuesIndex index, const char *value,
       // Display file name
       progression_area_str =
           esp3dTftValues.get_string_value(ESP3DValuesIndex::file_name);
-      progression_area_str += " ";
+      progression_area_str += "\n";
       progression_area_str += value;
-      progression_area_str += "%\n";
+      progression_area_str += "% ";
 
       // Display time elapsed
       uint64_t time_elapsed = std::stoull(
@@ -228,11 +228,11 @@ bool job_status_value_cb(ESP3DValuesIndex index, const char *value,
         int days = hours / 24;
         hours %= 24;
         if (days > 0 || hours > 0 || minutes > 0 || seconds > 0) {
-          progression_area_str += std::to_string(days);
           if (days > 0) {
             progression_area_str += std::to_string(days);
-            // FIXME: add translation
-            progression_area_str += "d ";
+            progression_area_str +=
+                esp3dTranslationService.translate(ESP3DLabel::days);
+            progression_area_str += " ";
           }
           if (hours > 0) {
             if (hours < 10) progression_area_str += "0";
@@ -256,12 +256,14 @@ bool job_status_value_cb(ESP3DValuesIndex index, const char *value,
           }
         } else {
           progression_area_str += std::to_string(time_elapsed);
-          // FIXME: add translation
-          progression_area_str += "ms";
+          esp3dTranslationService.translate(ESP3DLabel::days);
+          progression_area_str +=
+              esp3dTranslationService.translate(ESP3DLabel::ms);
         }
 
-        esp3d_log_d("Time elapsed %02dH:%02dMin:%02ds%lld", hours, minutes,
-                    seconds, time_elapsed);
+        esp3d_log("Time elapsed %02dH:%02dMin:%02ds%lld", hours, minutes,
+                  seconds, time_elapsed);
+        esp3d_log("%s", progression_area_str.c_str());
       }
     }
 

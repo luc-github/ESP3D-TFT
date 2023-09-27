@@ -44,6 +44,7 @@ class ESP3DGCodeParserService final {
   const char *getFwCommandString(FW_GCodeCommand cmd);
   bool hasAck(const char *command);
   bool forwardToScreen(const char *command);
+  bool isAckNeeded() { return true; }  // Depend on FW
 
  private:
   bool _isMultiLineReportOnGoing;

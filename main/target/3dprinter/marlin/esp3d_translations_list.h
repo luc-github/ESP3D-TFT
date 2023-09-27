@@ -82,6 +82,8 @@ enum class ESP3DLabel : uint16_t {
   no_sd_card,
   communication_lost,
   communication_recovered,
+  ms,
+  days,
   unknown_index,  // must be last
 };
 

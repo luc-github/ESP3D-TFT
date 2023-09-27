@@ -31,7 +31,6 @@
 #include "esp_timer.h"
 #endif  // ESP3D_TFT_BENCHMARK
 
-// TODO fine tune these values and put them in tasks_def.h
 enum class ESP3DParseState : uint8_t {
   boundary,
   content_disposition,
