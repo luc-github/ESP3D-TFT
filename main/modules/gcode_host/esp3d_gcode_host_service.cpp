@@ -480,56 +480,49 @@ bool ESP3DGCodeHostService::_readNextCommand(ESP3DGcodeStream* stream) {
       }
       _current_command_str += stream->dataStream[i];
     }
-    if (_current_command_str.length() == 0) {
-      esp3d_log_d("No command read");
-      return false;
-    }
   } else if (isFileStream(stream)) {
     esp3d_log_d("File commands cursor pos is %lld", stream->cursorPos);
     if (_file_handle == nullptr) {
       esp3d_log_e("No file handle");
       _error = ESP3DGcodeHostError::file_system;
-      _setStreamState(ESP3DGcodeStreamState::error);
       return false;
     }
 
     // read from file
-    bool is_done = false;
-    while (!is_done) {
+    bool need_search_command = true;
+    while (!need_search_command) {
       esp3d_log_d("Buffer pos: %d, in buffer of %d,  for %lld/%lld",
                   buffer_cursor, _file_buffer_length, stream->cursorPos,
                   stream->totalSize);
       if (buffer_cursor >= _file_buffer_length) {
+        // we need refill buffer from file
         _file_buffer_length = 0;
       }
+      // read from file
       if (_file_buffer_length == 0) {
         esp3d_log_d("Buffer is empty, read from file");
         buffer_cursor = 0;
         _file_buffer_length = fread(_file_buffer, sizeof(char),
                                     STREAM_CHUNK_SIZE - 1, _file_handle);
-
         _file_buffer[_file_buffer_length] = 0;
         esp3d_log_d("Got %d bytes from file: %s", _file_buffer_length,
                     _file_buffer);
-        if (_file_buffer_length == 0 && _current_command_str.length() == 0) {
-          esp3d_log_e("No command read");
-          if (stream->totalSize != 0 &&
-              stream->totalSize != stream->cursorPos) {
-            esp3d_log_e("File size is not correct");
+        if (_file_buffer_length == 0) {
+          esp3d_log_e("Failed to read from file");
+          if (stream->cursorPos < stream->totalSize) {
+            esp3d_log_e("No more data available, but file size is not reached");
             _error = ESP3DGcodeHostError::file_system;
-            _setStreamState(ESP3DGcodeStreamState::error);
             return false;
           }
-          _error = ESP3DGcodeHostError::no_error;
-          return false;
-        }
-        if (_file_buffer_length == 0) {
-          is_done = true;
-          esp3d_log_d("End of file");
-          break;
+          // we reached the end of the file, so no need to search for a command
+          // any more
+          //  we are done even no final '\n' was found
+          need_search_command = false;
         }
       }
-      if (!is_done) {
+      // we did not get the end of line, so we need to search for a command in
+      // the buffer
+      if (need_search_command) {
         esp3d_log_d("Parsing buffer");
         for (buffer_cursor = buffer_cursor; buffer_cursor < _file_buffer_length;
              buffer_cursor++) {
@@ -546,52 +539,46 @@ bool ESP3DGCodeHostService::_readNextCommand(ESP3DGcodeStream* stream) {
             if (_current_command_str.length() == 0) {
               esp3d_log_d("Empty line, continue");
               continue;
-              is_done = false;
               break;
             } else {
               buffer_cursor++;
               esp3d_log_d("Command is now: %s", _current_command_str.c_str());
-              is_done = true;
+              need_search_command = false;
+              break;
             }
           }
+          // fill the command string
           _current_command_str += _file_buffer[buffer_cursor];
           // esp3d_log("Command is now: %s", _current_command_str.c_str());
           if (_current_command_str.length() > MAX_COMMAND_LENGTH) {
             esp3d_log_e("Command too long > 255, %s",
                         _current_command_str.c_str());
+            // is that necessary ? as we are not going to send it
             buffer_cursor++;
             _error = ESP3DGcodeHostError::command_too_long;
-            _setStreamState(ESP3DGcodeStreamState::error);
             return false;
           }
         }
-      }
-      if (stream->cursorPos == stream->totalSize) {
-        esp3d_log_d("End of file");
-        is_done = true;
-      } else {
-        esp3d_log_d("Not end of file");
-      }
-      if (!is_done) {
-        esp3d_log_d("Not end of file and not end of line, continue");
-        return false;
-      } else {
-        if (_current_command_str.length() > 0) {
-          esp3d_log_d("Command is now: %s", _current_command_str.c_str());
+        if (stream->cursorPos == stream->totalSize) {
+          esp3d_log_d("End of file");
+          // no need to search anymore
+          need_search_command = false;
+        } else {
+          esp3d_log_d("Continue to read from file");
+          // we continue to read from file
+          _file_buffer_length = 0;
         }
-        esp3d_log_d("End of file meither end of line");
       }
     }
-
   } else {
     esp3d_log_e("Unknown stream type");
     _error = ESP3DGcodeHostError::unknow;
-    _setStreamState(ESP3DGcodeStreamState::error);
     return false;
   }
-  // No other string manipulation is done on the command string because
-  // need to know what kind of command it is first
-
+  if (_current_command_str.length() == 0) {
+    esp3d_log_d("No command read");
+    return false;
+  }
   esp3d_log_d("Cursor pos is now %lld / %lld, %lld, buffer cursor is %d/%d",
               stream->cursorPos, stream->totalSize,
               100 * stream->cursorPos / stream->totalSize, buffer_cursor,
@@ -925,7 +912,8 @@ void ESP3DGCodeHostService::_handle_stream_selection() {
         _current_stream_ptr->state == ESP3DGcodeStreamState::read_cursor ||
         _current_stream_ptr->state == ESP3DGcodeStreamState::paused)) {
     esp3d_log(
-        "Current stream is processing %lld, state:%s : type: %s , command: %s, "
+        "Current stream is processing %lld, state:%s : type: %s , command: "
+        "%s, "
         "keep it active",
         _current_stream_ptr->id,
         ESP3DGcodeStreamStateStr[static_cast<uint8_t>(
@@ -936,8 +924,8 @@ void ESP3DGCodeHostService::_handle_stream_selection() {
     return;
   }
 
-  // the current stream is main one but there are other streams in the queue in
-  // front of it
+  // the current stream is main one but there are other streams in the queue
+  // in front of it
   if (_current_stream_ptr == _current_main_stream_ptr &&
       _current_stream_ptr != _current_front_stream_ptr) {
     if (_current_main_stream_ptr) {
@@ -1185,6 +1173,20 @@ void ESP3DGCodeHostService::_handle_stream_states() {
           }
           _setStreamState(ESP3DGcodeStreamState::send_gcode_command);
         }
+      } else {
+        esp3d_log("Failed to read next command");
+        // it is an error
+        if (_error != ESP3DGcodeStreamError::no_error) {
+          _setStreamState(ESP3DGcodeStreamState::error);
+        } else {
+          // we reach end of file so let's set the state to end
+          if (_current_stream_ptr->cursorPos >=
+              _current_stream_ptr->totalSize) {
+            _setStreamState(ESP3DGcodeStreamState::end);
+          } else {  // keep reading
+            esp3d_log("Keep reading next command");
+          }
+        }
       }
 
       break;
@@ -1407,7 +1409,8 @@ void ESP3DGCodeHostService::_handle_stream_states() {
         esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
                                         text.c_str());
       }
-      // abort the stream because we are in error and we do not know what to do
+      // abort the stream because we are in error and we do not know what to
+      // do
       _setStreamState(ESP3DGcodeStreamState::end);
       break;
     default:
