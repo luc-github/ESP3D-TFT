@@ -1176,7 +1176,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       } else {
         esp3d_log("Failed to read next command");
         // it is an error
-        if (_error != ESP3DGcodeStreamError::no_error) {
+        if (_error != ESP3DGcodeHostError::no_error) {
           _setStreamState(ESP3DGcodeStreamState::error);
         } else {
           // we reach end of file so let's set the state to end
