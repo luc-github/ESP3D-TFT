@@ -79,6 +79,7 @@ void ESP3DCommands::ESP401(int cmd_params_pos, ESP3DMessage* msg) {
     if (!settingPtr) {
       hasError = true;
       error_msg = "Unknown setting";
+      esp3d_log_e("Unknown setting");
     } else {
       switch (settingType[0]) {
         case 'B':
@@ -88,14 +89,17 @@ void ESP3DCommands::ESP401(int cmd_params_pos, ESP3DMessage* msg) {
               if (!esp3dTftsettings.writeByte(index_setting, valueb)) {
                 hasError = true;
                 error_msg = "Failed set value";
+                esp3d_log_e("Failed set value");
               }
             } else {
               hasError = true;
               error_msg = "Incorrect value";
+              esp3d_log_e("Incorrect value");
             }
           } else {
             hasError = true;
             error_msg = "Incorrect type";
+            esp3d_log_e("Incorrect type");
           }
           break;
         case 'I':
@@ -106,14 +110,17 @@ void ESP3DCommands::ESP401(int cmd_params_pos, ESP3DMessage* msg) {
               if (!esp3dTftsettings.writeUint32(index_setting, value32)) {
                 hasError = true;
                 error_msg = "Failed set value";
+                esp3d_log_e("Failed set value");
               }
             } else {
               hasError = true;
               error_msg = "Incorrect value";
+              esp3d_log_e("Incorrect value");
             }
           } else {
             hasError = true;
             error_msg = "Incorrect type";
+            esp3d_log_e("Incorrect type");
           }
           break;
         case 'S':
@@ -124,14 +131,17 @@ void ESP3DCommands::ESP401(int cmd_params_pos, ESP3DMessage* msg) {
                                                 settingValue.c_str())) {
                 hasError = true;
                 error_msg = "Failed set value";
+                esp3d_log_e("Failed set value");
               }
             } else {
               hasError = true;
               error_msg = "Incorrect value";
+              esp3d_log_e("Incorrect value");
             }
           } else {
             hasError = true;
             error_msg = "Incorrect type";
+            esp3d_log_e("Incorrect type");
           }
           break;
         case 'A':
@@ -143,34 +153,41 @@ void ESP3DCommands::ESP401(int cmd_params_pos, ESP3DMessage* msg) {
                                                   settingValue.c_str())) {
                 hasError = true;
                 error_msg = "Failed set value";
+                esp3d_log_e("Failed set value");
               }
             } else {
               hasError = true;
               error_msg = "Incorrect value";
+              esp3d_log_e("Incorrect value");
             }
           } else {
             hasError = true;
             error_msg = "Incorrect type";
+            esp3d_log_e("Incorrect type");
           }
           break;
         case 'M':
           // esp3d_mask;
           hasError = true;
           error_msg = "Not supported yet";
+          esp3d_log_e("Not supported yet");
           break;
         case 'F':
           // esp3d_float;
           hasError = true;
           error_msg = "Not supported yet";
+          esp3d_log_e("Not supported yet");
           break;
         case 'X':
           // esp3d_bitsfield;
           hasError = true;
           error_msg = "Not supported yet";
+          esp3d_log_e("Not supported yet");
           break;
         default:
           hasError = true;
           error_msg = "Unknown type";
+          esp3d_log_e("Unknown type");
           break;
       }
     }

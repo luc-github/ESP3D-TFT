@@ -216,6 +216,10 @@ bool ESP3DSettings::isValidStringSetting(const char* value,
   // characters
   size_t len = strlen(value);
   switch (settingElement) {
+    case ESP3DSettingIndex::esp3d_pause_script:
+    case ESP3DSettingIndex::esp3d_resume_script:
+    case ESP3DSettingIndex::esp3d_stop_script:
+      return (len <= SIZE_OF_SCRIPT);
 #if ESP3D_WIFI_FEATURE
     case ESP3DSettingIndex::esp3d_ap_ssid:
     case ESP3DSettingIndex::esp3d_sta_ssid:
