@@ -922,6 +922,15 @@ void ESP3DGCodeHostService::_handle_stream_selection() {
     _current_main_stream_ptr = getCurrentMainStream();
   }
 
+  // this should not happen, but just in case
+  if (_current_stream_ptr->type == ESP3DGcodeHostStreamType::unknown ||
+      _current_stream_ptr->type == ESP3DGcodeHostStreamType::invalid) {
+    esp3d_log("Current stream is invalid, skip it");
+    _setStreamState(ESP3DGcodeStreamState::error);
+    _error = ESP3DGcodeHostError::unknow;
+    return;
+  }
+
   // if it is a script /multiline command do not change the current stream
   if (_current_stream_ptr->type == ESP3DGcodeHostStreamType::fs_script ||
       _current_stream_ptr->type == ESP3DGcodeHostStreamType::sd_script ||
