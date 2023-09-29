@@ -29,6 +29,7 @@ extern "C" {
 enum class ESP3DGcodeStreamState : uint8_t {
   undefined = 0,
   start,                 // start of stream / or resume it
+  ready_to_read_cursor,  // ready to read cursor position
   read_cursor,           // read command at cursor position
   send_gcode_command,    // gcode command to send
   resend_gcode_command,  // gcode command to resend
@@ -51,24 +52,24 @@ enum class ESP3DGcodeHostState : uint8_t {
 
 enum class ESP3DGcodeHostError : uint8_t {
   no_error = 0,
-  time_out,
-  data_send,
-  line_number,
-  ack_number,
-  memory_allocation,
-  too_many_resend,
-  number_mismatch,
-  line_ignored,
-  check_sum,
-  unknow,
-  file_not_found,
-  file_system,
-  empty_file,
-  access_denied,
-  cursor_out_of_range,
-  list_full,
-  aborted,
-  command_too_long,
+  time_out = 1,
+  data_send = 2,
+  line_number = 3,
+  ack_number = 4,
+  memory_allocation = 5,
+  too_many_resend = 6,
+  number_mismatch = 7,
+  line_ignored = 8,
+  check_sum = 9,
+  unknow = 10,
+  file_not_found = 11,
+  file_system = 12,
+  empty_file = 13,
+  access_denied = 14,
+  cursor_out_of_range = 15,
+  list_full = 16,
+  aborted = 17,
+  command_too_long = 18,
 };
 
 enum class ESP3DGcodeHostStreamType : uint8_t {
@@ -93,6 +94,7 @@ const char ESP3DGcodeHostStreamTypeStr[][20] = {
 // Be sure the order is the same as ESP3DGcodeStreamState
 const char ESP3DGcodeStreamStateStr[][30] = {"undefined",
                                              "start",
+                                             "ready_to_read_cursor",
                                              "read_cursor",
                                              "send_gcode_command",
                                              "resend_gcode_command",
