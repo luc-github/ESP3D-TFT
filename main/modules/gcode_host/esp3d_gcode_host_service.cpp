@@ -45,9 +45,6 @@
 #include "tasks_def.h"
 #include "translations/esp3d_translation_service.h"
 
-#undef STREAM_CHUNK_SIZE
-#define STREAM_CHUNK_SIZE 10
-
 // Macro/command behaviour:
 // to be executed regardless of streaming state (ie paused)
 // to be executed in same order as received
@@ -59,6 +56,7 @@ ESP3DGCodeHostService gcodeHostService;
 #define MAX_COMMAND_LENGTH 255
 #define ESP3D_COMMAND_TIMEOUT 10000  // milliseconds timeout
 #define ESP3D_MAX_RETRY 5
+#define ESP3D_REFRESH_INTERVAL 1000  // milliseconds
 
 #define isFileStreamType(type)                      \
   ((type == ESP3DGcodeHostStreamType::fs_stream) || \
@@ -1160,6 +1158,8 @@ void ESP3DGCodeHostService::_handle_msgs() {
 // handle stream state changes
 void ESP3DGCodeHostService::_handle_stream_states() {
   static std::string progress_str;
+  static uint64_t last_progression_time = 0;
+  static uint64_t last_ellapsedtime = 0;
   double new_progress;
   std::string new_progress_str;
 
@@ -1233,10 +1233,14 @@ void ESP3DGCodeHostService::_handle_stream_states() {
               ESP3DGcodeHostStreamType::fs_stream) ||
              (_current_stream_ptr->type ==
               ESP3DGcodeHostStreamType::sd_stream))) {
-          esp3dTftValues.set_string_value(
-              ESP3DValuesIndex::job_duration,
-              std::to_string(esp3d_hal::millis() - _current_stream_ptr->id)
-                  .c_str());
+          if (esp3d_hal::millis() - last_ellapsedtime >
+              ESP3D_REFRESH_INTERVAL) {
+            last_ellapsedtime = esp3d_hal::millis();
+            esp3dTftValues.set_string_value(
+                ESP3DValuesIndex::job_duration,
+                std::to_string(esp3d_hal::millis() - _current_stream_ptr->id)
+                    .c_str());
+          }
 
           new_progress = (1.0 * _current_stream_ptr->processedSize) /
                          _current_stream_ptr->totalSize;
@@ -1246,8 +1250,12 @@ void ESP3DGCodeHostService::_handle_stream_states() {
           if (progress_str != new_progress_str &&
               new_progress_str != "100.00") {
             progress_str = new_progress_str;
-            esp3dTftValues.set_string_value(ESP3DValuesIndex::job_progress,
-                                            progress_str.c_str());
+            if (esp3d_hal::millis() - last_progression_time >
+                ESP3D_REFRESH_INTERVAL) {
+              last_progression_time = esp3d_hal::millis();
+              esp3dTftValues.set_string_value(ESP3DValuesIndex::job_progress,
+                                              progress_str.c_str());
+            }
           }
         }
       }
@@ -1379,11 +1387,13 @@ void ESP3DGCodeHostService::_handle_stream_states() {
           _startTimeout = esp3d_hal::millis();
         } else {
           esp3d_log("change state to read cursor");
-          _setStreamState(
-              ESP3DGcodeStreamState::ready_to_read_cursor);  // no ack to
-                                                             // wait for
-                                                             // this gcode
-                                                             // commands
+          _current_command_str = "";
+          if (_current_stream_ptr->type ==
+              ESP3DGcodeHostStreamType::single_command) {
+            _setStreamState(ESP3DGcodeStreamState::end);
+          } else {
+            _setStreamState(ESP3DGcodeStreamState::ready_to_read_cursor);
+          }
         }
       } else {
         esp3d_log_e("Failed to create message");
@@ -1503,6 +1513,10 @@ void ESP3DGCodeHostService::_handle_stream_states() {
             _current_stream_ptr->totalSize) {
           esp3dTftValues.set_string_value(ESP3DValuesIndex::job_progress,
                                           "100");
+          esp3dTftValues.set_string_value(
+              ESP3DValuesIndex::job_duration,
+              std::to_string(esp3d_hal::millis() - _current_stream_ptr->id)
+                  .c_str());
         }
         esp3dTftValues.set_string_value(
             ESP3DValuesIndex::job_duration,
