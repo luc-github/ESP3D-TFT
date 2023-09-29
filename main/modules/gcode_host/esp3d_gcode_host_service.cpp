@@ -688,7 +688,7 @@ bool ESP3DGCodeHostService::_parseResponse(ESP3DMessage* rx) {
             ESP3DGcodeHostStreamType::single_command) {
           _setStreamState(ESP3DGcodeStreamState::end);
         } else {
-          _setStreamState(ESP3DGcodeStreamState::read_cursor);
+          _setStreamState(ESP3DGcodeStreamState::ready_to_read_cursor);
           _current_command_str = "";
         }
 
@@ -947,11 +947,11 @@ void ESP3DGCodeHostService::_handle_stream_selection() {
     return;
   }
 
-  // current stream cannot be interrupted unless it is paused or reading next
-  // command or starting
-  if (!(_current_stream_ptr->state == ESP3DGcodeStreamState::start ||
-        _current_stream_ptr->state == ESP3DGcodeStreamState::read_cursor ||
-        _current_stream_ptr->state == ESP3DGcodeStreamState::paused)) {
+  // current stream cannot be interrupted unless it is paused or ready to read
+  // next command
+  if (!(_current_stream_ptr->state ==
+        ESP3DGcodeStreamState::ready_to_read_cursor) &&
+      !(_current_stream_ptr->state == ESP3DGcodeStreamState::paused)) {
     esp3d_log(
         "Current stream is processing %lld, state:%s : type: %s , command: "
         "%s, "
@@ -1121,10 +1121,34 @@ void ESP3DGCodeHostService::_handle_stream_states() {
         if (!_current_stream_ptr->active) {
           esp3d_log("Stream not yet active, need reset line")
         } else {
-          _setStreamState(ESP3DGcodeStreamState::read_cursor);
+          _setStreamState(ESP3DGcodeStreamState::ready_to_read_cursor);
         }
       }
       break;
+
+      /////////////////////////////////////////////////////////
+      // ready to read cursor
+      /////////////////////////////////////////////////////////
+    case ESP3DGcodeStreamState::ready_to_read_cursor:
+      // ready to read next command
+      esp3d_log_d("Stream is ready to read cursor");
+      // check if we have a requested command to process before reading the
+      // next
+      if (_requested_state != (ESP3DGcodeStreamState::undefined)) {
+        if (_requested_state == ESP3DGcodeStreamState::pause) {
+          // pause the stream
+          _setStreamState(_requested_state);
+        } else {
+          // no valid requested state
+          _setStreamState(ESP3DGcodeStreamState::read_cursor);
+        }
+        _requested_state = ESP3DGcodeStreamState::undefined;
+      } else {
+        // no requested command, read next command
+        _setStreamState(ESP3DGcodeStreamState::read_cursor);
+      }
+      break;
+
       /////////////////////////////////////////////////////////
       // read cursor
       /////////////////////////////////////////////////////////
@@ -1165,15 +1189,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
         _setStreamState(ESP3DGcodeStreamState::end);
         break;
       }
-      // check if we have a requested command to process before reading the
-      // next
-      if (_requested_state != (ESP3DGcodeStreamState::undefined)) {
-        if (_requested_state == ESP3DGcodeStreamState::pause) {
-          _setStreamState(ESP3DGcodeStreamState::pause);
-          _requested_state = ESP3DGcodeStreamState::undefined;
-          break;
-        }
-      }
+
       if (_readNextCommand(_current_stream_ptr)) {
         if (esp3dCommands.is_esp_command((uint8_t*)_current_command_str.c_str(),
                                          _current_command_str.length())) {
@@ -1192,7 +1208,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
                 ESP3DGcodeHostStreamType::single_command) {
               _setStreamState(ESP3DGcodeStreamState::end);
             } else {
-              _setStreamState(ESP3DGcodeStreamState::read_cursor);
+              _setStreamState(ESP3DGcodeStreamState::ready_to_read_cursor);
             }
             break;
           } else {
@@ -1214,7 +1230,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
             _setStreamState(ESP3DGcodeStreamState::end);
           } else {  // keep reading
             esp3d_log("Keep reading next command");
-            _setStreamState(ESP3DGcodeStreamState::read_cursor);
+            _setStreamState(ESP3DGcodeStreamState::ready_to_read_cursor);
           }
         }
       }
@@ -1232,7 +1248,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       }
       if (_command_number == _resend_command_number) {
         _command_number = _resend_command_number - 1;
-        _setStreamState(ESP3DGcodeStreamState::read_cursor);
+        _setStreamState(ESP3DGcodeStreamState::ready_to_read_cursor);
       } else {
         // Commmand is not the last one
         // how to handle this case ?
@@ -1296,8 +1312,9 @@ void ESP3DGCodeHostService::_handle_stream_states() {
         } else {
           esp3d_log("change state to read cursor");
           _setStreamState(
-              ESP3DGcodeStreamState::read_cursor);  // no ack to wait for this
-                                                    // gcode commands
+              ESP3DGcodeStreamState::ready_to_read_cursor);  // no ack to wait
+                                                             // for this gcode
+                                                             // commands
         }
       } else {
         esp3d_log_e("Failed to create message");
@@ -1326,7 +1343,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
           _setStreamState(ESP3DGcodeStreamState::end);
         } else {
           // continue and read the next command
-          _setStreamState(ESP3DGcodeStreamState::read_cursor);
+          _setStreamState(ESP3DGcodeStreamState::ready_to_read_cursor);
         }
       } else {
         esp3d_log_e("Failed to create message");
