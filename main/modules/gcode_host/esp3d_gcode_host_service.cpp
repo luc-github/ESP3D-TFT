@@ -376,6 +376,7 @@ bool ESP3DGCodeHostService::_closeFile(ESP3DGcodeStream* stream) {
 // ##################### Stream Handling Functions ########################
 
 bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
+  _error = ESP3DGcodeHostError::no_error;
   esp3d_log("Starting stream");
   _file_buffer_length = 0;
   _current_command_str = "";
@@ -408,6 +409,7 @@ bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
     // and total size
     if (!_openFile(stream)) {
       esp3d_log_e("Failed to open file");
+      _error = ESP3DGcodeHostError::file_system;
       return false;
     }
     return true;
@@ -416,6 +418,7 @@ bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
     esp3d_log("Is command stream");
     return true;
   }
+  _error = ESP3DGcodeHostError::unknow;
   esp3d_log_e("Unknown stream type");
   return false;
 }
@@ -1103,19 +1106,16 @@ void ESP3DGCodeHostService::_handle_stream_states() {
     case ESP3DGcodeStreamState::start:
       if (!_startStream(_current_stream_ptr)) {
         esp3d_log_e("Failed to start stream");
-        _setStreamState(ESP3DGcodeStreamState::end);
-        break;
+        _error = ESP3DGcodeHostError::file_system;
+        _setStreamState(ESP3DGcodeStreamState::error);
       } else {
         if (!_current_stream_ptr->active) {
-          esp3d_log("Stream not yet active, need reset line");
-          break;
+          esp3d_log("Stream not yet active, need reset line")
         } else {
           _setStreamState(ESP3DGcodeStreamState::read_cursor);
-          // no break here to save a loop
         }
       }
-      /* fall through */
-
+      break;
       /////////////////////////////////////////////////////////
       // read cursor
       /////////////////////////////////////////////////////////
@@ -1205,6 +1205,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
             _setStreamState(ESP3DGcodeStreamState::end);
           } else {  // keep reading
             esp3d_log("Keep reading next command");
+            _setStreamState(ESP3DGcodeStreamState::read_cursor);
           }
         }
       }
@@ -1226,6 +1227,8 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       } else {
         // Commmand is not the last one
         // how to handle this case ?
+        _error = ESP3DGcodeHostError::number_mismatch;
+        _setStreamState(ESP3DGcodeStreamState::error);
         break;
       }
       /* fall through */
