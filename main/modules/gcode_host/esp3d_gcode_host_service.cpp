@@ -377,12 +377,12 @@ bool ESP3DGCodeHostService::_closeFile(ESP3DGcodeStream* stream) {
 
 bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
   _error = ESP3DGcodeHostError::no_error;
-  esp3d_log("Starting stream");
+  esp3d_log_d("Starting stream");
   _file_buffer_length = 0;
   _current_command_str = "";
   if (isFileStream(stream)) {
     if (_file_handle) {
-      esp3d_log("File handle is not null, close it");
+      esp3d_log_d("File handle is not null, close it");
       _closeFile(stream);
       esp3d_log_e("Previous File handle not closed!");
     }
@@ -397,7 +397,7 @@ bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
       std::string cmd = esp3dGcodeParser.getFwCommandString(
           FW_GCodeCommand::reset_stream_numbering);
       // add command on top of current stream
-      esp3d_log("Add command: %s", cmd.c_str());
+      esp3d_log_d("Add command: %s", cmd.c_str());
       _add_stream(cmd.c_str(), stream->auth_type, true);
       _command_number = 0;
       esp3dTftValues.set_string_value(ESP3DValuesIndex::job_status,
@@ -415,7 +415,7 @@ bool ESP3DGCodeHostService::_startStream(ESP3DGcodeStream* stream) {
     return true;
   } else if (isCommandStream(stream)) {
     stream->totalSize = strlen(stream->dataStream);
-    esp3d_log("Is command stream");
+    esp3d_log_d("Is command stream");
     return true;
   }
   _error = ESP3DGcodeHostError::unknow;
@@ -931,20 +931,19 @@ void ESP3DGCodeHostService::_handle_stream_selection() {
     return;
   }
 
-  // if it is a script /multiline command do not change the current stream
-  if (_current_stream_ptr->type == ESP3DGcodeHostStreamType::fs_script ||
-      _current_stream_ptr->type == ESP3DGcodeHostStreamType::sd_script ||
-      _current_stream_ptr->type ==
-          ESP3DGcodeHostStreamType::multiple_commands) {
+  // only file stream  can be interrupted, scripts / command streams cannot
+  if (!(_current_stream_ptr->type == ESP3DGcodeHostStreamType::fs_stream) &&
+      !(_current_stream_ptr->type == ESP3DGcodeHostStreamType::sd_stream)) {
     esp3d_log(
-        "Current stream is a script %lld, state:%s : type: %s , command: %s, "
-        "keep it active",
+        "Current stream is not a stream  %lld, state:%s : type: %s , command: "
+        "%s, keep it always active",
         _current_stream_ptr->id,
         ESP3DGcodeStreamStateStr[static_cast<uint8_t>(
             _current_stream_ptr->state)],
         ESP3DGcodeHostStreamTypeStr[static_cast<uint8_t>(
             _current_stream_ptr->type)],
         _current_command_str.c_str());
+    _current_stream_ptr->active = true;
     return;
   }
 
@@ -1113,6 +1112,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       // start
       /////////////////////////////////////////////////////////
     case ESP3DGcodeStreamState::start:
+      esp3d_log_d("Stream is starting");
       if (!_startStream(_current_stream_ptr)) {
         esp3d_log_e("Failed to start stream");
         _error = ESP3DGcodeHostError::file_system;
