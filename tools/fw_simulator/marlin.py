@@ -32,6 +32,12 @@ modes = {
     "absolute": True
 }
 
+def ok(line):
+    if (not line.startswith("N")):
+        return "ok (" + line + ")"
+    N = re.findall('N\d*', line)
+    if (len(N) > 0):
+        return "ok " + N[0][1:]
 # Update the temperatures according context
 def updateTemperatures(entry, timestp):
     global temperatures
@@ -110,7 +116,7 @@ def G0_G1_response(line, ser):
             positions["Y"] = float(Y_val)
         if (Z_val != ""):
             positions["Z"] = float(Z_val)
-        return "ok"
+        return ok(line)
     else:
         if (X_val != ""):
             positions["X"] += float(X_val)
@@ -118,7 +124,7 @@ def G0_G1_response(line, ser):
             positions["Y"] += float(Y_val)
         if (Z_val != ""):
             positions["Z"] += float(Z_val)
-        return "ok"
+        return ok(line)
 
 # G28 response
 def G28_response(line, ser):
@@ -134,7 +140,7 @@ def G28_response(line, ser):
         positions["X"] = 0.00
         positions["Y"] = 0.00
         positions["Z"] = 0.00
-    return "ok"
+    return ok(line)
 
 # G29 V4 response
 def G29_V4_response(line, ser):
@@ -178,19 +184,19 @@ def G29_V4_response(line, ser):
     common.send_echo(ser, " 1 -0.0363 -0.0313 -0.0412 -0.0050")
     common.send_echo(ser, " 2 -0.0500 +0.0550 +0.0512 +0.0262")
     common.send_echo(ser, " 3 -0.0463 -0.0363 -0.0638 -0.0175")
-    return "ok"
+    return ok(line)
 
 # Absolute mode
 def G90_response(line, ser):
     global modes
     modes["absolute"] = True
-    return "ok"
+    return ok(line)
 
 # Relative mode
 def G91_response(line, ser):
     global modes
     modes["absolute"] = False
-    return "ok"
+    return ok(line)
 
 # M104 extruder control not waiting
 def M104_response(line, ser):
@@ -198,7 +204,7 @@ def M104_response(line, ser):
     targettemp = re.findall('S\d+[\.]*\d*', line)
     if (len(targettemp) > 0):
         temperatures["E0"]["target"] = float(targettemp[0][1:])
-    return "ok"
+    return ok(line)
 
 # M105 temperatures query
 def M105_response(line, ser):
@@ -244,7 +250,7 @@ def M109_response(line, ser):
 def M114_response(line, ser):
     global positions
     val = "X:" + "{:.2f}".format(positions["X"]) + " Y:" + "{:.2f}".format(
-        positions["Y"]) + " Z:" + "{:.2f}".format(positions["Z"])+" E:0.00 Count X:0 Y:0 Z:0"
+        positions["Y"]) + " Z:" + "{:.2f}".format(positions["Z"])+" E:0.00 Count X:0 Y:0 Z:0\nok"
     return val
 
 # M140 bed control not waiting
@@ -253,7 +259,7 @@ def M140_response(line, ser):
     targettemp = re.findall('S\d+[\.]*\d*', line)
     if (len(targettemp) > 0):
         temperatures["B"]["target"] = float(targettemp[0][1:])
-    return "ok"
+    return ok(line)
 
 # M190 bed control waiting
 def M190_response(line, ser):
@@ -283,7 +289,7 @@ def M220_response(line, ser):
     if (len(val) > 0):
         F_R = val[0][1:]
         return "FR:"+F_R+"%\nok"
-    return "ok"
+    return ok(line)
 
 # List of supported methods
 methods = [
@@ -304,11 +310,15 @@ methods = [
     {"str": "M220", "fn": M220_response},
 ]
 
+
 # Process a line of GCODE
 def processLine(line, ser):
     time.sleep(0.01)
     global methods
     for method in methods:
-        if line.startswith(method["str"]):
+        if line.startswith(method["str"]) or (line.startswith("N") and line.find(method["str"]) != 0):
             return method["fn"](line, ser)
-    return "ok"
+    if line.startswith("M") or line.startswith("G")  or line.startswith("N"):
+        return ok(line)
+    
+    return ""

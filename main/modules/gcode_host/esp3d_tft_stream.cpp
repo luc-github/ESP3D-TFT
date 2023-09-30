@@ -28,12 +28,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "freertos/task.h"
-#include "serial/esp3d_serial_client.h"
-#include "version.h"
-
-#if ESP3D_GCODE_HOST_FEATURE
 #include "gcode_host/esp3d_gcode_host_service.h"
-#endif  // ESP3D_GCODE_HOST_FEATURE
+#include "serial/esp3d_serial_client.h"
 #include "tasks_def.h"
 #if ESP3D_USB_SERIAL_FEATURE
 #include "usb_serial/esp3d_usb_serial_client.h"
@@ -58,11 +54,11 @@ SemaphoreHandle_t xStreamSemaphore;
 static void streamTask(void *pvParameter) {
   (void)pvParameter;
   xStreamSemaphore = xSemaphoreCreateMutex();
-#if ESP3D_GCODE_HOST_FEATURE
+
   if (!gcodeHostService.begin()) {
     esp3d_log_e("Failed to begin gcode host service");
   }
-#endif  // ESP3D_GCODE_HOST_FEATURE
+
   while (1) {
     /* Delay */
     vTaskDelay(pdMS_TO_TICKS(10));
@@ -131,7 +127,7 @@ void ESP3DTftStream::handle() {
 }
 
 bool ESP3DTftStream::end() {
-  // TODO
+  // TODO: need code review
   // this part is never called
   //  if called need to kill task also
   serialClient.end();

@@ -49,7 +49,6 @@
 #include "authentication/esp3d_authentication.h"
 #include "bsp.h"
 
-
 #define STORAGE_NAME "ESP3D_TFT"
 #define SETTING_VERSION "ESP3D_TFT-V1.0.0"
 
@@ -165,6 +164,12 @@ const ESP3DSettingDescription ESP3DSettingsData[] = {
     {ESP3DSettingIndex::esp3d_bed_depth, ESP3DSettingType::float_t, 3,
      "100.00"},
 #endif  // ESP3D_DISPLAY_FEATURE
+    {ESP3DSettingIndex::esp3d_stop_script, ESP3DSettingType::string_t,
+     SIZE_OF_SCRIPT, ""},
+    {ESP3DSettingIndex::esp3d_pause_script, ESP3DSettingType::string_t,
+     SIZE_OF_SCRIPT, ""},
+    {ESP3DSettingIndex::esp3d_resume_script, ESP3DSettingType::string_t,
+     SIZE_OF_SCRIPT, ""},
 };
 
 // Is Valid String Setting ?
@@ -211,6 +216,10 @@ bool ESP3DSettings::isValidStringSetting(const char* value,
   // characters
   size_t len = strlen(value);
   switch (settingElement) {
+    case ESP3DSettingIndex::esp3d_pause_script:
+    case ESP3DSettingIndex::esp3d_resume_script:
+    case ESP3DSettingIndex::esp3d_stop_script:
+      return (len <= SIZE_OF_SCRIPT);
 #if ESP3D_WIFI_FEATURE
     case ESP3DSettingIndex::esp3d_ap_ssid:
     case ESP3DSettingIndex::esp3d_sta_ssid:
@@ -563,6 +572,7 @@ bool ESP3DSettings::reset() {
             result = false;
           }
           break;
+        case ESP3DSettingType::float_t:
         case ESP3DSettingType::string_t:
           if (setting == ESP3DSettingIndex::esp3d_version) {
             if (!ESP3DSettings::writeString(setting, SETTING_VERSION)) {
@@ -719,7 +729,9 @@ const char* ESP3DSettings::readIPString(ESP3DSettingIndex index,
 const char* ESP3DSettings::readString(ESP3DSettingIndex index, char* out_str,
                                       size_t len, bool* haserror) {
   const ESP3DSettingDescription* query = getSettingPtr(index);
-  if (query) {
+  if (query != NULL) {
+    esp3d_log("read setting %d, type: %d : %s", (uint16_t)index,
+              (uint8_t)query->type, query->default_val);
     if (query->type == ESP3DSettingType::string_t ||
         query->type == ESP3DSettingType::float_t) {
       esp_err_t err;
@@ -770,7 +782,7 @@ const char* ESP3DSettings::readString(ESP3DSettingIndex index, char* out_str,
         }
       }
     } else {
-      esp3d_log_e("Error setting is not a string");
+      esp3d_log_e("Error setting is not a string / float");
     }
   } else {
     esp3d_log_e("Cannot find %d entry", static_cast<uint16_t>(index));
@@ -778,8 +790,7 @@ const char* ESP3DSettings::readString(ESP3DSettingIndex index, char* out_str,
   if (haserror) {
     *haserror = true;
   }
-  esp3d_log_e("Error reading setting value %d, type %d",
-              static_cast<uint16_t>(index), static_cast<uint8_t>(query->type));
+  esp3d_log_e("Error reading setting value %d", static_cast<uint16_t>(index));
   return "";
 }
 
@@ -901,7 +912,8 @@ uint32_t ESP3DSettings::StringtoIPUInt32(const char* s) {
 
 const ESP3DSettingDescription* ESP3DSettings::getSettingPtr(
     const ESP3DSettingIndex index) {
-  for (uint16_t i = 0; i < sizeof(ESP3DSettingsData); i++) {
+  for (uint16_t i = 0;
+       i < sizeof(ESP3DSettingsData) / sizeof(ESP3DSettingDescription); i++) {
     if (ESP3DSettingsData[i].index == index) {
       return &ESP3DSettingsData[i];
     }

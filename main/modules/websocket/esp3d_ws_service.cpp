@@ -353,7 +353,7 @@ bool ESP3DWsService::pushMsgToRxQueue(int socketId, const uint8_t *msg,
     if (ESP3DClient::setDataContent(newMsgPtr, msg, size)) {
       newMsgPtr->authentication_level = authentication_level;
       newMsgPtr->origin = ESP3DClientType::websocket;
-      newMsgPtr->target = esp3dCommands.getOutputClient();
+      newMsgPtr->target = ESP3DClientType::stream;
       newMsgPtr->type = ESP3DMessageType::unique;
       newMsgPtr->request_id.id = socketId;
       if (esp3dCommands.is_esp_command((uint8_t *)msg, size)) {

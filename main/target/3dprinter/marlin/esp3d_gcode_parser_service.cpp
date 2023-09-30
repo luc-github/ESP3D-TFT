@@ -32,8 +32,30 @@ const char* pollingCommands[] = {"M105",  // Temperatures
                                  "M114",  // Positions
                                  "M220",  // Speed
                                  ""};
+const char* screenCommands[] = {"M117",  // TFT screen output
+                                ""};
+const char* no_ack_commands[] = {  // Commands that do not need an ack
+    ""};
+
+const char* fwFommands[] = {"M110 N0",  // reset stream numbering
+                            ""};
+
+const char* ESP3DGCodeParserService::getFwCommandString(FW_GCodeCommand cmd) {
+  return fwFommands[(uint8_t)cmd];
+}
 const char** ESP3DGCodeParserService::getPollingCommands() {
   return pollingCommands;
+}
+
+bool ESP3DGCodeParserService::forwardToScreen(const char* command) {
+  for (uint8_t i = 0; strlen(screenCommands[i]) != 0; i++) {
+    if (strncmp(command, screenCommands[i], strlen(screenCommands[i])) == 0) {
+      esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
+                                      &command[strlen(screenCommands[i])]);
+      return true;
+    }
+  }
+  return false;
 }
 
 ESP3DGCodeParserService::ESP3DGCodeParserService() {
@@ -44,7 +66,18 @@ ESP3DGCodeParserService::~ESP3DGCodeParserService() {
   _isMultiLineReportOnGoing = false;
 }
 
-bool ESP3DGCodeParserService::hasOkAck(const char* data) { return true; }
+// check if command generate an ack
+// by default almost all commands need an ack
+bool ESP3DGCodeParserService::hasAck(const char* command) {
+  for (uint8_t i = 0; strlen(no_ack_commands[i]) != 0; i++) {
+    if (strncmp(command, no_ack_commands[i], strlen(no_ack_commands[i])) == 0) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// TODO: implement multi line report detection
 bool ESP3DGCodeParserService::hasMultiLineReport(const char* data) {
   return false;
 }
@@ -336,7 +369,7 @@ ESP3DDataType ESP3DGCodeParserService::getType(const char* data) {
 
   // is it ack ?
   if ((ptr[0] == 'o' && ptr[1] == 'k') &&
-      (ptr[2] == '\n' || ptr[2] == '\r' || ptr[2] == ' ')) {
+      (ptr[2] == '\n' || ptr[2] == '\r' || ptr[2] == ' ' || ptr[2] == 0x0)) {
     return ESP3DDataType::ack;
   }
 

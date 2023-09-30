@@ -31,9 +31,11 @@ def main():
             if ser.in_waiting:
                 line = ser.readline().decode('utf-8').strip()
                 print(common.bcolors.COL_BLUE+line+common.bcolors.END_COL)
-                response = fw.processLine(line, ser)
-                if (response != ""):
-                    common.send_echo(ser, response)
+                #ignore log lines from TFT
+                if not line.startswith("["):
+                    response = fw.processLine(line, ser)
+                    if (response != ""):
+                        common.send_echo(ser, response)
         except KeyboardInterrupt:
             print(common.bcolors.COL_GREEN+"End of program"+common.bcolors.END_COL)
             exit(0)

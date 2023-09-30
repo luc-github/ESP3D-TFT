@@ -16,7 +16,6 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#if ESP3D_GCODE_HOST_FEATURE
 #include "authentication/esp3d_authentication.h"
 #include "esp3d_client.h"
 #include "esp3d_commands.h"
@@ -51,17 +50,22 @@ void ESP3DCommands::ESP700(int cmd_params_pos, ESP3DMessage* msg) {
     error_msg = "Missing parameter";
     esp3d_log_e("Error missing");
   } else {
-    if (gcodeHostService.getState() == ESP3DGcodeHostState::no_stream) {
-      if (!gcodeHostService.processScript(tmpstr.c_str(),
-                                          msg->authentication_level)) {
-        hasError = false;
-        error_msg = "Error processing script";
-        esp3d_log_e("Error processing script");
-      }
+    bool isMacro = true;
+    std::string filename = get_param(msg, cmd_params_pos, "stream=");
+    if (filename.length() > 0) {  // it is a stream
+      isMacro = false;
+    } else {  // it is a macro
+      filename = get_clean_param(msg, cmd_params_pos);
+    }
+    esp3d_log("Stream: %s", filename.c_str());
+    if (gcodeHostService.addStream(filename.c_str(), msg->authentication_level,
+                                   isMacro)) {
+      esp3d_log("Stream: %s added as %s", filename.c_str(),
+                isMacro ? "Macro" : "File");
     } else {
       hasError = false;
-      error_msg = "Streaming already in progress";
-      esp3d_log_e("Error streaming already in progress");
+      error_msg = "Failed to add stream";
+      esp3d_log_e("Failed to add stream");
     }
   }
   if (!dispatchAnswer(msg, COMMAND_ID, json, hasError,
@@ -69,4 +73,3 @@ void ESP3DCommands::ESP700(int cmd_params_pos, ESP3DMessage* msg) {
     esp3d_log_e("Error sending response to clients");
   }
 }
-#endif  // ESP3D_GCODE_HOST_FEATURE

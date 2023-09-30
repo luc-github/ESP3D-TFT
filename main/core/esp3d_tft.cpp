@@ -34,10 +34,9 @@
 #if ESP3D_WIFI_FEATURE
 #include "network/esp3d_tft_network.h"
 #endif  // ESP3D_WIFI_FEATURE
-#if ESP3D_GCODE_HOST_FEATURE
-#include "gcode_host/esp3d_tft_stream.h"
-#endif  // ESP3D_GCODE_HOST_FEATURE
 #include "esp_freertos_hooks.h"
+#include "gcode_host/esp3d_tft_stream.h"
+
 //////////////////////////////// Remove me
 #include "esp_spiffs.h"
 ////////////////////////////////
@@ -47,7 +46,6 @@
 #include "freertos/task.h"
 #include "nvs_flash.h"
 #include "translations/esp3d_translation_service.h"
-#include "version.h"
 
 #if ESP3D_SD_CARD_FEATURE
 #include "filesystem/esp3d_sd.h"
@@ -126,11 +124,11 @@ bool ESP3DTft::begin() {
     esp3dUpdateService.begin();
   }
 #endif  // ESP3D_UPDATE_FEATURE
-#if ESP3D_GCODE_HOST_FEATURE
+
   if (success) {
     success = esp3dTftstream.begin();
   }
-#endif  // ESP3D_GCODE_HOST_FEATURE
+
 #if ESP3D_WIFI_FEATURE
   if (success) {
     success = esp3dTftnetwork.begin();

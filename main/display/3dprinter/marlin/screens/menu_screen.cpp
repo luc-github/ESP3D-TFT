@@ -61,10 +61,10 @@ void enable_auto_leveling(bool enable) { auto_leveling = enable; }
 
 void menu_display_leveling() {
   std::string label_text =
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::print_status);
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::job_status);
   if (label_text == "paused") {
     lv_obj_add_flag(main_btn_leveling, LV_OBJ_FLAG_HIDDEN);
-  } else if (label_text == "printing") {
+  } else if (label_text == "processing") {
     lv_obj_add_flag(main_btn_leveling, LV_OBJ_FLAG_HIDDEN);
   } else {
     lv_obj_clear_flag(main_btn_leveling, LV_OBJ_FLAG_HIDDEN);
@@ -73,19 +73,18 @@ void menu_display_leveling() {
 
 void menu_display_disable_steppers() {
   std::string label_text =
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::print_status);
+      esp3dTftValues.get_string_value(ESP3DValuesIndex::job_status);
   if (label_text == "paused") {
     lv_obj_add_flag(main_btn_disable_steppers, LV_OBJ_FLAG_HIDDEN);
-  } else if (label_text == "printing") {
+  } else if (label_text == "processing") {
     lv_obj_add_flag(main_btn_disable_steppers, LV_OBJ_FLAG_HIDDEN);
   } else {
     lv_obj_clear_flag(main_btn_disable_steppers, LV_OBJ_FLAG_HIDDEN);
   }
 }
 
-void menu_screen_print_status_value_cb(ESP3DValuesIndex index,
-                                       const char *value,
-                                       ESP3DValuesCbAction action) {
+void menu_screen_job_status_value_cb(ESP3DValuesIndex index, const char *value,
+                                     ESP3DValuesCbAction action) {
   if (action == ESP3DValuesCbAction::Update) {
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::menu) {
       menu_display_leveling();

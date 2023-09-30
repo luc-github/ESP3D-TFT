@@ -10,6 +10,7 @@ set(SOURCES .
     modules/usb_serial
     modules/config_file
     modules/translations
+    modules/gcode_host
 )
 
 if(WIFI_SERVICE)
@@ -38,7 +39,7 @@ if(WIFI_SERVICE)
 endif()
 
 if(BT_SERVICE)
-    # TODO
+    # TODO: add bluetooth support?
 endif()
 
 if(SD_CARD_SERVICE)
@@ -47,10 +48,6 @@ endif()
 
 if(UPDATE_SERVICE)
     list(APPEND SOURCES "modules/update")
-endif()
-
-if(GCODE_HOST_SERVICE)
-    list(APPEND SOURCES "modules/gcode_host")
 endif()
 
  if(TFT_UI_SERVICE)
@@ -161,4 +158,3 @@ unset(WS_SERVICE CACHE)
 unset(SD_CARD_SERVICE CACHE)
 unset(NOTIFICATIONS_SERVICE CACHE)
 unset(UPDATE_SERVICE CACHE)
-unset(GCODE_HOST_SERVICE CACHE)

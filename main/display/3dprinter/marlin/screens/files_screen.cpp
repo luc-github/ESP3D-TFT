@@ -38,6 +38,7 @@
 #include "filesystem/esp3d_sd.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "gcode_host/esp3d_gcode_host_service.h"
 #include "main_screen.h"
 #include "tasks_def.h"
 #include "translations/esp3d_translation_service.h"
@@ -237,19 +238,25 @@ void event_file_handler(lv_event_t *e) {
   ESP3DFileDescriptor *file = (ESP3DFileDescriptor *)lv_event_get_user_data(e);
 
   esp3d_log("file Clicked: %s", file->name.c_str());
-  std::string file_path_to_play = files_path;
-  if (file_path_to_play != "/") {
-    file_path_to_play = std::string("/") + file->name;
-  } else {
-    file_path_to_play = file->name;
+
+  std::string file_path_to_play = ESP3D_SD_FS_HEADER;
+  file_path_to_play += files_path;
+  if (esp3d_string::endsWith(file_path_to_play.c_str(), "/") == false) {
+    file_path_to_play += "/";
   }
-  // todo play file and go to main screen
-  esp3dTftValues.set_string_value(ESP3DValuesIndex::file_path,
-                                  file_path_to_play.c_str());
-  esp3dTftValues.set_string_value(ESP3DValuesIndex::file_name,
-                                  file->name.c_str());
-  esp3dTftValues.set_string_value(ESP3DValuesIndex::print_status, "printing");
-  mainScreen::main_screen();
+  file_path_to_play += file->name;
+  file_path_to_play =
+      esp3d_string::str_replace(file_path_to_play.c_str(), "//", "/");
+  esp3d_log("file path : %s", file_path_to_play.c_str());
+  if (gcodeHostService.addStream(file_path_to_play.c_str(),
+                                 ESP3DAuthenticationLevel::admin, false)) {
+    esp3d_log("Stream: %s added as main File", file_path_to_play.c_str());
+  } else {
+    esp3d_log_e("Failed to add stream");
+  }
+  // Should we force the main screen to update the file name  and status ?
+  //
+  event_button_files_back_handler(e);
 }
 
 bool first_fill_needed = true;
@@ -319,11 +326,10 @@ void files_screen() {
   if (first_fill_needed) {
     if (files_list.size() == 0) {
       event_button_files_refresh_handler(nullptr);
+      lv_obj_add_flag(ui_files_list_ctl, LV_OBJ_FLAG_HIDDEN);
     }
     first_fill_needed = false;
-  }
-
-  if (files_has_sd) {
+  } else if (files_has_sd) {
     // dir first
     for (auto &file : files_list) {
       if (file.size == "-1") {

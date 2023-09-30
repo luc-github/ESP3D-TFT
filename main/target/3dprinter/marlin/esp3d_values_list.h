@@ -53,12 +53,15 @@ enum class ESP3DValuesIndex : uint16_t {
   position_x,
   position_y,
   position_z,
-  print_status,
+  job_status,
   file_path,
   file_name,
   network_status,
   network_mode,
   bed_leveling,
+  job_progress,
+  job_duration,
+  job_id,
   unknown_index
 };
 

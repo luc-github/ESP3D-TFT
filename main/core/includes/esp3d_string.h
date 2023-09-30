@@ -29,9 +29,9 @@ extern "C" {
 #endif
 
 namespace esp3d_string {
-// TODO:
+// TODO:need review of all functions to be sure they are consistent
 // some functions do internal change and others do copy of original string and
-// modify it need to review for consistency  or allows both copy and insite of
+// modify it need to review for consistency  or allows both copy and inside of
 // string TBD
 std::string set_precision(std::string str_value, uint8_t precision);
 const char* str_replace(const char* currentstr, const char* oldsubstr,
