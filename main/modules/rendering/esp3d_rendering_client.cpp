@@ -119,6 +119,8 @@ bool ESP3DRenderingClient::begin() {
 
 void ESP3DRenderingClient::handle() {
   static uint64_t now = esp3d_hal::millis();
+  static uint8_t polling_cmd_count = 0;
+  static uint8_t polling_cmd_index = 0;
   if (_started) {
     if (getRxMsgsCount() > 0) {
       if (pdTRUE == xSemaphoreTake(_xGuiSemaphore, portMAX_DELAY)) {
@@ -132,21 +134,29 @@ void ESP3DRenderingClient::handle() {
       }
     }
     if (_polling_on) {
-      if (esp3d_hal::millis() - now > ESP3D_POLLING_INTERVAL) {
+      if (polling_cmd_count == 0) {
         const char **pollingCommands = esp3dGcodeParser.getPollingCommands();
         for (uint8_t i = 0; strlen(pollingCommands[i]) != 0; i++) {
-          // check if command is not aleready in queue
-          if (!gcodeHostService.hasStreamListCommand(pollingCommands[i])) {
-            sendGcode(pollingCommands[i]);
+          sendGcode(pollingCommands[i]);
+          polling_cmd_count++;
+        }
+      } else {  // to split the polling commands in time but keeping the
+                // intervals of 3 seconds between each identical command
+        if (esp3d_hal::millis() - now >
+            ESP3D_POLLING_INTERVAL / polling_cmd_count) {
+          const char **pollingCommands = esp3dGcodeParser.getPollingCommands();
+          if (polling_cmd_index >= polling_cmd_count) polling_cmd_index = 0;
+          if (!gcodeHostService.hasStreamListCommand(
+                  pollingCommands[polling_cmd_index])) {
+            sendGcode(pollingCommands[polling_cmd_index]);
           } else {
             esp3d_log_w("Command %s already in queue", pollingCommands[i]);
           }
+          polling_cmd_index++;
+          now = esp3d_hal::millis();
         }
-        now = esp3d_hal::millis();
       }
     }
-  } else {
-    now = esp3d_hal::millis();
   }
 }
 
