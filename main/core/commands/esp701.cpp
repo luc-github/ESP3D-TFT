@@ -67,41 +67,43 @@ void ESP3DCommands::ESP701(int cmd_params_pos, ESP3DMessage* msg) {
       }
     } else {
       if (status != ESP3DGcodeHostState::idle) {
-        ESP3DGcodeStream* script =
-            gcodeHostService
-                .getCurrentMainStream();  // Passing pointers between
-                                          // threads seems like a bad idea
-        if (status == ESP3DGcodeHostState::paused) {
-          if (json) {
-            ok_msg = "{\"status\":\"paused\"";
-          } else {
-            ok_msg = "pause";
-          }
+        ESP3DGcodeStream* script = gcodeHostService.getCurrentMainStream();
+        if (script == NULL) {
+          hasError = true;
+          error_msg = "Failed to get script";
         } else {
-          if (json) {
-            ok_msg = "{\"status\":\"processing\"";
+          if (status == ESP3DGcodeHostState::paused) {
+            if (json) {
+              ok_msg = "{\"status\":\"paused\"";
+            } else {
+              ok_msg = "pause";
+            }
           } else {
-            ok_msg = "processing";
+            if (json) {
+              ok_msg = "{\"status\":\"processing\"";
+            } else {
+              ok_msg = "processing";
+            }
           }
-        }
-        if (json) {
-          ok_msg += ",\"total\":\"";
-          ok_msg += std::to_string(script->totalSize);
-          ok_msg += "\",\"processed\":\"";
-          ok_msg += std::to_string(script->processedSize);
-          ok_msg += "\",\"elapsed\":\"";
-          ok_msg += std::to_string(esp3d_hal::millis() - script->id);
-          ok_msg += "\",\"type\":\"";
-          ok_msg += std::to_string(static_cast<uint8_t>(script->type));
-          if (script->type == ESP3DGcodeHostStreamType::sd_stream ||
-              script->type == ESP3DGcodeHostStreamType::fs_stream) {
-            ok_msg += "\",\"name\":\"";
-            ok_msg += ((ESP3DGcodeStream*)script)->dataStream;
-            ok_msg += "\"";
+          if (json) {
+            ok_msg += ",\"total\":\"";
+            ok_msg += std::to_string(script->totalSize);
+            ok_msg += "\",\"processed\":\"";
+            ok_msg += std::to_string(script->processedSize);
+            ok_msg += "\",\"elapsed\":\"";
+            ok_msg += std::to_string(esp3d_hal::millis() - script->id);
+            ok_msg += "\",\"type\":\"";
+            ok_msg += std::to_string(static_cast<uint8_t>(script->type));
+            if (script->type == ESP3DGcodeHostStreamType::sd_stream ||
+                script->type == ESP3DGcodeHostStreamType::fs_stream) {
+              ok_msg += "\",\"name\":\"";
+              ok_msg += ((ESP3DGcodeStream*)script)->dataStream;
+              ok_msg += "\"";
+            }
+            ok_msg += "\"}";
+          } else {
+            // TODO: add more info ?
           }
-          ok_msg += "\"}";
-        } else {
-          // TODO: add more info ?
         }
       } else {
         hasError = true;

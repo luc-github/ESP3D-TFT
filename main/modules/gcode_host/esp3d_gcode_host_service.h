@@ -82,12 +82,13 @@ class ESP3DGCodeHostService : public ESP3DClient {
   bool addStream(const char *command, size_t length,
                  ESP3DAuthenticationLevel authentication_level);
 
-  size_t getStreamListSize() { return _scripts.size(); }
+  size_t getScriptsListSize() { return _scripts.size(); }
+  size_t getStreamsListSize() { return _scripts.size(); }
   bool hasStreamListCommand(const char *command);
 
  private:
   ESP3DGcodeHostStreamType _getStreamType(const char *data);
-  ESP3DGcodeStream *_get_front_stream();
+  ESP3DGcodeStream *_get_front_script();
   ESP3DGcodeStreamState _getStreamState();
   bool _setStreamState(ESP3DGcodeStreamState state);
   bool _setMainStreamState(ESP3DGcodeStreamState state);
@@ -96,6 +97,8 @@ class ESP3DGCodeHostService : public ESP3DClient {
   bool _endStream(ESP3DGcodeStream *stream);
   bool _openFile(ESP3DGcodeStream *stream);
   bool _closeFile(ESP3DGcodeStream *stream);
+  bool _pushBackGCodeStream(ESP3DGcodeStream *stream, bool is_stream = false);
+  bool _popFrontGCodeStream(bool is_stream = false);
 
   void _handle_notifications();
   void _handle_msgs();
@@ -129,9 +132,9 @@ class ESP3DGCodeHostService : public ESP3DClient {
 
   ESP3DGcodeStreamState _requested_state = ESP3DGcodeStreamState::undefined;
   std::list<ESP3DGcodeStream *> _scripts;
+  std::list<ESP3DGcodeStream *> _streams;
   ESP3DGcodeStream *_current_stream_ptr = nullptr;
   ESP3DGcodeStream *_current_main_stream_ptr = nullptr;
-  ESP3DGcodeStream *_current_front_stream_ptr = nullptr;
 
   std::string _stop_script;
   std::string _pause_script;
@@ -152,7 +155,8 @@ class ESP3DGCodeHostService : public ESP3DClient {
       0;  // Number of times the resend command has been requested
   pthread_mutex_t _tx_mutex;
   pthread_mutex_t _rx_mutex;
-  pthread_mutex_t _stream_list_mutex;
+  pthread_mutex_t _streams_list_mutex;
+  pthread_mutex_t _scripts_list_mutex;
 };
 
 extern ESP3DGCodeHostService gcodeHostService;

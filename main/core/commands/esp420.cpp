@@ -245,11 +245,20 @@ void ESP3DCommands::ESP420(int cmd_params_pos, ESP3DMessage *msg) {
     }
   }
 #endif  // #if ESP3D_USB_SERIAL
-  // Streaming buffer
-  size_t stream_size = gcodeHostService.getStreamListSize();
+  // Streaming buffer of commands and files
+
+  size_t stream_size = gcodeHostService.getScriptsListSize();
   float perct = 100.0 * stream_size / ESP3D_MAX_STREAM_SIZE;
-  tmpstr = std::to_string(perct);
-  tmpstr = esp3d_string::set_precision(tmpstr.c_str(), 1);
+  tmpstr = esp3d_string::set_precision(std::to_string(perct).c_str(), 1);
+  tmpstr += "% (";
+  tmpstr += std::to_string(stream_size);
+  tmpstr += "/";
+  tmpstr += std::to_string(ESP3D_MAX_STREAM_SIZE);
+  tmpstr += ")";
+  stream_size = gcodeHostService.getStreamsListSize();
+  perct = 100.0 * stream_size / ESP3D_MAX_STREAM_SIZE;
+  tmpstr += " - ";
+  tmpstr += esp3d_string::set_precision(std::to_string(perct).c_str(), 1);
   tmpstr += "% (";
   tmpstr += std::to_string(stream_size);
   tmpstr += "/";
