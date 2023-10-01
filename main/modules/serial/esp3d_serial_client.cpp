@@ -43,6 +43,7 @@ void ESP3DSerialClient::readSerial() {
   if (len) {
     // parse data
     startTimeout = esp3d_hal::millis();
+    esp3d_log("Read %d bytes", len);
     for (size_t i = 0; i < len; i++) {
       if (_bufferPos < ESP3D_SERIAL_RX_BUFFER_SIZE) {
         _buffer[_bufferPos] = _data[i];
