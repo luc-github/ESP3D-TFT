@@ -766,11 +766,15 @@ bool ESP3DGCodeHostService::_CheckSumCommand(char* result_buffer,
 }
 
 bool ESP3DGCodeHostService::_parseResponse(ESP3DMessage* rx) {
+  esp3d_log("Parse response %s", (char*)(rx->data));
   ESP3DDataType response_type = esp3dGcodeParser.getType((char*)(rx->data));
+  esp3d_log("Response type %d", static_cast<uint8_t>(response_type));
   switch (response_type) {
     case ESP3DDataType::ack:  // ack
-      esp3d_log("Got ack %s for %s", (char*)rx->data,
-                _current_command_str.c_str());
+      _startTimeout = esp3d_hal::millis();
+      esp3d_log("Reset timeout");
+      esp3d_log("Got ack %s", esp3d_string::str_trim((char*)rx->data));
+      esp3d_log("for %s", esp3d_string::str_trim(_current_command_str.c_str()));
       if (_awaitingAck) {
         esp3d_log("When having awaiting ack");
         // we got an ack for the current command
@@ -791,6 +795,7 @@ bool ESP3DGCodeHostService::_parseResponse(ESP3DMessage* rx) {
     case ESP3DDataType::status:  // can be busy or idle
       // just reset the timeout
       _startTimeout = esp3d_hal::millis();
+      esp3d_log("Reset timeout");
       break;
     case ESP3DDataType::error:  // error
       esp3d_log_e("Got Error: %s", ((char*)(rx->data)));
@@ -810,6 +815,8 @@ bool ESP3DGCodeHostService::_parseResponse(ESP3DMessage* rx) {
     case ESP3DDataType::resend:  // resend
       // use _current_command_str and resend it to the printer
       esp3d_log("Got resend");
+      _startTimeout = esp3d_hal::millis();
+      esp3d_log("Reset timeout");
       if (_awaitingAck) {
         _resend_command_number = esp3dGcodeParser.getLineResend();
         _resend_command_counter++;
@@ -820,8 +827,9 @@ bool ESP3DGCodeHostService::_parseResponse(ESP3DMessage* rx) {
       }
       break;
     default:  // esp_command, gcode, response,  comment, empty_line,
-              // emergency_command, unknown break
-              // the response is ignored by gcode host
+      // emergency_command, unknown break
+      // the response is ignored by gcode host
+      esp3d_log("Got useless response: %s", (char*)(rx->data));
       return false;
       break;
   }
@@ -1026,15 +1034,14 @@ void ESP3DGCodeHostService::_handle_stream_selection() {
   // only file stream  can be interrupted, scripts / command streams cannot
   if (!(_current_stream_ptr->type == ESP3DGcodeHostStreamType::fs_stream) &&
       !(_current_stream_ptr->type == ESP3DGcodeHostStreamType::sd_stream)) {
-    esp3d_log(
-        "Current stream is not a stream  %lld, state:%s : type: %s , command: "
-        "%s, keep it always active",
-        _current_stream_ptr->id,
-        ESP3DGcodeStreamStateStr[static_cast<uint8_t>(
-            _current_stream_ptr->state)],
-        ESP3DGcodeHostStreamTypeStr[static_cast<uint8_t>(
-            _current_stream_ptr->type)],
-        _current_command_str.c_str());
+    esp3d_log("Current stream is not a stream  %lld, state:%s : type: %s",
+              _current_stream_ptr->id,
+              ESP3DGcodeStreamStateStr[static_cast<uint8_t>(
+                  _current_stream_ptr->state)],
+              ESP3DGcodeHostStreamTypeStr[static_cast<uint8_t>(
+                  _current_stream_ptr->type)]);
+    esp3d_log("keep it always active, command:%s",
+              _current_command_str.c_str());
     _current_stream_ptr->active = true;
     return;
   }
@@ -1170,6 +1177,7 @@ ESP3DGcodeStreamState ESP3DGCodeHostService::_getStreamState() {
 // Handle the notifications
 // be sure sdkconfig has CONFIG_FREERTOS_TASK_NOTIFICATION_ARRAY_ENTRIES>=3
 void ESP3DGCodeHostService::_handle_notifications() {
+  esp3d_log("Handle notifications");
   // entry 0
   if (ulTaskNotifyTake(pdTRUE, 0)) {
     ESP3DGcodeStreamState state = _getStreamState();
@@ -1213,6 +1221,7 @@ void ESP3DGCodeHostService::_handle_notifications() {
 
 // Handle the messages in the queue
 void ESP3DGCodeHostService::_handle_msgs() {
+  esp3d_log("Handle messages");
   while (getRxMsgsCount() > 0) {
     ESP3DMessage* msg = popRx();
     esp3d_log("RX popped");
@@ -1404,7 +1413,8 @@ void ESP3DGCodeHostService::_handle_stream_states() {
     // send_gcode_command
     /////////////////////////////////////////////////////////
     case ESP3DGcodeStreamState::send_gcode_command:
-      _startTimeout = 0;
+      _startTimeout = esp3d_hal::millis();
+      esp3d_log("Reset timeout");
       msg = nullptr;
       // do we need to forward to screen ?
       if (esp3dGcodeParser.forwardToScreen(_current_command_str.c_str())) {
@@ -1577,7 +1587,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
         _current_main_stream_ptr = nullptr;
         esp3dTftValues.set_string_value(ESP3DValuesIndex::job_status, "idle");
         if (_current_stream_ptr->cursorPos >= _current_stream_ptr->totalSize) {
-          esp3d_log_d("Stream is finished send 100");
+          esp3d_log("Stream is finished send 100");
           esp3dTftValues.set_string_value(ESP3DValuesIndex::job_progress,
                                           "100");
           esp3dTftValues.set_string_value(
