@@ -248,7 +248,7 @@ def M109_response(cmd,line,ser):
             updateTemperatures("B", common.current_milli_time())
             val = generateTemperatureResponse(False)
             common.send_echo(ser, val)
-    return "ok"
+    return ok(line)
 
 # M114 Positions query
 def M114_response(cmd,line,ser):
@@ -286,7 +286,7 @@ def M190_response(cmd,line,ser):
             updateTemperatures("B", common.current_milli_time())
             val = generateTemperatureResponse(False)
             common.send_echo(ser, val)
-    return "ok"
+    return ok(line)
 
 # M220 response
 def M220_response(cmd,line,ser):
