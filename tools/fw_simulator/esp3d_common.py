@@ -17,6 +17,15 @@ class bcolors:
 def current_milli_time():
     return round(time.time() * 1000)
 
+def wait(durationms, ser):
+    nowtime = current_milli_time()
+    while (current_milli_time() < nowtime + durationms):
+         if ser.in_waiting:
+            line = ser.readline().decode('utf-8').strip()
+            print(bcolors.COL_BLUE+line+bcolors.END_COL)
+    
+    
 def send_echo(ser, msg):
     ser.write((msg + "\n").encode('utf-8'))
+    ser.flush()
     print(bcolors.END_COL + msg + bcolors.END_COL)
