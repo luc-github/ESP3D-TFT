@@ -26,17 +26,17 @@ extern "C" {
 #endif
 
 enum class ESP3DDataType : uint8_t {
-  esp_command,
-  gcode,
-  ack,
-  response,
-  error,
-  resend,
-  status,
-  comment,
-  empty_line,
-  emergency_command,
-  unknown
+  esp_command = 0,
+  gcode = 1,
+  ack = 2,
+  response = 3,
+  error = 4,
+  resend = 5,
+  status = 6,
+  comment = 7,
+  empty_line = 8,
+  emergency_command = 9,
+  unknown = 10
 };
 
 #ifdef __cplusplus
