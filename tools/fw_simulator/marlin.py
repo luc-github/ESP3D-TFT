@@ -90,7 +90,7 @@ def generateTemperatureResponse(withok):
 def send_busy(ser, nb):
     v = nb
     while (v > 0):
-        common.send_echo(ser, "echo:busy: processing\n")
+        common.send_echo(ser, "echo:busy: processing")
         common.wait(1000, ser)
         v = v - 1
 
@@ -275,7 +275,7 @@ def M190_response(cmd,line,ser):
         if (temperatures["B"]["target"] != 0):
             target = temperatures["B"]["target"]
         while (temperatures["B"]["value"] < target-2 or temperatures["B"]["value"] > target+2):
-            common.wait(1000, ser)
+            send_busy(ser, 1)
             updateTemperatures("E0", common.current_milli_time())
             updateTemperatures("B", common.current_milli_time())
             val = generateTemperatureResponse(False)
