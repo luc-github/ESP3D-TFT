@@ -298,7 +298,7 @@ def M190_response(cmd,line,ser):
             send_busy(ser, 1)
             if stop_heating:
                 stop_heating = False
-                temperatures["E0"]["target"] = 0.0
+                temperatures["B"]["target"] = 0.0
                 return ok(line) + "\nok"
             updateTemperatures("E0", common.current_milli_time())
             updateTemperatures("B", common.current_milli_time())
