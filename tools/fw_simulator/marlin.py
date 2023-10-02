@@ -32,6 +32,18 @@ modes = {
     "absolute": True
 }
 
+stop_heating = False
+
+
+def wait(durationms, ser):
+    global stop_heating
+    nowtime = common.current_milli_time()
+    while (common.current_milli_time() < nowtime + durationms):
+         if ser.in_waiting:
+            line = ser.readline().decode('utf-8').strip()
+            if line=="M108":
+                stop_heating = True
+            print(common.bcolors.COL_PURPLE+line+common.bcolors.END_COL)
 
 
 def ok(line):
@@ -91,7 +103,7 @@ def send_busy(ser, nb):
     v = nb
     while (v > 0):
         common.send_echo(ser, "echo:busy: processing")
-        common.wait(1000, ser)
+        wait(1000, ser)
         v = v - 1
 
 # G0/G1 response
@@ -230,20 +242,26 @@ def M107_response(cmd,line,ser):
 # M109 extruder control waiting
 def M109_response(cmd,line,ser):
     global temperatures
+    global stop_heating
     targettemp = re.findall('[SR]\d+[\.]*\d*', cmd)
     if (len(targettemp) > 0):
+        stop_heating = False
         temperatures["E0"]["target"] = float(targettemp[0][1:])
         target = 20.0
         if (temperatures["E0"]["target"] != 0):
             target = temperatures["E0"]["target"]
         while ( temperatures["E0"]["value"] < target-2 or temperatures["E0"]["value"] > target+2):
             send_busy(ser, 1)
+            if stop_heating:
+                stop_heating = False
+                temperatures["E0"]["target"] = 0.0
+                return ok(line) + "\nok"
             updateTemperatures("E0", common.current_milli_time())
             updateTemperatures("B", common.current_milli_time())
             val = generateTemperatureResponse(False)
             common.send_echo(ser, val)
             ser.flush()
-            common.wait(1000, ser)
+            wait(1000, ser)
             updateTemperatures("E0", common.current_milli_time())
             updateTemperatures("B", common.current_milli_time())
             val = generateTemperatureResponse(False)
@@ -268,20 +286,26 @@ def M140_response(cmd,line,ser):
 # M190 bed control waiting
 def M190_response(cmd,line,ser):
     global temperatures
+    global stop_heating
     targettemp = re.findall('[SR]\d+[\.]*\d*', cmd)
     if (len(targettemp) > 0):
         temperatures["B"]["target"] = float(targettemp[0][1:])
         target = 20.0
         if (temperatures["B"]["target"] != 0):
             target = temperatures["B"]["target"]
+            stop_heating = False
         while (temperatures["B"]["value"] < target-2 or temperatures["B"]["value"] > target+2):
             send_busy(ser, 1)
+            if stop_heating:
+                stop_heating = False
+                temperatures["E0"]["target"] = 0.0
+                return ok(line) + "\nok"
             updateTemperatures("E0", common.current_milli_time())
             updateTemperatures("B", common.current_milli_time())
             val = generateTemperatureResponse(False)
             common.send_echo(ser, val)
             ser.flush()
-            common.wait(1000, ser)
+            wait(1000, ser)
             updateTemperatures("E0", common.current_milli_time())
             updateTemperatures("B", common.current_milli_time())
             val = generateTemperatureResponse(False)
