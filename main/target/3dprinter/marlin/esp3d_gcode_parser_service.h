@@ -31,6 +31,13 @@ extern "C" {
 enum class FW_GCodeCommand : uint8_t {
   reset_stream_numbering = 0,
 };
+
+#define ESP3D_POLLING_COMMANDS_INDEX_TEMPERATURE_TEMPERATURE 0
+#define ESP3D_POLLING_COMMANDS_INDEX_TEMPERATURE_POSITION 1
+#define ESP3D_POLLING_COMMANDS_INDEX_TEMPERATURE_SPEED 2
+
+#define ESP3D_POLLING_COMMANDS_COUNT 3
+
 class ESP3DGCodeParserService final {
  public:
   ESP3DGCodeParserService();
@@ -45,6 +52,8 @@ class ESP3DGCodeParserService final {
   bool hasAck(const char *command);
   bool forwardToScreen(const char *command);
   bool isAckNeeded() { return true; }  // Depend on FW
+  uint64_t getPollingCommandsLastRun(uint8_t index);
+  bool setPollingCommandsLastRun(uint8_t index, uint64_t value);
 
  private:
   bool _isMultiLineReportOnGoing;
