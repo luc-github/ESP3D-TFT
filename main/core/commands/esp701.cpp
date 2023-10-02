@@ -74,7 +74,7 @@ void ESP3DCommands::ESP701(int cmd_params_pos, ESP3DMessage* msg) {
         } else {
           if (status == ESP3DGcodeHostState::paused) {
             if (json) {
-              ok_msg = "{\"status\":\"paused\"";
+              ok_msg = "{\"status\":\"pause\"";
             } else {
               ok_msg = "pause";
             }
