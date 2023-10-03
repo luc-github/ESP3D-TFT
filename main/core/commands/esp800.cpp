@@ -216,6 +216,12 @@ void ESP3DCommands::ESP800(int cmd_params_pos, ESP3DMessage* msg) {
   if (!dispatchKeyValue(json, "Screen", TFT_TARGET, target, requestId)) {
     return;
   }
+
+  // Streaming
+  if (!dispatchKeyValue(json, "Streaming", "Enabled", target, requestId)) {
+    return;
+  }
+
   // TODO: update once setup ready
   // Time
   if (!dispatchKeyValue(json, "Time", "none", target, requestId)) {
