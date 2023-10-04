@@ -1180,7 +1180,11 @@ void ESP3DGCodeHostService::_handle_notifications() {
   esp3d_log("Handle notifications");
   // entry 0
   if (ulTaskNotifyTake(pdTRUE, 0)) {
-    ESP3DGcodeStreamState state = _getStreamState();
+    ESP3DGcodeStreamState state = ESP3DGcodeStreamState::undefined;
+    ESP3DGcodeStream* stream = getCurrentMainStream();
+    if (stream) {
+      state = stream->state;
+    }
     if (ulTaskNotifyTakeIndexed(_xPauseNotifyIndex, pdTRUE, 0)) {
       esp3d_log("Received pause notification");
       if (!_setStreamRequestState(ESP3DGcodeStreamState::pause)) {
@@ -1194,7 +1198,7 @@ void ESP3DGCodeHostService::_handle_notifications() {
     if (ulTaskNotifyTakeIndexed(_xResumeNotifyIndex, pdTRUE, 0)) {
       esp3d_log("Received resume notification");
       if (state == ESP3DGcodeStreamState::paused) {
-        if (!_setStreamState(ESP3DGcodeStreamState::resume)) {
+        if (!_setMainStreamState(ESP3DGcodeStreamState::resume)) {
           esp3d_log_e("Failed to resume stream");
         } else {  // do not wait to set the state to processing to avoid to
                   // confuse the user
@@ -1208,7 +1212,7 @@ void ESP3DGCodeHostService::_handle_notifications() {
     if (ulTaskNotifyTakeIndexed(_xAbortNotifyIndex, pdTRUE, 0)) {
       esp3d_log("Received abort notification");
       if (state != ESP3DGcodeStreamState::undefined) {
-        if (!_setStreamState(ESP3DGcodeStreamState::abort)) {
+        if (!_setStreamRequestState(ESP3DGcodeStreamState::abort)) {
           esp3d_log_e("Failed to abort stream");
         } else {  // do not wait to set the state to processing to avoid to
                   // confuse the user
