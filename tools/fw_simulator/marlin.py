@@ -49,7 +49,7 @@ def wait(durationms, ser):
 def ok(line):
     if (not line.startswith("N")):
         return "ok (" + line + ")"
-    N = re.findall('N\d*', line)
+    N = re.findall(r'N\d*', line)
     if (len(N) > 0):
         return "ok " + N[0][1:]
     
@@ -113,15 +113,15 @@ def G0_G1_response(cmd,line,ser):
     Y_val = ""
     Z_val = ""
  # extract X
-    X = re.findall('X[+]*[-]*\d+[\.]*\d*', cmd)
+    X = re.findall(r'X[+]*[-]*\d+[\.]*\d*', cmd)
     if (len(X) > 0):
         X_val = X[0][1:]
     # extract Y
-    Y = re.findall('Y[+]*[-]*\d+[\.]*\d*', cmd)
+    Y = re.findall(r'Y[+]*[-]*\d+[\.]*\d*', cmd)
     if (len(Y) > 0):
         Y_val = Y[0][1:]
     # extract Z
-    Z = re.findall('Z[+]*[-]*\d+[\.]*\d*', cmd)
+    Z = re.findall(r'Z[+]*[-]*\d+[\.]*\d*', cmd)
     if (len(Z) > 0):
         Z_val = Z[0][1:]
     if (modes["absolute"]):
@@ -216,7 +216,7 @@ def G91_response(cmd,line,ser):
 # M104 extruder control not waiting
 def M104_response(cmd,line,ser):
     global temperatures
-    targettemp = re.findall('S\d+[\.]*\d*', cmd)
+    targettemp = re.findall(r'S\d+[\.]*\d*', cmd)
     if (len(targettemp) > 0):
         temperatures["E0"]["target"] = float(targettemp[0][1:])
     return ok(line)
@@ -243,7 +243,7 @@ def M107_response(cmd,line,ser):
 def M109_response(cmd,line,ser):
     global temperatures
     global stop_heating
-    targettemp = re.findall('[SR]\d+[\.]*\d*', cmd)
+    targettemp = re.findall(r'[SR]\d+[\.]*\d*', cmd)
     if (len(targettemp) > 0):
         stop_heating = False
         temperatures["E0"]["target"] = float(targettemp[0][1:])
@@ -278,7 +278,7 @@ def M114_response(cmd,line,ser):
 # M140 bed control not waiting
 def M140_response(cmd,line,ser):
     global temperatures
-    targettemp = re.findall('S\d+[\.]*\d*', cmd)
+    targettemp = re.findall(r'S\d+[\.]*\d*', cmd)
     if (len(targettemp) > 0):
         temperatures["B"]["target"] = float(targettemp[0][1:])
     return ok(line)
@@ -287,7 +287,7 @@ def M140_response(cmd,line,ser):
 def M190_response(cmd,line,ser):
     global temperatures
     global stop_heating
-    targettemp = re.findall('[SR]\d+[\.]*\d*', cmd)
+    targettemp = re.findall(r'[SR]\d+[\.]*\d*', cmd)
     if (len(targettemp) > 0):
         temperatures["B"]["target"] = float(targettemp[0][1:])
         target = 20.0
@@ -314,7 +314,7 @@ def M190_response(cmd,line,ser):
 
 # M220 response
 def M220_response(cmd,line,ser):
-    val = re.findall('S\d+', cmd)
+    val = re.findall(r'S\d+', cmd)
     if (len(val) > 0):
         F_R = val[0][1:]
         return "FR:"+F_R+"%\nok"
