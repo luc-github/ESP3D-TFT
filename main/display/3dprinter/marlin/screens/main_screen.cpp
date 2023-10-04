@@ -253,6 +253,8 @@ bool job_status_value_cb(ESP3DValuesIndex index, const char *value,
           if (seconds > 0) {
             if (seconds < 10) progression_area_str += "0";
             progression_area_str += std::to_string(seconds);
+          } else {
+            progression_area_str += "00";
           }
         } else {
           progression_area_str += std::to_string(time_elapsed);
