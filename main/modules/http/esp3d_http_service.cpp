@@ -197,6 +197,7 @@ bool ESP3DHttpService::begin() {
   config.backlog_conn = 8;
   config.close_fn = close_fn;
   config.lru_purge_enable = true;
+  config.uri_match_fn = httpd_uri_match_wildcard;
 
   // start server
   esp3d_log("Starting server on port: '%d'", config.server_port);
