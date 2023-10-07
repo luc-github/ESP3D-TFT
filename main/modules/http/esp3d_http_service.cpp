@@ -67,6 +67,12 @@ char chunk[CHUNK_BUFFER_SIZE];
 #else
 #define WEBSOCKET_DATA_HANDLER_CNT 0
 #endif  // ESP3D_WS_SERVICE_FEATURE
+#if ESP3D_WEBDAV_FEATURE
+#define WEBDAV_HANDLER_CNT 10
+#else
+#define WEBDAV_HANDLER_CNT 0
+#endif  // ESP3D_WEBDAV_FEATURE
+#define FILE_NOT_FOUND_HANDLER_CNT 1
 
 ESP3DHttpService esp3dHttpService;
 
@@ -228,7 +234,8 @@ bool ESP3DHttpService::begin() {
       COMMAND_HANDLER_CNT + CONFIG_HANDLER_CNT + FILES_HANDLER_CNT +
       LOGIN_HANDLER_CNT + FILES_UPLOAD_HANDLER_CNT + SDFILES_HANDLER_CNT +
       SDFILES_UPLOAD_HANDLER_CNT + UPDATEFW_UPLOAD_HANDLER_CNT +
-      WEBSOCKET_WEBUI_HANDLER_CNT + WEBSOCKET_DATA_HANDLER_CNT;
+      WEBSOCKET_WEBUI_HANDLER_CNT + WEBSOCKET_DATA_HANDLER_CNT +
+      WEBDAV_HANDLER_CNT + FILE_NOT_FOUND_HANDLER_CNT;
   // backlog_conn
   config.backlog_conn = 8;
   config.close_fn = close_fn;
@@ -251,7 +258,10 @@ bool ESP3DHttpService::begin() {
         .is_websocket = false,
         .handle_ws_control_frames = false,
         .supported_subprotocol = nullptr};
-    httpd_register_uri_handler(_server, &favicon_handler_config);
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &favicon_handler_config)) {
+      esp3d_log_e("favicon.ico handler registration failed");
+    }
 #if ESP3D_SSDP_FEATURE
     // description.xml (ssdp)
     const httpd_uri_t ssdp_handler_config = {
@@ -263,7 +273,9 @@ bool ESP3DHttpService::begin() {
         .is_websocket = false,
         .handle_ws_control_frames = false,
         .supported_subprotocol = nullptr};
-    httpd_register_uri_handler(_server, &ssdp_handler_config);
+    if (ESP_OK != httpd_register_uri_handler(_server, &ssdp_handler_config)) {
+      esp3d_log_e("description.xml handler registration failed");
+    }
 #endif  // ESP3D_SSDP_FEATURE
 
     // root /
@@ -276,7 +288,9 @@ bool ESP3DHttpService::begin() {
         .is_websocket = false,
         .handle_ws_control_frames = false,
         .supported_subprotocol = nullptr};
-    httpd_register_uri_handler(_server, &root_handler_config);
+    if (ESP_OK != httpd_register_uri_handler(_server, &root_handler_config)) {
+      esp3d_log_e("root handler registration failed");
+    }
     // Command /command
     const httpd_uri_t command_handler_config = {
         .uri = "/command",
@@ -287,7 +301,10 @@ bool ESP3DHttpService::begin() {
         .is_websocket = false,
         .handle_ws_control_frames = false,
         .supported_subprotocol = nullptr};
-    httpd_register_uri_handler(_server, &command_handler_config);
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &command_handler_config)) {
+      esp3d_log_e("command handler registration failed");
+    }
 
     // config /config
     const httpd_uri_t config_handler_config = {
@@ -299,7 +316,9 @@ bool ESP3DHttpService::begin() {
         .is_websocket = false,
         .handle_ws_control_frames = false,
         .supported_subprotocol = nullptr};
-    httpd_register_uri_handler(_server, &config_handler_config);
+    if (ESP_OK != httpd_register_uri_handler(_server, &config_handler_config)) {
+      esp3d_log_e("config handler registration failed");
+    }
 
     // flash files /files
     const httpd_uri_t files_handler_config = {
@@ -311,7 +330,9 @@ bool ESP3DHttpService::begin() {
         .is_websocket = false,
         .handle_ws_control_frames = false,
         .supported_subprotocol = nullptr};
-    httpd_register_uri_handler(_server, &files_handler_config);
+    if (ESP_OK != httpd_register_uri_handler(_server, &files_handler_config)) {
+      esp3d_log_e("files handler registration failed");
+    }
 
     // login
     const httpd_uri_t login_handler_config = {.uri = "/login",
@@ -321,7 +342,9 @@ bool ESP3DHttpService::begin() {
                                               .is_websocket = false,
                                               .handle_ws_control_frames = false,
                                               .supported_subprotocol = nullptr};
-    httpd_register_uri_handler(_server, &login_handler_config);
+    if (ESP_OK != httpd_register_uri_handler(_server, &login_handler_config)) {
+      esp3d_log_e("login handler registration failed");
+    }
 
     // flash files upload (POST data)
     httpd_uri_t files_upload_handler_config = {
@@ -332,7 +355,10 @@ bool ESP3DHttpService::begin() {
         .is_websocket = false,
         .handle_ws_control_frames = false,
         .supported_subprotocol = nullptr};
-    httpd_register_uri_handler(_server, &files_upload_handler_config);
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &files_upload_handler_config)) {
+      esp3d_log_e("files upload handler registration failed");
+    }
 #if ESP3D_SD_CARD_FEATURE
     // sdfiles upload (POST data)
     httpd_uri_t sdfiles_upload_handler_config = {
@@ -343,7 +369,10 @@ bool ESP3DHttpService::begin() {
         .is_websocket = false,
         .handle_ws_control_frames = false,
         .supported_subprotocol = nullptr};
-    httpd_register_uri_handler(_server, &sdfiles_upload_handler_config);
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &sdfiles_upload_handler_config)) {
+      esp3d_log_e("sdfiles upload handler registration failed");
+    }
     // sd files /sdfiles
     const httpd_uri_t sdfiles_handler_config = {
         .uri = "/sdfiles",
@@ -354,7 +383,10 @@ bool ESP3DHttpService::begin() {
         .is_websocket = false,
         .handle_ws_control_frames = false,
         .supported_subprotocol = nullptr};
-    httpd_register_uri_handler(_server, &sdfiles_handler_config);
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &sdfiles_handler_config)) {
+      esp3d_log_e("sdfiles handler registration failed");
+    }
 #endif  // ESP3D_SD_CARD_FEATURE
 
 #if ESP3D_UPDATE_FEATURE
@@ -367,7 +399,10 @@ bool ESP3DHttpService::begin() {
         .is_websocket = false,
         .handle_ws_control_frames = false,
         .supported_subprotocol = nullptr};
-    httpd_register_uri_handler(_server, &updatefw_upload_handler_config);
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &updatefw_upload_handler_config)) {
+      esp3d_log_e("updatefw upload handler registration failed");
+    }
 #endif  // ESP3D_UPDATE_FEATURE
 
     // webui web socket /ws
@@ -380,7 +415,10 @@ bool ESP3DHttpService::begin() {
         .is_websocket = true,
         .handle_ws_control_frames = false,
         .supported_subprotocol = "webui-v3"};
-    httpd_register_uri_handler(_server, &websocket_webui_handler_config);
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &websocket_webui_handler_config)) {
+      esp3d_log_e("websocket webui handler registration failed");
+    }
 #if ESP3D_WS_SERVICE_FEATURE
     const httpd_uri_t websocket_data_handler_config = {
         .uri = ESP3D_WS_DATA_URL,
@@ -391,8 +429,163 @@ bool ESP3DHttpService::begin() {
         .is_websocket = true,
         .handle_ws_control_frames = false,
         .supported_subprotocol = ESP3D_WS_DATA_SUBPROTOCOL};
-    httpd_register_uri_handler(_server, &websocket_data_handler_config);
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &websocket_data_handler_config)) {
+      esp3d_log_e("websocket data handler registration failed");
+    }
 #endif  // ESP3D_WS_SERVICE_FEATURE
+
+#if ESP3D_WEBDAV_FEATURE
+    // GET
+    const httpd_uri_t webdav_get_handler_config = {
+        .uri = "/DavWWWRoot/*",
+        .method = HTTP_GET,
+        .handler =
+            (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_get_handler),
+        .user_ctx = nullptr,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr};
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &webdav_get_handler_config)) {
+      esp3d_log_e("webdav get handler registration failed");
+    }
+
+    // PUT
+    const httpd_uri_t webdav_put_handler_config = {
+        .uri = "/DavWWWRoot/*",
+        .method = HTTP_PUT,
+        .handler =
+            (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_put_handler),
+        .user_ctx = nullptr,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr};
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &webdav_put_handler_config)) {
+      esp3d_log_e("webdav put handler registration failed");
+    }
+
+    // DELETE
+    const httpd_uri_t webdav_delete_handler_config = {
+        .uri = "/DavWWWRoot/*",
+        .method = HTTP_DELETE,
+        .handler = (esp_err_t(*)(httpd_req_t *))(
+            esp3dHttpService.webdav_delete_handler),
+        .user_ctx = nullptr,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr};
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &webdav_delete_handler_config)) {
+      esp3d_log_e("webdav delete handler registration failed");
+    }
+
+    // MKCOL
+    const httpd_uri_t webdav_mkcol_handler_config = {
+        .uri = "/DavWWWRoot/*",
+        .method = HTTP_MKCOL,
+        .handler = (esp_err_t(*)(httpd_req_t *))(
+            esp3dHttpService.webdav_mkcol_handler),
+        .user_ctx = nullptr,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr};
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &webdav_mkcol_handler_config)) {
+      esp3d_log_e("webdav mkcol handler registration failed");
+    }
+
+    // MOVE
+    const httpd_uri_t webdav_move_handler_config = {
+        .uri = "/DavWWWRoot/*",
+        .method = HTTP_MOVE,
+        .handler =
+            (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_move_handler),
+        .user_ctx = nullptr,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr};
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &webdav_move_handler_config)) {
+      esp3d_log_e("webdav move handler registration failed");
+    }
+
+    // COPY
+    const httpd_uri_t webdav_copy_handler_config = {
+        .uri = "/DavWWWRoot/*",
+        .method = HTTP_COPY,
+        .handler =
+            (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_copy_handler),
+        .user_ctx = nullptr,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr};
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &webdav_copy_handler_config)) {
+      esp3d_log_e("webdav copy handler registration failed");
+    }
+
+    // PROPFIND
+    const httpd_uri_t webdav_propfind_handler_config = {
+        .uri = "/DavWWWRoot/*",
+        .method = HTTP_PROPFIND,
+        .handler = (esp_err_t(*)(httpd_req_t *))(
+            esp3dHttpService.webdav_propfind_handler),
+        .user_ctx = nullptr,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr};
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &webdav_propfind_handler_config)) {
+      esp3d_log_e("webdav propfind handler registration failed");
+    }
+
+    // PROPPATCH
+    const httpd_uri_t webdav_proppatch_handler_config = {
+        .uri = "/DavWWWRoot/*",
+        .method = HTTP_PROPPATCH,
+        .handler = (esp_err_t(*)(httpd_req_t *))(
+            esp3dHttpService.webdav_proppatch_handler),
+        .user_ctx = nullptr,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr};
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &webdav_proppatch_handler_config)) {
+      esp3d_log_e("webdav proppatch handler registration failed");
+    }
+
+    // LOCK
+    const httpd_uri_t webdav_lock_handler_config = {
+        .uri = "/DavWWWRoot/*",
+        .method = HTTP_LOCK,
+        .handler =
+            (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_lock_handler),
+        .user_ctx = nullptr,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr};
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &webdav_lock_handler_config)) {
+      esp3d_log_e("webdav lock handler registration failed");
+    }
+
+    // UNLOCK
+    const httpd_uri_t webdav_unlock_handler_config = {
+        .uri = "/DavWWWRoot/*",
+        .method = HTTP_UNLOCK,
+        .handler = (esp_err_t(*)(httpd_req_t *))(
+            esp3dHttpService.webdav_unlock_handler),
+        .user_ctx = nullptr,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr};
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &webdav_unlock_handler_config)) {
+      esp3d_log_e("webdav unlock handler registration failed");
+    }
+#endif  // ESP3D_WEBDAV_FEATURE
 
     // File not found
     httpd_register_err_handler(
@@ -416,6 +609,7 @@ bool ESP3DHttpService::begin() {
       }
     }
 #endif  // ESP3D_WS_SERVICE_FEATURE
+
   } else {
     esp3d_log_e("Web server start failed %s", esp_err_to_name(err));
   }
@@ -448,6 +642,9 @@ void ESP3DHttpService::end() {
     httpd_unregister_uri(_server, "/sdfiles");
 #endif  // ESP3D_SD_CARD_FEATURE
     httpd_unregister_uri(_server, "/login");
+#if ESP3D_WEBDAV_FEATURE
+    httpd_unregister_uri(_server, "/DavWWWRoot/*");
+#endif  // ESP3D_WEBDAV_FEATURE
     httpd_register_err_handler(_server, HTTPD_404_NOT_FOUND, NULL);
     httpd_stop(_server);
   }

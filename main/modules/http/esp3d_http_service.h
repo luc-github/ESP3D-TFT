@@ -126,6 +126,19 @@ class ESP3DHttpService final {
 #if ESP3D_WS_SERVICE_FEATURE
   static esp_err_t websocket_data_handler(httpd_req_t *req);
 #endif  // ESP3D_WS_SERVICE_FEATURE
+#if ESP3D_WEBDAV_FEATURE
+  static esp_err_t webdav_get_handler(httpd_req_t *req);
+  static esp_err_t webdav_copy_handler(httpd_req_t *req);
+  static esp_err_t webdav_move_handler(httpd_req_t *req);
+  static esp_err_t webdav_delete_handler(httpd_req_t *req);
+  static esp_err_t webdav_mkcol_handler(httpd_req_t *req);
+  static esp_err_t webdav_propfind_handler(httpd_req_t *req);
+  static esp_err_t webdav_proppatch_handler(httpd_req_t *req);
+  static esp_err_t webdav_put_handler(httpd_req_t *req);
+  static esp_err_t webdav_lock_handler(httpd_req_t *req);
+  static esp_err_t webdav_unlock_handler(httpd_req_t *req);
+#endif  // ESP3D_WEBDAV_FEATURE
+
   static esp_err_t post_multipart_handler(httpd_req_t *req);
   static esp_err_t upload_to_flash_handler(const uint8_t *data, size_t datasize,
                                            ESP3DUploadState file_upload_state,
