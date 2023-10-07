@@ -37,6 +37,37 @@
 #define CHUNK_BUFFER_SIZE STREAM_CHUNK_SIZE
 char chunk[CHUNK_BUFFER_SIZE];
 
+#define FAV_ICON_HANLDER_CNT 1
+#if ESP3D_SSDP_FEATURE
+#define SSDP_HANLDER_CNT 1
+#else
+#define SSDP_HANLDER_CNT 0
+#endif  // ESP3D_SSDP_FEATURE
+#define ROOT_GET_HANDLER_CNT 1
+#define COMMAND_HANDLER_CNT 1
+#define CONFIG_HANDLER_CNT 1
+#define FILES_HANDLER_CNT 1
+#define LOGIN_HANDLER_CNT 1
+#define FILES_UPLOAD_HANDLER_CNT 1
+#if ESP3D_SD_CARD_FEATURE
+#define SDFILES_HANDLER_CNT 1
+#define SDFILES_UPLOAD_HANDLER_CNT 1
+#else
+#define SDFILES_HANDLER_CNT 0
+#define SDFILES_UPLOAD_HANDLER_CNT 0
+#endif  // ESP3D_SD_CARD_FEATURE
+#if ESP3D_UPDATE_FEATURE
+#define UPDATEFW_UPLOAD_HANDLER_CNT 1
+#else
+#define UPDATEFW_UPLOAD_HANDLER_CNT 0
+#endif  // ESP3D_UPDATE_FEATURE
+#define WEBSOCKET_WEBUI_HANDLER_CNT 1
+#if ESP3D_WS_SERVICE_FEATURE
+#define WEBSOCKET_DATA_HANDLER_CNT 1
+#else
+#define WEBSOCKET_DATA_HANDLER_CNT 0
+#endif  // ESP3D_WS_SERVICE_FEATURE
+
 ESP3DHttpService esp3dHttpService;
 
 PostUploadContext ESP3DHttpService::_post_files_upload_ctx = {
@@ -191,8 +222,13 @@ bool ESP3DHttpService::begin() {
   // Nb of sockets//need to match max LWIP socket in sdkconfig +3 internal
   config.max_open_sockets =
       8;  //(3 (http) +2 (1+reject)webui +3 (2 + reject) webdata)
-  // handler
-  config.max_uri_handlers = 12;  // currently use 10
+  // handlers
+  config.max_uri_handlers =
+      FAV_ICON_HANLDER_CNT + SSDP_HANLDER_CNT + ROOT_GET_HANDLER_CNT +
+      COMMAND_HANDLER_CNT + CONFIG_HANDLER_CNT + FILES_HANDLER_CNT +
+      LOGIN_HANDLER_CNT + FILES_UPLOAD_HANDLER_CNT + SDFILES_HANDLER_CNT +
+      SDFILES_UPLOAD_HANDLER_CNT + UPDATEFW_UPLOAD_HANDLER_CNT +
+      WEBSOCKET_WEBUI_HANDLER_CNT + WEBSOCKET_DATA_HANDLER_CNT;
   // backlog_conn
   config.backlog_conn = 8;
   config.close_fn = close_fn;
