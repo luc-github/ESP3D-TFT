@@ -137,6 +137,8 @@ class ESP3DHttpService final {
   static esp_err_t webdav_put_handler(httpd_req_t *req);
   static esp_err_t webdav_lock_handler(httpd_req_t *req);
   static esp_err_t webdav_unlock_handler(httpd_req_t *req);
+  static esp_err_t webdav_head_handler(httpd_req_t *req);
+  static esp_err_t webdav_options_handler(httpd_req_t *req);
 #endif  // ESP3D_WEBDAV_FEATURE
 
   static esp_err_t post_multipart_handler(httpd_req_t *req);

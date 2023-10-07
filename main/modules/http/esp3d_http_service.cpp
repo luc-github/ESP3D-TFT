@@ -68,7 +68,7 @@ char chunk[CHUNK_BUFFER_SIZE];
 #define WEBSOCKET_DATA_HANDLER_CNT 0
 #endif  // ESP3D_WS_SERVICE_FEATURE
 #if ESP3D_WEBDAV_FEATURE
-#define WEBDAV_HANDLER_CNT 10
+#define WEBDAV_HANDLER_CNT 12
 #else
 #define WEBDAV_HANDLER_CNT 0
 #endif  // ESP3D_WEBDAV_FEATURE
@@ -584,6 +584,37 @@ bool ESP3DHttpService::begin() {
     if (ESP_OK !=
         httpd_register_uri_handler(_server, &webdav_unlock_handler_config)) {
       esp3d_log_e("webdav unlock handler registration failed");
+    }
+
+    // OPTIONS
+    const httpd_uri_t webdav_options_handler_config = {
+        .uri = "/DavWWWRoot/*",
+        .method = HTTP_OPTIONS,
+        .handler = (esp_err_t(*)(httpd_req_t *))(
+            esp3dHttpService.webdav_options_handler),
+        .user_ctx = nullptr,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr};
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &webdav_options_handler_config)) {
+      esp3d_log_e("webdav options handler registration failed");
+    }
+
+    // HEAD
+    const httpd_uri_t webdav_head_handler_config = {
+        .uri = "/DavWWWRoot/*",
+        .method = HTTP_HEAD,
+        .handler =
+            (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_head_handler),
+        .user_ctx = nullptr,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr};
+
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &webdav_head_handler_config)) {
+      esp3d_log_e("webdav head handler registration failed");
     }
 #endif  // ESP3D_WEBDAV_FEATURE
 
