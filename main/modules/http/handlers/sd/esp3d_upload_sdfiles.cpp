@@ -17,7 +17,6 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#if ESP3D_SD_CARD_FEATURE
 #include <sys/param.h>
 
 #include "esp3d_commands.h"
@@ -120,4 +119,3 @@ esp_err_t ESP3DHttpService::upload_to_sd_handler(
   return ESP_OK;
 }
 
-#endif  // ESP3D_SD_CARD_FEATURE

@@ -16,7 +16,6 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#if ESP3D_SSDP_FEATURE
 
 #include <stdio.h>
 
@@ -36,4 +35,3 @@ esp_err_t ESP3DHttpService::description_xml_handler(httpd_req_t *req) {
   return httpd_resp_send(req, response, strlen(response));
 }
 
-#endif  // #if ESP3D_SSDP_FEATURE
