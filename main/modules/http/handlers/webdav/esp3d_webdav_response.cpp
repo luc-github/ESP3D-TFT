@@ -39,6 +39,9 @@ esp_err_t ESP3DHttpService::webdav_send_response(httpd_req_t *req, int code,
     case 204:
       status += "No Content";
       break;
+    case 207:
+      status += "Multi-Status";
+      break;
     case 400:
       status += "Bad Request";
       break;
