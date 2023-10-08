@@ -216,6 +216,8 @@ const char* esp3d_string::getContentType(const char* filename) {
       return "application/x-gzip";
     } else if (extension == "txt") {
       return "text/plain";
+    } else if (extension == "gco" || extension == "gcode") {
+      return "text/plain";
     }
   }
   return "application/octet-stream";
