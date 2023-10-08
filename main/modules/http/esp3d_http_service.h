@@ -28,6 +28,9 @@
 #include "authentication/esp3d_authentication_types.h"
 #include "esp3d_client.h"
 #include "esp3d_string.h"
+#if ESP3D_WEBDAV_FEATURE
+#include "webdav/esp3d_webdav_service.h"
+#endif  // ESP3D_WEBDAV_FEATURE
 
 #ifdef __cplusplus
 extern "C" {
@@ -135,8 +138,10 @@ class ESP3DHttpService final {
   static esp_err_t webdav_propfind_handler(httpd_req_t *req);
   static esp_err_t webdav_proppatch_handler(httpd_req_t *req);
   static esp_err_t webdav_put_handler(httpd_req_t *req);
+#if ESP3D_ENABLE_WEBDAV_LOCK
   static esp_err_t webdav_lock_handler(httpd_req_t *req);
   static esp_err_t webdav_unlock_handler(httpd_req_t *req);
+#endif  // ESP3D_ENABLE_WEBDAV_LOCK
   static esp_err_t webdav_head_handler(httpd_req_t *req);
   static esp_err_t webdav_options_handler(httpd_req_t *req);
 

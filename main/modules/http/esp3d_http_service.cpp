@@ -68,7 +68,11 @@ char chunk[CHUNK_BUFFER_SIZE];
 #define WEBSOCKET_DATA_HANDLER_CNT 0
 #endif  // ESP3D_WS_SERVICE_FEATURE
 #if ESP3D_WEBDAV_FEATURE
+#if ESP3D_ENABLE_WEBDAV_LOCK
 #define WEBDAV_HANDLER_CNT 12
+#else
+#define WEBDAV_HANDLER_CNT 10
+#endif  // ESP3D_ENABLE_WEBDAV_LOCK
 #else
 #define WEBDAV_HANDLER_CNT 0
 #endif  // ESP3D_WEBDAV_FEATURE
@@ -555,7 +559,7 @@ bool ESP3DHttpService::begin() {
         httpd_register_uri_handler(_server, &webdav_proppatch_handler_config)) {
       esp3d_log_e("webdav proppatch handler registration failed");
     }
-
+#if ESP3D_ENABLE_WEBDAV_LOCK
     // LOCK
     const httpd_uri_t webdav_lock_handler_config = {
         .uri = "/DavWWWRoot/*",
@@ -585,7 +589,7 @@ bool ESP3DHttpService::begin() {
         httpd_register_uri_handler(_server, &webdav_unlock_handler_config)) {
       esp3d_log_e("webdav unlock handler registration failed");
     }
-
+#endif  // ESP3D_ENABLE_WEBDAV_LOCK
     // OPTIONS
     const httpd_uri_t webdav_options_handler_config = {
         .uri = "/DavWWWRoot/*",
