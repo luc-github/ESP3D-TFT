@@ -46,6 +46,9 @@ int rfind(const char* str, const char* subStr, int start = -1);
 const char* formatBytes(uint64_t bytes);
 const char* urlDecode(const char* text);
 const char* getContentType(const char* filename);
+const char* getPathFromString(const char* str);
+const char* getFilenameFromString(const char* str);
+
 }  // namespace esp3d_string
 #ifdef __cplusplus
 }  // extern "C"

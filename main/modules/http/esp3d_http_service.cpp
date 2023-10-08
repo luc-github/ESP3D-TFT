@@ -442,7 +442,7 @@ bool ESP3DHttpService::begin() {
 #if ESP3D_WEBDAV_FEATURE
     // GET
     const httpd_uri_t webdav_get_handler_config = {
-        .uri = "/DavWWWRoot/*",
+        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
         .method = HTTP_GET,
         .handler =
             (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_get_handler),
@@ -457,7 +457,7 @@ bool ESP3DHttpService::begin() {
 
     // PUT
     const httpd_uri_t webdav_put_handler_config = {
-        .uri = "/DavWWWRoot/*",
+        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
         .method = HTTP_PUT,
         .handler =
             (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_put_handler),
@@ -472,7 +472,7 @@ bool ESP3DHttpService::begin() {
 
     // DELETE
     const httpd_uri_t webdav_delete_handler_config = {
-        .uri = "/DavWWWRoot/*",
+        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
         .method = HTTP_DELETE,
         .handler = (esp_err_t(*)(httpd_req_t *))(
             esp3dHttpService.webdav_delete_handler),
@@ -487,7 +487,7 @@ bool ESP3DHttpService::begin() {
 
     // MKCOL
     const httpd_uri_t webdav_mkcol_handler_config = {
-        .uri = "/DavWWWRoot/*",
+        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
         .method = HTTP_MKCOL,
         .handler = (esp_err_t(*)(httpd_req_t *))(
             esp3dHttpService.webdav_mkcol_handler),
@@ -502,7 +502,7 @@ bool ESP3DHttpService::begin() {
 
     // MOVE
     const httpd_uri_t webdav_move_handler_config = {
-        .uri = "/DavWWWRoot/*",
+        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
         .method = HTTP_MOVE,
         .handler =
             (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_move_handler),
@@ -517,7 +517,7 @@ bool ESP3DHttpService::begin() {
 
     // COPY
     const httpd_uri_t webdav_copy_handler_config = {
-        .uri = "/DavWWWRoot/*",
+        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
         .method = HTTP_COPY,
         .handler =
             (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_copy_handler),
@@ -532,7 +532,7 @@ bool ESP3DHttpService::begin() {
 
     // PROPFIND
     const httpd_uri_t webdav_propfind_handler_config = {
-        .uri = "/DavWWWRoot/*",
+        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
         .method = HTTP_PROPFIND,
         .handler = (esp_err_t(*)(httpd_req_t *))(
             esp3dHttpService.webdav_propfind_handler),
@@ -547,7 +547,7 @@ bool ESP3DHttpService::begin() {
 
     // PROPPATCH
     const httpd_uri_t webdav_proppatch_handler_config = {
-        .uri = "/DavWWWRoot/*",
+        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
         .method = HTTP_PROPPATCH,
         .handler = (esp_err_t(*)(httpd_req_t *))(
             esp3dHttpService.webdav_proppatch_handler),
@@ -562,7 +562,7 @@ bool ESP3DHttpService::begin() {
 #if ESP3D_ENABLE_WEBDAV_LOCK
     // LOCK
     const httpd_uri_t webdav_lock_handler_config = {
-        .uri = "/DavWWWRoot/*",
+        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
         .method = HTTP_LOCK,
         .handler =
             (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_lock_handler),
@@ -577,7 +577,7 @@ bool ESP3DHttpService::begin() {
 
     // UNLOCK
     const httpd_uri_t webdav_unlock_handler_config = {
-        .uri = "/DavWWWRoot/*",
+        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
         .method = HTTP_UNLOCK,
         .handler = (esp_err_t(*)(httpd_req_t *))(
             esp3dHttpService.webdav_unlock_handler),
@@ -592,7 +592,7 @@ bool ESP3DHttpService::begin() {
 #endif  // ESP3D_ENABLE_WEBDAV_LOCK
     // OPTIONS
     const httpd_uri_t webdav_options_handler_config = {
-        .uri = "/DavWWWRoot/*",
+        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
         .method = HTTP_OPTIONS,
         .handler = (esp_err_t(*)(httpd_req_t *))(
             esp3dHttpService.webdav_options_handler),
@@ -607,7 +607,7 @@ bool ESP3DHttpService::begin() {
 
     // HEAD
     const httpd_uri_t webdav_head_handler_config = {
-        .uri = "/DavWWWRoot/*",
+        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
         .method = HTTP_HEAD,
         .handler =
             (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_head_handler),
@@ -678,7 +678,7 @@ void ESP3DHttpService::end() {
 #endif  // ESP3D_SD_CARD_FEATURE
     httpd_unregister_uri(_server, "/login");
 #if ESP3D_WEBDAV_FEATURE
-    httpd_unregister_uri(_server, "/DavWWWRoot/*");
+    httpd_unregister_uri(_server, "/" ESP3D_WEBDAV_ROOT "/*");
 #endif  // ESP3D_WEBDAV_FEATURE
     httpd_register_err_handler(_server, HTTPD_404_NOT_FOUND, NULL);
     httpd_stop(_server);

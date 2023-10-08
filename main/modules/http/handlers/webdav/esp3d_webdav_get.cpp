@@ -21,9 +21,18 @@
 
 #include "esp3d_log.h"
 #include "esp3d_string.h"
+#include "filesystem/esp3d_globalfs.h"
 #include "http/esp3d_http_service.h"
+
 
 esp_err_t ESP3DHttpService::webdav_get_handler(httpd_req_t *req) {
   esp3d_log("Uri: %s", req->uri);
+  // TODO: implement method
+  // Check can access
+  // Check if file exist
+  // Check if file is a directory
+  // read file and send it
+  // close file
+  // release access
   return ESP_OK;
 }

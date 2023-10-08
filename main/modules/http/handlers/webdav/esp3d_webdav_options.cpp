@@ -25,5 +25,6 @@
 
 esp_err_t ESP3DHttpService::webdav_options_handler(httpd_req_t *req) {
   esp3d_log("Uri: %s", req->uri);
+  // TODO: Implement method
   return ESP_OK;
 }

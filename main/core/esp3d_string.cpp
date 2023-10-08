@@ -247,3 +247,31 @@ int esp3d_string::rfind(const char* str, const char* subStr, int start) {
   }
   return -1;
 }
+
+const char* esp3d_string::getPathFromString(const char* str) {
+  static std::string path;
+  path = str;
+  int pos = path.find_last_of("/");
+  if (pos != -1) {
+    path = path.substr(0, pos);
+  }
+  return path.c_str();
+}
+
+const char* esp3d_string::getFilenameFromString(const char* str) {
+  static std::string filename;
+  filename = str;
+  int pos = filename.find_last_of("/");
+  if (pos != -1) {
+    if (pos + 1 < filename.length()) {  // check if not last char
+      filename = filename.substr(pos + 1);
+    } else {  // last char is / so remove it and get dirname
+      filename[0] = '\0';
+      pos = filename.find_last_of("/");
+      if (pos != -1) {
+        filename = filename.substr(pos + 1);
+      }
+    }
+  }
+  return filename.c_str();
+}

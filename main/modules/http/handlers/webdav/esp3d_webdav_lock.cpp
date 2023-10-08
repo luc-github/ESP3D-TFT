@@ -22,8 +22,11 @@
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "http/esp3d_http_service.h"
-
+#if ESP3D_ENABLE_WEBDAV_LOCK
 esp_err_t ESP3DHttpService::webdav_lock_handler(httpd_req_t *req) {
   esp3d_log("Uri: %s", req->uri);
+  // TODO: implement method
   return ESP_OK;
 }
+
+#endif  // ESP3D_ENABLE_WEBDAV_LOCK

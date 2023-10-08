@@ -32,6 +32,10 @@
 #define ESP3D_WEBDAV_HEADER "1"
 #endif
 
+#define ESP3D_WEBDAV_ROOT "DavWWWRoot"
+
+#define ESP3D_WEBDAV_PATH(pathstr) &pathstr[strlen(ESP3D_WEBDAV_ROOT) + 1]
+
 #define ESP3D_WEBDAV_METHODS                                     \
   "PUT, GET, HEAD, DELETE, COPY, MOVE, LOCK, UNLOCK, PROPFIND, " \
   "OPTIONS" ESP3D_WEBDAV_LOCK_METHODS
