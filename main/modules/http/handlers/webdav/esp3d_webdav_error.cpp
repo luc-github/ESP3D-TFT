@@ -23,12 +23,15 @@
 #include "esp3d_string.h"
 #include "http/esp3d_http_service.h"
 
-esp_err_t ESP3DHttpService::webdav_send_error(httpd_req_t *req, int code,
-                                              const char *msg) {
+esp_err_t ESP3DHttpService::webdav_send_response(httpd_req_t *req, int code,
+                                                 const char *msg) {
   std::string status = std::to_string(code) + " ";
   switch (code) {
     case 200:
       status += "OK";
+      break;
+    case 201:
+      status += "Created";
       break;
     case 400:
       status += "Bad Request";
