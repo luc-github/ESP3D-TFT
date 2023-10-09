@@ -136,12 +136,7 @@ class ESP3DHttpService final {
   static esp_err_t webdav_delete_handler(httpd_req_t *req);
   static esp_err_t webdav_mkcol_handler(httpd_req_t *req);
   static esp_err_t webdav_propfind_handler(httpd_req_t *req);
-  static esp_err_t webdav_proppatch_handler(httpd_req_t *req);
   static esp_err_t webdav_put_handler(httpd_req_t *req);
-#if ESP3D_ENABLE_WEBDAV_LOCK
-  static esp_err_t webdav_lock_handler(httpd_req_t *req);
-  static esp_err_t webdav_unlock_handler(httpd_req_t *req);
-#endif  // ESP3D_ENABLE_WEBDAV_LOCK
   static esp_err_t webdav_head_handler(httpd_req_t *req);
   static esp_err_t webdav_options_handler(httpd_req_t *req);
 

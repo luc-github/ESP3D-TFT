@@ -22,22 +22,15 @@
 
 #include <esp_http_server.h>
 
-// #define ESP3D_ENABLE_WEBDAV_LOCK
-
-#if ESP3D_ENABLE_WEBDAV_LOCK
-#define ESP3D_WEBDAV_LOCK_METHODS ", LOCK, UNLOCK"
-#define ESP3D_WEBDAV_HEADER "1, 2"
-#else
-#define ESP3D_WEBDAV_LOCK_METHODS ""
 #define ESP3D_WEBDAV_HEADER "1"
-#endif
 
 #define ESP3D_WEBDAV_ROOT "DavWWWRoot"
 
 #define ESP3D_WEBDAV_PATH(pathstr) &pathstr[strlen(ESP3D_WEBDAV_ROOT) + 1]
 
-#define ESP3D_WEBDAV_METHODS                                     \
-  "PUT, GET, HEAD, DELETE, COPY, MOVE, LOCK, UNLOCK, PROPFIND, " \
-  "OPTIONS" ESP3D_WEBDAV_LOCK_METHODS
+#define ESP3D_WEBDAV_METHODS \
+  "PUT, GET, HEAD,"          \
+  " DELETE, COPY, MOVE,"     \
+  " PROPFIND, MKCOL, OPTIONS"
 
 extern esp_err_t httpd_resp_set_webdav_hdr(httpd_req_t *req);

@@ -68,11 +68,7 @@ char chunk[CHUNK_BUFFER_SIZE];
 #define WEBSOCKET_DATA_HANDLER_CNT 0
 #endif  // ESP3D_WS_SERVICE_FEATURE
 #if ESP3D_WEBDAV_FEATURE
-#if ESP3D_ENABLE_WEBDAV_LOCK
-#define WEBDAV_HANDLER_CNT 12
-#else
-#define WEBDAV_HANDLER_CNT 10
-#endif  // ESP3D_ENABLE_WEBDAV_LOCK
+#define WEBDAV_HANDLER_CNT 9
 #else
 #define WEBDAV_HANDLER_CNT 0
 #endif  // ESP3D_WEBDAV_FEATURE
@@ -549,51 +545,6 @@ bool ESP3DHttpService::begin() {
       esp3d_log_e("webdav propfind handler registration failed");
     }
 
-    // PROPPATCH
-    const httpd_uri_t webdav_proppatch_handler_config = {
-        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
-        .method = HTTP_PROPPATCH,
-        .handler = (esp_err_t(*)(httpd_req_t *))(
-            esp3dHttpService.webdav_proppatch_handler),
-        .user_ctx = nullptr,
-        .is_websocket = false,
-        .handle_ws_control_frames = false,
-        .supported_subprotocol = nullptr};
-    if (ESP_OK !=
-        httpd_register_uri_handler(_server, &webdav_proppatch_handler_config)) {
-      esp3d_log_e("webdav proppatch handler registration failed");
-    }
-#if ESP3D_ENABLE_WEBDAV_LOCK
-    // LOCK
-    const httpd_uri_t webdav_lock_handler_config = {
-        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
-        .method = HTTP_LOCK,
-        .handler =
-            (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_lock_handler),
-        .user_ctx = nullptr,
-        .is_websocket = false,
-        .handle_ws_control_frames = false,
-        .supported_subprotocol = nullptr};
-    if (ESP_OK !=
-        httpd_register_uri_handler(_server, &webdav_lock_handler_config)) {
-      esp3d_log_e("webdav lock handler registration failed");
-    }
-
-    // UNLOCK
-    const httpd_uri_t webdav_unlock_handler_config = {
-        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
-        .method = HTTP_UNLOCK,
-        .handler = (esp_err_t(*)(httpd_req_t *))(
-            esp3dHttpService.webdav_unlock_handler),
-        .user_ctx = nullptr,
-        .is_websocket = false,
-        .handle_ws_control_frames = false,
-        .supported_subprotocol = nullptr};
-    if (ESP_OK !=
-        httpd_register_uri_handler(_server, &webdav_unlock_handler_config)) {
-      esp3d_log_e("webdav unlock handler registration failed");
-    }
-#endif  // ESP3D_ENABLE_WEBDAV_LOCK
     // OPTIONS
     const httpd_uri_t webdav_options_handler_config = {
         .uri = "/" ESP3D_WEBDAV_ROOT "/*",
