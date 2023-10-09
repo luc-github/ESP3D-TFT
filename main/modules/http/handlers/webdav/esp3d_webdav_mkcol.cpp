@@ -25,6 +25,12 @@
 
 esp_err_t ESP3DHttpService::webdav_mkcol_handler(httpd_req_t *req) {
   esp3d_log("Uri: %s", req->uri);
-  // TODO: Implement method
+  // TODO: Implement method MKCOL
+  // extract path from uri
+  // clear payload from request if any
+  // Check can access (error code 503)
+  // check if path exists (error code 409 if already exists)
+  // release access
+  // response code 201 if success
   return ESP_OK;
 }

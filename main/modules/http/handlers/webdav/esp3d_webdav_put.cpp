@@ -25,6 +25,17 @@
 
 esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t *req) {
   esp3d_log("Uri: %s", req->uri);
-  // TODO: Implement method
+  // TODO: Implement method PUT
+  // extract path from uri
+  // clear payload from request if any
+  // Check can access (error code 503)
+  // check if file exists (no error unless it is file and there is already a
+  // directory with the same name)
+  // check size of file (error code 507)
+  // open file for writing (error code 500)
+  // close file
+  // release access
+  // response code 201 if success and new file
+  // response code 204 if success and overwrite file
   return ESP_OK;
 }

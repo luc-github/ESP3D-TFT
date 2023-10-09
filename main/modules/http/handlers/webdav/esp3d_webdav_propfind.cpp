@@ -25,6 +25,58 @@
 
 esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t *req) {
   esp3d_log("Uri: %s", req->uri);
-  // TODO: Implement method
+  // TODO: Implement method PROPFIND
+  // Get depth from header
+  // check for if exists (error 404)
+  // check if file or directory
+  // if depth==0 or file just stat the file or directory
+  // if depth>0 and directory respond with a list of files /directories in the
+  // directory of one depth
+  // return the information about the request response
+  // the response is an xml
+  // the response is a 207 status code
+  // Content-Type: application/xml;charset=utf-8
+  //<? xml version = "1.0" encoding = "utf-8" ?>
+  //<multistatus xmlns = "DAV:" depth="1">
+  //  <response>
+  //    <href>/monrep/</href>
+  //    <propstat>
+  //      <prop>
+  //        <getlastmodified> Tue,10 Jan 2023 09 : 00 : 00 GMT</getlastmodified>
+  //        <resourcetype>
+  //          <collection />
+  //        </ resourcetype>
+  //      </ prop>
+  //      <status>HTTP/1.1 200 OK</ status>
+  //    </propstat>
+  //  </response>
+  //
+  //  <response>
+  //    <href>/monrep/monsubrep/</ href>
+  //    <propstat>
+  //      <prop>
+  //        <getlastmodified> Tue, 10 Jan 2023 09 : 05 : 00
+  //        GMT</getlastmodified> <resourcetype>
+  //          <collection />
+  //        </resourcetype>
+  //      </prop>
+  //      <status>HTTP/1.1 200 OK</status>
+  //    </propstat>
+  //  </response>
+  //
+  //  <response>
+  //    <href>/monrep/monfichier.txt</href>
+  //    <propstat>
+  //      <prop>
+  //        <getlastmodified> Tue, 10 Jan 2023 09 : 10 : 00
+  //        GMT</getlastmodified>
+  //        <getcontentlength>3000000</getcontentlength>
+  //        <resourcetype />
+  //      </prop>
+  //      <status> HTTP / 1.1 200 OK</status>
+  //    </propstat>
+  //  </response>
+  //</multistatus>
+
   return ESP_OK;
 }

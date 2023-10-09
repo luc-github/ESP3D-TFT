@@ -25,6 +25,16 @@
 
 esp_err_t ESP3DHttpService::webdav_head_handler(httpd_req_t *req) {
   esp3d_log("Uri: %s", req->uri);
-  // TODO: implement method
+  // TODO: implement method HEAD
+  // Clear payload from request if any
+  // extract path from uri
+  // Check can access (error code 503)
+  // Check if file exist(error code 404)
+  // Check if file is a directory
+  // if file send content-type and content-length header
+  // if directory, send 200 response and return
+  // close file
+  // release access
+  // response code 200 if success
   return ESP_OK;
 }

@@ -25,6 +25,9 @@
 
 esp_err_t ESP3DHttpService::webdav_options_handler(httpd_req_t *req) {
   esp3d_log("Uri: %s", req->uri);
-  // TODO: Implement method
+  // TODO: Implement method OPTIONS
+  // Return DAV:1 in header
+  // Return Allow: <Methods> in header
+  // response is always 200
   return ESP_OK;
 }

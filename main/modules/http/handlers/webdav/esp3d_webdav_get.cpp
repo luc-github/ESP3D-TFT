@@ -24,15 +24,20 @@
 #include "filesystem/esp3d_globalfs.h"
 #include "http/esp3d_http_service.h"
 
-
 esp_err_t ESP3DHttpService::webdav_get_handler(httpd_req_t *req) {
   esp3d_log("Uri: %s", req->uri);
-  // TODO: implement method
-  // Check can access
-  // Check if file exist
+  // TODO: implement method GET
+  // extract path from uri
+  // clear payload from request if any
+  // Check can access (error code 503)
+  // Check if file exist(error code 404)
   // Check if file is a directory
-  // read file and send it
+  // if file send content-type and content-length header
+  // if directory, send 200 response and return
+  // read file and send it (error code 500 if any error)
   // close file
   // release access
+  // response code 200 if success
+
   return ESP_OK;
 }

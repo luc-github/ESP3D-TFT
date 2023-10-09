@@ -25,6 +25,12 @@
 
 esp_err_t ESP3DHttpService::webdav_delete_handler(httpd_req_t *req) {
   esp3d_log("Uri: %s", req->uri);
-  // TODO: implement method
+  // TODO: implement method DELETE
+  // extract path from uri
+  // clear payload from request if any
+  // Check can access (error code 503)
+  // check if path exists (error code 404 if not exists)
+  // release access
+  // response code 204 if success
   return ESP_OK;
 }

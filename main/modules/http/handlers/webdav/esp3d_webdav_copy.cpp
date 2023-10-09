@@ -25,6 +25,21 @@
 
 esp_err_t ESP3DHttpService::webdav_copy_handler(httpd_req_t *req) {
   esp3d_log("Uri: %s", req->uri);
-  // TODO: implement method
+  // TODO: implement method COPY
+  // extract full path from uri
+  // extract path from uri
+  // get destination fullpath from header Destination
+  // extract dest_path from fullpath destination
+  // get parameters from header Overwrite (F: T)= (false: true)
+  // clear payload from request if any
+  // Check can access (error code 503)
+  // check file size, if not enough space (error code 507)
+  // check if file exists and check Overwrite value
+  // if destination exists and Overwrite is false (error code 409)
+  // copy file to dest_path
+  //  close file
+  //  release access
+  //  response code 201 if success and new file
+  //  response code 204 if success and overwrite file
   return ESP_OK;
 }
