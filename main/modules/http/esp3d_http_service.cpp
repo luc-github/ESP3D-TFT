@@ -86,8 +86,10 @@ PostUploadContext ESP3DHttpService::_post_files_upload_ctx = {
                       size_t))(ESP3DHttpService::upload_to_flash_handler),
     .nextHandler =
         (esp_err_t(*)(httpd_req_t *))(ESP3DHttpService::files_handler),
-    .packetReadSize = 4 * 1024,   // This may need to be defined in tasks_def.h
-    .packetWriteSize = 4 * 1024,  // This may need to be defined in tasks_def.h
+    .packetReadSize =
+        4 * 1024,  // TODO:This may need to be defined in tasks_def.h
+    .packetWriteSize =
+        4 * 1024,  // TODO:This may need to be defined in tasks_def.h
     .status = ESP3DUploadStatus::not_started,
     .args = {}};
 #if ESP3D_SD_CARD_FEATURE
@@ -97,8 +99,10 @@ PostUploadContext ESP3DHttpService::_post_sdfiles_upload_ctx = {
                       size_t))(ESP3DHttpService::upload_to_sd_handler),
     .nextHandler =
         (esp_err_t(*)(httpd_req_t *))(ESP3DHttpService::sdfiles_handler),
-    .packetReadSize = 4 * 1024,   // This may need to be defined in tasks_def.h
-    .packetWriteSize = 4 * 1024,  // This may need to be defined in tasks_def.h
+    .packetReadSize =
+        4 * 1024,  // TODO:This may need to be defined in tasks_def.h
+    .packetWriteSize =
+        4 * 1024,  // TODO:This may need to be defined in tasks_def.h
     .status = ESP3DUploadStatus::not_started,
     .args = {}};
 #endif  // ESP3D_SD_CARD_FEATURE
@@ -109,8 +113,8 @@ PostUploadContext ESP3DHttpService::_post_updatefw_upload_ctx = {
                       size_t))(ESP3DHttpService::upload_to_updatefw_handler),
     .nextHandler =
         (esp_err_t(*)(httpd_req_t *))(ESP3DHttpService::updatefw_handler),
-    .packetReadSize = 1024,   // This may need to be defined in tasks_def.h
-    .packetWriteSize = 1024,  // This may need to be defined in tasks_def.h
+    .packetReadSize = 1024,   // TODO:This may need to be defined in tasks_def.h
+    .packetWriteSize = 1024,  // TODO:This may need to be defined in tasks_def.h
     .status = ESP3DUploadStatus::not_started,
     .args = {}};
 #endif  // ESP3D_UPDATE_FEATURE
@@ -119,8 +123,8 @@ PostUploadContext ESP3DHttpService::_post_login_ctx = {
     .writeFn = NULL,
     .nextHandler =
         (esp_err_t(*)(httpd_req_t *))(ESP3DHttpService::login_handler),
-    .packetReadSize = 512,  // This may need to be defined in tasks_def.h
-    .packetWriteSize = 0,   // This may need to be defined in tasks_def.h
+    .packetReadSize = 512,  // TODO:This may need to be defined in tasks_def.h
+    .packetWriteSize = 0,   // TODO:This may need to be defined in tasks_def.h
     .status = ESP3DUploadStatus::not_started,
     .args = {}};
 
