@@ -67,6 +67,8 @@
 // standard RFC 4918, per claude instant ia and copilot ia ^_^
 // This should also to avoid the need to parse the payload of the request
 // because we won't care about it
+// Because no lock/unlock the Server meet the DAV:1 specs and so no need to
+// support PROPPATCH neither
 
 esp_err_t httpd_resp_set_webdav_hdr(httpd_req_t *req) {
   esp_err_t err = ESP_OK;
