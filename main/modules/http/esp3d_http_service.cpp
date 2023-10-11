@@ -67,11 +67,11 @@ char chunk[CHUNK_BUFFER_SIZE];
 #else
 #define WEBSOCKET_DATA_HANDLER_CNT 0
 #endif  // ESP3D_WS_SERVICE_FEATURE
-#if ESP3D_WEBDAV_FEATURE
+#if ESP3D_WEBDAV_SERVICES_FEATURE
 #define WEBDAV_HANDLER_CNT 9
 #else
 #define WEBDAV_HANDLER_CNT 0
-#endif  // ESP3D_WEBDAV_FEATURE
+#endif  // ESP3D_WEBDAV_SERVICES_FEATURE
 #define FILE_NOT_FOUND_HANDLER_CNT 1
 
 ESP3DHttpService esp3dHttpService;
@@ -439,7 +439,7 @@ bool ESP3DHttpService::begin() {
     }
 #endif  // ESP3D_WS_SERVICE_FEATURE
 
-#if ESP3D_WEBDAV_FEATURE
+#if ESP3D_WEBDAV_SERVICES_FEATURE
     // GET
     const httpd_uri_t webdav_get_handler_config = {
         .uri = "/" ESP3D_WEBDAV_ROOT "/*",
@@ -575,7 +575,7 @@ bool ESP3DHttpService::begin() {
         httpd_register_uri_handler(_server, &webdav_head_handler_config)) {
       esp3d_log_e("webdav head handler registration failed");
     }
-#endif  // ESP3D_WEBDAV_FEATURE
+#endif  // ESP3D_WEBDAV_SERVICES_FEATURE
 
     // File not found
     httpd_register_err_handler(
@@ -632,9 +632,9 @@ void ESP3DHttpService::end() {
     httpd_unregister_uri(_server, "/sdfiles");
 #endif  // ESP3D_SD_CARD_FEATURE
     httpd_unregister_uri(_server, "/login");
-#if ESP3D_WEBDAV_FEATURE
+#if ESP3D_WEBDAV_SERVICES_FEATURE
     httpd_unregister_uri(_server, "/" ESP3D_WEBDAV_ROOT "/*");
-#endif  // ESP3D_WEBDAV_FEATURE
+#endif  // ESP3D_WEBDAV_SERVICES_FEATURE
     httpd_register_err_handler(_server, HTTPD_404_NOT_FOUND, NULL);
     httpd_stop(_server);
   }

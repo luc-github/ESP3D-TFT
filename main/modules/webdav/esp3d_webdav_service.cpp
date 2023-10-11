@@ -27,7 +27,8 @@
 //   especially big gcodes files and getlastmodified is supposed to be a backup
 //   check if not etag, and etag is not not mandatory
 // * no lock support because we are in mono user mode, and it is not mandatory
-// * always answer depth=1 what ever the request is, it make no sense to go
+// * answer depth=0
+// * answer depth=1 if the request is 1~infinity, it make no sense to go
 // deeper on esp32
 // * put strict minmum properties in propfind whatt ever the request is
 //   resourcetype, getcontenttype, getcontentlength (mandatories), and
@@ -64,7 +65,7 @@
 //<D:depth>1</D:depth>
 
 // In theory there is  need to do more and it is still compliant with the
-// standard RFC 4918, per claude instant ia and copilot ia ^_^
+// standard RFC 4918, per claude instant ia and co-pilot ia ^_^
 // This should also to avoid the need to parse the payload of the request
 // because we won't care about it
 // Because no lock/unlock the Server meet the DAV:1 specs and so no need to

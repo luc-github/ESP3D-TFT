@@ -49,7 +49,7 @@ OPTION(TARGET_FW_GRBL "GRBL firmware" OFF)
 # #######################################
 OPTION(ESP3D_AUTHENTICATION "Authentication on all clients" OFF)
 OPTION(DISABLE_SERIAL_AUTHENTICATION "Disable Serial Authentication" ON)
-OPTION(TIMESTAMP_ON_FILES "Time on file" OFF)
+OPTION(TIMESTAMP_ON_FILES "Time on file" ON)
 OPTION(SSDP_SERVICE "SSDP service" ON)
 OPTION(MDNS_SERVICE "MDNS service" ON)
 OPTION(WIFI_SERVICE "WiFi service" ON)
@@ -214,7 +214,7 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 # Debug = 2
 # Error only = 1
 # Disabled = 0
-add_compile_options(-DESP3D_TFT_LOG=0)
+add_compile_options(-DESP3D_TFT_LOG=2)
 # Disable ANSI color to fit some serial terminals 
 add_compile_options(-DDISABLE_COLOR_LOG=0)
 
@@ -252,8 +252,8 @@ if(WIFI_SERVICE)
         if(WS_SERVICE)
             add_compile_options(-DESP3D_WS_SERVICE_FEATURE=1)
         endif()
-        if(WEBDAV_SERVICE)
-            add_compile_options(-DESP3D_WEBDAV_SERVICE_FEATURE=1)
+        if(WEBDAV_SERVICES)
+            add_compile_options(-DESP3D_WEBDAV_SERVICES_FEATURE=1)
         endif()
     endif()
 

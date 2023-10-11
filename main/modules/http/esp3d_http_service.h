@@ -28,9 +28,9 @@
 #include "authentication/esp3d_authentication_types.h"
 #include "esp3d_client.h"
 #include "esp3d_string.h"
-#if ESP3D_WEBDAV_FEATURE
+#if ESP3D_WEBDAV_SERVICES_FEATURE
 #include "webdav/esp3d_webdav_service.h"
-#endif  // ESP3D_WEBDAV_FEATURE
+#endif  // ESP3D_WEBDAV_SERVICES_FEATURE
 
 #ifdef __cplusplus
 extern "C" {
@@ -129,7 +129,7 @@ class ESP3DHttpService final {
 #if ESP3D_WS_SERVICE_FEATURE
   static esp_err_t websocket_data_handler(httpd_req_t *req);
 #endif  // ESP3D_WS_SERVICE_FEATURE
-#if ESP3D_WEBDAV_FEATURE
+#if ESP3D_WEBDAV_SERVICES_FEATURE
   static esp_err_t webdav_get_handler(httpd_req_t *req);
   static esp_err_t webdav_copy_handler(httpd_req_t *req);
   static esp_err_t webdav_move_handler(httpd_req_t *req);
@@ -142,7 +142,7 @@ class ESP3DHttpService final {
 
   static esp_err_t webdav_send_response(httpd_req_t *req, int code,
                                         const char *msg);
-#endif  // ESP3D_WEBDAV_FEATURE
+#endif  // ESP3D_WEBDAV_SERVICES_FEATURE
 
   static esp_err_t post_multipart_handler(httpd_req_t *req);
   static esp_err_t upload_to_flash_handler(const uint8_t *data, size_t datasize,

@@ -31,6 +31,7 @@ esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t *req) {
   // Check can access (error code 503)
   // check if file exists (no error unless it is file and there is already a
   // directory with the same name)
+  // get header Overwrite (F: T)= (false: true)
   // check size of file (error code 507)
   // open file for writing (error code 500)
   // close file

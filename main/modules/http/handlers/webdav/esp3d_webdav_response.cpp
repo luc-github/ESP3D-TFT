@@ -56,6 +56,7 @@ esp_err_t ESP3DHttpService::webdav_send_response(httpd_req_t *req, int code,
       break;
     case 405:
       status += "Method Not Allowed";
+      break;
     case 406:
       status += "Not Acceptable";
       break;
@@ -91,5 +92,6 @@ esp_err_t ESP3DHttpService::webdav_send_response(httpd_req_t *req, int code,
       break;
   }
   esp3d_log("Uri: %s, status: %s", req->uri, status.c_str());
-  return httpd_resp_send_err(req, code, msg);
+  httpd_resp_set_status(req, status.c_str());
+  return httpd_resp_send(req, msg, HTTPD_RESP_USE_STRLEN);
 }

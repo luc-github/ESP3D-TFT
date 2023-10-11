@@ -29,9 +29,10 @@ esp_err_t ESP3DHttpService::webdav_copy_handler(httpd_req_t *req) {
   // extract full path from uri
   // extract path from uri
   // get destination fullpath from header Destination
-  // extract dest_path from fullpath destination
-  // get parameters from header Overwrite (F: T)= (false: true)
-  // clear payload from request if any
+  // get depth copy from header depth (0,1, infinity), if not header - only
+  // depth=0
+  // extract dest_path from fullpath destination get parameters from get
+  // header Overwrite (F: T)= (false: true) clear payload from request if any
   // Check can access (error code 503)
   // check file size, if not enough space (error code 507)
   // check if file exists and check Overwrite value
