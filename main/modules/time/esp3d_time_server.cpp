@@ -23,6 +23,7 @@
 
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
+#include "esp3d_values.h"
 #include "esp_netif_types.h"
 #include "esp_sntp.h"
 #include "network/esp3d_network.h"
@@ -47,12 +48,14 @@ bool TimeServer::isInternetTime(bool readfromsettings) {
   return _is_internet_time;
 }
 
+const char* TimeServer::getTimeZone() { return _time_zone.c_str(); }
+
 bool TimeServer::begin() {
   bool res = true;
   char out_str[SIZE_OF_SERVER_URL + 1] = {0};
   end();
   // check time zone because it is independent of internet time
-  updateTimezone(true);
+  updateTimeZone(true);
 
   // Check if internet time is enabled
   // if not we do nothing and return true
@@ -127,7 +130,7 @@ bool TimeServer::begin() {
   }
 
   // apply timezone
-  updateTimezone();
+  updateTimeZone();
 
 #if ESP3D_TFT_LOG
   time_t now;
@@ -140,11 +143,11 @@ bool TimeServer::begin() {
   esp3d_log_d("Current time is %s", asctime(&timeinfo));
 #endif  // ESP3D_TFT_LOG
 
-  /*
-  // Set timezone to China Standard Time
-      setenv("TZ", "CST-8", 1);
-      tzset();
-  */
+  std::string text = getCurrentTime();
+  text += "  (" + _time_zone;
+  text += ")";
+  esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
+                                  text.c_str());
   if (!res) {
     end();
   }
@@ -152,7 +155,7 @@ bool TimeServer::begin() {
   return _started;
 }
 
-bool TimeServer::updateTimezone(bool fromsettings) {
+bool TimeServer::updateTimeZone(bool fromsettings) {
   char out_str[SIZE_OF_TIMEZONE + 1] = {0};
   _time_zone = esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_timezone,
                                            out_str, SIZE_OF_TIMEZONE);
@@ -175,20 +178,15 @@ bool TimeServer::updateTimezone(bool fromsettings) {
   return true;
 }
 
-const char* TimeServer::current_time(time_t t) {
+const char* TimeServer::getCurrentTime() {
   static std::string stmp;
   struct tm tmstruct;
   time_t now;
   stmp = "";
   // get current time
-  if (t == 0) {
-    esp3d_log_d("No time provided");
-    time(&now);
-    localtime_r(&now, &tmstruct);
-  } else {
-    esp3d_log_d("Got time initialization");
-    localtime_r(&t, &tmstruct);
-  }
+  esp3d_log_d("No time provided");
+  time(&now);
+  localtime_r(&now, &tmstruct);
   stmp = std::to_string((tmstruct.tm_year) + 1900) + "-";
   if (((tmstruct.tm_mon) + 1) < 10) {
     stmp += "0";
@@ -210,8 +208,6 @@ const char* TimeServer::current_time(time_t t) {
     stmp += "0";
   }
   stmp += std::to_string(tmstruct.tm_sec);
-  stmp += "  (" + _time_zone;
-  stmp += ")";
   esp3d_log_d("Current time is %s", stmp.c_str());
   return stmp.c_str();
 }

@@ -599,8 +599,11 @@ void ESP3DCommands::ESP420(int cmd_params_pos, ESP3DMessage *msg) {
 
 #if ESP3D_TIMESTAMP_FEATURE
   // Time
-  if (!dispatchIdValue(json, "time", esp3dTimeService.current_time(), target,
-                       requestId)) {
+  tmpstr = esp3dTimeService.getCurrentTime();
+  tmpstr += "  (";
+  tmpstr += esp3dTimeService.getTimeZone();
+  tmpstr += ")";
+  if (!dispatchIdValue(json, "time", tmpstr.c_str(), target, requestId)) {
     return;
   }
 #endif  // ESP3D_TIMESTAMP_FEATURE
