@@ -49,7 +49,7 @@ OPTION(TARGET_FW_GRBL "GRBL firmware" OFF)
 # #######################################
 OPTION(ESP3D_AUTHENTICATION "Authentication on all clients" OFF)
 OPTION(DISABLE_SERIAL_AUTHENTICATION "Disable Serial Authentication" ON)
-OPTION(TIMESTAMP_ON_FILES "Time on file" ON)
+OPTION(TIME_SERVICE  "Time service" ON)
 OPTION(SSDP_SERVICE "SSDP service" ON)
 OPTION(MDNS_SERVICE "MDNS service" ON)
 OPTION(WIFI_SERVICE "WiFi service" ON)
@@ -232,7 +232,7 @@ if(DISABLE_SERIAL_AUTHENTICATION)
     add_compile_options(-DESP3D_DISABLE_SERIAL_AUTHENTICATION_FEATURE=1)
 endif()
 
-if(TIMESTAMP_ON_FILES)
+if(TIME_SERVICE)
     add_compile_options(-DESP3D_TIMESTAMP_FEATURE=1)
 endif()
 

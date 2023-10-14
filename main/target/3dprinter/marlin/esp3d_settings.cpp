@@ -244,7 +244,7 @@ bool ESP3DSettings::isValidStringSetting(const char* value,
   switch (settingElement) {
 #if ESP3D_TIMESTAMP_FEATURE
     case ESP3DSettingIndex::esp3d_timezone:
-      if (len != settingPtr->size) {
+      if (len != settingPtr->size - 1) {
         return false;
       }
       for (uint8_t i = 0; i < SupportedTimeZonesSize; i++) {

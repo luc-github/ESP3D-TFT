@@ -32,6 +32,9 @@
 #include "gcode_host/esp3d_tft_stream.h"
 #include "notifications/esp3d_notifications_service.h"
 #include "translations/esp3d_translation_service.h"
+#if ESP3D_TIMESTAMP_FEATURE
+#include "time/esp3d_time_server.h"
+#endif  // ESP3D_TIMESTAMP_FEATURE
 
 #define COMMAND_ID 401
 
@@ -197,6 +200,17 @@ void ESP3DCommands::ESP401(int cmd_params_pos, ESP3DMessage* msg) {
         case ESP3DSettingIndex::esp3d_ui_language:
           esp3dTranslationService.begin();
           break;
+#if ESP3D_TIMESTAMP_FEATURE
+        case ESP3DSettingIndex::esp3d_timezone:
+          esp3dTimeService.updateTimeZone(true);
+          break;
+        case ESP3DSettingIndex::esp3d_use_internet_time:
+        case ESP3DSettingIndex::esp3d_time_server1:
+        case ESP3DSettingIndex::esp3d_time_server2:
+        case ESP3DSettingIndex::esp3d_time_server3:
+          esp3dTimeService.begin();
+          break;
+#endif  // ESP3D_TIMESTAMP_FEATURE
 #if ESP3D_SD_CARD_FEATURE
 #if ESP3D_SD_IS_SPI
         case ESP3DSettingIndex::esp3d_spi_divider:

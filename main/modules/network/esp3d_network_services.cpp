@@ -29,7 +29,6 @@
 #include "esp_wifi.h"
 #include "http/esp3d_http_service.h"
 
-
 #if ESP3D_NOTIFICATIONS_FEATURE
 #include "notifications/esp3d_notifications_service.h"
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
@@ -42,6 +41,10 @@
 #if ESP3D_TELNET_FEATURE
 #include "socket_server/esp3d_socket_server.h"
 #endif  // ESP3D_TELNET_FEATURE
+#if ESP3D_TIMESTAMP_FEATURE
+#include "time/esp3d_time_server.h"
+#endif  // ESP3D_TIMESTAMP_FEATURE
+
 #include "authentication/esp3d_authentication.h"
 
 ESP3DNetworkServices esp3dNetworkServices;
@@ -54,6 +57,10 @@ bool ESP3DNetworkServices::begin() {
   esp3dTftValues.set_string_value(ESP3DValuesIndex::network_status, "+");
   esp3d_log("Starting Services");
   _started = esp3dAuthenthicationService.begin();
+#if ESP3D_TIMESTAMP_FEATURE
+  _started = _started && esp3dTimeService.begin();
+#endif  // ESP3D_TIMESTAMP_FEATURE
+
 #if ESP3D_HTTP_FEATURE
   _started = _started && esp3dHttpService.begin();
 #endif  // ESP3D_HTTP_FEATURE
@@ -98,6 +105,9 @@ void ESP3DNetworkServices::end() {
 #if ESP3D_NOTIFICATIONS_FEATURE
   esp3dNotificationsService.end();
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
+#if ESP3D_TIMESTAMP_FEATURE
+  esp3dTimeService.end();
+#endif  // ESP3D_TIMESTAMP_FEATURE
 
   _started = false;
 }

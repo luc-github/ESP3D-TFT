@@ -13,6 +13,10 @@ set(SOURCES .
     modules/gcode_host
 )
 
+if(TIME_SERVICE)
+    list(APPEND SOURCES "modules/time")
+endif()
+
 if(WIFI_SERVICE)
     if(SSDP_SERVICE)
         list(APPEND SOURCES "modules/ssdp")

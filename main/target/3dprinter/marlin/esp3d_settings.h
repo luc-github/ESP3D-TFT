@@ -32,7 +32,7 @@ const uint32_t SupportedBaudList[] = {9600,   19200,  38400,  57600,  74880,
 extern const uint8_t SupportedTimeZonesSize;
 extern const char* SupportedTimeZones[];
 #define SIZE_OF_SERVER_URL 128
-#define SIZE_OF_TIMEZONE 6
+#define SIZE_OF_TIMEZONE 7
 #endif  // ESP3D_TIMESTAMP_FEATURE
 
 #define SIZE_OF_SCRIPT 255
