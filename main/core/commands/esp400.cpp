@@ -446,7 +446,45 @@ void ESP3DCommands::ESP400(int cmd_params_pos, ESP3DMessage* msg) {
   }
 #endif  // ESP3D_UPDATE_FEATURE
 #endif  // ESP3D_SD_CARD_FEATURE
+#if ESP3D_TIMESTAMP_FEATURE
+  // Use internet time
+  if (!dispatchSetting(json, "service/time",
+                       ESP3DSettingIndex::esp3d_use_internet_time, "i-time",
+                       YesNoValues, YesNoLabels,
+                       sizeof(YesNoValues) / sizeof(char*), -1, -1, -1, nullptr,
+                       false, target, requestId)) {
+    esp3d_log_e("Error sending response to clients");
+  }
+  // Timezone
+  if (!dispatchSetting(json, "service/time", ESP3DSettingIndex::esp3d_timezone,
+                       "tzone", SupportedTimeZones, SupportedTimeZones,
+                       SupportedTimeZonesSize, -1, -1, -1, nullptr, false,
+                       target, requestId)) {
+    esp3d_log_e("Error sending response to clients");
+  }
 
+  // Time server 1
+  if (!dispatchSetting(json, "service/time",
+                       ESP3DSettingIndex::esp3d_time_server1, "t-server",
+                       nullptr, nullptr, SIZE_OF_SERVER_URL, 0, 0, -1, nullptr,
+                       false, target, requestId)) {
+    esp3d_log_e("Error sending response to clients");
+  }
+  // Time server 2
+  if (!dispatchSetting(json, "service/time",
+                       ESP3DSettingIndex::esp3d_time_server2, "t-server",
+                       nullptr, nullptr, SIZE_OF_SERVER_URL, 0, 0, -1, nullptr,
+                       false, target, requestId)) {
+    esp3d_log_e("Error sending response to clients");
+  }
+  // Time server 3
+  if (!dispatchSetting(json, "service/time",
+                       ESP3DSettingIndex::esp3d_time_server3, "t-server",
+                       nullptr, nullptr, SIZE_OF_SERVER_URL, 0, 0, -1, nullptr,
+                       false, target, requestId)) {
+    esp3d_log_e("Error sending response to clients");
+  }
+#endif  // ESP3D_TIMESTAMP_FEATURE
   if (json) {
     if (!dispatch("]}", target, requestId, ESP3DMessageType::tail)) {
       esp3d_log_e("Error sending response to clients");

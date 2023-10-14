@@ -28,7 +28,14 @@ extern "C" {
 
 const uint32_t SupportedBaudList[] = {9600,   19200,  38400,  57600,  74880,
                                       115200, 230400, 250000, 500000, 921600};
+#if ESP3D_TIMESTAMP_FEATURE
+extern const uint8_t SupportedTimeZonesSize;
+extern const char* SupportedTimeZones[];
+#define SIZE_OF_SERVER_URL 128
+#define SIZE_OF_TIMEZONE 6
+#endif  // ESP3D_TIMESTAMP_FEATURE
 
+#define SIZE_OF_SCRIPT 255
 #define SIZE_OF_SETTING_VERSION 25
 #define SIZE_OF_SETTING_SSID_ID 32
 #define SIZE_OF_SETTING_SSID_PWD 64
@@ -38,7 +45,6 @@ const uint32_t SupportedBaudList[] = {9600,   19200,  38400,  57600,  74880,
 #define SIZE_OF_SETTING_NOFIFICATION_T1 64
 #define SIZE_OF_SETTING_NOFIFICATION_T2 64
 #define SIZE_OF_SETTING_NOFIFICATION_TS 128
-#define SIZE_OF_SCRIPT 255
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 #define SIZE_OF_LOCAL_PASSWORD 20
 #define HIDDEN_SETTING_VALUE "********"
@@ -94,6 +100,11 @@ enum class ESP3DSettingIndex : uint16_t {
   esp3d_pause_script,
   esp3d_stop_script,
   esp3d_resume_script,
+  esp3d_use_internet_time,
+  esp3d_time_server1,
+  esp3d_time_server2,
+  esp3d_time_server3,
+  esp3d_timezone,
   unknown_index
 };
 
