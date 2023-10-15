@@ -1,5 +1,5 @@
 /*
-  esp3d_time_server
+  esp3d_time_service
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
   This code is free software; you can redistribute it and/or
@@ -17,7 +17,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "esp3d_time_server.h"
+#include "esp3d_time_service.h"
 
 #include <stdio.h>
 
@@ -28,17 +28,17 @@
 #include "esp_sntp.h"
 #include "network/esp3d_network.h"
 
-TimeServer esp3dTimeService;
+TimeService esp3dTimeService;
 
-TimeServer::TimeServer() {
+TimeService::TimeService() {
   _started = false;
   _is_internet_time = false;
   _time_zone = "+00:00";
   _server_count = 0;
 }
-TimeServer::~TimeServer() { end(); }
+TimeService::~TimeService() { end(); }
 
-bool TimeServer::isInternetTime(bool readfromsettings) {
+bool TimeService::isInternetTime(bool readfromsettings) {
   if (readfromsettings) {
     _is_internet_time =
         esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_use_internet_time);
@@ -48,9 +48,9 @@ bool TimeServer::isInternetTime(bool readfromsettings) {
   return _is_internet_time;
 }
 
-const char* TimeServer::getTimeZone() { return _time_zone.c_str(); }
+const char* TimeService::getTimeZone() { return _time_zone.c_str(); }
 
-bool TimeServer::setTimeZone(const char* stime) {
+bool TimeService::setTimeZone(const char* stime) {
   if (esp3dTftsettings.isValidStringSetting(
           stime, ESP3DSettingIndex::esp3d_timezone)) {
     _time_zone = stime;
@@ -60,7 +60,7 @@ bool TimeServer::setTimeZone(const char* stime) {
   return false;
 }
 
-bool TimeServer::begin() {
+bool TimeService::begin() {
   bool res = true;
   char out_str[SIZE_OF_SERVER_URL + 1] = {0};
   end();
@@ -165,7 +165,7 @@ bool TimeServer::begin() {
   return _started;
 }
 
-bool TimeServer::updateTimeZone(bool fromsettings) {
+bool TimeService::updateTimeZone(bool fromsettings) {
   char out_str[SIZE_OF_TIMEZONE + 1] = {0};
   _time_zone = esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_timezone,
                                            out_str, SIZE_OF_TIMEZONE);
@@ -188,7 +188,7 @@ bool TimeServer::updateTimeZone(bool fromsettings) {
   return true;
 }
 
-const char* TimeServer::getCurrentTime() {
+const char* TimeService::getCurrentTime() {
   static std::string stmp;
   struct tm tmstruct;
   time_t now;
@@ -224,42 +224,40 @@ const char* TimeServer::getCurrentTime() {
 
 // the string date time  need to be iso-8601
 // the time zone part will be ignored
-bool TimeServer::setTime(const char* stime) {
-  /*
-esp3d_log_d("Set time to %s", stime);
-String stmp = stime;
-struct tm tmstruct;
-struct timeval time_val = {0, 0};
-memset(&tmstruct, 0, sizeof(struct tm));
-if (strptime(stime, "%Y-%m-%dT%H:%M:%S", &tmstruct) == nullptr) {
-  esp3d_log_d("Invalid time format, try without seconds");
-  // allow not to set seconds for lazy guys typing command line
-  if (strptime(stime, "%Y-%m-%dT%H:%M", &tmstruct) == nullptr) {
-    esp3d_log_d("Invalid time format");
+bool TimeService::setTime(const char* stime) {
+  esp3d_log_d("Set time to %s", stime);
+  std::string stmp = stime;
+  struct tm tmstruct;
+  struct timeval time_val = {0, 0};
+  memset(&tmstruct, 0, sizeof(struct tm));
+  if (strptime(stime, "%Y-%m-%dT%H:%M:%S", &tmstruct) == nullptr) {
+    esp3d_log_d("Invalid time format, try without seconds");
+    // allow not to set seconds for lazy guys typing command line
+    if (strptime(stime, "%Y-%m-%dT%H:%M", &tmstruct) == nullptr) {
+      esp3d_log_d("Invalid time format");
+      return false;
+    }
+  }
+  char buf[20];
+  strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &tmstruct);
+  esp3d_log_d("Time string is %s", buf);
+  time_val.tv_usec = 0;
+  time_val.tv_sec = mktime(&tmstruct);
+
+  // need to set timezone also
+  int offset = _get_time_zone_offset_min();
+  struct timezone tz = {offset, 0};
+  // now set time to system
+  if (settimeofday(&time_val, &tz) == -1) {
     return false;
   }
-}
-char buf[80];
-strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &tmstruct);
-esp3d_log_d("Time string is %s", buf);
-time_val.tv_usec = 0;
-time_val.tv_sec = mktime(&tmstruct);
-// try to setTime
-
-//need to set timezone also
-//struct timezone {
-//             int tz_minuteswest;
-//             int tz_dsttime;
-//};
-  if (settimeofday(&time_val, 0) == -1) { return false; }
-*/
   return true;
 };
 
-bool TimeServer::started() { return _started; }
+bool TimeService::started() { return _started; }
 
 // currently not used
-void TimeServer::end() {
+void TimeService::end() {
   _started = false;
   _is_internet_time = false;
   _time_zone = "+00:00";
@@ -270,8 +268,20 @@ void TimeServer::end() {
   esp_sntp_stop();
 }
 
+int TimeService::_get_time_zone_offset_min() {
+  int offset = 0;
+  int hour = atoi(_time_zone.substr(1, 2).c_str());
+  int min = atoi(_time_zone.substr(4, 2).c_str());
+  offset = hour * 60 + min;
+  // result is in minutes west of GMT
+  if (_time_zone[0] == '+' && offset > 0) {
+    offset = -offset;
+  }
+  return offset;
+}
+
 // currently not used
-void TimeServer::handle() {
+void TimeService::handle() {
   if (_started) {
   }
 }

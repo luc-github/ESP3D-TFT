@@ -68,7 +68,7 @@
 #include "usb_serial/esp3d_usb_serial_client.h"
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
 #if ESP3D_TIMESTAMP_FEATURE
-#include "time/esp3d_time_server.h"
+#include "time/esp3d_time_service.h"
 #endif  // ESP3D_TIMESTAMP_FEATURE
 
 #define COMMAND_ID 420

@@ -1,5 +1,5 @@
 /*
-  esp3d_time_server.h -  time server functions class
+  esp3d_time_service.h -  time server functions class
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -28,10 +28,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-class TimeServer final {
+class TimeService final {
  public:
-  TimeServer();
-  ~TimeServer();
+  TimeService();
+  ~TimeService();
   bool begin();
   void end();
   void handle();
@@ -44,6 +44,7 @@ class TimeServer final {
   bool isInternetTime(bool readfromsettings = false);
 
  private:
+  int _get_time_zone_offset_min();
   bool _started;
   bool _is_internet_time;
   std::string _time_zone;
@@ -51,7 +52,7 @@ class TimeServer final {
   uint8_t _server_count;
 };
 
-extern TimeServer esp3dTimeService;
+extern TimeService esp3dTimeService;
 #ifdef __cplusplus
 }  // extern "C"
 #endif

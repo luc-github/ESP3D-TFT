@@ -33,7 +33,7 @@
 #include "notifications/esp3d_notifications_service.h"
 #include "translations/esp3d_translation_service.h"
 #if ESP3D_TIMESTAMP_FEATURE
-#include "time/esp3d_time_server.h"
+#include "time/esp3d_time_service.h"
 #endif  // ESP3D_TIMESTAMP_FEATURE
 
 #define COMMAND_ID 401

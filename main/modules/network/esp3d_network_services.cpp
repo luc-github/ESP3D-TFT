@@ -42,7 +42,7 @@
 #include "socket_server/esp3d_socket_server.h"
 #endif  // ESP3D_TELNET_FEATURE
 #if ESP3D_TIMESTAMP_FEATURE
-#include "time/esp3d_time_server.h"
+#include "time/esp3d_time_service.h"
 #endif  // ESP3D_TIMESTAMP_FEATURE
 
 #include "authentication/esp3d_authentication.h"
