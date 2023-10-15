@@ -59,6 +59,10 @@ const char* help[] = {
     "[ESP130](State) - display/set Telnet state which can be ON, OFF, CLOSE",
     "[ESP131](Port) - display/set Telnet port ",
 #endif  // ESP3D_TELNET_FEATURE
+#if ESP3D_TIMESTAMP_FEATURE
+    "[ESP140](sync) (srv(x)=XXXXX) (tzone=+/-HH:mm)(time=YYYY-MM-DDTHH:mm:ss) "
+    "(now) - display/set current time",
+#endif  // ESP3D_TIMESTAMP_FEATURE
 #if ESP3D_HTTP_FEATURE
 #if ESP3D_WS_SERVICE_FEATURE
     "[ESP160](State) - display/set WebSocket state which can be ON, OFF, CLOSE",
@@ -144,6 +148,9 @@ const uint cmdlist[] = {
 #if ESP3D_TELNET_FEATURE
     130, 131,
 #endif  // ESP3D_TELNET_FEATURE
+#if ESP3D_TIMESTAMP_FEATURE
+    140,
+#endif  // ESP3D_TIMESTAMP_FEATURE
 #if ESP3D_HTTP_FEATURE
 #if ESP3D_WS_SERVICE_FEATURE
     160,
