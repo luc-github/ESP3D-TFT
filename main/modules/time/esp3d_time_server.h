@@ -39,6 +39,7 @@ class TimeServer final {
   const char* getTimeZone();
   bool updateTimeZone(bool fromsettings = false);
   bool setTime(const char* stime);
+  bool setTimeZone(const char* stime);
   bool started();
   bool isInternetTime(bool readfromsettings = false);
 

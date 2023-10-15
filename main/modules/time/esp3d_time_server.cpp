@@ -50,6 +50,16 @@ bool TimeServer::isInternetTime(bool readfromsettings) {
 
 const char* TimeServer::getTimeZone() { return _time_zone.c_str(); }
 
+bool TimeServer::setTimeZone(const char* stime) {
+  if (esp3dTftsettings.isValidStringSetting(
+          stime, ESP3DSettingIndex::esp3d_timezone)) {
+    _time_zone = stime;
+    return esp3dTftsettings.writeString(ESP3DSettingIndex::esp3d_timezone,
+                                        _time_zone.c_str());
+  }
+  return false;
+}
+
 bool TimeServer::begin() {
   bool res = true;
   char out_str[SIZE_OF_SERVER_URL + 1] = {0};
