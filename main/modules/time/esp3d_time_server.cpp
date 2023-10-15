@@ -245,15 +245,16 @@ esp3d_log_d("Time string is %s", buf);
 time_val.tv_usec = 0;
 time_val.tv_sec = mktime(&tmstruct);
 // try to setTime
-/*
-need to set timezone also
-struct timezone {
-             int tz_minuteswest; /* minutes à l'ouest de Greenwich  */
-  int tz_dsttime; /* type de changement horaire      */
+
+//need to set timezone also
+//struct timezone {
+//             int tz_minuteswest;
+//             int tz_dsttime;
+//};
+  if (settimeofday(&time_val, 0) == -1) { return false; }
+*/
+  return true;
 };
-* / if (settimeofday(&time_val, 0) == -1) { return false; }
-*/ return true;
-}
 
 bool TimeServer::started() { return _started; }
 
