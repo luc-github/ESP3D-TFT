@@ -252,7 +252,7 @@ struct timezone {
   int tz_dsttime; /* type de changement horaire      */
 };
 * / if (settimeofday(&time_val, 0) == -1) { return false; }
-* / return true;
+*/ return true;
 }
 
 bool TimeServer::started() { return _started; }
