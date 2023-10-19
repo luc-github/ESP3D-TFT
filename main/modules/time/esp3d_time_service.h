@@ -46,6 +46,7 @@ class TimeService final {
  private:
   int _get_time_zone_offset_min();
   bool _started;
+  uint64_t _dispatch_time;
   bool _is_internet_time;
   std::string _time_zone;
   std::string _server_url[CONFIG_LWIP_SNTP_MAX_SERVERS];

@@ -254,6 +254,7 @@ void ESP3DNetwork::handle() {
     _async_radio_mode = ESP3DRadioMode::none;
     setMode(mode);
   }
+  esp3dNetworkServices.handle();
 #endif  // ESP3D_WIFI_FEATURE
 }
 

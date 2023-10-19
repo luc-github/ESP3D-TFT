@@ -61,6 +61,7 @@ const char* help[] = {
 #endif  // ESP3D_TELNET_FEATURE
 #if ESP3D_TIMESTAMP_FEATURE
     "[ESP140](sync) (srv(x)=XXXXX) (tzone=+/-HH:mm)(time=YYYY-MM-DDTHH:mm:ss) "
+    "(ntp=yes/no) "
     "(now) - display/set current time",
 #endif  // ESP3D_TIMESTAMP_FEATURE
 #if ESP3D_HTTP_FEATURE

@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 
+#include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
 #include "esp3d_values.h"
@@ -29,12 +30,15 @@
 #include "network/esp3d_network.h"
 
 TimeService esp3dTimeService;
+#define TIMEOUT_NTP_REQUEST 180000  // 3 minutes max to get time
+#define TIMEOUT_NTP_REFRESH 5000    // 5 seconds refresh time
 
 TimeService::TimeService() {
   _started = false;
   _is_internet_time = false;
   _time_zone = "+00:00";
   _server_count = 0;
+  _dispatch_time = 0;
 }
 TimeService::~TimeService() { end(); }
 
@@ -42,8 +46,8 @@ bool TimeService::isInternetTime(bool readfromsettings) {
   if (readfromsettings) {
     _is_internet_time =
         esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_use_internet_time);
-    esp3d_log_d("Internet time is %s",
-                _is_internet_time ? "enabled" : "disabled");
+    esp3d_log("Internet time is %s",
+              _is_internet_time ? "enabled" : "disabled");
   }
   return _is_internet_time;
 }
@@ -76,19 +80,19 @@ bool TimeService::begin() {
   ESP3DRadioMode current_radio_mode = esp3dNetwork.getMode();
   // No network   = no internet time
   if (current_radio_mode == ESP3DRadioMode::off) {
-    esp3d_log_d("No Internet time in OFF mode");
+    esp3d_log("No Internet time in OFF mode");
     return false;
   }
   // AP mode does not have internet = no internet time
   if (current_radio_mode == ESP3DRadioMode::wifi_ap ||
       current_radio_mode == ESP3DRadioMode::wifi_ap_config ||
       current_radio_mode == ESP3DRadioMode::wifi_ap_limited) {
-    esp3d_log_d("No Internet time in AP mode");
+    esp3d_log("No Internet time in AP mode");
     return false;
   }
   // BT mode does not have internet = no internet time
   if (current_radio_mode == ESP3DRadioMode::bluetooth_serial) {
-    esp3d_log_d("No Internet time in bt mode");
+    esp3d_log("No Internet time in bt mode");
     return false;
   }
 
@@ -120,44 +124,27 @@ bool TimeService::begin() {
   }
 
   if (_server_count == 0) {
-    esp3d_log_d("No time server defined");
+    esp3d_log("No time server defined");
     return false;
   }
+  sntp_set_sync_mode(SNTP_SYNC_MODE_IMMED);
 
   esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
   for (int i = 0; i < _server_count; i++) {
     esp_sntp_setservername(i, _server_url[i].c_str());
-    esp3d_log_d("Time server %d is %s", i, _server_url[i].c_str());
+    esp3d_log("Time server %d is %s", i, _server_url[i].c_str());
   }
 
   esp_sntp_init();
-  uint8_t retry = 0;
-  // Wait for time to be set
-  while (sntp_get_sync_status() == SNTP_SYNC_STATUS_RESET && retry < 20) {
-    vTaskDelay(500 / portTICK_PERIOD_MS);
-    esp3d_log_d("Wait for synchronization");
-    retry++;
-  }
-
   // apply timezone
   updateTimeZone();
-
-#if ESP3D_TFT_LOG
-  time_t now;
-  struct tm timeinfo;
-  // get current time
-  time(&now);
-
-  // get local time
-  localtime_r(&now, &timeinfo);
-  esp3d_log_d("Current time is %s", asctime(&timeinfo));
-#endif  // ESP3D_TFT_LOG
-
-  std::string text = getCurrentTime();
-  text += "  (" + _time_zone;
-  text += ")";
-  esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
-                                  text.c_str());
+  if (_is_internet_time) {
+    // Dispatch time async because get server time is not immediate
+    _dispatch_time = esp3d_hal::millis();
+  } else {
+    _dispatch_time = 0;
+    esp3d_log("Internet time is disabled");
+  }
   if (!res) {
     end();
   }
@@ -171,7 +158,7 @@ bool TimeService::updateTimeZone(bool fromsettings) {
                                            out_str, SIZE_OF_TIMEZONE);
   if (!esp3dTftsettings.isValidStringSetting(
           _time_zone.c_str(), ESP3DSettingIndex::esp3d_timezone)) {
-    esp3d_log_d("Invalid time zone %s", _time_zone.c_str());
+    esp3d_log("Invalid time zone %s", _time_zone.c_str());
     _time_zone = "+00:00";
   }
   std::string stmp = _time_zone;
@@ -194,7 +181,6 @@ const char* TimeService::getCurrentTime() {
   time_t now;
   stmp = "";
   // get current time
-  esp3d_log_d("No time provided");
   time(&now);
   localtime_r(&now, &tmstruct);
   stmp = std::to_string((tmstruct.tm_year) + 1900) + "-";
@@ -218,29 +204,29 @@ const char* TimeService::getCurrentTime() {
     stmp += "0";
   }
   stmp += std::to_string(tmstruct.tm_sec);
-  esp3d_log_d("Current time is %s", stmp.c_str());
+  esp3d_log("Current time is %s", stmp.c_str());
   return stmp.c_str();
 }
 
 // the string date time  need to be iso-8601
 // the time zone part will be ignored
 bool TimeService::setTime(const char* stime) {
-  esp3d_log_d("Set time to %s", stime);
+  esp3d_log("Set time to %s", stime);
   std::string stmp = stime;
   struct tm tmstruct;
   struct timeval time_val = {0, 0};
   memset(&tmstruct, 0, sizeof(struct tm));
   if (strptime(stime, "%Y-%m-%dT%H:%M:%S", &tmstruct) == nullptr) {
-    esp3d_log_d("Invalid time format, try without seconds");
+    esp3d_log("Invalid time format, try without seconds");
     // allow not to set seconds for lazy guys typing command line
     if (strptime(stime, "%Y-%m-%dT%H:%M", &tmstruct) == nullptr) {
-      esp3d_log_d("Invalid time format");
+      esp3d_log("Invalid time format");
       return false;
     }
   }
   char buf[20];
   strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &tmstruct);
-  esp3d_log_d("Time string is %s", buf);
+  esp3d_log("Time string is %s", buf);
   time_val.tv_usec = 0;
   time_val.tv_sec = mktime(&tmstruct);
 
@@ -282,6 +268,26 @@ int TimeService::_get_time_zone_offset_min() {
 
 // currently not used
 void TimeService::handle() {
+  static uint32_t last_time = 0;
   if (_started) {
+    if (_dispatch_time != 0) {
+      if (esp3d_hal::millis() - last_time > TIMEOUT_NTP_REFRESH) {
+        last_time = esp3d_hal::millis();
+        std::string text = getCurrentTime();
+        if (text.find("1970") == std::string::npos) {
+          text += "  (" + _time_zone;
+          text += ")";
+          esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
+                                          text.c_str());
+          _dispatch_time = 0;
+        } else {
+          esp3d_log("Time not set yet");
+          if (esp3d_hal::millis() - _dispatch_time > TIMEOUT_NTP_REQUEST) {
+            esp3d_log_e("Time failed to set");
+            _dispatch_time = 0;
+          }
+        }
+      }
+    }
   }
 }

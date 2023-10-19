@@ -81,7 +81,14 @@ bool ESP3DNetworkServices::begin() {
   return _started;
 }
 
-void ESP3DNetworkServices::handle() { esp3dAuthenthicationService.handle(); }
+void ESP3DNetworkServices::handle() {
+  if (_started) {
+    esp3dAuthenthicationService.handle();
+#if ESP3D_TIMESTAMP_FEATURE
+    esp3dTimeService.handle();
+#endif  // ESP3D_TIMESTAMP_FEATURE
+  }
+}
 
 void ESP3DNetworkServices::end() {
   if (!_started) {
