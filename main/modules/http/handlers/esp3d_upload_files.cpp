@@ -27,6 +27,29 @@
 #include "filesystem/esp3d_flash.h"
 #include "http/esp3d_http_service.h"
 
+/* TODO: to change file time to match original one if needed
+   struct tm tm;
+   // original:  "2023-02-15T16:27:36-0500"
+   std::string offset_str = "-0500";
+   std::string date_string = "2023-02-15T16:27:36";
+   memset(&tm, 0, sizeof(struct tm));
+   int offset_h = atoi(offset_str.substr(0, 3).c_str());  // 5
+   int offset_m = atoi(offset_str.substr(3, 2).c_str());  // 0
+   int offset_s = offset_h * 3600 + offset_m * 60;        // -18000
+   esp3d_log_d("offset_s: %d", offset_s);
+   if (strptime(date_string.c_str(), "%Y-%m-%dT%H:%M:%S", &tm) != NULL) {
+     time_t new_timestamp = mktime(&tm);
+     new_timestamp += offset_s;
+     struct utimbuf timestamp;
+     timestamp.actime = timestamp.modtime = new_timestamp;
+     esp_vfs_utime(uri.c_str(), &timestamp);
+   } else {
+     esp3d_log_e("Failed to convert date");
+   }
+
+
+*/
+
 esp_err_t ESP3DHttpService::upload_to_flash_handler(
     const uint8_t* data, size_t datasize, ESP3DUploadState file_upload_state,
     const char* filename, size_t filesize) {
