@@ -406,6 +406,7 @@ bool ESP3DGCodeHostService::_openFile(ESP3DGcodeStream* stream) {
             esp3d_log_e("Failed to seek to correct position in file: %s",
                         stream->dataStream);
             _error = ESP3DGcodeHostError::cursor_out_of_range;
+            globalFs.releaseFS(stream->dataStream);
             return false;
           }
         }
@@ -416,6 +417,7 @@ bool ESP3DGCodeHostService::_openFile(ESP3DGcodeStream* stream) {
           if (globalFs.stat(stream->dataStream, &file_stat) == -1) {
             esp3d_log_e("Failed to get file size");
             _error = ESP3DGcodeHostError::file_system;
+            globalFs.releaseFS(stream->dataStream);
             return false;
           }
           if (file_stat.st_size > 0) {
@@ -423,6 +425,7 @@ bool ESP3DGCodeHostService::_openFile(ESP3DGcodeStream* stream) {
           } else {
             esp3d_log_e("File size is 0");
             _error = ESP3DGcodeHostError::empty_file;
+            globalFs.releaseFS(stream->dataStream);
             return false;
           }
         }
@@ -431,11 +434,14 @@ bool ESP3DGCodeHostService::_openFile(ESP3DGcodeStream* stream) {
       } else {
         esp3d_log_e("Failed to open file");
         _error = ESP3DGcodeHostError::access_denied;
+        globalFs.releaseFS(stream->dataStream);
       }
     } else {
       esp3d_log_e("File does not exist");
       _error = ESP3DGcodeHostError::file_not_found;
+      globalFs.releaseFS(stream->dataStream);
     }
+
   } else {
     esp3d_log_e("Can't access FS");
     _error = ESP3DGcodeHostError::file_system;
@@ -575,6 +581,7 @@ bool ESP3DGCodeHostService::_readNextCommand(ESP3DGcodeStream* stream) {
     }
     esp3d_log("Command read: %s", _current_command_str.c_str());
   } else if (isFileStream(stream)) {
+    _current_command_str = "";
     esp3d_log("File commands cursor pos is %lld and current command is %s",
               stream->cursorPos, _current_command_str.c_str());
     if (_file_handle == nullptr) {
@@ -616,7 +623,7 @@ bool ESP3DGCodeHostService::_readNextCommand(ESP3DGcodeStream* stream) {
           // and \r and so it will be displayed on multiple lines and log char
           // won't be displayed on each line, which may confuse the simulator
           // taking the log as command
-
+          // so may need to format the buffer before displaying it
           //  esp3d_log("Got %d bytes from file: *%s*", _file_buffer_length,
           //              _file_buffer);
         }
@@ -644,8 +651,9 @@ bool ESP3DGCodeHostService::_readNextCommand(ESP3DGcodeStream* stream) {
               continue;
             } else {
               buffer_cursor++;
-              esp3d_log("Command found, is now: %s",
-                        _current_command_str.c_str());
+              esp3d_log("Command found, is now: *%s* of %d bytes",
+                        _current_command_str.c_str(),
+                        _current_command_str.length());
               need_search_command = false;
               break;
             }
@@ -671,7 +679,7 @@ bool ESP3DGCodeHostService::_readNextCommand(ESP3DGcodeStream* stream) {
             // no need to search anymore
             need_search_command = false;
           } else {
-            esp3d_log("Continue to read from  for %s",
+            esp3d_log("Continue to read from file for %s",
                       _current_command_str.c_str());
             // we continue to read from file
             _file_buffer_length = 0;
@@ -1347,6 +1355,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       }
 
       if (_readNextCommand(_current_stream_ptr)) {
+        esp3d_log("Read next command: *%s*", _current_command_str.c_str());
         if (esp3dCommands.is_esp_command((uint8_t*)_current_command_str.c_str(),
                                          _current_command_str.length())) {
           esp3d_log("Command is an esp command");
@@ -1449,6 +1458,8 @@ void ESP3DGCodeHostService::_handle_stream_states() {
         // grbl so it may be better to check if the command is a gcode
         // command or real time command and add the \n only if it is a gcode
         // command
+        esp3d_log("Sending : %d for %s", _current_command_str.length(),
+                  _current_command_str.c_str());
         if (_current_command_str[_current_command_str.length() - 1] != '\n') {
           _current_command_str += "\n";
         }
