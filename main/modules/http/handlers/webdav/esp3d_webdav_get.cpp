@@ -22,38 +22,90 @@
 
 #include "esp3d_log.h"
 #include "esp3d_string.h"
-#include "esp_vfs.h"
 #include "filesystem/esp3d_globalfs.h"
 #include "http/esp3d_http_service.h"
 #include "time.h"
+#include "webdav/esp3d_webdav_service.h"
 
 esp_err_t ESP3DHttpService::webdav_get_handler(httpd_req_t* req) {
+  int response_code = 200;
+  std::string response_msg = "";
+  size_t file_size = 0;
+  std::string content_type = "";
+  std::string last_modified = "";
   esp3d_log_d("Uri: %s", req->uri);
   std::string uri =
       esp3d_string::urlDecode(&req->uri[strlen(ESP3D_WEBDAV_ROOT) + 1]);
   esp3d_log_d("Uri: %s", uri.c_str());
-  esp3d_log_d("Path: %s", esp3d_string::getPathFromString(uri.c_str()));
-  esp3d_log_d("filename: %s", esp3d_string::getFilenameFromString(uri.c_str()));
+
+  int payload_size = _clearPayload(req);
+  (void)payload_size;
+  esp3d_log_d("Payload size: %d", payload_size);
+  httpd_resp_set_webdav_hdr(req);
 
   if (globalFs.accessFS(uri.c_str())) {
+    struct stat entry_stat;
+    if (globalFs.stat(uri.c_str(), &entry_stat) == -1) {
+      response_code = 404;
+      response_msg = "Failed to stat";
+    } else {
+      // get last modified time
+      last_modified = esp3d_string::getTimeString(entry_stat.st_mtime);
+      // Add Last-Modified header
+      httpd_resp_set_hdr(req, "Last-Modified", last_modified.c_str());
+      // is file ?
+      if (S_ISREG(entry_stat.st_mode)) {
+        // is file
+        file_size = entry_stat.st_size;
+        content_type = esp3d_string::getContentType(uri.c_str());
+        // Add Content-Type header
+        httpd_resp_set_type(req, content_type.c_str());
+        // Add Content-Length header
+        httpd_resp_set_hdr(req, "Content-Length",
+                           std::to_string(file_size).c_str());
+      }
+      // open file
+      FILE* fd = globalFs.open(uri.c_str(), "r");
+      if (fd) {
+        size_t chunksize;
+        size_t total_send = 0;
+        // send file
+        do {
+          // Read data block from the file
+          chunksize = fread(_chunk, 1, CHUNK_BUFFER_SIZE, fd);
+          total_send += chunksize;
+          if (chunksize > 0) {
+            // Send the HTTP data block
+            if (httpd_resp_send_chunk(req, _chunk, chunksize) != ESP_OK) {
+              esp3d_log_e("File sending failed!");
+              chunksize = 0;
+              response_code = 500;
+              response_msg = "Failed to send file";
+            }
+          }
+        } while (chunksize != 0);
+        // Close the file
+        fclose(fd);
+        httpd_resp_send_chunk(req, NULL, 0);
+        // Check if all the file has been sent
+        if (total_send != file_size) {
+          esp3d_log_e("File sending failed: size do not match!");
+          response_code = 500;
+          response_msg = "File sending failed: size do not match!";
+        }
+      } else {
+        esp3d_log_e("Failed to open file");
+        response_code = 500;
+        response_msg = "Failed to open file";
+      }
+    }
+    // release access
     globalFs.releaseFS(uri.c_str());
   } else {
     esp3d_log_e("Failed to access FS");
-    return webdav_send_response(req, 503, "Failed to access FS");
+    response_code = 503;
+    response_msg = "Failed to access FS";
   }
-
-  // TODO: implement method GET
-  // extract path from uri
-  // clear payload from request if any
-  // Check can access (error code 503)
-  // Check if file exist(error code 404)
-  // Check if file is a directory
-  // if file send content-type and content-length header
-  // if directory, send 200 response and return
-  // read file and send it (error code 500 if any error)
-  // close file
-  // release access
-  // response code 200 if success
-
-  return webdav_send_response(req, 200, "");
+  // send response code to client
+  return http_send_response(req, response_code, response_msg.c_str());
 }
