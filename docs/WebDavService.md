@@ -15,6 +15,8 @@ YYYY-MM-DDThh:mm:ssTZD (e.g. 1997-07-16T19:20:30+01:00)
 ## GET method
 The GET method is used to retrieve information about the resource identified by the Request-URI. And the content of the resource is returned as the response body.
 The necessary headers are:
+- DAV
+- Allow
 - Last-Modified
 - Content-Length (if the resource is a file)
 - Content-Type (if the resource is a file)
@@ -32,6 +34,8 @@ The response code is:
 ## HEAD method
 The HEAD method is used to retrieve information about the resource identified by the Request-URI. 
 The necessary headers are:
+- DAV
+- Allow
 - Last-Modified
 - Content-Length (if the resource is a file)
 - Content-Type (if the resource is a file)
@@ -43,4 +47,13 @@ The response code is:
 - 404 if the resource does not exist
 - 500 if any error during the file streaming
 - 503 if any error accessing the local file system (e.g. access denied)
+
+## OPTIONS method
+The OPTIONS method is used to retrieve the communication options for WebDav.
+The necessary headers are:
+- DAV
+- Allow
+No content
+The response code is always 200.
+
 

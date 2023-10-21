@@ -22,12 +22,20 @@
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "http/esp3d_http_service.h"
+#include "webdav/esp3d_webdav_service.h"
 
 esp_err_t ESP3DHttpService::webdav_options_handler(httpd_req_t *req) {
-  esp3d_log("Uri: %s", req->uri);
-  // TODO: Implement method OPTIONS
-  // Return DAV:1 in header
-  // Return Allow: <Methods> in header
-  // response is always 200
-  return ESP_OK;
+  int response_code = 200;
+  esp3d_log_d("Uri: %s", req->uri);
+  std::string uri =
+      esp3d_string::urlDecode(&req->uri[strlen(ESP3D_WEBDAV_ROOT) + 1]);
+  esp3d_log_d("Uri: %s", uri.c_str());
+  int payload_size = _clearPayload(req);
+  (void)payload_size;
+  esp3d_log_d("Payload size: %d", payload_size);
+  // Add Webdav headers
+  httpd_resp_set_webdav_hdr(req);
+  // response_code is 200
+  return http_send_response(req, response_code, "");
+  ;
 }

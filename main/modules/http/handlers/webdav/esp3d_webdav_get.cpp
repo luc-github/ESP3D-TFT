@@ -24,7 +24,6 @@
 #include "esp3d_string.h"
 #include "filesystem/esp3d_globalfs.h"
 #include "http/esp3d_http_service.h"
-#include "time.h"
 #include "webdav/esp3d_webdav_service.h"
 
 esp_err_t ESP3DHttpService::webdav_get_handler(httpd_req_t* req) {
@@ -41,6 +40,7 @@ esp_err_t ESP3DHttpService::webdav_get_handler(httpd_req_t* req) {
   int payload_size = _clearPayload(req);
   (void)payload_size;
   esp3d_log_d("Payload size: %d", payload_size);
+  // Add Webdav headers
   httpd_resp_set_webdav_hdr(req);
 
   if (globalFs.accessFS(uri.c_str())) {
