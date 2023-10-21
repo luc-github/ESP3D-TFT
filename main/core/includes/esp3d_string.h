@@ -24,6 +24,14 @@
 #include <cstring>
 #include <string>
 
+#if ESP3D_TIMESTAMP_FEATURE
+#include "time/esp3d_time_service.h"
+#else
+#include <ctime.h>
+#include <time.h>
+
+#endif  // ESP3D_TIMESTAMP_FEATURE
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -48,7 +56,7 @@ const char* urlDecode(const char* text);
 const char* getContentType(const char* filename);
 const char* getPathFromString(const char* str);
 const char* getFilenameFromString(const char* str);
-
+const char* getTimeString(time_t time);
 }  // namespace esp3d_string
 #ifdef __cplusplus
 }  // extern "C"

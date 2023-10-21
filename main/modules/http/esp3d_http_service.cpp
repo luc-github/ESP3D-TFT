@@ -30,12 +30,8 @@
 #include "esp_wifi.h"
 #include "filesystem/esp3d_globalfs.h"
 #include "network/esp3d_network.h"
-#include "tasks_def.h"
 #include "websocket/esp3d_webui_service.h"
 #include "websocket/esp3d_ws_service.h"
-
-#define CHUNK_BUFFER_SIZE STREAM_CHUNK_SIZE
-char chunk[CHUNK_BUFFER_SIZE];
 
 #define FAV_ICON_HANLDER_CNT 1
 #if ESP3D_SSDP_FEATURE
@@ -132,6 +128,8 @@ void ESP3DHttpService::pushError(ESP3DUploadError errcode, const char *st) {
   esp3dWsWebUiService.BroadcastTxt((uint8_t *)errmsg.c_str(),
                                    strlen(errmsg.c_str()));
 }
+
+char ESP3DHttpService::_chunk[CHUNK_BUFFER_SIZE] = {0};
 
 void ESP3DHttpService::push(esp3dSocketType socketType, int socketFd) {
   _sockets_list.push_back(std::make_pair(socketType, socketFd));
@@ -1024,9 +1022,9 @@ esp_err_t ESP3DHttpService::streamFile(const char *path, httpd_req_t *req) {
           }
           size_t chunksize;
           do {
-            chunksize = fread(chunk, 1, CHUNK_BUFFER_SIZE, fd);
+            chunksize = fread(_chunk, 1, CHUNK_BUFFER_SIZE, fd);
             if (chunksize > 0) {
-              if (httpd_resp_send_chunk(req, chunk, chunksize) != ESP_OK) {
+              if (httpd_resp_send_chunk(req, _chunk, chunksize) != ESP_OK) {
                 esp3d_log_e("File sending failed!");
                 chunksize = 0;
                 res = ESP_FAIL;
@@ -1133,4 +1131,16 @@ const char *ESP3DHttpService::getBoundaryString(httpd_req_t *req) {
     }
   }
   return boundaryStr;
+}
+
+int ESP3DHttpService::_clearPayload(httpd_req_t *req) {
+  size_t total_read = 0;
+  if (req->content_len > 0) {
+    size_t read_len = 0;
+    do {
+      read_len = httpd_req_recv(req, _chunk, CHUNK_BUFFER_SIZE);
+      total_read += read_len;
+    } while (read_len > 0 && total_read < req->content_len);
+  }
+  return total_read;
 }
