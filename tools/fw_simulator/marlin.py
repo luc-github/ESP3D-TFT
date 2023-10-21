@@ -355,5 +355,6 @@ def processLine(line,ser):
             return method["fn"](cmd,line,ser)
     if line.startswith("M") or line.startswith("G")  or line.startswith("N"):
         return ok(line)
-    
-    return ""
+    if line.find("[esp")!=-1  or line.find("[0;")!=-1 or line.find("[1;")!=-1:
+        return ""
+    return "echo:Unknown command: \"" + line + "\"\nok"
