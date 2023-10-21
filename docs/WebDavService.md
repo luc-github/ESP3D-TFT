@@ -2,6 +2,7 @@
 
 ## Introduction
 The protocol is based on HTTP and is designed to allow clients to perform remote Web content authoring operations. The protocol provides facilities to copy, move, delete resources, to query and set properties on resources. The protocol has several features but many are useless for the purpose of this project. The protocol will be followed but using only the features that are needed.
+The authentication is not implemented yet.
 
 ## WebDav version
 The version of WebDav that will be used is 1 because we do not need PROPATCH, LOCK and UNLOCK methods.
@@ -66,7 +67,18 @@ The response code is:
 - 204 if success
 - 404 if the resource does not exist
 - 503 if any error accessing the local file system (e.g. access denied)
+- 500 if any error during the file/dir deletion
 
-
+## MKCOL method
+The MKCOL method is used to create a new collection resource at the location specified by the Request-URI.
+The necessary headers are:
+- DAV
+- Allow
+No content
+The response code is:
+- 201 if success
+- 409 if the resource already exists
+- 503 if any error accessing the local file system (e.g. access denied)
+- 500 if any error during the dir creation
 
 

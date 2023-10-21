@@ -20,17 +20,44 @@
 #include <stdio.h>
 
 #include "esp3d_log.h"
-#include "esp3d_string.h"
+#include "filesystem/esp3d_globalfs.h"
 #include "http/esp3d_http_service.h"
+#include "webdav/esp3d_webdav_service.h"
 
 esp_err_t ESP3DHttpService::webdav_mkcol_handler(httpd_req_t *req) {
-  esp3d_log("Uri: %s", req->uri);
-  // TODO: Implement method MKCOL
-  // extract path from uri
-  // clear payload from request if any
+  int response_code = 201;
+  std::string response_msg = "Success";
+  esp3d_log_d("Uri: %s", req->uri);
+  std::string uri =
+      esp3d_string::urlDecode(&req->uri[strlen(ESP3D_WEBDAV_ROOT) + 1]);
+  esp3d_log_d("Uri: %s", uri.c_str());
+
+  int payload_size = _clearPayload(req);
+  (void)payload_size;
+  esp3d_log_d("Payload size: %d", payload_size);
+  // Add Webdav headers
+  httpd_resp_set_webdav_hdr(req);
   // Check can access (error code 503)
-  // check if path exists (error code 409 if already exists)
-  // release access
-  // response code 201 if success
-  return ESP_OK;
+  if (globalFs.accessFS(uri.c_str())) {
+    struct stat entry_stat;
+    if (globalFs.stat(uri.c_str(), &entry_stat) == -1) {
+      // does not exist
+      if (!globalFs.mkdir(uri.c_str())) {
+        esp3d_log_e("Failed to create dir");
+        response_code = 500;
+        response_msg = "Failed to create dir";
+      }
+    } else {  // already exists
+      response_code = 409;
+      response_msg = "Already exists";
+    }
+    // release access
+    globalFs.releaseFS(uri.c_str());
+  } else {
+    esp3d_log_e("Failed to access FS");
+    response_code = 503;
+    response_msg = "Failed to access FS";
+  }
+  // send response code to client
+  return http_send_response(req, response_code, response_msg.c_str());
 }
