@@ -56,4 +56,17 @@ The necessary headers are:
 No content
 The response code is always 200.
 
+## DELETE method
+The DELETE method is used to delete the resource identified by the Request-URI.
+The necessary headers are:
+- DAV
+- Allow
+No content
+The response code is:
+- 204 if success
+- 404 if the resource does not exist
+- 503 if any error accessing the local file system (e.g. access denied)
+
+
+
 

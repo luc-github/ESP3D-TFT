@@ -81,6 +81,9 @@ esp_err_t ESP3DHttpService::http_send_response(httpd_req_t *req, int code,
     case 424:
       status += "Failed Dependency";
       break;
+    case 500:
+      status += "Internal Server Error";
+      break;
     case 501:
       status += "Not Implemented";
       break;
@@ -88,7 +91,7 @@ esp_err_t ESP3DHttpService::http_send_response(httpd_req_t *req, int code,
       status += "Service Unavailable";
       break;
     default:
-      status += "Internal Server Error";
+      status += "";
       break;
   }
   esp3d_log("Uri: %s, status: %s", req->uri, status.c_str());
