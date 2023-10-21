@@ -13,7 +13,7 @@ The time format used is the local time with the timezone offset:
 YYYY-MM-DDThh:mm:ssTZD (e.g. 1997-07-16T19:20:30+01:00)
 
 ## GET method
-The GET method is used to retrieve information about the resource identified by the Request-URI. 
+The GET method is used to retrieve information about the resource identified by the Request-URI. And the content of the resource is returned as the response body.
 The necessary headers are:
 - Last-Modified
 - Content-Length (if the resource is a file)
@@ -27,7 +27,20 @@ The response code is:
 - 200 if the resource is a file or a directory and the request was successful
 - 404 if the resource does not exist
 - 500 if any error during the file streaming
-- 503 if any error accessing the local file system (e.g. permission denied)
+- 503 if any error accessing the local file system (e.g. access denied)
 
+## HEAD method
+The HEAD method is used to retrieve information about the resource identified by the Request-URI. 
+The necessary headers are:
+- Last-Modified
+- Content-Length (if the resource is a file)
+- Content-Type (if the resource is a file)
 
+Unlike GET method, the HEAD method does not return the content of the resource.
+
+The response code is:
+- 200 if the resource is a file or a directory and the request was successful
+- 404 if the resource does not exist
+- 500 if any error during the file streaming
+- 503 if any error accessing the local file system (e.g. access denied)
 

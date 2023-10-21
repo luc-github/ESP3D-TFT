@@ -24,17 +24,50 @@
 #include "http/esp3d_http_service.h"
 
 esp_err_t ESP3DHttpService::webdav_head_handler(httpd_req_t *req) {
-  esp3d_log("Uri: %s", req->uri);
-  // TODO: implement method HEAD
-  // Clear payload from request if any
-  // extract path from uri
-  // Check can access (error code 503)
-  // Check if file exist(error code 404)
-  // Check if file is a directory
-  // if file send content-type and content-length header
-  // if directory, send 200 response and return
-  // close file
-  // release access
-  // response code 200 if success
-  return ESP_OK;
+  int response_code = 200;
+  std::string response_msg = "";
+  size_t file_size = 0;
+  std::string content_type = "";
+  std::string last_modified = "";
+  esp3d_log_d("Uri: %s", req->uri);
+  std::string uri =
+      esp3d_string::urlDecode(&req->uri[strlen(ESP3D_WEBDAV_ROOT) + 1]);
+  esp3d_log_d("Uri: %s", uri.c_str());
+
+  int payload_size = _clearPayload(req);
+  (void)payload_size;
+  esp3d_log_d("Payload size: %d", payload_size);
+  httpd_resp_set_webdav_hdr(req);
+
+  if (globalFs.accessFS(uri.c_str())) {
+    struct stat entry_stat;
+    if (globalFs.stat(uri.c_str(), &entry_stat) == -1) {
+      response_code = 404;
+      response_msg = "Failed to stat";
+    } else {
+      // get last modified time
+      last_modified = esp3d_string::getTimeString(entry_stat.st_mtime);
+      // Add Last-Modified header
+      httpd_resp_set_hdr(req, "Last-Modified", last_modified.c_str());
+      // is file ?
+      if (S_ISREG(entry_stat.st_mode)) {
+        // is file
+        file_size = entry_stat.st_size;
+        content_type = esp3d_string::getContentType(uri.c_str());
+        // Add Content-Type header
+        httpd_resp_set_type(req, content_type.c_str());
+        // Add Content-Length header
+        httpd_resp_set_hdr(req, "Content-Length",
+                           std::to_string(file_size).c_str());
+      }
+    }
+    // release access
+    globalFs.releaseFS(uri.c_str());
+  } else {
+    esp3d_log_e("Failed to access FS");
+    response_code = 503;
+    response_msg = "Failed to access FS";
+  }
+  // send response code to client
+  return http_send_response(req, response_code, response_msg.c_str());
 }
