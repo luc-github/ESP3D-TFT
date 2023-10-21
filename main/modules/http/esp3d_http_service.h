@@ -31,6 +31,9 @@
 #if ESP3D_WEBDAV_SERVICES_FEATURE
 #include "webdav/esp3d_webdav_service.h"
 #endif  // ESP3D_WEBDAV_SERVICES_FEATURE
+#include "tasks_def.h"
+
+#define CHUNK_BUFFER_SIZE STREAM_CHUNK_SIZE
 
 #ifdef __cplusplus
 extern "C" {
@@ -140,8 +143,8 @@ class ESP3DHttpService final {
   static esp_err_t webdav_head_handler(httpd_req_t *req);
   static esp_err_t webdav_options_handler(httpd_req_t *req);
 
-  static esp_err_t webdav_send_response(httpd_req_t *req, int code,
-                                        const char *msg);
+  static esp_err_t http_send_response(httpd_req_t *req, int code,
+                                      const char *msg);
 #endif  // ESP3D_WEBDAV_SERVICES_FEATURE
 
   static esp_err_t post_multipart_handler(httpd_req_t *req);
@@ -171,6 +174,7 @@ class ESP3DHttpService final {
   const char *getArg(httpd_req_t *req, const char *argname);
 
  private:
+  static char _chunk[CHUNK_BUFFER_SIZE];
   bool _started;
   httpd_handle_t _server;
   const char *getBoundaryString(httpd_req_t *req);
@@ -179,7 +183,7 @@ class ESP3DHttpService final {
 #if ESP3D_SD_CARD_FEATURE
   static PostUploadContext _post_sdfiles_upload_ctx;
 #endif  // ESP3D_SD_CARD_FEATURE
-
+  static int _clearPayload(httpd_req_t *req);
 #if ESP3D_UPDATE_FEATURE
   static PostUploadContext _post_updatefw_upload_ctx;
 #endif  // ESP3D_UPDATE_FEATURE
