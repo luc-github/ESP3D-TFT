@@ -90,6 +90,9 @@ esp_err_t ESP3DHttpService::http_send_response(httpd_req_t *req, int code,
     case 503:
       status += "Service Unavailable";
       break;
+    case 507:
+      status += "Insufficient Storage";
+      break;
     default:
       status += "";
       break;

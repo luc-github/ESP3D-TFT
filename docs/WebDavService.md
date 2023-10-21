@@ -15,7 +15,7 @@ YYYY-MM-DDThh:mm:ssTZD (e.g. 1997-07-16T19:20:30+01:00)
 
 ## GET method
 The GET method is used to retrieve information about the resource identified by the Request-URI. And the content of the resource is returned as the response body.
-The necessary headers are:
+The necessary headers in response are:
 - DAV
 - Allow
 - Last-Modified
@@ -34,7 +34,7 @@ The response code is:
 
 ## HEAD method
 The HEAD method is used to retrieve information about the resource identified by the Request-URI. 
-The necessary headers are:
+The necessary headers in response are:
 - DAV
 - Allow
 - Last-Modified
@@ -51,7 +51,7 @@ The response code is:
 
 ## OPTIONS method
 The OPTIONS method is used to retrieve the communication options for WebDav.
-The necessary headers are:
+The necessary headers in response are:
 - DAV
 - Allow
 No content
@@ -59,7 +59,7 @@ The response code is always 200.
 
 ## DELETE method
 The DELETE method is used to delete the resource identified by the Request-URI.
-The necessary headers are:
+The necessary headers in response are:
 - DAV
 - Allow
 No content
@@ -71,7 +71,9 @@ The response code is:
 
 ## MKCOL method
 The MKCOL method is used to create a new collection resource at the location specified by the Request-URI.
-The necessary headers are:
+The request has the following headers:   
+- Destination is the path of the resource to create. to be used instead of the Request-URI if present.
+The necessary headers in response are:
 - DAV
 - Allow
 No content
@@ -80,5 +82,28 @@ The response code is:
 - 409 if the resource already exists
 - 503 if any error accessing the local file system (e.g. access denied)
 - 500 if any error during the dir creation
+
+## PUT method
+The PUT method is used to create a new non-collection resource at the location specified by the Request-URI.
+The request has the following headers:   
+- Overwrite can be T or F.   
+If T, the resource will be overwritten if it already exists. If F, the resource will not be overwritten if it already exists.
+- Content-Length is the size  of the file.
+- Content-Type is the type of the file.
+- Destination is the path of the resource to create. to be used instead of the Request-URI.
+
+the request content is the content of the resource to create.
+The necessary headers in response are:
+- DAV
+- Allow
+- Last-Modified
+No content
+The response code is:
+- 201 if success and file is created
+- 204 if success and file is overwritten (Overwrite: T)
+- 412 if the resource already exists and Overwrite: F
+- 503 if any error accessing the local file system (e.g. access denied)
+- 500 if any error during the file creation
+- 507 if the file is too big for the targeted file system
 
 

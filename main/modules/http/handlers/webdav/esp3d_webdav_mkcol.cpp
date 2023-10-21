@@ -24,14 +24,29 @@
 #include "http/esp3d_http_service.h"
 #include "webdav/esp3d_webdav_service.h"
 
-esp_err_t ESP3DHttpService::webdav_mkcol_handler(httpd_req_t *req) {
+esp_err_t ESP3DHttpService::webdav_mkcol_handler(httpd_req_t* req) {
   int response_code = 201;
   std::string response_msg = "Success";
   esp3d_log_d("Uri: %s", req->uri);
   std::string uri =
       esp3d_string::urlDecode(&req->uri[strlen(ESP3D_WEBDAV_ROOT) + 1]);
   esp3d_log_d("Uri: %s", uri.c_str());
-
+  // get header Destination
+  size_t header_size = httpd_req_get_hdr_value_len(req, "Destination");
+  if (header_size > 0) {
+    char* header_value = (char*)malloc(header_size + 1);
+    if (httpd_req_get_hdr_value_str(req, "Overwrite", header_value,
+                                    header_size + 1) == ESP_OK) {
+      // replace uri by destination
+      std::string dest = header_value;
+      size_t pos = dest.find(ESP3D_WEBDAV_ROOT);
+      if (pos != std::string::npos) {
+        uri = dest.substr(pos + strlen(ESP3D_WEBDAV_ROOT));
+      }
+    }
+    free(header_value);
+  }
+  // clear payload from request if any
   int payload_size = _clearPayload(req);
   (void)payload_size;
   esp3d_log_d("Payload size: %d", payload_size);
