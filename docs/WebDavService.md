@@ -122,7 +122,7 @@ The necessary headers in response are:
 - DAV
 - Allow
 - Content-Type is text/xml
-- Content-Length is the size of the response body
+- Content-Length is the size of the response body but because it is not possible to know the size of the response body before generating it because we do not know the number of resources in the directory, we will use chunked transfer encoding. so this header will not be present in the response.
 
 The response body is an xml document containing the properties of the resource.
 ```xml
@@ -175,7 +175,7 @@ The response body is an xml document containing the properties of the resource.
 The response code is:
 - 207 if success
 - 404 if the resource does not exist
-- 500 if any error accessing the local file system (e.g. access denied)
+- 503 if any error accessing the local file system (e.g. access denied)
 
 
 
