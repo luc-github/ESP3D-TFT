@@ -107,5 +107,6 @@ esp_err_t ESP3DHttpService::webdav_get_handler(httpd_req_t* req) {
     response_msg = "Failed to access FS";
   }
   // send response code to client
+  if (response_code == 200) return ESP_OK;
   return http_send_response(req, response_code, response_msg.c_str());
 }
