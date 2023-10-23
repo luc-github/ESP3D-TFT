@@ -37,20 +37,7 @@
 
 esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t* req) {
   esp3d_log("Uri: %s", req->uri);
-  // TODO: Implement method PUT
-  // extract path from uri
-  // clear payload from request if any
-  // Check can access (error code 503)
-  // check if file exists (no error unless it is file and there is already a
-  // directory with the same name)
-  // get header Overwrite (F: T)= (false: true)
-  // check size of file (error code 507)
-  // open file for writing (error code 500)
-  // close file
-  // release access
-  // response code 201 if success and new file
-  // response code 204 if success and overwrite file
-  int response_code = 200;
+  int response_code = 201;
   std::string response_msg = "";
   size_t file_size = 0;
   size_t total_read = 0;
@@ -99,20 +86,28 @@ esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t* req) {
   }
   // Add Webdav headers
   httpd_resp_set_webdav_hdr(req);
-
+  // Access file system
   if (globalFs.accessFS(uri.c_str())) {
     struct stat entry_stat;
     // check if file exists
     if (globalFs.stat(uri.c_str(), &entry_stat) == -1) {
-      // file does not exist
+      // file does not exist, so no issue to create it
       overwrite = true;
-    } else {
-      if (S_ISDIR(entry_stat.st_mode)) {
+    } else {                              // file exists
+      if (S_ISDIR(entry_stat.st_mode)) {  // it is a directory
         // is directory
         response_code = 412;
         response_msg = "Directory has same name as file";
         overwrite = false;
         esp3d_log_e("Directory has same name as file");
+      } else {             // it is a file
+        if (!overwrite) {  // file exists and overwrite is false
+          response_code = 412;
+          response_msg = "File already exists";
+          esp3d_log_e("File already exists");
+        } else {  // file exists and overwrite is true
+          response_code = 204;
+        }
       }
     }
     if (overwrite) {
@@ -187,6 +182,12 @@ esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t* req) {
             }
             // Close the file
             fclose(fd);
+            // Not blocking error
+            if (httpd_resp_set_hdr(req, "Content-Length",
+                                   std::to_string(total_read).c_str()) !=
+                ESP_OK) {
+              esp3d_log_e("httpd_resp_set_hdr failed for Content-Length");
+            }
             // Check if all the file has been sent
             if (hasError && total_read != file_size) {
               esp3d_log_e(
@@ -216,6 +217,7 @@ esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t* req) {
     response_code = 503;
     response_msg = "Failed to access FS";
   }
+
   // send response code to client
   return http_send_response(req, response_code, response_msg.c_str());
 }
