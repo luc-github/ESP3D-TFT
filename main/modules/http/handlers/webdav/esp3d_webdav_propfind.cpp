@@ -26,10 +26,10 @@
 
 #define PROPFIND_RESPONSE_BODY_HEADER_1                \
   "\r\n<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n" \
-  "<D:multistatus xmlns:D=\"DAV:\" depth=\""
+  "<multistatus xmlns=\"DAV:\" depth=\""
 #define PROPFIND_RESPONSE_BODY_HEADER_2 "\">\r\n"
 
-#define PROPFIND_RESPONSE_BODY_FOOTER "</D:multistatus>\r\n"
+#define PROPFIND_RESPONSE_BODY_FOOTER "</multistatus>\r\n"
 
 esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
   esp3d_log("Uri: %s", req->uri);
@@ -89,51 +89,51 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
         }
       }
       // stat on request first
-      response_body = "<D:response xmlns:esp=\"DAV:\">\r\n";
-      response_body += "<D:href>";
+      response_body = "<response>\r\n";
+      response_body += "<href>";
       response_body += "/";
       response_body += ESP3D_WEBDAV_ROOT;
       if (uri[0] != '/') response_body += "/";
       response_body += uri;
-      response_body += "</D:href>\r\n";
+      response_body += "</href>\r\n";
       response_body +=
-          "<D:propstat>\r\n<D:status>HTTP/1.1 200 "
-          "OK</D:status>\r\n<D:prop>\r\n";
-      response_body += "<esp:getlastmodified>";
+          "<propstat>\r\n<status>HTTP/1.1 200 "
+          "OK</status>\r\n<prop>\r\n";
+      response_body += "<getlastmodified>";
       response_body += esp3d_string::getTimeString(entry_stat.st_mtime);
-      response_body += "</esp:getlastmodified>\r\n";
+      response_body += "</getlastmodified>\r\n";
       // is dir
       if (S_ISDIR(entry_stat.st_mode)) {
         response_body +=
-            "<esp:resourcetype><D:collection></D:collection></"
-            "esp:resourcetype>\r\n";
+            "<resourcetype><collection></collection></"
+            "resourcetype>\r\n";
         // space entries are only for directory at first level
         uint64_t totalSpace = 0;
         uint64_t usedSpace = 0;
         uint64_t freeSpace = 0;
         globalFs.getSpaceInfo(&totalSpace, &usedSpace, &freeSpace, uri.c_str(),
                               true);
-        response_body += "<esp:quota-available-bytes>";
+        response_body += "<quota-available-bytes>";
         response_body += std::to_string(freeSpace);
-        response_body += "</esp:quota-available-bytes>\r\n";
-        response_body += "<esp:quota-used-bytes>";
+        response_body += "</quota-available-bytes>\r\n";
+        response_body += "<quota-used-bytes>";
         response_body += std::to_string(usedSpace);
-        response_body += "</esp:quota-used-bytes>\r\n";
-        response_body += "<esp:fs-total-space>";
+        response_body += "</quota-used-bytes>\r\n";
+        response_body += "<fs-total-space>";
         response_body += esp3d_string::formatBytes(totalSpace);
-        response_body += "</esp:fs-total-space>\r\n";
-        response_body += "<esp:fs-free-space>";
+        response_body += "</fs-total-space>\r\n";
+        response_body += "<fs-free-space>";
         response_body += esp3d_string::formatBytes(freeSpace);
-        response_body += "</esp:fs-free-space>\r\n";
+        response_body += "</fs-free-space>\r\n";
       } else {  // is file
-        response_body += "<esp:resourcetype></esp:resourcetype>\r\n";
-        response_body += "<esp:getcontentlength>" +
+        response_body += "<resourcetype></resourcetype>\r\n";
+        response_body += "<getcontentlength>" +
                          std::to_string(entry_stat.st_size) +
-                         "</esp:getcontentlength>\r\n";
+                         "</getcontentlength>\r\n";
       }
 
       // end tags xml
-      response_body += "</D:prop>\r\n</D:propstat>\r\n</D:response>\r\n";
+      response_body += "</prop>\r\n</propstat>\r\n</response>\r\n";
       httpd_resp_send_chunk(req, response_body.c_str(), response_body.length());
       esp3d_log_d("%s", response_body.c_str());
 
@@ -160,33 +160,33 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
             // build chunk
             // in webdav we need to add / at the end of directory nam/path
             // stat on request first
-            response_body = "<D:response xmlns:esp=\"DAV:\">\r\n";
-            response_body += "<D:href>";
+            response_body = "<response>\r\n";
+            response_body += "<href>";
             response_body += "/";
             response_body += ESP3D_WEBDAV_ROOT;
             if (currentPath[0] != '/') response_body += "/";
             response_body += currentPath;
-            response_body += "</D:href>\r\n";
+            response_body += "</href>\r\n";
             response_body +=
-                "<D:propstat>\r\n<D:status>HTTP/1.1 200 "
-                "OK</D:status>\r\n<D:prop>\r\n";
-            response_body += "<esp:getlastmodified>";
+                "<propstat>\r\n<status>HTTP/1.1 200 "
+                "OK</status>\r\n<prop>\r\n";
+            response_body += "<getlastmodified>";
             response_body += esp3d_string::getTimeString(entry_stat.st_mtime);
-            response_body += "</esp:getlastmodified>\r\n";
+            response_body += "</getlastmodified>\r\n";
             if (entry->d_type == DT_DIR) {
               // is dir
               response_body +=
-                  "<esp:resourcetype><D:collection></D:collection></"
-                  "esp:resourcetype>\r\n";
+                  "<resourcetype><collection></collection></"
+                  "resourcetype>\r\n";
             } else {
               // is file
-              response_body += "<esp:resourcetype></esp:resourcetype>\r\n";
-              response_body += "<esp:getcontentlength>" +
+              response_body += "<resourcetype></resourcetype>\r\n";
+              response_body += "<getcontentlength>" +
                                std::to_string(entry_stat.st_size) +
-                               "</esp:getcontentlength>\r\n";
+                               "</getcontentlength>\r\n";
             }
             // end tags xml
-            response_body += "</D:prop>\r\n</D:propstat>\r\n</D:response>\r\n";
+            response_body += "</prop>\r\n</propstat>\r\n</response>\r\n";
             httpd_resp_send_chunk(req, response_body.c_str(),
                                   response_body.length());
             esp3d_log_d("%s", response_body.c_str());
