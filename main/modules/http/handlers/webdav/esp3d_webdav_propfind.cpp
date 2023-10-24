@@ -76,6 +76,9 @@
 //  </response>
 //</multistatus>
 
+#define PROPFIND_RESPONSE_HEADER \
+  "HTTP/1.1 207 Multi-Status\r\nContent-Type: application/xml\r\n"
+
 #define PROPFIND_RESPONSE_BODY_HEADER_1            \
   "<? xml version=\"1.0\" encoding=\"utf-8\" ?>\n" \
   "<multistatus xmlns=\"DAV:\" depth=\""
@@ -111,8 +114,6 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
     free(header_value);
   }
 
-  // Add Webdav headers
-  httpd_resp_set_webdav_hdr(req);
   // Access file system
   if (globalFs.accessFS(uri.c_str())) {
     struct stat entry_stat;
@@ -121,21 +122,29 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
       // file does not exist, so no issue to create it
       response_code = 404;
       response_msg = "File not found";
+      esp3d_log_e("File not found %s", uri.c_str());
     } else {
       // Send Chunk
-      httpd_resp_send_chunk(req, "HTTP/1.1 207 Multi-Status\r\n", 24);
-      httpd_resp_send_chunk(req, "Content-Type: application/xml\r\n", 32);
-      httpd_resp_send_chunk(req, "<?xml version=\"1.0\"?>", 19);
+      httpd_resp_send_chunk(req, PROPFIND_RESPONSE_HEADER,
+                            strlen(PROPFIND_RESPONSE_HEADER));
+      // Add Webdav headers
+      httpd_resp_set_webdav_hdr(req, true);
       response_body = PROPFIND_RESPONSE_BODY_HEADER_1 + depth +
                       PROPFIND_RESPONSE_BODY_HEADER_2;
       httpd_resp_send_chunk(req, response_body.c_str(), response_body.length());
+      // WebDav Directory name must end with /
+      if (S_ISDIR(entry_stat.st_mode)) {
+        if (uri[uri.length() - 1] != '/') {
+          uri += "/";
+        }
+      }
       // stat on request first
       response_body = "<response>\n";
       response_body += "<href>";
       response_body += uri;
       response_body += "</href>\n";
       response_body += "<propstat>\n<prop>\n";
-      response_body += "<getlastmodified> ";
+      response_body += "<getlastmodified>";
       response_body += esp3d_string::getTimeString(entry_stat.st_mtime);
       response_body += "</getlastmodified>\n";
       // is dir
@@ -167,8 +176,8 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
       }
 
       // end tags xml
-      response_body += "</prop>\n<status> HTTP / 1.1 200 ";
-      response_body += "OK</status>\n</propstat>\n</response>\n";
+      response_body += "</prop>\n<status>HTTP/1.1 200 OK</status>\n ";
+      response_body += "</propstat>\n</response>\n";
       httpd_resp_send_chunk(req, response_body.c_str(), response_body.length());
 
       // reponse for the first only if dir or file
@@ -190,15 +199,19 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
                           entry->d_name);
               continue;
             }
-            // send chunk
+            // build chunk
+            // in webdav we need to add / at the end of directory nam/path
+            if (entry->d_type == DT_DIR) {
+              currentPath += "/";
+            }
 
             // stat on request first
             response_body = "<response>\n";
             response_body += "<href>";
-            response_body += uri;
+            response_body += currentPath;
             response_body += "</href>\n";
             response_body += "<propstat>\n<prop>\n";
-            response_body += "<getlastmodified> ";
+            response_body += "<getlastmodified>";
             response_body += esp3d_string::getTimeString(entry_stat.st_mtime);
             response_body += "</getlastmodified>\n";
 
@@ -214,7 +227,7 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
             }
             // end tags xml
             response_body +=
-                "</prop>\n<status> HTTP / 1.1 200 "
+                "</prop>\n<status>HTTP/1.1 200 "
                 "OK</status>\n</propstat>\n</response>\n";
             httpd_resp_send_chunk(req, response_body.c_str(),
                                   response_body.length());
@@ -222,10 +235,11 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
           globalFs.closedir(dir);
         }
       }
+      httpd_resp_send_chunk(req, PROPFIND_RESPONSE_BODY_FOOTER,
+                            strlen(PROPFIND_RESPONSE_BODY_FOOTER));
+      httpd_resp_send_chunk(req, NULL, 0);
     }
-    httpd_resp_send_chunk(req, PROPFIND_RESPONSE_BODY_FOOTER,
-                          strlen(PROPFIND_RESPONSE_BODY_FOOTER));
-    httpd_resp_send_chunk(req, NULL, 0);
+
     // release access
     globalFs.releaseFS(uri.c_str());
   } else {
@@ -236,5 +250,6 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
 
   // send response code to client
   if (response_code == 207) return ESP_OK;
+  httpd_resp_set_webdav_hdr(req);
   return http_send_response(req, response_code, response_msg.c_str());
 }
