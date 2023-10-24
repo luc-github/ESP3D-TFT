@@ -24,7 +24,7 @@
 
 #define ESP3D_WEBDAV_HEADER "1"
 
-#define ESP3D_WEBDAV_ROOT "DavWWWRoot"
+#define ESP3D_WEBDAV_ROOT "webdav"
 
 #define ESP3D_WEBDAV_PATH(pathstr) &pathstr[strlen(ESP3D_WEBDAV_ROOT) + 1]
 

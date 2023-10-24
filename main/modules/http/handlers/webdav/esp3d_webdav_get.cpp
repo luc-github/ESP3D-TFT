@@ -42,69 +42,77 @@ esp_err_t ESP3DHttpService::webdav_get_handler(httpd_req_t* req) {
   esp3d_log_d("Payload size: %d", payload_size);
   // Add Webdav headers
   httpd_resp_set_webdav_hdr(req);
-
-  if (globalFs.accessFS(uri.c_str())) {
-    struct stat entry_stat;
-    if (globalFs.stat(uri.c_str(), &entry_stat) == -1) {
-      response_code = 404;
-      response_msg = "Failed to stat";
-    } else {
-      // get last modified time
-      last_modified = esp3d_string::getTimeString(entry_stat.st_mtime);
-      // Add Last-Modified header
-      httpd_resp_set_hdr(req, "Last-Modified", last_modified.c_str());
-      // is file ?
-      if (S_ISREG(entry_stat.st_mode)) {
-        // is file
-        file_size = entry_stat.st_size;
-        content_type = esp3d_string::getContentType(uri.c_str());
-        // Add Content-Type header
-        httpd_resp_set_type(req, content_type.c_str());
-        // Add Content-Length header
-        httpd_resp_set_hdr(req, "Content-Length",
-                           std::to_string(file_size).c_str());
-      }
-      // open file
-      FILE* fd = globalFs.open(uri.c_str(), "r");
-      if (fd) {
-        size_t chunksize;
-        size_t total_send = 0;
-        // send file
-        do {
-          // Read data block from the file
-          chunksize = fread(_chunk, 1, CHUNK_BUFFER_SIZE, fd);
-          total_send += chunksize;
-          if (chunksize > 0) {
-            // Send the HTTP data block
-            if (httpd_resp_send_chunk(req, _chunk, chunksize) != ESP_OK) {
-              esp3d_log_e("File sending failed!");
-              chunksize = 0;
-              response_code = 500;
-              response_msg = "Failed to send file";
-            }
-          }
-        } while (chunksize != 0);
-        // Close the file
-        fclose(fd);
-        httpd_resp_send_chunk(req, NULL, 0);
-        // Check if all the file has been sent
-        if (total_send != file_size) {
-          esp3d_log_e("File sending failed: size do not match!");
-          response_code = 500;
-          response_msg = "File sending failed: size do not match!";
-        }
-      } else {
-        esp3d_log_e("Failed to open file");
-        response_code = 500;
-        response_msg = "Failed to open file";
-      }
-    }
-    // release access
-    globalFs.releaseFS(uri.c_str());
+  // sanity check
+  if (uri.length() == 0) uri = "/";
+  if (uri == "/") {
+    response_code = 404;
+    response_msg = "This is not a file";
+    esp3d_log_e("Empty uri");
   } else {
-    esp3d_log_e("Failed to access FS");
-    response_code = 503;
-    response_msg = "Failed to access FS";
+    if (globalFs.accessFS(uri.c_str())) {
+      struct stat entry_stat;
+      if (globalFs.stat(uri.c_str(), &entry_stat) == -1) {
+        response_code = 404;
+        response_msg = "Failed to stat";
+        esp3d_log_e("Failed to stat");
+      } else {
+        // get last modified time
+        last_modified = esp3d_string::getTimeString(entry_stat.st_mtime);
+        // Add Last-Modified header
+        httpd_resp_set_hdr(req, "Last-Modified", last_modified.c_str());
+        // is file ?
+        if (S_ISREG(entry_stat.st_mode)) {
+          // is file
+          file_size = entry_stat.st_size;
+          content_type = esp3d_string::getContentType(uri.c_str());
+          // Add Content-Type header
+          httpd_resp_set_type(req, content_type.c_str());
+          // Add Content-Length header
+          httpd_resp_set_hdr(req, "Content-Length",
+                             std::to_string(file_size).c_str());
+        }
+        // open file
+        FILE* fd = globalFs.open(uri.c_str(), "r");
+        if (fd) {
+          size_t chunksize;
+          size_t total_send = 0;
+          // send file
+          do {
+            // Read data block from the file
+            chunksize = fread(_chunk, 1, CHUNK_BUFFER_SIZE, fd);
+            total_send += chunksize;
+            if (chunksize > 0) {
+              // Send the HTTP data block
+              if (httpd_resp_send_chunk(req, _chunk, chunksize) != ESP_OK) {
+                esp3d_log_e("File sending failed!");
+                chunksize = 0;
+                response_code = 500;
+                response_msg = "Failed to send file";
+              }
+            }
+          } while (chunksize != 0);
+          // Close the file
+          fclose(fd);
+          httpd_resp_send_chunk(req, NULL, 0);
+          // Check if all the file has been sent
+          if (total_send != file_size) {
+            esp3d_log_e("File sending failed: size do not match!");
+            response_code = 500;
+            response_msg = "File sending failed: size do not match!";
+          }
+        } else {
+          esp3d_log_e("Failed to open file");
+          response_code = 500;
+          response_msg = "Failed to open file";
+        }
+      }
+      // release access
+      globalFs.releaseFS(uri.c_str());
+    } else {
+      esp3d_log_e("Failed to access FS");
+      response_code = 503;
+      response_msg = "Failed to access FS";
+    }
   }
   // send response code to client
   if (response_code == 200) return ESP_OK;

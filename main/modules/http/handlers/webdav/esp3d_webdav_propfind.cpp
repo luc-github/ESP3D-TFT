@@ -76,15 +76,16 @@
 //  </response>
 //</multistatus>
 
-#define PROPFIND_RESPONSE_HEADER \
-  "HTTP/1.1 207 Multi-Status\r\nContent-Type: application/xml\r\n"
+#define PROPFIND_RESPONSE_HEADER                                 \
+  "HTTP/1.1 207 Multi-Status\r\nContent-Type: application/xml; " \
+  "charset=\"utf-8\"\r\nContent-Length: xxx\r\n"
 
-#define PROPFIND_RESPONSE_BODY_HEADER_1            \
-  "<? xml version=\"1.0\" encoding=\"utf-8\" ?>\n" \
+#define PROPFIND_RESPONSE_BODY_HEADER_1                 \
+  "\r\n<?xml version=\"1.0\" encoding=\"utf-8\" ?>\r\n" \
   "<multistatus xmlns=\"DAV:\" depth=\""
-#define PROPFIND_RESPONSE_BODY_HEADER_2 "\">\n"
+#define PROPFIND_RESPONSE_BODY_HEADER_2 "\">\r\n"
 
-#define PROPFIND_RESPONSE_BODY_FOOTER "</multistatus>\n"
+#define PROPFIND_RESPONSE_BODY_FOOTER "</multistatus>\r\n"
 
 esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
   esp3d_log("Uri: %s", req->uri);
@@ -113,7 +114,8 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
     }
     free(header_value);
   }
-
+  // sanity check
+  if (uri.length() == 0) uri = "/";
   // Access file system
   if (globalFs.accessFS(uri.c_str())) {
     struct stat entry_stat;
@@ -127,11 +129,13 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
       // Send Chunk
       httpd_resp_send_chunk(req, PROPFIND_RESPONSE_HEADER,
                             strlen(PROPFIND_RESPONSE_HEADER));
+      esp3d_log_d("%s", PROPFIND_RESPONSE_HEADER);
       // Add Webdav headers
       httpd_resp_set_webdav_hdr(req, true);
       response_body = PROPFIND_RESPONSE_BODY_HEADER_1 + depth +
                       PROPFIND_RESPONSE_BODY_HEADER_2;
       httpd_resp_send_chunk(req, response_body.c_str(), response_body.length());
+      esp3d_log_d("%s", response_body.c_str());
       // WebDav Directory name must end with /
       if (S_ISDIR(entry_stat.st_mode)) {
         if (uri[uri.length() - 1] != '/') {
@@ -139,17 +143,18 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
         }
       }
       // stat on request first
-      response_body = "<response>\n";
+      response_body = "<response>\r\n";
       response_body += "<href>";
       response_body += uri;
-      response_body += "</href>\n";
-      response_body += "<propstat>\n<prop>\n";
+      response_body += "</href>\r\n";
+      response_body += "<propstat>\r\n<prop>\r\n";
       response_body += "<getlastmodified>";
       response_body += esp3d_string::getTimeString(entry_stat.st_mtime);
-      response_body += "</getlastmodified>\n";
+      response_body += "</getlastmodified>\r\n";
       // is dir
       if (S_ISDIR(entry_stat.st_mode)) {
-        response_body += "<resourcetype><collection /></resourcetype>\n";
+        response_body +=
+            "<resourcetype><collection></collection></resourcetype>\r\n";
         // space entries are only for directory at first level
         uint64_t totalSpace = 0;
         uint64_t usedSpace = 0;
@@ -158,27 +163,28 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
                               true);
         response_body += "<quota-available-bytes>";
         response_body += std::to_string(freeSpace);
-        response_body += "</quota-available-bytes>\n";
+        response_body += "</quota-available-bytes>\r\n";
         response_body += "<quota-used-bytes>";
         response_body += std::to_string(usedSpace);
-        response_body += "</quota-used-bytes>\n";
+        response_body += "</quota-used-bytes>\r\n";
         response_body += "<fs-total-space>";
         response_body += esp3d_string::formatBytes(totalSpace);
-        response_body += "</fs-total-space>\n";
+        response_body += "</fs-total-space>\r\n";
         response_body += "<fs-free-space>";
         response_body += esp3d_string::formatBytes(freeSpace);
-        response_body += "</fs-free-space>\n";
+        response_body += "</fs-free-space>\r\n";
       } else {  // is file
-        response_body += "<resourcetype/>\n";
+        response_body += "<resourcetype></resourcetype>\r\n";
         response_body += "<getcontentlength>" +
                          std::to_string(entry_stat.st_size) +
-                         "</getcontentlength>\n";
+                         "</getcontentlength>\r\n";
       }
 
       // end tags xml
-      response_body += "</prop>\n<status>HTTP/1.1 200 OK</status>\n ";
-      response_body += "</propstat>\n</response>\n";
+      response_body += "</prop>\r\n<status>HTTP/1.1 200 OK</status>\r\n";
+      response_body += "</propstat>\r\n</response>\r\n";
       httpd_resp_send_chunk(req, response_body.c_str(), response_body.length());
+      esp3d_log_d("%s", response_body.c_str());
 
       // reponse for the first only if dir or file
       if (depth == "1" && S_ISDIR(entry_stat.st_mode)) {
@@ -206,37 +212,40 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
             }
 
             // stat on request first
-            response_body = "<response>\n";
+            response_body = "<response>\r\n";
             response_body += "<href>";
             response_body += currentPath;
-            response_body += "</href>\n";
-            response_body += "<propstat>\n<prop>\n";
+            response_body += "</href>\r\n";
+            response_body += "<propstat>\r\n<prop>\r\n";
             response_body += "<getlastmodified>";
             response_body += esp3d_string::getTimeString(entry_stat.st_mtime);
-            response_body += "</getlastmodified>\n";
+            response_body += "</getlastmodified>\r\n";
 
             if (entry->d_type == DT_DIR) {
               // is dir
-              response_body += "<resourcetype><collection /></resourcetype>\n";
+              response_body +=
+                  "<resourcetype><collection></collection></resourcetype>\r\n";
             } else {
               // is file
-              response_body += "<resourcetype/>\n";
+              response_body += "<resourcetype></resourcetype>\r\n";
               response_body += "<getcontentlength>" +
                                std::to_string(entry_stat.st_size) +
-                               "</getcontentlength>\n";
+                               "</getcontentlength>\r\n";
             }
             // end tags xml
             response_body +=
-                "</prop>\n<status>HTTP/1.1 200 "
-                "OK</status>\n</propstat>\n</response>\n";
+                "</prop>\r\n<status>HTTP/1.1 200 "
+                "OK</status>\r\n</propstat>\r\n</response>\r\n";
             httpd_resp_send_chunk(req, response_body.c_str(),
                                   response_body.length());
+            esp3d_log_d("%s", response_body.c_str());
           }
           globalFs.closedir(dir);
         }
       }
       httpd_resp_send_chunk(req, PROPFIND_RESPONSE_BODY_FOOTER,
                             strlen(PROPFIND_RESPONSE_BODY_FOOTER));
+      esp3d_log_d("%s", PROPFIND_RESPONSE_BODY_FOOTER);
       httpd_resp_send_chunk(req, NULL, 0);
     }
 

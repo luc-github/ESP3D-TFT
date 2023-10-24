@@ -97,7 +97,7 @@ esp_err_t ESP3DHttpService::http_send_response(httpd_req_t *req, int code,
       status += "";
       break;
   }
-  esp3d_log("Uri: %s, status: %s", req->uri, status.c_str());
+  esp3d_log_d("Uri: %s, status: %s", req->uri, status.c_str());
   httpd_resp_set_status(req, status.c_str());
   return httpd_resp_send(req, msg, HTTPD_RESP_USE_STRLEN);
 }

@@ -86,138 +86,145 @@ esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t* req) {
   }
   // Add Webdav headers
   httpd_resp_set_webdav_hdr(req);
-  // Access file system
-  if (globalFs.accessFS(uri.c_str())) {
-    struct stat entry_stat;
-    // check if file exists
-    if (globalFs.stat(uri.c_str(), &entry_stat) == -1) {
-      // file does not exist, so no issue to create it
-      overwrite = true;
-    } else {                              // file exists
-      if (S_ISDIR(entry_stat.st_mode)) {  // it is a directory
-        // is directory
-        response_code = 412;
-        response_msg = "Directory has same name as file";
-        overwrite = false;
-        esp3d_log_e("Directory has same name as file");
-      } else {             // it is a file
-        if (!overwrite) {  // file exists and overwrite is false
+  // sanity check
+  if (uri.length() == 0) uri = "/";
+  if (uri == "/") {
+    response_code = 400;
+    response_msg = "Not allowed";
+    esp3d_log_e("Empty uri");
+  } else {
+    // Access file system
+    if (globalFs.accessFS(uri.c_str())) {
+      struct stat entry_stat;
+      // check if file exists
+      if (globalFs.stat(uri.c_str(), &entry_stat) == -1) {
+        // file does not exist, so no issue to create it
+        overwrite = true;
+      } else {                              // file exists
+        if (S_ISDIR(entry_stat.st_mode)) {  // it is a directory
+          // is directory
           response_code = 412;
-          response_msg = "File already exists";
-          esp3d_log_e("File already exists");
-        } else {  // file exists and overwrite is true
-          response_code = 204;
-        }
-      }
-    }
-    if (overwrite) {
-#if ESP3D_TIMESTAMP_FEATURE
-      last_modified = esp3dTimeService.getCurrentTime();
-      last_modified += esp3dTimeService.getTimeZone();
-#else
-      time_t now;
-      time(&now);
-      last_modified = esp3d_string::getTimeString(now);
-
-#endif  // ESP3D_TIMESTAMP_FEATURE
-      httpd_resp_set_hdr(req, "Last-Modified", last_modified.c_str());
-      // check free space
-      uint64_t totalBytes;
-      uint64_t usedBytes;
-      uint64_t freeBytes;
-      if (globalFs.getSpaceInfo(&totalBytes, &usedBytes, &freeBytes,
-                                uri.c_str(), true)) {
-        if (freeBytes < file_size) {
-          response_code = 507;
-          response_msg = "Not enough space";
-        } else {
-          FILE* fd = globalFs.open(uri.c_str(), "w");
-          if (fd) {
-            bool hasError = false;
-            if (req->content_len > 0) {
-              char* packetWrite = nullptr;
-              size_t remaining = req->content_len;
-              size_t received = 0;
-              packetWrite = (char*)malloc(CHUNK_PUT_BUFFER_SIZE + 1);
-              if (packetWrite) {
-                while (remaining > 0 && !hasError) {
-                  if ((received = httpd_req_recv(req, packetWrite,
-                                                 CHUNK_PUT_BUFFER_SIZE)) <= 0) {
-                    esp3d_log_e("Connection lost");
-                    hasError = true;
-                  }
-                  if (received == HTTPD_SOCK_ERR_TIMEOUT) {
-                    esp3d_log_e("Time out");
-                    continue;
-                  }
-                  if (received == HTTPD_SOCK_ERR_INVALID ||
-                      received == HTTPD_SOCK_ERR_FAIL) {
-                    esp3d_log_e("Error connection");
-                    hasError = true;
-                  }
-                  // decrease received bytes from
-                  // remaining bytes amount
-                  remaining -= received;
-                  // write packet to file
-                  if (received > 0) {
-                    packetWrite[received] = 0;
-                    if (fwrite(packetWrite, 1, received, fd) != received) {
-                      esp3d_log_e("Error writing file");
-                      hasError = true;
-                    }
-                    total_read += received;
-                  }
-                }
-                free(packetWrite);
-                if (hasError) {
-                  response_code = 500;
-                  response_msg = "Error writing file";
-                  esp3d_log_e("Error writing file");
-                }
-              } else {
-                esp3d_log_e("Failed to allocate memory");
-                response_code = 500;
-                response_msg = "Failed to allocate memory";
-              }
-            }
-            // Close the file
-            fclose(fd);
-            // Not blocking error
-            if (httpd_resp_set_hdr(req, "Content-Length",
-                                   std::to_string(total_read).c_str()) !=
-                ESP_OK) {
-              esp3d_log_e("httpd_resp_set_hdr failed for Content-Length");
-            }
-            // Check if all the file has been sent
-            if (hasError && total_read != file_size) {
-              esp3d_log_e(
-                  "File receiving failed: size do not "
-                  "match!");
-              response_code = 500;
-              response_msg =
-                  "File receiving failed: size do not "
-                  "match!";
-            }
-          } else {
-            esp3d_log_e("Failed to open file");
-            response_code = 500;
-            response_msg = "Failed to open file";
+          response_msg = "Directory has same name as file";
+          overwrite = false;
+          esp3d_log_e("Directory has same name as file");
+        } else {             // it is a file
+          if (!overwrite) {  // file exists and overwrite is false
+            response_code = 412;
+            response_msg = "File already exists";
+            esp3d_log_e("File already exists");
+          } else {  // file exists and overwrite is true
+            response_code = 204;
           }
         }
-      } else {
-        esp3d_log_e("Failed to get space info");
-        response_code = 500;
-        response_msg = "Failed to get space info";
       }
-    }
-    // release access
-    globalFs.releaseFS(uri.c_str());
-  } else {
-    esp3d_log_e("Failed to access FS");
-    response_code = 503;
-    response_msg = "Failed to access FS";
-  }
+      if (overwrite) {
+#if ESP3D_TIMESTAMP_FEATURE
+        last_modified = esp3dTimeService.getCurrentTime();
+        last_modified += esp3dTimeService.getTimeZone();
+#else
+        time_t now;
+        time(&now);
+        last_modified = esp3d_string::getTimeString(now);
 
+#endif  // ESP3D_TIMESTAMP_FEATURE
+        httpd_resp_set_hdr(req, "Last-Modified", last_modified.c_str());
+        // check free space
+        uint64_t totalBytes;
+        uint64_t usedBytes;
+        uint64_t freeBytes;
+        if (globalFs.getSpaceInfo(&totalBytes, &usedBytes, &freeBytes,
+                                  uri.c_str(), true)) {
+          if (freeBytes < file_size) {
+            response_code = 507;
+            response_msg = "Not enough space";
+          } else {
+            FILE* fd = globalFs.open(uri.c_str(), "w");
+            if (fd) {
+              bool hasError = false;
+              if (req->content_len > 0) {
+                char* packetWrite = nullptr;
+                size_t remaining = req->content_len;
+                size_t received = 0;
+                packetWrite = (char*)malloc(CHUNK_PUT_BUFFER_SIZE + 1);
+                if (packetWrite) {
+                  while (remaining > 0 && !hasError) {
+                    if ((received = httpd_req_recv(
+                             req, packetWrite, CHUNK_PUT_BUFFER_SIZE)) <= 0) {
+                      esp3d_log_e("Connection lost");
+                      hasError = true;
+                    }
+                    if (received == HTTPD_SOCK_ERR_TIMEOUT) {
+                      esp3d_log_e("Time out");
+                      continue;
+                    }
+                    if (received == HTTPD_SOCK_ERR_INVALID ||
+                        received == HTTPD_SOCK_ERR_FAIL) {
+                      esp3d_log_e("Error connection");
+                      hasError = true;
+                    }
+                    // decrease received bytes from
+                    // remaining bytes amount
+                    remaining -= received;
+                    // write packet to file
+                    if (received > 0) {
+                      packetWrite[received] = 0;
+                      if (fwrite(packetWrite, 1, received, fd) != received) {
+                        esp3d_log_e("Error writing file");
+                        hasError = true;
+                      }
+                      total_read += received;
+                    }
+                  }
+                  free(packetWrite);
+                  if (hasError) {
+                    response_code = 500;
+                    response_msg = "Error writing file";
+                    esp3d_log_e("Error writing file");
+                  }
+                } else {
+                  esp3d_log_e("Failed to allocate memory");
+                  response_code = 500;
+                  response_msg = "Failed to allocate memory";
+                }
+              }
+              // Close the file
+              fclose(fd);
+              // Not blocking error
+              if (httpd_resp_set_hdr(req, "Content-Length",
+                                     std::to_string(total_read).c_str()) !=
+                  ESP_OK) {
+                esp3d_log_e("httpd_resp_set_hdr failed for Content-Length");
+              }
+              // Check if all the file has been sent
+              if (hasError && total_read != file_size) {
+                esp3d_log_e(
+                    "File receiving failed: size do not "
+                    "match!");
+                response_code = 500;
+                response_msg =
+                    "File receiving failed: size do not "
+                    "match!";
+              }
+            } else {
+              esp3d_log_e("Failed to open file");
+              response_code = 500;
+              response_msg = "Failed to open file";
+            }
+          }
+        } else {
+          esp3d_log_e("Failed to get space info");
+          response_code = 500;
+          response_msg = "Failed to get space info";
+        }
+      }
+      // release access
+      globalFs.releaseFS(uri.c_str());
+    } else {
+      esp3d_log_e("Failed to access FS");
+      response_code = 503;
+      response_msg = "Failed to access FS";
+    }
+  }
   // send response code to client
   return http_send_response(req, response_code, response_msg.c_str());
 }

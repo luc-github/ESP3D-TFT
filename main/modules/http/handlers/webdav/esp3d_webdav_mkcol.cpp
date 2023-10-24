@@ -52,26 +52,34 @@ esp_err_t ESP3DHttpService::webdav_mkcol_handler(httpd_req_t* req) {
   esp3d_log_d("Payload size: %d", payload_size);
   // Add Webdav headers
   httpd_resp_set_webdav_hdr(req);
-  // Check can access (error code 503)
-  if (globalFs.accessFS(uri.c_str())) {
-    struct stat entry_stat;
-    if (globalFs.stat(uri.c_str(), &entry_stat) == -1) {
-      // does not exist
-      if (!globalFs.mkdir(uri.c_str())) {
-        esp3d_log_e("Failed to create dir");
-        response_code = 500;
-        response_msg = "Failed to create dir";
-      }
-    } else {  // already exists
-      response_code = 409;
-      response_msg = "Already exists";
-    }
-    // release access
-    globalFs.releaseFS(uri.c_str());
+  // sanity check
+  if (uri.length() == 0) uri = "/";
+  if (uri == "/") {
+    response_code = 400;
+    response_msg = "Not allowed";
+    esp3d_log_e("Empty uri");
   } else {
-    esp3d_log_e("Failed to access FS");
-    response_code = 503;
-    response_msg = "Failed to access FS";
+    // Check can access (error code 503)
+    if (globalFs.accessFS(uri.c_str())) {
+      struct stat entry_stat;
+      if (globalFs.stat(uri.c_str(), &entry_stat) == -1) {
+        // does not exist
+        if (!globalFs.mkdir(uri.c_str())) {
+          esp3d_log_e("Failed to create dir");
+          response_code = 500;
+          response_msg = "Failed to create dir";
+        }
+      } else {  // already exists
+        response_code = 409;
+        response_msg = "Already exists";
+      }
+      // release access
+      globalFs.releaseFS(uri.c_str());
+    } else {
+      esp3d_log_e("Failed to access FS");
+      response_code = 503;
+      response_msg = "Failed to access FS";
+    }
   }
   // send response code to client
   return http_send_response(req, response_code, response_msg.c_str());

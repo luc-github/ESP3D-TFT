@@ -37,35 +37,43 @@ esp_err_t ESP3DHttpService::webdav_delete_handler(httpd_req_t *req) {
   esp3d_log_d("Payload size: %d", payload_size);
   // Add Webdav headers
   httpd_resp_set_webdav_hdr(req);
-  // Check can access (error code 503)
-  if (globalFs.accessFS(uri.c_str())) {
-    struct stat entry_stat;
-    if (globalFs.stat(uri.c_str(), &entry_stat) == -1) {
-      response_code = 404;
-      response_msg = "Failed to stat";
-    } else {
-      if (S_ISDIR(entry_stat.st_mode)) {
-        // is directory
-        if (!globalFs.rmdir(uri.c_str())) {
-          esp3d_log_e("Failed to delete dir");
-          response_code = 500;
-          response_msg = "Failed to delete dir";
-        }
+  // sanity check
+  if (uri.length() == 0) uri = "/";
+  if (uri == "/") {
+    response_code = 400;
+    response_msg = "Not allowed";
+    esp3d_log_e("Empty uri");
+  } else {
+    // Check can access (error code 503)
+    if (globalFs.accessFS(uri.c_str())) {
+      struct stat entry_stat;
+      if (globalFs.stat(uri.c_str(), &entry_stat) == -1) {
+        response_code = 404;
+        response_msg = "Failed to stat";
       } else {
-        // is file
-        if (!globalFs.remove(uri.c_str())) {
-          esp3d_log_e("Failed to delete file");
-          response_code = 500;
-          response_msg = "Failed to delete file";
+        if (S_ISDIR(entry_stat.st_mode)) {
+          // is directory
+          if (!globalFs.rmdir(uri.c_str())) {
+            esp3d_log_e("Failed to delete dir");
+            response_code = 500;
+            response_msg = "Failed to delete dir";
+          }
+        } else {
+          // is file
+          if (!globalFs.remove(uri.c_str())) {
+            esp3d_log_e("Failed to delete file");
+            response_code = 500;
+            response_msg = "Failed to delete file";
+          }
         }
       }
+      // release access
+      globalFs.releaseFS(uri.c_str());
+    } else {
+      esp3d_log_e("Failed to access FS");
+      response_code = 503;
+      response_msg = "Failed to access FS";
     }
-    // release access
-    globalFs.releaseFS(uri.c_str());
-  } else {
-    esp3d_log_e("Failed to access FS");
-    response_code = 503;
-    response_msg = "Failed to access FS";
   }
   // send response code to client
   return http_send_response(req, response_code, response_msg.c_str());

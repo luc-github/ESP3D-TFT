@@ -51,6 +51,7 @@ esp_err_t httpd_resp_set_webdav_hdr(httpd_req_t *req, bool is_chunk) {
       esp3d_log_e("httpd_resp_send_chunk failed for DAV");
       return err;
     }
+    esp3d_log_d("%s", chunked.c_str());
   }
 
   return err;

@@ -440,7 +440,7 @@ bool ESP3DHttpService::begin() {
 #if ESP3D_WEBDAV_SERVICES_FEATURE
     // GET
     const httpd_uri_t webdav_get_handler_config = {
-        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
+        .uri = "/" ESP3D_WEBDAV_ROOT "/?*",
         .method = HTTP_GET,
         .handler =
             (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_get_handler),
@@ -455,7 +455,7 @@ bool ESP3DHttpService::begin() {
 
     // PUT
     const httpd_uri_t webdav_put_handler_config = {
-        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
+        .uri = "/" ESP3D_WEBDAV_ROOT "/?*",
         .method = HTTP_PUT,
         .handler =
             (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_put_handler),
@@ -470,7 +470,7 @@ bool ESP3DHttpService::begin() {
 
     // DELETE
     const httpd_uri_t webdav_delete_handler_config = {
-        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
+        .uri = "/" ESP3D_WEBDAV_ROOT "/?*",
         .method = HTTP_DELETE,
         .handler = (esp_err_t(*)(httpd_req_t *))(
             esp3dHttpService.webdav_delete_handler),
@@ -485,7 +485,7 @@ bool ESP3DHttpService::begin() {
 
     // MKCOL
     const httpd_uri_t webdav_mkcol_handler_config = {
-        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
+        .uri = "/" ESP3D_WEBDAV_ROOT "/?*",
         .method = HTTP_MKCOL,
         .handler = (esp_err_t(*)(httpd_req_t *))(
             esp3dHttpService.webdav_mkcol_handler),
@@ -498,39 +498,9 @@ bool ESP3DHttpService::begin() {
       esp3d_log_e("webdav mkcol handler registration failed");
     }
 
-    // MOVE
-    const httpd_uri_t webdav_move_handler_config = {
-        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
-        .method = HTTP_MOVE,
-        .handler =
-            (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_move_handler),
-        .user_ctx = nullptr,
-        .is_websocket = false,
-        .handle_ws_control_frames = false,
-        .supported_subprotocol = nullptr};
-    if (ESP_OK !=
-        httpd_register_uri_handler(_server, &webdav_move_handler_config)) {
-      esp3d_log_e("webdav move handler registration failed");
-    }
-
-    // COPY
-    const httpd_uri_t webdav_copy_handler_config = {
-        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
-        .method = HTTP_COPY,
-        .handler =
-            (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_copy_handler),
-        .user_ctx = nullptr,
-        .is_websocket = false,
-        .handle_ws_control_frames = false,
-        .supported_subprotocol = nullptr};
-    if (ESP_OK !=
-        httpd_register_uri_handler(_server, &webdav_copy_handler_config)) {
-      esp3d_log_e("webdav copy handler registration failed");
-    }
-
     // PROPFIND
     const httpd_uri_t webdav_propfind_handler_config = {
-        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
+        .uri = "/" ESP3D_WEBDAV_ROOT "/?*",
         .method = HTTP_PROPFIND,
         .handler = (esp_err_t(*)(httpd_req_t *))(
             esp3dHttpService.webdav_propfind_handler),
@@ -545,7 +515,7 @@ bool ESP3DHttpService::begin() {
 
     // OPTIONS
     const httpd_uri_t webdav_options_handler_config = {
-        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
+        .uri = "/" ESP3D_WEBDAV_ROOT "/?*",
         .method = HTTP_OPTIONS,
         .handler = (esp_err_t(*)(httpd_req_t *))(
             esp3dHttpService.webdav_options_handler),
@@ -560,7 +530,7 @@ bool ESP3DHttpService::begin() {
 
     // HEAD
     const httpd_uri_t webdav_head_handler_config = {
-        .uri = "/" ESP3D_WEBDAV_ROOT "/*",
+        .uri = "/" ESP3D_WEBDAV_ROOT "/?*",
         .method = HTTP_HEAD,
         .handler =
             (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_head_handler),
@@ -568,10 +538,39 @@ bool ESP3DHttpService::begin() {
         .is_websocket = false,
         .handle_ws_control_frames = false,
         .supported_subprotocol = nullptr};
-
     if (ESP_OK !=
         httpd_register_uri_handler(_server, &webdav_head_handler_config)) {
       esp3d_log_e("webdav head handler registration failed");
+    }
+
+    // MOVE
+    const httpd_uri_t webdav_move_handler_config = {
+        .uri = "/" ESP3D_WEBDAV_ROOT "/?*",
+        .method = HTTP_MOVE,
+        .handler =
+            (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_move_handler),
+        .user_ctx = nullptr,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr};
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &webdav_move_handler_config)) {
+      esp3d_log_e("webdav move handler registration failed");
+    }
+
+    // COPY
+    const httpd_uri_t webdav_copy_handler_config = {
+        .uri = "/" ESP3D_WEBDAV_ROOT "/?*",
+        .method = HTTP_COPY,
+        .handler =
+            (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_copy_handler),
+        .user_ctx = nullptr,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr};
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &webdav_copy_handler_config)) {
+      esp3d_log_e("webdav copy handler registration failed");
     }
 #endif  // ESP3D_WEBDAV_SERVICES_FEATURE
 
@@ -631,7 +630,7 @@ void ESP3DHttpService::end() {
 #endif  // ESP3D_SD_CARD_FEATURE
     httpd_unregister_uri(_server, "/login");
 #if ESP3D_WEBDAV_SERVICES_FEATURE
-    httpd_unregister_uri(_server, "/" ESP3D_WEBDAV_ROOT "/*");
+    httpd_unregister_uri(_server, "/" ESP3D_WEBDAV_ROOT "/?*");
 #endif  // ESP3D_WEBDAV_SERVICES_FEATURE
     httpd_register_err_handler(_server, HTTPD_404_NOT_FOUND, NULL);
     httpd_stop(_server);

@@ -17,11 +17,38 @@
 				const addressstr="http://"+ipaddress+"/"+DavWWWRoot+path
 				xhr.open("PROPFIND", addressstr);
 				xhr.setRequestHeader('Depth', '1');
-				xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
-xhr.setRequestHeader("Access-Control-Allow-Credentials", "true");
-xhr.setRequestHeader("Access-Control-Allow-Methods", "ACL, CANCELUPLOAD, CHECKIN, CHECKOUT, COPY, DELETE, GET, HEAD, LOCK, MKCALENDAR, MKCOL, MOVE, OPTIONS, POST, PROPFIND, PROPPATCH, PUT, REPORT, SEARCH, UNCHECKOUT, UNLOCK, UPDATE, VERSION-CONTROL");
-xhr.setRequestHeader("Access-Control-Allow-Headers", "Overwrite, Destination, Content-Type, Depth, User-Agent, Translate, Range, Content-Range, Timeout, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control, Location, Lock-Token, If");
-xhr.setRequestHeader("Access-Control-Expose-Headers", "DAV, content-length, Allow");
+				xhr.send();
+				xhr.onload=()=>{
+				  if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 201 || xhr.status == 204 || xhr.status == 207 )) {
+					const data = xhr.response;
+					console.log(data);
+				  } else {
+					console.log(`Error: ${xhr.status}`);
+				  }
+				};
+			}
+			function options_function(method){
+				getInput();	
+				console.log(ipaddress, DavWWWRoot);
+				const xhr = new XMLHttpRequest();
+				const addressstr="http://"+ipaddress+"/"+DavWWWRoot+path
+				xhr.open("OPTIONS", addressstr);
+				xhr.send();
+				xhr.onload=()=>{
+				  if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 201 || xhr.status == 204 || xhr.status == 207 )) {
+					const data = xhr.response;
+					console.log(data);
+				  } else {
+					console.log(`Error: ${xhr.status}`);
+				  }
+				};
+			}
+			function get_function(method){
+				getInput();	
+				console.log(ipaddress, DavWWWRoot);
+				const xhr = new XMLHttpRequest();
+				const addressstr="http://"+ipaddress+"/"+DavWWWRoot+path
+				xhr.open("GET", addressstr);
 				xhr.send();
 				xhr.onload=()=>{
 				  if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 201 || xhr.status == 204 || xhr.status == 207 )) {
@@ -40,5 +67,7 @@ WebDav Root:<input type="text" value="DavWWWRoot" id="davroot" /><br/>
 Path:<input type="text" value="/" id="path" /><br/>
 
 <button onclick="propfind_function();">Propfind</button>
+<button onclick="options_function();">Options</button>
+<button onclick="get_function();">Get</button>
 </body>
 </html>
