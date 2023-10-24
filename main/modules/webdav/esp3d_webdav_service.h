@@ -33,4 +33,5 @@
   " DELETE, COPY, MOVE,"     \
   " PROPFIND, MKCOL, OPTIONS"
 
-extern esp_err_t httpd_resp_set_webdav_hdr(httpd_req_t *req);
+extern esp_err_t httpd_resp_set_webdav_hdr(httpd_req_t *req,
+                                           bool ischunk = false);
