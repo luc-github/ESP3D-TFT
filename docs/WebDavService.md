@@ -101,8 +101,8 @@ The necessary headers in response are:
 No content
 The response code is:
 - 201 if success and file is created
-- 204 if success and file is overwritten (Overwrite: T)
-- 412 if the resource already exists and Overwrite: F, or if the resource is a directory
+- 204 if success and file is overwritten
+- 412 if the resource is a directory
 - 503 if any error accessing the local file system (e.g. access denied)
 - 500 if any error during the file creation
 - 507 if the file is too big for the targeted file system
