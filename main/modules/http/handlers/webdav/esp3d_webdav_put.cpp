@@ -42,50 +42,26 @@ esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t* req) {
   size_t file_size = 0;
   size_t total_read = 0;
   std::string last_modified = "";
-  esp3d_log_d("Uri: %s", req->uri);
+  esp3d_log("Uri: %s", req->uri);
   std::string uri =
       esp3d_string::urlDecode(&req->uri[strlen(ESP3D_WEBDAV_ROOT) + 1]);
-  esp3d_log_d("Uri: %s", uri.c_str());
-  bool overwrite = false;
-  // get header Overwrite
-  size_t header_size = httpd_req_get_hdr_value_len(req, "Overwrite");
-  if (header_size > 0) {
-    char* header_value = (char*)malloc(header_size + 1);
-    if (httpd_req_get_hdr_value_str(req, "Overwrite", header_value,
-                                    header_size + 1) == ESP_OK) {
-      if (strcmp(header_value, "T") == 0) {
-        overwrite = true;
-      }
-    }
-    free(header_value);
-  }
-  // get header Destination
-  header_size = httpd_req_get_hdr_value_len(req, "Destination");
-  if (header_size > 0) {
-    char* header_value = (char*)malloc(header_size + 1);
-    if (httpd_req_get_hdr_value_str(req, "Destination", header_value,
-                                    header_size + 1) == ESP_OK) {
-      // replace uri by destination
-      std::string dest = header_value;
-      size_t pos = dest.find(ESP3D_WEBDAV_ROOT);
-      if (pos != std::string::npos) {
-        uri = dest.substr(pos + strlen(ESP3D_WEBDAV_ROOT));
-      }
-    }
-    free(header_value);
-  }
+  esp3d_log("Uri: %s", uri.c_str());
+  bool overwrite = true;
+
   // get content length
-  header_size = httpd_req_get_hdr_value_len(req, "Content-Length");
+  size_t header_size = httpd_req_get_hdr_value_len(req, "Content-Length");
   if (header_size > 0) {
     char* header_value = (char*)malloc(header_size + 1);
     if (httpd_req_get_hdr_value_str(req, "Content-Length", header_value,
                                     header_size + 1) == ESP_OK) {
       file_size = atoi(header_value);
     }
+    esp3d_log("Content-Length: %d", file_size);
     free(header_value);
   }
   // Add Webdav headers
   httpd_resp_set_webdav_hdr(req);
+
   // sanity check
   if (uri.length() == 0) uri = "/";
   if (uri == "/") {
@@ -108,13 +84,8 @@ esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t* req) {
           overwrite = false;
           esp3d_log_e("Directory has same name as file");
         } else {             // it is a file
-          if (!overwrite) {  // file exists and overwrite is false
-            response_code = 412;
-            response_msg = "File already exists";
-            esp3d_log_e("File already exists");
-          } else {  // file exists and overwrite is true
-            response_code = 204;
-          }
+          overwrite = true;  // overwrite by default
+          response_code = 204;
         }
       }
       if (overwrite) {
@@ -189,12 +160,6 @@ esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t* req) {
               }
               // Close the file
               fclose(fd);
-              // Not blocking error
-              if (httpd_resp_set_hdr(req, "Content-Length",
-                                     std::to_string(total_read).c_str()) !=
-                  ESP_OK) {
-                esp3d_log_e("httpd_resp_set_hdr failed for Content-Length");
-              }
               // Check if all the file has been sent
               if (hasError && total_read != file_size) {
                 esp3d_log_e(
@@ -226,5 +191,5 @@ esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t* req) {
     }
   }
   // send response code to client
-  return http_send_response(req, response_code, response_msg.c_str());
+  return http_send_response(req, response_code, "");
 }

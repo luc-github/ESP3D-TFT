@@ -88,11 +88,10 @@ The response code is:
 ## PUT method
 The PUT method is used to create a new non-collection resource at the location specified by the Request-URI.
 The request has the following headers:   
-- Overwrite can be T or F.   
-If T, the resource will be overwritten if it already exists. If F, the resource will not be overwritten if it already exists.
 - Content-Length is the size  of the file.
 - Content-Type is the type of the file.
-- Destination is the path of the resource to create. to be used instead of the Request-URI.
+
+no Overwrite header because we always overwrite the file.
 
 the request content is the content of the resource to create.
 The necessary headers in response are:
