@@ -102,9 +102,6 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
       response_body += "<esp:getlastmodified>";
       response_body += esp3d_string::getTimeString(entry_stat.st_mtime);
       response_body += "</esp:getlastmodified>\r\n";
-      response_body += "<esp:displayname>";
-      response_body += uri;
-      response_body += "</esp:displayname>\r\n";
       // is dir
       if (S_ISDIR(entry_stat.st_mode)) {
         response_body +=
@@ -146,7 +143,6 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
         // parse directory direct children
         DIR* dir = globalFs.opendir(uri.c_str());
         std::string currentPath;
-        std::string displayName;
         if (dir) {
           struct dirent* entry;
           struct stat entry_stat;
@@ -163,11 +159,6 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
             }
             // build chunk
             // in webdav we need to add / at the end of directory nam/path
-            displayName = "";
-            if (entry->d_type == DT_DIR) {
-              displayName = "/";
-            }
-            displayName += entry->d_name;
             // stat on request first
             response_body = "<D:response xmlns:esp=\"DAV:\">\r\n";
             response_body += "<D:href>";
@@ -182,9 +173,6 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
             response_body += "<esp:getlastmodified>";
             response_body += esp3d_string::getTimeString(entry_stat.st_mtime);
             response_body += "</esp:getlastmodified>\r\n";
-            response_body += "<esp:displayname>";
-            response_body += displayName;
-            response_body += "</esp:displayname>\r\n";
             if (entry->d_type == DT_DIR) {
               // is dir
               response_body +=
