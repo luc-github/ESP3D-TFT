@@ -36,16 +36,16 @@
 #define CHUNK_PUT_BUFFER_SIZE STREAM_CHUNK_SIZE * 4
 
 esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t* req) {
-  esp3d_log_d("Uri: %s", req->uri);
+  esp3d_log("Uri: %s", req->uri);
   int response_code = 201;
   std::string response_msg = "";
   size_t file_size = 0;
   size_t total_read = 0;
   std::string last_modified = "";
-  esp3d_log_d("Uri: %s", req->uri);
+  esp3d_log("Uri: %s", req->uri);
   std::string uri =
       esp3d_string::urlDecode(&req->uri[strlen(ESP3D_WEBDAV_ROOT) + 1]);
-  esp3d_log_d("Uri: %s", uri.c_str());
+  esp3d_log("Uri: %s", uri.c_str());
   bool overwrite = true;
 
   // get content length
@@ -56,9 +56,10 @@ esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t* req) {
                                     header_size + 1) == ESP_OK) {
       file_size = atoi(header_value);
     }
-    esp3d_log_d("Content-Length: %d", file_size);
+    esp3d_log("Content-Length: %d", file_size);
     free(header_value);
   }
+
   // Add Webdav headers
   httpd_resp_set_webdav_hdr(req);
 
