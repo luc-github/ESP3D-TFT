@@ -75,11 +75,9 @@ esp_err_t ESP3DHttpService::webdav_copy_handler(httpd_req_t* req) {
   httpd_resp_set_webdav_hdr(req);
   // sanity check
   if (uri.length() == 0) uri = "/";
-  if (uri == "/" ||
-      strncmp(uri.c_str(), ESP3D_FLASH_FS_HEADER,
-              strlen(ESP3D_FLASH_FS_HEADER) - 1) == 0 ||
-      strncmp(uri.c_str(), ESP3D_SD_FS_HEADER,
-              strlen(ESP3D_SD_FS_HEADER) - 1) == 0) {
+  if (uri == "/" || uri == ESP3D_FLASH_FS_HEADER || uri == ESP3D_SD_FS_HEADER ||
+      std::string(uri + "/") == ESP3D_FLASH_FS_HEADER ||
+      std::string(uri + "/") == ESP3D_SD_FS_HEADER) {
     response_code = 400;
     response_msg = "Not allowed";
     esp3d_log_e("Empty uri");

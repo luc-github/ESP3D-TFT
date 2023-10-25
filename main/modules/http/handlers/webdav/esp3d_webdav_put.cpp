@@ -59,6 +59,7 @@ esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t* req) {
     esp3d_log("Content-Length: %d", file_size);
     free(header_value);
   }
+
   // Add Webdav headers
   httpd_resp_set_webdav_hdr(req);
 
@@ -103,6 +104,7 @@ esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t* req) {
           if (freeBytes < file_size) {
             response_code = 507;
             response_msg = "Not enough space";
+            esp3d_log_e("Not enough space");
           } else {
             FILE* fd = globalFs.open(uri.c_str(), "w");
             if (fd) {
