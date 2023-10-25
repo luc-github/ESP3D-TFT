@@ -89,15 +89,10 @@ esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t* req) {
         }
       }
       if (overwrite) {
-#if ESP3D_TIMESTAMP_FEATURE
-        last_modified = esp3dTimeService.getCurrentTime();
-        last_modified += esp3dTimeService.getTimeZone();
-#else
         time_t now;
         time(&now);
-        last_modified = esp3d_string::getTimeString(now);
+        last_modified = esp3d_string::getTimeString(now, true);
 
-#endif  // ESP3D_TIMESTAMP_FEATURE
         httpd_resp_set_hdr(req, "Last-Modified", last_modified.c_str());
         // check free space
         uint64_t totalBytes;

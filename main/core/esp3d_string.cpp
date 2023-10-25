@@ -276,20 +276,29 @@ const char* esp3d_string::getFilenameFromString(const char* str) {
   return filename.c_str();
 }
 
-const char* esp3d_string::getTimeString(time_t time) {
+const char* esp3d_string::getTimeString(time_t time, bool isGMT) {
   static char buffer[40];
   memset(buffer, 0, sizeof(buffer));
   struct tm* tm_info;
   struct tm tmstruct;
-  // convert to local time
-  tm_info = localtime_r(&time, &tmstruct);
-  strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%S", tm_info);
+
+  if (isGMT) {
+    // convert to GMT time
+    tm_info = gmtime_r(&time, &tmstruct);
+    strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", tm_info);
+  } else {
+    // convert to local time
+    tm_info = localtime_r(&time, &tmstruct);
+    strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%S", tm_info);
+  }
+  if (!isGMT) {
 #if ESP3D_TIMESTAMP_FEATURE
-  // if time zone is set add it
-  strcat(buffer, esp3dTimeService.getTimeZone());
+    // if time zone is set add it
+    strcat(buffer, esp3dTimeService.getTimeZone());
 #else
-  // add Z to indicate UTC time because no time zone is set
-  strcat(buffer, "Z");
+    // add Z to indicate UTC time because no time zone is set
+    strcat(buffer, "Z");
 #endif  // ESP3D_TIMESTAMP_FEATURE
+  }
   return buffer;
 }

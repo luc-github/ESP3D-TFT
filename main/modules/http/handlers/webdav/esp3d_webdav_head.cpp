@@ -56,7 +56,7 @@ esp_err_t ESP3DHttpService::webdav_head_handler(httpd_req_t *req) {
         esp3d_log_e("Failed to stat");
       } else {
         // get last modified time
-        last_modified = esp3d_string::getTimeString(entry_stat.st_mtime);
+        last_modified = esp3d_string::getTimeString(entry_stat.st_mtime, true);
         // Add Last-Modified header
         httpd_resp_set_hdr(req, "Last-Modified", last_modified.c_str());
         // is file ?

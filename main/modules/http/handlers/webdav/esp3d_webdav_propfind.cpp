@@ -100,7 +100,7 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
           "<propstat>\r\n<status>HTTP/1.1 200 "
           "OK</status>\r\n<prop>\r\n";
       response_body += "<getlastmodified>";
-      response_body += esp3d_string::getTimeString(entry_stat.st_mtime);
+      response_body += esp3d_string::getTimeString(entry_stat.st_mtime, true);
       response_body += "</getlastmodified>\r\n";
       // is dir
       if (S_ISDIR(entry_stat.st_mode)) {
@@ -171,7 +171,8 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
                 "<propstat>\r\n<status>HTTP/1.1 200 "
                 "OK</status>\r\n<prop>\r\n";
             response_body += "<getlastmodified>";
-            response_body += esp3d_string::getTimeString(entry_stat.st_mtime);
+            response_body +=
+                esp3d_string::getTimeString(entry_stat.st_mtime, true);
             response_body += "</getlastmodified>\r\n";
             if (entry->d_type == DT_DIR) {
               // is dir

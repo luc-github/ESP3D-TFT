@@ -224,9 +224,12 @@ bool TimeService::setTime(const char* stime) {
       return false;
     }
   }
+#if ESP3D_TFT_LOG
   char buf[20];
   strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &tmstruct);
   esp3d_log("Time string is %s", buf);
+#endif  // ESP3D_TFT_LOG
+
   time_val.tv_usec = 0;
   time_val.tv_sec = mktime(&tmstruct);
 
