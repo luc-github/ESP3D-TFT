@@ -32,15 +32,15 @@
 #define PROPFIND_RESPONSE_BODY_FOOTER "</multistatus>\r\n"
 
 esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
-  esp3d_log("Uri: %s", req->uri);
+  esp3d_log_d("Uri: %s", req->uri);
   int response_code = 207;
   std::string response_msg = "";
   std::string response_body = "";
   std::string depth = "0";
-  esp3d_log("Uri: %s", req->uri);
+  esp3d_log_d("Uri: %s", req->uri);
   std::string uri =
       esp3d_string::urlDecode(&req->uri[strlen(ESP3D_WEBDAV_ROOT) + 1]);
-  esp3d_log("Uri: %s", uri.c_str());
+  esp3d_log_d("Uri: %s", uri.c_str());
   // clear the payload
   int payload_size = _clearPayload(req);
   (void)payload_size;
@@ -52,16 +52,21 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
     if (httpd_req_get_hdr_value_str(req, "Depth", header_value,
                                     header_size + 1) == ESP_OK) {
       depth = header_value;
-      esp3d_log("Depth: %s", depth.c_str());
+      esp3d_log_d("Depth: %s", depth.c_str());
       if (depth != "0" && depth != "1") {
         depth = "1";  // infinity or anything different than 0/1 will be 1
-        esp3d_log("Now Depth: %s", depth.c_str());
+        esp3d_log_d("Now Depth: %s", depth.c_str());
       }
     }
     free(header_value);
   }
   // sanity check
   if (uri.length() == 0) uri = "/";
+  if (uri != "/" && uri[uri.length() - 1] == '/') {
+    uri = uri.substr(0, uri.length() - 1);
+  }
+  if (uri[0] != '/') uri = "/" + uri;
+  esp3d_log_d("Sanity check Uri: %s", uri.c_str());
   // Access file system
   if (globalFs.accessFS(uri.c_str())) {
     struct stat entry_stat;
@@ -81,20 +86,14 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
       response_body = PROPFIND_RESPONSE_BODY_HEADER_1 + depth +
                       PROPFIND_RESPONSE_BODY_HEADER_2;
       httpd_resp_send_chunk(req, response_body.c_str(), response_body.length());
-      esp3d_log("%s", response_body.c_str());
-      // WebDav Directory name must end with /
-      if (S_ISDIR(entry_stat.st_mode)) {
-        if (uri[uri.length() - 1] != '/') {
-          uri += "/";
-        }
-      }
+      esp3d_log_d("%s", response_body.c_str());
+
       // stat on request first
       response_body = "<response>\r\n";
       response_body += "<href>";
       response_body += "/";
       response_body += ESP3D_WEBDAV_ROOT;
-      if (uri[0] != '/') response_body += "/";
-      response_body += uri;
+      if (uri != "/") response_body += uri;
       response_body += "</href>\r\n";
       response_body +=
           "<propstat>\r\n<status>HTTP/1.1 200 "
@@ -135,10 +134,13 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
       // end tags xml
       response_body += "</prop>\r\n</propstat>\r\n</response>\r\n";
       httpd_resp_send_chunk(req, response_body.c_str(), response_body.length());
-      esp3d_log("%s", response_body.c_str());
+      esp3d_log_d("%s", response_body.c_str());
 
       // reponse for the first only if dir or file
       if (depth == "1" && S_ISDIR(entry_stat.st_mode)) {
+        if (uri[uri.length() - 1] != '/') {
+          uri += "/";
+        }
         // do direct childs only
         // parse directory direct children
         DIR* dir = globalFs.opendir(uri.c_str());
@@ -190,14 +192,14 @@ esp_err_t ESP3DHttpService::webdav_propfind_handler(httpd_req_t* req) {
             response_body += "</prop>\r\n</propstat>\r\n</response>\r\n";
             httpd_resp_send_chunk(req, response_body.c_str(),
                                   response_body.length());
-            esp3d_log("%s", response_body.c_str());
+            esp3d_log_d("%s", response_body.c_str());
           }
           globalFs.closedir(dir);
         }
       }
       httpd_resp_send_chunk(req, PROPFIND_RESPONSE_BODY_FOOTER,
                             strlen(PROPFIND_RESPONSE_BODY_FOOTER));
-      esp3d_log("%s", PROPFIND_RESPONSE_BODY_FOOTER);
+      esp3d_log_d("%s", PROPFIND_RESPONSE_BODY_FOOTER);
       httpd_resp_send_chunk(req, NULL, 0);
     }
 
