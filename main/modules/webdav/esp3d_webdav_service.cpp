@@ -42,10 +42,17 @@ esp_err_t httpd_resp_set_webdav_hdr(httpd_req_t *req, bool is_chunk) {
       esp3d_log_e("httpd_resp_set_hdr failed for Allow");
       return err;
     }
+
+    err = httpd_resp_set_hdr(req, "Connection", "close");
+    if (err != ESP_OK) {
+      esp3d_log_e("httpd_resp_set_hdr failed for Connection");
+      return err;
+    }
   } else {
     std::string chunked =
         "DAV: " ESP3D_WEBDAV_HEADER
-        "\r\nCache-Control: no-cache\r\nAllow: " ESP3D_WEBDAV_METHODS "\r\n";
+        "\r\nCache-Control: no-cache\r\nAllow: " ESP3D_WEBDAV_METHODS
+        "\r\nConnection: close\r\n";
     err = httpd_resp_send_chunk(req, chunked.c_str(), chunked.length());
     if (err != ESP_OK) {
       esp3d_log_e("httpd_resp_send_chunk failed for DAV");
