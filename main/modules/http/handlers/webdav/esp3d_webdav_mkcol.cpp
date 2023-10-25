@@ -35,7 +35,7 @@ esp_err_t ESP3DHttpService::webdav_mkcol_handler(httpd_req_t* req) {
   size_t header_size = httpd_req_get_hdr_value_len(req, "Destination");
   if (header_size > 0) {
     char* header_value = (char*)malloc(header_size + 1);
-    if (httpd_req_get_hdr_value_str(req, "Overwrite", header_value,
+    if (httpd_req_get_hdr_value_str(req, "Destination", header_value,
                                     header_size + 1) == ESP_OK) {
       // replace uri by destination
       std::string dest = header_value;
