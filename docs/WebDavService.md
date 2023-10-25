@@ -195,7 +195,6 @@ The request has the following headers:
 The necessary headers in response are:
 - DAV
 - Allow
-- Last-Modified
 
 No content
 
@@ -223,7 +222,6 @@ The request has the following headers:
 The necessary headers in response are:
 - DAV
 - Allow
-- Last-Modified
 
 No content
 
