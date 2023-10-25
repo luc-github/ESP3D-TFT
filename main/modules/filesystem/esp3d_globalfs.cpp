@@ -22,11 +22,13 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include <cstring>
 #include <string>
 
 #include "esp3d_flash.h"
+#include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 
@@ -278,7 +280,14 @@ int ESP3DGlobalFileSystem::stat(const char *filepath, struct stat *entry_stat) {
   ESP3DFileSystemType fstype = getFSType(filepath);
   switch (fstype) {
     case ESP3DFileSystemType::root:
-      return -1;
+      memset(entry_stat, 0, sizeof(struct stat));
+      entry_stat->st_mode = S_IFDIR;
+      time_t now;
+      time(&now);
+      entry_stat->st_mtime = now - (esp3d_hal::millis() / 1000);
+      entry_stat->st_atime = entry_stat->st_mtime;
+      entry_stat->st_ctime = entry_stat->st_mtime;
+      return 0;
 #if ESP3D_SD_CARD_FEATURE
     case ESP3DFileSystemType::sd:
       esp3d_log("Is SD %s", filepath);

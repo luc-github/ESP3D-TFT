@@ -894,6 +894,11 @@ void ESP3DCommands::execute_internal_command(int cmd, int cmd_params_pos,
       ESP131(cmd_params_pos, msg);
       break;
 #endif  // ESP3D_TELNET_FEATURE
+#if ESP3D_TIMESTAMP_FEATURE
+    case 140:
+      ESP140(cmd_params_pos, msg);
+      break;
+#endif  // ESP3D_TIMESTAMP_FEATURE
 #if ESP3D_HTTP_FEATURE
 #if ESP3D_WS_SERVICE_FEATURE
     case 160:

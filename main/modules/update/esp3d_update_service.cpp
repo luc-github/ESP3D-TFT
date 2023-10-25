@@ -32,6 +32,9 @@
 #include "filesystem/esp3d_sd.h"
 #include "sd_def.h"
 #endif  // ESP3D_SD_CARD_FEATURE
+#if ESP3D_TIMESTAMP_FEATURE
+#include "time/esp3d_time_service.h"
+#endif  // ESP3D_TIMESTAMP_FEATURE
 
 #include "network/esp3d_network.h"
 #if ESP3D_NOTIFICATIONS_FEATURE
@@ -102,21 +105,24 @@ const ESP3DSettingIndex NetbyteKeysPos[] = {
 // Services
 // String values
 const char *ServstringKeysVal[] = {
-//  "Time_server1",
-//  "Time_server2",
-//   "Time_server3",
+#if ESP3D_TIMESTAMP_FEATURE
+    "Time_server1",   "Time_server2",  "Time_server3",        "Time_zone",
+#endif  // ESP3D_TIMESTAMP_FEATURE
 #if ESP3D_AUTHENTICATION_FEATURE
     "ADMIN_PASSWORD", "USER_PASSWORD",
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
 #if ESP3D_NOTIFICATIONS_FEATURE
-    "NOTIF_TOKEN1", "NOTIF_TOKEN2", "NOTIF_TOKEN_Settings"
+    "NOTIF_TOKEN1",   "NOTIF_TOKEN2",  "NOTIF_TOKEN_Settings"
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 };
 
 const ESP3DSettingIndex ServstringKeysPos[] = {
-//   ESP_TIME_SERVER1,
-//   ESP_TIME_SERVER2,
-//   ESP_TIME_SERVER3,
+#if ESP3D_TIMESTAMP_FEATURE
+    ESP3DSettingIndex::esp3d_time_server1,
+    ESP3DSettingIndex::esp3d_time_server2,
+    ESP3DSettingIndex::esp3d_time_server3,
+    ESP3DSettingIndex::esp3d_timezone,
+#endif  // ESP3D_TIMESTAMP_FEATURE
 #if ESP3D_AUTHENTICATION_FEATURE
     ESP3DSettingIndex::esp3d_admin_password,
     ESP3DSettingIndex::esp3d_user_password,
@@ -176,13 +182,14 @@ const char *ServboolKeysVal[] = {
     "WebSocket_active",
 #endif  // ESP3D_WS_SERVICE_FEATURE
 //"WebDav_active",
-//"Time_DST",
 #if ESP3D_SD_CARD_FEATURE
     "CHECK_FOR_UPDATE",
 #endif  // ESP3D_SD_CARD_FEATURE
 
-    //"Active_buzzer",
-    //"Active_Internet_time",
+//"Active_buzzer",
+#if ESP3D_TIMESTAMP_FEATURE
+    "Active_Internet_time",
+#endif  // ESP3D_TIMESTAMP_FEATURE
     "Radio_enabled"};
 
 const ESP3DSettingIndex ServboolKeysPos[] = {
@@ -204,8 +211,10 @@ const ESP3DSettingIndex ServboolKeysPos[] = {
 #if ESP3D_SD_CARD_FEATURE
     ESP3DSettingIndex::esp3d_check_update_on_sd,
 #endif  // ESP3D_SD_CARD_FEATURE
-    // ESP_BUZZER,
-    // ESP_INTERNET_TIME,
+        // ESP_BUZZER,
+#if ESP3D_TIMESTAMP_FEATURE
+    ESP3DSettingIndex::esp3d_use_internet_time,
+#endif  // ESP3D_TIMESTAMP_FEATURE
     ESP3DSettingIndex::esp3d_radio_boot_mode};
 
 // Byte values

@@ -67,6 +67,10 @@
 #if ESP3D_USB_SERIAL_FEATURE
 #include "usb_serial/esp3d_usb_serial_client.h"
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
+#if ESP3D_TIMESTAMP_FEATURE
+#include "time/esp3d_time_service.h"
+#endif  // ESP3D_TIMESTAMP_FEATURE
+
 #define COMMAND_ID 420
 
 // Get ESP current status
@@ -592,6 +596,17 @@ void ESP3DCommands::ESP420(int cmd_params_pos, ESP3DMessage *msg) {
   if (!dispatchIdValue(json, "language", tmpstr.c_str(), target, requestId)) {
     return;
   }
+
+#if ESP3D_TIMESTAMP_FEATURE
+  // Time
+  tmpstr = esp3dTimeService.getCurrentTime();
+  tmpstr += "  (";
+  tmpstr += esp3dTimeService.getTimeZone();
+  tmpstr += ")";
+  if (!dispatchIdValue(json, "time", tmpstr.c_str(), target, requestId)) {
+    return;
+  }
+#endif  // ESP3D_TIMESTAMP_FEATURE
 
   // end of list
   if (json) {

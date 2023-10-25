@@ -26,8 +26,6 @@
 #include "esp3d_fs_types.h"
 #include "esp_vfs.h"
 
-#define ESP3D_FLASH_FS_HEADER "/fs/"
-
 enum class ESP3DFsState : uint8_t {
   idle,
   busy,

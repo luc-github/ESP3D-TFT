@@ -33,7 +33,12 @@
 #include "network/esp3d_network.h"
 #include "sdkconfig.h"
 #include "spi_flash_mmap.h"
+#if ESP3D_UPDATE_FEATURE
 #include "update/esp3d_update_service.h"
+#endif  // ESP3D_UPDATE_FEATURE
+#if ESP3D_TIMESTAMP_FEATURE
+#include "time/esp3d_time_service.h"
+#endif  // ESP3D_TIMESTAMP_FEATURE
 
 #define COMMAND_ID 800
 
@@ -46,7 +51,11 @@ void ESP3DCommands::ESP800(int cmd_params_pos, ESP3DMessage* msg) {
   ESP3DRequest requestId = msg->request_id;
   msg->target = target;
   msg->origin = ESP3DClientType::command;
+  std::string timestr = "none";
+#if ESP3D_TIMESTAMP_FEATURE
   std::string timeparam = get_param(msg, cmd_params_pos, "time=");
+  std::string tzparam = get_param(msg, cmd_params_pos, "tz=");
+#endif  // ESP3D_TIMESTAMP_FEATURE
   std::string setupparam = get_param(msg, cmd_params_pos, "setup=");
   bool json = hasTag(msg, cmd_params_pos, "json");
   std::string tmpstr;
@@ -56,9 +65,37 @@ void ESP3DCommands::ESP800(int cmd_params_pos, ESP3DMessage* msg) {
     return;
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
-  if (timeparam.length() > 0) {
-    // TODO: init time parameter
+#if ESP3D_TIMESTAMP_FEATURE
+  // set time if internet time is not enabled
+  if (!esp3dTimeService.isInternetTime()) {
+    if (tzparam.length() > 0) {
+      if (!esp3dTimeService.setTimeZone(tzparam.c_str())) {
+        // not blocking error
+        esp3d_log_e("Error setting timezone");
+        timestr = "Failed to set";
+      } else {
+        timestr = "Manual";
+      }
+    } else {
+      timestr = "Not set";
+    }
+    if (timeparam.length() > 0) {
+      if (!esp3dTimeService.setTime(timeparam.c_str())) {
+        // not blocking error
+        esp3d_log_e("Error setting time");
+      }
+    }
+  } else {
+    if (esp3dTimeService.started()) {
+      timestr = "Auto";
+    } else {
+      timestr = "Failed to set";
+    }
   }
+#else
+  timestr = "none";
+#endif  // ESP3D_TIMESTAMP_FEATURE
+
   if (setupparam.length() > 0) {
     if (!esp3dTftsettings.writeByte(ESP3DSettingIndex::esp3d_setup,
                                     setupparam == "1" ? 1 : 0)) {
@@ -222,11 +259,14 @@ void ESP3DCommands::ESP800(int cmd_params_pos, ESP3DMessage* msg) {
     return;
   }
 
-  // TODO: update once setup ready
+#if ESP3D_TIMESTAMP_FEATURE
+
+#endif  // ESP3D_TIMESTAMP_FEATURE
   // Time
-  if (!dispatchKeyValue(json, "Time", "none", target, requestId)) {
+  if (!dispatchKeyValue(json, "Time", timestr.c_str(), target, requestId)) {
     return;
   }
+
   // end of list
   if (json) {
     if (!dispatch("}}", target, requestId, ESP3DMessageType::tail)) {

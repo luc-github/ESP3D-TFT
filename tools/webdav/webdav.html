@@ -1,0 +1,73 @@
+<html>
+	<head>
+		<script>
+			let ipaddress;
+			let DavWWWRoot;
+			let path;
+			function getInput(){
+				ipaddress = document.getElementById("ipaddress").value;
+			    DavWWWRoot = document.getElementById("davroot").value;
+			    path = document.getElementById("path").value;
+			}
+			
+			function propfind_function(method){
+				getInput();	
+				console.log(ipaddress, DavWWWRoot);
+				const xhr = new XMLHttpRequest();
+				const addressstr="http://"+ipaddress+"/"+DavWWWRoot+path
+				xhr.open("PROPFIND", addressstr);
+				xhr.setRequestHeader('Depth', '1');
+				xhr.send();
+				xhr.onload=()=>{
+				  if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 201 || xhr.status == 204 || xhr.status == 207 )) {
+					const data = xhr.response;
+					console.log(data);
+				  } else {
+					console.log(`Error: ${xhr.status}`);
+				  }
+				};
+			}
+			function options_function(method){
+				getInput();	
+				console.log(ipaddress, DavWWWRoot);
+				const xhr = new XMLHttpRequest();
+				const addressstr="http://"+ipaddress+"/"+DavWWWRoot+path
+				xhr.open("OPTIONS", addressstr);
+				xhr.send();
+				xhr.onload=()=>{
+				  if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 201 || xhr.status == 204 || xhr.status == 207 )) {
+					const data = xhr.response;
+					console.log(data);
+				  } else {
+					console.log(`Error: ${xhr.status}`);
+				  }
+				};
+			}
+			function get_function(method){
+				getInput();	
+				console.log(ipaddress, DavWWWRoot);
+				const xhr = new XMLHttpRequest();
+				const addressstr="http://"+ipaddress+"/"+DavWWWRoot+path
+				xhr.open("GET", addressstr);
+				xhr.send();
+				xhr.onload=()=>{
+				  if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 201 || xhr.status == 204 || xhr.status == 207 )) {
+					const data = xhr.response;
+					console.log(data);
+				  } else {
+					console.log(`Error: ${xhr.status}`);
+				  }
+				};
+			}
+			</script>
+	</head>
+<body>
+Address:<input type="text" value="192.168.2.184" id="ipaddress" /><br/>
+WebDav Root:<input type="text" value="DavWWWRoot" id="davroot" /><br/>
+Path:<input type="text" value="/" id="path" /><br/>
+
+<button onclick="propfind_function();">Propfind</button>
+<button onclick="options_function();">Options</button>
+<button onclick="get_function();">Get</button>
+</body>
+</html>

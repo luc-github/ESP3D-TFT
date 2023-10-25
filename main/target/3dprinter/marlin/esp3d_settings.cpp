@@ -65,6 +65,18 @@ const uint8_t SupportedApChannels[] = {1, 2, 3,  4,  5,  6,  7,
                                        8, 9, 10, 11, 12, 13, 14};
 const uint8_t SupportedApChannelsSize =
     sizeof(SupportedApChannels) / sizeof(uint8_t);
+#if ESP3D_TIMESTAMP_FEATURE
+const char* SupportedTimeZones[] = {
+    "-12:00", "-11:00", "-10:00", "-09:00", "-08:00", "-07:00", "-06:00",
+    "-05:00", "-04:00", "-03:30", "-03:00", "-02:00", "-01:00", "+00:00",
+    "+01:00", "+02:00", "+03:00", "+03:30", "+04:00", "+04:30", "+05:00",
+    "+05:30", "+05:45", "+06:00", "+06:30", "+07:00", "+08:00", "+08:45",
+    "+09:00", "+09:30", "+10:00", "+10:30", "+11:00", "+12:00", "+12:45",
+    "+13:00", "+14:00"};
+
+const uint8_t SupportedTimeZonesSize =
+    sizeof(SupportedTimeZones) / sizeof(const char*);
+#endif  // ESP3D_TIMESTAMP_FEATURE
 
 // value of settings, default value are all strings
 const ESP3DSettingDescription ESP3DSettingsData[] = {
@@ -170,6 +182,18 @@ const ESP3DSettingDescription ESP3DSettingsData[] = {
      SIZE_OF_SCRIPT, ""},
     {ESP3DSettingIndex::esp3d_resume_script, ESP3DSettingType::string_t,
      SIZE_OF_SCRIPT, ""},
+#if ESP3D_TIMESTAMP_FEATURE
+    {ESP3DSettingIndex::esp3d_use_internet_time, ESP3DSettingType::byte_t, 1,
+     "1"},
+    {ESP3DSettingIndex::esp3d_time_server1, ESP3DSettingType::string_t,
+     SIZE_OF_SERVER_URL, "0.pool.ntp.org"},
+    {ESP3DSettingIndex::esp3d_time_server2, ESP3DSettingType::string_t,
+     SIZE_OF_SERVER_URL, "1.pool.ntp.org"},
+    {ESP3DSettingIndex::esp3d_time_server3, ESP3DSettingType::string_t,
+     SIZE_OF_SERVER_URL, "2.pool.ntp.org"},
+    {ESP3DSettingIndex::esp3d_timezone, ESP3DSettingType::string_t,
+     SIZE_OF_TIMEZONE, "+00:00"},
+#endif  // ESP3D_TIMESTAMP_FEATURE
 };
 
 // Is Valid String Setting ?
@@ -209,17 +233,36 @@ bool ESP3DSettings::isValidStringSetting(const char* value,
   if (!(settingPtr->type == ESP3DSettingType::string_t)) {
     return false;
   }
-  if (strlen(value) > settingPtr->size) {
-    return false;
-  }
   // use strlen because it crash with regex if value is longer than 41
   // characters
   size_t len = strlen(value);
+
+  if (len > settingPtr->size) {
+    return false;
+  }
+
   switch (settingElement) {
+#if ESP3D_TIMESTAMP_FEATURE
+    case ESP3DSettingIndex::esp3d_timezone:
+      if (len != settingPtr->size - 1) {
+        return false;
+      }
+      for (uint8_t i = 0; i < SupportedTimeZonesSize; i++) {
+        if (strcmp(value, SupportedTimeZones[i]) == 0) {
+          return true;
+        }
+      }
+      break;
+#endif  // ESP3D_TIMESTAMP_FEATURE
     case ESP3DSettingIndex::esp3d_pause_script:
     case ESP3DSettingIndex::esp3d_resume_script:
     case ESP3DSettingIndex::esp3d_stop_script:
-      return (len <= SIZE_OF_SCRIPT);
+#if ESP3D_TIMESTAMP_FEATURE
+    case ESP3DSettingIndex::esp3d_time_server1:
+    case ESP3DSettingIndex::esp3d_time_server2:
+    case ESP3DSettingIndex::esp3d_time_server3:
+#endif              // ESP3D_TIMESTAMP_FEATURE
+      return true;  // len test already done so return true
 #if ESP3D_WIFI_FEATURE
     case ESP3DSettingIndex::esp3d_ap_ssid:
     case ESP3DSettingIndex::esp3d_sta_ssid:
@@ -338,6 +381,9 @@ bool ESP3DSettings::isValidByteSetting(uint8_t value,
 #if ESP3D_NOTIFICATIONS_FEATURE
     case ESP3DSettingIndex::esp3d_auto_notification:
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
+#if ESP3D_TIMESTAMP_FEATURE
+    case ESP3DSettingIndex::esp3d_use_internet_time:
+#endif  // ESP3D_TIMESTAMP_FEATURE
       if (value == (uint8_t)ESP3DState::off ||
           value == (uint8_t)ESP3DState::on) {
         return true;

@@ -16,7 +16,6 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#if ESP3D_UPDATE_FEATURE
 
 #include "esp3d_log.h"
 #include "esp3d_string.h"
@@ -121,4 +120,4 @@ esp_err_t ESP3DHttpService::upload_to_updatefw_handler(
   }
   return ESP_OK;
 }
-#endif  // ESP3D_UPDATE_FEATURE
+
