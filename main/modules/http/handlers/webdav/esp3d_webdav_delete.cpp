@@ -27,14 +27,14 @@
 esp_err_t ESP3DHttpService::webdav_delete_handler(httpd_req_t *req) {
   int response_code = 204;
   std::string response_msg = "Success";
-  esp3d_log_d("Uri: %s", req->uri);
+  esp3d_log("Uri: %s", req->uri);
   std::string uri =
       esp3d_string::urlDecode(&req->uri[strlen(ESP3D_WEBDAV_ROOT) + 1]);
-  esp3d_log_d("Uri: %s", uri.c_str());
+  esp3d_log("Uri: %s", uri.c_str());
 
   int payload_size = _clearPayload(req);
   (void)payload_size;
-  esp3d_log_d("Payload size: %d", payload_size);
+  esp3d_log("Payload size: %d", payload_size);
   // Add Webdav headers
   httpd_resp_set_webdav_hdr(req);
   // sanity check

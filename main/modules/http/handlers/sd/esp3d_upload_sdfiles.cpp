@@ -36,7 +36,7 @@
    int offset_h = atoi(offset_str.substr(0, 3).c_str());  // 5
    int offset_m = atoi(offset_str.substr(3, 2).c_str());  // 0
    int offset_s = offset_h * 3600 + offset_m * 60;        // -18000
-   esp3d_log_d("offset_s: %d", offset_s);
+   esp3d_log("offset_s: %d", offset_s);
    if (strptime(date_string.c_str(), "%Y-%m-%dT%H:%M:%S", &tm) != NULL) {
      time_t new_timestamp = mktime(&tm);
      new_timestamp += offset_s;
