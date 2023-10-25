@@ -191,6 +191,7 @@ Only move /fs to /fs and /sd to /sd
 The request has the following headers:
 - Destination is the path of the resource to create. to be used instead of the Request-URI if present.
 - Overwrite is a boolean that indicates if the destination resource should be overwritten if it already exists. If the header is not present, the default value is false.
+- Depth can be 0 or 1 or infinity but we do not support collection copy so this header is ignored 
 
 The necessary headers in response are:
 - DAV

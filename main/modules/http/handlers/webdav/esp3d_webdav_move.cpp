@@ -89,6 +89,7 @@ esp_err_t ESP3DHttpService::webdav_move_handler(httpd_req_t* req) {
       struct stat entry_stat;
       if (globalFs.stat(uri.c_str(), &entry_stat) == -1) {
         response_code = 404;
+        esp3d_log_e("Source does not exist");
       } else {
         if (S_ISREG(entry_stat.st_mode)) {
           source_is_file = true;
@@ -109,6 +110,7 @@ esp_err_t ESP3DHttpService::webdav_move_handler(httpd_req_t* req) {
           overwrite = false;
           response_code = 400;
           response_msg = "Not allowed";
+          esp3d_log_e("Not allowed");
         }
         // check if overwrite is allowed, overwrite means Ok to move
         if (overwrite) {
