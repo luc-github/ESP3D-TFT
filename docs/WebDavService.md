@@ -71,6 +71,7 @@ The response code is:
 - 404 if the resource does not exist
 - 503 if any error accessing the local file system (e.g. access denied)
 - 500 if any error during the file/dir deletion
+- 400 if the resource is / or /sd or /fs
 
 ## MKCOL method
 The MKCOL method is used to create a new collection resource at the location specified by the Request-URI.
@@ -85,6 +86,7 @@ The response code is:
 - 409 if the resource already exists
 - 503 if any error accessing the local file system (e.g. access denied)
 - 500 if any error during the dir creation
+- 400 if the resource is / or /sd or /fs
 
 ## PUT method
 The PUT method is used to create a new non-collection resource at the location specified by the Request-URI.
@@ -184,6 +186,7 @@ The response code is:
 ## COPY method
 The COPY method is used to copy the resource identified by the Request-URI to the destination URI.
 The copy is allowed only for a file and not for a directory.
+Only move /fs to /fs and /sd to /sd
 
 The request has the following headers:
 - Destination is the path of the resource to create. to be used instead of the Request-URI if present.
@@ -202,13 +205,16 @@ The response code is:
 - 404 if the resource does not exist
 - 413 if the resource is a directory
 - 412 if the destination resource already exists and overwrite is false
+- 409 if overwrite is true and the destination and source are different types (file or directory)
 - 503 if any error accessing the local file system (e.g. access denied)
 - 500 if any error during the file creation
 - 507 if the file is too big for the targeted file system
+- 400 if source or destination is / or /sd or /fs, or try to /sd to /fs or /fs to /sd
 
 ## MOVE method
 The MOVE method is used to move the resource identified by the Request-URI to the destination URI.
 There is no merge of the destination resource and the source resource but the destination resource is overwritten/replaced if it already exists.
+Only move /fs to /fs and /sd to /sd
 
 The request has the following headers:
 - Destination is the path of the resource to create. to be used instead of the Request-URI if present.
@@ -226,8 +232,10 @@ The response code is:
 - 204 if success and file is overwritten
 - 404 if the resource does not exist
 - 412 if the destination resource already exists and overwrite is false
+- 409 if overwrite is true and the destination and source are different types (file or directory)
 - 503 if any error accessing the local file system (e.g. access denied)
 - 500 if any error during the file creation
+- 400 if source or destination is / or /sd or /fs, or try to move /sd to /fs or /fs to /sd
 
 
 

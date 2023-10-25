@@ -27,3 +27,7 @@ enum class ESP3DFileSystemType : uint8_t {
   sd,
   unknown,
 };
+
+#define ESP3D_FLASH_FS_HEADER "/fs/"
+
+#define ESP3D_SD_FS_HEADER "/sd/"
