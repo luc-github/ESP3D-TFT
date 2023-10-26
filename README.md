@@ -11,11 +11,17 @@ A Serial TFT with all WiFi feature to control 3D Printer or CNC, using same feat
 
 Unlike ESP3D some features will be fixed:
 * Flash FS = littleFS
-* TBD
+* ESP32 / ESP32-S3
+* WebDav on Both local FS and SD
+  
 
 ## UI
 
-To be defined, it will use lvgl library in espressif IDF 4.X (TBD)  
+To be defined, it will use lvgl library
+
+## Framework
+
+Espressif IDF 5.1 
 
 ## Reference boards
 
@@ -25,50 +31,12 @@ The reference boards I have bought :
 * ESP32-S3 based + SDReader + PSRAM + 4.3' capacitive screen  (800x600) [model](https://www.aliexpress.com/item/1005003814428825.html) (Received)
 * ESP32-S3 based + SDReader + PSRAM + 3.5' capacitive screen (320x480) [model](https://www.aliexpress.com/item/1005004309826174.html) (Received)
 * ESP32 + SDReader + 3.5' Resistive screen (480x320) [Rotrics TFT](https://rotrics.com/products/3-5-inch-touchscreen) (Received)
-* TBD...
+* More on https://esp3d.io/esp3d-tft/v1.x/hardware/index.html
 
 ## installation
-- Install the IDF vs code extension
-	- https://github.com/espressif/vscode-esp-idf-extension/blob/master/docs/tutorial/install.md
-- Configure the extension
-	- Select : View->Command palette 
-	- Type : configure esp
-- Open TFT-ESP3D project
-	- Go to file and select open folder where project is located
-- Edit CMakeLists.txt to select the correct target, be sure your Device target and port are properly set in espressif extension. (esp32 / esp32s3)
+Please follow the instructions from https://esp3d.io/esp3d-tft/v1.x/installation/index.html
 
-## Project's sources structure
-```
-- ESP3D-TFT/   
-             - CMakeLists.txt   
-             - components/ - lvgl/ -...   
-			   - littlefs/ -...  
-			   - SSDP_IDF / -...  
-			   - mdns/ -...  
-	         - main/ - core/ - esp3d_tft.cpp   
-					 - includes/ - esp3d_tft.h   
-						- CMakeLists.txt
-						- components.mk
-						- main.cpp
-						- version.h
-             - hardware/ - ESP32_2432S028R/ - sdkconfig
-				                            - partitions.csv
-											- components/lcd/ - CMakeLists.txt
-													- components.mk
-													- ...
-											- components/touch/ - CMakeLists.txt
-													- components.mk
-												- ...
-						- ESP32_ROTRICS_DEXARM35/ -...
-						- ESP32S3_HMI43V3/ -...
-						- ESP32S3_ZXD50CE02S_USRC_4832/ -...
-		    - target/ - cnc/ - grbl/
-			          - 3dprinter/ - repetier
-					               - marlin
-								   - smooothieware/ - ui/ 	- res800_600/
-				  										  	- res 480_320/
-				  											- res320_240/ 
-```
+
 ## Todo
 
 Everything, code from scratch or almost
