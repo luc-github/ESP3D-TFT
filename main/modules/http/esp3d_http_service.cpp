@@ -30,6 +30,7 @@
 #include "esp_wifi.h"
 #include "filesystem/esp3d_globalfs.h"
 #include "network/esp3d_network.h"
+#include "sdkconfig.h"
 #include "websocket/esp3d_webui_service.h"
 #include "websocket/esp3d_ws_service.h"
 
@@ -64,7 +65,7 @@
 #define WEBSOCKET_DATA_HANDLER_CNT 0
 #endif  // ESP3D_WS_SERVICE_FEATURE
 #if ESP3D_WEBDAV_SERVICES_FEATURE
-#define WEBDAV_HANDLER_CNT 9
+#define WEBDAV_HANDLER_CNT 9 + 3
 #else
 #define WEBDAV_HANDLER_CNT 0
 #endif  // ESP3D_WEBDAV_SERVICES_FEATURE
@@ -572,6 +573,52 @@ bool ESP3DHttpService::begin() {
         httpd_register_uri_handler(_server, &webdav_copy_handler_config)) {
       esp3d_log_e("webdav copy handler registration failed");
     }
+
+    // LOCK
+    const httpd_uri_t webdav_lock_handler_config = {
+        .uri = "/" ESP3D_WEBDAV_ROOT "/?*",
+        .method = HTTP_LOCK,
+        .handler =
+            (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.webdav_lock_handler),
+        .user_ctx = nullptr,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr};
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &webdav_lock_handler_config)) {
+      esp3d_log_e("webdav lock handler registration failed");
+    }
+
+    // UNLOCK
+    const httpd_uri_t webdav_unlock_handler_config = {
+        .uri = "/" ESP3D_WEBDAV_ROOT "/?*",
+        .method = HTTP_UNLOCK,
+        .handler = (esp_err_t(*)(httpd_req_t *))(
+            esp3dHttpService.webdav_unlock_handler),
+        .user_ctx = nullptr,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr};
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &webdav_unlock_handler_config)) {
+      esp3d_log_e("webdav unlock handler registration failed");
+    }
+
+    // PROPPATCH
+    const httpd_uri_t webdav_proppatch_handler_config = {
+        .uri = "/" ESP3D_WEBDAV_ROOT "/?*",
+        .method = HTTP_PROPPATCH,
+        .handler = (esp_err_t(*)(httpd_req_t *))(
+            esp3dHttpService.webdav_proppatch_handler),
+        .user_ctx = nullptr,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr};
+    if (ESP_OK !=
+        httpd_register_uri_handler(_server, &webdav_proppatch_handler_config)) {
+      esp3d_log_e("webdav proppatch handler registration failed");
+    }
+
 #endif  // ESP3D_WEBDAV_SERVICES_FEATURE
 
     // File not found
@@ -1047,6 +1094,72 @@ esp_err_t ESP3DHttpService::streamFile(const char *path, httpd_req_t *req) {
 
   return res;
 }
+
+#if ESP3D_TFT_LOG >= ESP3D_TFT_LOG_LEVEL_DEBUG
+// The header is esp_httpd_priv.h but it is not exposed
+// so lets just define struct here
+#define HTTPD_SCRATCH_BUF HTTPD_MAX_REQ_HDR_LEN
+
+struct httpd_req_aux {
+  struct sock_db *sd;                  /*!< Pointer to socket database */
+  char scratch[HTTPD_SCRATCH_BUF + 1]; /*!< Temporary buffer for our operations
+                                          (1 byte extra for null termination) */
+  size_t remaining_len;    /*!< Amount of data remaining to be fetched */
+  char *status;            /*!< HTTP response's status code */
+  char *content_type;      /*!< HTTP response's content type */
+  bool first_chunk_sent;   /*!< Used to indicate if first chunk sent */
+  unsigned req_hdrs_count; /*!< Count of total headers in request packet */
+  unsigned
+      resp_hdrs_count; /*!< Count of additional headers in response packet */
+  struct resp_hdr {
+    const char *field;
+    const char *value;
+  } *resp_hdrs; /*!< Additional headers in response packet */
+  struct http_parser_url url_parse_res; /*!< URL parsing result, used for
+                                           retrieving URL elements */
+#ifdef CONFIG_HTTPD_WS_SUPPORT
+  bool ws_handshake_detect; /*!< WebSocket handshake detection flag */
+  httpd_ws_type_t ws_type;  /*!< WebSocket frame type */
+  bool ws_final;            /*!< WebSocket FIN bit (final frame or not) */
+  uint8_t mask_key[4];      /*!< WebSocket mask key for this payload */
+#endif
+};
+
+uint ESP3DHttpService::showAllHeaders(httpd_req_t *req) {
+  struct httpd_req_aux *ra = (struct httpd_req_aux *)req->aux;
+  char *hdr_ptr =
+      ra->scratch; /*!< Request headers are kept in scratch buffer */
+  unsigned count = ra->req_hdrs_count;
+  unsigned total = count;
+  while (count--) {
+    /* Search for the ':' character. Else, it would mean
+     * that the field is invalid
+     */
+    const char *val_ptr = strchr(hdr_ptr, ':');
+    if (!val_ptr) {
+      break;
+    }
+
+    /* If the field, does not match, continue searching.
+     * Compare lengths first as field from header is not
+     * null terminated (has ':' in the end).
+     */
+    esp3d_log_d("%d Headers: %s", count, hdr_ptr);
+    if (count) {
+      /* Jump to end of header field-value string */
+      hdr_ptr = 1 + strchr(hdr_ptr, '\0');
+
+      /* Skip all null characters (with which the line
+       * terminators had been overwritten) */
+      while (*hdr_ptr == '\0') {
+        hdr_ptr++;
+      }
+    }
+  }
+
+  return total;
+}
+#endif  // ESP3D_TFT_LOG >= ESP3D_TFT_LOG_LEVEL_DEBUG
 
 void ESP3DHttpService::process(ESP3DMessage *msg) {
   if (msg->request_id.http_request) {

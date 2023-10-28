@@ -26,7 +26,10 @@
 #include "http/esp3d_http_service.h"
 #include "webdav/esp3d_webdav_service.h"
 
-esp_err_t ESP3DHttpService::webdav_get_handler(httpd_req_t* req) {
+esp_err_t ESP3DHttpService::webdav_get_handler(httpd_req_t *req) {
+#if ESP3D_TFT_LOG >= ESP3D_TFT_LOG_LEVEL_DEBUG
+  esp3d_log_d("Headers count: %d\n", showAllHeaders(req));
+#endif  // ESP3D_TFT_LOG >= ESP3D_LOG_LEVEL_
   int response_code = 200;
   std::string response_msg = "";
   size_t file_size = 0;
@@ -72,7 +75,7 @@ esp_err_t ESP3DHttpService::webdav_get_handler(httpd_req_t* req) {
                              std::to_string(file_size).c_str());
         }
         // open file
-        FILE* fd = globalFs.open(uri.c_str(), "r");
+        FILE *fd = globalFs.open(uri.c_str(), "r");
         if (fd) {
           size_t chunksize;
           size_t total_send = 0;

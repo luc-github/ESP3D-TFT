@@ -142,6 +142,9 @@ class ESP3DHttpService final {
   static esp_err_t webdav_put_handler(httpd_req_t *req);
   static esp_err_t webdav_head_handler(httpd_req_t *req);
   static esp_err_t webdav_options_handler(httpd_req_t *req);
+  static esp_err_t webdav_lock_handler(httpd_req_t *req);
+  static esp_err_t webdav_unlock_handler(httpd_req_t *req);
+  static esp_err_t webdav_proppatch_handler(httpd_req_t *req);
 
   static esp_err_t http_send_response(httpd_req_t *req, int code,
                                       const char *msg);
@@ -152,6 +155,9 @@ class ESP3DHttpService final {
                                            ESP3DUploadState file_upload_state,
                                            const char *filename,
                                            size_t filesize);
+#if ESP3D_TFT_LOG >= ESP3D_TFT_LOG_LEVEL_DEBUG
+  static uint showAllHeaders(httpd_req_t *req);
+#endif  // ESP3D_TFT_LOG >= ESP3D_TFT_LOG_LEVEL_DEBUG
 #if ESP3D_UPDATE_FEATURE
   static esp_err_t updatefw_handler(httpd_req_t *req);
   static esp_err_t upload_to_updatefw_handler(
