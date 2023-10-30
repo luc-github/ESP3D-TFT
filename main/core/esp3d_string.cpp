@@ -24,6 +24,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
+
+#include "esp3d_hal.h"
 
 // helper to format string float to readable string with precision
 std::string esp3d_string::set_precision(std::string str_value,
@@ -301,4 +304,63 @@ const char* esp3d_string::getTimeString(time_t time, bool isGMT) {
 #endif  // ESP3D_TIMESTAMP_FEATURE
   }
   return buffer;
+}
+
+// Update hash function used by generateUUID
+void update_hash(uint8_t* data, size_t len, uint8_t* hash_buffer,
+                 uint8_t hash_size) {
+  static bool reverse = false;
+  reverse = !reverse;
+  int start_index = reverse ? hash_size : 0;
+  for (int i = 0; i < hash_size; i++) {
+    int idx =
+        reverse ? (start_index - i) % hash_size : (start_index + i) % hash_size;
+    if (i >= len) {
+      hash_buffer[idx] ^= rand() % 253 + 1;
+    } else {
+      hash_buffer[idx] ^= data[i];
+    }
+  }
+}
+
+const char* esp3d_string::generateUUID(const char* seed) {
+  static std::string token;
+  std::string tmp;
+  uint8_t hash_buffer[16];
+  memset(hash_buffer, 0, 16);
+  if (!seed) {
+    tmp = "ESP3D ecosystem";
+  } else {
+    tmp = seed;
+  }
+  // init random seed
+  srand(time(NULL));
+  // Use seed
+  update_hash((uint8_t*)tmp.c_str(), tmp.length(), hash_buffer, 16);
+
+  // use epoch time
+  uint64_t millisec = esp3d_hal::millis();
+  update_hash((uint8_t*)&millisec, sizeof(millisec), hash_buffer, 16);
+
+  // use current time
+  time_t now;
+  time(&now);
+  update_hash((uint8_t*)&now, sizeof(now), hash_buffer, 16);
+
+  tmp = "";
+  // now hash all the buffer
+  for (int i = 0; i < 16; i++) {
+    char hex[3];
+    sprintf(hex, "%02x", hash_buffer[i]);
+    tmp += hex;
+  }
+
+  // format the uuid on 36 chars
+  token = tmp.substr(0, 8) + "-";
+  token += tmp.substr(8, 4) + "-";
+  token += tmp.substr(12, 4) + "-";
+  token += tmp.substr(16, 4) + "-";
+  token += &tmp[20];
+
+  return token.c_str();
 }

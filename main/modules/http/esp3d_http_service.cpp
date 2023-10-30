@@ -1126,6 +1126,7 @@ struct httpd_req_aux {
 };
 
 uint ESP3DHttpService::showAllHeaders(httpd_req_t *req) {
+  esp3d_log("Uri: %s", req->uri);
   struct httpd_req_aux *ra = (struct httpd_req_aux *)req->aux;
   char *hdr_ptr =
       ra->scratch; /*!< Request headers are kept in scratch buffer */
@@ -1144,7 +1145,7 @@ uint ESP3DHttpService::showAllHeaders(httpd_req_t *req) {
      * Compare lengths first as field from header is not
      * null terminated (has ':' in the end).
      */
-    esp3d_log_d("%d Headers: %s", count, hdr_ptr);
+    esp3d_log("%d Headers: %s", count, hdr_ptr);
     if (count) {
       /* Jump to end of header field-value string */
       hdr_ptr = 1 + strchr(hdr_ptr, '\0');
@@ -1251,6 +1252,8 @@ int ESP3DHttpService::_clearPayload(httpd_req_t *req) {
     size_t read_len = 0;
     do {
       read_len = httpd_req_recv(req, _chunk, CHUNK_BUFFER_SIZE);
+      _chunk[read_len] = 0x0;
+      esp3d_log("%s", _chunk);
       total_read += read_len;
     } while (read_len > 0 && total_read < req->content_len);
   }

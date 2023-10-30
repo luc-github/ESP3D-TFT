@@ -57,6 +57,7 @@ const char* getContentType(const char* filename);
 const char* getPathFromString(const char* str);
 const char* getFilenameFromString(const char* str);
 const char* getTimeString(time_t time, bool isGMT = false);
+const char* generateUUID(const char* seed = NULL);
 }  // namespace esp3d_string
 #ifdef __cplusplus
 }  // extern "C"

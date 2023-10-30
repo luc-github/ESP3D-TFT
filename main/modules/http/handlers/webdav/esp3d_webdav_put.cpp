@@ -36,6 +36,7 @@
 #define CHUNK_PUT_BUFFER_SIZE STREAM_CHUNK_SIZE * 4
 
 esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t* req) {
+  esp3d_log("Method: %s", "PUT");
   esp3d_log("Uri: %s", req->uri);
   int response_code = 201;
   std::string response_msg = "";
@@ -44,7 +45,7 @@ esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t* req) {
   std::string last_modified = "";
   esp3d_log("Uri: %s", req->uri);
 #if ESP3D_TFT_LOG >= ESP3D_TFT_LOG_LEVEL_DEBUG
-  esp3d_log_d("Headers count: %d\n", showAllHeaders(req));
+  esp3d_log("Headers count: %d\n", showAllHeaders(req));
 #endif  // ESP3D_TFT_LOG >= ESP3D_LOG_LEVEL_DEBUG
   std::string uri =
       esp3d_string::urlDecode(&req->uri[strlen(ESP3D_WEBDAV_ROOT) + 1]);
@@ -112,9 +113,9 @@ esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t* req) {
             FILE* fd = globalFs.open(uri.c_str(), "w");
             if (fd) {
               bool hasError = false;
-              if (req->content_len > 0) {
+              if (file_size > 0) {
                 char* packetWrite = nullptr;
-                size_t remaining = req->content_len;
+                size_t remaining = file_size;
                 size_t received = 0;
                 packetWrite = (char*)malloc(CHUNK_PUT_BUFFER_SIZE + 1);
                 if (packetWrite) {
@@ -185,7 +186,7 @@ esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t* req) {
       // release access
       globalFs.releaseFS(uri.c_str());
     } else {
-      esp3d_log_e("Failed to access FS");
+      esp3d_log_e("Failed to access FS: %s", uri.c_str());
       response_code = 503;
       response_msg = "Failed to access FS";
     }

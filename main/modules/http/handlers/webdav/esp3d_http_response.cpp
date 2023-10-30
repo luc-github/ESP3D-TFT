@@ -28,7 +28,7 @@ esp_err_t ESP3DHttpService::http_send_response(httpd_req_t *req, int code,
   std::string status = std::to_string(code) + " ";
   switch (code) {
     case 200:
-      status += "OK";
+      status = HTTPD_200;
       break;
     case 201:
       status += "Created";
@@ -37,13 +37,13 @@ esp_err_t ESP3DHttpService::http_send_response(httpd_req_t *req, int code,
       status += "Accepted";
       break;
     case 204:
-      status += "No Content";
+      status = HTTPD_204;
       break;
     case 207:
-      status += "Multi-Status";
+      status = HTTPD_207;
       break;
     case 400:
-      status += "Bad Request";
+      status = HTTPD_400;
       break;
     case 401:
       status += "Unauthorized";
@@ -52,7 +52,7 @@ esp_err_t ESP3DHttpService::http_send_response(httpd_req_t *req, int code,
       status += "Forbidden";
       break;
     case 404:
-      status += "Not Found";
+      status = HTTPD_404;
       break;
     case 405:
       status += "Method Not Allowed";
@@ -61,7 +61,7 @@ esp_err_t ESP3DHttpService::http_send_response(httpd_req_t *req, int code,
       status += "Not Acceptable";
       break;
     case 408:
-      status += "Request Timeout";
+      status = HTTPD_408;
       break;
     case 409:
       status += "Conflict";
@@ -82,7 +82,7 @@ esp_err_t ESP3DHttpService::http_send_response(httpd_req_t *req, int code,
       status += "Failed Dependency";
       break;
     case 500:
-      status += "Internal Server Error";
+      status = HTTPD_500;
       break;
     case 501:
       status += "Not Implemented";
@@ -95,9 +95,12 @@ esp_err_t ESP3DHttpService::http_send_response(httpd_req_t *req, int code,
       break;
     default:
       status += "";
+      esp3d_log_e("Unknown status code: %d", code);
       break;
   }
-  esp3d_log("Uri: %s, status: %s", req->uri, status.c_str());
   httpd_resp_set_status(req, status.c_str());
-  return httpd_resp_send(req, msg, HTTPD_RESP_USE_STRLEN);
+  esp3d_log("%s", req->uri);
+  esp3d_log("Status: %s", status.c_str());
+  esp3d_log("%s", msg);
+  return httpd_resp_send(req, msg, strlen(msg));
 }

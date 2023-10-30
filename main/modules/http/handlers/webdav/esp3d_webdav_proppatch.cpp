@@ -25,19 +25,10 @@
 #include "webdav/esp3d_webdav_service.h"
 
 esp_err_t ESP3DHttpService::webdav_proppatch_handler(httpd_req_t *req) {
-  // int response_code = 200;
+  esp3d_log("Method: %s", "PROPPATCH");
   esp3d_log("Uri: %s", req->uri);
+  // TODO: read payload and implement proppatch changes
+  //  Now:
   // just redirect to propfind as answer is the same
   return webdav_propfind_handler(req);
-  /*std::string uri =
-      esp3d_string::urlDecode(&req->uri[strlen(ESP3D_WEBDAV_ROOT) + 1]);
-  esp3d_log("Uri: %s", uri.c_str());
-  int payload_size = _clearPayload(req);
-  (void)payload_size;
-  esp3d_log("Payload size: %d", payload_size);
-  // Add Webdav headers
-  httpd_resp_set_webdav_hdr(req);
-  // response_code is 200
-  return http_send_response(req, response_code, "");*/
-  ;
 }

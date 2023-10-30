@@ -21,24 +21,53 @@
 
 #include "esp3d_log.h"
 #include "esp3d_string.h"
+#include "filesystem/esp3d_globalfs.h"
 #include "http/esp3d_http_service.h"
 #include "webdav/esp3d_webdav_service.h"
 
 esp_err_t ESP3DHttpService::webdav_unlock_handler(httpd_req_t *req) {
-  int response_code = 200;
+  int response_code = 204;
+  std::string response_msg = "Success";
+  esp3d_log("Method: %s", "UNLOCK");
   esp3d_log("Uri: %s", req->uri);
 #if ESP3D_TFT_LOG >= ESP3D_TFT_LOG_LEVEL_DEBUG
-  esp3d_log_d("Headers count: %d\n", showAllHeaders(req));
-#endif  // ESP3D_TFT_LOG >= ESP3D_LOG_LEVEL_DEBUG
+  esp3d_log("Headers count: %d\n", showAllHeaders(req));
+#endif  // ESP3D_TFT_LOG >= ESP3D_LOG_LEVEL_
   std::string uri =
       esp3d_string::urlDecode(&req->uri[strlen(ESP3D_WEBDAV_ROOT) + 1]);
   esp3d_log("Uri: %s", uri.c_str());
+
   int payload_size = _clearPayload(req);
   (void)payload_size;
   esp3d_log("Payload size: %d", payload_size);
   // Add Webdav headers
   httpd_resp_set_webdav_hdr(req);
-  // response_code is 200
-  return http_send_response(req, response_code, "");
-  ;
+  // sanity check
+  if (uri.length() == 0) uri = "/";
+  if (uri == "/" || uri == ESP3D_FLASH_FS_HEADER || uri == ESP3D_SD_FS_HEADER ||
+      std::string(uri + "/") == ESP3D_FLASH_FS_HEADER ||
+      std::string(uri + "/") == ESP3D_SD_FS_HEADER) {
+    response_code = 400;
+    response_msg = "Not allowed";
+    esp3d_log_e("wrong uri");
+  } else {
+    // Check can access (error code 503)
+    if (globalFs.accessFS(uri.c_str())) {
+      struct stat entry_stat;
+      if (globalFs.stat(uri.c_str(), &entry_stat) == -1) {
+        response_code = 404;
+        response_msg = "Failed to stat";
+      } else {
+        // Nothing to do here because we don't support locking actually
+      }
+      // release access
+      globalFs.releaseFS(uri.c_str());
+    } else {
+      esp3d_log_e("Failed to access FS: %s", uri.c_str());
+      response_code = 503;
+      response_msg = "Failed to access FS";
+    }
+  }
+  // send response code to client
+  return http_send_response(req, response_code, response_msg.c_str());
 }

@@ -175,8 +175,43 @@ The response body is an xml document containing the properties of the resource.
 	</D:propstat>
   </D:response>
 </D:multistatus>
-
 ```
+
+if one of the resource is locked, the response will be:
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<D:multistatus xmlns:D="DAV:">
+  <D:response xmlns:esp3d="DAV:">
+	<D:href>/webdav</D:href>
+	<D:propstat>
+	  <D:status>HTTP/1.1 200 OK</D:status>
+	  <D:prop>
+		<esp3d:getlastmodified>Wed, 25 Oct 2023 04:44:55 GMT</esp3d:getlastmodified>
+		<esp3d:creationdate>Wed, 25 Oct 2023 04:44:55 GMT</esp3d:creationdate>
+		<D:resourcetype>
+		  <D:collection/>
+		</D:resourcetype>
+		<esp3d:displayname>/</esp3d:displayname>
+		<D:lockdiscovery>
+    		<D:activelock>
+     			<D:locktype><D:write/></D:locktype>
+     			<D:lockscope><D:exclusive/></D:lockscope>
+     			<D:depth>infinity</D:depth>
+     			<D:owner>John</D:owner>
+     			<D:timeout>Second-600</D:timeout>
+     			<D:locktoken>
+      				<D:href>opaquelocktoken:f81de2ad-7f6d-a1b2-4f3c-00a0c91a9d76</D:href>
+     			</D:locktoken>
+			 </D:activelock>
+         </D:lockdiscovery>
+	  </D:prop>
+	</D:propstat>
+  </D:response>
+</D:multistatus>
+```
+
+If the resource is a directory, the lock informations will be same for each sub resource, including same lock token.
+Note: Because we do not actually support lock method, we will never return lock informations.
 
 The response code is:
 - 207 if success
@@ -236,10 +271,111 @@ The response code is:
 - 500 if any error during the file creation
 - 400 if source or destination is / or /sd or /fs, or try to move /sd to /fs or /fs to /sd
 
+## PROPPATCH method
+
+The PROPPATCH method is used to set and/or remove properties defined on the resource identified by the Request-URI.
+The request has the following headers:
+- Content-Type is the type of the request body. It can be text/xml or application/xml or application/x-www-form-urlencoded or multipart/form-data but we only support text/xml.
+- Content-Length is the size of the request body.
+
+The request body is an xml document containing the properties to set or remove.
+The following xml document will set the properties Win32CreationTime, Win32LastAccessTime, Win32LastModifiedTime and Win32FileAttributes. which are not standard properties but are used by windows to display the file properties.
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+<D:propertyupdate xmlns:D="DAV:" xmlns:Z="urn:schemas-microsoft-com:">
+	<D:set>
+		<D:prop>
+			<Z:Win32CreationTime>Fri, 12 Aug 2022 07:03:25 GMT</Z:Win32CreationTime>
+			<Z:Win32LastAccessTime>Sat, 28 Oct 2023 13:59:02 GMT</Z:Win32LastAccessTime>
+			<Z:Win32LastModifiedTime>Fri, 12 Aug 2022 07:03:25 GMT</Z:Win32LastModifiedTime>
+			<Z:Win32FileAttributes>00000000</Z:Win32FileAttributes>
+		</D:prop>
+	</D:set>
+</D:propertyupdate>
+```
+TBD: We should to analyse the request body and set the properties accordingly.
+But currently we will ignore the request.
+
+The reponse will be the standard response for PROPFIND method for the resource.
+Changing the properties should be ignored if the format is not WebDav standard.
+
+TBD: We should to analyse the request body and set the properties accordingly even if the format is not WebDav standard.
 
 
 
+## LOCK method
+The LOCK method is used to take out a lock of any access type on the resource identified by the Request-URI.
+
+The request has the following headers:
+- Timeout is the time in seconds that the lock will be valid. If the header is not present, the default value is infinite.
+- Content-Type is the type of the request body. It can be text/xml or application/xml.
+- Content-Length is the size of the request body.
+
+Content of the request body is:
+```xml
+
+<?xml version="1.0" encoding="utf-8" ?>
+<D:lockinfo xmlns:D="DAV:">
+	<D:lockscope>
+		<D:exclusive/>
+	</D:lockscope>
+	<D:locktype>
+		<D:write/>
+	</D:locktype>
+	<D:owner>
+		<D:href>DESKTOP-LUCTW\luc</D:href>
+	</D:owner>
+</D:lockinfo>
+```
+The response need a token that will be used to access and unlock the resource.
+This token should be unique for each lock and the format is opaquelocktoken:<UUID>.
+
+The response has the following headers:
+- Lock-Token is the token that will be used to access and unlock the resource.
+- Content-Type is the type of the response body. It can be text/xml or application/xml.
+- Content-Length is the size of the response body.
 
 
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<D:prop xmlns:D="DAV:">
+	<D:lockdiscovery>
+		<D:activelock>
+			<D:locktoken>
+				<D:href>opaquelocktoken:f81de2df-7e8d-4fab-81bb-4b268c1323a7</D:href>
+			</D:locktoken>
+		</D:activelock>
+	</D:lockdiscovery>
+</D:prop>
+```
+In our case we will generate a random UUID and return it as the token.
 
+
+The response code is:
+- 200 if success
+- 400 if source or destination is / or /sd or /fs, or try to move /sd to /fs or /fs to /sd
+- 404 if the resource does not exist
+- 423 if the resource is already locked (because we do not support lock method, we will never return this code)
+- 412 if the token is invalid (because we do not support lock method, we will never return this code)
+- 403 if authorization is invalid (because we do not support lock method, we will never return this code)
+- 503 if any error accessing the local file system (e.g. access denied)
+
+## UNLOCK method
+The UNLOCK method is used to remove the lock identified by the Lock-Token header.
+The request has the following headers:
+- Lock-Token is the token that will be used to access and unlock the resource.
+
+The necessary headers in response are:
+- DAV
+- Allow
+
+No content
+
+The response code is:
+- 204 if success
+- 400 if source or destination is / or /sd or /fs, or try to move /sd to /fs or /fs to /sd
+- 404 if the resource does not exist
+- 412 if the token is invalid (because we do not support lock method, we will never return this code)
+- 423 if the resource is not locked (because we do not support lock method, we will never return this code)
+- 503 if any error accessing the local file system (e.g. access denied)
 

@@ -26,12 +26,13 @@
 
 esp_err_t ESP3DHttpService::webdav_options_handler(httpd_req_t *req) {
   int response_code = 200;
+  esp3d_log("Method: %s", "OPTIONS");
   esp3d_log("Uri: %s", req->uri);
   std::string uri =
       esp3d_string::urlDecode(&req->uri[strlen(ESP3D_WEBDAV_ROOT) + 1]);
   esp3d_log("Uri: %s", uri.c_str());
 #if ESP3D_TFT_LOG >= ESP3D_TFT_LOG_LEVEL_DEBUG
-  esp3d_log_d("Headers count: %d\n", showAllHeaders(req));
+  esp3d_log("Headers count: %d\n", showAllHeaders(req));
 #endif  // ESP3D_TFT_LOG >= ESP3D_LOG_LEVEL_
   int payload_size = _clearPayload(req);
   (void)payload_size;
