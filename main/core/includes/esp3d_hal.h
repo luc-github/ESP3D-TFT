@@ -20,13 +20,14 @@
 
 #pragma once
 #include <stdio.h>
+
 #include <string>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-namespace esp3d_hal
-{
+namespace esp3d_hal {
 int64_t millis();
 
 int64_t micros();
@@ -36,7 +37,20 @@ int64_t seconds();
 uint64_t getEfuseMac();
 
 void wait(int64_t milliseconds);
-}
+
+class Esp3dTimout final {
+ public:
+  Esp3dTimout(int64_t timeout)
+      : _timeout(timeout), _start(esp3d_hal::millis()) {}
+  bool isTimeout() { return (esp3d_hal::millis() - _start) > _timeout; }
+  void reset() { _start = esp3d_hal::millis(); }
+
+ private:
+  int64_t _timeout;
+  int64_t _start;
+};
+
+}  // namespace esp3d_hal
 #ifdef __cplusplus
-} // extern "C"
+}  // extern "C"
 #endif

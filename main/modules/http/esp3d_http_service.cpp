@@ -1252,6 +1252,15 @@ int ESP3DHttpService::_clearPayload(httpd_req_t *req) {
     size_t read_len = 0;
     do {
       read_len = httpd_req_recv(req, _chunk, CHUNK_BUFFER_SIZE);
+      if (read_len == HTTPD_SOCK_ERR_TIMEOUT) {
+        esp3d_log_e("Time out");
+        break;
+      }
+      if (read_len == HTTPD_SOCK_ERR_INVALID ||
+          read_len == HTTPD_SOCK_ERR_FAIL) {
+        esp3d_log_e("Error connection");
+        break;
+      }
       _chunk[read_len] = 0x0;
       esp3d_log("%s", _chunk);
       total_read += read_len;
