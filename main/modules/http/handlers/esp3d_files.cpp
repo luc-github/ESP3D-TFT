@@ -157,7 +157,7 @@ esp_err_t ESP3DHttpService::files_handler(httpd_req_t *req) {
 #if ESP3D_TIMESTAMP_FEATURE
           char buff[20];
           strftime(buff, sizeof(buff), "%Y-%m-%d %H:%M:%S",
-                   gmtime(&(entry_stat.st_mtim.tv_sec)));
+                   localtime(&(entry_stat.st_mtim.tv_sec)));
 #endif  // ESP3D_TIMESTAMP_FEATURE
           tmpstr += "{\"name\":\"";
           tmpstr += entry->d_name;

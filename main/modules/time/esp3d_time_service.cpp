@@ -176,36 +176,16 @@ bool TimeService::updateTimeZone(bool fromsettings) {
 }
 
 const char* TimeService::getCurrentTime() {
-  static std::string stmp;
   struct tm tmstruct;
   time_t now;
   stmp = "";
   // get current time
   time(&now);
   localtime_r(&now, &tmstruct);
-  stmp = std::to_string((tmstruct.tm_year) + 1900) + "-";
-  if (((tmstruct.tm_mon) + 1) < 10) {
-    stmp += "0";
-  }
-  stmp += std::to_string((tmstruct.tm_mon) + 1) + "-";
-  if (tmstruct.tm_mday < 10) {
-    stmp += "0";
-  }
-  stmp += std::to_string(tmstruct.tm_mday) + " ";
-  if (tmstruct.tm_hour < 10) {
-    stmp += "0";
-  }
-  stmp += std::to_string(tmstruct.tm_hour) + ":";
-  if (tmstruct.tm_min < 10) {
-    stmp += "0";
-  }
-  stmp += std::to_string(tmstruct.tm_min) + ":";
-  if (tmstruct.tm_sec < 10) {
-    stmp += "0";
-  }
-  stmp += std::to_string(tmstruct.tm_sec);
-  esp3d_log("Current time is %s", stmp.c_str());
-  return stmp.c_str();
+  static char buf[20];
+  strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &tmstruct);
+  esp3d_log("Time string is %s", buf);
+  return buf;
 }
 
 // the string date time  need to be iso-8601

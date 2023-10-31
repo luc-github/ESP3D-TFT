@@ -130,7 +130,7 @@ void ESP3DCommands::ESP720(int cmd_params_pos, ESP3DMessage *msg) {
 #if ESP3D_TIMESTAMP_FEATURE
           char buff[20];
           strftime(buff, sizeof(buff), "%Y-%m-%d %H:%M:%S",
-                   gmtime(&(entry_stat.st_mtim.tv_sec)));
+                   localtime(&(entry_stat.st_mtim.tv_sec)));
 #endif  // ESP3D_TIMESTAMP_FEATURE
           if (json) {
             if (nbDirs || nbFiles) {
