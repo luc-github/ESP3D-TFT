@@ -178,7 +178,6 @@ bool TimeService::updateTimeZone(bool fromsettings) {
 const char* TimeService::getCurrentTime() {
   struct tm tmstruct;
   time_t now;
-  stmp = "";
   // get current time
   time(&now);
   localtime_r(&now, &tmstruct);

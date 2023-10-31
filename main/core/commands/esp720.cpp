@@ -84,6 +84,7 @@ void ESP3DCommands::ESP720(int cmd_params_pos, ESP3DMessage *msg) {
       size_t freeSpace = 0;
       flashFs.getSpaceInfo(&totalSpace, &usedSpace, &freeSpace, true);
       while ((entry = flashFs.readdir(dir)) != NULL) {
+        esp3d_log_d("Read entry %s", entry->d_name);
         currentPath = tmpstr;
         if (tmpstr[tmpstr.length() - 1] != '/') {
           currentPath += "/";
@@ -108,6 +109,7 @@ void ESP3DCommands::ESP720(int cmd_params_pos, ESP3DMessage *msg) {
         } else {
           continue;
         }
+        esp3d_log_d("Dir %s", ok_msg.c_str());
         ESP3DMessage *newMsg = ESP3DClient::copyMsgInfos(msgInfo);
         newMsg->type = ESP3DMessageType::core;
         if (!dispatch(newMsg, ok_msg.c_str())) {
@@ -116,6 +118,7 @@ void ESP3DCommands::ESP720(int cmd_params_pos, ESP3DMessage *msg) {
       }
       flashFs.rewinddir(dir);
       while ((entry = flashFs.readdir(dir)) != NULL) {
+        esp3d_log_d("Read entry %s", entry->d_name);
         currentPath = tmpstr + entry->d_name;
         if (entry->d_type == DT_DIR) {
           continue;
@@ -166,6 +169,7 @@ void ESP3DCommands::ESP720(int cmd_params_pos, ESP3DMessage *msg) {
             ok_msg += "\n";
           }
         }
+        esp3d_log_d("File %s", ok_msg.c_str());
         ESP3DMessage *newMsg = ESP3DClient::copyMsgInfos(msgInfo);
         newMsg->type = ESP3DMessageType::core;
         if (!dispatch(newMsg, ok_msg.c_str())) {
