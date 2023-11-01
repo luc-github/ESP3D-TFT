@@ -72,7 +72,7 @@ void ESP3DCommands::ESP800(int cmd_params_pos, ESP3DMessage* msg) {
       if (!esp3dTimeService.setTimeZone(tzparam.c_str())) {
         // not blocking error
         esp3d_log_e("Error setting timezone");
-        timestr = "Failed to set";
+        timestr = "Failed to set timezone";
       } else {
         timestr = "Manual";
       }
@@ -83,6 +83,7 @@ void ESP3DCommands::ESP800(int cmd_params_pos, ESP3DMessage* msg) {
       if (!esp3dTimeService.setTime(timeparam.c_str())) {
         // not blocking error
         esp3d_log_e("Error setting time");
+        timestr = "Failed to set time";
       }
     }
   } else {

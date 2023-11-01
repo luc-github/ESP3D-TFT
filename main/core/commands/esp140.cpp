@@ -27,7 +27,7 @@
 #define COMMAND_ID 140
 
 // Sync / Set / Get current time
-//[ESP140]<sync> <srv1=XXXXX> <srv2=XXXXX> <srv3=XXXXX> <tzone=xxx> <dst=YES/NO>
+//[ESP140]<sync> <srv1=XXXXX> <srv2=XXXXX> <srv3=XXXXX> <tzone=xxx>
 //<time=YYYY-MM-DDTHH:mm:ss> <ntp=YES/NO> <now> json=<no> pwd=<admin password>
 void ESP3DCommands::ESP140(int cmd_params_pos, ESP3DMessage* msg) {
   ESP3DClientType target = msg->origin;
