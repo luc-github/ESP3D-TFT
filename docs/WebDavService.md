@@ -16,6 +16,10 @@ The allow header will be set to GET, HEAD, PUT, DELETE, OPTIONS, PROPFIND, MKCOL
 The time format used is the local time with the timezone offset:
 YYYY-MM-DDThh:mm:ssTZD (e.g. 1997-07-16T19:20:30+01:00)
 
+## Host / User-Agent
+User-Agent: ESP3D-TFT-HttpdavServer/1.0 (ESP32S3; Firmware/1.0.0; Platform/RTOS; Embedded; http://www.esp3d.io)
+Host: http://192.168.0.1/webdav
+
 ## GET method
 The GET method is used to retrieve information about the resource identified by the Request-URI. And the content of the resource is returned as the response body.
 The necessary headers in response are:

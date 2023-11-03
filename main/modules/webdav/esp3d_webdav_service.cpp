@@ -21,44 +21,63 @@
 
 #include "esp3d_log.h"
 #include "esp3d_string.h"
+#include "esp3d_version.h"
+#include "http/esp3d_http_service.h"
+#include "network/esp3d_network.h"
+#include "sdkconfig.h"
 
-esp_err_t httpd_resp_set_webdav_hdr(httpd_req_t *req, bool is_chunk) {
+esp_err_t httpd_resp_set_webdav_hdr(httpd_req_t *req) {
   esp_err_t err = ESP_OK;
-  if (!is_chunk) {
-    err = httpd_resp_set_hdr(req, "DAV", ESP3D_WEBDAV_HEADER);
-    if (err != ESP_OK) {
-      esp3d_log_e("httpd_resp_set_hdr failed for DAV");
-      return err;
-    }
 
-    err = httpd_resp_set_hdr(req, "Cache-Control", "no-cache");
-    if (err != ESP_OK) {
-      esp3d_log_e("httpd_resp_set_hdr failed for cache-control");
-      return err;
-    }
+  err = httpd_resp_set_hdr(req, "DAV", ESP3D_WEBDAV_HEADER);
+  if (err != ESP_OK) {
+    esp3d_log_e("httpd_resp_set_hdr failed for DAV");
+    return err;
+  }
 
-    err = httpd_resp_set_hdr(req, "Allow", ESP3D_WEBDAV_METHODS);
-    if (err != ESP_OK) {
-      esp3d_log_e("httpd_resp_set_hdr failed for Allow");
-      return err;
-    }
+  err = httpd_resp_set_hdr(req, "User-Agent",
+                           "ESP3D-TFT-WebdavServer/1.0 (" CONFIG_IDF_TARGET
+                           "; Firmware/" ESP3D_TFT_VERSION
+                           "; Platform/RTOS; Embedded; http://www.esp3d.io)");
+  if (err != ESP_OK) {
+    esp3d_log_e("httpd_resp_set_hdr failed for User-Agent");
+    return err;
+  }
 
-    err = httpd_resp_set_hdr(req, "Connection", "close");
-    if (err != ESP_OK) {
-      esp3d_log_e("httpd_resp_set_hdr failed for Connection");
-      return err;
+  static std::string host = "";
+  if (host.empty()) {
+    host = "http://";
+    host += esp3dNetwork.getLocalIpString();
+    if (esp3dHttpService.getPort() != 80) {
+      host += ":";
+      host += esp3dHttpService.getPort();
     }
-  } else {
-    std::string chunked =
-        "DAV: " ESP3D_WEBDAV_HEADER
-        "\r\nCache-Control: no-cache\r\nAllow: " ESP3D_WEBDAV_METHODS
-        "\r\nConnection: close\r\n";
-    err = httpd_resp_send_chunk(req, chunked.c_str(), chunked.length());
-    if (err != ESP_OK) {
-      esp3d_log_e("httpd_resp_send_chunk failed for DAV");
-      return err;
-    }
-    esp3d_log("%s", chunked.c_str());
+    host += "/";
+    host += ESP3D_WEBDAV_ROOT;
+  }
+
+  err = httpd_resp_set_hdr(req, "Host", host.c_str());
+  if (err != ESP_OK) {
+    esp3d_log_e("httpd_resp_set_hdr failed for Host");
+    return err;
+  }
+
+  err = httpd_resp_set_hdr(req, "Cache-Control", "no-cache");
+  if (err != ESP_OK) {
+    esp3d_log_e("httpd_resp_set_hdr failed for cache-control");
+    return err;
+  }
+
+  err = httpd_resp_set_hdr(req, "Allow", ESP3D_WEBDAV_METHODS);
+  if (err != ESP_OK) {
+    esp3d_log_e("httpd_resp_set_hdr failed for Allow");
+    return err;
+  }
+
+  err = httpd_resp_set_hdr(req, "Connection", "close");
+  if (err != ESP_OK) {
+    esp3d_log_e("httpd_resp_set_hdr failed for Connection");
+    return err;
   }
 
   return err;

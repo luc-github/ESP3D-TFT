@@ -32,6 +32,8 @@ esp_err_t ESP3DHttpService::not_authenticated_handler(httpd_req_t *req) {
   int socketId = httpd_req_to_sockfd(req);
   esp3d_log("Uri: %s, socket: %d", req->uri, socketId);
   esp3dHttpService.onClose(socketId);
+  // Send httpd header
+  httpd_resp_set_http_hdr(req);
   httpd_resp_set_hdr(req, "Set-Cookie", "ESPSESSIONID=0");
   httpd_resp_set_hdr(req, "Cache-Control", "no-cache");
   httpd_resp_set_type(req, "application/json");

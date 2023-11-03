@@ -30,6 +30,8 @@
 
 esp_err_t ESP3DHttpService::login_handler(httpd_req_t *req) {
   esp3d_log("Uri: %s", req->uri);
+  // Send httpd header
+  httpd_resp_set_http_hdr(req);
 #if ESP3D_AUTHENTICATION_FEATURE
   std::string tmpstr;
   if (esp3dHttpService.hasArg(req, "DISCONNECT")) {

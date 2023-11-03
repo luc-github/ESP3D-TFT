@@ -158,7 +158,7 @@ bool TimeService::updateTimeZone(bool fromsettings) {
                                            out_str, SIZE_OF_TIMEZONE);
   if (!esp3dTftsettings.isValidStringSetting(
           _time_zone.c_str(), ESP3DSettingIndex::esp3d_timezone)) {
-    esp3d_log("Invalid time zone %s", _time_zone.c_str());
+    esp3d_log_e("Invalid time zone %s", _time_zone.c_str());
     _time_zone = "+00:00";
   }
   std::string stmp = _time_zone;
@@ -220,7 +220,7 @@ bool TimeService::setTime(const char* stime) {
     return false;
   }
   return true;
-};
+}
 
 bool TimeService::started() { return _started; }
 

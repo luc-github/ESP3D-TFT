@@ -28,7 +28,8 @@ esp_err_t ESP3DHttpService::root_get_handler(httpd_req_t *req) {
   esp3d_log("Uri: %s, %d", req->uri, static_cast<uint8_t>(level));
   (void)level;
 #endif  // ESP3D_AUTHENTICATION_FEATURE
-
+  // Send httpd header
+  httpd_resp_set_http_hdr(req);
   bool forcefallback = false;
   size_t buf_len = httpd_req_get_url_query_len(req);
   if (buf_len > 0) {

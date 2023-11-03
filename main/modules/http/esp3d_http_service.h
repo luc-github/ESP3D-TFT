@@ -110,6 +110,7 @@ class ESP3DHttpService final {
   static char *generate_http_auth_basic_digest(const char *username,
                                                const char *password);
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
+  static esp_err_t httpd_resp_set_http_hdr(httpd_req_t *req);
   static ESP3DAuthenticationLevel getAuthenticationLevel(httpd_req_t *req);
   static esp_err_t root_get_handler(httpd_req_t *req);
   static esp_err_t command_handler(httpd_req_t *req);
@@ -178,11 +179,13 @@ class ESP3DHttpService final {
   void pop(esp3dSocketType socketType, int socketFd);
 
   const char *getArg(httpd_req_t *req, const char *argname);
+  uint32_t getPort() { return _port; };
 
  private:
   static char _chunk[CHUNK_BUFFER_SIZE];
   bool _started;
   httpd_handle_t _server;
+  uint32_t _port;
   const char *getBoundaryString(httpd_req_t *req);
   // it is based on : `only one post is supported at once`
   static PostUploadContext _post_files_upload_ctx;

@@ -26,6 +26,7 @@
 #include "esp3d_log.h"
 #include "esp3d_settings.h"
 #include "esp3d_string.h"
+#include "esp3d_version.h"
 #include "esp_tls_crypto.h"
 #include "esp_wifi.h"
 #include "filesystem/esp3d_globalfs.h"
@@ -220,10 +221,9 @@ bool ESP3DHttpService::begin() {
     return true;
   }
   httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-  uint32_t intValue =
-      esp3dTftsettings.readUint32(ESP3DSettingIndex::esp3d_http_port);
+  _port = esp3dTftsettings.readUint32(ESP3DSettingIndex::esp3d_http_port);
   // HTTP port
-  config.server_port = intValue;
+  config.server_port = _port;
   // Http server core
   config.core_id = 0;
   // stack size (default 4096)
@@ -997,6 +997,37 @@ ESP3DAuthenticationLevel ESP3DHttpService::getAuthenticationLevel(
   return ESP3DAuthenticationLevel::admin;
 #endif  // #if ESP3D_AUTHENTICATION_FEATURE
 }
+
+esp_err_t ESP3DHttpService::httpd_resp_set_http_hdr(httpd_req_t *req) {
+  esp_err_t err = ESP_OK;
+
+  err = httpd_resp_set_hdr(req, "User-Agent",
+                           "ESP3D-TFT-HttpServer/1.0 (" CONFIG_IDF_TARGET
+                           "; Firmware/" ESP3D_TFT_VERSION
+                           "; Platform/RTOS; Embedded; http://www.esp3d.io)");
+  if (err != ESP_OK) {
+    esp3d_log_e("httpd_resp_set_hdr failed for User-Agent");
+    return err;
+  }
+
+  static std::string host = "";
+  if (host.empty()) {
+    host = "http://";
+    host += esp3dNetwork.getLocalIpString();
+    if (esp3dHttpService.getPort() != 80) {
+      host += ":";
+      host += esp3dHttpService.getPort();
+    }
+  }
+
+  err = httpd_resp_set_hdr(req, "Host", host.c_str());
+  if (err != ESP_OK) {
+    esp3d_log_e("httpd_resp_set_hdr failed for Host");
+    return err;
+  }
+  return err;
+}
+
 esp_err_t ESP3DHttpService::streamFile(const char *path, httpd_req_t *req) {
   esp_err_t res = ESP_OK;
   if (!_started || !_server) {

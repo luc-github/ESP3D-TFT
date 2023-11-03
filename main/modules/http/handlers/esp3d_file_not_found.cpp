@@ -28,6 +28,8 @@
 
 esp_err_t ESP3DHttpService::file_not_found_handler(httpd_req_t *req,
                                                    httpd_err_code_t err) {
+  // Send httpd header
+  httpd_resp_set_http_hdr(req);
 #if ESP3D_AUTHENTICATION_FEATURE
   ESP3DAuthenticationLevel authentication_level = getAuthenticationLevel(req);
   if (authentication_level == ESP3DAuthenticationLevel::guest) {

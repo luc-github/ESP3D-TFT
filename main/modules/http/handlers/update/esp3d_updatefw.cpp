@@ -26,9 +26,10 @@
 esp_err_t ESP3DHttpService::updatefw_handler(httpd_req_t *req) {
   // No need Authentication as already handled in multipart_parser
   esp3d_log("Uri: %s", req->uri);
+  // Send httpd header
+  httpd_resp_set_http_hdr(req);
   httpd_resp_sendstr(req, "Update firmware done restarting");
   vTaskDelay(pdMS_TO_TICKS(1000));
   esp_restart();
   return ESP_OK;
 }
-

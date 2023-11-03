@@ -30,6 +30,8 @@
 esp_err_t ESP3DHttpService::command_handler(httpd_req_t *req) {
   // TODO: check authentication level
   ESP3DAuthenticationLevel authentication_level = getAuthenticationLevel(req);
+  // Send httpd header
+  httpd_resp_set_http_hdr(req);
 #if ESP3D_AUTHENTICATION_FEATURE
   if (authentication_level == ESP3DAuthenticationLevel::guest) {
     // send 401
