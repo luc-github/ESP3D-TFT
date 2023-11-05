@@ -31,7 +31,6 @@ The necessary headers in response are:
 
 The content of the reponse is:
  - the file if the resource is a file
- - empty if the resource is a directory
 
 The response code is:
 - 200 if the resource is a file  and the request was successful
@@ -258,7 +257,7 @@ There is no merge of the destination resource and the source resource but the de
 Only move /fs to /fs and /sd to /sd
 
 The request has the following headers:
-- Destination is the path of the resource to create. to be used instead of the Request-URI if present.
+- Destination is the path of the resource to create
 - Overwrite is a boolean that indicates if the destination resource should be overwritten if it already exists. If the header is not present, the default value is false.
 
 The necessary headers in response are:
