@@ -34,7 +34,8 @@ The content of the reponse is:
  - empty if the resource is a directory
 
 The response code is:
-- 200 if the resource is a file or a directory and the request was successful
+- 200 if the resource is a file  and the request was successful
+- 405 if the resource is a directory 
 - 404 if the resource does not exist
 - 500 if any error during the file streaming
 - 503 if any error accessing the local file system (e.g. access denied)
@@ -51,8 +52,9 @@ The necessary headers in response are:
 Unlike GET method, the HEAD method does not return the content of the resource.
 
 The response code is:
-- 200 if the resource is a file or a directory and the request was successful
+- 200 if the resource is a file and the request was successful
 - 404 if the resource does not exist
+- 405 if the resource is a directory 
 - 500 if any error during the file streaming
 - 503 if any error accessing the local file system (e.g. access denied)
 

@@ -73,6 +73,10 @@ esp_err_t ESP3DHttpService::webdav_head_handler(httpd_req_t *req) {
           // Add Content-Length header
           httpd_resp_set_hdr(req, "Content-Length",
                              std::to_string(file_size).c_str());
+        } else {
+          response_code = 405;
+          response_msg = "It is not a file";
+          esp3d_log_e("It is not a file");
         }
       }
       // release access
