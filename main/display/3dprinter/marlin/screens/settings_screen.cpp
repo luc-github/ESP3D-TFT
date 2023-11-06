@@ -328,7 +328,7 @@ void setting_edit_done_cb(const char *str, void *data) {
                                                           val_string.c_str());
           }
           break;
-        case ESP3DSettingType::ip:
+        case ESP3DSettingType::ip_t:
         case ESP3DSettingType::mask:
         case ESP3DSettingType::bitsfield:
           esp3d_log_e("This type %d, is not yet supported",

@@ -104,19 +104,19 @@ const ESP3DSettingDescription ESP3DSettingsData[] = {
     {ESP3DSettingIndex::esp3d_sta_password, ESP3DSettingType::string_t,
      SIZE_OF_SETTING_SSID_PWD, ""},
     {ESP3DSettingIndex::esp3d_sta_ip_mode, ESP3DSettingType::byte_t, 1, "0"},
-    {ESP3DSettingIndex::esp3d_sta_ip_static, ESP3DSettingType::ip, 4,
+    {ESP3DSettingIndex::esp3d_sta_ip_static, ESP3DSettingType::ip_t, 4,
      "192.168.1.100"},
-    {ESP3DSettingIndex::esp3d_sta_mask_static, ESP3DSettingType::ip, 4,
+    {ESP3DSettingIndex::esp3d_sta_mask_static, ESP3DSettingType::ip_t, 4,
      "255.255.255.0"},
-    {ESP3DSettingIndex::esp3d_sta_gw_static, ESP3DSettingType::ip, 4,
+    {ESP3DSettingIndex::esp3d_sta_gw_static, ESP3DSettingType::ip_t, 4,
      "192.168.1.1"},
-    {ESP3DSettingIndex::esp3d_sta_dns_static, ESP3DSettingType::ip, 4,
+    {ESP3DSettingIndex::esp3d_sta_dns_static, ESP3DSettingType::ip_t, 4,
      "192.168.1.1"},
     {ESP3DSettingIndex::esp3d_ap_ssid, ESP3DSettingType::string_t,
      SIZE_OF_SETTING_SSID_ID, "esp3dtft"},
     {ESP3DSettingIndex::esp3d_ap_password, ESP3DSettingType::string_t,
      SIZE_OF_SETTING_SSID_PWD, "12345678"},
-    {ESP3DSettingIndex::esp3d_ap_ip_static, ESP3DSettingType::ip, 4,
+    {ESP3DSettingIndex::esp3d_ap_ip_static, ESP3DSettingType::ip_t, 4,
      "192.168.0.1"},
     {ESP3DSettingIndex::esp3d_ap_channel, ESP3DSettingType::byte_t, 1, "2"},
 #endif  // ESP3D_WIFI_FEATURE
@@ -313,7 +313,7 @@ bool ESP3DSettings::isValidIntegerSetting(uint32_t value,
     return false;
   }
   if (!(settingPtr->type == ESP3DSettingType::integer_t ||
-        settingPtr->type == ESP3DSettingType::ip)) {
+        settingPtr->type == ESP3DSettingType::ip_t)) {
     return false;
   }
   switch (settingElement) {
@@ -489,7 +489,7 @@ bool ESP3DSettings::isValidIPStringSetting(const char* value,
   if (!settingPtr) {
     return false;
   }
-  if (settingPtr->type != ESP3DSettingType::ip) {
+  if (settingPtr->type != ESP3DSettingType::ip_t) {
     return false;
   }
   return std::regex_match(value,
@@ -602,7 +602,7 @@ bool ESP3DSettings::reset() {
             result = false;
           }
           break;
-        case ESP3DSettingType::ip:
+        case ESP3DSettingType::ip_t:
           if (!ESP3DSettings::writeIPString(setting, query->default_val)) {
             esp3d_log_e("Error writing %s to settings %d", query->default_val,
                         static_cast<uint16_t>(setting));
@@ -722,7 +722,7 @@ uint32_t ESP3DSettings::readUint32(ESP3DSettingIndex index, bool* haserror) {
   const ESP3DSettingDescription* query = getSettingPtr(index);
   if (query) {
     if (query->type == ESP3DSettingType::integer_t ||
-        query->type == ESP3DSettingType::ip) {
+        query->type == ESP3DSettingType::ip_t) {
       esp_err_t err;
       access_nvs(NVS_READONLY);
       std::shared_ptr<nvs::NVSHandle> handle =
@@ -867,7 +867,7 @@ bool ESP3DSettings::writeUint32(ESP3DSettingIndex index, const uint32_t value) {
   const ESP3DSettingDescription* query = getSettingPtr(index);
   if (query) {
     if (query->type == ESP3DSettingType::integer_t ||
-        query->type == ESP3DSettingType::ip) {
+        query->type == ESP3DSettingType::ip_t) {
       esp_err_t err;
       access_nvs(NVS_READWRITE);
       std::shared_ptr<nvs::NVSHandle> handle =

@@ -149,7 +149,7 @@ void ESP3DCommands::ESP401(int cmd_params_pos, ESP3DMessage* msg) {
           break;
         case 'A':
 
-          if (settingPtr->type == ESP3DSettingType ::ip) {
+          if (settingPtr->type == ESP3DSettingType::ip_t) {
             if (esp3dTftsettings.isValidIPStringSetting(settingValue.c_str(),
                                                         index_setting)) {
               if (!esp3dTftsettings.writeIPString(index_setting,
