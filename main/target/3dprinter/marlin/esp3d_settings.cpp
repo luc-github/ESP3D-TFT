@@ -240,7 +240,12 @@ bool ESP3DSettings::isValidStringSetting(const char* value,
   if (len > settingPtr->size) {
     return false;
   }
-
+  // check if any non printable char not supposed to be here
+  for (uint i = 0; i < strlen(value); i++) {
+    if (!std::isprint(value[i])) {
+      return false;
+    }
+  }
   switch (settingElement) {
 #if ESP3D_TIMESTAMP_FEATURE
     case ESP3DSettingIndex::esp3d_timezone:
@@ -297,6 +302,11 @@ bool ESP3DSettings::isValidStringSetting(const char* value,
 #if ESP3D_AUTHENTICATION_FEATURE
     case ESP3DSettingIndex::esp3d_admin_password:
     case ESP3DSettingIndex::esp3d_user_password:
+      for (uint i = 0; i < strlen(value); i++) {
+        if (value[i] == ' ') {  // no space allowed
+          return false;
+        }
+      }
       return len <= SIZE_OF_LOCAL_PASSWORD;  // any string from 0 to 20
 #endif                                       // ESP3D_AUTHENTICATION_FEATURE
     default:
@@ -332,11 +342,13 @@ bool ESP3DSettings::isValidIntegerSetting(uint32_t value,
 #endif  // ESP3D_TELNET_FEATURE
 #if ESP3D_HTTP_FEATURE
     case ESP3DSettingIndex::esp3d_http_port:
+#endif  // ESP3D_HTTP_FEATURE
+#if ESP3D_HTTP_FEATURE || ESP3D_TELNET_FEATURE
       if (value >= 1 && value < 65535) {
         return true;
       }
       break;
-#endif  // ESP3D_HTTP_FEATURE
+#endif  // ESP3D_HTTP_FEATURE  || ESP3D_TELNET_FEATURE
 
     default:
       return false;
@@ -492,8 +504,36 @@ bool ESP3DSettings::isValidIPStringSetting(const char* value,
   if (settingPtr->type != ESP3DSettingType::ip_t) {
     return false;
   }
-  return std::regex_match(value,
-                          std::regex("^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$"));
+  /*return std::regex_match(value,
+                          std::regex("^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$"));*/
+  // The below code cover more test than regex matching
+  std::string ippart[4];
+  uint index = 0;
+  for (uint8_t i = 0; i < strlen(value); i++) {
+    // only digit and . are allowed
+    if (!isdigit(value[i]) && value[i] != '.') {
+      return false;
+    }
+    if (value[i] == '.') {  // new ip part
+      index++;
+      if (index > 3) {  // only 4 parts allowed (IPv4 only for the moment)
+        return false;
+      }
+    } else {  // fill the part
+      ippart[index] += value[i];
+    }
+  }
+  if (index != 3) {  // only exactly 4 parts allowed, no less
+    return false;
+  }
+  for (uint8_t i = 0; i < 4; i++) {  // check each part
+    // max value is 255, no empty part, no part longer than 3 digits
+    if (atoi(ippart[i].c_str()) > 255 || ippart[i].length() > 3 ||
+        ippart[i].length() == 0) {
+      return false;
+    }
+  }
+  return true;
 }
 
 bool ESP3DSettings::isValidSettingsNvs() {
