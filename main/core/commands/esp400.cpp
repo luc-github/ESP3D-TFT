@@ -31,8 +31,8 @@
 const char* BaudRateList[] = {"9600",   "19200",  "38400",  "57600",  "74880",
                               "115200", "230400", "250000", "500000", "921600"};
 const char* SPIDivider[] = {"1", "2", "4", "6", "8", "16", "32"};
-const char* YesNoLabels[] = {"yes", "no"};
-const char* YesNoValues[] = {"1", "0"};
+const char* YesNoLabels[] = {"no", "yes"};
+const char* YesNoValues[] = {"0", "1"};
 const char* RadioModeLabels[] = {"none", "sta", "ap", "setup"};
 const char* RadioModeValues[] = {"0", "1", "2", "3"};
 #if ESP3D_USB_SERIAL_FEATURE

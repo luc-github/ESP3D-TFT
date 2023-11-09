@@ -104,19 +104,19 @@ const ESP3DSettingDescription ESP3DSettingsData[] = {
     {ESP3DSettingIndex::esp3d_sta_password, ESP3DSettingType::string_t,
      SIZE_OF_SETTING_SSID_PWD, ""},
     {ESP3DSettingIndex::esp3d_sta_ip_mode, ESP3DSettingType::byte_t, 1, "0"},
-    {ESP3DSettingIndex::esp3d_sta_ip_static, ESP3DSettingType::ip, 4,
+    {ESP3DSettingIndex::esp3d_sta_ip_static, ESP3DSettingType::ip_t, 4,
      "192.168.1.100"},
-    {ESP3DSettingIndex::esp3d_sta_mask_static, ESP3DSettingType::ip, 4,
+    {ESP3DSettingIndex::esp3d_sta_mask_static, ESP3DSettingType::ip_t, 4,
      "255.255.255.0"},
-    {ESP3DSettingIndex::esp3d_sta_gw_static, ESP3DSettingType::ip, 4,
+    {ESP3DSettingIndex::esp3d_sta_gw_static, ESP3DSettingType::ip_t, 4,
      "192.168.1.1"},
-    {ESP3DSettingIndex::esp3d_sta_dns_static, ESP3DSettingType::ip, 4,
+    {ESP3DSettingIndex::esp3d_sta_dns_static, ESP3DSettingType::ip_t, 4,
      "192.168.1.1"},
     {ESP3DSettingIndex::esp3d_ap_ssid, ESP3DSettingType::string_t,
      SIZE_OF_SETTING_SSID_ID, "esp3dtft"},
     {ESP3DSettingIndex::esp3d_ap_password, ESP3DSettingType::string_t,
      SIZE_OF_SETTING_SSID_PWD, "12345678"},
-    {ESP3DSettingIndex::esp3d_ap_ip_static, ESP3DSettingType::ip, 4,
+    {ESP3DSettingIndex::esp3d_ap_ip_static, ESP3DSettingType::ip_t, 4,
      "192.168.0.1"},
     {ESP3DSettingIndex::esp3d_ap_channel, ESP3DSettingType::byte_t, 1, "2"},
 #endif  // ESP3D_WIFI_FEATURE
@@ -240,7 +240,12 @@ bool ESP3DSettings::isValidStringSetting(const char* value,
   if (len > settingPtr->size) {
     return false;
   }
-
+  // check if any non printable char not supposed to be here
+  for (uint i = 0; i < strlen(value); i++) {
+    if (!std::isprint(value[i])) {
+      return false;
+    }
+  }
   switch (settingElement) {
 #if ESP3D_TIMESTAMP_FEATURE
     case ESP3DSettingIndex::esp3d_timezone:
@@ -297,6 +302,11 @@ bool ESP3DSettings::isValidStringSetting(const char* value,
 #if ESP3D_AUTHENTICATION_FEATURE
     case ESP3DSettingIndex::esp3d_admin_password:
     case ESP3DSettingIndex::esp3d_user_password:
+      for (uint i = 0; i < strlen(value); i++) {
+        if (value[i] == ' ') {  // no space allowed
+          return false;
+        }
+      }
       return len <= SIZE_OF_LOCAL_PASSWORD;  // any string from 0 to 20
 #endif                                       // ESP3D_AUTHENTICATION_FEATURE
     default:
@@ -313,7 +323,7 @@ bool ESP3DSettings::isValidIntegerSetting(uint32_t value,
     return false;
   }
   if (!(settingPtr->type == ESP3DSettingType::integer_t ||
-        settingPtr->type == ESP3DSettingType::ip)) {
+        settingPtr->type == ESP3DSettingType::ip_t)) {
     return false;
   }
   switch (settingElement) {
@@ -332,11 +342,13 @@ bool ESP3DSettings::isValidIntegerSetting(uint32_t value,
 #endif  // ESP3D_TELNET_FEATURE
 #if ESP3D_HTTP_FEATURE
     case ESP3DSettingIndex::esp3d_http_port:
+#endif  // ESP3D_HTTP_FEATURE
+#if ESP3D_HTTP_FEATURE || ESP3D_TELNET_FEATURE
       if (value >= 1 && value < 65535) {
         return true;
       }
       break;
-#endif  // ESP3D_HTTP_FEATURE
+#endif  // ESP3D_HTTP_FEATURE  || ESP3D_TELNET_FEATURE
 
     default:
       return false;
@@ -489,11 +501,39 @@ bool ESP3DSettings::isValidIPStringSetting(const char* value,
   if (!settingPtr) {
     return false;
   }
-  if (settingPtr->type != ESP3DSettingType::ip) {
+  if (settingPtr->type != ESP3DSettingType::ip_t) {
     return false;
   }
-  return std::regex_match(value,
-                          std::regex("^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$"));
+  /*return std::regex_match(value,
+                          std::regex("^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$"));*/
+  // The below code cover more test than regex matching
+  std::string ippart[4];
+  uint index = 0;
+  for (uint8_t i = 0; i < strlen(value); i++) {
+    // only digit and . are allowed
+    if (!isdigit(value[i]) && value[i] != '.') {
+      return false;
+    }
+    if (value[i] == '.') {  // new ip part
+      index++;
+      if (index > 3) {  // only 4 parts allowed (IPv4 only for the moment)
+        return false;
+      }
+    } else {  // fill the part
+      ippart[index] += value[i];
+    }
+  }
+  if (index != 3) {  // only exactly 4 parts allowed, no less
+    return false;
+  }
+  for (uint8_t i = 0; i < 4; i++) {  // check each part
+    // max value is 255, no empty part, no part longer than 3 digits
+    if (atoi(ippart[i].c_str()) > 255 || ippart[i].length() > 3 ||
+        ippart[i].length() == 0) {
+      return false;
+    }
+  }
+  return true;
 }
 
 bool ESP3DSettings::isValidSettingsNvs() {
@@ -602,7 +642,7 @@ bool ESP3DSettings::reset() {
             result = false;
           }
           break;
-        case ESP3DSettingType::ip:
+        case ESP3DSettingType::ip_t:
           if (!ESP3DSettings::writeIPString(setting, query->default_val)) {
             esp3d_log_e("Error writing %s to settings %d", query->default_val,
                         static_cast<uint16_t>(setting));
@@ -722,7 +762,7 @@ uint32_t ESP3DSettings::readUint32(ESP3DSettingIndex index, bool* haserror) {
   const ESP3DSettingDescription* query = getSettingPtr(index);
   if (query) {
     if (query->type == ESP3DSettingType::integer_t ||
-        query->type == ESP3DSettingType::ip) {
+        query->type == ESP3DSettingType::ip_t) {
       esp_err_t err;
       access_nvs(NVS_READONLY);
       std::shared_ptr<nvs::NVSHandle> handle =
@@ -867,7 +907,7 @@ bool ESP3DSettings::writeUint32(ESP3DSettingIndex index, const uint32_t value) {
   const ESP3DSettingDescription* query = getSettingPtr(index);
   if (query) {
     if (query->type == ESP3DSettingType::integer_t ||
-        query->type == ESP3DSettingType::ip) {
+        query->type == ESP3DSettingType::ip_t) {
       esp_err_t err;
       access_nvs(NVS_READWRITE);
       std::shared_ptr<nvs::NVSHandle> handle =

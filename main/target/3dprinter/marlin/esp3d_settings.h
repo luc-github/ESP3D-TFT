@@ -129,11 +129,11 @@ enum class ESP3DSettingType : uint8_t {
   byte_t,     // byte
   integer_t,  // 4 bytes
   string_t,   // string
-  ip,         // 4 bytes
+  ip_t,       // 4 bytes
   float_t,    // 4 bytes
   mask,       // x bytes
   bitsfield,  // x bytes
-  unknown
+  unknown_t
 };
 
 struct ESP3DSettingDescription {

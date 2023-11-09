@@ -150,7 +150,7 @@ bool ESP3DCommands::dispatchSetting(bool json, const char* filter,
     case ESP3DSettingType::integer_t:
       value = std::to_string(esp3dTftsettings.readUint32(index));
       break;
-    case ESP3DSettingType::ip:
+    case ESP3DSettingType::ip_t:
       value = esp3dTftsettings.readIPString(index);
       break;
     case ESP3DSettingType::float_t:
@@ -198,7 +198,7 @@ bool ESP3DCommands::dispatchSetting(bool json, const char* filter,
       case ESP3DSettingType::integer_t:
         tmpstr += "I";
         break;
-      case ESP3DSettingType::ip:
+      case ESP3DSettingType::ip_t:
         tmpstr += "A";
         break;
       case ESP3DSettingType::float_t:
