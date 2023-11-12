@@ -76,6 +76,13 @@ bool ESP3DGCodeParserService::forwardToScreen(const char* command) {
     if (strncmp(command, screenCommands[i], strlen(screenCommands[i])) == 0) {
       esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
                                       &command[strlen(screenCommands[i])]);
+      // TODO: Forward to Notification / WebUI ?
+      // ESP3DNotificationsService::sendMSG(const char* title, const char*
+      // message)
+#if ESP3D_HTTP_FEATURE
+      // esp3dWsWebUiService.pushNotification(
+      // &command[strlen(screenCommands[i])]);
+#endif  // ESP3D_HTTP_FEATURE
       return true;
     }
   }

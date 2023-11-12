@@ -396,6 +396,7 @@ bool ESP3DCommands::dispatch(const char* sbuf, ESP3DClientType target,
   if (newMsgPtr) {
     newMsgPtr->request_id = requestId;
     newMsgPtr->type = type;
+    newMsgPtr->authentication_level = authentication_level;
     return dispatch(newMsgPtr, sbuf);
   }
   esp3d_log_e("no newMsgPtr");
@@ -1027,14 +1028,19 @@ void ESP3DCommands::execute_internal_command(int cmd, int cmd_params_pos,
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
     default:
       msg->target = msg->origin;
+      esp3d_log("Invalid Command: %s", tmpstr.c_str());
       if (hasTag(msg, cmd_params_pos, "json")) {
-        if (!dispatch(msg,
-                      "{\"cmd\":\"0\",\"status\":\"error\",\"data\":\"Invalid "
-                      "Command\"}")) {
+        std::string tmpstr = "{\"cmd\":\"";
+        tmpstr += std::to_string(cmd);
+        tmpstr += "\",\"status\":\"error\",\"data\":\"Invalid Command\"}";
+        if (!dispatch(msg, tmpstr.c_str())) {
           esp3d_log_e("Out of memory");
         }
       } else {
-        if (!dispatch(msg, "Invalid Command\n")) {
+        std::string tmpstr = "Invalid Command:";
+        tmpstr += std::to_string(cmd);
+        tmpstr += "\n";
+        if (!dispatch(msg, tmpstr.c_str())) {
           esp3d_log_e("Out of memory");
         }
       }

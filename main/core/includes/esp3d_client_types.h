@@ -1,5 +1,5 @@
 /*
-  esp3d-client
+  esp3d_client_types.h
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
