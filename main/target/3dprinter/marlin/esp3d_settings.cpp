@@ -259,6 +259,9 @@ bool ESP3DSettings::isValidStringSetting(const char* value,
       }
       break;
 #endif  // ESP3D_TIMESTAMP_FEATURE
+    case ESP3DSettingIndex::esp3d_version:
+      return strcmp(value, SETTING_VERSION) == 0;
+      break;
     case ESP3DSettingIndex::esp3d_pause_script:
     case ESP3DSettingIndex::esp3d_resume_script:
     case ESP3DSettingIndex::esp3d_stop_script:
@@ -540,7 +543,8 @@ bool ESP3DSettings::isValidSettingsNvs() {
   char result[SIZE_OF_SETTING_VERSION + 1] = {0};
   if (esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_version, result,
                                   SIZE_OF_SETTING_VERSION + 1)) {
-    if (strcmp(SETTING_VERSION, result) != 0) {
+    if (!esp3dTftsettings.isValidStringSetting(
+            result, ESP3DSettingIndex::esp3d_version)) {
       esp3d_log_e("Expected %s but got %s", SETTING_VERSION, result);
       return false;
     } else {

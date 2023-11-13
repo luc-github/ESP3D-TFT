@@ -1028,18 +1028,18 @@ void ESP3DCommands::execute_internal_command(int cmd, int cmd_params_pos,
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
     default:
       msg->target = msg->origin;
-      esp3d_log("Invalid Command: %s", tmpstr.c_str());
+      esp3d_log("Invalid Command: [ESP%s]", tmpstr.c_str());
       if (hasTag(msg, cmd_params_pos, "json")) {
-        std::string tmpstr = "{\"cmd\":\"";
+        std::string tmpstr = "{\"cmd\":\"[ESP";
         tmpstr += std::to_string(cmd);
-        tmpstr += "\",\"status\":\"error\",\"data\":\"Invalid Command\"}";
+        tmpstr += "]\",\"status\":\"error\",\"data\":\"Invalid Command\"}";
         if (!dispatch(msg, tmpstr.c_str())) {
           esp3d_log_e("Out of memory");
         }
       } else {
-        std::string tmpstr = "Invalid Command:";
+        std::string tmpstr = "Invalid Command: [ESP";
         tmpstr += std::to_string(cmd);
-        tmpstr += "\n";
+        tmpstr += "]\n";
         if (!dispatch(msg, tmpstr.c_str())) {
           esp3d_log_e("Out of memory");
         }
