@@ -157,6 +157,9 @@ const ESP3DSettingDescription ESP3DSettingsData[] = {
 #if ESP3D_WS_SERVICE_FEATURE
     {ESP3DSettingIndex::esp3d_ws_on, ESP3DSettingType::byte_t, 1, "1"},
 #endif  // ESP3D_WS_SERVICE_FEATURE
+#if ESP3D_WEBDAV_SERVICES_FEATURE
+    {ESP3DSettingIndex::esp3d_webdav_on, ESP3DSettingType::byte_t, 1, "1"},
+#endif  // ESP3D_WEBDAV_SERVICES_FEATURE
 #if ESP3D_AUTHENTICATION_FEATURE
     {ESP3DSettingIndex::esp3d_admin_password, ESP3DSettingType::string_t,
      SIZE_OF_LOCAL_PASSWORD, "admin"},
@@ -388,6 +391,9 @@ bool ESP3DSettings::isValidByteSetting(uint8_t value,
 #endif  // ESP3D_WS_SERVICE_FEATURE
 #if ESP3D_HTTP_FEATURE
     case ESP3DSettingIndex::esp3d_http_on:
+#if ESP3D_WEBDAV_SERVICES_FEATURE
+    case ESP3DSettingIndex::esp3d_webdav_on:
+#endif  // ESP3D_WEBDAV_SERVICES_FEATURE
 #endif  // ESP3D_HTTP_FEATURE
     case ESP3DSettingIndex::esp3d_radio_boot_mode:
 #if ESP3D_NOTIFICATIONS_FEATURE

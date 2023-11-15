@@ -173,6 +173,7 @@ const char *ESP3DHttpService::getArg(httpd_req_t *req, const char *argname) {
 ESP3DHttpService::ESP3DHttpService() {
   _started = false;
   _server = nullptr;
+  _webdav_active = false;
   _post_files_upload_ctx.status = ESP3DUploadStatus::not_started;
 #if ESP3D_SD_CARD_FEATURE
   _post_sdfiles_upload_ctx.status = ESP3DUploadStatus::not_started;
@@ -221,6 +222,7 @@ bool ESP3DHttpService::begin() {
     return true;
   }
   httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+  webdavActive(true);
   _port = esp3dTftsettings.readUint32(ESP3DSettingIndex::esp3d_http_port);
   // HTTP port
   config.server_port = _port;
@@ -652,10 +654,20 @@ bool ESP3DHttpService::begin() {
 
 void ESP3DHttpService::handle() {}
 
+bool ESP3DHttpService::webdavActive(bool fromSettings) {
+  if (fromSettings) {
+    _webdav_active = (ESP3DState)esp3dTftsettings.readByte(
+                         ESP3DSettingIndex::esp3d_webdav_on) == ESP3DState::on;
+  }
+
+  return _webdav_active;
+}
+
 void ESP3DHttpService::end() {
   if (!_started && !_server) {
     return;
   }
+  _webdav_active = false;
   esp3d_log("Stop Http Service");
   if (_server) {
     esp3dWsWebUiService.end();

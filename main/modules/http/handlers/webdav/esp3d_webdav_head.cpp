@@ -33,6 +33,14 @@ esp_err_t ESP3DHttpService::webdav_head_handler(httpd_req_t *req) {
   std::string last_modified = "";
   esp3d_log("Method: %s", "HEAD");
   esp3d_log("Uri: %s", req->uri);
+  if (!esp3dHttpService.webdavActive()) {
+    int payload_size = _clearPayload(req);
+    (void)payload_size;
+    response_code = 400;
+    response_msg = "Webdav not active";
+    esp3d_log_e("Webdav not active");
+    return http_send_response(req, response_code, response_msg.c_str());
+  }
 #if ESP3D_TFT_LOG >= ESP3D_TFT_LOG_LEVEL_DEBUG
   esp3d_log("Headers count: %d\n", showAllHeaders(req));
 #endif  // ESP3D_TFT_LOG >= ESP3D_LOG_LEVEL_

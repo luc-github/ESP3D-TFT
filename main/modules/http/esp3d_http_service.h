@@ -180,8 +180,12 @@ class ESP3DHttpService final {
 
   const char *getArg(httpd_req_t *req, const char *argname);
   uint32_t getPort() { return _port; };
+  bool webdavActive(bool fromSettings = false);
 
  private:
+#if ESP3D_WEBDAV_SERVICES_FEATURE
+  bool _webdav_active;
+#endif  // ESP3D_WEBDAV_SERVICES_FEATURE
   static char _chunk[CHUNK_BUFFER_SIZE];
   bool _started;
   httpd_handle_t _server;

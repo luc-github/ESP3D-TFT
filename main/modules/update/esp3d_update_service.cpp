@@ -178,6 +178,9 @@ const char *ServboolKeysVal[] = {
 #if ESP3D_TELNET_FEATURE
     "TELNET_active",
 #endif  // ESP3D_TELNET_FEATURE
+#if ESP3D_WEBDAV_SERVICES_FEATURE
+    "WebDav_active",
+#endif  // ESP3D_WEBDAV_SERVICES_FEATURE
 #if ESP3D_WS_SERVICE_FEATURE
     "WebSocket_active",
 #endif  // ESP3D_WS_SERVICE_FEATURE
@@ -203,6 +206,9 @@ const ESP3DSettingIndex ServboolKeysPos[] = {
 #if ESP3D_TELNET_FEATURE
     ESP3DSettingIndex::esp3d_socket_on,
 #endif  // ESP3D_TELNET_FEATURE
+#if ESP3D_WEBDAV_SERVICES_FEATURE
+    ESP3DSettingIndex::esp3d_webdav_on,
+#endif  // ESP3D_WEBDAV_SERVICES_FEATURE
 #if ESP3D_WS_SERVICE_FEATURE
     ESP3DSettingIndex::esp3d_ws_on,
 #endif  // ESP3D_WS_SERVICE_FEATURE

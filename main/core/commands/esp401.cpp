@@ -35,6 +35,9 @@
 #if ESP3D_TIMESTAMP_FEATURE
 #include "time/esp3d_time_service.h"
 #endif  // ESP3D_TIMESTAMP_FEATURE
+#if ESP3D_WEBDAV_SERVICES_FEATURE
+#include "http/esp3d_http_service.h"
+#endif  // ESP3D_WEBDAV_SERVICES_FEATURE
 
 #define COMMAND_ID 401
 
@@ -200,6 +203,11 @@ void ESP3DCommands::ESP401(int cmd_params_pos, ESP3DMessage* msg) {
         case ESP3DSettingIndex::esp3d_ui_language:
           esp3dTranslationService.begin();
           break;
+#if ESP3D_WEBDAV_SERVICES_FEATURE
+        case ESP3DSettingIndex::esp3d_webdav_on:
+          esp3dHttpService.webdavActive(true);
+          break;
+#endif  // ESP3D_WEBDAV_SERVICES_FEATURE
 #if ESP3D_TIMESTAMP_FEATURE
         case ESP3DSettingIndex::esp3d_timezone:
           esp3dTimeService.updateTimeZone(true);
