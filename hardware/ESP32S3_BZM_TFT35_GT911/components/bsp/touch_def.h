@@ -1,19 +1,26 @@
 //Pins definition for ESP32S3_BZM_TFT35_GT911
 //Touch driver FT5X06 I2C
 #pragma once
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define TOUCH_CONTROLLER "GT911"
 
-#define GT911_ADDR            (0x5D)
-#define GT911_CLK_SPEED       (400000)
-//#define GT911_TOUCH_IRQ       (-1) //Not connected
-//#define GT911_TOUCH_IRQ_PRESS 0 // not working currently - FIX ME
-#define GT911_TOUCH_PRESS 1
-#define GT911_RESET_PIN (41)
+#include "gt911.h"
+
+const gt911_config_t gt911_cfg = {
+    .i2c_clk_speed = 400*1000,
+    .rst_pin = -1, // GPIO 25
+#if WITH_GT911_INT
+    .int_pin = 38, // GPIO 38
+#else
+    .int_pin = -1, // INT pin not connected (by default)
+#endif
+    .swap_xy = true,
+    .invert_x = false,
+    .invert_y = true,    
+};
 
 #ifdef __cplusplus
 } /* extern "C" */

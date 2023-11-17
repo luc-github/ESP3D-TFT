@@ -1,19 +1,17 @@
 //Pins definition for ESP32 ESP32S3_BZM_TFT35_GT911
 //I2C bus
-#pragma once
+#include "i2c_bus.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define I2C_PORT_NUMBER   0
 
-/**
- * @brief ESP32-S3-HMI-DevKit I2C GPIO definition
- *
- */
-#define I2C_SCL_PIN    (39) //GPIO 5
-#define I2C_SDA_PIN    (40) //GPIO 6
-#define I2C_CLK_SPEED  (400000)
-#define I2C_PORT_NUMBER (0)
+const i2c_config_t i2c_cfg = {
+    .mode = I2C_MODE_MASTER,
+    .scl_io_num = 39, // GPIO 39
+    .sda_io_num = 40, // GPIO 40
+    .scl_pullup_en = GPIO_PULLUP_ENABLE,
+    .sda_pullup_en = GPIO_PULLUP_ENABLE,
+    .master.clk_speed = 400*1000
+};
 
 #ifdef __cplusplus
 } /* extern "C" */
