@@ -24,14 +24,11 @@
 #include "bsp.h"
 
 #include "esp3d_log.h"
-#include "i2c_bus.h"
-#include "i2c_def.h"
-#include "esp3d_log.h"
 
 #if ESP3D_DISPLAY_FEATURE
 #include "disp_def.h"
 #include "st7796.h"
-#include "gt911.h"
+#include "i2c_def.h"
 #include "lvgl.h"
 #include "touch_def.h"
 #endif  // ESP3D_DISPLAY_FEATURE
@@ -40,11 +37,6 @@
 #include "usb_serial.h"
 #endif  // ESP3D_USB_SERIAL_FEATURE
 
-static i2c_bus_handle_t i2c_bus_handle = NULL;
-
-/*
-
-*/
 
 /*********************
  *      DEFINES
@@ -57,18 +49,18 @@ static i2c_bus_handle_t i2c_bus_handle = NULL;
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
+#if ESP3D_DISPLAY_FEATURE
+static void lv_touch_read(lv_indev_drv_t * drv, lv_indev_data_t * data);
+#endif
 /**********************
  *  STATIC VARIABLES
- **********************/
-static i2c_config_t conf = {.mode = I2C_MODE_MASTER,
-                            .scl_io_num = I2C_SCL_PIN,
-                            .sda_io_num = I2C_SDA_PIN,
-                            .scl_pullup_en = GPIO_PULLUP_ENABLE,
-                            .sda_pullup_en = GPIO_PULLUP_ENABLE,
-                            .master.clk_speed = I2C_CLK_SPEED};
+**********************/
+ 
+#if ESP3D_DISPLAY_FEATURE
+static i2c_bus_handle_t i2c_bus_handle = NULL;
+#endif
 /**********************
- *      MACROS
+         MACROS
  **********************/
 
 /**********************
@@ -94,17 +86,19 @@ esp_err_t bsp_init(void) {
 
   /* i2c controller initialization */
   esp3d_log("Initializing i2C controller");
-
   if (NULL != i2c_bus_handle) {
     esp3d_log_e("I2C bus already initialized.");
     return ESP_FAIL;
   }
-
-  i2c_bus_handle = i2c_bus_create(I2C_PORT_NUMBER, &conf);
+  /* i2c controller initialization */
+  esp3d_log("Initializing i2C controller...");
+  i2c_bus_handle = i2c_bus_create(I2C_PORT_NUMBER, &i2c_cfg);
   if (i2c_bus_handle == NULL) {
-    esp3d_log_e("I2C bus failed to be initialized.");
+    esp3d_log_e("I2C bus initialization failed!");
     return ESP_FAIL;
   }
+
+
   // NOTE:
   // this location allows usb-host driver to be installed - later it will failed
   // Do not know why...
@@ -123,10 +117,13 @@ esp_err_t bsp_init(void) {
   }
 
   /* Touch controller initialization */
-  esp3d_log("Initializing touch controller");
-  if (gt911_init(i2c_bus_handle) != ESP_OK) {
-    return ESP_FAIL;
+  esp3d_log("Initializing touch controller...");
+  bool has_touch_init = true;
+  if (gt911_init(i2c_bus_handle, &gt911_cfg) != ESP_OK) {
+    esp3d_log_e("Touch controller initialization failed!");
+    has_touch_init = false;
   }
+
   // Lvgl initialization
   lv_init();
 
@@ -165,12 +162,34 @@ esp_err_t bsp_init(void) {
   disp_drv.user_data = *panel_handle;
   lv_disp_drv_register(&disp_drv); /*Finally register the driver*/
 
-  /* Register an input device */
-  static lv_indev_drv_t indev_drv; /*Descriptor of a input device driver*/
-  lv_indev_drv_init(&indev_drv);   /*Basic initialization*/
-  indev_drv.type = LV_INDEV_TYPE_POINTER; /*Touch pad is a pointer-like device*/
-  indev_drv.read_cb = gt911_read;        /*Set your driver function*/
-  lv_indev_drv_register(&indev_drv);      /*Finally register the driver*/
-
+  if (has_touch_init) {
+    /* Register the touch input device */
+    static lv_indev_drv_t indev_drv;
+    lv_indev_drv_init(&indev_drv);
+    indev_drv.type = LV_INDEV_TYPE_POINTER;
+    indev_drv.read_cb = lv_touch_read;
+    lv_indev_drv_register(&indev_drv);
+  }
   return ESP_OK;
 }
+
+
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+#if ESP3D_DISPLAY_FEATURE
+static void lv_touch_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
+  static uint16_t last_x, last_y;
+  gt911_data_t touch_data = gt911_read(); 
+  if (touch_data.is_pressed) {
+    last_x = touch_data.x;
+    last_y = touch_data.y;
+    esp3d_log("Touch x=%d, y=%d", last_x, last_y);
+  }
+  data->point.x = last_x;
+  data->point.y = last_y;
+  data->state = touch_data.is_pressed ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
+}
+
+#endif
