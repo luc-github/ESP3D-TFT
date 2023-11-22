@@ -24,6 +24,7 @@
 #include "esp3d_commands.h"
 #include "esp3d_settings.h"
 #include "esp3d_string.h"
+#include "filesystem/esp3d_sd.h"
 
 #define COMMAND_ID 202
 
@@ -64,6 +65,8 @@ void ESP3DCommands::ESP202(int cmd_params_pos, ESP3DMessage* msg) {
                                       spidiv)) {
         hasError = true;
         error_msg = "Set value failed";
+      } else {
+        sd.setSPISpeedDivider(spidiv);
       }
     } else {
       hasError = true;

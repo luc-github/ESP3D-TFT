@@ -63,6 +63,7 @@ void ESP3DCommands::ESP710(int cmd_params_pos, ESP3DMessage* msg) {
     ESP3DClient::deleteMsg(msg);
   }
   if (!hasError) {
+    flashFs.accessFS();
     flush();
     if (!flashFs.format()) {
       hasError = true;
@@ -76,5 +77,6 @@ void ESP3DCommands::ESP710(int cmd_params_pos, ESP3DMessage* msg) {
         esp3d_log_e("Error sending response to clients");
       }
     }
+    flashFs.releaseFS();
   }
 }
