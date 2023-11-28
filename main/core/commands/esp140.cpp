@@ -109,7 +109,7 @@ void ESP3DCommands::ESP140(int cmd_params_pos, ESP3DMessage* msg) {
     }
 
     if (json) {
-      ok_msg += "\"}";
+      ok_msg += "}";
     } else {
       ok_msg += "\n";
     }
