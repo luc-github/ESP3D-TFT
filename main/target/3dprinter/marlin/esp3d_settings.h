@@ -105,6 +105,7 @@ enum class ESP3DSettingIndex : uint16_t {
   esp3d_time_server2,
   esp3d_time_server3,
   esp3d_timezone,
+  esp3d_webdav_on,
   unknown_index
 };
 

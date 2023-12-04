@@ -531,6 +531,18 @@ void ESP3DCommands::ESP420(int cmd_params_pos, ESP3DMessage *msg) {
   }
 #endif  // ESP3D_TELNET_FEATURE
 #if ESP3D_HTTP_FEATURE
+#if ESP3D_WEBDAV_SERVICES_FEATURE
+  // WebDav service
+  if (esp3dHttpService.started() && esp3dHttpService.webdavActive()) {
+    tmpstr = "ON";
+  } else {
+    tmpstr = "OFF";
+  }
+
+  if (!dispatchIdValue(json, "WebDav", tmpstr.c_str(), target, requestId)) {
+    return;
+  }
+#endif  // ESP3D_WEBDAV_SERVICES_FEATURE
 #if ESP3D_WS_SERVICE_FEATURE
   // Web socket server
   if (!esp3dWsDataService.started()) {

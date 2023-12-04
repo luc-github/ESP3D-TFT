@@ -334,6 +334,15 @@ void ESP3DCommands::ESP400(int cmd_params_pos, ESP3DMessage* msg) {
                        requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
+#if ESP3D_WEBDAV_SERVICES_FEATURE
+  // webdav service on
+  if (!dispatchSetting(
+          json, "service/webdavp", ESP3DSettingIndex::esp3d_webdav_on, "enable",
+          YesNoValues, YesNoLabels, sizeof(YesNoValues) / sizeof(char*), -1, -1,
+          -1, nullptr, true, target, requestId)) {
+    esp3d_log_e("Error sending response to clients");
+  }
+#endif  // ESP3D_WEBDAV_SERVICES_FEATURE
 #endif  // ESP3D_HTTP_FEATURE
 
 #if ESP3D_TELNET_FEATURE

@@ -68,6 +68,9 @@ const char* help[] = {
 #if ESP3D_WS_SERVICE_FEATURE
     "[ESP160](State) - display/set WebSocket state which can be ON, OFF, CLOSE",
 #endif  // ESP3D_WS_SERVICE_FEATURE
+#if ESP3D_WEBDAV_SERVICES_FEATURE
+    "[ESP190](State) - display/set WebDav state which can be ON, OFF",
+#endif  // ESP3D_WEBDAV_SERVICES_FEATURE
 #endif  // ESP3D_HTTP_FEATURE
 #if ESP3D_SD_CARD_FEATURE
     "[ESP200](RELEASE) (REFRESH)- display/set SD Card Status",
@@ -157,6 +160,9 @@ const uint cmdlist[] = {
 #if ESP3D_WS_SERVICE_FEATURE
     160,
 #endif  // ESP3D_WS_SERVICE_FEATURE
+#if ESP3D_WEBDAV_SERVICES_FEATURE
+    190,
+#endif  // ESP3D_WEBDAV_SERVICES_FEATURE
 #endif  // ESP3D_HTTP_FEATURE
 #if ESP3D_SD_CARD_FEATURE
     200,

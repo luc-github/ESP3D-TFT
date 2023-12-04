@@ -100,6 +100,9 @@ class ESP3DCommands {
 #if ESP3D_WS_SERVICE_FEATURE
   void ESP160(int cmd_params_pos, ESP3DMessage* msg);
 #endif  // ESP3D_WS_SERVICE_FEATURE
+#if ESP3D_WEBDAV_SERVICES_FEATURE
+  void ESP190(int cmd_params_pos, ESP3DMessage* msg);
+#endif  // ESP3D_WEBDAV_SERVICES_FEATURE
 #endif  // ESP3D_HTTP_FEATURE
 #if ESP3D_SD_CARD_FEATURE
   void ESP200(int cmd_params_pos, ESP3DMessage* msg);

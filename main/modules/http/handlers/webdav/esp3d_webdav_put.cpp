@@ -40,6 +40,15 @@ esp_err_t ESP3DHttpService::webdav_put_handler(httpd_req_t* req) {
   esp3d_log("Uri: %s", req->uri);
   int response_code = 201;
   std::string response_msg = "";
+  if (!esp3dHttpService.webdavActive()) {
+    int payload_size = _clearPayload(req);
+    (void)payload_size;
+    response_code = 400;
+    response_msg = "Webdav not active";
+    esp3d_log_e("Webdav not active");
+    return http_send_response(req, response_code, response_msg.c_str());
+  }
+
   size_t file_size = 0;
   size_t total_read = 0;
   std::string last_modified = "";

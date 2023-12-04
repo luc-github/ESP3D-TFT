@@ -52,7 +52,7 @@ void ESP3DCommands::ESP410(int cmd_params_pos, ESP3DMessage *msg) {
 
   if (esp3dNetwork.getMode() == ESP3DRadioMode::off ||
       esp3dNetwork.getMode() == ESP3DRadioMode::bluetooth_serial) {
-    tmpstr = "Network not enabled";
+    tmpstr = "WiFi not enabled";
     dispatchAnswer(msg, COMMAND_ID, json, true, tmpstr.c_str());
     return;
   }

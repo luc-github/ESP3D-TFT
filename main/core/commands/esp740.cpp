@@ -184,7 +184,7 @@ void ESP3DCommands::ESP740(int cmd_params_pos, ESP3DMessage *msg) {
           occupation = 1;
         }
         ok_msg += std::to_string(occupation);
-        ok_msg += "}}";
+        ok_msg += "\"}}";
 
       } else {
         ok_msg = "Files: ";
