@@ -42,7 +42,6 @@ void ESP3DCommands::ESP740(int cmd_params_pos, ESP3DMessage *msg) {
   msg->origin = ESP3DClientType::command;
 #if ESP3D_AUTHENTICATION_FEATURE
   if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
-    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }

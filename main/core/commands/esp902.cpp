@@ -51,6 +51,12 @@ void ESP3DCommands::ESP902(int cmd_params_pos, ESP3DMessage* msg) {
         ESP3DSettingIndex::esp3d_usb_serial_baud_rate);
     ok_msg = std::to_string(br);
   } else {
+#if ESP3D_AUTHENTICATION_FEATURE
+    if (msg->authentication_level != ESP3DAuthenticationLevel::admin) {
+      dispatchAuthenticationError(msg, COMMAND_ID, json);
+      return;
+    }
+#endif  // ESP3D_AUTHENTICATION_FEATURE
     uint32_t br = atoi(tmpstr.c_str());
     esp3d_log("got %s param for a value of %ld, is valid %d", tmpstr.c_str(),
               br,

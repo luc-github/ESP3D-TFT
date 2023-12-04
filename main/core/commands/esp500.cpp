@@ -23,8 +23,8 @@
 #include "esp3d_string.h"
 
 #define COMMAND_ID 500
-// Get/Set connection status
-//[ESP500] json=<no> pwd=<admin password>
+// Get authenticationn status
+//[ESP500] logout json=<no> pwd=<admin password>
 void ESP3DCommands::ESP500(int cmd_params_pos, ESP3DMessage* msg) {
   ESP3DClientType target = msg->origin;
   ESP3DRequest requestId = msg->request_id;
@@ -35,6 +35,7 @@ void ESP3DCommands::ESP500(int cmd_params_pos, ESP3DMessage* msg) {
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
   bool json = hasTag(msg, cmd_params_pos, "json");
+  bool logout = hasTag(msg, cmd_params_pos, "logout");
   std::string tmpstr;
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
@@ -54,7 +55,10 @@ void ESP3DCommands::ESP500(int cmd_params_pos, ESP3DMessage* msg) {
     }
 
   } else {
-    hasError = true;
+    if (logout) {
+    } else {
+      hasError = true;
+    }
   }
 
   if (!dispatchAnswer(msg, COMMAND_ID, json, hasError,

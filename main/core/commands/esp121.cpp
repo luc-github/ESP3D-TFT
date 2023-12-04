@@ -41,7 +41,6 @@ void ESP3DCommands::ESP121(int cmd_params_pos, ESP3DMessage* msg) {
   uint32_t intValue = 0;
 #if ESP3D_AUTHENTICATION_FEATURE
   if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
-    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
@@ -51,6 +50,12 @@ void ESP3DCommands::ESP121(int cmd_params_pos, ESP3DMessage* msg) {
     intValue = esp3dTftsettings.readUint32(ESP3DSettingIndex::esp3d_http_port);
     ok_msg = std::to_string(intValue);
   } else {
+#if ESP3D_AUTHENTICATION_FEATURE
+    if (msg->authentication_level != ESP3DAuthenticationLevel::admin) {
+      dispatchAuthenticationError(msg, COMMAND_ID, json);
+      return;
+    }
+#endif  // ESP3D_AUTHENTICATION_FEATURE
     intValue = atoi(tmpstr.c_str());
     esp3d_log("got %s param for a value of %ld, is valid %d", tmpstr.c_str(),
               intValue,

@@ -42,7 +42,6 @@ void ESP3DCommands::ESP460(int cmd_params_pos, ESP3DMessage* msg) {
   char out_str[255] = {0};
 #if ESP3D_AUTHENTICATION_FEATURE
   if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
-    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
@@ -86,6 +85,12 @@ void ESP3DCommands::ESP460(int cmd_params_pos, ESP3DMessage* msg) {
       error_msg = "This setting is unknown";
     }
   } else {
+#if ESP3D_AUTHENTICATION_FEATURE
+    if (msg->authentication_level != ESP3DAuthenticationLevel::admin) {
+      dispatchAuthenticationError(msg, COMMAND_ID, json);
+      return;
+    }
+#endif  // ESP3D_AUTHENTICATION_FEATURE
     if (esp3d_string::startsWith(tmpstr.c_str(), "DUMP=")) {
       hasError = true;
       error_msg = "Set value failed";

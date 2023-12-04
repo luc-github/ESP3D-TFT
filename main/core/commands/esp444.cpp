@@ -52,6 +52,12 @@ void ESP3DCommands::ESP444(int cmd_params_pos, ESP3DMessage* msg) {
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   if (isReset) {
+#if ESP3D_AUTHENTICATION_FEATURE
+    if (msg->authentication_level != ESP3DAuthenticationLevel::admin) {
+      dispatchAuthenticationError(msg, COMMAND_ID, json);
+      return;
+    }
+#endif  // ESP3D_AUTHENTICATION_FEATURE
     esp3dTftsettings.reset();
     esp3d_log("Resetting settings");
   }

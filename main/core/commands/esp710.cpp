@@ -40,8 +40,7 @@ void ESP3DCommands::ESP710(int cmd_params_pos, ESP3DMessage* msg) {
   bool needFormat = hasTag(msg, cmd_params_pos, "FORMATFS");
   std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
-    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
+  if (msg->authentication_level != ESP3DAuthenticationLevel::admin) {
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
