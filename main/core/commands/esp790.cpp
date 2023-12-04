@@ -42,7 +42,6 @@ void ESP3DCommands::ESP790(int cmd_params_pos, ESP3DMessage* msg) {
   uint8_t cmdListSize = sizeof(cmdList) / sizeof(char*);
 #if ESP3D_AUTHENTICATION_FEATURE
   if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
-    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }

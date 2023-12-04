@@ -24,7 +24,7 @@
 #include "gcode_host/esp3d_gcode_host_service.h"
 
 #define COMMAND_ID 702
-
+// Define scripts used when script is paused/aborted/resumed
 //[ESP702]<pause/stop/resume>=<script> - display/set ESP700 stream scripts
 void ESP3DCommands::ESP702(int cmd_params_pos, ESP3DMessage* msg) {
   ESP3DClientType target = msg->origin;
@@ -45,7 +45,6 @@ void ESP3DCommands::ESP702(int cmd_params_pos, ESP3DMessage* msg) {
       ESP3DSettingIndex::esp3d_resume_script};
 #if ESP3D_AUTHENTICATION_FEATURE
   if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
-    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }

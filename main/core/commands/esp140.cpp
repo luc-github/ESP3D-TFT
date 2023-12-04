@@ -56,7 +56,6 @@ void ESP3DCommands::ESP140(int cmd_params_pos, ESP3DMessage* msg) {
   };
 #if ESP3D_AUTHENTICATION_FEATURE
   if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
-    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
@@ -114,6 +113,12 @@ void ESP3DCommands::ESP140(int cmd_params_pos, ESP3DMessage* msg) {
       ok_msg += "\n";
     }
   } else {
+#if ESP3D_AUTHENTICATION_FEATURE
+    if (msg->authentication_level != ESP3DAuthenticationLevel::admin) {
+      dispatchAuthenticationError(msg, COMMAND_ID, json);
+      return;
+    }
+#endif  // ESP3D_AUTHENTICATION_FEATURE    bool hasParam = false;
     bool hasParam = false;
     std::string tmpkey;
     for (uint8_t i = 0; i < cmdListSize; i++) {

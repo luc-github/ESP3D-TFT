@@ -40,43 +40,47 @@ void ESP3DCommands::ESP112(int cmd_params_pos, ESP3DMessage* msg) {
   char out_str[255] = {0};
 
 #if ESP3D_AUTHENTICATION_FEATURE
-  if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
-    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
+  dispatchAuthenticationError(msg, COMMAND_ID, json);
+  return;
+}
+#endif  // ESP3D_AUTHENTICATION_FEATURE
+tmpstr = get_clean_param(msg, cmd_params_pos);
+if (tmpstr.length() == 0) {
+  const ESP3DSettingDescription* settingPtr =
+      esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_hostname);
+  if (settingPtr) {
+    ok_msg = esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_hostname,
+                                         out_str, settingPtr->size);
+  } else {
+    hasError = true;
+    error_msg = "This setting is unknown";
+  }
+} else {
+#if ESP3D_AUTHENTICATION_FEATURE
+  if (msg->authentication_level != ESP3DAuthenticationLevel::admin) {
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
 #endif  // ESP3D_AUTHENTICATION_FEATURE
-  tmpstr = get_clean_param(msg, cmd_params_pos);
-  if (tmpstr.length() == 0) {
-    const ESP3DSettingDescription* settingPtr =
-        esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_hostname);
-    if (settingPtr) {
-      ok_msg = esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_hostname,
-                                           out_str, settingPtr->size);
-    } else {
+  esp3d_log("got %s param for a value of %s, is valid %d", tmpstr.c_str(),
+            tmpstr.c_str(),
+            esp3dTftsettings.isValidStringSetting(
+                tmpstr.c_str(), ESP3DSettingIndex::esp3d_hostname));
+  if (esp3dTftsettings.isValidStringSetting(
+          tmpstr.c_str(), ESP3DSettingIndex::esp3d_hostname)) {
+    esp3d_log("Value %s is valid", tmpstr.c_str());
+    if (!esp3dTftsettings.writeString(ESP3DSettingIndex::esp3d_hostname,
+                                      tmpstr.c_str())) {
       hasError = true;
-      error_msg = "This setting is unknown";
+      error_msg = "Set value failed";
     }
   } else {
-    esp3d_log("got %s param for a value of %s, is valid %d", tmpstr.c_str(),
-              tmpstr.c_str(),
-              esp3dTftsettings.isValidStringSetting(
-                  tmpstr.c_str(), ESP3DSettingIndex::esp3d_hostname));
-    if (esp3dTftsettings.isValidStringSetting(
-            tmpstr.c_str(), ESP3DSettingIndex::esp3d_hostname)) {
-      esp3d_log("Value %s is valid", tmpstr.c_str());
-      if (!esp3dTftsettings.writeString(ESP3DSettingIndex::esp3d_hostname,
-                                        tmpstr.c_str())) {
-        hasError = true;
-        error_msg = "Set value failed";
-      }
-    } else {
-      hasError = true;
-      error_msg = "Invalid parameter";
-    }
+    hasError = true;
+    error_msg = "Invalid parameter";
   }
-  if (!dispatchAnswer(msg, COMMAND_ID, json, hasError,
-                      hasError ? error_msg.c_str() : ok_msg.c_str())) {
-    esp3d_log_e("Error sending response to clients");
-  }
+}
+if (!dispatchAnswer(msg, COMMAND_ID, json, hasError,
+                    hasError ? error_msg.c_str() : ok_msg.c_str())) {
+  esp3d_log_e("Error sending response to clients");
+}
 }

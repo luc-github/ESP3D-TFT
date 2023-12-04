@@ -41,7 +41,6 @@ void ESP3DCommands::ESP102(int cmd_params_pos, ESP3DMessage* msg) {
   uint8_t byteValue = (uint8_t)-1;
 #if ESP3D_AUTHENTICATION_FEATURE
   if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
-    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
@@ -57,6 +56,12 @@ void ESP3DCommands::ESP102(int cmd_params_pos, ESP3DMessage* msg) {
       ok_msg = "Unknown";
     }
   } else {
+#if ESP3D_AUTHENTICATION_FEATURE
+    if (msg->authentication_level != ESP3DAuthenticationLevel::admin) {
+      dispatchAuthenticationError(msg, COMMAND_ID, json);
+      return;
+    }
+#endif  // ESP3D_AUTHENTICATION_FEATURE
     if (tmpstr == "DHCP") {
       byteValue = static_cast<uint8_t>(ESP3DIpMode::dhcp);
     } else if (tmpstr == "STATIC") {

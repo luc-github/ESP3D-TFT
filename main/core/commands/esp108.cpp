@@ -40,7 +40,6 @@ void ESP3DCommands::ESP108(int cmd_params_pos, ESP3DMessage* msg) {
   uint8_t byteValue = 0;
 #if ESP3D_AUTHENTICATION_FEATURE
   if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
-    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
@@ -50,6 +49,12 @@ void ESP3DCommands::ESP108(int cmd_params_pos, ESP3DMessage* msg) {
     byteValue = esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_ap_channel);
     ok_msg = std::to_string(byteValue);
   } else {
+#if ESP3D_AUTHENTICATION_FEATURE
+    if (msg->authentication_level != ESP3DAuthenticationLevel::admin) {
+      dispatchAuthenticationError(msg, COMMAND_ID, json);
+      return;
+    }
+#endif  // ESP3D_AUTHENTICATION_FEATURE
     byteValue = atoi(tmpstr.c_str());
     esp3d_log("got %s param for a value of %d, is valid %d", tmpstr.c_str(),
               byteValue,

@@ -39,7 +39,6 @@ void ESP3DCommands::ESP107(int cmd_params_pos, ESP3DMessage* msg) {
   std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
   if (msg->authentication_level == ESP3DAuthenticationLevel::guest) {
-    msg->authentication_level = ESP3DAuthenticationLevel::not_authenticated;
     dispatchAuthenticationError(msg, COMMAND_ID, json);
     return;
   }
@@ -49,6 +48,12 @@ void ESP3DCommands::ESP107(int cmd_params_pos, ESP3DMessage* msg) {
     ok_msg =
         esp3dTftsettings.readIPString(ESP3DSettingIndex::esp3d_ap_ip_static);
   } else {
+#if ESP3D_AUTHENTICATION_FEATURE
+    if (msg->authentication_level != ESP3DAuthenticationLevel::admin) {
+      dispatchAuthenticationError(msg, COMMAND_ID, json);
+      return;
+    }
+#endif  // ESP3D_AUTHENTICATION_FEATURE
     if (esp3dTftsettings.isValidIPStringSetting(
             tmpstr.c_str(), ESP3DSettingIndex::esp3d_ap_ip_static)) {
       esp3d_log("Value %s is valid", tmpstr.c_str());
