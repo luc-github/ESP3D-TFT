@@ -71,8 +71,10 @@ void spi_bus_init(int host,
     };
 
     esp3d_log("Initializing SPI bus...");
-    esp_err_t ret = spi_bus_initialize(host, &buscfg, (spi_dma_chan_t)dma_channel);
-    assert(ret == ESP_OK);
+    //esp_err_t ret = spi_bus_initialize(host, &buscfg, (spi_dma_chan_t)dma_channel);
+    //esp3d_log_e("ret:%d",ret);
+    ESP_ERROR_CHECK(spi_bus_initialize(host, &buscfg, (spi_dma_chan_t)dma_channel));
+    //assert(ret == ESP_OK);
 }
 
 /**********************

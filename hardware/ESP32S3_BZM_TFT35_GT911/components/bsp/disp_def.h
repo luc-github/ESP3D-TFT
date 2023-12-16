@@ -1,5 +1,5 @@
-// Pins for ESP32S3_BZM_TFT35_GT911
-// Display driver ST7796 parallele 8080
+// Display definitions for ESP32S3_BZM_TFT35_GT911
+// Display driver ST7796 (SPI)
 #pragma once
 #ifdef __cplusplus
 extern "C" {
@@ -7,40 +7,73 @@ extern "C" {
 
 #define TFT_DISPLAY_CONTROLLER "ST7796"
 
+#include "spi_bus.h"
+#include "st7796.h"
+#include "disp_backlight.h"
 
-#define DISP_DIRECTION_LANDSCAPE (1)  // 1:landscape mode   0:portrait mode
+/*
+PORTRAIT                0
+PORTRAIT_INVERTED       1
+LANDSCAPE               2
+LANDSCAPE_INVERTED      3
+*/
 
-#if DISP_DIRECTION_LANDSCAPE == 1  // landscape mode
-#define DISP_HOR_RES_MAX (480)
-#define DISP_VER_RES_MAX (320)
+#define DISP_ORIENTATION 3  // landscape inverted
+
+#if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
+#define DISP_HOR_RES_MAX 480
+#define DISP_VER_RES_MAX 320
 #else  // portrait mode
-#define DISP_HOR_RES_MAX (320)
-#define DISP_VER_RES_MAX (480)
+#define DISP_HOR_RES_MAX 320
+#define DISP_VER_RES_MAX 480
 #endif
 
-#define DISP_BUF_SIZE (DISP_HOR_RES_MAX * (DISP_VER_RES_MAX / 10))
+#define DISP_USE_DOUBLE_BUFFER (true)
 
-#define DISP_BITS_WIDTH (8)
-#define DISP_CMD_BITS_WIDTH (8)
-#define DISP_PARAM_BITS_WIDTH (8)
-#define DISP_CLK_FREQ (8 * 1000 * 1000)  // could be 10 if no PSRAM memory
+#if WITH_PSRAM
+  // 1/10 (32-line) buffer (30KB) in external PSRAM
+  #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * DISP_VER_RES_MAX / 10)
+  #define DISP_BUF_MALLOC_TYPE  MALLOC_CAP_DMA
+#else
+  // 1/40 (8-line) buffer (7.5KB) in internal DRAM
+  #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * 8)
+  #define DISP_BUF_MALLOC_TYPE  MALLOC_CAP_DMA
+#endif  // WITH_PSRAM
 
-#define DISP_BL_PIN (4)  // GPIO 4
-#define DISP_CS_PIN (11)  // GPIO 11
-#define DISP_RST_PIN (3)  // GPIO 3 - same as touch
-#define DISP_RS_PIN (10)   // GPIO 10
-#define DISP_WR_PIN (9)  // GPIO 9
+#define DISP_BUF_SIZE_BYTES    (DISP_BUF_SIZE * sizeof(uint16_t))
 
-#define DISP_D00_PIN (8)   // GPIO 8
-#define DISP_D01_PIN (18)  // GPIO 18
-#define DISP_D02_PIN (17)   // GPIO 17
-#define DISP_D03_PIN (16)   // GPIO 16
-#define DISP_D04_PIN (15)  // GPIO 15
-#define DISP_D05_PIN (7)  // GPIO 7
-#define DISP_D06_PIN (6)  // GPIO 6
-#define DISP_D07_PIN (5)  // GPIO 5
-#define DISP_BL_ON (1)
-#define DISP_BL_OFF (0)
+esp_lcd_panel_dev_config_t disp_panel_cfg = {
+    .reset_gpio_num = 45, // PIN 45
+    .color_space = ESP_LCD_COLOR_SPACE_RGB,
+    .bits_per_pixel = 16,
+};
+
+// SPI (dedicated)
+#define DISP_SPI_HOST SPI3_HOST //2
+
+#define DISP_SPI_CLK  39  // GPIO 39
+#define DISP_SPI_MOSI 38  // GPIO 38
+//#define DISP_SPI_MISO 12  // GPIO 12
+
+esp_lcd_panel_io_spi_config_t disp_spi_cfg = {
+    .dc_gpio_num = 40, // GPIO 40
+    .cs_gpio_num = 41, // GPIO 41
+    .pclk_hz = 40 * 1000 * 1000,
+    .lcd_cmd_bits = 8,
+    .lcd_param_bits = 8,
+    .spi_mode = 0,
+    .trans_queue_depth = 10,
+};
+
+#define DISP_BCKL_DEFAULT_DUTY 100  //%
+
+const disp_backlight_config_t disp_bcklt_cfg = {
+    .gpio_num = 48, // GPIO 48
+    .pwm_control = false,
+    .output_invert = false,
+    .timer_idx = 0,
+    .channel_idx = 0
+};
 
 #ifdef __cplusplus
 } /* extern "C" */

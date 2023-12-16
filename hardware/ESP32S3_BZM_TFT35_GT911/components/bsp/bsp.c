@@ -22,14 +22,12 @@
  *      INCLUDES
  *********************/
 #include "bsp.h"
-
 #include "esp3d_log.h"
 
 #if ESP3D_DISPLAY_FEATURE
-#include "disp_def.h"
-#include "st7796.h"
-#include "i2c_def.h"
 #include "lvgl.h"
+#include "i2c_def.h"
+#include "disp_def.h"
 #include "touch_def.h"
 #endif  // ESP3D_DISPLAY_FEATURE
 
@@ -50,17 +48,22 @@
  *  STATIC PROTOTYPES
  **********************/
 #if ESP3D_DISPLAY_FEATURE
+static bool disp_flush_ready(esp_lcd_panel_io_handle_t panel_io, esp_lcd_panel_io_event_data_t *edata, void *user_ctx);
+static void lv_disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 static void lv_touch_read(lv_indev_drv_t * drv, lv_indev_data_t * data);
 #endif
+
 /**********************
  *  STATIC VARIABLES
-**********************/
- 
+ **********************/
 #if ESP3D_DISPLAY_FEATURE
 static i2c_bus_handle_t i2c_bus_handle = NULL;
+static lv_disp_drv_t disp_drv;
+static esp_lcd_panel_handle_t disp_panel;
 #endif
+
 /**********************
-         MACROS
+ *      MACROS
  **********************/
 
 /**********************
@@ -79,27 +82,67 @@ esp_err_t bsp_deinit_usb(void) {
 }
 #endif  // ESP3D_USB_SERIAL_FEATURE
 esp_err_t bsp_init(void) {
-  static lv_disp_drv_t disp_drv; /*Descriptor of a display driver*/
+#if ESP3D_DISPLAY_FEATURE
 
-  // Drivers initialization
-  esp3d_log("Display buffer size: %d", DISP_BUF_SIZE);
 
-  /* i2c controller initialization */
-  esp3d_log("Initializing i2C controller");
-  if (NULL != i2c_bus_handle) {
-    esp3d_log_e("I2C bus already initialized.");
+
+  /* Display backlight initialization */
+  disp_backlight_h bcklt_handle = disp_backlight_new(&disp_bcklt_cfg);
+  disp_backlight_set(bcklt_handle, 0);
+
+  /* SPI master initialization */
+  esp3d_log("Initializing SPI master (display)...");
+  spi_bus_init(DISP_SPI_HOST, -1, DISP_SPI_MOSI, DISP_SPI_CLK,
+               DISP_BUF_SIZE_BYTES, SPI_DMA_CH_AUTO, -1, -1);
+
+  esp3d_log("Attaching display panel to SPI bus...");
+  esp_lcd_panel_io_handle_t disp_io_handle;
+  disp_spi_cfg.on_color_trans_done = disp_flush_ready;  
+  ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi(
+      (esp_lcd_spi_bus_handle_t)DISP_SPI_HOST, &disp_spi_cfg, &disp_io_handle));
+
+  /* Display panel initialization */
+  esp3d_log("Initializing display...");
+  ESP_ERROR_CHECK(esp_lcd_new_panel_st7796(disp_io_handle, &disp_panel_cfg, &disp_panel));
+  ESP_ERROR_CHECK(esp_lcd_panel_reset(disp_panel));
+  ESP_ERROR_CHECK(esp_lcd_panel_init(disp_panel));
+  ESP_ERROR_CHECK(esp_lcd_panel_invert_color(disp_panel, true));
+#if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
+  ESP_ERROR_CHECK(esp_lcd_panel_swap_xy(disp_panel, true));
+#endif //DISP_ORIENTATION
+#if DISP_ORIENTATION == 1 || DISP_ORIENTATION == 3  // mirrored
+  ESP_ERROR_CHECK(esp_lcd_panel_mirror(disp_panel, true, true));
+#endif //DISP_ORIENTATION
+
+ 
+
+
+
+  disp_backlight_set(bcklt_handle, DISP_BCKL_DEFAULT_DUTY);
+
+  // Lvgl initialization
+  esp3d_log("Initializing LVGL...");
+  lv_init();
+
+  /* Initialize the working buffer(s) depending on the selected display. */
+  static lv_disp_draw_buf_t draw_buf;
+  esp3d_log("Display buffer size: %1.2f KB", DISP_BUF_SIZE_BYTES / 1024.0);
+  lv_color_t *buf1 = (lv_color_t *)heap_caps_malloc(DISP_BUF_SIZE_BYTES, DISP_BUF_MALLOC_TYPE);
+  if (buf1 == NULL) {
+    esp3d_log_e("Failed to allocate LVGL draw buffer 1");
     return ESP_FAIL;
   }
-  /* i2c controller initialization */
-  esp3d_log("Initializing i2C controller...");
-  i2c_bus_handle = i2c_bus_create(I2C_PORT_NUMBER, &i2c_cfg);
-  if (i2c_bus_handle == NULL) {
-    esp3d_log_e("I2C bus initialization failed!");
+  lv_color_t *buf2 = NULL;
+#if DISP_USE_DOUBLE_BUFFER
+  buf2 = (lv_color_t *)heap_caps_malloc(DISP_BUF_SIZE_BYTES, DISP_BUF_MALLOC_TYPE);
+  if (buf2 == NULL) {
+    esp3d_log_e("Failed to allocate LVGL draw buffer 2");
     return ESP_FAIL;
   }
+#endif  // DISP_USE_DOUBLE_BUFFER
+  lv_disp_draw_buf_init(&draw_buf, buf1, buf2, DISP_BUF_SIZE);
 
-
-  // NOTE:
+ // NOTE:
   // this location allows usb-host driver to be installed - later it will failed
   // Do not know why...
 #if  ESP3D_USB_SERIAL_FEATURE
@@ -108,14 +151,26 @@ esp_err_t bsp_init(void) {
   }
 #endif  // ESP3D_USB_SERIAL_FEATURE
 
+  /* Register the display device */
+  lv_disp_drv_init(&disp_drv);
+  disp_drv.flush_cb = lv_disp_flush;
+  disp_drv.draw_buf = &draw_buf;
+  disp_drv.hor_res = DISP_HOR_RES_MAX;
+  disp_drv.ver_res = DISP_VER_RES_MAX;
+  lv_disp_drv_register(&disp_drv);
 
-
-  /* Display controller initialization */
-  esp3d_log("Initializing display controller");
-  if (st7796_init(&disp_drv) != ESP_OK) {
+  /* i2c controller initialization */
+  esp3d_log("Initializing i2C controller");
+  if (NULL != i2c_bus_handle) {
+    esp3d_log_e("I2C bus already initialized.");
     return ESP_FAIL;
   }
-
+  esp3d_log("Initializing i2C controller...");
+  i2c_bus_handle = i2c_bus_create(I2C_PORT_NUMBER, &i2c_cfg);
+  if (i2c_bus_handle == NULL) {
+    esp3d_log_e("I2C bus initialization failed!");
+    return ESP_FAIL;
+  }
   /* Touch controller initialization */
   esp3d_log("Initializing touch controller...");
   bool has_touch_init = true;
@@ -123,44 +178,6 @@ esp_err_t bsp_init(void) {
     esp3d_log_e("Touch controller initialization failed!");
     has_touch_init = false;
   }
-
-  // Lvgl initialization
-  lv_init();
-
-  // Lvgl setup
-  esp3d_log("Setup Lvgl");
-  lv_color_t* buf1 = (lv_color_t*)heap_caps_malloc(
-      DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
-  if (buf1 == NULL) {
-    esp3d_log_e("Failed to allocate LVGL draw buffer 1");
-    return ESP_FAIL;
-  }
-
-  /* Use double buffered when not working with monochrome displays */
-  lv_color_t* buf2 = (lv_color_t*)heap_caps_malloc(
-      DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
-  if (buf2 == NULL) {
-    esp3d_log_e("Failed to allocate LVGL draw buffer 2");
-    return ESP_FAIL;
-  }
-
-  static lv_disp_draw_buf_t draw_buf;
-
-  uint32_t size_in_px = DISP_BUF_SIZE;
-
-  /* Initialize the working buffer depending on the selected display.*/
-  lv_disp_draw_buf_init(&draw_buf, buf1, buf2, size_in_px);
-
-  esp_lcd_panel_handle_t* panel_handle = st7796_panel_handle();
-  lv_disp_drv_init(&disp_drv);      /*Basic initialization*/
-  disp_drv.flush_cb = st7796_flush; /*Set your driver function*/
-  disp_drv.draw_buf = &draw_buf;    /*Assign the buffer to the display*/
-  disp_drv.hor_res =
-      DISP_HOR_RES_MAX; /*Set the horizontal resolution of the display*/
-  disp_drv.ver_res =
-      DISP_VER_RES_MAX; /*Set the vertical resolution of the display*/
-  disp_drv.user_data = *panel_handle;
-  lv_disp_drv_register(&disp_drv); /*Finally register the driver*/
 
   if (has_touch_init) {
     /* Register the touch input device */
@@ -170,6 +187,7 @@ esp_err_t bsp_init(void) {
     indev_drv.read_cb = lv_touch_read;
     lv_indev_drv_register(&indev_drv);
   }
+#endif // ESP3D_DISPLAY_FEATURE
   return ESP_OK;
 }
 
@@ -179,6 +197,16 @@ esp_err_t bsp_init(void) {
  *   STATIC FUNCTIONS
  **********************/
 #if ESP3D_DISPLAY_FEATURE
+
+static bool disp_flush_ready(esp_lcd_panel_io_handle_t panel_io, esp_lcd_panel_io_event_data_t *edata, void *user_ctx) {
+  lv_disp_flush_ready(&disp_drv);
+  return false;
+}
+
+static void lv_disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p) {
+  esp_lcd_panel_draw_bitmap(disp_panel, area->x1, area->y1, area->x2 + 1, area->y2 + 1, color_p);
+}
+
 static void lv_touch_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
   static uint16_t last_x, last_y;
   gt911_data_t touch_data = gt911_read(); 
