@@ -446,7 +446,7 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg, uint8_t* sbuf, size_t len) {
 
 bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
   bool sendOk = true;
-  esp3d_log_d("Dispatch message origin %d(%s) to client %d(%s) , size: %d,  type: %d(%s)",
+  esp3d_log("Dispatch message origin %d(%s) to client %d(%s) , size: %d,  type: %d(%s)",
             static_cast<uint8_t>(msg->origin),GETCLIENTSTR(msg->origin),
             static_cast<uint8_t>(msg->target), GETCLIENTSTR(msg->target),
             msg->size,
