@@ -59,6 +59,7 @@ class ESP3DSocketServer : public ESP3DClient {
   bool startSocketServer();
   bool getClient();
   uint clientsConnected();
+  bool isConnected(){return clientsConnected()>0;}
   void closeAllClients();
   void resetTaskHandle() { _xHandle = NULL; }
   ESP3DSocketInfos* getClientInfos(uint index);

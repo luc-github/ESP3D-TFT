@@ -55,6 +55,7 @@ void spi_bus_init(int host,
     const char *spi_names[] = {
         "SPI1_HOST", "SPI2_HOST", "SPI3_HOST"
     };
+    (void)spi_names;
 #endif //ESP3D_TFT_LOG
     esp3d_log("Configuring SPI host %s", spi_names[host]);
     esp3d_log("MISO pin: %d, MOSI pin: %d, SCLK pin: %d, IO2/WP pin: %d, IO3/HD pin: %d",

@@ -45,6 +45,30 @@
 #include "esp3d_string.h"
 #include "gcode_host/esp3d_gcode_host_service.h"
 
+#if ESP3D_TFT_LOG 
+static const char * esp3dclientstr[]={
+  "no_client",
+  "serial",
+  "usb_serial",
+  "stream",
+  "telnet",
+  "webui",
+  "webui_websocket",
+  "websocket",
+  "rendering",
+  "command",  // origin only
+  "system",   // origin only
+  "all_clients"
+};
+#define GETCLIENTSTR(id) static_cast<uint8_t>(id)>=0 && static_cast<uint8_t>(id)<=static_cast<uint8_t>(ESP3DClientType::all_clients)?esp3dclientstr[static_cast<uint8_t>(id)] :"Out of index"
+
+const char * esp3dmsgstr[] = {
+  "head", "core", "tail", "unique"
+};
+#define GETMSGTYPESTR(id) static_cast<uint8_t>(id)>=0 && static_cast<uint8_t>(id)<=static_cast<uint8_t>(ESP3DMessageType::unique)?esp3dmsgstr[static_cast<uint8_t>(id)] :"Out of index"
+
+#endif // ESP3D_TFT_LOG
+
 ESP3DCommands esp3dCommands;
 
 ESP3DCommands::ESP3DCommands() {
@@ -422,10 +446,11 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg, uint8_t* sbuf, size_t len) {
 
 bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
   bool sendOk = true;
-  esp3d_log("Dispatch message origin %d to client %d , size: %d,  type: %d",
-            static_cast<uint8_t>(msg->origin),
-            static_cast<uint8_t>(msg->target), msg->size,
-            static_cast<uint8_t>(msg->type));
+  esp3d_log_d("Dispatch message origin %d(%s) to client %d(%s) , size: %d,  type: %d(%s)",
+            static_cast<uint8_t>(msg->origin),GETCLIENTSTR(msg->origin),
+            static_cast<uint8_t>(msg->target), GETCLIENTSTR(msg->target),
+            msg->size,
+            static_cast<uint8_t>(msg->type), GETMSGTYPESTR(msg->type));
   if (!msg) {
     esp3d_log_e("no msg");
     return false;
@@ -545,7 +570,7 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
 
 #if ESP3D_HTTP_FEATURE
       // ESP3DClientType::webui_websocket
-      if (msg->origin != ESP3DClientType::webui_websocket) {
+      if (msg->origin != ESP3DClientType::webui_websocket && esp3dWsWebUiService.isConnected()) {
         if (msg->target == ESP3DClientType::all_clients) {
           // become the reference message
           msg->target = ESP3DClientType::webui_websocket;
@@ -562,7 +587,7 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
       }
 #if ESP3D_WS_SERVICE_FEATURE
       // ESP3DClientType::websocket
-      if (msg->origin != ESP3DClientType::websocket) {
+      if (msg->origin != ESP3DClientType::websocket && esp3dWsDataService.isConnected()) {
         msg->request_id.id = 0;
         if (msg->target == ESP3DClientType::all_clients) {
           // become the reference message
@@ -582,7 +607,7 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
 #endif  // #if ESP3D_HTTP_FEATURE
 #if ESP3D_TELNET_FEATURE
       // ESP3DClientType::telnet
-      if (msg->origin != ESP3DClientType::telnet) {
+      if (msg->origin != ESP3DClientType::telnet && esp3dSocketServer.isConnected()) {
         msg->request_id.id = 0;
         if (msg->target == ESP3DClientType::all_clients) {
           // become the reference message
