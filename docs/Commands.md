@@ -127,6 +127,9 @@ label can be: light/framesize/quality/contrast/brightness/saturation/gainceiling
 * Touch Calibration 
     `[ESP215]<CALIBRATE> json=<no> pwd=<user password>`
 
+* Take screen snapshot and save to SD card   
+    `[ESP216]<SNAP> json=<no> pwd=<user password>`
+
 * Get ESP pins definition  // Not used in ESP3D-TFT
     `[ESP220]json=<no> pwd=<user password>`
 

@@ -951,6 +951,11 @@ void ESP3DCommands::execute_internal_command(int cmd, int cmd_params_pos,
     case 214:
       ESP214(cmd_params_pos, msg);
       break;
+#if LV_USE_SNAPSHOT
+    case 216:
+      ESP216(cmd_params_pos, msg);
+      break;
+#endif // LV_USE_SNAPSHOT
 #endif  // ESP3D_DISPLAY_FEATURE
     case 400:
       ESP400(cmd_params_pos, msg);

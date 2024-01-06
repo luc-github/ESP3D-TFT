@@ -112,6 +112,9 @@ class ESP3DCommands {
 #endif  // ESP3D_SD_CARD_FEATURE
 #if ESP3D_DISPLAY_FEATURE
   void ESP214(int cmd_params_pos, ESP3DMessage* msg);
+  #if LV_USE_SNAPSHOT 
+  void ESP216(int cmd_params_pos, ESP3DMessage* msg);
+  #endif  //LV_USE_SNAPSHOT
 #endif  // ESP3D_DISPLAY_FEATURE
   void ESP400(int cmd_params_pos, ESP3DMessage* msg);
   void ESP401(int cmd_params_pos, ESP3DMessage* msg);
