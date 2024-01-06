@@ -33,7 +33,6 @@ typedef struct {
     bool pwm_control;
     bool output_invert;
     int gpio_num; // see gpio_num_t
-
     // Relevant only for PWM controlled backlight
     // Ignored for switch (ON/OFF) backlight control
     int timer_idx;   // ledc_timer_t

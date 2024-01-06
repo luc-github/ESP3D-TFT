@@ -68,9 +68,9 @@ esp_lcd_panel_io_spi_config_t disp_spi_cfg = {
 #define DISP_BCKL_DEFAULT_DUTY 100  //%
 
 const disp_backlight_config_t disp_bcklt_cfg = {
-    .gpio_num = 27, // GPIO 27
     .pwm_control = false,
     .output_invert = false,
+    .gpio_num = 27,
     .timer_idx = 0,
     .channel_idx = 0
 };
