@@ -5,13 +5,12 @@ import serial.tools.list_ports
 import esp3d_common as common
 import marlin 
 import grbl
-import grblhal
 import repetier
 import smoothieware
 
 def main():
     if len(sys.argv) < 2:
-        print("Please use one of the follwowing FW: marlin, repetier, smoothieware, grbl or grblhal.")
+        print("Please use one of the follwowing FW: marlin, repetier, smoothieware or grbl.")
         return
 
     fw_name = sys.argv[1].lower()
@@ -24,16 +23,14 @@ def main():
         fw = smoothieware
     elif fw_name == "grbl":
         fw = grbl
-    elif fw_name == "grblhal":
-        fw = grblhal
     else:
         print("Firmware not supported : {}".format(fw_name))
         return
     ports = serial.tools.list_ports.comports()
     portTFT = ""
-    print(common.bcolors.COL_GREEN+"Serial ports:"+common.bcolors.END_COL)
+    print(common.bcolors.COL_GREEN+"Serial ports detected: "+common.bcolors.END_COL)
     for port, desc, hwid in sorted(ports):
-        print(common.bcolors.COL_GREEN+"{}: {} ".format(port, desc)+common.bcolors.END_COL)
+        print(common.bcolors.COL_GREEN+" - {}: {} ".format(port, desc)+common.bcolors.END_COL)
         desc.capitalize()
         if (desc.find("SERIAL") != -1):
             portTFT = port
