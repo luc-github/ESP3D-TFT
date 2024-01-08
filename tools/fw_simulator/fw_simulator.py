@@ -1,12 +1,34 @@
 #!/usr/bin/python
+import sys
 import serial
 import serial.tools.list_ports
 import esp3d_common as common
 import marlin 
-
-fw = marlin
+import grbl
+import grblhal
+import repetier
+import smoothieware
 
 def main():
+    if len(sys.argv) < 2:
+        print("Please use one of the follwowing FW: marlin, repetier, smoothieware, grbl or grblhal.")
+        return
+
+    fw_name = sys.argv[1].lower()
+
+    if fw_name == "marlin":
+        fw = marlin
+    elif fw_name == "repetier":
+        fw = repetier
+    elif fw_name == "smoothieware":
+        fw = smoothieware
+    elif fw_name == "grbl":
+        fw = grbl
+    elif fw_name == "grblhal":
+        fw = grblhal
+    else:
+        print("Firmware not supported : {}".format(fw_name))
+        return
     ports = serial.tools.list_ports.comports()
     portTFT = ""
     print(common.bcolors.COL_GREEN+"Serial ports:"+common.bcolors.END_COL)
@@ -23,7 +45,7 @@ def main():
         print(common.bcolors.COL_RED+"No serial port found"+common.bcolors.END_COL)
         exit(0)
     ser = serial.Serial(portTFT, 115200)
-
+    print(common.bcolors.COL_GREEN+"Now Simulating: " + fw_name + common.bcolors.END_COL)
     starttime = common.current_milli_time()
     # loop forever, just unplug the port to stop the program or do ctrl-c
     while True:
