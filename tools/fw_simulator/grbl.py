@@ -154,6 +154,17 @@ def G91_response(cmd, line, ser):
     modes["absolute"] = False
     return ok(line)
 
+def Jog_response(cmd, line, ser):
+    if (cmd.find("G91")!= -1):
+        G91_response(cmd, line, ser)
+    elif (cmd.find("G90")!= -1):
+        G90_response(cmd, line, ser)
+    cmd = cmd.replace("G90", "")
+    cmd = cmd.replace("G91", "")
+    cmd = cmd.replace("G21", "")
+    cmd = cmd.strip()
+    return G0_G1_response(cmd, line, ser)
+
 # status response
 # "<Idle|MPos:0.000,0.000,0.000,1.000,1.000|FS:0,0|WCO:0.000,0.000,0.000,1.000,1.000>\n"
 # "<Idle|MPos:0.000,0.000,0.000,1.000,1.000|FS:0,0|A:S|Pn:P>\n"
@@ -190,6 +201,7 @@ methods = [
     {"str": "G0", "fn": G0_G1_response},
     {"str": "G1", "fn": G0_G1_response},
     {"str": "$H", "fn": Home_response},
+    {"str": "$J=", "fn": Jog_response},
     {"str": "G90", "fn": G90_response},
     {"str": "G91", "fn": G91_response},
     {"str": "?", "fn": status_response},
@@ -212,6 +224,8 @@ def processLine(line, ser):
     if line.startswith("M") or line.startswith("G") or line.startswith("N") or line.startswith("$"):
         return ok(line)
     if line.find("[esp") != -1 or line.find("[0;") != -1 or line.find("[1;") != -1:
+        return ""
+    if line.startswith("ESP-ROM") or line.startswith("Build:") or line.startswith("SPIWP:") or line.startswith("mode:")or line.startswith("load:") or line.startswith("entry "):
         return ""
     #FIXME: this is not grbl response if the command is not recognized
     return "echo:Unknown command: \"" + line + "\"\nok"

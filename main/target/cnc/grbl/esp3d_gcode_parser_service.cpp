@@ -29,21 +29,17 @@ ESP3DGCodeParserService esp3dGcodeParser;
 const char* emmergencyGcodeCommand[] = {"M112", "M410", "M999"};
 const char* emmergencyESP3DCommand[] = {"[ESP701]"};
 const char* pollingCommands[] = {
-    "M105",  // Temperatures
-    "M114",  // Positions
-    "M220",  // Speed
+    "?",  // status
 };
 
 uint64_t pollingCommandsLastUpdate[] = {
-    0,  // Temperatures
-    0,  // Positions
-    0,  // Speed
+    0,  // status
 };
 
 const char* screenCommands[] = {"M117",  // TFT screen output
                                 ""};
 const char* no_ack_commands[] = {  // Commands that do not need an ack
-    ""};
+    "?"};
 
 const char* fwCommands[] = {"M110 N0",  // reset stream numbering
                             ""};
