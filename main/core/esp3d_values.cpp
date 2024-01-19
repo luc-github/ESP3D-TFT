@@ -67,6 +67,8 @@ bool ESP3DValues::set_string_value(ESP3DValuesIndex index, const char* value,
       element->value = value;
       esp3d_log("Setting String value %s for %d", value, (int)index);
       if (element->callbackFn) {
+        //FIXME:Instead of immediatly use the callback function
+        //we should use a queue and call it in the loop to be sure there is no race condition
         element->callbackFn(element->index, value, action);
       }
       return true;
