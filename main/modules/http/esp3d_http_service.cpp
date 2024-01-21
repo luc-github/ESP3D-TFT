@@ -394,6 +394,23 @@ bool ESP3DHttpService::begin() {
     }
 #endif  // ESP3D_SD_CARD_FEATURE
 
+#ifdef ESP3D_CAMERA_FEATURE
+    //  camera /snap
+    const httpd_uri_t config_handler_camera = {
+        .uri = "/snap",
+        .method = HTTP_GET,
+        .handler =
+            (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.snap_handler),
+        .user_ctx = nullptr,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr};
+    if (ESP_OK != httpd_register_uri_handler(_server, &config_handler_camera))
+    {
+      esp3d_log_e("camera handler registration failed");
+    }
+#endif // ESP3D_CAMERA_FEATURE
+
 #if ESP3D_UPDATE_FEATURE
     // updatefw upload (POST data)
     httpd_uri_t updatefw_upload_handler_config = {
