@@ -25,10 +25,12 @@
 #include <functional>
 #include <list>
 #include <string>
+//For the symbol used 
 #if ESP3D_DISPLAY_FEATURE
 #include "lvgl.h"
 #endif  // ESP3D_DISPLAY_FEATURE
 #include "esp3d_values_list.h"
+#include <pthread.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,12 +62,20 @@ struct ESP3DValuesDescription {
   callbackFunction_t callbackFn = nullptr;
 };
 
+struct ESP3DValuesData{
+  std::string value = "";
+  ESP3DValuesCbAction action = ESP3DValuesCbAction::Update;
+  ESP3DValuesIndex index = ESP3DValuesIndex::unknown_index;
+  ESP3DValuesDescription * description = nullptr;
+};
+
 class ESP3DValues final {
  public:
   ESP3DValues();
   ~ESP3DValues();
   bool intialize();
   void clear();
+  void handle();
   const ESP3DValuesDescription* get_description(ESP3DValuesIndex index);
   const char* get_string_value(ESP3DValuesIndex index);
   bool set_string_value(
@@ -74,6 +84,8 @@ class ESP3DValues final {
 
  private:
   std::list<ESP3DValuesDescription> _values;
+  std::list<ESP3DValuesData> _updated_values_queue;
+  pthread_mutex_t _mutex;
 };
 
 extern ESP3DValues esp3dTftValues;
