@@ -33,6 +33,7 @@
 #include "lvgl.h"
 #include "rendering/esp3d_rendering_client.h"
 #include "tasks_def.h"
+#include "esp3d_values.h"
 
 #define STACKDEPTH UI_STACK_DEPTH
 #define TASKPRIORITY UI_TASK_PRIORITY
@@ -85,6 +86,7 @@ static void guiTask(void *pvParameter) {
 
     /* Try to take the semaphore, call lvgl related function on success */
     if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY)) {
+      esp3dTftValues.handle();
       lv_task_handler();
       xSemaphoreGive(xGuiSemaphore);
     }

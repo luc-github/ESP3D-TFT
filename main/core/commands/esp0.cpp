@@ -80,6 +80,9 @@ const char* help[] = {
 #endif  // ESP3D_SD_IS_SPI
 #if ESP3D_DISPLAY_FEATURE
     "[ESP214](Text) - Output to esp screen status",
+#if LV_USE_SNAPSHOT
+    "[ESP216](SNAP) - Do Snapshot of current screen",
+#endif  //LV_USE_SNAPSHOT
 #endif  // ESP3D_DISPLAY_FEATURE
 #endif  // ESP3D_SD_CARD_FEATURE
     "[ESP400] - display ESP3D settings",
@@ -171,6 +174,9 @@ const uint cmdlist[] = {
 #endif  // ESP3D_SD_IS_SPI
 #if ESP3D_DISPLAY_FEATURE
     214,
+#if LV_USE_SNAPSHOT
+    216,
+#endif  //LV_USE_SNAPSHOT
 #endif  // ESP3D_DISPLAY_FEATURE
 #endif  // ESP3D_SD_CARD_FEATURE
 
