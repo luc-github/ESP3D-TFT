@@ -29,7 +29,7 @@
 #include <esp_camera.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-
+#include "driver/gpio.h"
 #include "http/esp3d_http_service.h"
 
 #define DEFAULT_FRAME_SIZE FRAMESIZE_HVGA
@@ -235,14 +235,17 @@ bool Camera::initHardware()
     config.grab_mode = CAMERA_GRAB_LATEST;   // ;    CAMERA_GRAB_LATEST
     esp3d_log("Init camera");
 #if CAM_PULLUP1 != -1
-    pinMode(CAM_PULLUP1, INPUT_PULLUP);
+    esp_rom_gpio_pad_select_gpio(CAM_PULLUP1);
+    gpio_set_direction(CAM_PULLUP1, GPIO_MODE_INPUT);
 #endif // CAM_PULLUP1
 #if CAM_PULLUP2 != -1
-    pinMode(CAM_PULLUP2, INPUT_PULLUP);
+    esp_rom_gpio_pad_select_gpio(CAM_PULLUP2);
+    gpio_set_direction(CAM_PULLUP2, GPIO_MODE_INPUT);
 #endif // CAM_PULLUP2
 #if CAM_LED_PIN != -1
-    pinMode(CAM_LED_PIN, OUTPUT);
-    digitalWrite(CAM_LED_PIN, LOW);
+    esp_rom_gpio_pad_select_gpio(CAM_LED_PIN);
+    gpio_set_direction(CAM_LED_PIN, GPIO_MODE_OUTPUT);
+    gpio_set_level(CAM_LED_PIN, 0);
 #endif // CAM_LED_PIN
        // initialize the camera
     esp3d_log("Init camera config");
