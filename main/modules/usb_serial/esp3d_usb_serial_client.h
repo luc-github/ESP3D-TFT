@@ -47,7 +47,7 @@ class ESP3DUsbSerialClient : public ESP3DClient {
   bool pushMsgToRxQueue(const uint8_t* msg, size_t size);
   void flush();
   void connectDevice();
-  void handle_rx(uint8_t* data, size_t data_len);
+  void handle_rx(const uint8_t* data, size_t data_len);
   bool started() { return _started; }
   void setConnected(bool connected);
   bool isConnected() { return _connected; }
