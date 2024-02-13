@@ -36,11 +36,12 @@ ESP3DUsbSerialClient usbSerialClient;
  *
  * Just pass received data to usb serial client
  */
-void rx_callback(uint8_t *data, size_t data_len, void *arg) {
+bool rx_callback(const uint8_t *data, size_t data_len, void *arg) {
   usbSerialClient.handle_rx(data, data_len);
+  return true;
 }
 
-void ESP3DUsbSerialClient::handle_rx(uint8_t *data, size_t data_len) {
+void ESP3DUsbSerialClient::handle_rx(const uint8_t *data, size_t data_len) {
   static uint64_t startTimeout = 0;  // microseconds
   // parse data
   startTimeout = esp3d_hal::millis();
@@ -102,6 +103,7 @@ void ESP3DUsbSerialClient::connectDevice() {
       .connection_timeout_ms = 5000,  // 5 seconds, enough time to plug the
                                       // device in or experiment with timeout
       .out_buffer_size = ESP3D_USB_SERIAL_TX_BUFFER_SIZE,
+      .in_buffer_size = ESP3D_USB_SERIAL_RX_BUFFER_SIZE,
       .event_cb = handle_event,
       .data_cb = rx_callback,
       .user_arg = NULL,
