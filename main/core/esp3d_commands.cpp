@@ -1127,6 +1127,6 @@ ESP3DClientType ESP3DCommands::getOutputClient(bool fromSettings) {
     }
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
   }
-  esp3d_log("Output client is %d", static_cast<uint8_t>(_output_client));
+  esp3d_log("Output client is %d (%s)", static_cast<uint8_t>(_output_client), GETCLIENTSTR(_output_client));
   return _output_client;
 }

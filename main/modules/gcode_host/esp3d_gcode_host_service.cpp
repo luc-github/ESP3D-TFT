@@ -143,7 +143,12 @@ bool ESP3DGCodeHostService::addStream(
   // because it is msg we should consider it as a command so we can execute it
   // first
   // so let's trim it to remove any space or \n
-  return _add_stream(esp3d_string::str_trim(command), authentication_level,
+  std::string cmd = esp3d_string::str_trim(command);
+  if (cmd.length() == 0) {
+    esp3d_log_e("Empty command");
+    return false;
+  }
+  return _add_stream(cmd.c_str(), authentication_level,
                      true);
 }
 
@@ -848,7 +853,8 @@ bool ESP3DGCodeHostService::_processRx(ESP3DMessage* rx) {
   if (_outputClient == ESP3DClientType::no_client) {
     esp3d_log("Output client not set, can't send: %s", (char*)(rx->data));
   } else if (rx->origin == _outputClient) {
-    esp3d_log("Stream got the response: %s", (char*)(rx->data));
+    esp3d_log("Stream got data: %s from %d", (char*)(rx->data),
+              static_cast<uint8_t>(rx->origin));
     if (_connection_lost) {
       std::string text = esp3dTranslationService.translate(
           ESP3DLabel::communication_recovered);
@@ -859,7 +865,7 @@ bool ESP3DGCodeHostService::_processRx(ESP3DMessage* rx) {
 
     _parseResponse(rx);
   } else {
-    esp3d_log("Forwarding message from: %d", static_cast<uint8_t>(rx->origin));
+    esp3d_log("Sending message from: %d to %d", static_cast<uint8_t>(rx->origin), static_cast<uint8_t>(rx->target));
     addStream((const char*)rx->data, rx->size, rx->authentication_level);
   }
   deleteMsg(rx);
@@ -1042,14 +1048,14 @@ void ESP3DGCodeHostService::_handle_stream_selection() {
   // only file stream  can be interrupted, scripts / command streams cannot
   if (!(_current_stream_ptr->type == ESP3DGcodeHostStreamType::fs_stream) &&
       !(_current_stream_ptr->type == ESP3DGcodeHostStreamType::sd_stream)) {
-    esp3d_log("Current stream is not a stream  %lld, state:%s : type: %s",
+   /* esp3d_log("Current stream is not a file stream  %lld, state:%s : type: %s",
               _current_stream_ptr->id,
               ESP3DGcodeStreamStateStr[static_cast<uint8_t>(
                   _current_stream_ptr->state)],
               ESP3DGcodeHostStreamTypeStr[static_cast<uint8_t>(
-                  _current_stream_ptr->type)]);
-    esp3d_log("keep it always active, command:%s",
-              _current_command_str.c_str());
+                  _current_stream_ptr->type)]);*/
+    /*esp3d_log("keep it always active, command:%s",
+              _current_command_str.c_str());*/
     _current_stream_ptr->active = true;
     return;
   }
@@ -1185,7 +1191,7 @@ ESP3DGcodeStreamState ESP3DGCodeHostService::_getStreamState() {
 // Handle the notifications
 // be sure sdkconfig has CONFIG_FREERTOS_TASK_NOTIFICATION_ARRAY_ENTRIES>=3
 void ESP3DGCodeHostService::_handle_notifications() {
-  esp3d_log("Handle notifications");
+ // esp3d_log("Handle notifications");
   // entry 0
   if (ulTaskNotifyTake(pdTRUE, 0)) {
     ESP3DGcodeStreamState state = ESP3DGcodeStreamState::undefined;
@@ -1233,7 +1239,7 @@ void ESP3DGCodeHostService::_handle_notifications() {
 
 // Handle the messages in the queue
 void ESP3DGCodeHostService::_handle_msgs() {
-  esp3d_log("Handle messages");
+  //esp3d_log("Handle messages");
   while (getRxMsgsCount() > 0) {
     ESP3DMessage* msg = popRx();
     esp3d_log("RX popped");
