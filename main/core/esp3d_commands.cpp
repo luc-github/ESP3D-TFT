@@ -53,7 +53,7 @@ static const char* esp3dclientstr[] = {
     "system",   // origin only
     "all_clients"};
 #define GETCLIENTSTR(id)                                         \
-  static_cast<uint8_t>(id) >= 0 &&                               \
+  static_cast<int8_t>(id) >= 0 &&                               \
           static_cast<uint8_t>(id) <=                            \
               static_cast<uint8_t>(ESP3DClientType::all_clients) \
       ? esp3dclientstr[static_cast<uint8_t>(id)]                 \
@@ -61,7 +61,7 @@ static const char* esp3dclientstr[] = {
 
 const char* esp3dmsgstr[] = {"head", "core", "tail", "unique"};
 #define GETMSGTYPESTR(id)                                    \
-  static_cast<uint8_t>(id) >= 0 &&                           \
+  static_cast<int8_t>(id) >= 0 &&                           \
           static_cast<uint8_t>(id) <=                        \
               static_cast<uint8_t>(ESP3DMessageType::unique) \
       ? esp3dmsgstr[static_cast<uint8_t>(id)]                \
@@ -1071,7 +1071,7 @@ void ESP3DCommands::execute_internal_command(int cmd, int cmd_params_pos,
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
     default:
       msg->target = msg->origin;
-      esp3d_log("Invalid Command: [ESP%s]", tmpstr.c_str());
+      esp3d_log("Invalid Command: [ESP%d]", cmd);
       if (hasTag(msg, cmd_params_pos, "json")) {
         std::string tmpstr = "{\"cmd\":\"[ESP";
         tmpstr += std::to_string(cmd);
