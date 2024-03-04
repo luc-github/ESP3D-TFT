@@ -27,6 +27,11 @@
 #include <cstdlib>
 
 #include "esp3d_hal.h"
+#if ESP3D_WIFI_FEATURE
+#include "network/esp3d_network.h"
+#endif  // ESP3D_WIFI_FEATURE
+
+
 
 // helper to format string float to readable string with precision
 std::string esp3d_string::set_precision(std::string str_value,
@@ -363,4 +368,28 @@ const char* esp3d_string::generateUUID(const char* seed) {
   token += &tmp[20];
 
   return token.c_str();
+}
+
+const char* esp3d_string::expandString(const char* s, bool formatspace) {
+  static std::string tmp;
+  tmp = s;
+  if (tmp.find("%") != std::string::npos) {
+#if ESP3D_WIFI_FEATURE
+    tmp = esp3d_string::str_replace(tmp.c_str(), "%ESP_IP%", esp3dNetwork.getLocalIpString());
+    tmp = esp3d_string::str_replace(tmp.c_str(), "%ESP_NAME%", esp3dNetwork.getHostName());
+#else
+    tmp = esp3d_string::str_replace(tmp.c_str(), "%ESP_IP%", "???");
+    tmp = esp3d_string::str_replace(tmp.c_str(), "%ESP_NAME%", "???");
+#endif  //ESP3D_WIFI_FEATURE
+#if ESP3D_TIMESTAMP_FEATURE
+    std::string dt = esp3dTimeService.getCurrentTime();
+    if (formatspace) {
+      dt = esp3d_string::str_replace(dt.c_str(), " ", "\\ ");
+      }
+    tmp = esp3d_string::str_replace(tmp.c_str(), "%ESP_DATETIME%", dt.c_str());
+#else
+    tmp = esp3d_string::str_replace(tmp.c_str(), "%ESP_DATETIME%", "???");
+#endif  // ESP3D_TIMESTAMP_FEATURE
+  }
+  return tmp.c_str();
 }

@@ -53,7 +53,7 @@ OPTION(TIME_SERVICE  "Time service" ON)
 OPTION(SSDP_SERVICE "SSDP service" ON)
 OPTION(MDNS_SERVICE "MDNS service" ON)
 OPTION(WIFI_SERVICE "WiFi service" ON)
-OPTION(BT_SERVICE "Bluetooth service" OFF)
+OPTION(BT_SERVICE "Bluetooth service" ON)
 OPTION(WEB_SERVICES "Web Services http/websocket/webdav" ON)
 OPTION(WEBDAV_SERVICES "WebDav Services" ON)
 OPTION(TELNET_SERVICE "Telnet service" ON)
@@ -63,10 +63,6 @@ OPTION(SD_CARD_SERVICE "SD card service" ON)
 OPTION(NOTIFICATIONS_SERVICE "Notifications service" ON)
 OPTION(UPDATE_SERVICE "Update service" ON)
 OPTION(USE_FAT_INSTEAD_OF_LITTLEFS "Use FAT instead of LittleFS" OFF)
-if(ESP32S3_BZM_TFT35_GT911)
-#     if  CAMERA_SERVICE is ON， UPDATE_SERVICE must be OFF.
-    OPTION(CAMERA_SERVICE "Camera service" ON)
-endif()
 
 # #######################################
 # Do not change anything below this line
@@ -220,9 +216,9 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 # Debug = 2
 # Error only = 1
 # Disabled = 0
-add_compile_options(-DESP3D_TFT_LOG=1)
+add_compile_options(-DESP3D_TFT_LOG=0)
 # Disable ANSI color to fit some serial terminals 
-add_compile_options(-DDISABLE_COLOR_LOG=0)
+add_compile_options(-DDISABLE_COLOR_LOG=1)
 
 #Use the Snapshot API of LVGL to dump screens to the SD card
 add_compile_options(-DLV_USE_SNAPSHOT=1)
@@ -262,9 +258,6 @@ if(WIFI_SERVICE)
         endif()
         if(WEBDAV_SERVICES)
             add_compile_options(-DESP3D_WEBDAV_SERVICES_FEATURE=1)
-        endif()
-        if(CAMERA_SERVICE)
-            add_compile_options(-DESP3D_CAMERA_FEATURE=1)
         endif()
     endif()
 

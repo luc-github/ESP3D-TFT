@@ -123,26 +123,15 @@ void ESP3DNotificationsService::end() {
 
 bool ESP3DNotificationsService::sendMSG(const char* title,
                                         const char* message) {
-  std::string formated_message = message;
-  std::string formated_title = title;
-
-  if (formated_message.find('%') != std::string::npos) {
-    formated_message = esp3d_string::str_replace(
-        formated_message.c_str(), "%ESP_IP%", esp3dNetwork.getLocalIpString());
-    formated_message = esp3d_string::str_replace(
-        formated_message.c_str(), "%ESP_NAME%", esp3dNetwork.getHostName());
-  }
+  std::string formated_message;
+  std::string formated_title;
+  formated_message = esp3d_string::expandString(message);
   if (formated_message.length() == 0) {
     _lastError = ESP3DNotificationError::empty_message;
     esp3d_log_e("Empty notification message");
     return false;
   }
-  if (formated_title.find('%') != std::string::npos) {
-    formated_title = esp3d_string::str_replace(
-        formated_message.c_str(), "%ESP_IP%", esp3dNetwork.getLocalIpString());
-    formated_title = esp3d_string::str_replace(
-        formated_message.c_str(), "%ESP_NAME%", esp3dNetwork.getHostName());
-  }
+  formated_title = esp3d_string::expandString(title);
   if (formated_title.length() == 0) {
     formated_title = "Notification";
   }

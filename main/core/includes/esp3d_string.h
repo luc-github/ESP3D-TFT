@@ -58,6 +58,7 @@ const char* getPathFromString(const char* str);
 const char* getFilenameFromString(const char* str);
 const char* getTimeString(time_t time, bool isGMT = false);
 const char* generateUUID(const char* seed = NULL);
+const char * expandString(const char *s, bool formatspace = false);
 }  // namespace esp3d_string
 #ifdef __cplusplus
 }  // extern "C"

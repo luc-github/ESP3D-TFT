@@ -101,14 +101,22 @@ bool ESP3DTftStream::begin() {
     getTargetFirmware(true);
 
     if (esp3dCommands.getOutputClient(true) == ESP3DClientType::serial) {
+      esp3d_log("Serial client starting");
       if (serialClient.begin()) {
+        esp3d_log("Serial client started");
         return true;
+      } else {
+        esp3d_log_e("Serial client start failed");
       }
     }
 #if ESP3D_USB_SERIAL_FEATURE
     else if (esp3dCommands.getOutputClient() == ESP3DClientType::usb_serial) {
+      esp3d_log("USB Serial client starting");
       if (usbSerialClient.begin()) {
+        esp3d_log("USB Serial client started");
         return true;
+      } else {
+        esp3d_log_e("USB Serial client start failed");
       }
     }
 #endif  // ESP3D_USB_SERIAL_FEATURE
