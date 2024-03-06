@@ -45,29 +45,29 @@
 #include "esp3d_string.h"
 #include "gcode_host/esp3d_gcode_host_service.h"
 
-#if ESP3D_TFT_LOG 
-static const char * esp3dclientstr[]={
-  "no_client",
-  "serial",
-  "usb_serial",
-  "stream",
-  "telnet",
-  "webui",
-  "webui_websocket",
-  "websocket",
-  "rendering",
-  "command",  // origin only
-  "system",   // origin only
-  "all_clients"
-};
-#define GETCLIENTSTR(id) static_cast<uint8_t>(id)>=0 && static_cast<uint8_t>(id)<=static_cast<uint8_t>(ESP3DClientType::all_clients)?esp3dclientstr[static_cast<uint8_t>(id)] :"Out of index"
+#if ESP3D_TFT_LOG
+static const char* esp3dclientstr[] = {
+    "no_client",  "serial",          "usb_serial", "stream",    "telnet",
+    "webui",      "webui_websocket", "websocket",  "rendering",
+    "command",  // origin only
+    "system",   // origin only
+    "all_clients"};
+#define GETCLIENTSTR(id)                                         \
+  static_cast<int8_t>(id) >= 0 &&                               \
+          static_cast<uint8_t>(id) <=                            \
+              static_cast<uint8_t>(ESP3DClientType::all_clients) \
+      ? esp3dclientstr[static_cast<uint8_t>(id)]                 \
+      : "Out of index"
 
-const char * esp3dmsgstr[] = {
-  "head", "core", "tail", "unique"
-};
-#define GETMSGTYPESTR(id) static_cast<uint8_t>(id)>=0 && static_cast<uint8_t>(id)<=static_cast<uint8_t>(ESP3DMessageType::unique)?esp3dmsgstr[static_cast<uint8_t>(id)] :"Out of index"
+const char* esp3dmsgstr[] = {"head", "core", "tail", "unique"};
+#define GETMSGTYPESTR(id)                                    \
+  static_cast<int8_t>(id) >= 0 &&                           \
+          static_cast<uint8_t>(id) <=                        \
+              static_cast<uint8_t>(ESP3DMessageType::unique) \
+      ? esp3dmsgstr[static_cast<uint8_t>(id)]                \
+      : "Out of index"
 
-#endif // ESP3D_TFT_LOG
+#endif  // ESP3D_TFT_LOG
 
 ESP3DCommands esp3dCommands;
 
@@ -446,11 +446,12 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg, uint8_t* sbuf, size_t len) {
 
 bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
   bool sendOk = true;
-  esp3d_log("Dispatch message origin %d(%s) to client %d(%s) , size: %d,  type: %d(%s)",
-            static_cast<uint8_t>(msg->origin),GETCLIENTSTR(msg->origin),
-            static_cast<uint8_t>(msg->target), GETCLIENTSTR(msg->target),
-            msg->size,
-            static_cast<uint8_t>(msg->type), GETMSGTYPESTR(msg->type));
+  esp3d_log(
+      "Dispatch message origin %d(%s) to client %d(%s) , size: %d,  type: "
+      "%d(%s)",
+      static_cast<uint8_t>(msg->origin), GETCLIENTSTR(msg->origin),
+      static_cast<uint8_t>(msg->target), GETCLIENTSTR(msg->target), msg->size,
+      static_cast<uint8_t>(msg->type), GETMSGTYPESTR(msg->type));
   if (!msg) {
     esp3d_log_e("no msg");
     return false;
@@ -458,6 +459,10 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
   // currently only echo back no test done on success
   // TODO check add is successful
   switch (msg->target) {
+    case ESP3DClientType::no_client:
+      ESP3DClient::deleteMsg(msg);
+      esp3d_log("No client message");
+      break;
 #if ESP3D_HTTP_FEATURE
     case ESP3DClientType::webui:
       if (esp3dHttpService.started()) {
@@ -570,7 +575,8 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
 
 #if ESP3D_HTTP_FEATURE
       // ESP3DClientType::webui_websocket
-      if (msg->origin != ESP3DClientType::webui_websocket && esp3dWsWebUiService.isConnected()) {
+      if (msg->origin != ESP3DClientType::webui_websocket &&
+          esp3dWsWebUiService.isConnected()) {
         if (msg->target == ESP3DClientType::all_clients) {
           // become the reference message
           msg->target = ESP3DClientType::webui_websocket;
@@ -587,7 +593,8 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
       }
 #if ESP3D_WS_SERVICE_FEATURE
       // ESP3DClientType::websocket
-      if (msg->origin != ESP3DClientType::websocket && esp3dWsDataService.isConnected()) {
+      if (msg->origin != ESP3DClientType::websocket &&
+          esp3dWsDataService.isConnected()) {
         msg->request_id.id = 0;
         if (msg->target == ESP3DClientType::all_clients) {
           // become the reference message
@@ -607,7 +614,8 @@ bool ESP3DCommands::dispatch(ESP3DMessage* msg) {
 #endif  // #if ESP3D_HTTP_FEATURE
 #if ESP3D_TELNET_FEATURE
       // ESP3DClientType::telnet
-      if (msg->origin != ESP3DClientType::telnet && esp3dSocketServer.isConnected()) {
+      if (msg->origin != ESP3DClientType::telnet &&
+          esp3dSocketServer.isConnected()) {
         msg->request_id.id = 0;
         if (msg->target == ESP3DClientType::all_clients) {
           // become the reference message
@@ -955,7 +963,7 @@ void ESP3DCommands::execute_internal_command(int cmd, int cmd_params_pos,
     case 216:
       ESP216(cmd_params_pos, msg);
       break;
-#endif // LV_USE_SNAPSHOT
+#endif  // LV_USE_SNAPSHOT
 #endif  // ESP3D_DISPLAY_FEATURE
     case 400:
       ESP400(cmd_params_pos, msg);
@@ -1063,7 +1071,7 @@ void ESP3DCommands::execute_internal_command(int cmd, int cmd_params_pos,
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
     default:
       msg->target = msg->origin;
-      esp3d_log("Invalid Command: [ESP%s]", tmpstr.c_str());
+      esp3d_log("Invalid Command: [ESP%d]", cmd);
       if (hasTag(msg, cmd_params_pos, "json")) {
         std::string tmpstr = "{\"cmd\":\"[ESP";
         tmpstr += std::to_string(cmd);
@@ -1119,6 +1127,6 @@ ESP3DClientType ESP3DCommands::getOutputClient(bool fromSettings) {
     }
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
   }
-  esp3d_log("Output client is %d", static_cast<uint8_t>(_output_client));
+  esp3d_log("Output client is %d (%s)", static_cast<uint8_t>(_output_client), GETCLIENTSTR(_output_client));
   return _output_client;
 }

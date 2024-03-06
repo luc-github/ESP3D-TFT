@@ -159,7 +159,7 @@ void ESP3DRenderingClient::handle() {
           sendGcode(pollingCommands[polling_cmd_index]);
         } else {
           esp3d_log_w("Command %s already in queue or recently processed",
-                      pollingCommands[i]);
+                      pollingCommands[polling_cmd_index]);
         }
         polling_cmd_index++;
         now = esp3d_hal::millis();

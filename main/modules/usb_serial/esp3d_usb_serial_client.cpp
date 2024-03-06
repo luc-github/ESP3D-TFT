@@ -36,11 +36,12 @@ ESP3DUsbSerialClient usbSerialClient;
  *
  * Just pass received data to usb serial client
  */
-void rx_callback(uint8_t *data, size_t data_len, void *arg) {
+bool rx_callback(const uint8_t *data, size_t data_len, void *arg) {
   usbSerialClient.handle_rx(data, data_len);
+  return true;
 }
 
-void ESP3DUsbSerialClient::handle_rx(uint8_t *data, size_t data_len) {
+void ESP3DUsbSerialClient::handle_rx(const uint8_t *data, size_t data_len) {
   static uint64_t startTimeout = 0;  // microseconds
   // parse data
   startTimeout = esp3d_hal::millis();
@@ -102,6 +103,7 @@ void ESP3DUsbSerialClient::connectDevice() {
       .connection_timeout_ms = 5000,  // 5 seconds, enough time to plug the
                                       // device in or experiment with timeout
       .out_buffer_size = ESP3D_USB_SERIAL_TX_BUFFER_SIZE,
+      .in_buffer_size = ESP3D_USB_SERIAL_RX_BUFFER_SIZE,
       .event_cb = handle_event,
       .data_cb = rx_callback,
       .user_arg = NULL,
@@ -115,12 +117,12 @@ void ESP3DUsbSerialClient::connectDevice() {
   // You don't need to know the device's VID and PID. Just plug in any device
   // and the VCP service will pick correct (already registered) driver for the
   // device
-  esp3d_log("Opening any VCP device...");
+   //esp3d_log("Opening any VCP device...");
   // TODO try to identify device
   _vcp = std::unique_ptr<CdcAcmDevice>(esp_usb::VCP::open(&dev_config));
 
   if (_vcp == nullptr) {
-    esp3d_log_w("Failed to open VCP device, retrying...");
+   // esp3d_log_w("Failed to open VCP device, retrying...");
     return;
   }
 
@@ -259,7 +261,7 @@ bool ESP3DUsbSerialClient::pushMsgToRxQueue(const uint8_t *msg, size_t size) {
 #if ESP3D_DISABLE_SERIAL_AUTHENTICATION_FEATURE
       newMsgPtr->authentication_level = ESP3DAuthenticationLevel::admin;
 #endif  // ESP3D_DISABLE_SERIAL_AUTHENTICATION
-      newMsgPtr->origin = ESP3DClientType::serial;
+      newMsgPtr->origin = ESP3DClientType::usb_serial;
       if (!addRxData(newMsgPtr)) {
         // delete message as cannot be added to the queue
         ESP3DClient::deleteMsg(newMsgPtr);

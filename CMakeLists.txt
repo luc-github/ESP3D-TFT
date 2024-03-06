@@ -216,9 +216,9 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 # Debug = 2
 # Error only = 1
 # Disabled = 0
-add_compile_options(-DESP3D_TFT_LOG=2)
+add_compile_options(-DESP3D_TFT_LOG=0)
 # Disable ANSI color to fit some serial terminals 
-add_compile_options(-DDISABLE_COLOR_LOG=0)
+add_compile_options(-DDISABLE_COLOR_LOG=1)
 
 #Use the Snapshot API of LVGL to dump screens to the SD card
 add_compile_options(-DLV_USE_SNAPSHOT=1)

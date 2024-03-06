@@ -47,8 +47,8 @@ void ESP3DCommands::ESP214(int cmd_params_pos, ESP3DMessage* msg) {
   if (tmpstr.length() == 0) {
     ok_msg =
         esp3dTftValues.get_string_value(ESP3DValuesIndex::status_bar_label);
-
   } else {
+    tmpstr =  esp3d_string::expandString(tmpstr.c_str());
     if (!esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
                                          tmpstr.c_str())) {
       hasError = true;
