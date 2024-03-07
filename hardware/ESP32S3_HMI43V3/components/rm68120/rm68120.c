@@ -112,8 +112,8 @@ esp_err_t esp_lcd_new_panel_rm68120(
     const esp_lcd_panel_io_handle_t io,
     const esp_lcd_panel_dev_config_t *panel_dev_config,
     esp_lcd_panel_handle_t *ret_panel);
-void rm68120_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area,
-                   lv_color_t *color_p);
+void rm68120_flush(lv_display_t *disp_drv, const lv_area_t *area,
+                   void * px_map);
 esp_lcd_panel_handle_t panel_handle = NULL;
 
 esp_lcd_panel_handle_t *rm68120_panel_handle() { return &panel_handle; }
@@ -121,21 +121,21 @@ esp_lcd_panel_handle_t *rm68120_panel_handle() { return &panel_handle; }
 static bool rm68120_notify_flush_ready(esp_lcd_panel_io_handle_t panel_io,
                                        esp_lcd_panel_io_event_data_t *edata,
                                        void *user_ctx) {
-  lv_disp_drv_t *disp_driver = (lv_disp_drv_t *)user_ctx;
+  lv_display_t *disp_driver = (lv_display_t *)user_ctx;
   lv_disp_flush_ready(disp_driver);
   return false;
 }
 
-void rm68120_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area,
-                   lv_color_t *color_p) {
+void rm68120_flush(lv_display_t *disp_drv, const lv_area_t *area,
+                   void * px_map) {
   esp_lcd_panel_handle_t panel_handle =
       (esp_lcd_panel_handle_t)disp_drv->user_data;
 
   esp_lcd_panel_draw_bitmap(panel_handle, area->x1, area->y1, area->x2 + 1,
-                            area->y2 + 1, color_p);
+                            area->y2 + 1, px_map);
 }
 
-esp_err_t rm68120_init(lv_disp_drv_t *disp_drv) {
+esp_err_t rm68120_init(lv_display_t *disp_drv) {
   if (panel_handle != NULL) {
     esp3d_log_e("rm68120 bus already initialized");
     return ESP_FAIL;

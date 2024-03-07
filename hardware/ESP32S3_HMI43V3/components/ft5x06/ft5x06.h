@@ -37,7 +37,7 @@ extern "C" {
 #endif
 
 esp_err_t ft5x06_init(i2c_bus_handle_t i2c_bus_handle);
-void ft5x06_read(lv_indev_drv_t * drv, lv_indev_data_t * data);
+void ft5x06_read(lv_indev_t * drv, lv_indev_data_t * data);
 
 #ifdef __cplusplus
 }

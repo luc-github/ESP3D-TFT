@@ -79,8 +79,15 @@ esp_err_t bsp_deinit_usb(void) {
   return usb_serial_deinit();
 }
 
-esp_err_t bsp_init(void) {
-  static lv_disp_drv_t disp_drv; /*Descriptor of a display driver*/
+lv_display_t * disp_drv = NULL;
+
+esp_err_t bsp_init(void) { 
+  /*Descriptor of a display driver*/
+   disp_drv = lv_display_create(DISP_HOR_RES_MAX, DISP_VER_RES_MAX);
+  if (disp_drv == NULL) {
+    esp3d_log_e("Failed to allocate display driver");
+    return ESP_FAIL;
+  }
 
   // Drivers initialization
   esp3d_log("Display buffer size: %d", DISP_BUF_SIZE);
@@ -111,7 +118,7 @@ esp_err_t bsp_init(void) {
 
   /* Display controller initialization */
   esp3d_log("Initializing display controller");
-  if (rm68120_init(&disp_drv) != ESP_OK) {
+  if (rm68120_init(disp_drv) != ESP_OK) {
     return ESP_FAIL;
   }
 
@@ -151,22 +158,22 @@ esp_err_t bsp_init(void) {
   lv_disp_draw_buf_init(&draw_buf, buf1, buf2, size_in_px);
 
   esp_lcd_panel_handle_t* panel_handle = rm68120_panel_handle();
-  lv_disp_drv_init(&disp_drv);       /*Basic initialization*/
-  disp_drv.flush_cb = rm68120_flush; /*Set your driver function*/
-  disp_drv.draw_buf = &draw_buf;     /*Assign the buffer to the display*/
-  disp_drv.hor_res =
+  lv_disp_drv_init(disp_drv);       /*Basic initialization*/
+  disp_drv->flush_cb = rm68120_flush; /*Set your driver function*/
+  disp_drv->draw_buf = &draw_buf;     /*Assign the buffer to the display*/
+  disp_drv->hor_res =
       DISP_HOR_RES_MAX; /*Set the horizontal resolution of the display*/
-  disp_drv.ver_res =
+  disp_drv->ver_res =
       DISP_VER_RES_MAX; /*Set the vertical resolution of the display*/
-  disp_drv.user_data = *panel_handle;
-  lv_disp_drv_register(&disp_drv); /*Finally register the driver*/
+  disp_drv->user_data = *panel_handle;
+  lv_disp_drv_register(disp_drv); /*Finally register the driver*/
 
   /* Register an input device */
-  static lv_indev_drv_t indev_drv; /*Descriptor of a input device driver*/
-  lv_indev_drv_init(&indev_drv);   /*Basic initialization*/
-  indev_drv.type = LV_INDEV_TYPE_POINTER; /*Touch pad is a pointer-like device*/
-  indev_drv.read_cb = ft5x06_read;        /*Set your driver function*/
-  lv_indev_drv_register(&indev_drv);      /*Finally register the driver*/
+  //static lv_indev_drv_t indev_drv; /*Descriptor of a input device driver*/
+  //lv_indev_drv_init(&indev_drv);   /*Basic initialization*/
+  //indev_drv.type = LV_INDEV_TYPE_POINTER; /*Touch pad is a pointer-like device*/
+  // indev_drv.read_cb = ft5x06_read;        /*Set your driver function*/
+  //lv_indev_drv_register(&indev_drv);      /*Finally register the driver*/
 
   return ESP_OK;
 }

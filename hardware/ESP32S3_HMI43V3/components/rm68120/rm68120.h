@@ -36,10 +36,10 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-esp_err_t rm68120_init(lv_disp_drv_t* disp_drv);
+esp_err_t rm68120_init(lv_display_t* disp_drv);
 esp_lcd_panel_handle_t* rm68120_panel_handle();
-void rm68120_flush(lv_disp_drv_t* disp_drv, const lv_area_t* area,
-                   lv_color_t* color_p);
+void rm68120_flush(lv_display_t* disp_drv, const lv_area_t* area,
+                   void* px_map);
 
 /**********************
  *      MACROS

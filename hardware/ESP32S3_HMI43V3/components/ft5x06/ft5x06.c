@@ -173,7 +173,7 @@ esp_err_t ft5x06_init(i2c_bus_handle_t i2c_bus_handle)
 }
 
 /*Will be called by the library to read the touchpad*/
-void ft5x06_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
+void ft5x06_read(lv_indev_t * indev_drv, lv_indev_data_t * data)
 {
     static lv_coord_t last_x = 0;
     static lv_coord_t last_y = 0;
