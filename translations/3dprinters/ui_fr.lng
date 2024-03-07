@@ -1,24 +1,64 @@
-#Translation pack for french language
+#Translation pack for <language> language
 [translations]
 l_0=Français
-l_1=Taille MAJ
+l_1=Taille pour les mises à jour
 l_2=Ecran
-l_3=Arch
+l_3=Arche
 l_4=SDK
-l_5=Freq
-l_6=Taille Flash
-l_7=Memoire
-l_8=PSRam
+l_5=Fréq
+l_6=Taille mémoire
+l_7=Mémoire libre
+l_8=Taille PSRAM
 l_9=Version
-l_10=MAJ Carte SD
-l_11=Oui
-l_12=Non
+l_10=MàJ depuis la carte SD
+l_11=Actif
+l_12=Inactif
 l_13=mm
 l_14=°C
+l_15=Système de fichiers Flash
+l_16=Veuillez confirmer
+l_17=Voulez-vous arrêter l'impression en cours ?
+l_18=Erreur
+l_19=L'application du mode a échoué !
+l_20=L'application du paramètre a échoué !
+l_21=Nom d'hôte
+l_22=Extensions
+l_23=Veuillez patienter...
+l_24=Port de sortie
+l_25=USB
+l_26=Série
+l_27=Débit port série
+l_28=Débit port USB série
+l_29=Connexion au wifi...
+l_30=Non connecté
+l_31=Définir comme point d'accès
+l_32=IP perdue
+l_33=Type de déplacement
+l_34=abs
+l_35=Absolu
+l_36=rel
+l_37=Relatif
+l_38=Requêtes automatiques
+l_39=Activé
+l_40=Désactivé
+l_41=Moteurs désactivés
+l_42=Commandes du ventilateur
+l_43=Informations
+l_44=Nivellement automatique
+l_45=Ajustez chaque vis de nivellement correspondant à la position active jusqu'à ce qu'une feuille de papier glisse entre la buse et la plaque.\nRépétez l'opération pour chaque point jusqu'à ce qu'aucune correction ne soit nécessaire.
+l_46=Ajustez les vis de nivellement, puis cliquez sur suivant.\nVous pouvez également sélectionner manuellement chaque point.
+l_47=Largeur du lit 
+l_48=Profondeur du lit
+l_49=Emplacement de la mesure : %s
+l_50=Démarrer les mesures
+l_51=Inverser l'axe %s
+l_52=Langue
+l_53=Pas de SD card
 
 [info]
 creator=luc@tech-hunter.com
 creation_date=2023-05-16
 maintainer==luc@tech-hunter.com
-last_update=2023-07-19
-target=French
+last_update=2023-09-10
+target_language=French
+target_version=3.0
