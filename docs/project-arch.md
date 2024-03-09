@@ -136,7 +136,7 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |---|:---:|
 |disp_backlight|Ok|
 |disp_spi| |
-|ili9341| |
+|ili9341|On going |
 |ili9488| |
 |st7796||
 |rm68120| |
