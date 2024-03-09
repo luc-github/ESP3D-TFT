@@ -133,6 +133,7 @@ The `hardware` directory contains the hardware specific files like drivers, part
  |ESP32S3_CUSTOM|
 
 |Drivers| Status|
+|---|:---:|
 |disp_backlight|Ok|
 |disp_spi| |
 |ili9341| |
