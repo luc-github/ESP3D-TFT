@@ -1,4 +1,4 @@
-<span align="left"><img src="https://github.com/luc-github/ESP3D-TFT/blob/main/logo/ESP3D.png" width="200px"/></span><span align="left">ESP3D-TFT Firmware for ESP32 based TFT  </span>    
+<span align="left"><img src="https://github.com/luc-github/ESP3D-TFT/blob/main/resources/logo/ESP3D.png" width="200px"/></span><span align="left">ESP3D-TFT Firmware for ESP32 based TFT  </span>    
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
