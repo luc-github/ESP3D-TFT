@@ -24,7 +24,7 @@
 #include "esp3d_string.h"
 #include "filesystem/esp3d_sd.h"
 #include <lvgl.h>
-#include "disp_def.h"
+
 #include "esp3d_hal.h"
 
 #define COMMAND_ID 216
