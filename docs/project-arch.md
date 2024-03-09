@@ -76,40 +76,74 @@ The `embedded` directory contains the code for the embedded maintenance web page
 The `hardware` directory contains the hardware specific files like drivers, partitions description, specific sdkconfig, hardware configuration files. The hardware specific files are organized into one common subdirectory and one subdirectory for each supported hardware platform.
 
 
-| Drivers | depend | ESP32_2432S028R |  ESP32_3248S035C | ESP32_3248S035R | ESP32_ROTRICS_DEXARM35| ESP32_CUSTOM |
-|---|---|:---:|:--:|:--:|:--:|:--:|
-|disp_backlight|esp3d_log driver| X | X | X | O | O|
-|disp_spi| esp3d_log driver | O |  O  | O | X | O |
-|ili9341|esp3d_log esp_lcd driver| X |  O | O | O | O |
-|ili9488| esp3d_log lvgl disp_spi | O |  O | O | X | O |
-|st7796|esp3d_log esp_lcd driver| O |  X | X | O | O |
-|rm68120|esp3d_log lvgl esp_lcd driver| O |  O | O | O| O |
-|xpt2046|esp3d_log driver| X |  O | X | X| O |
-|gt911|esp3d_log i2c_bus| O | X | O | O| O |
-|ft5x06|esp3d_log lvgl i2c_bus| O |  O | O | O| O
-|tca9554|esp3d_log i2c_bus| O |  O | O | O| O |
-|i2c_bus|esp3d_log driver| O | X | O| O| O |
-|spi_bus|esp3d_log driver| X |  X | X | X| O
-|sw_spi|esp3d_log driver| sw_spi |  O | O | O| O
-|partition|| ESP32_2432S028R |  ESP32_3248S035C | ESP32_3248S035R | ESP32_ROTRICS_DEXARM35 | ESP32_CUSTOM
-|bsp|| ESP32_2432S028R |  ESP32_3248S035C | ESP32_3248S035R | ESP32_ROTRICS_DEXARM35 | ESP32_CUSTOM
+| Drivers |Type | Depend | ESP32_2432S028R |  ESP32_3248S035C | ESP32_3248S035R | ESP32_ROTRICS_DEXARM35| ESP32_CUSTOM |
+|---|---|---|:---:|:--:|:--:|:--:|:--:|
+|disp_backlight|Display component |esp3d_log driver| X | X | X | O | O|
+|disp_spi|| esp3d_log driver | O |  O  | O | X | O |
+|ili9341||esp3d_log esp_lcd driver| X |  O | O | O | O |
+|ili9488|| esp3d_log lvgl disp_spi | O |  O | O | X | O |
+|st7796||esp3d_log esp_lcd driver| O |  X | X | O | O |
+|rm68120||esp3d_log lvgl esp_lcd driver| O |  O | O | O| O |
+|xpt2046||esp3d_log driver| X |  O | X | X| O |
+|gt911||esp3d_log i2c_bus| O | X | O | O| O |
+|ft5x06||esp3d_log lvgl i2c_bus| O |  O | O | O| O
+|tca9554||esp3d_log i2c_bus| O |  O | O | O| O |
+|i2c_bus||esp3d_log driver| O | X | O| O| O |
+|spi_bus||esp3d_log driver| X |  X | X | X| O
+|sw_spi||esp3d_log driver| sw_spi |  O | O | O| O
+|partition||| 4MB |  ESP32_3248S035C | ESP32_3248S035R | ESP32_ROTRICS_DEXARM35 | ESP32_CUSTOM
+|bsp||| ESP32_2432S028R |  ESP32_3248S035C | ESP32_3248S035R | ESP32_ROTRICS_DEXARM35 | ESP32_CUSTOM
 
 
-| Drivers | depend | ESP32S3_4827S043C | ESP32S3_8048S043C | ESP32S3_8048S050C | ESP32S3_8048S070C | ESP32S3_BZM_TFT35_GT911 | ESP32S3_HMI43V3 | ESP32S3_ZX3D50CE02S_USRC_4832 | ESP32S3_CUSTOM|
-|---|---|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-|disp_backlight|esp3d_log driver| X | X | X | X | X | O | O | O |
-|disp_spi| esp3d_log driver | O | O | O | O | O | O | O | O |
-|ili9341|esp3d_log esp_lcd driver| O | O | O | O | O | O | O | O |
-|ili9488|esp3d_log lvgl disp_spi| O | O | O | O | O | O | O | O |
-|st7796|esp3d_log esp_lcd driver| O | O | O | O | X | O | X | O|
-|rm68120|esp3d_log lvgl esp_lcd driver| O | O | O | O | O | X | O | O |
-|xpt2046|esp3d_log driver| O | O | O | O | O | O | O | O|
-|ft5x06|esp3d_log lvgl i2c_bus| O | O | O| O | O | X | X | O|
-|gt911|esp3d_log i2c_bus| X | X | X | X | X | O | O | O |
-|tca9554|esp3d_log i2c_bus| O | O | O | O | O | X | O | O|
-|i2c_bus|esp3d_log driver| X | X | X | X | X | X | X | O|
-|spi_bus|esp3d_log driver|  O | O | O | O | O | O | O | O|
-|sw_spi|esp3d_log driver| O | O | O | O | O | O | O | O |
-|usb_serial|esp3d_log| O | O | O | O | X | X | X | X |
-|partition|| ESP32S3_4827S043C | ESP32S3_8048S043C | ESP32S3_8048S050C | ESP32S3_8048S070C | ESP32S3_BZM_TFT35_GT911 | ESP32S3_HMI43V3 | ESP32S3_ZX3D50CE02S_USRC_4832 | ESP32S3_CUSTOM|
-|bsp|| ESP32S3_4827S043C | ESP32S3_8048S043C | ESP32S3_8048S050C | ESP32S3_8048S070C | ESP32S3_BZM_TFT35_GT911 | ESP32S3_HMI43V3 | ESP32S3_ZX3D50CE02S_USRC_4832 | ESP32S3_CUSTOM|
+| Drivers |Type| Depend | ESP32S3_4827S043C | ESP32S3_8048S043C | ESP32S3_8048S050C | ESP32S3_8048S070C | ESP32S3_BZM_TFT35_GT911 | ESP32S3_HMI43V3 | ESP32S3_ZX3D50CE02S_USRC_4832 | ESP32S3_CUSTOM|
+|---|---|---|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
+|disp_backlight|Display component|esp3d_log driver| X | X | X | X | X | O | O | O |
+|disp_spi|| esp3d_log driver | O | O | O | O | O | O | O | O |
+|ili9341||esp3d_log esp_lcd driver| O | O | O | O | O | O | O | O |
+|ili9488||esp3d_log lvgl disp_spi| O | O | O | O | O | O | O | O |
+|st7796||esp3d_log esp_lcd driver| O | O | O | O | X | O | X | O|
+|rm68120||esp3d_log lvgl esp_lcd driver| O | O | O | O | O | X | O | O |
+|xpt2046||esp3d_log driver| O | O | O | O | O | O | O | O|
+|ft5x06||esp3d_log lvgl i2c_bus| O | O | O| O | O | X | X | O|
+|gt911||esp3d_log i2c_bus| X | X | X | X | X | O | O | O |
+|tca9554||esp3d_log i2c_bus| O | O | O | O | O | X | O | O|
+|i2c_bus||esp3d_log driver| X | X | X | X | X | X | X | O|
+|spi_bus||esp3d_log driver|  O | O | O | O | O | O | O | O|
+|sw_spi||esp3d_log driver| O | O | O | O | O | O | O | O |
+|usb_serial||esp3d_log| O | O | O | O | X | X | X | X |
+|partition||| ESP32S3_4827S043C | ESP32S3_8048S043C | ESP32S3_8048S050C | ESP32S3_8048S070C | ESP32S3_BZM_TFT35_GT911 | ESP32S3_HMI43V3 | ESP32S3_ZX3D50CE02S_USRC_4832 | ESP32S3_CUSTOM|
+|bsp||| ESP32S3_4827S043C | ESP32S3_8048S043C | ESP32S3_8048S050C | ESP32S3_8048S070C | ESP32S3_BZM_TFT35_GT911 | ESP32S3_HMI43V3 | ESP32S3_ZX3D50CE02S_USRC_4832 | ESP32S3_CUSTOM|
+
+
+### Refactored hardware directory
+|Board| Status|
+|---|:---:|
+ |ESP32_2432S028R | On going |  
+ |ESP32_3248S035C | 
+ |ESP32_3248S035R | 
+ |ESP32_ROTRICS_DEXARM35| 
+ |ESP32_CUSTOM |
+ |ESP32S3_4827S043C | 
+ |ESP32S3_8048S043C | 
+ |ESP32S3_8048S050C | 
+ |ESP32S3_8048S070C | 
+ |ESP32S3_BZM_TFT35_GT911 | 
+ |ESP32S3_HMI43V3 | 
+ |ESP32S3_ZX3D50CE02S_USRC_4832 | 
+ |ESP32S3_CUSTOM|
+
+|Drivers| Status|
+|disp_backlight|Ok|
+|disp_spi| |
+|ili9341| |
+|ili9488| |
+|st7796||
+|rm68120| |
+|xpt2046||
+|ft5x06||
+|gt911||
+|tca9554||
+|i2c_bus||
+|spi_bus||
+|sw_spi|  |
+|usb_serial|| 
