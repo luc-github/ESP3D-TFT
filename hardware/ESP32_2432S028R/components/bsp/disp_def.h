@@ -43,8 +43,13 @@ LANDSCAPE_INVERTED      3
 
 esp_lcd_panel_dev_config_t disp_panel_cfg = {
     .reset_gpio_num = 4, // GPIO 4
-    .color_space = ESP_LCD_COLOR_SPACE_BGR,
+    .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_BGR, // Mettez l'ordre des éléments RGB souhaité ici
+    .data_endian = LCD_RGB_DATA_ENDIAN_BIG, // Mettez l'endianness des données souhaitée ici
     .bits_per_pixel = 16,
+    .flags = {
+        .reset_active_high = 0
+    },
+    .vendor_config = NULL
 };
 
 // SPI (dedicated)
@@ -56,14 +61,25 @@ esp_lcd_panel_dev_config_t disp_panel_cfg = {
 //#define DISP_SPI_MISO 12  // GPIO 12
 
 esp_lcd_panel_io_spi_config_t disp_spi_cfg = {
-    .dc_gpio_num = 2, // GPIO 2
-    .cs_gpio_num = 15, // GPIO 15
-    .pclk_hz = 40 * 1000 * 1000,
-    .lcd_cmd_bits = 8,
-    .lcd_param_bits = 8,
-    .spi_mode = 0,
-    .trans_queue_depth = 10,
+.cs_gpio_num = 15, /*!< GPIO used for CS line */
+    .dc_gpio_num= 2, /*!< GPIO used to select the D/C line, set this to -1 if the D/C line is not used */
+    .spi_mode = 0,    /*!< Traditional SPI mode (0~3) */
+    .pclk_hz= 40 * 1000 * 1000,    /*!< Frequency of pixel clock */
+    .trans_queue_depth = 10, /*!< Size of internal transaction queue */
+    .on_color_trans_done= NULL,/*!< Callback invoked when color data transfer has finished */
+    .user_ctx = NULL,   /*!< User private data, passed directly to on_color_trans_done's user_ctx */
+    .lcd_cmd_bits=8,   /*!< Bit-width of LCD command */
+    .lcd_param_bits=8, /*!< Bit-width of LCD parameter */
+    .flags =  {/*!< Extra flags to fine-tune the SPI device */
+        .dc_low_on_data=0,  /*!< If this flag is enabled, DC line = 0 means transfer data, DC line = 1 means transfer command; vice versa */
+        .octal_mode=0,      /*!< transmit with octal mode (8 data lines), this mode is used to simulate Intel 8080 timing */
+        .quad_mode=0,       /*!< transmit with quad mode (4 data lines), this mode is useful when transmitting LCD parameters (Only use one line for command) */
+        .sio_mode=0, /*!< Read and write through a single data line (MOSI) */
+        .lsb_first=0,       /*!< transmit LSB bit first */
+        .cs_high_active=0,  /*!< CS line is high active */
+    } 
 };
+
 
 #define DISP_BCKL_DEFAULT_DUTY 100  //%
 
