@@ -41,10 +41,12 @@ LANDSCAPE_INVERTED      3
 #endif  // WITH_PSRAM
 #define DISP_BUF_SIZE_BYTES    (DISP_BUF_SIZE * 2)
 
+
+// LCD panel configuration
 esp_lcd_panel_dev_config_t disp_panel_cfg = {
     .reset_gpio_num = 4, // GPIO 4
-    .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_BGR, // Mettez l'ordre des éléments RGB souhaité ici
-    .data_endian = LCD_RGB_DATA_ENDIAN_BIG, // Mettez l'endianness des données souhaitée ici
+    .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_BGR, 
+    .data_endian = LCD_RGB_DATA_ENDIAN_BIG,
     .bits_per_pixel = 16,
     .flags = {
         .reset_active_high = 0
@@ -54,12 +56,13 @@ esp_lcd_panel_dev_config_t disp_panel_cfg = {
 
 // SPI (dedicated)
 #define DISP_SPI_HOST SPI2_HOST  // 1
-// #define DISP_SPI_HOST SPI3_HOST //2
 
+// SPI pins definition (common)
 #define DISP_SPI_CLK  14  // GPIO 14
 #define DISP_SPI_MOSI 13  // GPIO 13
 //#define DISP_SPI_MISO 12  // GPIO 12
 
+//SPI definition for LCD
 esp_lcd_panel_io_spi_config_t disp_spi_cfg = {
 .cs_gpio_num = 15, /*!< GPIO used for CS line */
     .dc_gpio_num= 2, /*!< GPIO used to select the D/C line, set this to -1 if the D/C line is not used */
@@ -80,7 +83,7 @@ esp_lcd_panel_io_spi_config_t disp_spi_cfg = {
     } 
 };
 
-
+// Backlight configuration
 #define DISP_BCKL_DEFAULT_DUTY 100  //%
 
 const disp_backlight_config_t disp_bcklt_cfg = {

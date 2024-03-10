@@ -136,7 +136,7 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |---|:---:|
 |disp_backlight|Ok|
 |disp_spi| |
-|ili9341|On going |
+|ili9341|Ok|
 |ili9488| |
 |st7796||
 |rm68120| |
@@ -146,13 +146,15 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |tca9554||
 |i2c_bus||
 |spi_bus||
-|sw_spi|  |
+|sw_spi| On going  |
 |usb_serial|| 
 
 
-#### disp_backlight
+#### disp_backlight driver
 The `disp_backlight` driver is a display component that is used by the display drivers to control the backlight of the display. The `disp_backlight` driver configuration is part of display driver configuration.
 
+
+in disp_def.h:
 ```cpp
 // Default backlight level value in percentage
 #define DISP_BCKL_DEFAULT_DUTY 100  //%
@@ -167,4 +169,48 @@ const disp_backlight_config_t disp_bcklt_cfg = {
     .timer_idx = 0,         // LEDC timer index
     .channel_idx = 0        // LEDC channel index    
 };
+```
+
+#### ili9341 driver
+The `ili9341` driver is a SPI display driver that is used to control the ILI9341 display. The `ili9341` driver configuration is part of display driver configuration.
+
+in disp_def.h:
+```cpp
+
+//Resolution according orientation
+#define DISP_ORIENTATION 3  // landscape inverted
+
+#if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
+#define DISP_HOR_RES_MAX 320
+#define DISP_VER_RES_MAX 240
+#else  // portrait mode
+#define DISP_HOR_RES_MAX 240
+#define DISP_VER_RES_MAX 320
+#endif
+
+// ILI9341 display driver configuration
+esp_lcd_panel_dev_config_t disp_panel_cfg = {
+    .reset_gpio_num = 4, // GPIO 4
+    .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_BGR, 
+    .data_endian = LCD_RGB_DATA_ENDIAN_BIG,
+    .bits_per_pixel = 16,
+    .flags = {
+        .reset_active_high = 0
+    },
+    .vendor_config = NULL
+};
+
+//LVGL buffer definition depend if board has PSRAM or not
+#define DISP_USE_DOUBLE_BUFFER (true)
+
+#if WITH_PSRAM
+  // 1/10 (24-line) buffer (15KB) in external PSRAM
+  #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * DISP_VER_RES_MAX / 10)
+  #define DISP_BUF_MALLOC_TYPE  MALLOC_CAP_SPIRAM
+#else
+  // 1/20 (12-line) buffer (7.5KB) in internal DRAM
+  #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * 12)
+  #define DISP_BUF_MALLOC_TYPE  MALLOC_CAP_DMA
+#endif  // WITH_PSRAM
+#define DISP_BUF_SIZE_BYTES    (DISP_BUF_SIZE * 2)
 ```
