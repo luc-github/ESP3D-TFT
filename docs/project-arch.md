@@ -79,8 +79,8 @@ The `hardware` directory contains the hardware specific files like drivers, part
 | Drivers |Type | Depend | ESP32_2432S028R |  ESP32_3248S035C | ESP32_3248S035R | ESP32_ROTRICS_DEXARM35| ESP32_CUSTOM |
 |---|---|---|:---:|:--:|:--:|:--:|:--:|
 |disp_backlight|Display component |esp3d_log driver| X | X | X | O | O|
-|disp_spi|| esp3d_log driver | O |  O  | O | X | O |
-|ili9341||esp3d_log esp_lcd driver| X |  O | O | O | O |
+|disp_spi|| esp3d_log driver | O |  O  | O |X  | O |
+|ili9341|SPI Display|esp3d_log esp_lcd driver| X |  O | O | O | O |
 |ili9488|| esp3d_log lvgl disp_spi | O |  O | O | X | O |
 |st7796||esp3d_log esp_lcd driver| O |  X | X | O | O |
 |rm68120||esp3d_log lvgl esp_lcd driver| O |  O | O | O| O |
@@ -99,7 +99,7 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |---|---|---|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 |disp_backlight|Display component|esp3d_log driver| X | X | X | X | X | O | O | O |
 |disp_spi|| esp3d_log driver | O | O | O | O | O | O | O | O |
-|ili9341||esp3d_log esp_lcd driver| O | O | O | O | O | O | O | O |
+|ili9341|SPI Display|esp3d_log esp_lcd driver| O | O | O | O | O | O | O | O |
 |ili9488||esp3d_log lvgl disp_spi| O | O | O | O | O | O | O | O |
 |st7796||esp3d_log esp_lcd driver| O | O | O | O | X | O | X | O|
 |rm68120||esp3d_log lvgl esp_lcd driver| O | O | O | O | O | X | O | O |
@@ -148,3 +148,23 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |spi_bus||
 |sw_spi|  |
 |usb_serial|| 
+
+
+#### disp_backlight
+The `disp_backlight` driver is a display component that is used by the display drivers to control the backlight of the display. The `disp_backlight` driver configuration is part of display driver configuration.
+
+```cpp
+// Default backlight level value in percentage
+#define DISP_BCKL_DEFAULT_DUTY 100  //%
+
+// Backlight configuration
+const disp_backlight_config_t disp_bcklt_cfg = {
+    .pwm_control = false,   // true: LEDC is used, false: GPIO is used
+    .output_invert = false, // true: LEDC output is inverted, false: LEDC output is not inverted
+    .gpio_num = 21,         // GPIO number for backlight control
+    // Relevant only for PWM controlled backlight
+    // Ignored for switch (ON/OFF) backlight control
+    .timer_idx = 0,         // LEDC timer index
+    .channel_idx = 0        // LEDC channel index    
+};
+```

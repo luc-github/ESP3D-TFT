@@ -30,7 +30,6 @@
 
 #include "esp3d_log.h"
 
-
 /**
  * @brief Creates a display backlight instance.
  *
@@ -196,11 +195,12 @@ esp_err_t disp_backlight_delete(disp_backlight_t **bckl) {
       esp3d_log("PWM control stopped");
     }
   } else {
-    err = gpio_reset_pin((*bckl)->index);
-    if (err != ESP_OK) {
-      esp3d_log_e("Failed to reset GPIO pin");
-    } else {
+    if (GPIO_IS_VALID_GPIO((*bckl)->index)) {
+      gpio_reset_pin((*bckl)->index);
       esp3d_log("GPIO pin reset");
+    } else {
+      esp3d_log_e("Invalid GPIO pin");
+      err = ESP_ERR_INVALID_ARG;
     }
   }
 
@@ -211,5 +211,5 @@ esp_err_t disp_backlight_delete(disp_backlight_t **bckl) {
   } else {
     esp3d_log_e("Failed to delete backlight");
   }
-  return ESP_OK;
+  return err;
 }
