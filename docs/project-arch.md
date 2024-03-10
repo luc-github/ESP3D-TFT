@@ -84,13 +84,13 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |ili9488|| esp3d_log lvgl disp_spi | O |  O | O | X | O |
 |st7796||esp3d_log esp_lcd driver| O |  X | X | O | O |
 |rm68120||esp3d_log lvgl esp_lcd driver| O |  O | O | O| O |
-|xpt2046||esp3d_log driver| X |  O | X | X| O |
+|xpt2046|Touch|esp3d_log driver| X |  O | X | X| O |
 |gt911||esp3d_log i2c_bus| O | X | O | O| O |
 |ft5x06||esp3d_log lvgl i2c_bus| O |  O | O | O| O
 |tca9554||esp3d_log i2c_bus| O |  O | O | O| O |
 |i2c_bus||esp3d_log driver| O | X | O| O| O |
 |spi_bus|SPI Bus|esp3d_log driver| X |  X | X | X| O
-|sw_spi||esp3d_log driver| X |  O | O | O| O
+|sw_spi|Software SPI|esp3d_log driver| X |  O | O | O| O
 |partition||| 4MB |  ESP32_3248S035C | ESP32_3248S035R | ESP32_ROTRICS_DEXARM35 | ESP32_CUSTOM
 |bsp||| ESP32_2432S028R |  ESP32_3248S035C | ESP32_3248S035R | ESP32_ROTRICS_DEXARM35 | ESP32_CUSTOM
 
@@ -140,7 +140,7 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |ili9488| |
 |st7796||
 |rm68120| |
-|xpt2046||
+|xpt2046|Ok|
 |ft5x06||
 |gt911||
 |tca9554||
@@ -241,5 +241,26 @@ const sw_spi_config_t touch_spi_cfg = {
     .clk_pin = 25,  // GPIO 25
     .mosi_pin = 32, // GPIO 33
     .miso_pin = 39, // GPIO 39
+};
+```
+
+
+#### xpt2046 driver
+The `xpt2046` driver is a touch driver that is used to control the XPT2046 touch controller. The `xpt2046` driver configuration is part of the touch driver configuration.
+
+touch_def.h:
+```cpp
+// X/Y Calibration Values
+#define TOUCH_X_MIN           380
+#define TOUCH_Y_MIN           200
+#define TOUCH_X_MAX           3950
+#define TOUCH_Y_MAX           3850
+
+xpt2046_config_t xpt2046_cfg = {
+    .irq_pin = 36, // GPIO 36  
+    .touch_threshold = 300, // Threshold for touch detection  
+    .swap_xy = true,
+    .invert_x = true,
+    .invert_y = true,
 };
 ```
