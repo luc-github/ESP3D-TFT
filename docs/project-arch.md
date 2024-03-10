@@ -118,8 +118,8 @@ The `hardware` directory contains the hardware specific files like drivers, part
 ### Refactored hardware directory
 |Board| Status|
 |---|:---:|
- |ESP32_2432S028R | On going |  
- |ESP32_3248S035C | 
+ |ESP32_2432S028R | Ok |
+ |ESP32_3248S035C | On going |  
  |ESP32_3248S035R | 
  |ESP32_ROTRICS_DEXARM35| 
  |ESP32_CUSTOM |
