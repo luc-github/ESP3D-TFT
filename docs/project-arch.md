@@ -145,8 +145,8 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |gt911||
 |tca9554||
 |i2c_bus||
-|spi_bus||
-|sw_spi| On going  |
+|spi_bus|Ok|
+|sw_spi| Ok |
 |usb_serial|| 
 
 
@@ -226,4 +226,20 @@ in disp_def.h:
 #define DISP_SPI_CLK  14  // GPIO 14
 #define DISP_SPI_MOSI 13  // GPIO 13
 #define DISP_SPI_MISO 12  // GPIO 12
+```
+
+#### sw_spi driver
+The `sw_spi` driver is a software SPI driver that is used to control the SPI bus. The `sw_spi` driver configuration is part of the driver configuration file which use it.
+
+eg: touch driver use it, so it can be part of the touch driver configuration.   
+
+touch_def.h:
+```cpp
+// SPI (BitBang)
+const sw_spi_config_t touch_spi_cfg = {
+    .cs_pin = 33,   // GPIO 33
+    .clk_pin = 25,  // GPIO 25
+    .mosi_pin = 32, // GPIO 33
+    .miso_pin = 39, // GPIO 39
+};
 ```

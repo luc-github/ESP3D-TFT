@@ -146,15 +146,23 @@ esp_err_t bsp_init(void) {
 #endif  // DISP_ORIENTATION
 
   /* Touch controller initialization */
-  esp3d_log("Initializing touch controller...");
-  sw_spi_init(&touch_spi_cfg);
-  xpt2046_cfg.read_reg12_fn = touch_spi_read_reg12;
   bool has_touch = true;
-  if (xpt2046_init(&xpt2046_cfg) != ESP_OK) {
-    esp3d_log_e("Failed to initialize touch controller");
+  // Initialize the sw_spi for touch controller
+  if (sw_spi_init(&touch_spi_cfg) != ESP_OK) {
+    esp3d_log_e("Failed to initialize sw spi for touch controller");
     has_touch = false;
   }
-  ESP_ERROR_CHECK(xpt2046_init(&xpt2046_cfg));
+  if (has_touch) {
+    esp3d_log("Initializing touch controller...");
+    xpt2046_cfg.read_reg12_fn = touch_spi_read_reg12;
+
+    if (xpt2046_init(&xpt2046_cfg) != ESP_OK) {
+      esp3d_log_e("Failed to initialize touch controller");
+      has_touch = false;
+    } else {
+      esp3d_log("Touch controller initialized");
+    }
+  }
 
   err = disp_backlight_set(bcklt_handle, DISP_BCKL_DEFAULT_DUTY);
   if (err != ESP_OK) {
