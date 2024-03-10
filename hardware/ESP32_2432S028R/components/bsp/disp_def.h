@@ -60,7 +60,7 @@ esp_lcd_panel_dev_config_t disp_panel_cfg = {
 // SPI pins definition (common)
 #define DISP_SPI_CLK  14  // GPIO 14
 #define DISP_SPI_MOSI 13  // GPIO 13
-//#define DISP_SPI_MISO 12  // GPIO 12
+#define DISP_SPI_MISO 12  // GPIO 12
 
 //SPI definition for LCD
 esp_lcd_panel_io_spi_config_t disp_spi_cfg = {

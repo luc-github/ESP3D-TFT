@@ -89,8 +89,8 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |ft5x06||esp3d_log lvgl i2c_bus| O |  O | O | O| O
 |tca9554||esp3d_log i2c_bus| O |  O | O | O| O |
 |i2c_bus||esp3d_log driver| O | X | O| O| O |
-|spi_bus||esp3d_log driver| X |  X | X | X| O
-|sw_spi||esp3d_log driver| sw_spi |  O | O | O| O
+|spi_bus|SPI Bus|esp3d_log driver| X |  X | X | X| O
+|sw_spi||esp3d_log driver| X |  O | O | O| O
 |partition||| 4MB |  ESP32_3248S035C | ESP32_3248S035R | ESP32_ROTRICS_DEXARM35 | ESP32_CUSTOM
 |bsp||| ESP32_2432S028R |  ESP32_3248S035C | ESP32_3248S035R | ESP32_ROTRICS_DEXARM35 | ESP32_CUSTOM
 
@@ -108,7 +108,7 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |gt911||esp3d_log i2c_bus| X | X | X | X | X | O | O | O |
 |tca9554||esp3d_log i2c_bus| O | O | O | O | O | X | O | O|
 |i2c_bus||esp3d_log driver| X | X | X | X | X | X | X | O|
-|spi_bus||esp3d_log driver|  O | O | O | O | O | O | O | O|
+|spi_bus|SPI Bus|esp3d_log driver|  O | O | O | O | O | O | O | O|
 |sw_spi||esp3d_log driver| O | O | O | O | O | O | O | O |
 |usb_serial||esp3d_log| O | O | O | O | X | X | X | X |
 |partition||| ESP32S3_4827S043C | ESP32S3_8048S043C | ESP32S3_8048S050C | ESP32S3_8048S070C | ESP32S3_BZM_TFT35_GT911 | ESP32S3_HMI43V3 | ESP32S3_ZX3D50CE02S_USRC_4832 | ESP32S3_CUSTOM|
@@ -213,4 +213,17 @@ esp_lcd_panel_dev_config_t disp_panel_cfg = {
   #define DISP_BUF_MALLOC_TYPE  MALLOC_CAP_DMA
 #endif  // WITH_PSRAM
 #define DISP_BUF_SIZE_BYTES    (DISP_BUF_SIZE * 2)
+```
+
+#### spi_bus driver
+The `spi_bus` driver is a SPI bus driver that is used to control the SPI bus. The `spi_bus` driver configuration is part of display driver configuration.
+in disp_def.h:
+```cpp
+// SPI (dedicated)
+#define DISP_SPI_HOST SPI2_HOST  // 1
+
+// SPI pins definition (common)
+#define DISP_SPI_CLK  14  // GPIO 14
+#define DISP_SPI_MOSI 13  // GPIO 13
+#define DISP_SPI_MISO 12  // GPIO 12
 ```

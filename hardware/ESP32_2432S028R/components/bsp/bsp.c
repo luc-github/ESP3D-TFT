@@ -99,8 +99,11 @@ esp_err_t bsp_init(void) {
 
   /* SPI master initialization */
   esp3d_log("Initializing SPI master (display)...");
-  spi_bus_init(DISP_SPI_HOST, -1, DISP_SPI_MOSI, DISP_SPI_CLK,
-               DISP_BUF_SIZE_BYTES, 1, -1, -1);
+  if (spi_bus_init(DISP_SPI_HOST, DISP_SPI_MISO, DISP_SPI_MOSI, DISP_SPI_CLK,
+                   DISP_BUF_SIZE_BYTES, 1, -1, -1) != ESP_OK) {
+    esp3d_log_e("SPI master initialization failed!");
+    return ESP_FAIL;
+  }
 
   esp3d_log("Attaching display panel to SPI bus...");
   esp_lcd_panel_io_handle_t disp_io_handle;
@@ -215,7 +218,8 @@ esp_err_t bsp_init(void) {
 /**
  * @brief Checks if the display flush is ready.
  *
- * This function is used to determine if the display flush is ready to be performed.
+ * This function is used to determine if the display flush is ready to be
+ * performed.
  *
  * @param panel_io The handle to the LCD panel I/O.
  * @param edata The event data associated with the LCD panel I/O.
@@ -247,14 +251,14 @@ static bool disp_flush_ready(esp_lcd_panel_io_handle_t panel_io,
  * @param color_p  Pointer to the color data array.
  */
 static void lv_disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area,
-              lv_color_t *color_p) {
+                          lv_color_t *color_p) {
   esp_lcd_panel_draw_bitmap(disp_panel, area->x1, area->y1, area->x2 + 1,
                             area->y2 + 1, color_p);
 }
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  *
  * @param reg The register to read from.
  * @return The 12-bit value read from the register.
@@ -264,12 +268,12 @@ static uint16_t touch_spi_read_reg12(uint8_t reg) {
   return data >> 3;
 }
 
-
 /**
- * @brief 
- * 
+ * @brief
  *
- * This function is responsible for reading touch input data and updating the LVGL input device data structure.
+ *
+ * This function is responsible for reading touch input data and updating the
+ * LVGL input device data structure.
  *
  * @param drv Pointer to the LVGL input device driver.
  * @param data Pointer to the LVGL input device data structure.
