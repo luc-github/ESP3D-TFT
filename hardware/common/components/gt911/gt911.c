@@ -22,6 +22,7 @@
 #include "gt911.h"
 
 #include <driver/gpio.h>
+
 #include "esp3d_log.h"
 
 /*********************
@@ -54,23 +55,52 @@ static gt911_touch_detect_t gt911_is_touch_detected();
  **********************/
 static i2c_bus_device_handle_t _i2c_dev = NULL;
 static const gt911_config_t *_config = NULL;
-
+static uint16_t _gt911_x_max = 0;
+static uint16_t _gt911_y_max = 0;
 static volatile bool _gt911_INT = false;
-static void IRAM_ATTR gt911_interrupt_handler(void *args) {
-  _gt911_INT = true;  
-}
-
-/**********************
- *      MACROS
- **********************/
+static void IRAM_ATTR gt911_interrupt_handler(void *args) { _gt911_INT = true; }
 
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
 
-uint16_t gt911_x_max;
-uint16_t gt911_y_max;
+/**
+ * Retrieves the maximum value for the X coordinate from the GT911 touch
+ * controller.
+ *
+ * @return The maximum value for the X coordinate.
+ */
+uint16_t get_gt911_x_max() {
+  if (_gt911_x_max == 0) {
+    esp3d_log_e("GT911 not initialized");
+  }
+  return _gt911_x_max;
+}
 
+/**
+ * Retrieves the maximum value for the Y coordinate from the GT911 touch
+ * controller.
+ *
+ * @return The maximum value for the Y coordinate.
+ */
+uint16_t get_gt911_y_max() {
+  if (_gt911_y_max == 0) {
+    esp3d_log_e("GT911 not initialized");
+  }
+  return _gt911_y_max;
+}
+
+/**
+ * @brief Initializes the gt911 touch controller.
+ *
+ * This function initializes the gt911 touch controller with the provided
+ * configuration and i2c handle.
+ *
+ * @param i2c_bus i2c bus handle used by the driver.
+ * @param config Pointer to the configuration structure.
+ * @return `ESP_OK` if the initialization is successful, otherwise an error
+ * code.
+ */
 esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config) {
   if (NULL != _i2c_dev || i2c_bus == NULL || config == NULL) {
     return ESP_ERR_INVALID_ARG;
@@ -81,32 +111,43 @@ esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config) {
 
   // Make sure INT pin is low before reset procedure (Sets i2c address to 0x5D)
   if (GPIO_IS_VALID_OUTPUT_GPIO(config->int_pin)) {
-    
     esp3d_log("GT911 INT pin: %d", config->int_pin);
-    gpio_config_t int_gpio_cfg = {
-        .mode = GPIO_MODE_OUTPUT,
-        .pin_bit_mask = BIT64(config->int_pin)
-    };
-    ESP_ERROR_CHECK(gpio_config(&int_gpio_cfg));
-    ESP_ERROR_CHECK(gpio_set_level(config->int_pin, 0));
+    gpio_config_t int_gpio_cfg = {.mode = GPIO_MODE_OUTPUT,
+                                  .pin_bit_mask = BIT64(config->int_pin)};
+    if (gpio_config(&int_gpio_cfg) != ESP_OK) {
+      esp3d_log_e("Failed to configure INT pin: %d", config->int_pin);
+      return ESP_ERR_INVALID_ARG;
+    }
+    gpio_set_level(config->int_pin, 0);
+  } else {
+    if (config->int_pin != -1) {
+      esp3d_log_e("Invalid INT pin: %d", config->int_pin);
+      return ESP_ERR_INVALID_ARG;
+    }
   }
 
   // Perform reset procedure
-  if (GPIO_IS_VALID_OUTPUT_GPIO(config->rst_pin)) {    
+  if (GPIO_IS_VALID_OUTPUT_GPIO(config->rst_pin)) {
     esp3d_log("GT911 reset pin: %d", config->rst_pin);
-    gpio_config_t rst_gpio_cfg = {
-        .mode = GPIO_MODE_OUTPUT,
-        .pin_bit_mask = BIT64(config->rst_pin)
-    };
-    ESP_ERROR_CHECK(gpio_config(&rst_gpio_cfg));
-    ESP_ERROR_CHECK(gpio_set_level(config->rst_pin, 0));
+    gpio_config_t rst_gpio_cfg = {.mode = GPIO_MODE_OUTPUT,
+                                  .pin_bit_mask = BIT64(config->rst_pin)};
+    if (gpio_config(&rst_gpio_cfg) != ESP_OK) {
+      esp3d_log_e("Failed to configure RST pin: %d", config->rst_pin);
+      return ESP_ERR_INVALID_ARG;
+    }
+    gpio_set_level(config->rst_pin, 0);
     vTaskDelay(pdMS_TO_TICKS(10));
-    ESP_ERROR_CHECK(gpio_set_level(config->rst_pin, 1));
+    gpio_set_level(config->rst_pin, 1);
     vTaskDelay(pdMS_TO_TICKS(10));
+  } else {
+    if (config->rst_pin != -1) {
+      esp3d_log_e("Invalid RST pin: %d", config->rst_pin);
+      return ESP_ERR_INVALID_ARG;
+    }
   }
 
   // Reconfigure INT pin as floating input with falling edge interrupt handler
-  if (GPIO_IS_VALID_GPIO(config->int_pin)) {    
+  if (GPIO_IS_VALID_GPIO(config->int_pin)) {
     gpio_config_t irq_config = {
         .pin_bit_mask = BIT64(config->int_pin),
         .mode = GPIO_MODE_INPUT,
@@ -115,10 +156,18 @@ esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config) {
         .intr_type = GPIO_INTR_NEGEDGE,
     };
     esp_err_t result = gpio_config(&irq_config);
-    assert(result == ESP_OK);
+    if (result != ESP_OK) {
+      esp3d_log_e("Failed to configure INT pin: %d", config->int_pin);
+      return result;
+    }
 
     gpio_install_isr_service(0);
     gpio_isr_handler_add(config->int_pin, gt911_interrupt_handler, NULL);
+  } else {
+    if (config->int_pin != -1) {
+      esp3d_log_e("Invalid INT pin: %d", config->int_pin);
+      return ESP_ERR_INVALID_ARG;
+    }
   }
 
   uint8_t buf[4];
@@ -149,31 +198,39 @@ esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config) {
       return err;
     }
   }
-  
+
   // Display Product ID
-  esp3d_log("GT911 Product ID: 0x%02x,0x%02x,0x%02x,0x%02x", buf[0], buf[1], buf[2], buf[3]);
+  esp3d_log("GT911 Product ID: 0x%02x,0x%02x,0x%02x,0x%02x", buf[0], buf[1],
+            buf[2], buf[3]);
 
   // Display Config
   err = i2c_bus_read_bytes_16(_i2c_dev, GT911_CONFIG_REG, 1, &buf[0]);
   if (err != ESP_OK) return err;
   esp3d_log("GT911 Config: 0x%02x", buf[0]);
 
-  // Read X/Y Limits  
+  // Read X/Y Limits
   err = i2c_bus_read_bytes_16(_i2c_dev, GT911_XY_MAX_REG, 4, &buf[0]);
   if (err != ESP_OK) return err;
-  gt911_x_max = ((uint16_t)buf[1] << 8) + buf[0];
-  gt911_y_max = ((uint16_t)buf[3] << 8) + buf[2];
+  _gt911_x_max = ((uint16_t)buf[1] << 8) + buf[0];
+  _gt911_y_max = ((uint16_t)buf[3] << 8) + buf[2];
   if (config->swap_xy) {
-    uint16_t swap_tmp = gt911_x_max;
-    gt911_x_max = gt911_y_max;
-    gt911_y_max = swap_tmp;
+    uint16_t swap_tmp = _gt911_x_max;
+    _gt911_x_max = _gt911_y_max;
+    _gt911_y_max = swap_tmp;
   }
-  esp3d_log("GT911 Limits x=%d, y=%d", gt911_x_max, gt911_y_max);
+  esp3d_log("GT911 Limits x=%d, y=%d", _gt911_x_max, _gt911_y_max);
 
   return ESP_OK;
 }
 
+/**
+ * Reads data from the GT911 touch controller.
+ *
+ * @return The GT911 data read from the touch controller.
+ */
 gt911_data_t gt911_read() {
+  // Function implementation goes here
+
   gt911_data_t data = {.is_pressed = false, .x = -1, .y = -1};
   if (_i2c_dev == NULL || _config == NULL) {
     return data;
@@ -181,8 +238,10 @@ gt911_data_t gt911_read() {
   if (gt911_is_touch_detected() == TOUCH_DETECTED) {
     uint8_t dataArray[4];
     esp_err_t err = i2c_bus_read_bytes_16(
-        _i2c_dev, GT911_READ_XY_REG + 2, 4, &dataArray[0]); // only read 1 point and only read X Y    
-    i2c_bus_write_byte_16(_i2c_dev, GT911_READ_XY_REG, 0);  // now can clear for next read
+        _i2c_dev, GT911_READ_XY_REG + 2, 4,
+        &dataArray[0]);  // only read 1 point and only read X Y
+    i2c_bus_write_byte_16(_i2c_dev, GT911_READ_XY_REG,
+                          0);  // now can clear for next read
     if (err != ESP_OK) {
       return data;
     }
@@ -191,15 +250,15 @@ gt911_data_t gt911_read() {
     data.x = ((uint16_t)dataArray[1] << 8) + dataArray[0];
     data.y = ((uint16_t)dataArray[3] << 8) + dataArray[2];
     if (_config->swap_xy) {
-        int16_t swap_tmp = data.x;
-        data.x = data.y;
-        data.y = swap_tmp;
+      int16_t swap_tmp = data.x;
+      data.x = data.y;
+      data.y = swap_tmp;
     }
     if (_config->invert_x) {
-        data.x = gt911_x_max - data.x;
+      data.x = _gt911_x_max - data.x;
     }
     if (_config->invert_y) {
-        data.y = gt911_y_max - data.y;
+      data.y = _gt911_y_max - data.y;
     }
     esp3d_log("P(%d,%d)", data.x, data.y);
   }
@@ -210,6 +269,11 @@ gt911_data_t gt911_read() {
  *   Static FUNCTIONS
  **********************/
 
+/**
+ * @brief Checks if touch is detected by the GT911 touch controller.
+ *
+ * @return The touch detection status.
+ */
 static gt911_touch_detect_t gt911_is_touch_detected() {
   if (_i2c_dev == NULL || _config == NULL) {
     return TOUCH_NOT_DETECTED;
@@ -223,12 +287,14 @@ static gt911_touch_detect_t gt911_is_touch_detected() {
 
   // Check touch pressure
   uint8_t buf[1];
-  esp_err_t err = i2c_bus_read_bytes_16(_i2c_dev, GT911_READ_XY_REG, 1, &buf[0]);
-  if (err != ESP_OK) {    
+  esp_err_t err =
+      i2c_bus_read_bytes_16(_i2c_dev, GT911_READ_XY_REG, 1, &buf[0]);
+  if (err != ESP_OK) {
     return TOUCH_NOT_DETECTED;
   }
-  uint8_t touch_points_num = buf[0] & 0x0f; 
-  if ((buf[0] & 0x80) == 0x00 || touch_points_num == 0 || touch_points_num > 5) {
+  uint8_t touch_points_num = buf[0] & 0x0f;
+  if ((buf[0] & 0x80) == 0x00 || touch_points_num == 0 ||
+      touch_points_num > 5) {
     i2c_bus_write_byte_16(_i2c_dev, GT911_READ_XY_REG, 0);
   } else {
     return TOUCH_DETECTED;

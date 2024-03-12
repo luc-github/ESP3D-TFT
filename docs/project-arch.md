@@ -84,7 +84,7 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |ili9488|| esp3d_log lvgl disp_spi | O |  O | O | X | O |
 |st7796||esp3d_log esp_lcd driver| O |  X | X | O | O |
 |rm68120||esp3d_log lvgl esp_lcd driver| O |  O | O | O| O |
-|xpt2046|Touch|esp3d_log driver| X |  O | X | X| O |
+|xpt2046|SPI Touch|esp3d_log driver| X |  O | X | X| O |
 |gt911||esp3d_log i2c_bus| O | X | O | O| O |
 |ft5x06||esp3d_log lvgl i2c_bus| O |  O | O | O| O
 |tca9554||esp3d_log i2c_bus| O |  O | O | O| O |
@@ -102,8 +102,9 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |ili9341|SPI Display|esp3d_log esp_lcd driver| O | O | O | O | O | O | O | O |
 |ili9488||esp3d_log lvgl disp_spi| O | O | O | O | O | O | O | O |
 |st7796||esp3d_log esp_lcd driver| O | O | O | O | X | O | X | O|
+|st7262/ILI9485 |RGB Display|esp3d_log esp_lcd driver| X | O | O | O | X | O | O | O|
 |rm68120||esp3d_log lvgl esp_lcd driver| O | O | O | O | O | X | O | O |
-|xpt2046||esp3d_log driver| O | O | O | O | O | O | O | O|
+|xpt2046|SPI Touch|esp3d_log driver| O | O | O | O | O | O | O | O|
 |ft5x06||esp3d_log lvgl i2c_bus| O | O | O| O | O | X | X | O|
 |gt911||esp3d_log i2c_bus| X | X | X | X | X | O | O | O |
 |tca9554||esp3d_log i2c_bus| O | O | O | O | O | X | O | O|
@@ -139,12 +140,13 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |ili9341|Ok|
 |ili9488| |
 |st7796||
+|st7262||
 |rm68120| |
 |xpt2046|Ok|
 |ft5x06||
-|gt911||
+|gt911|Ok|
 |tca9554||
-|i2c_bus||
+|i2c_bus|Ok|
 |spi_bus|Ok|
 |sw_spi| Ok |
 |usb_serial|| 
@@ -262,5 +264,45 @@ xpt2046_config_t xpt2046_cfg = {
     .swap_xy = true,
     .invert_x = true,
     .invert_y = true,
+};
+```
+
+#### i2c_bus driver
+The `i2c_bus` driver is a I2C bus driver that is used to control the I2C bus. The `i2c_bus` driver configuration file is i2c_def.h.
+
+bsp.c:
+```cpp
+//define the I2C bus 
+#define I2C_PORT_NUMBER   0
+
+// I2C pins definition
+const i2c_config_t i2c_cfg = {
+    .mode = I2C_MODE_MASTER,
+    .scl_io_num = 20, // GPIO 20
+    .sda_io_num = 19, // GPIO 19
+    .scl_pullup_en = GPIO_PULLUP_ENABLE,
+    .sda_pullup_en = GPIO_PULLUP_ENABLE,
+    .master.clk_speed = 400*1000
+};
+
+```
+
+#### gt911 driver
+The `gt911` driver is a touch driver that is used to control the GT911 touch controller. The `gt911` driver configuration is part of the touch driver configuration file : touch_def.h.
+
+touch_def.h:
+```cpp
+// GT911 touch controller configuration
+const gt911_config_t gt911_cfg = {
+    .i2c_clk_speed = 400*1000,
+    .rst_pin = 38, // GPIO 38
+#if WITH_GT911_INT
+    .int_pin = 18, // GPIO 18
+#else
+    .int_pin = -1, // INT pin not connected (by default)
+#endif
+    .swap_xy = false,
+    .invert_x = false,
+    .invert_y = false,    
 };
 ```

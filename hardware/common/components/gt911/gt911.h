@@ -33,6 +33,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+// Configuration structure for GT911
 typedef struct {
   uint32_t i2c_clk_speed;
   int8_t rst_pin;
@@ -42,6 +43,7 @@ typedef struct {
   bool invert_y;
 } gt911_config_t;
 
+// Data structure for touch position and state
 typedef struct {
   bool is_pressed;
   int16_t x;
@@ -51,11 +53,39 @@ typedef struct {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-extern uint16_t gt911_x_max;
-extern uint16_t gt911_y_max;
-
+/**
+ * @brief Initializes the gt911 touch controller.
+ *
+ * This function initializes the gt911 touch controller with the provided
+ * configuration and i2c handle.
+ *
+ * @param i2c_bus i2c bus handle used by the driver.
+ * @param config Pointer to the configuration structure.
+ * @return `ESP_OK` if the initialization is successful, otherwise an error
+ * code.
+ */
 esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config);
+
+/**
+ * Reads data from the GT911 touch controller.
+ *
+ * @return The data read from the GT911 touch controller.
+ */
 gt911_data_t gt911_read();
+
+/**
+ * @brief Get the maximum x-coordinate value supported by the GT911 touch controller.
+ *
+ * @return The maximum x-coordinate value.
+ */
+uint16_t get_gt911_x_max();
+
+/**
+ * @brief Retrieves the maximum Y coordinate value supported by the GT911 touch controller.
+ *
+ * @return The maximum Y coordinate value.
+ */
+uint16_t get_gt911_y_max();
 
 #ifdef __cplusplus
 }
