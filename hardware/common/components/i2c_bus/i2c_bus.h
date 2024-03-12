@@ -1,8 +1,8 @@
 /**
  * @file i2c_bus.h
  * @brief 
- * @version 0.1
- * @date 2021-03-07
+ * @version: modified version for ESP3D-TFT (luc lebosse 2024)
+ * @date 2024-02-11
  * 
  * @copyright Copyright 2021 Espressif Systems (Shanghai) Co. Ltd.
  *
@@ -19,22 +19,28 @@
  *      limitations under the License.
  */
 
-#ifndef _I2C_BUS_H_
-#define _I2C_BUS_H_
-#include "driver/i2c.h"
-
-#define NULL_I2C_MEM_ADDR 0xFF 			/*!< set mem_address to NULL_I2C_MEM_ADDR if i2c device has no internal address during read/write */
-#define NULL_I2C_DEV_ADDR 0xFF 			/*!< invalid i2c device address */
-typedef void *i2c_bus_handle_t; 		/*!< i2c bus handle */
-typedef void *i2c_bus_device_handle_t; 	/*!< i2c device handle */
-
+#pragma once
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-/**************************************** Public Functions (Application level)*********************************************/
+/*********************
+ *      INCLUDES
+ *********************/
+#include "driver/i2c.h"
 
+/*********************
+ *      DEFINES
+ *********************/
+#define NULL_I2C_MEM_ADDR 0xFF 			/*!< set mem_address to NULL_I2C_MEM_ADDR if i2c device has no internal address during read/write */
+#define NULL_I2C_DEV_ADDR 0xFF 			/*!< invalid i2c device address */
+typedef void *i2c_bus_handle_t; 		/*!< i2c bus handle */
+typedef void *i2c_bus_device_handle_t; 	/*!< i2c device handle */
+
+/**********************
+ * GLOBAL PROTOTYPES
+ **********************/
 /**
  * @brief Create an I2C bus instance then return a handle if created successfully. Each I2C bus works in a singleton mode,
  * which means for an i2c port only one group parameter works. When i2c_bus_create is called more than one time for the
@@ -144,6 +150,22 @@ esp_err_t i2c_bus_read_byte(i2c_bus_device_handle_t dev_handle, uint8_t mem_addr
  *     - ESP_ERR_TIMEOUT Operation timeout because the bus is busy.
  */
 esp_err_t i2c_bus_read_bytes(i2c_bus_device_handle_t dev_handle, uint8_t mem_address, size_t data_len, uint8_t *data);
+
+/**
+ * @brief Read multiple bytes from i2c device with 16-bit internal register/memory address.
+ * If internal reg/mem address is 16-bit, please refer i2c_bus_read_reg16
+ *
+ * @param dev_handle I2C device handle
+ * @param mem_address The internal reg/mem address to read from, set to NULL_I2C_MEM_ADDR if no internal address.
+ * @param data_len Number of bytes to read
+ * @param data Pointer to a buffer to save the data that was read
+ * @return esp_err_t 
+ *     - ESP_OK Success
+ *     - ESP_ERR_INVALID_ARG Parameter error
+ *     - ESP_FAIL Sending command error, slave doesn't ACK the transfer.
+ *     - ESP_ERR_INVALID_STATE I2C driver not installed or not in master mode.
+ *     - ESP_ERR_TIMEOUT Operation timeout because the bus is busy.
+ */
 esp_err_t i2c_bus_read_bytes_16(i2c_bus_device_handle_t dev_handle, uint16_t mem_address, size_t data_len, uint8_t *data);
 
 /**
@@ -193,6 +215,21 @@ esp_err_t i2c_bus_read_bits(i2c_bus_device_handle_t dev_handle, uint8_t mem_addr
  *     - ESP_ERR_TIMEOUT Operation timeout because the bus is busy.
  */
 esp_err_t i2c_bus_write_byte(i2c_bus_device_handle_t dev_handle, uint8_t mem_address, uint8_t data);
+
+
+/**
+ * @brief Write single byte to i2c device with 16-bit internal register/memory address
+ *
+ * @param dev_handle I2C device handle
+ * @param mem_address The internal reg/mem address to write to, set to NULL_I2C_MEM_ADDR if no internal address.
+ * @param data The byte to write.
+ * @return esp_err_t 
+ *     - ESP_OK Success
+ *     - ESP_ERR_INVALID_ARG Parameter error
+ *     - ESP_FAIL Sending command error, slave doesn't ACK the transfer.
+ *     - ESP_ERR_INVALID_STATE I2C driver not installed or not in master mode.
+ *     - ESP_ERR_TIMEOUT Operation timeout because the bus is busy.
+ */
 esp_err_t i2c_bus_write_byte_16(i2c_bus_device_handle_t dev_handle, uint16_t mem_address, uint8_t data);
 
 /**
@@ -211,6 +248,22 @@ esp_err_t i2c_bus_write_byte_16(i2c_bus_device_handle_t dev_handle, uint16_t mem
  *     - ESP_ERR_TIMEOUT Operation timeout because the bus is busy.
  */
 esp_err_t i2c_bus_write_bytes(i2c_bus_device_handle_t dev_handle, uint8_t mem_address, size_t data_len, const uint8_t *data);
+
+/**
+ * @brief Write multiple byte to i2c device with 16-bit internal register/memory address
+ * If internal reg/mem address is 16-bit, please refer i2c_bus_write_reg16
+ *
+ * @param dev_handle I2C device handle
+ * @param mem_address The internal reg/mem address to write to, set to NULL_I2C_MEM_ADDR if no internal address.
+ * @param data_len Number of bytes to write
+ * @param data Pointer to the bytes to write.
+ * @return esp_err_t 
+ *     - ESP_OK Success
+ *     - ESP_ERR_INVALID_ARG Parameter error
+ *     - ESP_FAIL Sending command error, slave doesn't ACK the transfer.
+ *     - ESP_ERR_INVALID_STATE I2C driver not installed or not in master mode.
+ *     - ESP_ERR_TIMEOUT Operation timeout because the bus is busy.
+ */
 esp_err_t i2c_bus_write_bytes_16(i2c_bus_device_handle_t dev_handle, uint16_t mem_address, size_t data_len, const uint8_t *data);
 
 /**
@@ -245,8 +298,6 @@ esp_err_t i2c_bus_write_bit(i2c_bus_device_handle_t dev_handle, uint8_t mem_addr
  *     - ESP_ERR_TIMEOUT Operation timeout because the bus is busy.
  */
 esp_err_t i2c_bus_write_bits(i2c_bus_device_handle_t dev_handle, uint8_t mem_address, uint8_t bit_start, uint8_t length, uint8_t data);
-
-/**************************************** Public Functions (Low level)*********************************************/
 
 /**
  * @brief I2C master send queued commands create by ``i2c_cmd_link_create`` .
@@ -304,4 +355,3 @@ esp_err_t i2c_bus_read_reg16(i2c_bus_device_handle_t dev_handle, uint16_t mem_ad
 }
 #endif
 
-#endif
