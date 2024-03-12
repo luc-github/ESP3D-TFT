@@ -74,7 +74,7 @@ static SemaphoreHandle_t _sem_gui_ready;
 esp_err_t bsp_init(void) {
 #if ESP3D_DISPLAY_FEATURE
   /* Display backlight initialization */
-  disp_backlight_h bcklt_handle = disp_backlight_new(&disp_bcklt_cfg);
+  disp_backlight_h bcklt_handle = disp_backlight_create(&disp_bcklt_cfg);
   disp_backlight_set(bcklt_handle, 0);
 
   /* Display panel initialization */

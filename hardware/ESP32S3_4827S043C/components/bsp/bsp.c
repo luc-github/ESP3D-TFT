@@ -71,6 +71,13 @@ static SemaphoreHandle_t _sem_gui_ready;
  *   GLOBAL FUNCTIONS
  **********************/
 
+/**
+ * @brief Initializes the Board Support Package (BSP).
+ *
+ * This function initializes the necessary components and peripherals required by the BSP.
+ *
+ * @return esp_err_t Returns `ESP_OK` on success, or an error code if initialization fails.
+ */
 esp_err_t bsp_init(void) {
 #if ESP3D_DISPLAY_FEATURE
   /* Display backlight initialization */
@@ -85,7 +92,6 @@ esp_err_t bsp_init(void) {
     esp3d_log_e("Failed to set display backlight");
     return ESP_FAIL;
   }
-
 
   /* Display panel initialization */
   esp3d_log("Initializing display...");

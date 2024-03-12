@@ -74,7 +74,7 @@ static SemaphoreHandle_t _sem_gui_ready;
 esp_err_t bsp_init(void) {
 #if ESP3D_DISPLAY_FEATURE
   /* Display backlight initialization */
-  disp_backlight_h bcklt_handle = disp_backlight_new(&disp_bcklt_cfg);
+  disp_backlight_h bcklt_handle = disp_backlight_create(&disp_bcklt_cfg);
   disp_backlight_set(bcklt_handle, 0);
 
   /* Display panel initialization */
@@ -232,8 +232,8 @@ static void lv_touch_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
   if (touch_data.is_pressed) {
     // Touch seems to have a resolution of 480x272 for some reason.
     // So, we need to map the touch coords to the display coords.
-    last_x = touch_data.x * DISP_HOR_RES_MAX / gt911_x_max;
-    last_y = touch_data.y * DISP_VER_RES_MAX / gt911_y_max;
+    last_x = touch_data.x * DISP_HOR_RES_MAX / get_gt911_x_max();
+    last_y = touch_data.y * DISP_VER_RES_MAX / get_gt911_y_max();
     esp3d_log("Touch x=%d, y=%d", last_x, last_y);
   }
   data->point.x = last_x;

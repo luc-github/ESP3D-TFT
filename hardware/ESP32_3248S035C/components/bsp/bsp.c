@@ -68,14 +68,16 @@ static esp_lcd_panel_handle_t disp_panel;
 esp_err_t bsp_init(void) {
 #if ESP3D_DISPLAY_FEATURE
   /* Display backlight initialization */
-  disp_backlight_h bcklt_handle = disp_backlight_new(&disp_bcklt_cfg);
+  disp_backlight_h bcklt_handle = disp_backlight_create(&disp_bcklt_cfg);
   disp_backlight_set(bcklt_handle, 0);
 
   /* SPI master initialization */
   esp3d_log("Initializing SPI master (display)...");
-  spi_bus_init(DISP_SPI_HOST, -1, DISP_SPI_MOSI, DISP_SPI_CLK,
-               DISP_BUF_SIZE_BYTES, 1, -1, -1);
-
+  if (spi_bus_init(DISP_SPI_HOST, DISP_SPI_MISO, DISP_SPI_MOSI, DISP_SPI_CLK, DISP_BUF_SIZE_BYTES, 1, -1, -1) != ESP_OK) {
+    esp3d_log_e("SPI master initialization failed!");
+    return ESP_FAIL;
+  }
+ 
   esp3d_log("Attaching display panel to SPI bus...");
   esp_lcd_panel_io_handle_t disp_io_handle;
   disp_spi_cfg.on_color_trans_done = disp_flush_ready;  

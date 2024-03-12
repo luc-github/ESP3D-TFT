@@ -69,7 +69,7 @@ static spi_device_handle_t touch_spi;
 esp_err_t bsp_init(void) {
 #if ESP3D_DISPLAY_FEATURE
   /* Display backlight initialization */
-  disp_backlight_h bcklt_handle = disp_backlight_new(&disp_bcklt_cfg);
+  disp_backlight_h bcklt_handle = disp_backlight_create(&disp_bcklt_cfg);
   disp_backlight_set(bcklt_handle, 0);
 
   /* SPI master initialization */
