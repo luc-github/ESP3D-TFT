@@ -74,8 +74,18 @@ static SemaphoreHandle_t _sem_gui_ready;
 esp_err_t bsp_init(void) {
 #if ESP3D_DISPLAY_FEATURE
   /* Display backlight initialization */
-  disp_backlight_h bcklt_handle = disp_backlight_new(&disp_bcklt_cfg);
-  disp_backlight_set(bcklt_handle, 0);
+  disp_backlight_t *bcklt_handle = NULL;
+  esp3d_log("Initializing display backlight...");
+  esp_err_t err = disp_backlight_create(&disp_bcklt_cfg, &bcklt_handle);
+  if (err != ESP_OK) {
+    esp3d_log_e("Failed to initialize display backlight");
+    return err;
+  }
+  if (disp_backlight_set(bcklt_handle, 0) != ESP_OK) {
+    esp3d_log_e("Failed to set display backlight");
+    return ESP_FAIL;
+  }
+
 
   /* Display panel initialization */
   esp3d_log("Initializing display...");
@@ -120,13 +130,18 @@ esp_err_t bsp_init(void) {
 
   /* Touch controller initialization */
   esp3d_log("Initializing touch controller...");  
-  bool has_touch_init = true;
+  bool has_touch = true;
   if (gt911_init(i2c_bus_handle, &gt911_cfg) != ESP_OK) {
     esp3d_log_e("Touch controller initialization failed!");
-    has_touch_init = false;
+    has_touch = false;
   }
 
-  disp_backlight_set(bcklt_handle, DISP_BCKL_DEFAULT_DUTY);
+  //enable display backlight
+  err = disp_backlight_set(bcklt_handle, DISP_BCKL_DEFAULT_DUTY);
+  if (err != ESP_OK) {
+    esp3d_log_e("Failed to set display backlight");
+    return err;
+  }
 
   // Lvgl initialization
   esp3d_log("Initializing LVGL...");
@@ -172,7 +187,7 @@ esp_err_t bsp_init(void) {
 #endif
   lv_disp_drv_register(&disp_drv);
 
-  if (has_touch_init) {
+  if (has_touch) {
     /* Register the touch input device */
     static lv_indev_drv_t indev_drv;
     lv_indev_drv_init(&indev_drv);
