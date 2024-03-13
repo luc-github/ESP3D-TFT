@@ -37,26 +37,11 @@ extern "C" {
 #include "esp_lcd_panel_commands.h"
 #include "esp_lcd_panel_rgb.h"
 
-/*********************
- *      DEFINES
- *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 esp_err_t esp_lcd_new_panel_st7262(const esp_lcd_rgb_panel_config_t *disp_panel_cfg, esp_lcd_panel_handle_t *disp_panel);
-
-/**********************
- *  STATIC PROTOTYPES
- **********************/
-
-/**********************
- *      MACROS
- **********************/
 
 #ifdef __cplusplus
 } /* extern "C" */

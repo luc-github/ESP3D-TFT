@@ -1,11 +1,11 @@
 // Display definitions for ESP32_4827S043C
-// Display driver ILI9485 (16-bit RGB565 parallel interface)
+// Display driver ST7262 (16-bit RGB565 parallel interface)
 #pragma once
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define TFT_DISPLAY_CONTROLLER "ILI9485"
+#define TFT_DISPLAY_CONTROLLER "ST7262"
 
 #include "esp_lcd_panel_commands.h"
 #include "esp_lcd_panel_ops.h"
@@ -13,15 +13,18 @@ extern "C" {
 #include "esp_lcd_panel_rgb.h"
 #include "disp_backlight.h"
 
+
+
+// Display orientation
 /*
 PORTRAIT                0
 PORTRAIT_INVERTED       1
 LANDSCAPE               2
 LANDSCAPE_INVERTED      3
 */
-
 #define DISP_ORIENTATION 2  // landscape
 
+// Display resolution
 #if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
 #define DISP_HOR_RES_MAX 480
 #define DISP_VER_RES_MAX 272
@@ -30,6 +33,7 @@ LANDSCAPE_INVERTED      3
 #define DISP_VER_RES_MAX 480
 #endif
 
+// Display interface
 #define DISP_CLK_FREQ           (14 * 1000 * 1000)
 #define DISP_AVOID_TEAR_EFFECT_WITH_SEM (true)
 #define DISP_USE_BOUNCE_BUFFER  (false)
@@ -48,6 +52,7 @@ LANDSCAPE_INVERTED      3
 #endif  // WITH_PSRAM
 #define DISP_BUF_SIZE_BYTES    (DISP_BUF_SIZE * 2)
 
+// Display panel configuration
 const esp_lcd_rgb_panel_config_t disp_panel_cfg = {
     .clk_src = LCD_CLK_SRC_DEFAULT,
     .timings = {
@@ -111,6 +116,7 @@ const esp_lcd_rgb_panel_config_t disp_panel_cfg = {
     }
 };
 
+// Display backlight configuration
 #define DISP_BCKL_DEFAULT_DUTY 20  //%
 
 const disp_backlight_config_t disp_bcklt_cfg = {

@@ -207,7 +207,7 @@ esp_err_t bsp_init(void) {
   disp_drv.full_refresh = false;
 #endif
   lv_disp_drv_register(&disp_drv);
-
+// Register the touch input device
   if (has_touch) {
     /* Register the touch input device */
     static lv_indev_drv_t indev_drv;
@@ -220,6 +220,14 @@ esp_err_t bsp_init(void) {
   return ESP_OK;
 }
 
+
+/**
+ * @brief Patchin the accesses of the file system.
+ *
+ * This function is responsible for patching display when accessing the file system.
+ *
+ * @return esp_err_t Returns ESP_OK if the file system access is successful, otherwise returns an error code.
+ */
 esp_err_t bsp_accessFs(void) {
 #if ESP3D_DISPLAY_FEATURE  
   esp_err_t ret = esp_lcd_rgb_panel_set_pclk(disp_panel, DISP_PATCH_FS_FREQ);
@@ -229,6 +237,13 @@ esp_err_t bsp_accessFs(void) {
   return ESP_OK;
 }
 
+/**
+ * @brief Revert the display patch when releasing the access of the file system resources.
+ *
+ * This function revert the display patch when releasing access of the file system resources.
+ *
+ * @return esp_err_t Returns ESP_OK if the file system resources are successfully released, otherwise returns an error code.
+ */
 esp_err_t bsp_releaseFs(void) {
 #if ESP3D_DISPLAY_FEATURE  
   esp_err_t ret = esp_lcd_rgb_panel_set_pclk(disp_panel, DISP_CLK_FREQ);
@@ -243,6 +258,17 @@ esp_err_t bsp_releaseFs(void) {
  **********************/
 #if ESP3D_DISPLAY_FEATURE
 
+/**
+ * @brief Callback function for handling display on vsync events.
+ *
+ * This function is called when a vsync event occurs on the LCD panel.
+ * It is responsible for handling the event and performing any necessary actions.
+ *
+ * @param panel The handle to the LCD panel.
+ * @param event_data The event data associated with the vsync event.
+ * @param user_data User-defined data passed to the callback function.
+ * @return true if the event was handled successfully, false otherwise.
+ */
 static bool disp_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_rgb_panel_event_data_t *event_data, void *user_data) {
   BaseType_t high_task_awoken = pdFALSE;
 #if DISP_AVOID_TEAR_EFFECT_WITH_SEM
@@ -253,6 +279,13 @@ static bool disp_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_rgb_
   return high_task_awoken == pdTRUE;
 }
 
+/**
+ * Flushes the display with the specified color data within the given area.
+ *
+ * @param disp_drv Pointer to the display driver structure.
+ * @param area     Pointer to the area to be flushed.
+ * @param color_p  Pointer to the color data.
+ */
 static void lv_disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p) {
 #if DISP_AVOID_TEAR_EFFECT_WITH_SEM
   xSemaphoreGive(_sem_gui_ready);
@@ -262,6 +295,12 @@ static void lv_disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_c
   lv_disp_flush_ready(disp_drv);
 }
 
+/**
+ * Reads touch input for the LVGL input device driver.
+ *
+ * @param drv The LVGL input device driver.
+ * @param data The LVGL input device data.
+ */
 static void lv_touch_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
   static uint16_t last_x, last_y;
   gt911_data_t touch_data = gt911_read(); 

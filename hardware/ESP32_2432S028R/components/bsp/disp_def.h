@@ -11,15 +11,16 @@ extern "C" {
 #include "ili9341.h"
 #include "disp_backlight.h"
 
+// Display orientation
 /*
 PORTRAIT                0
 PORTRAIT_INVERTED       1
 LANDSCAPE               2
 LANDSCAPE_INVERTED      3
 */
-
 #define DISP_ORIENTATION 3  // landscape inverted
 
+// Display resolution
 #if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
 #define DISP_HOR_RES_MAX 320
 #define DISP_VER_RES_MAX 240
@@ -28,6 +29,7 @@ LANDSCAPE_INVERTED      3
 #define DISP_VER_RES_MAX 320
 #endif
 
+// Display interface
 #define DISP_USE_DOUBLE_BUFFER (true)
 
 #if WITH_PSRAM

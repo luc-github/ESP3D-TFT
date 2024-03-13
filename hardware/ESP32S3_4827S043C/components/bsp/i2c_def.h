@@ -6,8 +6,10 @@ extern "C" {
 
 #include "i2c_bus.h"
 
+// I2C definitions
 #define I2C_PORT_NUMBER   0
 
+//Configure I2C
 const i2c_config_t i2c_cfg = {
     .mode = I2C_MODE_MASTER,
     .scl_io_num = 20, // GPIO 20
