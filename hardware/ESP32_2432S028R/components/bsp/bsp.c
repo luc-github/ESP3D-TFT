@@ -130,7 +130,6 @@ esp_err_t bsp_init(void) {
     return ESP_FAIL;
   }
 
-  // ESP_ERROR_CHECK(esp_lcd_panel_invert_color(disp_panel, true));
 #if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
   if (esp_lcd_panel_swap_xy(disp_panel, true) != ESP_OK) {
     esp3d_log_e("Failed to swap display orientation");
