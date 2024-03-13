@@ -124,7 +124,7 @@ esp_err_t bsp_init(void) {
   esp_lcd_rgb_panel_event_callbacks_t cbs = {
       .on_vsync = disp_on_vsync_event,
   };
-  ESP_ERROR_CHECK(esp_lcd_rgb_panel_register_event_callbacks(disp_panel, &cbs, &disp_drv));
+  ESP_ERROR_CHECK(esp_lcd_rgb_panel_register_event_callbacks(disp_panel, &cbs,NULL));
 
   /* i2c controller initialization */
   esp3d_log("Initializing i2C controller...");
@@ -207,8 +207,8 @@ esp_err_t bsp_init(void) {
 
 esp_err_t bsp_accessFs(void) {
 #if ESP3D_DISPLAY_FEATURE  
-  esp_err_t ret = esp_lcd_rgb_panel_set_pclk(disp_panel, 6 * 1000 * 1000);
-  vTaskDelay(pdMS_TO_TICKS(40));
+  esp_err_t ret = esp_lcd_rgb_panel_set_pclk(disp_panel, DISP_PATCH_FS_FREQ);
+  vTaskDelay(pdMS_TO_TICKS(DISP_PATCH_FS_DELAY));
   return ret;
 #endif  // ESP3D_DISPLAY_FEATURE
   return ESP_OK;
@@ -217,7 +217,7 @@ esp_err_t bsp_accessFs(void) {
 esp_err_t bsp_releaseFs(void) {
 #if ESP3D_DISPLAY_FEATURE  
   esp_err_t ret = esp_lcd_rgb_panel_set_pclk(disp_panel, DISP_CLK_FREQ);
-  vTaskDelay(pdMS_TO_TICKS(40));
+  vTaskDelay(pdMS_TO_TICKS(DISP_PATCH_FS_DELAY));
   return ret;
 #endif  // ESP3D_DISPLAY_FEATURE
   return ESP_OK;

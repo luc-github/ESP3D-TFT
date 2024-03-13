@@ -36,6 +36,9 @@ LANDSCAPE_INVERTED      3
 #define DISP_USE_DOUBLE_BUFFER  (true)
 #define DISP_NUM_FB             (1)
 
+#define DISP_PATCH_FS_FREQ (6 * 1000 * 1000)  // 6MHz
+#define DISP_PATCH_FS_DELAY  (40)
+
 #if DISP_NUM_FB == 2
   // Full frame buffer (255KB) in external PSRAM
   #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * DISP_VER_RES_MAX)
@@ -61,7 +64,7 @@ const esp_lcd_rgb_panel_config_t disp_panel_cfg = {
             .hsync_idle_low = 0,
             .vsync_idle_low = 0,
             .de_idle_high = 0,
-            .pclk_active_neg = true,
+            .pclk_active_neg = 1,
             .pclk_idle_high = 0,
         },
     },
@@ -99,12 +102,12 @@ const esp_lcd_rgb_panel_config_t disp_panel_cfg = {
         14, // D15 (R4) - GPIO 14
     },
     .flags = {
-        .disp_active_low = (uint32_t)NULL,
-        .refresh_on_demand = (uint32_t)NULL,
-        .fb_in_psram = true, // Do not change this, as it is mandatory for RGB parallel interface and octal PSRAM
-        .double_fb = (uint32_t)NULL,
-        .no_fb = (uint32_t)NULL,
-        .bb_invalidate_cache = (uint32_t)NULL,
+        .disp_active_low = 0,
+        .refresh_on_demand = 0,
+        .fb_in_psram = 1, // Do not change this, as it is mandatory for RGB parallel interface and octal PSRAM
+        .double_fb = 0,
+        .no_fb = 0,
+        .bb_invalidate_cache = 0,
     }
 };
 
