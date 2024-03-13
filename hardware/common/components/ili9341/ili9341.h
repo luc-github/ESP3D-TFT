@@ -48,7 +48,7 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 /**
- * @brief Creates a new ILI9341 LCD panel.
+ * @brief Creates a new ILI9341 LCD panel (SPI).
  *
  * This function creates a new ILI9341 LCD panel using the provided I/O handle and panel device configuration.
  *
