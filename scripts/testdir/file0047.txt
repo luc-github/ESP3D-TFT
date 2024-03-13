@@ -1,1 +1,0 @@
-testdir/file0047.txt
