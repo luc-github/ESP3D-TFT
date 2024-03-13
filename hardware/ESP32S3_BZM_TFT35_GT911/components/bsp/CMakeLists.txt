@@ -2,5 +2,5 @@
 idf_component_register(
     SRCS "bsp.c"
     INCLUDE_DIRS .
-    REQUIRES esp3d_log lvgl i2c_bus gt911 st7796 usb_serial disp_backlight
+    REQUIRES usb_serial esp3d_log lvgl spi_bus i2c_bus st7796 gt911 disp_backlight
 )

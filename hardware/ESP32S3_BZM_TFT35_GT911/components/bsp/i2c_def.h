@@ -6,8 +6,8 @@
 
 const i2c_config_t i2c_cfg = {
     .mode = I2C_MODE_MASTER,
-    .scl_io_num = 39, // GPIO 39
-    .sda_io_num = 40, // GPIO 40
+    .scl_io_num = 2, // GPIO 2
+    .sda_io_num = 42, // GPIO 42
     .scl_pullup_en = GPIO_PULLUP_ENABLE,
     .sda_pullup_en = GPIO_PULLUP_ENABLE,
     .master.clk_speed = 400*1000

@@ -55,6 +55,9 @@
 #include "update/esp3d_update_service.h"
 #endif  // ESP3D_UPDATE_FEATURE
 
+#if ESP3D_CAMERA_FEATURE
+#include "camera/camera.h"
+#endif // ESP3D_CAMERA_FEATURE
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -133,7 +136,12 @@ bool ESP3DTft::begin() {
   if (success) {
     success = esp3dTftnetwork.begin();
   }
-#endif  // ESP3D_WIFI_FEATURE
+#endif // ESP3D_WIFI_FEATURE
+#if ESP3D_CAMERA_FEATURE
+  esp3d_log("Initializing camera...");
+  esp3d_camera.begin();
+#endif
+
   return success && successFs && successSd;
 }
 

@@ -116,13 +116,14 @@ class ESP3DHttpService final {
   static esp_err_t command_handler(httpd_req_t *req);
   static esp_err_t config_handler(httpd_req_t *req);
 #if ESP3D_SSDP_FEATURE
-  static esp_err_t description_xml_handler(httpd_req_t *req);
-#endif  // #if ESP3D_SSDP_FEATURE
-  static esp_err_t favicon_ico_handler(httpd_req_t *req);
-  static esp_err_t file_not_found_handler(httpd_req_t *req,
-                                          httpd_err_code_t err);
-  static esp_err_t login_handler(httpd_req_t *req);
-  static esp_err_t files_handler(httpd_req_t *req);
+    static esp_err_t description_xml_handler(httpd_req_t *req);
+#endif // #if ESP3D_SSDP_FEATURE
+    static esp_err_t favicon_ico_handler(httpd_req_t *req);
+    static esp_err_t file_not_found_handler(httpd_req_t *req,
+                                            httpd_err_code_t err);
+    static esp_err_t login_handler(httpd_req_t *req);
+    static esp_err_t files_handler(httpd_req_t *req);
+    static esp_err_t snap_handler(httpd_req_t *req);
 #if ESP3D_SD_CARD_FEATURE
   static esp_err_t sdfiles_handler(httpd_req_t *req);
   static esp_err_t upload_to_sd_handler(const uint8_t *data, size_t datasize,

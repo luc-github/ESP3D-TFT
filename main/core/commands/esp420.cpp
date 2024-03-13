@@ -71,6 +71,10 @@
 #include "time/esp3d_time_service.h"
 #endif  // ESP3D_TIMESTAMP_FEATURE
 
+#ifdef ESP3D_CAMERA_FEATURE
+#include "camera/camera.h"
+#endif // ESP3D_CAMERA_FEATURE
+
 #define COMMAND_ID 420
 
 // Get ESP current status
@@ -597,8 +601,24 @@ void ESP3DCommands::ESP420(int cmd_params_pos, ESP3DMessage *msg) {
                        requestId)) {
     return;
   }
-#endif  // ESP3D_NOTIFICATIONS_FEATURE
-        // UI language
+#endif // ESP3D_NOTIFICATIONS_FEATURE
+#ifdef ESP3D_CAMERA_FEATURE
+
+  if (esp3d_camera.started())
+  {
+    // camera name
+    tmpstr = esp3d_camera.GetModelString();
+    tmpstr += "  (";
+    tmpstr += std::to_string(esp3d_camera.GetModel());
+    tmpstr += ")";
+    if (!dispatchIdValue(json, "camera name", tmpstr.c_str(), target, requestId))
+    {
+      return;
+    }
+  }
+
+#endif // ESP3D_CAMERA_FEATURE
+       // UI language
   tmpstr = esp3dTranslationService.translate(ESP3DLabel::language);
   if (tmpstr != "???") {
     tmpstr += " (";

@@ -11,10 +11,10 @@ extern "C" {
  *
  */
 #define ESP3D_SD_IS_SPI 1
-#define ESP3D_SD_MOSI_PIN (47)  // GPIO 47
-#define ESP3D_SD_MISO_PIN (14)  // GPIO 14
-#define ESP3D_SD_CLK_PIN (21)   // GPIO 21
-#define ESP3D_SD_CS_PIN (48)    // GPIO 48
+#define ESP3D_SD_MOSI_PIN (11)  // GPIO 11
+#define ESP3D_SD_MISO_PIN (13)  // GPIO 13
+#define ESP3D_SD_CLK_PIN (12)   // GPIO 12
+#define ESP3D_SD_CS_PIN (10)    // GPIO 10
 
 #define SPI_ALLOCATION_SIZE (16 * 1024)
 
