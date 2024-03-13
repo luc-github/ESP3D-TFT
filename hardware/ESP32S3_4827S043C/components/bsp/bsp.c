@@ -43,9 +43,10 @@
  *  STATIC PROTOTYPES
  **********************/
 #if ESP3D_DISPLAY_FEATURE
-static bool disp_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_rgb_panel_event_data_t *event_data, void *user_data);
 static void lv_disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 static void lv_touch_read(lv_indev_drv_t * drv, lv_indev_data_t * data);
+static bool disp_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_rgb_panel_event_data_t *event_data, void *user_data);
+esp_err_t esp_lcd_new_panel_st7262(const esp_lcd_rgb_panel_config_t *disp_panel_cfg, esp_lcd_panel_handle_t *disp_panel);
 #endif
 
 /**********************
@@ -95,15 +96,22 @@ esp_err_t bsp_init(void) {
 
   /* Display panel initialization */
   esp3d_log("Initializing display...");
-  ESP_ERROR_CHECK(esp_lcd_new_rgb_panel(&disp_panel_cfg, &disp_panel));
-  ESP_ERROR_CHECK(esp_lcd_panel_reset(disp_panel));
-  ESP_ERROR_CHECK(esp_lcd_panel_init(disp_panel));
-  //ESP_ERROR_CHECK(esp_lcd_panel_invert_color(disp_panel, true));
+  if (esp_lcd_new_panel_st7262(&disp_panel_cfg, &disp_panel)!=ESP_OK){
+    esp3d_log_e("Failed to create new RGB panel");
+    return ESP_FAIL;
+  }
+
 #if DISP_ORIENTATION == 0 || DISP_ORIENTATION == 1  // portrait mode
-  ESP_ERROR_CHECK(esp_lcd_panel_swap_xy(disp_panel, true));
+  if(esp_lcd_panel_swap_xy(disp_panel, true)!=ESP_OK){
+    esp3d_log_e("Failed to swap xy");
+    return ESP_FAIL;
+  }
 #endif //DISP_ORIENTATION
 #if DISP_ORIENTATION == 1 || DISP_ORIENTATION == 3  // mirrored
-  ESP_ERROR_CHECK(esp_lcd_panel_mirror(disp_panel, true, true));
+  if(esp_lcd_panel_mirror(disp_panel, true, true)!=ESP_OK){
+    esp3d_log_e("Failed to mirror");
+    return ESP_FAIL;
+  }
 #endif //DISP_ORIENTATION  
 
 #if DISP_AVOID_TEAR_EFFECT_WITH_SEM
@@ -124,7 +132,11 @@ esp_err_t bsp_init(void) {
   esp_lcd_rgb_panel_event_callbacks_t cbs = {
       .on_vsync = disp_on_vsync_event,
   };
-  ESP_ERROR_CHECK(esp_lcd_rgb_panel_register_event_callbacks(disp_panel, &cbs,NULL));
+
+  if(esp_lcd_rgb_panel_register_event_callbacks(disp_panel, &cbs,NULL)!=ESP_OK){
+    esp3d_log_e("Failed to register VSync event callback");
+    return ESP_FAIL;
+  }
 
   /* i2c controller initialization */
   esp3d_log("Initializing i2C controller...");
@@ -160,7 +172,10 @@ esp_err_t bsp_init(void) {
   void* buf2 = NULL;
 #if DISP_NUM_FB == 2
   esp3d_log("Use panel frame buffers as LVGL draw buffers");
-  ESP_ERROR_CHECK(esp_lcd_rgb_panel_get_frame_buffer(disp_panel, 2, &buf1, &buf2));
+  if(esp_lcd_rgb_panel_get_frame_buffer(disp_panel, 2, &buf1, &buf2)!=ESP_OK){
+    esp3d_log_e("Failed to get panel frame buffers");
+    return ESP_FAIL;
+  }
 #else
   esp3d_log("Allocate LVGL draw buffer");
   buf1 = heap_caps_malloc(DISP_BUF_SIZE_BYTES, MALLOC_CAP_SPIRAM);
