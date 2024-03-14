@@ -25,20 +25,13 @@
 
 #include "esp3d_log.h"
 
+
 #if ESP3D_DISPLAY_FEATURE
 #include "disp_def.h"
 #include "lvgl.h"
 #include "touch_def.h"
 
 #endif  // ESP3D_DISPLAY_FEATURE
-
-/*********************
- *      DEFINES
- *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
 
 /**********************
  *  STATIC PROTOTYPES
@@ -163,7 +156,7 @@ esp_err_t bsp_init(void) {
     }
   }
 
-  //enable display backlight
+  // enable display backlight
   err = disp_backlight_set(bcklt_handle, DISP_BCKL_DEFAULT_DUTY);
   if (err != ESP_OK) {
     esp3d_log_e("Failed to set display backlight");
@@ -201,7 +194,7 @@ esp_err_t bsp_init(void) {
   disp_drv.hor_res = DISP_HOR_RES_MAX;
   disp_drv.ver_res = DISP_VER_RES_MAX;
   lv_disp_drv_register(&disp_drv);
-  
+
   if (has_touch) {
     esp3d_log("Touch controller initialized");
     /* Register the touch input device */

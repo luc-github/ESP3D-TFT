@@ -82,7 +82,7 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |disp_spi|| esp3d_log driver | O |  O  | O |X  | O |
 |ili9341|SPI Display|esp3d_log esp_lcd driver| X |  O | O | O | O |
 |ili9488|| esp3d_log lvgl disp_spi | O |  O | O | X | O |
-|st7796||esp3d_log esp_lcd driver| O |  X | X | O | O |
+|st7796|SPI Display|esp3d_log esp_lcd driver| O |  X | X | O | O |
 |rm68120||esp3d_log lvgl esp_lcd driver| O |  O | O | O| O |
 |xpt2046|SPI Touch|esp3d_log driver| X |  O | X | X| O |
 |gt911||esp3d_log i2c_bus| O | X | O | O| O |
@@ -101,7 +101,7 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |disp_spi|| esp3d_log driver | O | O | O | O | O | O | O | O |
 |ili9341|SPI Display|esp3d_log esp_lcd driver| O | O | O | O | O | O | O | O |
 |ili9488||esp3d_log lvgl disp_spi| O | O | O | O | O | O | O | O |
-|st7796||esp3d_log esp_lcd driver| O | O | O | O | X | O | X | O|
+|st7796| SPI Display |esp3d_log esp_lcd driver| O | O | O | O | X | O | X | O|
 |st7262/ILI9485 |RGB Display|esp3d_log esp_lcd driver| X | O | O | O | X | O | O | O|
 |rm68120||esp3d_log lvgl esp_lcd driver| O | O | O | O | O | X | O | O |
 |xpt2046|SPI Touch|esp3d_log driver| O | O | O | O | O | O | O | O|
@@ -139,7 +139,7 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |disp_spi| |
 |ili9341|Ok|
 |ili9488| |
-|st7796||
+|st7796|Ok|
 |st7262|Ok|
 |rm68120| |
 |xpt2046|Ok|

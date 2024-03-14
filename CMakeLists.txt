@@ -3,7 +3,7 @@
 # #######################################
 
 # With TFT:
-OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" ON)
+OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" OFF)
 OPTION(ESP32_ROTRICS_DEXARM35 "TFT TARGET is ESP32 Rotrics DexArm 3.5inches" OFF)
 OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-SRC-4832 3.5inches" OFF)
 OPTION(ESP32S3_BZM_TFT35_GT911 "TFT TARGET is ESP32S3 Panlee BZM 3.5inches" OFF)
@@ -13,7 +13,7 @@ OPTION(ESP32S3_8048S043C "TFT TARGET is ESP32S3_8048S043C - 4.3in. 800x480 (Capa
 OPTION(ESP32S3_4827S043C "TFT TARGET is ESP32S3_4827S043C - 4.3in. 480x272 (Capacitive)" OFF)
 OPTION(ESP32_3248S035C "TFT TARGET is ESP32_3248S035C - 3.5in. 480x320 (Capacitive)" OFF)
 OPTION(ESP32_3248S035R "TFT TARGET is ESP32_3248S035R - 3.5in. 480x320 (Resistive)" OFF)
-OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R - 2.8in. 320x240 (Resistive)" OFF)
+OPTION(ESP32_2432S028R "TFT TARGET is ESP32_2432S028R - 2.8in. 320x240 (Resistive)" ON)
 
 # Without TFT:
 OPTION(ESP32S3_FREENOVE_1_1 "HARDWARE TARGET is ESP32S3 Freenove v1.1" OFF)
@@ -31,7 +31,7 @@ if(ESP32_3248S035C OR ESP32_3248S035R OR ESP32_2432S028R)
     # 4MB Flash, no PSRAM by default
     OPTION(HARDWARE_MOD_8MB_FLASH "Hardware Mod: 8MB Flash Upgrade" OFF)
     OPTION(HARDWARE_MOD_16MB_FLASH "Hardware Mod: 16MB Flash Upgrade" OFF)
-    OPTION(HARDWARE_MOD_EXT_PSRAM "Hardware Mod: External PSRAM" OFF)
+    OPTION(HARDWARE_MOD_EXT_PSRAM "Hardware Mod: External PSRAM" ON)
 endif()
 
 
@@ -97,6 +97,7 @@ elseif(ESP32S3_4827S043C)
     set(TFT_TARGET "ESP32S3_4827S043C")
     set(SDKCONFIG hardware/common/sdkconfig/ESP32-S3/with_PSRAM/16MB_Flash)    
     list(APPEND EXTRA_COMPONENT_DIRS hardware/ESP32S3_4827S043C/components)
+    list(APPEND EXTRA_COMPONENT_DIRS hardware/common/components/drivers_rgb)
     add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32S3_4827S043C/components/bsp")
 elseif(ESP32_3248S035C)
     set(TFT_TARGET "ESP32_3248S035C")
@@ -208,7 +209,6 @@ else()
         "Now cmake will exit")
 endif()
 
-
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
 # ESP3D-TFT specific log level
@@ -218,10 +218,10 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 # Disabled = 0
 add_compile_options(-DESP3D_TFT_LOG=0)
 # Disable ANSI color to fit some serial terminals 
-add_compile_options(-DDISABLE_COLOR_LOG=1)
+add_compile_options(-DDISABLE_COLOR_LOG=0)
 
 #Use the Snapshot API of LVGL to dump screens to the SD card
-add_compile_options(-DLV_USE_SNAPSHOT=1)
+add_compile_options(-DLV_USE_SNAPSHOT=0)
 
 # ESP3D-TFT specific bechmark
 # Enabled  = 1
@@ -307,3 +307,4 @@ message(STATUS "TFT_TARGET = ${TFT_TARGET}")
 message(STATUS "IDF_TARGET = ${IDF_TARGET}")
 message(STATUS "--------------------------")
 message(STATUS "")
+

@@ -349,8 +349,11 @@ static esp_err_t lcd_panel_draw_bitmap(esp_lcd_panel_t *panel, int x_start,
                                        int y_start, int x_end, int y_end,
                                        const void *color_data) {
   lcd_panel_t *lcd_panel = __containerof(panel, lcd_panel_t, base);
-  assert((x_start < x_end) && (y_start < y_end) &&
-         "start position must be smaller than end position");
+  if (!((x_start < x_end) && (y_start < y_end))) {
+    esp3d_log_e("start position must be smaller than end position");
+    return ESP_ERR_INVALID_ARG;
+  }
+
   esp_lcd_panel_io_handle_t io = lcd_panel->io;
 
   x_start += lcd_panel->x_gap;
