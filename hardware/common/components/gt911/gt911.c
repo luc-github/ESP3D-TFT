@@ -171,32 +171,31 @@ esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config) {
   }
 
   uint8_t buf[4];
-  esp_err_t err;
+  esp_err_t err = ESP_FAIL;
+  uint8_t i2c_addr_index = 0;
 
-  // Search for GT911 device and try to read the Product ID
-  _i2c_dev = i2c_bus_device_create(i2c_bus, 0x5D, config->i2c_clk_speed);
-  if (_i2c_dev == NULL) {
-    esp3d_log_e("Failed creating GT911 device!");
-    return ESP_FAIL;
-  }
-  err = i2c_bus_read_bytes_16(_i2c_dev, GT911_PRODUCT_ID_REG, 4, &buf[0]);
-  if (err == ESP_OK) {
-    esp3d_log("GT911 device found at addr: 0x5D");
-  } else {
-    // Floating or mis-configured INT pin may cause GT911 to come up
-    //   at address 0x14 instead of 0x5D, so check there as well.
-    _i2c_dev = i2c_bus_device_create(i2c_bus, 0x14, config->i2c_clk_speed);
+  while (config->i2c_addr[i2c_addr_index] != 0 && err != ESP_OK) {
+    esp3d_log("Checking  GT911 i2c addr: 0x%02x", config->i2c_addr[i2c_addr_index]);
+    _i2c_dev = i2c_bus_device_create(i2c_bus, config->i2c_addr[i2c_addr_index],
+                                     config->i2c_clk_speed);
     if (_i2c_dev == NULL) {
       esp3d_log_e("Failed creating GT911 device!");
       return ESP_FAIL;
     }
     err = i2c_bus_read_bytes_16(_i2c_dev, GT911_PRODUCT_ID_REG, 4, &buf[0]);
     if (err == ESP_OK) {
-      esp3d_log("GT911 device found at addr: 0x14");
+      esp3d_log("GT911 device found at addr: 0x%02x",
+                config->i2c_addr[i2c_addr_index]);
     } else {
-      esp3d_log_e("GT911 device not found!");
-      return err;
+      // go next address
+      i2c_bus_device_delete(_i2c_dev);
+      _i2c_dev = NULL;
+      i2c_addr_index++;
     }
+  }
+  if (_i2c_dev == NULL) {
+    esp3d_log_e("GT911 device not found!");
+    return err;
   }
 
   // Display Product ID
@@ -205,7 +204,10 @@ esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config) {
 
   // Display Config
   err = i2c_bus_read_bytes_16(_i2c_dev, GT911_CONFIG_REG, 1, &buf[0]);
-  if (err != ESP_OK) return err;
+  if (err != ESP_OK) {
+    esp3d_log_e("Failed to read GT911 config");
+    return err;
+  }
   esp3d_log("GT911 Config: 0x%02x", buf[0]);
 
   // Read X/Y Limits

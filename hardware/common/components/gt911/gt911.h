@@ -1,6 +1,6 @@
 /**
- * @file ft5x06.h
- * @brief FT5x06 driver header file.
+ * @file gt911.h
+ * @brief gt911 driver header file.
  * @version 0.1
  * @date 2021-03-07
  *
@@ -36,6 +36,7 @@ extern "C" {
 // Configuration structure for GT911
 typedef struct {
   uint32_t i2c_clk_speed;
+  uint8_t *i2c_addr;
   int8_t rst_pin;
   int8_t int_pin;
   bool swap_xy;
