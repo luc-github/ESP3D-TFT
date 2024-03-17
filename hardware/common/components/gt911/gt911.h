@@ -42,6 +42,8 @@ typedef struct {
   bool swap_xy;
   bool invert_x;
   bool invert_y;
+  uint16_t x_max;
+  uint16_t y_max;
 } gt911_config_t;
 
 // Data structure for touch position and state

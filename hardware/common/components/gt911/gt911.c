@@ -107,6 +107,9 @@ esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config) {
   }
   _config = config;
 
+  _gt911_x_max = _config->x_max;
+  _gt911_y_max = _config->y_max;
+
   esp3d_log("GT911 init");
 
   // Make sure INT pin is low before reset procedure (Sets i2c address to 0x5D)
@@ -209,16 +212,21 @@ esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config) {
     return err;
   }
   esp3d_log("GT911 Config: 0x%02x", buf[0]);
-
-  // Read X/Y Limits
-  err = i2c_bus_read_bytes_16(_i2c_dev, GT911_XY_MAX_REG, 4, &buf[0]);
-  if (err != ESP_OK) return err;
-  _gt911_x_max = ((uint16_t)buf[1] << 8) + buf[0];
-  _gt911_y_max = ((uint16_t)buf[3] << 8) + buf[2];
-  if (config->swap_xy) {
-    uint16_t swap_tmp = _gt911_x_max;
-    _gt911_x_max = _gt911_y_max;
-    _gt911_y_max = swap_tmp;
+  if (_gt911_x_max==0 || _gt911_y_max==0) {
+    // Read X/Y Limits
+    err = i2c_bus_read_bytes_16(_i2c_dev, GT911_XY_MAX_REG, 4, &buf[0]);
+    if (err != ESP_OK) return err;
+    if (_gt911_x_max == 0) {
+      _gt911_x_max = ((uint16_t)buf[1] << 8) + buf[0];
+    }
+    if (_gt911_y_max == 0) {
+      _gt911_y_max = ((uint16_t)buf[3] << 8) + buf[2];
+    }
+    if (config->swap_xy) {
+      uint16_t swap_tmp = _gt911_x_max;
+      _gt911_x_max = _gt911_y_max;
+      _gt911_y_max = swap_tmp;
+    }
   }
   esp3d_log("GT911 Limits x=%d, y=%d", _gt911_x_max, _gt911_y_max);
 
