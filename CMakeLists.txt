@@ -24,15 +24,15 @@ OPTION(ESP32_CUSTOM "HARDWARE TARGET is ESP32 custom board" OFF)
 # #######################################
 # Optionally: Select hardware mods applied
 # #######################################
-if(ESP32S3_8048S070C OR ESP32S3_8048S050C OR ESP32S3_8048S043C OR ESP32S3_4827S043C OR ESP32_3248S035C)
-    OPTION(HARDWARE_MOD_GT911_INT "Hardware Mod: GT911 INT pin" OFF)
-endif()
-if(ESP32_3248S035C OR ESP32_3248S035R OR ESP32_2432S028R)
-    # 4MB Flash, no PSRAM by default
-    OPTION(HARDWARE_MOD_8MB_FLASH "Hardware Mod: 8MB Flash Upgrade" OFF)
-    OPTION(HARDWARE_MOD_16MB_FLASH "Hardware Mod: 16MB Flash Upgrade" OFF)
-    OPTION(HARDWARE_MOD_EXT_PSRAM "Hardware Mod: External PSRAM" ON)
-endif()
+#only for ESP32S3_8048S070C OR ESP32S3_8048S050C OR ESP32S3_8048S043C OR ESP32S3_4827S043C OR ESP32_3248S035C
+OPTION(HARDWARE_MOD_GT911_INT "Hardware Mod: GT911 INT pin" OFF)
+
+#Only for ESP32_3248S035C OR ESP32_3248S035R OR ESP32_2432S028R
+# 4MB Flash, no PSRAM by default
+OPTION(HARDWARE_MOD_8MB_FLASH "Hardware Mod: 8MB Flash Upgrade" OFF)
+OPTION(HARDWARE_MOD_16MB_FLASH "Hardware Mod: 16MB Flash Upgrade" OFF)
+OPTION(HARDWARE_MOD_EXT_PSRAM "Hardware Mod: External PSRAM" ON)
+
 
 
 # #######################################
@@ -45,7 +45,7 @@ OPTION(TARGET_FW_GRBL "GRBL firmware" OFF)
 
 
 # #######################################
-# Select the Options
+# Select the Features
 # #######################################
 OPTION(ESP3D_AUTHENTICATION "Authentication on all clients" OFF)
 OPTION(DISABLE_SERIAL_AUTHENTICATION "Disable Serial Authentication" ON)

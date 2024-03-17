@@ -1,6 +1,0 @@
-set(TFT_TARGET "ESP32S3_BZM_TFT35_GT911")
-add_compile_options(-DWITH_PSRAM=1)
-add_compile_options(-DWITH_GT911_INT=1)
-set(SDKCONFIG hardware/ESP32S3_BZM_TFT35_GT911/sdkconfig)
-list(APPEND EXTRA_COMPONENT_DIRS hardware/ESP32S3_BZM_TFT35_GT911/components)
-add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32S3_BZM_TFT35_GT911/components/bsp")

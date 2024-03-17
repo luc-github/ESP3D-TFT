@@ -1,6 +1,0 @@
-set(TFT_TARGET "ESP32S3_FREENOVE_1_1")
-set(SDKCONFIG hardware/ESP32S3_FREENOVE_1_1/sdkconfig)
-set(EXTRA_COMPONENT_DIRS hardware/ESP32S3_FREENOVE_1_1/components)
-add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32S3_FREENOVE_1_1/components/bsp")    
-add_compile_options(-DESP3D_USB_SERIAL_FEATURE=1)
-unset(TFT_UI_SERVICE CACHE)

@@ -1,10 +1,3 @@
-# Features FS
-
-if(USE_FAT_INSTEAD_OF_LITTLEFS)
-    add_compile_options(-DESP3D_FATFS_FEATURE=1)
-    else()
-    add_compile_options(-DESP3D_LITTLEFS_FEATURE=1)
-endif()
 
 # Firmware target
 if(TARGET_FW_MARLIN)
@@ -27,18 +20,18 @@ elseif(TARGET_FW_GRBL)
         add_compile_options("-I${CMAKE_SOURCE_DIR}/main/display/cnc/grbl")
     endif()
     add_compile_options("-I${CMAKE_SOURCE_DIR}/main/target/cnc/grbl")
-else()
-    message(FATAL_ERROR
-        "\n"
-        "No firmware target defined, please define a target in CMakeLists.txt"
-        "\n"
-        "Now cmake will exit")
 endif()
 
 # Add the dev tools settings
 include(cmake/dev_tools.cmake)
 
 # Features
+if(USE_FAT_INSTEAD_OF_LITTLEFS)
+    add_compile_options(-DESP3D_FATFS_FEATURE=1)
+else()
+    add_compile_options(-DESP3D_LITTLEFS_FEATURE=1)
+endif()
+
 if(ESP3D_AUTHENTICATION)
     add_compile_options(-DESP3D_AUTHENTICATION_FEATURE=1)
 endif()
@@ -109,6 +102,9 @@ endif()
 add_compile_options("-I${CMAKE_SOURCE_DIR}/customizations")
 
 add_compile_options(-DTFT_TARGET="${TFT_TARGET}")
+
+# check the configuration
+include (cmake/sanity_check.cmake)
 
 # Status
 message(STATUS "")

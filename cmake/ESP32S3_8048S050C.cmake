@@ -1,7 +1,0 @@
-set(TFT_TARGET "ESP32S3_8048S050C")
-set(SDKCONFIG hardware/common/sdkconfig/ESP32-S3/with_PSRAM/16MB_Flash)    
-list(APPEND EXTRA_COMPONENT_DIRS hardware/ESP32S3_8048S050C/components)
-add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32S3_8048S050C/components/bsp")
-if(HARDWARE_MOD_GT911_INT)
-add_compile_options(-DWITH_GT911_INT=1)
-endif()
