@@ -1,0 +1,120 @@
+# Features FS
+
+if(USE_FAT_INSTEAD_OF_LITTLEFS)
+    add_compile_options(-DESP3D_FATFS_FEATURE=1)
+    else()
+    add_compile_options(-DESP3D_LITTLEFS_FEATURE=1)
+endif()
+
+# Firmware target
+if(TARGET_FW_MARLIN)
+    if(TFT_UI_SERVICE)
+        add_compile_options("-I${CMAKE_SOURCE_DIR}/main/display/3dprinter/marlin")
+    endif()
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/main/target/3dprinter/marlin")
+elseif(TARGET_FW_REPETIER)
+     if(TFT_UI_SERVICE)
+        add_compile_options("-I${CMAKE_SOURCE_DIR}/main/display/3dprinter/repetier")
+    endif()
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/main/target/3dprinter/repetier")
+elseif(TARGET_FW_SMOOTHIEWARE)
+     if(TFT_UI_SERVICE)
+        add_compile_options("-I${CMAKE_SOURCE_DIR}/main/display/3dprinter/smoothiware")
+    endif()
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/main/target/3dprinter/smoothiware")
+elseif(TARGET_FW_GRBL)
+     if(TFT_UI_SERVICE)
+        add_compile_options("-I${CMAKE_SOURCE_DIR}/main/display/cnc/grbl")
+    endif()
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/main/target/cnc/grbl")
+else()
+    message(FATAL_ERROR
+        "\n"
+        "No firmware target defined, please define a target in CMakeLists.txt"
+        "\n"
+        "Now cmake will exit")
+endif()
+
+# Add the dev tools settings
+include(cmake/dev_tools.cmake)
+
+# Features
+if(ESP3D_AUTHENTICATION)
+    add_compile_options(-DESP3D_AUTHENTICATION_FEATURE=1)
+endif()
+
+if(DISABLE_SERIAL_AUTHENTICATION)
+    add_compile_options(-DESP3D_DISABLE_SERIAL_AUTHENTICATION_FEATURE=1)
+endif()
+
+if(TIME_SERVICE)
+    add_compile_options(-DESP3D_TIMESTAMP_FEATURE=1)
+endif()
+
+if(WIFI_SERVICE)
+    add_compile_options(-DESP3D_WIFI_FEATURE=1)
+
+    if(SSDP_SERVICE)
+        add_compile_options(-DESP3D_SSDP_FEATURE=1)
+    endif()
+
+    if(MDNS_SERVICE)
+        add_compile_options(-DESP3D_MDNS_FEATURE=1)
+    endif()
+
+    if(WEB_SERVICES)
+        add_compile_options(-DESP3D_HTTP_FEATURE=1)
+        if(WS_SERVICE)
+            add_compile_options(-DESP3D_WS_SERVICE_FEATURE=1)
+        endif()
+        if(WEBDAV_SERVICES)
+            add_compile_options(-DESP3D_WEBDAV_SERVICES_FEATURE=1)
+        endif()
+    endif()
+
+    if(TELNET_SERVICE)
+        add_compile_options(-DESP3D_TELNET_FEATURE=1)
+    endif()
+
+    if(NOTIFICATIONS_SERVICE)
+        add_compile_options(-DESP3D_NOTIFICATIONS_FEATURE=1)
+    endif()
+endif()
+
+if(BT_SERVICE)
+    add_compile_options(-DESP3D_BLUETOOTH_FEATURE=1)
+endif()
+
+if(TFT_UI_SERVICE)
+    add_compile_options(-DESP3D_DISPLAY_FEATURE=1)
+    # For lvgl_conf to use simple path
+    add_compile_options(-DLV_CONF_INCLUDE_SIMPLE=1)
+    add_compile_options(-DLV_LVGL_H_INCLUDE_SIMPLE=1)
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/main/display")
+    else()
+    add_compile_options(-DLV_CONF_SUPPRESS_DEFINE_CHECK=1)
+endif()
+
+if(SD_CARD_SERVICE)
+    add_compile_options(-DESP3D_SD_CARD_FEATURE=1)
+    if(UPDATE_SERVICE)
+        add_compile_options(-DESP3D_UPDATE_FEATURE=1)
+    endif()
+else()
+unset(UPDATE_SERVICE CACHE)
+endif()
+
+
+# Add entry point for customizations headers
+add_compile_options("-I${CMAKE_SOURCE_DIR}/customizations")
+
+add_compile_options(-DTFT_TARGET="${TFT_TARGET}")
+
+# Status
+message(STATUS "")
+message(STATUS "----Project definition----")
+message(STATUS "PROJECT_NAME =  ESP3D TFT")
+message(STATUS "TFT_TARGET = ${TFT_TARGET}")
+message(STATUS "IDF_TARGET = ${IDF_TARGET}")
+message(STATUS "--------------------------")
+message(STATUS "")

@@ -1,0 +1,38 @@
+#C:/Users/luc/Documents/GitHub/ESP3D-TFT/
+set(EXTRA_COMPONENT_DIRS hardware/common/components)
+
+if(ESP32S3_FREENOVE_1_1)
+   include (cmake/ESP32S3_FREENOVE_1_1.cmake)
+elseif(ESP32S3_8048S070C)
+    include (cmake/ESP32S3_8048S070C.cmake)
+elseif(ESP32S3_8048S050C)
+    include (cmake/ESP32S3_8048S050C.cmake)
+elseif(ESP32S3_8048S043C)
+    include(cmake/ESP32S3_8048S043C.cmake)
+elseif(ESP32S3_4827S043C)
+    include (cmake/ESP32S3_4827S043C.cmake)
+elseif(ESP32_3248S035C)
+   include (cmake/ESP32_3248S035C.cmake)
+elseif(ESP32_3248S035R)
+    include (cmake/ESP32_3248S035R.cmake)
+elseif(ESP32_2432S028R)
+    include (cmake/ESP32_2432S028R.cmake)
+elseif(ESP32S3_HMI43V3)
+    include (cmake/ESP32S3_HMI43V3.cmake)
+elseif(ESP32_ROTRICS_DEXARM35)
+   include (cmake/ESP32_ROTRICS_DEXARM35.cmake)
+elseif(ESP32S3_ZX3D50CE02S_USRC_4832)
+    include (cmake/ESP32S3_ZX3D50CE02S_USRC_4832.cmake)
+elseif(ESP32S3_BZM_TFT35_GT911)
+    include(cmake/ESP32S3_BZM_TFT35_GT911.cmake)
+elseif(ESP32S3_CUSTOM)
+    include(cmake/ESP32S3_CUSTOM.cmake)
+elseif(ESP32_CUSTOM)
+    include(cmake/ESP32_CUSTOM.cmake)
+else()
+    message(FATAL_ERROR
+        "\n"
+        "No hardware target defined, please define a target in CMakeLists.txt"
+        "\n"
+        "Now cmake will exit")
+endif()
