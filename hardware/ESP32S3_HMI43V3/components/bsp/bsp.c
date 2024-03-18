@@ -26,7 +26,6 @@
 
 #if ESP3D_DISPLAY_FEATURE
 #include "disp_def.h"
-#include "ft5x06.h"
 #include "i2c_bus.h"
 #include "i2c_def.h"
 #include "lvgl.h"
@@ -42,7 +41,7 @@
  **********************/
 #if ESP3D_DISPLAY_FEATURE
 //static void lv_disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
-//static void lv_touch_read(lv_indev_drv_t * drv, lv_indev_data_t * data);
+static void lv_touch_read(lv_indev_drv_t * drv, lv_indev_data_t * data);
 //static bool disp_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_rgb_panel_event_data_t *event_data, void *user_data);
 //esp_err_t esp_lcd_new_panel_st7262(const esp_lcd_rgb_panel_config_t *disp_panel_cfg, esp_lcd_panel_handle_t *disp_panel);
 #endif
@@ -109,8 +108,8 @@ esp_err_t bsp_init(void) {
     esp3d_log_e("I2C bus initialization failed!");
     return ESP_FAIL;
   }
-
   #endif // ESP3D_DISPLAY_FEATURE
+  
   // NOTE:
   // this location allows usb-host driver to be installed - later it will failed
   // Do not know why...
@@ -129,9 +128,11 @@ esp_err_t bsp_init(void) {
   }
 
   /* Touch controller initialization */
-  esp3d_log("Initializing touch controller");
-  if (ft5x06_init(i2c_bus_handle) != ESP_OK) {
-    return ESP_FAIL;
+  esp3d_log("Initializing touch controller...");  
+  bool has_touch = true;
+  if (ft5x06_init(i2c_bus_handle, &ft5x06_cfg) != ESP_OK) {
+    esp3d_log_e("Touch controller initialization failed!");
+    has_touch = false;
   }
 
   // Lvgl initialization
@@ -173,13 +174,41 @@ esp_err_t bsp_init(void) {
       DISP_VER_RES_MAX; /*Set the vertical resolution of the display*/
   disp_drv.user_data = *panel_handle;
   lv_disp_drv_register(&disp_drv); /*Finally register the driver*/
-
+if (has_touch) {
   /* Register an input device */
   static lv_indev_drv_t indev_drv; /*Descriptor of a input device driver*/
   lv_indev_drv_init(&indev_drv);   /*Basic initialization*/
   indev_drv.type = LV_INDEV_TYPE_POINTER; /*Touch pad is a pointer-like device*/
-  indev_drv.read_cb = ft5x06_read;        /*Set your driver function*/
+  indev_drv.read_cb = lv_touch_read;        /*Set your driver function*/
   lv_indev_drv_register(&indev_drv);      /*Finally register the driver*/
+}
 #endif // ESP3D_DISPLAY_FEATURE
   return ESP_OK;
 }
+
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+#if ESP3D_DISPLAY_FEATURE
+
+/**
+ * Reads touch input for the LVGL input device driver.
+ *
+ * @param drv The LVGL input device driver.
+ * @param data The LVGL input device data.
+ */
+static void lv_touch_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
+  static uint16_t last_x, last_y;
+  ft5x06_data_t touch_data = ft5x06_read(); 
+  if (touch_data.is_pressed) {
+    last_x = touch_data.x;
+    last_y = touch_data.y;
+    esp3d_log("Touch x=%d, y=%d", last_x, last_y);
+  }
+  data->point.x = last_x;
+  data->point.y = last_y;
+  data->state = touch_data.is_pressed ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
+}
+
+#endif // ESP3D_DISPLAY_FEATURE
