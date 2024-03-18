@@ -291,7 +291,7 @@ esp_err_t ft5x06_init(i2c_bus_handle_t i2c_bus, const ft5x06_config_t *config) {
                   config->i2c_addr[i2c_addr_index]);
     } else {
       // go next address
-      i2c_bus_device_delete(_i2c_dev);
+      //i2c_bus_device_delete(_i2c_dev);
       _i2c_dev = NULL;
       i2c_addr_index++;
     }
