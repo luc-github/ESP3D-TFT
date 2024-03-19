@@ -1,5 +1,7 @@
 // Pins for ESP32S3 HMI43V3
 // Display driver RM68120 parallele 8080
+
+#include "rm68120.h"
 #pragma once
 #ifdef __cplusplus
 extern "C" {
@@ -7,9 +9,12 @@ extern "C" {
 
 #define TFT_DISPLAY_CONTROLLER "RM68120"
 
-#define DISP_DIRECTION_LANDSCAPE (1)  // 1:landscape mode   0:portrait mode
+#define DISP_ORIENTATION \
+  (orientation_landscape)  // 0:portrait mode 1:landscape mode 2:portrait mode
+                           // reverse 3:landscape mode reverse
 
-#if DISP_DIRECTION_LANDSCAPE == 1  // landscape mode
+#if DISP_ORIENTATION == orientation_landscape || \
+    DISP_ORIENTATION == orientation_landscape_invert  // landscape mode
 #define DISP_HOR_RES_MAX (800)
 #define DISP_VER_RES_MAX (480)
 #else  // portrait mode
@@ -17,38 +22,72 @@ extern "C" {
 #define DISP_VER_RES_MAX (800)
 #endif
 
-// 1/10
 #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * (DISP_VER_RES_MAX / 10))
-#define DISP_USE_DOUBLE_BUFFER (2)
+#define DISP_USE_DOUBLE_BUFFER (true)
 
-#define DISP_BITS_WIDTH (16)
-#define DISP_CMD_BITS_WIDTH (16)
-#define DISP_PARAM_BITS_WIDTH (16)
-#define DISP_CLK_FREQ (8 * 1000 * 1000)  // could be 10 if no PSRAM memory
+const esp_i80_rm68120_config_t rm68120_cfg{
+    .disp_busconfig =
+        {
+            .clk_src = LCD_CLK_SRC_DEFAULT,
+            .dc_gpio_num = 38,  // DISP_RS_PIN=GPIO38
+            .wr_gpio_num = 17,  // DISP_WR_PIN=GPIO17
+            .data_gpio_nums =
+                {
+                    1,   // DISP_D00_PIN = GPIO1
+                    9,   // DISP_D01_PIN = GPIO9
+                    2,   // DISP_D02_PIN = GPIO2
+                    10,  // DISP_D03_PIN = GPIO10
+                    3,   // DISP_D04_PIN = GPIO3
+                    11,  // DISP_D05_PIN = GPIO11
+                    4,   // DISP_D06_PIN = GPIO4
+                    12,  // DISP_D07_PIN = GPIO12
+                    5,   // DISP_D08_PIN = GPIO5
+                    13,  // DISP_D09_PIN = GPIO13
+                    6,   // DISP_D10_PIN = GPIO6
+                    14,  // DISP_D11_PIN = GPIO14
+                    7,   // DISP_D12_PIN = GPIO7
+                    15,  // DISP_D13_PIN = GPIO15
+                    8,   // DISP_D14_PIN = GPIO8
+                    16,  // DISP_D15_PIN = GPIO16
+                },
+            .bus_width = 16,  // DISP_BITS_WIDTH
+            .max_transfer_bytes = DISP_BUF_SIZE * sizeof(uint16_t),
+            .psram_trans_align = 64,
+            .sram_trans_align = 4,
+        },
+    .disp_ioconfig =
+        {
+            .cs_gpio_num = -1,
+            .pclk_hz = (8 * 1000 *
+                        1000)  // could be 10 if no PSRAM memory= DISP_CLK_FREQ,
+                           .trans_queue_depth = 10,
+            .dc_levels =
+                {
+                    .dc_idle_level = 0,
+                    .dc_cmd_level = 0,
+                    .dc_dummy_level = 0,
+                    .dc_data_level = 1,
+                },
+            .on_color_trans_done =
+                NULL,  // Callback invoked when color data
+                       // transfer has finished updated in bdsp.c
+            .user_ctx =
+                NULL,  // User private data, passed directly to
+                       // on_color_trans_done’s user_ctx updated in bdsp.c
+            .lcd_cmd_bits = 16,    // DISP_CMD_BITS_WIDTH
+            .lcd_param_bits = 16,  // DISP_PARAM_BITS_WIDTH
+        },
+    .disp_devconfig =
+        {
+            .reset_gpio_num = 21,  // DISP_RST_PIN = GPIO21
+            .color_space = ESP_LCD_COLOR_SPACE_RGB,
+            .bits_per_pixel = 16,
+        },
+    .orientation = DISP_ORIENTATION,
+    .hor_res = DISP_HOR_RES_MAX,
+    .ver_res = DISP_VER_RES_MAX,
 
-#define DISP_BL_PIN (-1)
-#define DISP_CS_PIN (-1)
-#define DISP_RST_PIN (21)  // GPIO 21
-#define DISP_RS_PIN (38)   // GPIO 38
-#define DISP_WR_PIN (17)   // GPIO 17
-
-#define DISP_D00_PIN (1)   // GPIO 1
-#define DISP_D01_PIN (9)   // GPIO 9
-#define DISP_D02_PIN (2)   // GPIO 2
-#define DISP_D03_PIN (10)  // GPIO 10
-#define DISP_D04_PIN (3)   // GPIO 3
-#define DISP_D05_PIN (11)  // GPIO 11
-#define DISP_D06_PIN (4)   // GPIO 4
-#define DISP_D07_PIN (12)  // GPIO 12
-#define DISP_D08_PIN (5)   // GPIO 5
-#define DISP_D09_PIN (13)  // GPIO 13
-
-#define DISP_D10_PIN (6)   // GPIO 6
-#define DISP_D11_PIN (14)  // GPIO 14
-#define DISP_D12_PIN (7)   // GPIO 7
-#define DISP_D13_PIN (15)  // GPIO 15
-#define DISP_D14_PIN (8)   // GPIO 8
-#define DISP_D15_PIN (16)  // GPIO 16
+};
 
 #ifdef __cplusplus
 } /* extern "C" */
