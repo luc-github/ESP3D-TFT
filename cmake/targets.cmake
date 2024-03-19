@@ -1,5 +1,5 @@
 #global drivers
-set(EXTRA_COMPONENT_DIRS hardware/common/components)
+set(EXTRA_COMPONENT_DIRS ${CMAKE_SOURCE_DIR}/hardware/drivers_common)
 
 # all targets
 file(GLOB TARGET_FILES "cmake/targets/*.cmake")
