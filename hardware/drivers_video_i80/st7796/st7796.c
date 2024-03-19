@@ -14,6 +14,8 @@
 #include "esp_check.h"
 #include "disp_def.h"
 #include "st7796.h"
+#define DISP_BL_ON (1)
+#define DISP_BL_OFF (0)
 
 /**********************
  *      TYPEDEFS

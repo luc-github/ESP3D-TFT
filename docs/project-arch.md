@@ -8,6 +8,7 @@ The Goal of this document is to provide a high level overview of the project arc
 
 The project is organized into the following directories:
 
+- `cmake`: Contains the cmake files for the project and for each target
 - `components`: Contains the main components of the project
 - `customization`: Contains the customization files for the project to avoid to change in sources
 - `docs`: Contains project documentation
@@ -24,6 +25,38 @@ The project is organized into the following directories:
 - `.gitignore`: The git ignore file for the project
 - `.gitmodules`: The git submodules file for the project
 - `.github`: The github actions directory for the project
+
+### cmake directory
+
+The `cmake` directory contains the cmake files for the project and for each target. The cmake files are organized into the following files and subdirectories:
+- `dev_tools.cmake`: Contains the cmake file for the development tools (log level, benchmark, log color, etc), this file can be edited but only for debug purpose
+- `features.cmake`: Contains the cmake file for the features of the project (wifi, webserver, etc)
+- `sanity_check.cmake`: Contains the cmake file for the sanity check of the project
+- `targets.cmake`: Complete the cmake file of the project according target board
+- `targets` directory : contains the cmake file for each target board, the file is named as the target board name
+
+Each target file contains the following sections:
+```
+# Ensure the board is enabled in CMakeLists.txt
+if(<BOARD_NAME>) #<BOARD_NAME> is enabled or not in CMakeLists.txt
+    # Add board name (Mandatory)
+    set(TFT_TARGET "<BOARD_NAME>")
+    # Add the sdkconfig file path (Mandatory), it can be specific or based on one of the common sdkconfig   
+    set(SDKCONFIG  ${CMAKE_SOURCE_DIR}/hardware/<BOARD_NAME>/sdkconfig)
+    # Add Specific Components if any for the board (Mandatory)
+    list(APPEND EXTRA_COMPONENT_DIRS ${CMAKE_SOURCE_DIR}/hardware/<BOARD_NAME>/components)
+    # Add specific usb driver for otg (Only if needed)
+    list(APPEND EXTRA_COMPONENT_DIRS ${CMAKE_SOURCE_DIR}/hardware/drivers_usb_otg)
+    # Add specific video driver for i80 (Only if needed)
+    list(APPEND EXTRA_COMPONENT_DIRS ${CMAKE_SOURCE_DIR}/hardware/drivers_video_i80)
+    # Add specific video driver for rgb (Only if needed)
+    list(APPEND EXTRA_COMPONENT_DIRS ${CMAKE_SOURCE_DIR}/hardware/rgb)
+    # Add specific bsp path for board definition (Mandatory)
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/<BOARD_NAME>/components/bsp")
+    # Enable USB-OTG as serial alternative for communications (Only if needed)
+    add_compile_options(-DESP3D_USB_SERIAL_FEATURE=1)
+endif()
+```
 
 ### components directory
 
@@ -74,6 +107,13 @@ The `embedded` directory contains the code for the embedded maintenance web page
 #### hardware directory
 
 The `hardware` directory contains the hardware specific files like drivers, partitions description, specific sdkconfig, hardware configuration files. The hardware specific files are organized into one common subdirectory and one subdirectory for each supported hardware platform.
+- `common`: Contains the common hardware specific files like  partitions description, specific sdkconfig
+- `drivers_common`: Contains the common drivers for all the boards
+- `drivers_video_i80`: Contains the drivers for the i80 video drivers which cannot be in common drivers because of the specific sdkconfig
+- `drivers_video_rgb`: Contains the drivers for the rgb video drivers which cannot be in common drivers because of the specific sdkconfig
+- `drivers_usb_otg`: Contains the drivers for the usb otg which cannot be in common drivers because of the specific sdkconfig and hardware
+- `<BOARD_NAME>`: Contains the hardware drivers, definitions, partitions and sdkconfig specific files for the <BOARD_NAME> board
+- ...
 
 
 | Drivers |Type | Depend | ESP32_2432S028R |  ESP32_3248S035C | ESP32_3248S035R | ESP32_ROTRICS_DEXARM35| ESP32_CUSTOM |
@@ -442,3 +482,29 @@ const ft5x06_config_t ft5x06_cfg = {
     .y_max = 800,     
 };    
 ```
+
+#### tca9554 driver
+The `tca9554` driver is a I2C GPIO expander driver that is used to control the TCA9554 GPIO expander. The `tca9554` driver configuration file is tca9554_def.h.
+
+tca9554_def.h:
+```cpp
+const tca9554_config_t tca9554_cfg = {.i2c_clk_speed = 400 * 1000,
+                                      .i2c_addr = (uint8_t[]){0x3C, 0x24, 0}};
+```
+
+#### usb_serial driver
+The `usb_serial` driver is a USB serial driver that is used to control the OTG USB serial. The `usb_serial` driver configuration usb_serial_def.h.
+
+usb_serial_def.h:
+```cpp
+#define ESP3D_USB_SERIAL_BAUDRATE "115200"
+#define ESP3D_USB_SERIAL_DATA_BITS (8)
+#define ESP3D_USB_SERIAL_PARITY \
+  (0)  // 0: 1 stopbit, 1: 1.5 stopbits, 2: 2 stopbits
+#define ESP3D_USB_SERIAL_STOP_BITS \
+  (0)  // 0: None, 1: Odd, 2: Even, 3: Mark, 4: Space
+  ```
+
+### rm68120 driver
+The `rm68120` driver is a display driver that is used to control the RM68120 display. The `rm68120` driver configuration is part of display driver configuration.
+
