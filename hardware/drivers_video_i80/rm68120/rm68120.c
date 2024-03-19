@@ -250,7 +250,6 @@ esp_err_t esp_lcd_new_panel_rm68120(
                       "configure GPIO for RST line failed");
   }
 
-    esp_i80_rm68120_orientation_t orientation;
   switch(disp_rm68120_configuration->orientation){
     case orientation_portrait:
       orientation = SCR_DIR_TBLR;
