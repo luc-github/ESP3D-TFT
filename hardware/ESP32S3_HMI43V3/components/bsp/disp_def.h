@@ -1,12 +1,10 @@
 // Pins for ESP32S3 HMI43V3
 // Display driver RM68120 parallele 8080
-
-#include "rm68120.h"
 #pragma once
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+#include "rm68120.h"
 #define TFT_DISPLAY_CONTROLLER "RM68120"
 
 #define DISP_ORIENTATION \
@@ -25,7 +23,7 @@ extern "C" {
 #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * (DISP_VER_RES_MAX / 10))
 #define DISP_USE_DOUBLE_BUFFER (true)
 
-const esp_i80_rm68120_config_t rm68120_cfg{
+const esp_i80_rm68120_config_t rm68120_cfg={
     .disp_busconfig =
         {
             .clk_src = LCD_CLK_SRC_DEFAULT,
@@ -59,7 +57,7 @@ const esp_i80_rm68120_config_t rm68120_cfg{
         {
             .cs_gpio_num = -1,
             .pclk_hz = (8 * 1000 *
-                        1000)  // could be 10 if no PSRAM memory= DISP_CLK_FREQ,
+                        1000),  // could be 10 if no PSRAM memory= DISP_CLK_FREQ,
                            .trans_queue_depth = 10,
             .dc_levels =
                 {

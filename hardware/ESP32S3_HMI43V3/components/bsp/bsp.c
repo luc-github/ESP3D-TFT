@@ -30,7 +30,6 @@
 #include "disp_def.h"
 #include "i2c_def.h"
 #include "lvgl.h"
-#include "rm68120.h"
 #include "tca9554_def.h"
 #include "touch_def.h"
 #endif  // ESP3D_DISPLAY_FEATURE
@@ -41,26 +40,22 @@
  *  STATIC PROTOTYPES
  **********************/
 #if ESP3D_DISPLAY_FEATURE
-// static void lv_disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area,
-// lv_color_t * color_p);
 static void lv_touch_read(lv_indev_drv_t* drv, lv_indev_data_t* data);
-// static bool disp_on_vsync_event(esp_lcd_panel_handle_t panel, const
-// esp_lcd_rgb_panel_event_data_t *event_data, void *user_data); esp_err_t
-// esp_lcd_new_panel_st7262(const esp_lcd_rgb_panel_config_t *disp_panel_cfg,
-// esp_lcd_panel_handle_t *disp_panel);
-#endif
+void display_flush_ready();
+void rm68120_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area,
+                   lv_color_t *color_p);
+#endif // ESP3D_DISPLAY_FEATURE
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 #if ESP3D_DISPLAY_FEATURE
 static i2c_bus_handle_t i2c_bus_handle = NULL;
-// static lv_disp_drv_t disp_drv;
-// static esp_lcd_panel_handle_t disp_panel;
+static lv_disp_drv_t disp_drv;
+ static esp_lcd_panel_handle_t disp_panel_handle;
 #endif  // ESP3D_DISPLAY_FEATURE
-/**********************
- *      MACROS
- **********************/
+
+
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -135,7 +130,8 @@ esp_err_t bsp_init(void) {
 
   /* Display controller initialization */
   esp3d_log("Initializing display controller");
-  if (rm68120_init(&disp_drv) != ESP_OK) {
+  if (esp_lcd_new_panel_rm68120(&rm68120_cfg, &disp_panel_handle, (void*)display_flush_ready)!=ESP_OK){
+    esp3d_log_e("RM68120 initialization failed!");
     return ESP_FAIL;
   }
 
@@ -176,15 +172,14 @@ esp_err_t bsp_init(void) {
   /* Initialize the working buffer depending on the selected display.*/
   lv_disp_draw_buf_init(&draw_buf, buf1, buf2, size_in_px);
 
-  esp_lcd_panel_handle_t* panel_handle = rm68120_panel_handle();
+ 
   lv_disp_drv_init(&disp_drv);       /*Basic initialization*/
   disp_drv.flush_cb = rm68120_flush; /*Set your driver function*/
   disp_drv.draw_buf = &draw_buf;     /*Assign the buffer to the display*/
-  disp_drv.hor_res =
-      DISP_HOR_RES_MAX; /*Set the horizontal resolution of the display*/
-  disp_drv.ver_res =
-      DISP_VER_RES_MAX; /*Set the vertical resolution of the display*/
-  disp_drv.user_data = *panel_handle;
+  disp_drv.hor_res = rm68120_cfg.hor_res ; /*Set the horizontal resolution of the display*/
+  disp_drv.ver_res =  rm68120_cfg.ver_res; /*Set the vertical resolution of the display*/
+  disp_drv.user_data =(void*)&disp_panel_handle;
+
   lv_disp_drv_register(&disp_drv); /*Finally register the driver*/
   if (has_touch) {
     /* Register an input device */
@@ -203,6 +198,19 @@ esp_err_t bsp_init(void) {
  *   STATIC FUNCTIONS
  **********************/
 #if ESP3D_DISPLAY_FEATURE
+
+void display_flush_ready(){
+  lv_disp_flush_ready(&disp_drv);
+}
+
+void rm68120_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area,
+                   lv_color_t *color_p) {
+  esp_lcd_panel_handle_t panel_handle =
+      (esp_lcd_panel_handle_t)disp_drv->user_data;
+
+  esp_lcd_panel_draw_bitmap(panel_handle, area->x1, area->y1, area->x2 + 1,
+                            area->y2 + 1, color_p);
+}
 
 /**
  * Reads touch input for the LVGL input device driver.
