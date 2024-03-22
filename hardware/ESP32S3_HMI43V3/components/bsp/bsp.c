@@ -73,7 +73,7 @@ static esp_lcd_panel_handle_t panel_handle = NULL;
  */
 esp_err_t bsp_init_usb(void) {
   /*usb host initialization */
-  esp3d_log_d("Initializing usb-serial");
+  esp3d_log("Initializing usb-serial");
   return usb_serial_create_task();
 }
 
@@ -87,7 +87,7 @@ esp_err_t bsp_init_usb(void) {
  * otherwise returns an error code.
  */
 esp_err_t bsp_deinit_usb(void) {
-  esp3d_log_d("Remove usb-serial");
+  esp3d_log("Remove usb-serial");
   return usb_serial_deinit();
 }
 
@@ -103,10 +103,10 @@ esp_err_t bsp_init(void) {
 #if ESP3D_DISPLAY_FEATURE
 
   // Drivers initialization
-  esp3d_log_d("Display buffer size: %d", DISP_BUF_SIZE);
+  esp3d_log("Display buffer size: %d", DISP_BUF_SIZE);
 
   /* i2c controller initialization */
-  esp3d_log_d("Initializing i2C controller...");
+  esp3d_log("Initializing i2C controller...");
   i2c_bus_handle = i2c_bus_create(I2C_PORT_NUMBER, &i2c_cfg);
   if (i2c_bus_handle == NULL) {
     esp3d_log_e("I2C bus initialization failed!");
@@ -122,7 +122,7 @@ esp_err_t bsp_init(void) {
   }
 #if ESP3D_DISPLAY_FEATURE
   /* tca9554 controller initialization */
-  esp3d_log_d("Initializing tca9554 controller");
+  esp3d_log("Initializing tca9554 controller");
   if (tca9554_init(i2c_bus_handle, &tca9554_cfg) != ESP_OK) {
     esp3d_log_e("TCA9554 initialization failed!");
     return ESP_FAIL;
@@ -136,7 +136,7 @@ esp_err_t bsp_init(void) {
   }
 
   /* Touch controller initialization */
-  esp3d_log_d("Initializing touch controller...");
+  esp3d_log("Initializing touch controller...");
   bool has_touch = true;
   if (ft5x06_init(i2c_bus_handle, &ft5x06_cfg) != ESP_OK) {
     esp3d_log_e("Touch controller initialization failed!");
@@ -147,7 +147,7 @@ esp_err_t bsp_init(void) {
   lv_init();
 
   // Lvgl setup
-  esp3d_log_d("Setup Lvgl");
+  esp3d_log("Setup Lvgl");
   lv_color_t* buf1 = (lv_color_t*)heap_caps_malloc(
       DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
   if (buf1 == NULL) {
@@ -224,7 +224,7 @@ static void lv_touch_read(lv_indev_drv_t* drv, lv_indev_data_t* data) {
   if (touch_data.is_pressed) {
     last_x = touch_data.x;
     last_y = touch_data.y;
-    esp3d_log_d("Touch x=%d, y=%d", last_x, last_y);
+    esp3d_log("Touch x=%d, y=%d", last_x, last_y);
   }
   data->point.x = last_x;
   data->point.y = last_y;
