@@ -27,8 +27,9 @@
 
 
 #if ESP3D_DISPLAY_FEATURE
-#include "disp_def.h"
+
 #include "i2c_def.h"
+#include "disp_def.h"
 #include "lvgl.h"
 #include "tca9554_def.h"
 #include "touch_def.h"
@@ -52,7 +53,7 @@ void rm68120_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area,
 #if ESP3D_DISPLAY_FEATURE
 static i2c_bus_handle_t i2c_bus_handle = NULL;
 static lv_disp_drv_t disp_drv;
- static esp_lcd_panel_handle_t disp_panel_handle = NULL;
+static esp_lcd_panel_handle_t panel_handle = NULL;
 #endif  // ESP3D_DISPLAY_FEATURE
 
 
@@ -100,7 +101,6 @@ esp_err_t bsp_deinit_usb(void) {
  */
 esp_err_t bsp_init(void) {
 #if ESP3D_DISPLAY_FEATURE
-  static lv_disp_drv_t disp_drv; /*Descriptor of a display driver*/
 
   // Drivers initialization
   esp3d_log_d("Display buffer size: %d", DISP_BUF_SIZE);
@@ -128,15 +128,13 @@ esp_err_t bsp_init(void) {
     return ESP_FAIL;
   }
 
-  esp3d_log_d("panel handle before init %p",disp_panel_handle );
 
   /* Display controller initialization */
-  esp3d_log_d("Initializing display controller");
-  if (esp_lcd_new_panel_rm68120(&rm68120_cfg, &disp_panel_handle, (void*)display_flush_ready)!=ESP_OK){
-    esp3d_log_e("RM68120 initialization failed!");
+  esp3d_log("Initializing display controller");
+  if (rm68120_init(&rm68120_cfg, &panel_handle, (void*)display_flush_ready) != ESP_OK) {
     return ESP_FAIL;
   }
-   esp3d_log_d("panel handle afeter init %p",disp_panel_handle );
+
   /* Touch controller initialization */
   esp3d_log_d("Initializing touch controller...");
   bool has_touch = true;
@@ -180,11 +178,10 @@ esp_err_t bsp_init(void) {
   disp_drv.draw_buf = &draw_buf;     /*Assign the buffer to the display*/
   disp_drv.hor_res = rm68120_cfg.hor_res ; /*Set the horizontal resolution of the display*/
   disp_drv.ver_res =  rm68120_cfg.ver_res; /*Set the vertical resolution of the display*/
-  disp_drv.user_data = &disp_panel_handle;
-
-  esp3d_log_d("panel handle assigned %p",disp_drv.user_data );
-
+  disp_drv.user_data = panel_handle;
   lv_disp_drv_register(&disp_drv); /*Finally register the driver*/
+
+
   if (has_touch) {
     /* Register an input device */
     static lv_indev_drv_t indev_drv; /*Descriptor of a input device driver*/
@@ -209,14 +206,12 @@ void display_flush_ready(){
 
 void rm68120_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area,
                    lv_color_t *color_p) {
-  esp_lcd_panel_handle_t * panel_handle_ptr =
-      ((esp_lcd_panel_handle_t *)(disp_drv->user_data));
-      esp3d_log_d("panel handle %p",*panel_handle_ptr );
+  esp_lcd_panel_handle_t panel_handle =
+      (esp_lcd_panel_handle_t)disp_drv->user_data;
 
-  esp_lcd_panel_draw_bitmap(*panel_handle_ptr, area->x1, area->y1, area->x2 + 1,
+  esp_lcd_panel_draw_bitmap(panel_handle, area->x1, area->y1, area->x2 + 1,
                             area->y2 + 1, color_p);
 }
-
 /**
  * Reads touch input for the LVGL input device driver.
  *

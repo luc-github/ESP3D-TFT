@@ -19,11 +19,11 @@ extern "C" {
 #include "esp_lcd_panel_ops.h"
 #include "esp_lcd_panel_interface.h"
 #include "esp_lcd_panel_commands.h"
-#include "esp_lcd_panel_ops.h"
 
 /**********************
  *      TYPEDEFS
  **********************/
+
 typedef enum {
     orientation_portrait = 0,
     orientation_landscape = 1,
@@ -40,24 +40,21 @@ typedef struct {
     uint16_t ver_res;
 } esp_i80_rm68120_config_t;
 
-
-
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
 /**
- * @brief Initializes a new RM68120 LCD panel.
+ * @brief Initializes the RM68120 display driver.
  *
- * This function initializes a new RM68120 LCD panel with the provided configuration.
+ * This function initializes the RM68120 display driver with the provided configuration.
  *
- * @param disp_rm68120_cfg Pointer to the configuration structure for the RM68120 panel.
- * @param disp_panel Pointer to the handle of the LCD panel.
+ * @param disp_rm68120_cfg Pointer to the configuration structure for the RM68120 display driver.
+ * @param panel_handle Pointer to the handle of the LCD panel.
  * @param flush_ready_fn Pointer to the flush ready function.
- * @return `ESP_OK` if the panel is successfully initialized, or an error code if initialization fails.
+ * @return `ESP_OK` if the initialization is successful, otherwise an error code.
  */
-esp_err_t esp_lcd_new_panel_rm68120(const esp_i80_rm68120_config_t *disp_rm68120_cfg, esp_lcd_panel_handle_t *disp_panel, void * flush_ready_fn);
+esp_err_t rm68120_init(const esp_i80_rm68120_config_t *disp_rm68120_cfg,esp_lcd_panel_handle_t *panel_handle,  void * flush_ready_fn);
 
 #ifdef __cplusplus
 } /* extern "C" */
