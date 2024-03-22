@@ -56,7 +56,7 @@ void ESP3DCommands::ESP216(int cmd_params_pos, ESP3DMessage* msg) {
     lv_obj_t * currentt_scr = lv_scr_act();
     lv_img_dsc_t snapshot ;
     uint32_t buffer_size = lv_snapshot_buf_size_needed(currentt_scr, LV_IMG_CF_TRUE_COLOR);
-    esp3d_log_d("Snapshot buffer size needed: %ld", buffer_size);
+    esp3d_log("Snapshot buffer size needed: %ld", buffer_size);
     uint8_t      *buffer_image = (uint8_t *)malloc(buffer_size);
     if (!buffer_image) {
         hasError = true;
