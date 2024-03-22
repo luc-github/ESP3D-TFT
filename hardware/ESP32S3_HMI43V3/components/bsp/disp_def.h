@@ -23,8 +23,8 @@ extern "C" {
 #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * (DISP_VER_RES_MAX / 10))
 #define DISP_USE_DOUBLE_BUFFER (true)
 
-const esp_i80_rm68120_config_t rm68120_cfg={
-    .disp_busconfig =
+const esp_i80_rm68120_config_t rm68120_cfg = {
+    .bus_config =
         {
             .clk_src = LCD_CLK_SRC_DEFAULT,
             .dc_gpio_num = 38,  // DISP_RS_PIN=GPIO38
@@ -53,12 +53,13 @@ const esp_i80_rm68120_config_t rm68120_cfg={
             .psram_trans_align = 64,
             .sram_trans_align = 4,
         },
-    .disp_ioconfig =
+    .io_config =
         {
             .cs_gpio_num = -1,
-            .pclk_hz = (8 * 1000 *
-                        1000),  // could be 10 if no PSRAM memory= DISP_CLK_FREQ,
-                           .trans_queue_depth = 10,
+            .pclk_hz =
+                (8 * 1000 *
+                 1000),  // could be 10 if no PSRAM memory= DISP_CLK_FREQ,
+            .trans_queue_depth = 10,
             .dc_levels =
                 {
                     .dc_idle_level = 0,
@@ -75,16 +76,23 @@ const esp_i80_rm68120_config_t rm68120_cfg={
             .lcd_cmd_bits = 16,    // DISP_CMD_BITS_WIDTH
             .lcd_param_bits = 16,  // DISP_PARAM_BITS_WIDTH
         },
-    .disp_devconfig =
+    .panel_config =
         {
             .reset_gpio_num = 21,  // DISP_RST_PIN = GPIO21
-            .color_space = ESP_LCD_COLOR_SPACE_RGB,
-            .bits_per_pixel = 16,
+            .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_RGB,
+            .data_endian =
+                0, /*!< Set the data endian for color data larger than 1 byte */
+            .bits_per_pixel = 16, /*!< Color depth, in bpp */
+            .flags =
+                {
+                    .reset_active_high = 0, /*!< Setting this if the panel reset
+                                               is high level active */
+                },
+            .vendor_config = NULL, /*!< Vendor specific configuration */
         },
     .orientation = DISP_ORIENTATION,
     .hor_res = DISP_HOR_RES_MAX,
     .ver_res = DISP_VER_RES_MAX,
-
 };
 
 #ifdef __cplusplus

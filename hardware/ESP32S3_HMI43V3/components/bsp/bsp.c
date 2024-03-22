@@ -52,7 +52,7 @@ void rm68120_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area,
 #if ESP3D_DISPLAY_FEATURE
 static i2c_bus_handle_t i2c_bus_handle = NULL;
 static lv_disp_drv_t disp_drv;
- static esp_lcd_panel_handle_t disp_panel_handle;
+ static esp_lcd_panel_handle_t disp_panel_handle = NULL;
 #endif  // ESP3D_DISPLAY_FEATURE
 
 
@@ -72,7 +72,7 @@ static lv_disp_drv_t disp_drv;
  */
 esp_err_t bsp_init_usb(void) {
   /*usb host initialization */
-  esp3d_log("Initializing usb-serial");
+  esp3d_log_d("Initializing usb-serial");
   return usb_serial_create_task();
 }
 
@@ -86,7 +86,7 @@ esp_err_t bsp_init_usb(void) {
  * otherwise returns an error code.
  */
 esp_err_t bsp_deinit_usb(void) {
-  esp3d_log("Remove usb-serial");
+  esp3d_log_d("Remove usb-serial");
   return usb_serial_deinit();
 }
 
@@ -103,10 +103,10 @@ esp_err_t bsp_init(void) {
   static lv_disp_drv_t disp_drv; /*Descriptor of a display driver*/
 
   // Drivers initialization
-  esp3d_log("Display buffer size: %d", DISP_BUF_SIZE);
+  esp3d_log_d("Display buffer size: %d", DISP_BUF_SIZE);
 
   /* i2c controller initialization */
-  esp3d_log("Initializing i2C controller...");
+  esp3d_log_d("Initializing i2C controller...");
   i2c_bus_handle = i2c_bus_create(I2C_PORT_NUMBER, &i2c_cfg);
   if (i2c_bus_handle == NULL) {
     esp3d_log_e("I2C bus initialization failed!");
@@ -122,21 +122,23 @@ esp_err_t bsp_init(void) {
   }
 #if ESP3D_DISPLAY_FEATURE
   /* tca9554 controller initialization */
-  esp3d_log("Initializing tca9554 controller");
+  esp3d_log_d("Initializing tca9554 controller");
   if (tca9554_init(i2c_bus_handle, &tca9554_cfg) != ESP_OK) {
     esp3d_log_e("TCA9554 initialization failed!");
     return ESP_FAIL;
   }
 
+  esp3d_log_d("panel handle before init %p",disp_panel_handle );
+
   /* Display controller initialization */
-  esp3d_log("Initializing display controller");
+  esp3d_log_d("Initializing display controller");
   if (esp_lcd_new_panel_rm68120(&rm68120_cfg, &disp_panel_handle, (void*)display_flush_ready)!=ESP_OK){
     esp3d_log_e("RM68120 initialization failed!");
     return ESP_FAIL;
   }
-
+   esp3d_log_d("panel handle afeter init %p",disp_panel_handle );
   /* Touch controller initialization */
-  esp3d_log("Initializing touch controller...");
+  esp3d_log_d("Initializing touch controller...");
   bool has_touch = true;
   if (ft5x06_init(i2c_bus_handle, &ft5x06_cfg) != ESP_OK) {
     esp3d_log_e("Touch controller initialization failed!");
@@ -147,7 +149,7 @@ esp_err_t bsp_init(void) {
   lv_init();
 
   // Lvgl setup
-  esp3d_log("Setup Lvgl");
+  esp3d_log_d("Setup Lvgl");
   lv_color_t* buf1 = (lv_color_t*)heap_caps_malloc(
       DISP_BUF_SIZE * sizeof(lv_color_t), MALLOC_CAP_DMA);
   if (buf1 == NULL) {
@@ -178,7 +180,9 @@ esp_err_t bsp_init(void) {
   disp_drv.draw_buf = &draw_buf;     /*Assign the buffer to the display*/
   disp_drv.hor_res = rm68120_cfg.hor_res ; /*Set the horizontal resolution of the display*/
   disp_drv.ver_res =  rm68120_cfg.ver_res; /*Set the vertical resolution of the display*/
-  disp_drv.user_data =(void*)&disp_panel_handle;
+  disp_drv.user_data = &disp_panel_handle;
+
+  esp3d_log_d("panel handle assigned %p",disp_drv.user_data );
 
   lv_disp_drv_register(&disp_drv); /*Finally register the driver*/
   if (has_touch) {
@@ -205,10 +209,11 @@ void display_flush_ready(){
 
 void rm68120_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area,
                    lv_color_t *color_p) {
-  esp_lcd_panel_handle_t panel_handle =
-      (esp_lcd_panel_handle_t)disp_drv->user_data;
+  esp_lcd_panel_handle_t * panel_handle_ptr =
+      ((esp_lcd_panel_handle_t *)(disp_drv->user_data));
+      esp3d_log_d("panel handle %p",*panel_handle_ptr );
 
-  esp_lcd_panel_draw_bitmap(panel_handle, area->x1, area->y1, area->x2 + 1,
+  esp_lcd_panel_draw_bitmap(*panel_handle_ptr, area->x1, area->y1, area->x2 + 1,
                             area->y2 + 1, color_p);
 }
 
@@ -224,7 +229,7 @@ static void lv_touch_read(lv_indev_drv_t* drv, lv_indev_data_t* data) {
   if (touch_data.is_pressed) {
     last_x = touch_data.x;
     last_y = touch_data.y;
-    esp3d_log("Touch x=%d, y=%d", last_x, last_y);
+    esp3d_log_d("Touch x=%d, y=%d", last_x, last_y);
   }
   data->point.x = last_x;
   data->point.y = last_y;

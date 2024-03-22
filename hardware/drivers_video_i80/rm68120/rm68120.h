@@ -32,9 +32,9 @@ typedef enum {
 } esp_i80_rm68120_orientation_t;
 
 typedef struct {
-    esp_lcd_i80_bus_config_t disp_busconfig;
-    esp_lcd_panel_io_i80_config_t disp_ioconfig;
-    esp_lcd_panel_dev_config_t disp_devconfig;
+    esp_lcd_i80_bus_config_t bus_config ;
+    esp_lcd_panel_io_i80_config_t io_config;
+    esp_lcd_panel_dev_config_t panel_config;
     esp_i80_rm68120_orientation_t orientation;
     uint16_t hor_res;
     uint16_t ver_res;

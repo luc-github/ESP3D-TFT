@@ -120,7 +120,7 @@ static esp_err_t panel_rm68120_set_gap(esp_lcd_panel_t *panel, int x_gap,
 static esp_err_t panel_rm68120_disp_off(esp_lcd_panel_t *panel, bool off);
 static void rm68120_reg_config(esp_lcd_panel_t *panel);
 
-esp_err_t esp_lcd_new_panel_rm68120_init(
+esp_err_t esp_lcd_panel_rm68120_create(
     const esp_lcd_panel_io_handle_t io,
     const esp_lcd_panel_dev_config_t *panel_dev_config,
     esp_lcd_panel_handle_t *ret_panel);
@@ -138,7 +138,7 @@ esp_err_t esp_lcd_new_panel_rm68120_init(
  *
  * @param disp_rm68120_cfg Pointer to the configuration structure for the
  * RM68120 panel.
- * @param disp_panel Pointer to the handle of the LCD panel.
+ * @param panel_handle Pointer to the handle of the LCD panel.
  * @param flush_ready_fn Pointer to the function that will be called when the
  * flush operation is ready.
  *
@@ -147,18 +147,17 @@ esp_err_t esp_lcd_new_panel_rm68120_init(
  */
 esp_err_t esp_lcd_new_panel_rm68120(
     const esp_i80_rm68120_config_t *disp_rm68120_cfg,
-    esp_lcd_panel_handle_t *disp_panel, void *flush_ready_fn) {
-  if (disp_rm68120_cfg == NULL || disp_panel == NULL) {
+    esp_lcd_panel_handle_t *panel_handle, void *flush_ready_fn) {
+  if (disp_rm68120_cfg == NULL ) {
     esp3d_log_e("Panel creation failed, invalid argument");
     return ESP_ERR_INVALID_ARG;
   }
   disp_rm68120_configuration = disp_rm68120_cfg;
-  esp_lcd_panel_handle_t panel_handle = NULL;
   esp3d_log("init rm68120 lcd bus");
   esp_lcd_i80_bus_handle_t i80_bus = NULL;
   esp3d_log("init lcd bus");
   esp_err_t err =
-      esp_lcd_new_i80_bus(&(disp_rm68120_cfg->disp_busconfig), &i80_bus);
+      esp_lcd_new_i80_bus(&(disp_rm68120_cfg->bus_config ), &i80_bus);
   if (err != ESP_OK) {
     esp3d_log_e("init lcd i80 display bus failed");
     return err;
@@ -169,29 +168,30 @@ esp_err_t esp_lcd_new_panel_rm68120(
   }
   esp3d_log("init lcd panel");
   esp_lcd_panel_io_handle_t io_handle = NULL;
-  esp_lcd_panel_io_i80_config_t io_config = disp_rm68120_cfg->disp_ioconfig;
+  esp_lcd_panel_io_i80_config_t io_config = disp_rm68120_cfg->io_config;
   io_config.on_color_trans_done =
       rm68120_notify_flush_ready;    // Callback invoked when color data
                                      // transfer has finished
   io_config.user_ctx = flush_ready_fn;  // User private data, passed directly
                                      // to on_color_trans_done’s user_ctx
   err = esp_lcd_new_panel_io_i80(i80_bus, &io_config, &io_handle);
-  if (err != ESP_OK) {
+  if (err != ESP_OK || io_handle == NULL) {
     esp3d_log_e("init lcd i80 display bus failed");
     return err;
   }
 
-  esp3d_log("init lcd panel rm68120");
-  err = esp_lcd_new_panel_rm68120_init(
-      io_handle, &(disp_rm68120_cfg->disp_devconfig), &panel_handle);
+  esp3d_log("create lcd panel rm68120");
+  err = esp_lcd_panel_rm68120_create(
+      io_handle, &(disp_rm68120_cfg->panel_config), panel_handle);
   if (err != ESP_OK) {
     esp3d_log_e("init lcd i80 display bus failed");
     return err;
   }
+  esp3d_log("Reset lcd panel");
+  esp_lcd_panel_reset(*panel_handle);  
+  esp3d_log("Init lcd panel");
+  esp_lcd_panel_init(*panel_handle); 
 
-  esp_lcd_panel_reset(panel_handle);  // LCD Reset
-  esp_lcd_panel_init(panel_handle);   // LCD init
-  *disp_panel = panel_handle;
   return ESP_OK;
 }
 
@@ -211,7 +211,7 @@ esp_err_t esp_lcd_new_panel_rm68120(
  * @return `ESP_OK` if the panel is successfully initialized, or an error code
  * if initialization fails.
  */
-esp_err_t esp_lcd_new_panel_rm68120_init(
+esp_err_t esp_lcd_panel_rm68120_create(
     const esp_lcd_panel_io_handle_t io,
     const esp_lcd_panel_dev_config_t *panel_dev_config,
     esp_lcd_panel_handle_t *ret_panel) {
