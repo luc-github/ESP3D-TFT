@@ -200,6 +200,11 @@ esp_err_t bsp_init(void) {
  **********************/
 #if ESP3D_DISPLAY_FEATURE
 
+/**
+ * @brief Indicates that the display flush is ready.
+ *
+ * This function is called to indicate that the display flush operation has completed and the display is ready for the next operation.
+ */
 void display_flush_ready(){
   lv_disp_flush_ready(&disp_drv);
 }
@@ -212,6 +217,7 @@ void rm68120_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area,
   esp_lcd_panel_draw_bitmap(panel_handle, area->x1, area->y1, area->x2 + 1,
                             area->y2 + 1, color_p);
 }
+
 /**
  * Reads touch input for the LVGL input device driver.
  *
