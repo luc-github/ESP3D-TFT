@@ -28,7 +28,6 @@
 #include "disp_def.h"
 #include "esp3d_log.h"
 #include "ft5x06.h"
-#include "i2c_bus.h"
 #include "i2c_def.h"
 #include "lvgl.h"
 #include "st7796.h"
@@ -44,12 +43,6 @@
 static i2c_bus_handle_t i2c_bus_handle = NULL;
 static lv_disp_drv_t disp_drv;
 //static esp_lcd_panel_handle_t panel_handle = NULL;
-static i2c_config_t conf = {.mode = I2C_MODE_MASTER,
-                            .scl_io_num = I2C_SCL_PIN,
-                            .sda_io_num = I2C_SDA_PIN,
-                            .scl_pullup_en = GPIO_PULLUP_ENABLE,
-                            .sda_pullup_en = GPIO_PULLUP_ENABLE,
-                            .master.clk_speed = I2C_CLK_SPEED};
 #endif  // ESP3D_DISPLAY_FEATURE
 
 
@@ -110,14 +103,11 @@ esp_err_t bsp_init(void) {
   /* i2c controller initialization */
   esp3d_log_d("Initializing i2C controller");
 
-  if (NULL != i2c_bus_handle) {
-    esp3d_log_e("I2C bus already initialized.");
-    return ESP_FAIL;
-  }
-
-  i2c_bus_handle = i2c_bus_create(I2C_PORT_NUMBER, &conf);
+  /* i2c controller initialization */
+  esp3d_log_d("Initializing i2C controller...");
+  i2c_bus_handle = i2c_bus_create(I2C_PORT_NUMBER, &i2c_cfg);
   if (i2c_bus_handle == NULL) {
-    esp3d_log_e("I2C bus failed to be initialized.");
+    esp3d_log_e("I2C bus initialization failed!");
     return ESP_FAIL;
   }
 #endif  // ESP3D_DISPLAY_FEATURE
