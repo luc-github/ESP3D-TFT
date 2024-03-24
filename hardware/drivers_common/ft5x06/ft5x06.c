@@ -171,7 +171,7 @@ esp_err_t ft5x06_init(i2c_bus_handle_t i2c_bus, const ft5x06_config_t *config) {
   _ft5x06_x_max = _config->x_max;
   _ft5x06_y_max = _config->y_max;
 
-  esp3d_log_d("ft5x06 init, x_max=%d, y_max=%d", _ft5x06_x_max, _ft5x06_y_max);
+  esp3d_log("ft5x06 init, x_max=%d, y_max=%d", _ft5x06_x_max, _ft5x06_y_max);
 
   // Make sure INT pin is low before reset procedure
   if (GPIO_IS_VALID_OUTPUT_GPIO(config->int_pin)) {
@@ -332,7 +332,7 @@ esp_err_t ft5x06_init(i2c_bus_handle_t i2c_bus, const ft5x06_config_t *config) {
     _ft5x06_x_max = _ft5x06_y_max;
     _ft5x06_y_max = swap_tmp;
   }
-  esp3d_log_d("ft5x06 Limits x=%d, y=%d", _ft5x06_x_max, _ft5x06_y_max);
+  esp3d_log("ft5x06 Limits x=%d, y=%d", _ft5x06_x_max, _ft5x06_y_max);
   if (_ft5x06_x_max == 0 || _ft5x06_y_max == 0) {
     esp3d_log_e("ft5x06 invalid limits");
     return ESP_FAIL;
@@ -375,7 +375,7 @@ ft5x06_data_t ft5x06_read() {
     if (_config->invert_y) {
       data.y = _ft5x06_y_max - data.y;
     }
-    esp3d_log_d("P(%d,%d)", data.x, data.y);
+    esp3d_log("P(%d,%d)", data.x, data.y);
   }
   return data;
 }
