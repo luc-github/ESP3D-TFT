@@ -25,29 +25,18 @@
 #include "bsp.h"
 #include "usb_serial.h"
 
-/*********************
- *      DEFINES
- *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
-
-/**********************
- *  STATIC PROTOTYPES
- **********************/
-
-/**********************
- *  STATIC VARIABLES
- **********************/
-
-/**********************
- *      MACROS
- **********************/
 
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+/**
+ * @brief Initializes the USB functionality of the BSP.
+ *
+ * This function initializes the USB functionality of the BSP (Board Support Package).
+ * It performs any necessary setup and configuration for USB operations.
+ *
+ * @return esp_err_t Returns `ESP_OK` if the USB initialization is successful, or an error code if it fails.
+ */
 esp_err_t bsp_init_usb(void)
 {
     /*usb host initialization */
@@ -55,12 +44,26 @@ esp_err_t bsp_init_usb(void)
     return usb_serial_create_task();
 }
 
+/**
+ * @brief Deinitializes the USB functionality of the BSP.
+ *
+ * This function is responsible for deinitializing the USB functionality of the BSP.
+ *
+ * @return esp_err_t Returns `ESP_OK` on success, or an error code if an error occurred.
+ */
 esp_err_t bsp_deinit_usb(void)
 {
     esp3d_log("Remove usb-serial");
     return usb_serial_deinit();
 }
 
+/**
+ * @brief Initializes the Board Support Package (BSP).
+ *
+ * This function initializes the necessary hardware and peripherals for the board.
+ *
+ * @return esp_err_t Returns ESP_OK on success, or an error code if initialization fails.
+ */
 esp_err_t bsp_init(void)
 {
     if ( usb_serial_init()!=ESP_OK) {

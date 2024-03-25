@@ -31,14 +31,6 @@
 #include "touch_def.h"
 #endif  // ESP3D_DISPLAY_FEATURE
 
-/*********************
- *      DEFINES
- *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -46,7 +38,7 @@
 static bool disp_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_rgb_panel_event_data_t *event_data, void *user_data);
 static void lv_disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 static void lv_touch_read(lv_indev_drv_t * drv, lv_indev_data_t * data);
-#endif
+#endif // ESP3D_DISPLAY_FEATURE
 
 /**********************
  *  STATIC VARIABLES
@@ -61,16 +53,19 @@ static esp_lcd_panel_handle_t disp_panel;
 static SemaphoreHandle_t _sem_vsync_end;
 static SemaphoreHandle_t _sem_gui_ready;
 #endif  // DISP_AVOID_TEAR_EFFECT_WITH_SEM
-#endif
-
-/**********************
- *      MACROS
- **********************/
+#endif // ESP3D_DISPLAY_FEATURE
 
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
 
+/**
+ * @brief Initializes the Board Support Package (BSP).
+ *
+ * This function initializes the necessary hardware and peripherals required by the BSP.
+ *
+ * @return esp_err_t Returns ESP_OK on success, or an error code if initialization fails.
+ */
 esp_err_t bsp_init(void) {
 #if ESP3D_DISPLAY_FEATURE
   /* Display backlight initialization */
@@ -79,15 +74,33 @@ esp_err_t bsp_init(void) {
 
   /* Display panel initialization */
   esp3d_log("Initializing display...");
-  ESP_ERROR_CHECK(esp_lcd_new_rgb_panel(&disp_panel_cfg, &disp_panel));
-  ESP_ERROR_CHECK(esp_lcd_panel_reset(disp_panel));
-  ESP_ERROR_CHECK(esp_lcd_panel_init(disp_panel));
-  //ESP_ERROR_CHECK(esp_lcd_panel_invert_color(disp_panel, true));
+  if(esp_lcd_new_rgb_panel(&disp_panel_cfg, &disp_panel) != ESP_OK) {
+    esp3d_log_e("Display initialization failed!");
+    return ESP_FAIL;
+  }
+  if(esp_lcd_panel_reset(disp_panel) != ESP_OK) {
+    esp3d_log_e("Display reset failed!");
+    return ESP_FAIL;
+  }
+  if(esp_lcd_panel_init(disp_panel) != ESP_OK) {
+    esp3d_log_e("Display initialization failed!");
+    return ESP_FAIL;
+  }
+  //if(esp_lcd_panel_invert_color(disp_panel, true) != ESP_OK) {
+  //  esp3d_log_e("Display invert color failed!");
+  //  return ESP_FAIL;
+  //}
 #if DISP_ORIENTATION == 0 || DISP_ORIENTATION == 1  // portrait mode
-  ESP_ERROR_CHECK(esp_lcd_panel_swap_xy(disp_panel, true));
+  if(esp_lcd_panel_swap_xy(disp_panel, true) != ESP_OK) {
+    esp3d_log_e("Display swap xy failed!");
+    return ESP_FAIL;
+  }
 #endif //DISP_ORIENTATION
 #if DISP_ORIENTATION == 1 || DISP_ORIENTATION == 3  // mirrored
-  ESP_ERROR_CHECK(esp_lcd_panel_mirror(disp_panel, true, true));
+  if(esp_lcd_panel_mirror(disp_panel, true, true) != ESP_OK) {
+    esp3d_log_e("Display mirror failed!");
+    return ESP_FAIL;
+  }
 #endif //DISP_ORIENTATION  
 
 #if DISP_AVOID_TEAR_EFFECT_WITH_SEM
@@ -108,7 +121,10 @@ esp_err_t bsp_init(void) {
   esp_lcd_rgb_panel_event_callbacks_t cbs = {
       .on_vsync = disp_on_vsync_event,
   };
-  ESP_ERROR_CHECK(esp_lcd_rgb_panel_register_event_callbacks(disp_panel, &cbs, &disp_drv));
+  if(esp_lcd_rgb_panel_register_event_callbacks(disp_panel, &cbs, &disp_drv) != ESP_OK) {
+    esp3d_log_e("Failed to register VSync event callback");
+    return ESP_FAIL;
+  }
 
   /* i2c controller initialization */
   esp3d_log("Initializing i2C controller...");
@@ -139,7 +155,10 @@ esp_err_t bsp_init(void) {
   void* buf2 = NULL;
 #if DISP_NUM_FB == 2
   esp3d_log("Use panel frame buffers as LVGL draw buffers");
-  ESP_ERROR_CHECK(esp_lcd_rgb_panel_get_frame_buffer(disp_panel, 2, &buf1, &buf2));
+  if(esp_lcd_rgb_panel_get_frame_buffer(disp_panel, 2, &buf1, &buf2) != ESP_OK) {
+    esp3d_log_e("Failed to get panel frame buffers");
+    return ESP_FAIL;
+  }
 #else
   esp3d_log("Allocate LVGL draw buffer");
   buf1 = heap_caps_malloc(DISP_BUF_SIZE_BYTES, MALLOC_CAP_SPIRAM);
@@ -184,19 +203,35 @@ esp_err_t bsp_init(void) {
   return ESP_OK;
 }
 
+/**
+ * @brief Accesses the file system.
+ *
+ * This function is responsible for accessing the file system.
+ *
+ * @return esp_err_t Returns ESP_OK if the file system is accessed successfully,
+ *                   otherwise returns an error code.
+ */
 esp_err_t bsp_accessFs(void) {
 #if ESP3D_DISPLAY_FEATURE  
-  esp_err_t ret = esp_lcd_rgb_panel_set_pclk(disp_panel, 6 * 1000 * 1000);
-  vTaskDelay(pdMS_TO_TICKS(40));
+  esp_err_t ret = esp_lcd_rgb_panel_set_pclk(disp_panel,DISP_PATCH_FS_FREQ);
+  vTaskDelay(pdMS_TO_TICKS(DISP_PATCH_FS_DELAY));
   return ret;
 #endif  // ESP3D_DISPLAY_FEATURE
   return ESP_OK;
 }
 
+/**
+ * @brief Releases the file system resources used by the BSP.
+ *
+ * This function releases the file system resources used by the BSP.
+ *
+ * @return esp_err_t Returns ESP_OK if the file system resources are released successfully,
+ *                   or an error code if there was an issue releasing the resources.
+ */
 esp_err_t bsp_releaseFs(void) {
 #if ESP3D_DISPLAY_FEATURE  
   esp_err_t ret = esp_lcd_rgb_panel_set_pclk(disp_panel, DISP_CLK_FREQ);
-  vTaskDelay(pdMS_TO_TICKS(40));
+  vTaskDelay(pdMS_TO_TICKS(DISP_PATCH_FS_DELAY));
   return ret;
 #endif  // ESP3D_DISPLAY_FEATURE
   return ESP_OK;
@@ -207,6 +242,20 @@ esp_err_t bsp_releaseFs(void) {
  **********************/
 #if ESP3D_DISPLAY_FEATURE
 
+/**
+ * @brief Callback function for handling the display on vsync event.
+ *
+ * This function is called when a vsync event occurs on the LCD panel.
+ * It takes the LCD panel handle, event data, and user data as parameters.
+ * The function checks if the GUI is ready by attempting to take a semaphore.
+ * If the semaphore is successfully taken, it gives another semaphore to signal the end of vsync.
+ * The function returns true if the high priority task is awoken, false otherwise.
+ *
+ * @param panel The handle of the LCD panel.
+ * @param event_data The event data associated with the vsync event.
+ * @param user_data User data passed to the function.
+ * @return true if the high priority task is awoken, false otherwise.
+ */
 static bool disp_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_rgb_panel_event_data_t *event_data, void *user_data) {
   BaseType_t high_task_awoken = pdFALSE;
 #if DISP_AVOID_TEAR_EFFECT_WITH_SEM
@@ -217,6 +266,17 @@ static bool disp_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_rgb_
   return high_task_awoken == pdTRUE;
 }
 
+/**
+ * @brief Flushes the display with the provided color data within the specified area.
+ *
+ * This function is responsible for updating the display with the provided color data
+ * within the specified area. It also handles synchronization and avoids the tear effect
+ * using semaphores if the `DISP_AVOID_TEAR_EFFECT_WITH_SEM` flag is defined.
+ *
+ * @param disp_drv Pointer to the display driver structure.
+ * @param area Pointer to the area to be updated on the display.
+ * @param color_p Pointer to the color data array.
+ */
 static void lv_disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p) {
 #if DISP_AVOID_TEAR_EFFECT_WITH_SEM
   xSemaphoreGive(_sem_gui_ready);
@@ -226,6 +286,12 @@ static void lv_disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_c
   lv_disp_flush_ready(disp_drv);
 }
 
+/**
+ * Reads touch data from GT911 touch controller and updates the input device data.
+ *
+ * @param drv Pointer to the input device driver.
+ * @param data Pointer to the input device data structure.
+ */
 static void lv_touch_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
   static uint16_t last_x, last_y;
   gt911_data_t touch_data = gt911_read(); 

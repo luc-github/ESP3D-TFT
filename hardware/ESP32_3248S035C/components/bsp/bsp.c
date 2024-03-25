@@ -55,10 +55,6 @@ static esp_lcd_panel_handle_t disp_panel;
 #endif
 
 /**********************
- *      MACROS
- **********************/
-
-/**********************
  *   GLOBAL FUNCTIONS
  **********************/
 
@@ -98,8 +94,11 @@ esp_err_t bsp_init(void) {
   esp3d_log("Attaching display panel to SPI bus...");
   esp_lcd_panel_io_handle_t disp_io_handle;
   disp_spi_cfg.on_color_trans_done = disp_flush_ready;
-  ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi(
-      (esp_lcd_spi_bus_handle_t)DISP_SPI_HOST, &disp_spi_cfg, &disp_io_handle));
+  if (esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)DISP_SPI_HOST,
+                               &disp_spi_cfg, &disp_io_handle) != ESP_OK) {
+    esp3d_log_e("Failed to attach display panel to SPI bus");
+    return ESP_FAIL;
+  }
 
   /* Display panel initialization */
   esp3d_log("Initializing display...");
@@ -125,7 +124,7 @@ esp_err_t bsp_init(void) {
   }
 #endif                                              // DISP_ORIENTATION
 #if DISP_ORIENTATION == 1 || DISP_ORIENTATION == 3  // mirrored
-  if(esp_lcd_panel_mirror(disp_panel, true, true) != ESP_OK) {
+  if (esp_lcd_panel_mirror(disp_panel, true, true) != ESP_OK) {
     esp3d_log_e("Failed to mirror display panel");
     return ESP_FAIL;
   }
@@ -230,10 +229,16 @@ static bool disp_flush_ready(esp_lcd_panel_io_handle_t panel_io,
  */
 static void lv_disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area,
                           lv_color_t *color_p) {
-esp_lcd_panel_draw_bitmap(disp_panel, area->x1, area->y1, area->x2 + 1,
-                          area->y2 + 1, color_p);
+  esp_lcd_panel_draw_bitmap(disp_panel, area->x1, area->y1, area->x2 + 1,
+                            area->y2 + 1, color_p);
 }
 
+/**
+ * Reads touch input for the LVGL input device driver.
+ *
+ * @param drv Pointer to the LVGL input device driver.
+ * @param data Pointer to the LVGL input device data structure.
+ */
 static void lv_touch_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
   static uint16_t last_x, last_y;
   gt911_data_t touch_data = gt911_read();

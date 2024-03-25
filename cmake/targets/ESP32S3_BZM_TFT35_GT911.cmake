@@ -1,4 +1,3 @@
-
 if(ESP32S3_BZM_TFT35_GT911)
     set(TFT_TARGET "ESP32S3_BZM_TFT35_GT911")
     add_compile_options(-DWITH_PSRAM=1)
@@ -8,4 +7,5 @@ if(ESP32S3_BZM_TFT35_GT911)
     list(APPEND EXTRA_COMPONENT_DIRS ${CMAKE_SOURCE_DIR}/hardware/drivers_usb_otg)
     list(APPEND EXTRA_COMPONENT_DIRS ${CMAKE_SOURCE_DIR}/hardware/drivers_video_i80)
     add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32S3_BZM_TFT35_GT911/components/bsp")
+    add_compile_options(-DESP3D_USB_SERIAL_FEATURE=1)
 endif()

@@ -346,8 +346,6 @@ esp_err_t ft5x06_init(i2c_bus_handle_t i2c_bus, const ft5x06_config_t *config) {
  * @return The ft5x06 data read from the touch controller.
  */
 ft5x06_data_t ft5x06_read() {
-  // Function implementation goes here
-
   ft5x06_data_t data = {.is_pressed = false, .x = -1, .y = -1};
   if (_i2c_dev == NULL || _config == NULL) {
     return data;

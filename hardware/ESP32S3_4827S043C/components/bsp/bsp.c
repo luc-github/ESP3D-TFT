@@ -280,7 +280,7 @@ static bool disp_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_rgb_
 }
 
 /**
- * Flushes the display with the specified color data within the given area.
+ * @brief Flushes the display with the specified color data within the given area.
  *
  * @param disp_drv Pointer to the display driver structure.
  * @param area     Pointer to the area to be flushed.
@@ -296,7 +296,7 @@ static void lv_disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_c
 }
 
 /**
- * Reads touch input for the LVGL input device driver.
+ * @brief Reads touch input for the LVGL input device driver.
  *
  * @param drv The LVGL input device driver.
  * @param data The LVGL input device data.

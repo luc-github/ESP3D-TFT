@@ -4,13 +4,16 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+#include "st7796.h"
+#include "disp_backlight.h"
 #define TFT_DISPLAY_CONTROLLER "ST7796"
 
+#define DISP_ORIENTATION \
+  (orientation_landscape)  // 0:portrait mode 1:landscape mode 2:portrait mode
+                           // reverse 3:landscape mode reverse
 
-#define DISP_DIRECTION_LANDSCAPE (1)  // 1:landscape mode   0:portrait mode
-
-#if DISP_DIRECTION_LANDSCAPE == 1  // landscape mode
+#if DISP_ORIENTATION == orientation_landscape || \
+    DISP_ORIENTATION == orientation_landscape_invert  // landscape mode
 #define DISP_HOR_RES_MAX (480)
 #define DISP_VER_RES_MAX (320)
 #else  // portrait mode
@@ -20,27 +23,90 @@ extern "C" {
 
 #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * (DISP_VER_RES_MAX / 10))
 
-#define DISP_BITS_WIDTH (8)
-#define DISP_CMD_BITS_WIDTH (8)
-#define DISP_PARAM_BITS_WIDTH (8)
-#define DISP_CLK_FREQ (8 * 1000 * 1000)  // could be 10 if no PSRAM memory
+const esp_i80_st7796_config_t st7796_cfg = {
+    .bus_config =
+        {
+            .clk_src = LCD_CLK_SRC_DEFAULT,
+            .dc_gpio_num = 10,  // DISP_RS_PIN=10
+            .wr_gpio_num = 9,  // DISP_WR_PIN=GPIO9
+            .data_gpio_nums =
+                {
+                    8,   // DISP_D00_PIN = GPIO8
+                    18,   // DISP_D01_PIN = GPIO18
+                    17,   // DISP_D02_PIN = GPIO17
+                    16,  // DISP_D03_PIN = GPIO16
+                    15,   // DISP_D04_PIN = GPIO15
+                    7,  // DISP_D05_PIN = GPIO7
+                    6,   // DISP_D06_PIN = GPIO6
+                    5,  // DISP_D07_PIN = GPIO5
+                    -1,   // DISP_D08_PIN = N/C
+                    -1,  // DISP_D09_PIN = N/C
+                    -1,   // DISP_D10_PIN = N/C
+                    -1,  // DISP_D11_PIN = N/C
+                    -1,   // DISP_D12_PIN = N/C
+                    -1,  // DISP_D13_PIN = N/C
+                    -1,   // DISP_D14_PIN = N/C
+                    -1,  // DISP_D15_PIN = N/C
+                },
+            .bus_width = 8,  // DISP_BITS_WIDTH
+            .max_transfer_bytes = DISP_BUF_SIZE * sizeof(uint16_t),
+            .psram_trans_align = 64,
+            .sram_trans_align = 4,
+        },
+    .io_config =
+        {
+            .cs_gpio_num = 11, //DISP_CS_PIN
+            .pclk_hz =
+                (8 * 1000 *
+                 1000),  // could be 10 if no PSRAM memory= DISP_CLK_FREQ,
+            .trans_queue_depth = 10,
+            .dc_levels =
+                {
+                    .dc_idle_level = 0,
+                    .dc_cmd_level = 0,
+                    .dc_dummy_level = 0,
+                    .dc_data_level = 1,
+                },
+            .on_color_trans_done =
+                NULL,  // Callback invoked when color data
+                       // transfer has finished updated in bdsp.c
+            .user_ctx =
+                NULL,  // User private data, passed directly to
+                       // on_color_trans_done’s user_ctx updated in bdsp.c
+            .lcd_cmd_bits = 8,    // DISP_CMD_BITS_WIDTH
+            .lcd_param_bits = 8,  // DISP_PARAM_BITS_WIDTH
+        },
+    .panel_config =
+        {
+            .reset_gpio_num = 3,  // DISP_RST_PIN = GPIO3 - Same as touch
+            .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_BGR,
+            .data_endian =
+                0, /*!< Set the data endian for color data larger than 1 byte */
+            .bits_per_pixel = 16, /*!< Color depth, in bpp */
+            .flags =
+                {
+                    .reset_active_high = 0, /*!< Setting this if the panel reset
+                                               is high level active */
+                },
+            .vendor_config = NULL, /*!< Vendor specific configuration */
+        },
+    .orientation = DISP_ORIENTATION,
+    .hor_res = DISP_HOR_RES_MAX,
+    .ver_res = DISP_VER_RES_MAX,
+};
 
-#define DISP_BL_PIN (4)  // GPIO 4
-#define DISP_CS_PIN (11)  // GPIO 11
-#define DISP_RST_PIN (3)  // GPIO 3 - same as touch
-#define DISP_RS_PIN (10)   // GPIO 10
-#define DISP_WR_PIN (9)  // GPIO 9
+// Display backlight configuration
+#define DISP_BCKL_DEFAULT_DUTY 100  //%
 
-#define DISP_D00_PIN (8)   // GPIO 8
-#define DISP_D01_PIN (18)  // GPIO 18
-#define DISP_D02_PIN (17)   // GPIO 17
-#define DISP_D03_PIN (16)   // GPIO 16
-#define DISP_D04_PIN (15)  // GPIO 15
-#define DISP_D05_PIN (7)  // GPIO 7
-#define DISP_D06_PIN (6)  // GPIO 6
-#define DISP_D07_PIN (5)  // GPIO 5
-#define DISP_BL_ON (1)
-#define DISP_BL_OFF (0)
+const disp_backlight_config_t disp_bcklt_cfg = {
+    .pwm_control = false,
+    .output_invert = false,
+    .gpio_num = 4, // DISP_BL_PIN=GPIO4
+    .timer_idx = 0,
+    .channel_idx = 0
+};
+
+
 
 #ifdef __cplusplus
 } /* extern "C" */

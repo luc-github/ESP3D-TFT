@@ -178,7 +178,8 @@ esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config) {
   uint8_t i2c_addr_index = 0;
 
   while (config->i2c_addr[i2c_addr_index] != 0 && err != ESP_OK) {
-    esp3d_log("Checking  GT911 i2c addr: 0x%02x", config->i2c_addr[i2c_addr_index]);
+    esp3d_log("Checking  GT911 i2c addr: 0x%02x",
+              config->i2c_addr[i2c_addr_index]);
     _i2c_dev = i2c_bus_device_create(i2c_bus, config->i2c_addr[i2c_addr_index],
                                      config->i2c_clk_speed);
     if (_i2c_dev == NULL) {
@@ -191,7 +192,7 @@ esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config) {
                 config->i2c_addr[i2c_addr_index]);
     } else {
       // go next address
-      //i2c_bus_device_delete(_i2c_dev);
+      // i2c_bus_device_delete(_i2c_dev);
       _i2c_dev = NULL;
       i2c_addr_index++;
     }
@@ -212,7 +213,7 @@ esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config) {
     return err;
   }
   esp3d_log("GT911 Config: 0x%02x", buf[0]);
-  if (_gt911_x_max==0 || _gt911_y_max==0) {
+  if (_gt911_x_max == 0 || _gt911_y_max == 0) {
     // Read X/Y Limits
     err = i2c_bus_read_bytes_16(_i2c_dev, GT911_XY_MAX_REG, 4, &buf[0]);
     if (err != ESP_OK) return err;
@@ -239,8 +240,6 @@ esp_err_t gt911_init(i2c_bus_handle_t i2c_bus, const gt911_config_t *config) {
  * @return The GT911 data read from the touch controller.
  */
 gt911_data_t gt911_read() {
-  // Function implementation goes here
-
   gt911_data_t data = {.is_pressed = false, .x = -1, .y = -1};
   if (_i2c_dev == NULL || _config == NULL) {
     return data;

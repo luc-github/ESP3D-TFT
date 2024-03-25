@@ -131,8 +131,7 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |i2c_bus||esp3d_log driver| O | X | O| O| O |
 |spi_bus|SPI Bus|esp3d_log driver| X |  X | X | X| O
 |sw_spi|Software SPI|esp3d_log driver| X |  O | O | O| O
-|partition||| 4MB |  ESP32_3248S035C | ESP32_3248S035R | ESP32_ROTRICS_DEXARM35 | ESP32_CUSTOM
-|bsp||| ESP32_2432S028R |  ESP32_3248S035C | ESP32_3248S035R | ESP32_ROTRICS_DEXARM35 | ESP32_CUSTOM
+
 
 
 | Drivers |Type| Depend | ESP32S3_4827S043C | ESP32S3_8048S043C | ESP32S3_8048S050C | ESP32S3_8048S070C | ESP32S3_BZM_TFT35_GT911 | ESP32S3_HMI43V3 | ESP32S3_ZX3D50CE02S_USRC_4832 | ESP32S3_CUSTOM|
@@ -152,8 +151,7 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |spi_bus|SPI Bus|esp3d_log driver|  O | O | O | O | O | O | O | O|
 |sw_spi||esp3d_log driver| O | O | O | O | O | O | O | O |
 |usb_serial||esp3d_log| O | O | O | O | X | X | X | X |
-|partition||| ESP32S3_4827S043C | ESP32S3_8048S043C | ESP32S3_8048S050C | ESP32S3_8048S070C | ESP32S3_BZM_TFT35_GT911 | ESP32S3_HMI43V3 | ESP32S3_ZX3D50CE02S_USRC_4832 | ESP32S3_CUSTOM|
-|bsp||| ESP32S3_4827S043C | ESP32S3_8048S043C | ESP32S3_8048S050C | ESP32S3_8048S070C | ESP32S3_BZM_TFT35_GT911 | ESP32S3_HMI43V3 | ESP32S3_ZX3D50CE02S_USRC_4832 | ESP32S3_CUSTOM|
+
 
 
 ### Refactored hardware directory
@@ -161,17 +159,18 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |---|:---:|
  |ESP32_2432S028R | Ok |
  |ESP32_3248S035C | Ok |  
- |ESP32_3248S035R | 
+ |ESP32_3248S035R | Ok |
  |ESP32_ROTRICS_DEXARM35| 
- |ESP32_CUSTOM |
- |ESP32S3_4827S043C | 
- |ESP32S3_8048S043C | 
- |ESP32S3_8048S050C | 
- |ESP32S3_8048S070C | 
- |ESP32S3_BZM_TFT35_GT911 | 
+ |ESP32_CUSTOM | Ok |
+ |ESP32S3_4827S043C | Ok |
+ |ESP32S3_8048S043C | Ok |
+ |ESP32S3_8048S050C | Ok |
+ |ESP32S3_8048S070C | Ok |
+ |ESP32S3_BZM_TFT35_GT911 | Ok | 
  |ESP32S3_HMI43V3 |  Ok |
  |ESP32S3_ZX3D50CE02S_USRC_4832 | Ok |
- |ESP32S3_CUSTOM|
+ |ESP32S3_CUSTOM| Ok |
+ |ESP32S3_FREENOVE_1_1| Ok |
 
 |Drivers| Status|
 |---|:---:|
@@ -193,28 +192,80 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |usb_serial|Ok| 
 
 
-#### disp_backlight driver
-The `disp_backlight` driver is a display component that is used by the display drivers to control the backlight of the display. The `disp_backlight` driver configuration is part of display driver configuration.
-
-
+### Bus drivers
+* spi_bus driver
+The `spi_bus` driver is a SPI bus driver that is used to control the SPI bus. The `spi_bus` driver configuration is part of display driver configuration.
 in disp_def.h:
 ```cpp
-// Default backlight level value in percentage
-#define DISP_BCKL_DEFAULT_DUTY 100  //%
+// SPI (dedicated)
+#define DISP_SPI_HOST SPI2_HOST  // 1
 
-// Backlight configuration
-const disp_backlight_config_t disp_bcklt_cfg = {
-    .pwm_control = false,   // true: LEDC is used, false: GPIO is used
-    .output_invert = false, // true: LEDC output is inverted, false: LEDC output is not inverted
-    .gpio_num = 21,         // GPIO number for backlight control
-    // Relevant only for PWM controlled backlight
-    // Ignored for switch (ON/OFF) backlight control
-    .timer_idx = 0,         // LEDC timer index
-    .channel_idx = 0        // LEDC channel index    
+// SPI pins definition (common)
+#define DISP_SPI_CLK  14  // GPIO 14
+#define DISP_SPI_MOSI 13  // GPIO 13
+#define DISP_SPI_MISO 12  // GPIO 12
+```
+
+* sw_spi driver
+The `sw_spi` driver is a software SPI driver that is used to control the SPI bus. The `sw_spi` driver configuration is part of the driver configuration file which use it.
+
+eg: touch driver use it, so it can be part of the touch driver configuration.   
+
+touch_def.h:
+```cpp
+// SPI (BitBang)
+const sw_spi_config_t touch_spi_cfg = {
+    .cs_pin = 33,   // GPIO 33
+    .clk_pin = 25,  // GPIO 25
+    .mosi_pin = 32, // GPIO 33
+    .miso_pin = 39, // GPIO 39
 };
 ```
 
-#### ili9341 driver
+* i2c_bus driver
+The `i2c_bus` driver is a I2C bus driver that is used to control the I2C bus. The `i2c_bus` driver configuration file is i2c_def.h.
+
+bsp.c:
+```cpp
+//define the I2C bus 
+#define I2C_PORT_NUMBER   0
+
+// I2C pins definition
+const i2c_config_t i2c_cfg = {
+    .mode = I2C_MODE_MASTER,
+    .scl_io_num = 20, // GPIO 20
+    .sda_io_num = 19, // GPIO 19
+    .scl_pullup_en = GPIO_PULLUP_ENABLE,
+    .sda_pullup_en = GPIO_PULLUP_ENABLE,
+    .master.clk_speed = 400*1000
+};
+
+```
+
+* tca9554 driver
+The `tca9554` driver is a I2C GPIO expander driver that is used to control the TCA9554 GPIO expander. The `tca9554` driver configuration file is tca9554_def.h.
+
+tca9554_def.h:
+```cpp
+const tca9554_config_t tca9554_cfg = {.i2c_clk_speed = 400 * 1000,
+                                      .i2c_addr = (uint8_t[]){0x3C, 0x24, 0}};
+```
+
+* usb_serial driver
+The `usb_serial` driver is a USB serial driver that is used to control the OTG USB serial. The `usb_serial` driver configuration usb_serial_def.h.
+
+usb_serial_def.h:
+```cpp
+#define ESP3D_USB_SERIAL_BAUDRATE "115200"
+#define ESP3D_USB_SERIAL_DATA_BITS (8)
+#define ESP3D_USB_SERIAL_PARITY \
+  (0)  // 0: 1 stopbit, 1: 1.5 stopbits, 2: 2 stopbits
+#define ESP3D_USB_SERIAL_STOP_BITS \
+  (0)  // 0: None, 1: Odd, 2: Even, 3: Mark, 4: Space
+  ```
+
+### SPI Display drivers
+* ili9341 driver
 The `ili9341` driver is a SPI display driver that is used to control the ILI9341 display. The `ili9341` driver configuration is part of display driver configuration.
 
 in disp_def.h:
@@ -258,7 +309,93 @@ esp_lcd_panel_dev_config_t disp_panel_cfg = {
 #define DISP_BUF_SIZE_BYTES    (DISP_BUF_SIZE * 2)
 ```
 
-#### st7262 driver
+* st7796 spi driver
+The `st7796` driver is a display driver that is used to control the ST7796 display. The `st7796` driver configuration is part of display driver configuration.
+
+disp_def.h:
+```cpp
+// Display orientation
+/*
+PORTRAIT                0
+PORTRAIT_INVERTED       1
+LANDSCAPE               2
+LANDSCAPE_INVERTED      3
+*/
+#define DISP_ORIENTATION 3  // landscape inverted
+
+// Display resolution
+#if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
+#define DISP_HOR_RES_MAX 480
+#define DISP_VER_RES_MAX 320
+#else  // portrait mode
+#define DISP_HOR_RES_MAX 320
+#define DISP_VER_RES_MAX 480
+#endif
+
+// Display interface
+#define DISP_USE_DOUBLE_BUFFER (true)
+
+#if WITH_PSRAM
+// 1/10 (32-line) buffer (30KB) in external PSRAM
+#define DISP_BUF_SIZE (DISP_HOR_RES_MAX * DISP_VER_RES_MAX / 10)
+#define DISP_BUF_MALLOC_TYPE MALLOC_CAP_SPIRAM
+#else
+// 1/40 (8-line) buffer (7.5KB) in internal DRAM
+#define DISP_BUF_SIZE (DISP_HOR_RES_MAX * 8)
+#define DISP_BUF_MALLOC_TYPE MALLOC_CAP_DMA
+#endif  // WITH_PSRAM
+#define DISP_BUF_SIZE_BYTES (DISP_BUF_SIZE * 2)
+
+// LCD panel configuration
+esp_lcd_panel_dev_config_t disp_panel_cfg = {
+    .reset_gpio_num = -1,  // st7796 RST not connected to GPIO
+    .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_BGR,
+    .data_endian = LCD_RGB_DATA_ENDIAN_BIG,
+    .bits_per_pixel = 16,
+    .flags = {.reset_active_high = 0},
+    .vendor_config = NULL};
+
+// SPI (dedicated)
+#define DISP_SPI_HOST SPI2_HOST  // 1
+// #define DISP_SPI_HOST SPI3_HOST //2
+
+// SPI pins definition (common)
+#define DISP_SPI_CLK 14   // GPIO 14
+#define DISP_SPI_MOSI 13  // GPIO 13
+#define DISP_SPI_MISO 12  // GPIO 12
+
+// SPI definition for LCD
+esp_lcd_panel_io_spi_config_t disp_spi_cfg = {
+    .cs_gpio_num = 15, /*!< GPIO used for CS line */
+    .dc_gpio_num = 2,  /*!< GPIO used to select the D/C line, set this to -1 if
+                          the D/C line is not used */
+    .spi_mode = 0,     /*!< Traditional SPI mode (0~3) */
+    .pclk_hz = 40 * 1000 * 1000, /*!< Frequency of pixel clock */
+    .trans_queue_depth = 10,     /*!< Size of internal transaction queue */
+    .on_color_trans_done =
+        NULL, /*!< Callback invoked when color data transfer has finished */
+    .user_ctx = NULL,    /*!< User private data, passed directly to
+                            on_color_trans_done's user_ctx */
+    .lcd_cmd_bits = 8,   /*!< Bit-width of LCD command */
+    .lcd_param_bits = 8, /*!< Bit-width of LCD parameter */
+    .flags = {
+        /*!< Extra flags to fine-tune the SPI device */
+        .dc_low_on_data =
+            0, /*!< If this flag is enabled, DC line = 0 means transfer data, DC
+                  line = 1 means transfer command; vice versa */
+        .octal_mode = 0, /*!< transmit with octal mode (8 data lines), this mode
+                            is used to simulate Intel 8080 timing */
+        .quad_mode = 0,  /*!< transmit with quad mode (4 data lines), this mode
+                            is useful when transmitting LCD parameters (Only use
+                            one line for command) */
+        .sio_mode = 0,  /*!< Read and write through a single data line (MOSI) */
+        .lsb_first = 0, /*!< transmit LSB bit first */
+        .cs_high_active = 0, /*!< CS line is high active */
+    }};
+```
+
+### RGB Display drivers
+* st7262 driver
 The `st7262` driver is a RGB display driver that is used to control the ST7262 display. The `st7262` driver configuration is part of display driver configuration.
 
 in disp_def.h:
@@ -365,148 +502,9 @@ const esp_lcd_rgb_panel_config_t disp_panel_cfg = {
 };
 ```
 
+* i80 Display drivers
 
-#### spi_bus driver
-The `spi_bus` driver is a SPI bus driver that is used to control the SPI bus. The `spi_bus` driver configuration is part of display driver configuration.
-in disp_def.h:
-```cpp
-// SPI (dedicated)
-#define DISP_SPI_HOST SPI2_HOST  // 1
-
-// SPI pins definition (common)
-#define DISP_SPI_CLK  14  // GPIO 14
-#define DISP_SPI_MOSI 13  // GPIO 13
-#define DISP_SPI_MISO 12  // GPIO 12
-```
-
-#### sw_spi driver
-The `sw_spi` driver is a software SPI driver that is used to control the SPI bus. The `sw_spi` driver configuration is part of the driver configuration file which use it.
-
-eg: touch driver use it, so it can be part of the touch driver configuration.   
-
-touch_def.h:
-```cpp
-// SPI (BitBang)
-const sw_spi_config_t touch_spi_cfg = {
-    .cs_pin = 33,   // GPIO 33
-    .clk_pin = 25,  // GPIO 25
-    .mosi_pin = 32, // GPIO 33
-    .miso_pin = 39, // GPIO 39
-};
-```
-
-
-#### xpt2046 driver
-The `xpt2046` driver is a touch driver that is used to control the XPT2046 touch controller. The `xpt2046` driver configuration is part of the touch driver configuration.
-
-touch_def.h:
-```cpp
-// X/Y Calibration Values
-#define TOUCH_X_MIN           380
-#define TOUCH_Y_MIN           200
-#define TOUCH_X_MAX           3950
-#define TOUCH_Y_MAX           3850
-
-xpt2046_config_t xpt2046_cfg = {
-    .irq_pin = 36, // GPIO 36  
-    .touch_threshold = 300, // Threshold for touch detection  
-    .swap_xy = true,
-    .invert_x = true,
-    .invert_y = true,
-};
-```
-
-#### i2c_bus driver
-The `i2c_bus` driver is a I2C bus driver that is used to control the I2C bus. The `i2c_bus` driver configuration file is i2c_def.h.
-
-bsp.c:
-```cpp
-//define the I2C bus 
-#define I2C_PORT_NUMBER   0
-
-// I2C pins definition
-const i2c_config_t i2c_cfg = {
-    .mode = I2C_MODE_MASTER,
-    .scl_io_num = 20, // GPIO 20
-    .sda_io_num = 19, // GPIO 19
-    .scl_pullup_en = GPIO_PULLUP_ENABLE,
-    .sda_pullup_en = GPIO_PULLUP_ENABLE,
-    .master.clk_speed = 400*1000
-};
-
-```
-
-#### gt911 driver
-The `gt911` driver is a touch driver that is used to control the GT911 touch controller. The `gt911` driver configuration is part of the touch driver configuration file : touch_def.h.
-
-touch_def.h:
-```cpp
-// GT911 touch controller configuration
-const gt911_config_t gt911_cfg = {
-    .i2c_clk_speed = 400*1000,
-    .i2c_addr = (uint8_t[]){0x5D, 0X14,0},  // Floating or mis-configured INT pin may cause GT911 to come up at address 0x14 instead of 0x5D, so check there as well.
-    .rst_pin = 38, // GPIO 38
-#if WITH_GT911_INT
-    .int_pin = 18, // GPIO 18
-#else
-    .int_pin = -1, // INT pin not connected (by default)
-#endif
-    .swap_xy = false,
-    .invert_x = false,
-    .invert_y = false,   
-    .x_max = 0,//auto detect
-    .y_max = 0,//auto detect    
-};
-```
-
-#### ft5x06 driver
-The `ft5x06` driver is a touch driver that is used to control the FT5x06 touch controller. The `ft5x06` driver configuration is part of the touch driver configuration file : touch_def.h.
-
-touch_def.h:
-```cpp
-const ft5x06_config_t ft5x06_cfg = {
-    .i2c_clk_speed = 400*1000,
-    .i2c_addr =
-        (uint8_t[]){
-            0x38,
-            0}, 
-    .rst_pin = -1, // GPIO 38
-#if WITH_FT5X06_INT
-    .int_pin = 18, // GPIO 18
-#else
-    .int_pin = -1, // INT pin not connected (by default)
-#endif
-    .swap_xy = true,
-    .invert_x = false,
-    .invert_y = false,
-    .x_max = 480,
-    .y_max = 800,     
-};    
-```
-
-#### tca9554 driver
-The `tca9554` driver is a I2C GPIO expander driver that is used to control the TCA9554 GPIO expander. The `tca9554` driver configuration file is tca9554_def.h.
-
-tca9554_def.h:
-```cpp
-const tca9554_config_t tca9554_cfg = {.i2c_clk_speed = 400 * 1000,
-                                      .i2c_addr = (uint8_t[]){0x3C, 0x24, 0}};
-```
-
-#### usb_serial driver
-The `usb_serial` driver is a USB serial driver that is used to control the OTG USB serial. The `usb_serial` driver configuration usb_serial_def.h.
-
-usb_serial_def.h:
-```cpp
-#define ESP3D_USB_SERIAL_BAUDRATE "115200"
-#define ESP3D_USB_SERIAL_DATA_BITS (8)
-#define ESP3D_USB_SERIAL_PARITY \
-  (0)  // 0: 1 stopbit, 1: 1.5 stopbits, 2: 2 stopbits
-#define ESP3D_USB_SERIAL_STOP_BITS \
-  (0)  // 0: None, 1: Odd, 2: Even, 3: Mark, 4: Space
-  ```
-
-### rm68120 driver
+rm68120 driver
 The `rm68120` driver is a display driver that is used to control the RM68120 display. The `rm68120` driver configuration is part of display driver configuration.
 
 disp_def.h:
@@ -600,7 +598,7 @@ const esp_i80_rm68120_config_t rm68120_cfg = {
 };
 ```
 
-### st7796 i80 driver
+* st7796 i80 driver
 The `st7796` driver is a display driver that is used to control the ST7796 display. The `st7796` driver configuration is part of display driver configuration.
 
 disp_def.h:
@@ -692,89 +690,95 @@ const esp_i80_st7796_config_t st7796_cfg = {
     .hor_res = DISP_HOR_RES_MAX,
     .ver_res = DISP_VER_RES_MAX,
 };
+
+### Backlight drivers
+The `disp_backlight` driver is a display component that is used by the display drivers to control the backlight of the display. The `disp_backlight` driver configuration is part of display driver configuration.
+
+
+in disp_def.h:
+```cpp
+// Default backlight level value in percentage
+#define DISP_BCKL_DEFAULT_DUTY 100  //%
+
+// Backlight configuration
+const disp_backlight_config_t disp_bcklt_cfg = {
+    .pwm_control = false,   // true: LEDC is used, false: GPIO is used
+    .output_invert = false, // true: LEDC output is inverted, false: LEDC output is not inverted
+    .gpio_num = 21,         // GPIO number for backlight control
+    // Relevant only for PWM controlled backlight
+    // Ignored for switch (ON/OFF) backlight control
+    .timer_idx = 0,         // LEDC timer index
+    .channel_idx = 0        // LEDC channel index    
+};
 ```
 
-### st7796 spi driver
-The `st7796` driver is a display driver that is used to control the ST7796 display. The `st7796` driver configuration is part of display driver configuration.
+### SPI Touch drivers
+* xpt2046 driver
+The `xpt2046` driver is a touch driver that is used to control the XPT2046 touch controller. The `xpt2046` driver configuration is part of the touch driver configuration.
 
-disp_def.h:
+touch_def.h:
 ```cpp
-// Display orientation
-/*
-PORTRAIT                0
-PORTRAIT_INVERTED       1
-LANDSCAPE               2
-LANDSCAPE_INVERTED      3
-*/
-#define DISP_ORIENTATION 3  // landscape inverted
+// X/Y Calibration Values
+#define TOUCH_X_MIN           380
+#define TOUCH_Y_MIN           200
+#define TOUCH_X_MAX           3950
+#define TOUCH_Y_MAX           3850
 
-// Display resolution
-#if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
-#define DISP_HOR_RES_MAX 480
-#define DISP_VER_RES_MAX 320
-#else  // portrait mode
-#define DISP_HOR_RES_MAX 320
-#define DISP_VER_RES_MAX 480
-#endif
+xpt2046_config_t xpt2046_cfg = {
+    .irq_pin = 36, // GPIO 36  
+    .touch_threshold = 300, // Threshold for touch detection  
+    .swap_xy = true,
+    .invert_x = true,
+    .invert_y = true,
+};
+```
 
-// Display interface
-#define DISP_USE_DOUBLE_BUFFER (true)
+### I2C Touch drivers
 
-#if WITH_PSRAM
-// 1/10 (32-line) buffer (30KB) in external PSRAM
-#define DISP_BUF_SIZE (DISP_HOR_RES_MAX * DISP_VER_RES_MAX / 10)
-#define DISP_BUF_MALLOC_TYPE MALLOC_CAP_SPIRAM
+* gt911 driver
+The `gt911` driver is a touch driver that is used to control the GT911 touch controller. The `gt911` driver configuration is part of the touch driver configuration file : touch_def.h.
+
+touch_def.h:
+```cpp
+// GT911 touch controller configuration
+const gt911_config_t gt911_cfg = {
+    .i2c_clk_speed = 400*1000,
+    .i2c_addr = (uint8_t[]){0x5D, 0X14,0},  // Floating or mis-configured INT pin may cause GT911 to come up at address 0x14 instead of 0x5D, so check there as well.
+    .rst_pin = 38, // GPIO 38
+#if WITH_GT911_INT
+    .int_pin = 18, // GPIO 18
 #else
-// 1/40 (8-line) buffer (7.5KB) in internal DRAM
-#define DISP_BUF_SIZE (DISP_HOR_RES_MAX * 8)
-#define DISP_BUF_MALLOC_TYPE MALLOC_CAP_DMA
-#endif  // WITH_PSRAM
-#define DISP_BUF_SIZE_BYTES (DISP_BUF_SIZE * 2)
+    .int_pin = -1, // INT pin not connected (by default)
+#endif
+    .swap_xy = false,
+    .invert_x = false,
+    .invert_y = false,   
+    .x_max = 0,//auto detect
+    .y_max = 0,//auto detect    
+};
+```
 
-// LCD panel configuration
-esp_lcd_panel_dev_config_t disp_panel_cfg = {
-    .reset_gpio_num = -1,  // st7796 RST not connected to GPIO
-    .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_BGR,
-    .data_endian = LCD_RGB_DATA_ENDIAN_BIG,
-    .bits_per_pixel = 16,
-    .flags = {.reset_active_high = 0},
-    .vendor_config = NULL};
+* ft5x06 driver
+The `ft5x06` driver is a touch driver that is used to control the FT5x06 touch controller. The `ft5x06` driver configuration is part of the touch driver configuration file : touch_def.h.
 
-// SPI (dedicated)
-#define DISP_SPI_HOST SPI2_HOST  // 1
-// #define DISP_SPI_HOST SPI3_HOST //2
-
-// SPI pins definition (common)
-#define DISP_SPI_CLK 14   // GPIO 14
-#define DISP_SPI_MOSI 13  // GPIO 13
-#define DISP_SPI_MISO 12  // GPIO 12
-
-// SPI definition for LCD
-esp_lcd_panel_io_spi_config_t disp_spi_cfg = {
-    .cs_gpio_num = 15, /*!< GPIO used for CS line */
-    .dc_gpio_num = 2,  /*!< GPIO used to select the D/C line, set this to -1 if
-                          the D/C line is not used */
-    .spi_mode = 0,     /*!< Traditional SPI mode (0~3) */
-    .pclk_hz = 40 * 1000 * 1000, /*!< Frequency of pixel clock */
-    .trans_queue_depth = 10,     /*!< Size of internal transaction queue */
-    .on_color_trans_done =
-        NULL, /*!< Callback invoked when color data transfer has finished */
-    .user_ctx = NULL,    /*!< User private data, passed directly to
-                            on_color_trans_done's user_ctx */
-    .lcd_cmd_bits = 8,   /*!< Bit-width of LCD command */
-    .lcd_param_bits = 8, /*!< Bit-width of LCD parameter */
-    .flags = {
-        /*!< Extra flags to fine-tune the SPI device */
-        .dc_low_on_data =
-            0, /*!< If this flag is enabled, DC line = 0 means transfer data, DC
-                  line = 1 means transfer command; vice versa */
-        .octal_mode = 0, /*!< transmit with octal mode (8 data lines), this mode
-                            is used to simulate Intel 8080 timing */
-        .quad_mode = 0,  /*!< transmit with quad mode (4 data lines), this mode
-                            is useful when transmitting LCD parameters (Only use
-                            one line for command) */
-        .sio_mode = 0,  /*!< Read and write through a single data line (MOSI) */
-        .lsb_first = 0, /*!< transmit LSB bit first */
-        .cs_high_active = 0, /*!< CS line is high active */
-    }};
+touch_def.h:
+```cpp
+const ft5x06_config_t ft5x06_cfg = {
+    .i2c_clk_speed = 400*1000,
+    .i2c_addr =
+        (uint8_t[]){
+            0x38,
+            0}, 
+    .rst_pin = -1, // GPIO 38
+#if WITH_FT5X06_INT
+    .int_pin = 18, // GPIO 18
+#else
+    .int_pin = -1, // INT pin not connected (by default)
+#endif
+    .swap_xy = true,
+    .invert_x = false,
+    .invert_y = false,
+    .x_max = 480,
+    .y_max = 800,     
+};    
 ```

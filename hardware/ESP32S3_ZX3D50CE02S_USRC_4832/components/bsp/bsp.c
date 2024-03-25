@@ -109,14 +109,6 @@ esp_err_t bsp_init(void) {
     esp3d_log_e("Failed to set display backlight");
     return ESP_FAIL;
   }
-  /*  esp3d_log("Turn off LCD backlight");
-      gpio_config_t bk_gpio_config = {
-          .mode = GPIO_MODE_OUTPUT,
-          .pin_bit_mask = 1ULL << disp_bcklt_cfg.gpio_num
-      };
-      ESP_ERROR_CHECK(gpio_config(&bk_gpio_config));
-      gpio_set_level( disp_bcklt_cfg.gpio_num, 1);*/
-
   // Drivers initialization
   esp3d_log("Display buffer size: %d", DISP_BUF_SIZE);
 

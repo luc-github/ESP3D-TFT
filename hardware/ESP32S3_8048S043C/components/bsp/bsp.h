@@ -40,8 +40,32 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+/**
+ * @brief Initializes the Board Support Package (BSP).
+ *
+ * This function initializes the necessary hardware and peripherals required by the BSP.
+ *
+ * @return esp_err_t Returns ESP_OK if the initialization is successful, otherwise an error code.
+ */
 esp_err_t bsp_init(void);
+
+/**
+ * @brief Accesses the file system.
+ *
+ * This function is used to access the file system.
+ *
+ * @return esp_err_t Returns ESP_OK on success, or an error code if an error occurred.
+ */
 esp_err_t bsp_accessFs(void);
+
+/**
+ * @brief Releases the file system resources used by the BSP.
+ *
+ * This function releases the file system resources used by the Board Support Package (BSP).
+ * It should be called when the BSP is no longer needed or when the file system resources need to be freed.
+ *
+ * @return `ESP_OK` if the file system resources are successfully released, or an error code if an error occurs.
+ */
 esp_err_t bsp_releaseFs(void);
 
 #ifdef __cplusplus

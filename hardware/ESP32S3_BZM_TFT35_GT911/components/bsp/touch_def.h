@@ -16,7 +16,7 @@ const gt911_config_t gt911_cfg = {
             0x5D, 0X14,
             0},  // Floating or mis-configured INT pin may cause GT911 to come
                  // up at address 0x14 instead of 0x5D, so check there as well.
-    .rst_pin = -1, // GPIO 25
+    .rst_pin = -1, // GPIO3 but already setup by display driver so not needed here
 #if WITH_GT911_INT
     .int_pin = 38, // GPIO 38
 #else
@@ -24,7 +24,9 @@ const gt911_config_t gt911_cfg = {
 #endif
     .swap_xy = true,
     .invert_x = false,
-    .invert_y = true,    
+    .invert_y = true,
+    .x_max = 0,//auto detect
+    .y_max = 0,//auto detect       
 };
 
 #ifdef __cplusplus

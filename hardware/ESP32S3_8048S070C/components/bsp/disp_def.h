@@ -35,6 +35,8 @@ LANDSCAPE_INVERTED      3
 #define DISP_USE_BOUNCE_BUFFER  (false)
 #define DISP_USE_DOUBLE_BUFFER  (true)
 #define DISP_NUM_FB             (1)
+#define DISP_PATCH_FS_FREQ (6 * 1000 * 1000)  // 6MHz
+#define DISP_PATCH_FS_DELAY  (40)
 
 #if DISP_NUM_FB == 2
   // Full frame buffer (255KB) in external PSRAM
