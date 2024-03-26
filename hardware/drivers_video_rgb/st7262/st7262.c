@@ -21,33 +21,62 @@
  *      INCLUDES
  *********************/
 
+#include "st7262.h"
+
+#include <driver/gpio.h>
 #include <stdlib.h>
 #include <sys/cdefs.h>
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include <driver/gpio.h>
 #include "esp3d_log.h"
 #include "esp_check.h"
-#include "st7262.h"
-
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-esp_err_t esp_lcd_new_panel_st7262(const esp_lcd_rgb_panel_config_t *disp_panel_cfg, esp_lcd_panel_handle_t *disp_panel){
+/**
+ * @brief Initializes a new ST7262 LCD panel.
+ *
+ * This function initializes a new ST7262 LCD panel using the provided configuration.
+ *
+ * @param disp_panel_cfg Pointer to the configuration structure for the ST7262 panel.
+ * @param disp_panel Pointer to the handle of the initialized ST7262 panel.
+ *
+ * @return `ESP_OK` if the ST7262 panel is successfully initialized, or an error code if initialization fails.
+ */
+esp_err_t esp_lcd_new_panel_st7262(
+  const esp_i80_st7262_config_t *disp_panel_cfg,
+  esp_lcd_panel_handle_t *disp_panel) {
   esp_err_t ret = ESP_OK;
-  if (esp_lcd_new_rgb_panel(disp_panel_cfg, disp_panel)!=ESP_OK){
-    esp3d_log_e( "Failed to create new RGB panel");
+  if (esp_lcd_new_rgb_panel(&(disp_panel_cfg->panel_config), disp_panel) !=
+      ESP_OK) {
+    esp3d_log_e("Failed to create new RGB panel");
     return ESP_FAIL;
   }
-  if (esp_lcd_panel_reset(*disp_panel)!=ESP_OK){
-        esp3d_log_e("Failed to reset panel");
+  if (esp_lcd_panel_reset(*disp_panel) != ESP_OK) {
+    esp3d_log_e("Failed to reset panel");
     return ESP_FAIL;
   }
-  if (esp_lcd_panel_init(*disp_panel)!=ESP_OK){
-        esp3d_log_e( "Failed to initialize panel");
+  if (esp_lcd_panel_init(*disp_panel) != ESP_OK) {
+    esp3d_log_e("Failed to initialize panel");
     return ESP_FAIL;
+  }
+
+  if (disp_panel_cfg->orientation == orientation_portrait ||
+      disp_panel_cfg->orientation == orientation_portrait_invert) {
+    if (esp_lcd_panel_swap_xy(*disp_panel, true) != ESP_OK) {
+      esp3d_log_e("Failed to swap xy");
+      return ESP_FAIL;
+    }
+  }
+
+  if (disp_panel_cfg->orientation == orientation_landscape_invert ||
+      disp_panel_cfg->orientation == orientation_portrait_invert) {
+    if (esp_lcd_panel_mirror(*disp_panel, true, true) != ESP_OK) {
+      esp3d_log_e("Failed to mirror");
+      return ESP_FAIL;
+    }
   }
   return ret;
 }

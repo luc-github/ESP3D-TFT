@@ -136,7 +136,7 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |---|---|---|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 |disp_backlight|Display component|esp3d_log driver| X | X | X | X | X | O | O | O |
 |st7796| i80 Display |esp3d_log esp_lcd driver| O | O | O | O | X | O | X | O|
-|ILI9485 |RGB Display|esp3d_log esp_lcd driver| X | O | O | O | O | O | O | O|
+|ili9485 |RGB Display|esp3d_log esp_lcd driver| X | O | O | O | O | O | O | O|
 |st7262 |RGB Display|esp3d_log esp_lcd driver| O | X | X | O | O | O | O | O|
 |ek9716|RGB Display|esp3d_log lvgl esp_lcd driver| O | O | O | X| O | O | O | O |
 |rm68120|i80 Display|esp3d_log lvgl esp_lcd driver| O | O | O | O | O | X | O | O |
@@ -175,6 +175,7 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |st7796 SPI|Ok|
 |st7796 i80|Ok|
 |st7262 RGB|Ok|
+|ili9485 RGB| Ok |
 |ek9716 RGB||
 |rm68120 i80|Ok |
 |xpt2046 SPI|Ok|

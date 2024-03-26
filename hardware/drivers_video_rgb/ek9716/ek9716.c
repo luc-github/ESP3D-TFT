@@ -1,5 +1,5 @@
 /*
-  ili9485.c
+  ek9716.c
 
   Copyright (c) 2023 Luc Lebosse. All rights reserved.
 
@@ -21,7 +21,7 @@
  *      INCLUDES
  *********************/
 
-#include "ili9485.h"
+#include "ek9716.h"
 
 #include <driver/gpio.h>
 #include <stdlib.h>
@@ -36,17 +36,17 @@
  *   GLOBAL FUNCTIONS
  **********************/
 /**
- * @brief Initializes a new ILI9485 LCD panel.
+ * @brief Initializes a new ek9716 LCD panel.
  *
- * This function initializes a new ILI9485 LCD panel based on the provided configuration.
+ * This function initializes a new ek9716 LCD panel based on the provided configuration.
  *
- * @param disp_panel_cfg Pointer to the configuration structure for the ILI9485 panel.
- * @param disp_panel Pointer to the handle of the initialized ILI9485 panel.
+ * @param disp_panel_cfg Pointer to the configuration structure for the ek9716 panel.
+ * @param disp_panel Pointer to the handle of the initialized ek9716 panel.
  *
  * @return `ESP_OK` if the panel is successfully initialized, or an error code if initialization fails.
  */
-esp_err_t esp_lcd_new_panel_ili9485(
-  const esp_i80_ili9485_config_t *disp_panel_cfg,
+esp_err_t esp_lcd_new_panel_ek9716(
+  const esp_i80_ek9716_config_t *disp_panel_cfg,
   esp_lcd_panel_handle_t *disp_panel) {
   esp_err_t ret = ESP_OK;
   if (esp_lcd_new_rgb_panel(&(disp_panel_cfg->panel_config), disp_panel) !=

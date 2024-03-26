@@ -23,7 +23,15 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
+/**
+ * @brief Enumeration for the orientation of the display.
+ *
+ * This enumeration defines the possible orientations of the display.
+ * - `orientation_portrait`: The display is in portrait mode.
+ * - `orientation_landscape`: The display is in landscape mode.
+ * - `orientation_portrait_invert`: The display is in inverted portrait mode.
+ * - `orientation_landscape_invert`: The display is in inverted landscape mode.
+ */
 typedef enum {
     orientation_portrait = 0,
     orientation_landscape = 1,
@@ -31,13 +39,16 @@ typedef enum {
     orientation_landscape_invert = 3,
 } esp_i80_rm68120_orientation_t;
 
+/**
+ * @brief Configuration structure for the RM68120 driver.
+ */
 typedef struct {
-    esp_lcd_i80_bus_config_t bus_config ;
-    esp_lcd_panel_io_i80_config_t io_config;
-    esp_lcd_panel_dev_config_t panel_config;
-    esp_i80_rm68120_orientation_t orientation;
-    uint16_t hor_res;
-    uint16_t ver_res;
+    esp_lcd_i80_bus_config_t bus_config; /**< I80 bus configuration */
+    esp_lcd_panel_io_i80_config_t io_config; /**< I80 panel IO configuration */
+    esp_lcd_panel_dev_config_t panel_config; /**< Panel device configuration */
+    esp_i80_rm68120_orientation_t orientation; /**< Orientation of the RM68120 display */
+    uint16_t hor_res; /**< Horizontal resolution of the display */
+    uint16_t ver_res; /**< Vertical resolution of the display */
 } esp_i80_rm68120_config_t;
 
 /**********************

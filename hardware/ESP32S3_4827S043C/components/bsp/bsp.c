@@ -96,18 +96,6 @@ esp_err_t bsp_init(void) {
     return ESP_FAIL;
   }
 
-#if DISP_ORIENTATION == 0 || DISP_ORIENTATION == 1  // portrait mode
-  if(esp_lcd_panel_swap_xy(disp_panel, true)!=ESP_OK){
-    esp3d_log_e("Failed to swap xy");
-    return ESP_FAIL;
-  }
-#endif //DISP_ORIENTATION
-#if DISP_ORIENTATION == 1 || DISP_ORIENTATION == 3  // mirrored
-  if(esp_lcd_panel_mirror(disp_panel, true, true)!=ESP_OK){
-    esp3d_log_e("Failed to mirror");
-    return ESP_FAIL;
-  }
-#endif //DISP_ORIENTATION  
 
 #if DISP_AVOID_TEAR_EFFECT_WITH_SEM
   esp3d_log("Create semaphores");
