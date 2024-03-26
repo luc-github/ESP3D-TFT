@@ -58,7 +58,7 @@ typedef enum {
 } esp_i80_st7262_orientation_t;
 
 /**
- * @brief Configuration structure for the ESP32 I80 interface with ST7262 driver and ILI9485 panel.
+ * @brief Configuration structure for the ESP32 RGB interface with ST7262 driver.
  */
 typedef struct {
   esp_lcd_rgb_panel_config_t panel_config; /**< Configuration for the RGB panel. */
