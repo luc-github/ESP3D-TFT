@@ -7,7 +7,6 @@ extern "C" {
 #include "rm68120.h"
 #define TFT_DISPLAY_CONTROLLER "RM68120"
 
-#define DISP_ORIENTATION orientation_landscape
 #define DISP_HOR_RES_MAX (800)
 #define DISP_VER_RES_MAX (480)
 
