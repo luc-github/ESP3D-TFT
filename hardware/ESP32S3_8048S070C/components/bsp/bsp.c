@@ -80,36 +80,12 @@ esp_err_t bsp_init(void) {
     return ESP_FAIL;
   }
 
-  /* Display panel initialization */
+ /* Display panel initialization */
   esp3d_log("Initializing display...");
-  if(esp_lcd_new_rgb_panel(&disp_panel_cfg, &disp_panel) != ESP_OK) {
-    esp3d_log_e("Display initialization failed!");
+  if (esp_lcd_new_panel_ek9716(&disp_panel_cfg, &disp_panel)!=ESP_OK){
+    esp3d_log_e("Failed to create new RGB panel");
     return ESP_FAIL;
   }
-  if(esp_lcd_panel_reset(disp_panel) != ESP_OK) {
-    esp3d_log_e("Display reset failed!");
-    return ESP_FAIL;
-  }
-  if(esp_lcd_panel_init(disp_panel) != ESP_OK) {
-    esp3d_log_e("Display initialization failed!");
-    return ESP_FAIL;
-  }
-  //if(esp_lcd_panel_invert_color(disp_panel, true) != ESP_OK) {
-  //  esp3d_log_e("Display invert color failed!");
-  //  return ESP_FAIL;
-  //}
-#if DISP_ORIENTATION == 0 || DISP_ORIENTATION == 1  // portrait mode
-  if(esp_lcd_panel_swap_xy(disp_panel, true) != ESP_OK) {
-    esp3d_log_e("Display swap xy failed!");
-    return ESP_FAIL;
-  }
-#endif //DISP_ORIENTATION
-#if DISP_ORIENTATION == 1 || DISP_ORIENTATION == 3  // mirrored
-  if(esp_lcd_panel_mirror(disp_panel, true, true) != ESP_OK) {
-    esp3d_log_e("Display mirror failed!");
-    return ESP_FAIL;
-  }
-#endif //DISP_ORIENTATION  
 
 #if DISP_AVOID_TEAR_EFFECT_WITH_SEM
   esp3d_log("Create semaphores");

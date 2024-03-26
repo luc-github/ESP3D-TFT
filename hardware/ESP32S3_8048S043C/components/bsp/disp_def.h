@@ -7,28 +7,12 @@ extern "C" {
 
 #define TFT_DISPLAY_CONTROLLER "ST7262"
 
-#include "esp_lcd_panel_commands.h"
-#include "esp_lcd_panel_ops.h"
-#include "esp_lcd_panel_interface.h"
-#include "esp_lcd_panel_rgb.h"
+#include "st7262.h"
 #include "disp_backlight.h"
 
-/*
-PORTRAIT                0
-PORTRAIT_INVERTED       1
-LANDSCAPE               2
-LANDSCAPE_INVERTED      3
-*/
-
-#define DISP_ORIENTATION 2  // landscape
-
-#if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
 #define DISP_HOR_RES_MAX 800
 #define DISP_VER_RES_MAX 480
-#else  // portrait mode
-#define DISP_HOR_RES_MAX 480
-#define DISP_VER_RES_MAX 800
-#endif
+
 
 #define DISP_CLK_FREQ           (13 * 1000 * 1000)  // adjusted
 #define DISP_AVOID_TEAR_EFFECT_WITH_SEM (true)
@@ -48,7 +32,8 @@ LANDSCAPE_INVERTED      3
 #endif  // WITH_PSRAM
 #define DISP_BUF_SIZE_BYTES    (DISP_BUF_SIZE * 2)
 
-const esp_lcd_rgb_panel_config_t disp_panel_cfg = {
+const esp_rgb_st7262_config_t disp_panel_cfg = {
+    .panel_config = {
     .clk_src = LCD_CLK_SRC_DEFAULT,
     .timings = {
         .pclk_hz = DISP_CLK_FREQ,
@@ -109,6 +94,10 @@ const esp_lcd_rgb_panel_config_t disp_panel_cfg = {
         .no_fb = (uint32_t)NULL,
         .bb_invalidate_cache = (uint32_t)NULL,
     }
+},
+    .orientation = orientation_landscape,
+    .hor_res = DISP_HOR_RES_MAX,
+    .ver_res = DISP_VER_RES_MAX,
 };
 
 #define DISP_BCKL_DEFAULT_DUTY 20  //%

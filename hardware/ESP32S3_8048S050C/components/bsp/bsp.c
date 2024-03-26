@@ -25,7 +25,6 @@
 
 #include "esp3d_log.h"
 
-
 #if ESP3D_DISPLAY_FEATURE
 #include "disp_def.h"
 #include "i2c_def.h"
@@ -77,41 +76,24 @@ static SemaphoreHandle_t _sem_gui_ready;
  */
 esp_err_t bsp_init(void) {
 #if ESP3D_DISPLAY_FEATURE
-  /* Display backlight initialization */
-  disp_backlight_h bcklt_handle = disp_backlight_create(&disp_bcklt_cfg);
-  disp_backlight_set(bcklt_handle, 0);
+  disp_backlight_t *bcklt_handle = NULL;
+  esp3d_log("Initializing display backlight...");
+  esp_err_t err = disp_backlight_create(&disp_bcklt_cfg, &bcklt_handle);
+  if (err != ESP_OK) {
+    esp3d_log_e("Failed to initialize display backlight");
+    return err;
+  }
+  if (disp_backlight_set(bcklt_handle, 0) != ESP_OK) {
+    esp3d_log_e("Failed to set display backlight");
+    return ESP_FAIL;
+  }
 
   /* Display panel initialization */
   esp3d_log("Initializing display...");
-  if (esp_lcd_new_rgb_panel(&disp_panel_cfg, &disp_panel) != ESP_OK) {
-    esp3d_log_e("Failed to initialize display panel");
+  if (esp_lcd_new_panel_st7262(&disp_panel_cfg, &disp_panel) != ESP_OK) {
+    esp3d_log_e("Failed to create new RGB panel");
     return ESP_FAIL;
   }
-  if (esp_lcd_panel_reset(disp_panel) != ESP_OK) {
-    esp3d_log_e("Failed to reset display panel");
-    return ESP_FAIL;
-  }
-  if (esp_lcd_panel_init(disp_panel) != ESP_OK) {
-    esp3d_log_e("Failed to initialize display panel");
-    return ESP_FAIL;
-  }
-  // if(esp_lcd_panel_invert_color(disp_panel, true) != ESP_OK) {
-  //   esp3d_log_e("Failed to invert display colors");
-  //   return ESP_FAIL;
-  // }
-
-#if DISP_ORIENTATION == 0 || DISP_ORIENTATION == 1  // portrait mode
-  if (esp_lcd_panel_swap_xy(disp_panel, true) != ESP_OK) {
-    esp3d_log_e("Failed to swap X and Y axes");
-    return ESP_FAIL;
-  }
-#endif                                              // DISP_ORIENTATION
-#if DISP_ORIENTATION == 1 || DISP_ORIENTATION == 3  // mirrored
-  if (esp_lcd_panel_mirror(disp_panel, true, true) != ESP_OK) {
-    esp3d_log_e("Failed to mirror display");
-    return ESP_FAIL;
-  }
-#endif  // DISP_ORIENTATION
 
 #if DISP_AVOID_TEAR_EFFECT_WITH_SEM
   esp3d_log("Create semaphores");
@@ -153,7 +135,12 @@ esp_err_t bsp_init(void) {
     has_touch_init = false;
   }
 
-  disp_backlight_set(bcklt_handle, DISP_BCKL_DEFAULT_DUTY);
+  // enable display backlight
+  err = disp_backlight_set(bcklt_handle, DISP_BCKL_DEFAULT_DUTY);
+  if (err != ESP_OK) {
+    esp3d_log_e("Failed to set display backlight");
+    return err;
+  }
 
   // Lvgl initialization
   esp3d_log("Initializing LVGL...");

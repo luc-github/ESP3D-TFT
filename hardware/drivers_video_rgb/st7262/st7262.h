@@ -65,7 +65,7 @@ typedef struct {
   esp_i80_st7262_orientation_t orientation; /**< Orientation of the display. */
   uint16_t hor_res; /**< Horizontal resolution of the display. */
   uint16_t ver_res; /**< Vertical resolution of the display. */
-} esp_i80_st7262_config_t;
+} esp_rgb_st7262_config_t;
 
 
 /**********************
@@ -78,7 +78,7 @@ typedef struct {
  * The value `ESP_OK` represents success, while other values represent different error conditions.
  * Error codes are defined in the `esp_err.h` header file.
  */
-esp_err_t esp_lcd_new_panel_st7262(const esp_i80_st7262_config_t *disp_panel_cfg, esp_lcd_panel_handle_t *disp_panel);
+esp_err_t esp_lcd_new_panel_st7262(const esp_rgb_st7262_config_t *disp_panel_cfg, esp_lcd_panel_handle_t *disp_panel);
 
 #ifdef __cplusplus
 } /* extern "C" */

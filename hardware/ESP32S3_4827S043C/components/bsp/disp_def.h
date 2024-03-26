@@ -13,27 +13,29 @@ extern "C" {
 #define DISP_HOR_RES_MAX 480
 #define DISP_VER_RES_MAX 272
 
-// Display interface
-#define DISP_CLK_FREQ (14 * 1000 * 1000)
 #define DISP_AVOID_TEAR_EFFECT_WITH_SEM (true)
 #define DISP_USE_BOUNCE_BUFFER (false)
+
 #define DISP_USE_DOUBLE_BUFFER (true)
 #define DISP_NUM_FB (1)
+
+#define DISP_CLK_FREQ (14 * 1000 * 1000)
 
 #define DISP_PATCH_FS_FREQ (6 * 1000 * 1000)  // 6MHz
 #define DISP_PATCH_FS_DELAY (40)
 
 #if DISP_NUM_FB == 2
-// Full frame buffer (255KB) in external PSRAM
+// Full frame buffer 
 #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * DISP_VER_RES_MAX)
 #else
-// 1/4 (68-line) buffer (63.75KB) in external PSRAM
+// 1/4 buffer 
 #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * DISP_VER_RES_MAX / 4)
 #endif  // WITH_PSRAM
+
 #define DISP_BUF_SIZE_BYTES (DISP_BUF_SIZE * 2)
 
 // Display panel configuration
-const esp_i80_ili9485_config_t disp_panel_cfg = {
+const esp_rgb_ili9485_config_t disp_panel_cfg = {
     .panel_config = {.clk_src = LCD_CLK_SRC_DEFAULT,
                      .timings =
                          {

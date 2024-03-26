@@ -64,7 +64,7 @@ typedef struct {
   esp_i80_ek9716_orientation_t orientation; /**< Orientation of the panel. */
   uint16_t hor_res; /**< Horizontal resolution of the panel. */
   uint16_t ver_res; /**< Vertical resolution of the panel. */
-} esp_i80_ek9716_config_t;
+} esp_rgb_ek9716_config_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -79,7 +79,7 @@ typedef struct {
  *
  * @return `ESP_OK` if the panel is successfully initialized, or an error code if initialization fails.
  */
-esp_err_t esp_lcd_new_panel_ek9716(const esp_i80_ek9716_config_t *disp_panel_cfg, esp_lcd_panel_handle_t *disp_panel);
+esp_err_t esp_lcd_new_panel_ek9716(const esp_rgb_ek9716_config_t *disp_panel_cfg, esp_lcd_panel_handle_t *disp_panel);
 
 #ifdef __cplusplus
 } /* extern "C" */
