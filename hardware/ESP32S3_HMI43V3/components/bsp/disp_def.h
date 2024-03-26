@@ -7,18 +7,10 @@ extern "C" {
 #include "rm68120.h"
 #define TFT_DISPLAY_CONTROLLER "RM68120"
 
-#define DISP_ORIENTATION \
-  (orientation_landscape)  // 0:portrait mode 1:landscape mode 2:portrait mode
-                           // reverse 3:landscape mode reverse
-
-#if DISP_ORIENTATION == orientation_landscape || \
-    DISP_ORIENTATION == orientation_landscape_invert  // landscape mode
+#define DISP_ORIENTATION orientation_landscape
 #define DISP_HOR_RES_MAX (800)
 #define DISP_VER_RES_MAX (480)
-#else  // portrait mode
-#define DISP_HOR_RES_MAX (480)
-#define DISP_VER_RES_MAX (800)
-#endif
+
 
 #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * (DISP_VER_RES_MAX / 10))
 #define DISP_USE_DOUBLE_BUFFER (true)
@@ -90,7 +82,7 @@ const esp_i80_rm68120_config_t rm68120_cfg = {
                 },
             .vendor_config = NULL, /*!< Vendor specific configuration */
         },
-    .orientation = DISP_ORIENTATION,
+    .orientation = orientation_landscape,
     .hor_res = DISP_HOR_RES_MAX,
     .ver_res = DISP_VER_RES_MAX,
 };

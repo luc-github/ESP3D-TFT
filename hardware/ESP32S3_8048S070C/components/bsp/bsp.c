@@ -68,9 +68,17 @@ static SemaphoreHandle_t _sem_gui_ready;
  */
 esp_err_t bsp_init(void) {
 #if ESP3D_DISPLAY_FEATURE
-  /* Display backlight initialization */
-  disp_backlight_h bcklt_handle = disp_backlight_create(&disp_bcklt_cfg);
-  disp_backlight_set(bcklt_handle, 0);
+  disp_backlight_t *bcklt_handle = NULL;
+  esp3d_log("Initializing display backlight...");
+  esp_err_t err = disp_backlight_create(&disp_bcklt_cfg, &bcklt_handle);
+  if (err != ESP_OK) {
+    esp3d_log_e("Failed to initialize display backlight");
+    return err;
+  }
+  if (disp_backlight_set(bcklt_handle, 0) != ESP_OK) {
+    esp3d_log_e("Failed to set display backlight");
+    return ESP_FAIL;
+  }
 
   /* Display panel initialization */
   esp3d_log("Initializing display...");
@@ -142,7 +150,12 @@ esp_err_t bsp_init(void) {
     has_touch_init = false;
   }
 
-  disp_backlight_set(bcklt_handle, DISP_BCKL_DEFAULT_DUTY);
+   // enable display backlight
+  err = disp_backlight_set(bcklt_handle, DISP_BCKL_DEFAULT_DUTY);
+  if (err != ESP_OK) {
+    esp3d_log_e("Failed to set display backlight");
+    return err;
+  }
 
   // Lvgl initialization
   esp3d_log("Initializing LVGL...");

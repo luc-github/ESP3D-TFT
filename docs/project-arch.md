@@ -123,11 +123,9 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |ili9341|SPI Display|esp3d_log esp_lcd driver| X |  O | O | O | O |
 |ili9488|| esp3d_log lvgl disp_spi | O |  O | O | X | O |
 |st7796|SPI Display|esp3d_log esp_lcd driver| O |  X | X | O | O |
-|rm68120||esp3d_log lvgl esp_lcd driver| O |  O | O | O| O |
 |xpt2046|SPI Touch|esp3d_log driver| X |  O | X | X| O |
 |gt911||esp3d_log i2c_bus| O | X | O | O| O |
 |ft5x06||esp3d_log lvgl i2c_bus| O |  O | O | O| O
-|tca9554||esp3d_log i2c_bus| O |  O | O | O| O |
 |i2c_bus||esp3d_log driver| O | X | O| O| O |
 |spi_bus|SPI Bus|esp3d_log driver| X |  X | X | X| O
 |sw_spi|Software SPI|esp3d_log driver| X |  O | O | O| O
@@ -137,20 +135,16 @@ The `hardware` directory contains the hardware specific files like drivers, part
 | Drivers |Type| Depend | ESP32S3_4827S043C | ESP32S3_8048S043C | ESP32S3_8048S050C | ESP32S3_8048S070C | ESP32S3_BZM_TFT35_GT911 | ESP32S3_HMI43V3 | ESP32S3_ZX3D50CE02S_USRC_4832 | ESP32S3_CUSTOM|
 |---|---|---|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
 |disp_backlight|Display component|esp3d_log driver| X | X | X | X | X | O | O | O |
-|disp_spi|| esp3d_log driver | O | O | O | O | O | O | O | O |
-|ili9341|SPI Display|esp3d_log esp_lcd driver| O | O | O | O | O | O | O | O |
-|ili9488||esp3d_log lvgl disp_spi| O | O | O | O | O | O | O | O |
 |st7796| i80 Display |esp3d_log esp_lcd driver| O | O | O | O | X | O | X | O|
-|st7262/ILI9485 |RGB Display|esp3d_log esp_lcd driver| X | O | O | O | X | O | O | O|
-|rm68120||esp3d_log lvgl esp_lcd driver| O | O | O | O | O | X | O | O |
-|xpt2046|SPI Touch|esp3d_log driver| O | O | O | O | O | O | O | O|
-|ft5x06||esp3d_log lvgl i2c_bus| O | O | O| O | O | X | X | O|
-|gt911||esp3d_log i2c_bus| X | X | X | X | X | O | O | O |
-|tca9554||esp3d_log i2c_bus| O | O | O | O | O | X | O | O|
-|i2c_bus||esp3d_log driver| X | X | X | X | X | X | X | O|
-|spi_bus|SPI Bus|esp3d_log driver|  O | O | O | O | O | O | O | O|
-|sw_spi||esp3d_log driver| O | O | O | O | O | O | O | O |
-|usb_serial||esp3d_log| O | O | O | O | X | X | X | X |
+|ILI9485 |RGB Display|esp3d_log esp_lcd driver| X | O | O | O | O | O | O | O|
+|st7262 |RGB Display|esp3d_log esp_lcd driver| O | X | X | O | O | O | O | O|
+|ek9716|RGB Display|esp3d_log lvgl esp_lcd driver| O | O | O | X| O | O | O | O |
+|rm68120|i80 Display|esp3d_log lvgl esp_lcd driver| O | O | O | O | O | X | O | O |
+|ft5x06|i2c Touch|esp3d_log lvgl i2c_bus| O | O | O| O | O | X | X | O|
+|gt911|i2c Touch|esp3d_log i2c_bus| X | X | X | X | X | O | O | O |
+|tca9554|IO expander|esp3d_log i2c_bus| O | O | O | O | O | X | O | O|
+|i2c_bus|i2c Bus|esp3d_log driver| X | X | X | X | X | X | X | O|
+|usb_serial| OTG Host|esp3d_log| O | O | O | O | X | X | X | X |
 
 
 
@@ -176,15 +170,16 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |---|:---:|
 |disp_backlight|Ok|
 |disp_spi| |
-|ili9341|Ok|
-|ili9488| |
+|ili9341 SPI|Ok|
+|ili9488 SPI| |
 |st7796 SPI|Ok|
 |st7796 i80|Ok|
-|st7262|Ok|
-|rm68120|Ok |
-|xpt2046|Ok|
-|ft5x06|Ok|
-|gt911|Ok|
+|st7262 RGB|Ok|
+|ek9716 RGB||
+|rm68120 i80|Ok |
+|xpt2046 SPI|Ok|
+|ft5x06 ic2|Ok|
+|gt911 ic2 |Ok|
 |tca9554|Ok|
 |i2c_bus|Ok|
 |spi_bus|Ok|

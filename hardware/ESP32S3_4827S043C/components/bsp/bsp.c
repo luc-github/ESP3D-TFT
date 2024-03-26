@@ -46,7 +46,6 @@
 static void lv_disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 static void lv_touch_read(lv_indev_drv_t * drv, lv_indev_data_t * data);
 static bool disp_on_vsync_event(esp_lcd_panel_handle_t panel, const esp_lcd_rgb_panel_event_data_t *event_data, void *user_data);
-esp_err_t esp_lcd_new_panel_st7262(const esp_lcd_rgb_panel_config_t *disp_panel_cfg, esp_lcd_panel_handle_t *disp_panel);
 #endif
 
 /**********************
@@ -63,10 +62,6 @@ static SemaphoreHandle_t _sem_vsync_end;
 static SemaphoreHandle_t _sem_gui_ready;
 #endif  // DISP_AVOID_TEAR_EFFECT_WITH_SEM
 #endif
-
-/**********************
- *      MACROS
- **********************/
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -96,7 +91,7 @@ esp_err_t bsp_init(void) {
 
   /* Display panel initialization */
   esp3d_log("Initializing display...");
-  if (esp_lcd_new_panel_st7262(&disp_panel_cfg, &disp_panel)!=ESP_OK){
+  if (esp_lcd_new_panel_ili9485(&disp_panel_cfg, &disp_panel)!=ESP_OK){
     esp3d_log_e("Failed to create new RGB panel");
     return ESP_FAIL;
   }
@@ -118,12 +113,12 @@ esp_err_t bsp_init(void) {
   esp3d_log("Create semaphores");
   _sem_vsync_end = xSemaphoreCreateBinary();
   if (!_sem_vsync_end) {
-    esp3d_log_e("Failed to create st7262_sem_vsync_end");
+    esp3d_log_e("Failed to create ili9485_sem_vsync_end");
     return ESP_FAIL;
   }
   _sem_gui_ready = xSemaphoreCreateBinary();
   if (!_sem_gui_ready) {
-    esp3d_log_e("Failed to create st7262_sem_gui_ready");
+    esp3d_log_e("Failed to create ili9485_sem_gui_ready");
     return ESP_FAIL;
   }
 #endif  // DISP_AVOID_TEAR_EFFECT_WITH_SEM
@@ -257,7 +252,6 @@ esp_err_t bsp_releaseFs(void) {
  *   STATIC FUNCTIONS
  **********************/
 #if ESP3D_DISPLAY_FEATURE
-
 /**
  * @brief Callback function for handling display on vsync events.
  *

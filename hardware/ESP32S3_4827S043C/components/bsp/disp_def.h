@@ -1,16 +1,13 @@
 // Display definitions for ESP32_4827S043C
-// Display driver ST7262 (16-bit RGB565 parallel interface)
+// Display driver ili9485 (16-bit RGB565 parallel interface)
 #pragma once
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define TFT_DISPLAY_CONTROLLER "ST7262"
+#define TFT_DISPLAY_CONTROLLER "ili9485"
 
-#include "esp_lcd_panel_commands.h"
-#include "esp_lcd_panel_ops.h"
-#include "esp_lcd_panel_interface.h"
-#include "esp_lcd_panel_rgb.h"
+#include "ili9485.h"
 #include "disp_backlight.h"
 
 
