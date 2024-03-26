@@ -6,20 +6,11 @@ extern "C" {
 #endif
 #include "st7796.h"
 #include "disp_backlight.h"
+
 #define TFT_DISPLAY_CONTROLLER "ST7796"
 
-#define DISP_ORIENTATION \
-  (orientation_landscape)  // 0:portrait mode 1:landscape mode 2:portrait mode
-                           // reverse 3:landscape mode reverse
-
-#if DISP_ORIENTATION == orientation_landscape || \
-    DISP_ORIENTATION == orientation_landscape_invert  // landscape mode
 #define DISP_HOR_RES_MAX (480)
 #define DISP_VER_RES_MAX (320)
-#else  // portrait mode
-#define DISP_HOR_RES_MAX (320)
-#define DISP_VER_RES_MAX (480)
-#endif
 
 #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * (DISP_VER_RES_MAX / 10))
 
@@ -90,7 +81,7 @@ const esp_i80_st7796_config_t st7796_cfg = {
                 },
             .vendor_config = NULL, /*!< Vendor specific configuration */
         },
-    .orientation = DISP_ORIENTATION,
+    .orientation = orientation_landscape,
     .hor_res = DISP_HOR_RES_MAX,
     .ver_res = DISP_VER_RES_MAX,
 };
