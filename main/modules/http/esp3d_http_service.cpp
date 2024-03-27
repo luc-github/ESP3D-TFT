@@ -72,6 +72,12 @@
 #endif  // ESP3D_WEBDAV_SERVICES_FEATURE
 #define FILE_NOT_FOUND_HANDLER_CNT 1
 
+#if ESP3D_CAMERA_FEATURE
+#define CAMERA_HANDLER_CNT 1
+#else
+#define CAMERA_HANDLER_CNT 0
+#endif // ESP3D_CAMERA_FEATURE
+
 ESP3DHttpService esp3dHttpService;
 
 PostUploadContext ESP3DHttpService::_post_files_upload_ctx = {
@@ -240,7 +246,7 @@ bool ESP3DHttpService::begin() {
       LOGIN_HANDLER_CNT + FILES_UPLOAD_HANDLER_CNT + SDFILES_HANDLER_CNT +
       SDFILES_UPLOAD_HANDLER_CNT + UPDATEFW_UPLOAD_HANDLER_CNT +
       WEBSOCKET_WEBUI_HANDLER_CNT + WEBSOCKET_DATA_HANDLER_CNT +
-      WEBDAV_HANDLER_CNT + FILE_NOT_FOUND_HANDLER_CNT;
+      WEBDAV_HANDLER_CNT + FILE_NOT_FOUND_HANDLER_CNT + CAMERA_HANDLER_CNT;
   // backlog_conn
   config.backlog_conn = 8;
   config.close_fn = close_fn;
@@ -393,6 +399,23 @@ bool ESP3DHttpService::begin() {
       esp3d_log_e("sdfiles handler registration failed");
     }
 #endif  // ESP3D_SD_CARD_FEATURE
+
+#ifdef ESP3D_CAMERA_FEATURE
+    //  camera /snap
+    const httpd_uri_t config_handler_camera = {
+        .uri = "/snap",
+        .method = HTTP_GET,
+        .handler =
+            (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.snap_handler),
+        .user_ctx = nullptr,
+        .is_websocket = false,
+        .handle_ws_control_frames = false,
+        .supported_subprotocol = nullptr};
+    if (ESP_OK != httpd_register_uri_handler(_server, &config_handler_camera))
+    {
+      esp3d_log_e("camera handler registration failed");
+    }
+#endif // ESP3D_CAMERA_FEATURE
 
 #if ESP3D_UPDATE_FEATURE
     // updatefw upload (POST data)

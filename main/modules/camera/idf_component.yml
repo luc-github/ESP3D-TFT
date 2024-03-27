@@ -1,0 +1,4 @@
+## IDF Component Manager Manifest File
+dependencies:
+  espressif/esp32-camera: "^2.0.6"
+  idf: ">=5.1.0"

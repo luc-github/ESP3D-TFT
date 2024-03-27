@@ -1,7 +1,7 @@
 # Component directive
-set(SOURCES "st7796.c")
+set(SOURCES "camera.cpp")
 set(INCLUDES .)
 idf_component_register(SRCS ${SOURCES}
     INCLUDE_DIRS ${INCLUDES}
-    REQUIRES esp3d_log lvgl esp_lcd driver
+    REQUIRES esp3d_log esp_http_server
 )

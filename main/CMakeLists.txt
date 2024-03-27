@@ -11,6 +11,7 @@ set(SOURCES .
     modules/config_file
     modules/translations
     modules/gcode_host
+    modules/camera
 )
 
 if(TIME_SERVICE)
@@ -44,6 +45,9 @@ if(WIFI_SERVICE)
         if(WEBDAV_SERVICES)
             list(APPEND SOURCES "modules/http/handlers/webdav")
             list(APPEND SOURCES "modules/webdav")
+        endif()
+        if(CAMERA_SERVICES)
+            list(APPEND SOURCES "modules/camera")
         endif()
         list(APPEND SOURCES "modules/websocket")
         set(WEBEMBEDDEDFILES "embedded/favicon.ico.gz" "embedded/index.html.gz")
