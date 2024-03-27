@@ -3,10 +3,10 @@
 # #######################################
 
 # With TFT:
-OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" ON)
+OPTION(ESP32S3_HMI43V3 "TFT TARGET is ESP32S3 HMI 4.3inches" OFF)
 OPTION(ESP32_ROTRICS_DEXARM35 "TFT TARGET is ESP32 Rotrics DexArm 3.5inches" OFF)
 OPTION(ESP32S3_ZX3D50CE02S_USRC_4832 "TFT TARGET is ESP32S3 Panlee ZX3D50CE02S-SRC-4832 3.5inches" OFF)
-OPTION(ESP32S3_BZM_TFT35_GT911 "TFT TARGET is ESP32S3 Panlee BZM 3.5inches" OFF)
+OPTION(ESP32S3_BZM_TFT35_GT911 "TFT TARGET is ESP32S3 Panlee BZM 3.5inches" ON)
 OPTION(ESP32S3_8048S070C "TFT TARGET is ESP32S3_8048S070C - 7.0in. 800x480 (Capacitive)" OFF)
 OPTION(ESP32S3_8048S050C "TFT TARGET is ESP32S3_8048S050C - 5.0in. 800x480 (Capacitive)" OFF)
 OPTION(ESP32S3_8048S043C "TFT TARGET is ESP32S3_8048S043C - 4.3in. 800x480 (Capacitive)" OFF)
@@ -53,17 +53,20 @@ OPTION(TIME_SERVICE  "Time service" ON)
 OPTION(SSDP_SERVICE "SSDP service" ON)
 OPTION(MDNS_SERVICE "MDNS service" ON)
 OPTION(WIFI_SERVICE "WiFi service" ON)
-OPTION(BT_SERVICE "Bluetooth service" ON)
+OPTION(BT_SERVICE "Bluetooth service" OFF)
 OPTION(WEB_SERVICES "Web Services http/websocket/webdav" ON)
 OPTION(WEBDAV_SERVICES "WebDav Services" ON)
-OPTION(TELNET_SERVICE "Telnet service" ON)
+OPTION(TELNET_SERVICE "Telnet service" OFF)
 OPTION(WS_SERVICE "WebSocket data service" ON)
 OPTION(TFT_UI_SERVICE "TFT UI service" ON)
 OPTION(SD_CARD_SERVICE "SD card service" ON)
 OPTION(NOTIFICATIONS_SERVICE "Notifications service" ON)
-OPTION(UPDATE_SERVICE "Update service" ON)
+OPTION(UPDATE_SERVICE "Update service" OFF)
 OPTION(USE_FAT_INSTEAD_OF_LITTLEFS "Use FAT instead of LittleFS" OFF)
-
+if(ESP32S3_BZM_TFT35_GT911)
+#     if  CAMERA_SERVICE is ON, UPDATE_SERVICE should be OFF. IDF should be 5.1.2
+    OPTION(CAMERA_SERVICE "Camera service" ON)
+endif()
 # #######################################
 # Do not change anything below this line
 # #######################################
@@ -216,7 +219,7 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 # Debug = 2
 # Error only = 1
 # Disabled = 0
-add_compile_options(-DESP3D_TFT_LOG=0)
+add_compile_options(-DESP3D_TFT_LOG=1)
 # Disable ANSI color to fit some serial terminals 
 add_compile_options(-DDISABLE_COLOR_LOG=1)
 
@@ -258,6 +261,9 @@ if(WIFI_SERVICE)
         endif()
         if(WEBDAV_SERVICES)
             add_compile_options(-DESP3D_WEBDAV_SERVICES_FEATURE=1)
+        endif()
+        if(CAMERA_SERVICE)
+            add_compile_options(-DESP3D_CAMERA_FEATURE=1)
         endif()
     endif()
 
