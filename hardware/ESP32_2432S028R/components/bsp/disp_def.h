@@ -27,6 +27,7 @@ extern "C" {
 #endif  // WITH_PSRAM
 #define DISP_BUF_SIZE_BYTES (DISP_BUF_SIZE * 2)
 
+// Display configuration
 esp_spi_ili9341_config_t display_spi_ili9341_cfg = {
     .panel_dev_config = {.reset_gpio_num =
                              4,  // GPIO 4
@@ -64,7 +65,7 @@ esp_spi_ili9341_config_t display_spi_ili9341_cfg = {
     .ver_res = DISP_VER_RES_MAX,
 };
 
-
+// Display backlight configuration
 #define DISP_BCKL_DEFAULT_DUTY 100  //%
 
 const disp_backlight_config_t disp_bcklt_cfg = {.pwm_control = false,

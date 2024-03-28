@@ -1,6 +1,22 @@
-/**
- * @file ili9341.c
- */
+/*
+  ili9341.c
+
+  Copyright (c) 2023 Luc Lebosse. All rights reserved.
+
+  This code is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This code is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 #include "ili9341.h"
 
@@ -61,6 +77,17 @@ static esp_err_t lcd_panel_disp_on_off(esp_lcd_panel_t *panel, bool off);
  *   GLOBAL FUNCTIONS
  **********************/
 
+/**
+ * @brief Initializes a new ILI9341 LCD panel.
+ *
+ * This function initializes a new ILI9341 LCD panel using the provided I/O handle and panel configuration.
+ *
+ * @param io The I/O handle for the LCD panel.
+ * @param panel_cfg The configuration settings for the ILI9341 panel.
+ * @param disp_panel Pointer to the variable where the LCD panel handle will be stored.
+ *
+ * @return `ESP_OK` if the panel is successfully initialized, or an error code if initialization fails.
+ */
 esp_err_t esp_lcd_new_panel_ili9341(const esp_lcd_panel_io_handle_t io,
                                     const esp_spi_ili9341_config_t *panel_cfg,
                                     esp_lcd_panel_handle_t *disp_panel) {
@@ -122,15 +149,20 @@ esp_err_t esp_lcd_new_panel_ili9341(const esp_lcd_panel_io_handle_t io,
   lcd_panel->base.disp_on_off = lcd_panel_disp_on_off;
   *disp_panel = &(lcd_panel->base);
   esp3d_log("new ili9341 panel @%p", lcd_panel);
-
-  ESP_ERROR_CHECK(esp_lcd_panel_reset(*disp_panel));
-  ESP_ERROR_CHECK(esp_lcd_panel_init(*disp_panel));
-  // ESP_ERROR_CHECK(esp_lcd_panel_invert_color(disp_panel, true));
+  //reset ili9341 panel
+  ESP_GOTO_ON_ERROR(esp_lcd_panel_reset(*disp_panel), err, "",
+                    "reset ili9341 panel failed");
+  //init ili9341 panel
+  ESP_GOTO_ON_ERROR(esp_lcd_panel_init(*disp_panel), err, "",
+                    "init ili9341 panel failed");
+  //set Orientation                  
 if (panel_cfg->orientation== orientation_landscape || panel_cfg->orientation== orientation_landscape_invert) {
-  ESP_ERROR_CHECK(esp_lcd_panel_swap_xy(*disp_panel, true));
+  ESP_GOTO_ON_ERROR(esp_lcd_panel_swap_xy(*disp_panel, true), err, "",
+                    "swap ili9341 panel failed");
 }                                          // DISP_ORIENTATION
 if(panel_cfg->orientation == orientation_portrait_invert || panel_cfg->orientation == orientation_landscape_invert){
-  ESP_ERROR_CHECK(esp_lcd_panel_mirror(*disp_panel, true, true));
+  ESP_GOTO_ON_ERROR(esp_lcd_panel_mirror(*disp_panel, true, true), err, "",
+                    "mirror ili9341 panel failed");
 }
 
   return ESP_OK;
@@ -149,6 +181,14 @@ err:
  *   STATIC FUNCTIONS
  **********************/
 
+/**
+ * @brief Deletes an LCD panel.
+ *
+ * This function is used to delete an LCD panel structure and free up the memory allocated for it.
+ *
+ * @param panel Pointer to the LCD panel structure to be deleted.
+ * @return `ESP_OK` if the LCD panel is successfully deleted, or an error code if an error occurred.
+ */
 static esp_err_t lcd_panel_del(esp_lcd_panel_t *panel) {
   lcd_panel_t *lcd_panel = __containerof(panel, lcd_panel_t, base);
 
@@ -160,6 +200,14 @@ static esp_err_t lcd_panel_del(esp_lcd_panel_t *panel) {
   return ESP_OK;
 }
 
+/**
+ * @brief Resets the LCD panel.
+ *
+ * This function is responsible for resetting the LCD panel specified by the `panel` parameter.
+ *
+ * @param panel Pointer to the `esp_lcd_panel_t` structure representing the LCD panel.
+ * @return `ESP_OK` if the LCD panel reset is successful, otherwise an error code indicating the cause of failure.
+ */
 static esp_err_t lcd_panel_reset(esp_lcd_panel_t *panel) {
   lcd_panel_t *lcd_panel = __containerof(panel, lcd_panel_t, base);
   esp_lcd_panel_io_handle_t io = lcd_panel->io;
@@ -175,10 +223,17 @@ static esp_err_t lcd_panel_reset(esp_lcd_panel_t *panel) {
     vTaskDelay(pdMS_TO_TICKS(
         20));  // spec, wait at least 5 ms. before sending new command
   }
-
   return ESP_OK;
 }
 
+/**
+ * @brief Initializes the LCD panel.
+ *
+ * This function initializes the LCD panel specified by the `panel` parameter.
+ *
+ * @param panel Pointer to the `esp_lcd_panel_t` structure representing the LCD panel.
+ * @return `ESP_OK` if the initialization is successful, otherwise an error code.
+ */
 static esp_err_t lcd_panel_init(esp_lcd_panel_t *panel) {
   lcd_panel_t *lcd_panel = __containerof(panel, lcd_panel_t, base);
   esp_lcd_panel_io_handle_t io = lcd_panel->io;
@@ -245,9 +300,26 @@ static esp_err_t lcd_panel_init(esp_lcd_panel_t *panel) {
   return ESP_OK;
 }
 
+/**
+ * @brief  Draws a bitmap on the LCD panel.
+ *
+ * This function draws a bitmap on the LCD panel starting from the specified
+ * coordinates (x_start, y_start) and ending at the specified coordinates
+ * (x_end, y_end). The bitmap data is provided through the color_data parameter.
+ *
+ * @param panel       Pointer to the LCD panel structure.
+ * @param x_start     The starting x-coordinate of the bitmap.
+ * @param y_start     The starting y-coordinate of the bitmap.
+ * @param x_end       The ending x-coordinate of the bitmap.
+ * @param y_end       The ending y-coordinate of the bitmap.
+ * @param color_data  Pointer to the color data of the bitmap.
+ *
+ * @return            ESP_OK if the bitmap was successfully drawn, otherwise an
+ *                    appropriate error code is returned.
+ */
 static esp_err_t lcd_panel_draw_bitmap(esp_lcd_panel_t *panel, int x_start,
-                                       int y_start, int x_end, int y_end,
-                                       const void *color_data) {
+                     int y_start, int x_end, int y_end,
+                     const void *color_data) {
   lcd_panel_t *lcd_panel = __containerof(panel, lcd_panel_t, base);
   assert((x_start < x_end) && (y_start < y_end) &&
          "start position must be smaller than end position");
@@ -284,6 +356,16 @@ static esp_err_t lcd_panel_draw_bitmap(esp_lcd_panel_t *panel, int x_start,
   return ESP_OK;
 }
 
+/**
+ * @brief Inverts the color data of the LCD panel.
+ *
+ * This function is used to invert the color data of the LCD panel. When `invert_color_data` is set to `true`,
+ * the color data will be inverted. When `invert_color_data` is set to `false`, the color data will remain unchanged.
+ *
+ * @param panel Pointer to the LCD panel structure.
+ * @param invert_color_data Flag indicating whether to invert the color data.
+ * @return `ESP_OK` if the color data is successfully inverted, or an error code if an error occurred.
+ */
 static esp_err_t lcd_panel_invert_color(esp_lcd_panel_t *panel,
                                         bool invert_color_data) {
   lcd_panel_t *lcd_panel = __containerof(panel, lcd_panel_t, base);
@@ -298,6 +380,16 @@ static esp_err_t lcd_panel_invert_color(esp_lcd_panel_t *panel,
   return ESP_OK;
 }
 
+/**
+ * @brief Mirrors the LCD panel horizontally and/or vertically.
+ *
+ * This function allows you to mirror the LCD panel horizontally and/or vertically.
+ *
+ * @param panel Pointer to the LCD panel structure.
+ * @param mirror_x Set to `true` to mirror the panel horizontally, `false` otherwise.
+ * @param mirror_y Set to `true` to mirror the panel vertically, `false` otherwise.
+ * @return `ESP_OK` if the operation is successful, otherwise an error code.
+ */
 static esp_err_t lcd_panel_mirror(esp_lcd_panel_t *panel, bool mirror_x,
                                   bool mirror_y) {
   lcd_panel_t *lcd_panel = __containerof(panel, lcd_panel_t, base);
@@ -317,6 +409,18 @@ static esp_err_t lcd_panel_mirror(esp_lcd_panel_t *panel, bool mirror_x,
   return ESP_OK;
 }
 
+/**
+ * @brief Swaps the X and Y axes of the LCD panel.
+ *
+ * This function is used to swap the X and Y axes of the LCD panel if needed.
+ *
+ * @param panel Pointer to the LCD panel structure.
+ * @param swap_axes Boolean value indicating whether to swap the axes.
+ *                 - `true` to swap the axes.
+ *                 - `false` to keep the axes as is.
+ *
+ * @return `ESP_OK` if the axes are successfully swapped, or an error code if an error occurred.
+ */
 static esp_err_t lcd_panel_swap_xy(esp_lcd_panel_t *panel, bool swap_axes) {
   lcd_panel_t *lcd_panel = __containerof(panel, lcd_panel_t, base);
   esp_lcd_panel_io_handle_t io = lcd_panel->io;
@@ -330,6 +434,14 @@ static esp_err_t lcd_panel_swap_xy(esp_lcd_panel_t *panel, bool swap_axes) {
   return ESP_OK;
 }
 
+/**
+ * Sets the gap between pixels on the LCD panel.
+ *
+ * @param panel The LCD panel structure.
+ * @param x_gap The horizontal gap between pixels.
+ * @param y_gap The vertical gap between pixels.
+ * @return `ESP_OK` if the gap was set successfully, otherwise an error code.
+ */
 static esp_err_t lcd_panel_set_gap(esp_lcd_panel_t *panel, int x_gap,
                                    int y_gap) {
   lcd_panel_t *lcd_panel = __containerof(panel, lcd_panel_t, base);
@@ -338,6 +450,16 @@ static esp_err_t lcd_panel_set_gap(esp_lcd_panel_t *panel, int x_gap,
   return ESP_OK;
 }
 
+/**
+ * @brief Turns the display on or off for the LCD panel.
+ *
+ * This function is used to turn the display on or off for the specified LCD panel.
+ *
+ * @param panel Pointer to the ESP_LCD_PANEL structure representing the LCD panel.
+ * @param off Boolean value indicating whether to turn the display off (true) or on (false).
+ *
+ * @return ESP_OK if the operation is successful, otherwise an error code.
+ */
 static esp_err_t lcd_panel_disp_on_off(esp_lcd_panel_t *panel, bool off) {
   lcd_panel_t *lcd_panel = __containerof(panel, lcd_panel_t, base);
   esp_lcd_panel_io_handle_t io = lcd_panel->io;

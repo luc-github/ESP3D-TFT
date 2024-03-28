@@ -35,9 +35,8 @@
  *      DEFINES
  *********************/
 
-/**********************
- *      TYPEDEFS
- **********************/
+#define MAP(n, min, max, range) \
+  (uint32_t)((uint32_t)((n > min) ? (n - min) : 0) * range) / (max - min);
 
 /**********************
  *  STATIC PROTOTYPES
@@ -61,13 +60,17 @@ static esp_lcd_panel_handle_t disp_panel;
 #endif
 
 /**********************
- *      MACROS
- **********************/
-
-/**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
+/**
+ * @brief Initializes the Board Support Package (BSP).
+ *
+ * This function initializes the necessary components and peripherals required
+ * by the BSP.
+ *
+ * @return esp_err_t Returns `ESP_OK` on success, or an error code if
+ * initialization fails.
+ */
 esp_err_t bsp_init(void) {
 #if ESP3D_DISPLAY_FEATURE
   /* Display backlight initialization */
@@ -103,22 +106,33 @@ esp_err_t bsp_init(void) {
   esp3d_log("Attaching display panel to SPI bus...");
   esp_lcd_panel_io_handle_t disp_io_handle;
   display_spi_ili9341_cfg.disp_spi_cfg.on_color_trans_done = disp_flush_ready;
-  ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi(
+  err = esp_lcd_new_panel_io_spi(
       (esp_lcd_spi_bus_handle_t)(display_spi_ili9341_cfg.spi_bus_config
                                      .spi_host_index),
-      &(display_spi_ili9341_cfg.disp_spi_cfg), &disp_io_handle));
+      &(display_spi_ili9341_cfg.disp_spi_cfg), &disp_io_handle);
+
+  if (err != ESP_OK) {
+    esp3d_log_e("Failed to attach display panel to SPI bus");
+    return err;
+  }
 
   /* Display panel initialization */
   esp3d_log("Initializing display...");
-  ESP_ERROR_CHECK(esp_lcd_new_panel_ili9341(
-      disp_io_handle, &display_spi_ili9341_cfg, &disp_panel));
-  
-
+  err = esp_lcd_new_panel_ili9341(disp_io_handle, &display_spi_ili9341_cfg,
+                                  &disp_panel);
+  if (err != ESP_OK) {
+    esp3d_log_e("Failed to initialize display panel");
+    return err;
+  }
   /* Touch controller initialization */
   esp3d_log("Initializing touch controller...");
   sw_spi_init(&touch_spi_cfg);
   xpt2046_cfg.read_reg12_fn = touch_spi_read_reg12;
-  ESP_ERROR_CHECK(xpt2046_init(&xpt2046_cfg));
+  err = xpt2046_init(&xpt2046_cfg);
+  if (err != ESP_OK) {
+    esp3d_log_e("Failed to initialize touch controller");
+    return err;
+  }
 
   // enable display backlight
   err = disp_backlight_set(bcklt_handle, DISP_BCKL_DEFAULT_DUTY);
@@ -174,6 +188,16 @@ esp_err_t bsp_init(void) {
  **********************/
 #if ESP3D_DISPLAY_FEATURE
 
+/**
+ * @brief Checks if the display flush is ready.
+ *
+ * This function is used to check if the display flush is ready to be performed.
+ *
+ * @param panel_io The handle to the LCD panel I/O.
+ * @param edata The event data associated with the LCD panel I/O.
+ * @param user_ctx The user context.
+ * @return `true` if the display flush is ready, `false` otherwise.
+ */
 static bool disp_flush_ready(esp_lcd_panel_io_handle_t panel_io,
                              esp_lcd_panel_io_event_data_t *edata,
                              void *user_ctx) {
@@ -181,20 +205,42 @@ static bool disp_flush_ready(esp_lcd_panel_io_handle_t panel_io,
   return false;
 }
 
+/**
+ * Flushes the display with the specified color data in the given area.
+ *
+ * @param disp_drv Pointer to the display driver structure.
+ * @param area     Pointer to the area to be flushed.
+ * @param color_p  Pointer to the color data array.
+ */
 static void lv_disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area,
                           lv_color_t *color_p) {
   esp_lcd_panel_draw_bitmap(disp_panel, area->x1, area->y1, area->x2 + 1,
                             area->y2 + 1, color_p);
 }
 
+/**
+ * Reads a 12-bit register value from the touch SPI.
+ *
+ * This function reads a 16-bit register value from the touch SPI and returns
+ * the lower 12 bits of the value by shifting it 3 bits to the right.
+ *
+ * @param reg The register to read from.
+ * @return The 12-bit value read from the register.
+ */
 static uint16_t touch_spi_read_reg12(uint8_t reg) {
   uint16_t data = sw_spi_read_reg16(reg);
   return data >> 3;
 }
 
-#define MAP(n, min, max, range) \
-  (uint32_t)((uint32_t)((n > min) ? (n - min) : 0) * range) / (max - min);
-
+/**
+ * @brief Reads touch data from the touch input device.
+ *
+ * This function is responsible for reading touch data from the touch input
+ * device and updating the `data` structure with the latest touch information.
+ *
+ * @param drv Pointer to the LVGL input device driver.
+ * @param data Pointer to the LVGL input device data structure.
+ */
 static void lv_touch_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
   static uint16_t last_x, last_y;
   xpt2046_data_t touch_data = xpt2046_read();

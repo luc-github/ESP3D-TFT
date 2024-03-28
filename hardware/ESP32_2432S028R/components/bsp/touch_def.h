@@ -20,8 +20,8 @@ xpt2046_config_t xpt2046_cfg = {
     .irq_pin = 36, // GPIO 36  
     .touch_threshold = 300, // Threshold for touch detection  
     .swap_xy = true,
-    .invert_x = true,
-    .invert_y = true,
+    .invert_x = false,
+    .invert_y = false,
 };
 
 // SPI (BitBang)

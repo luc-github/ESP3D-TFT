@@ -251,8 +251,6 @@ static uint16_t touch_spi_read_reg12(uint8_t reg) {
  * @param data Pointer to the LVGL input device data structure.
  */
 static void lv_touch_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
-  // Function implementation goes here
-}
 static uint16_t last_x, last_y;
 xpt2046_data_t touch_data = xpt2046_read();
 if (touch_data.is_pressed) {
