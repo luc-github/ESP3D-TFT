@@ -84,29 +84,35 @@ esp_err_t bsp_init(void) {
   }
 
   /* SPI master initialization */
-  esp3d_log("Initializing SPI master (display)...");
-  spi_bus_init(DISP_SPI_HOST, -1, DISP_SPI_MOSI, DISP_SPI_CLK,
-               DISP_BUF_SIZE_BYTES, 1, -1, -1);
+  if (display_spi_ili9341_cfg.spi_bus_config.is_master) {
+    esp_spi_bus_ili9341_config_t *spi_cfg =
+        &(display_spi_ili9341_cfg.spi_bus_config);
+    esp3d_log("Initializing SPI master (display)...");
+    err = spi_bus_init(spi_cfg->spi_host_index, spi_cfg->pin_miso,
+                       spi_cfg->pin_mosi, spi_cfg->pin_clk,
+                       spi_cfg->max_transfer_sz, spi_cfg->dma_channel,
+                       spi_cfg->quadwp_io_num, spi_cfg->quadhd_io_num);
+    if (err != ESP_OK) {
+      {
+        esp3d_log_e("Failed to initialize SPI master (display)");
+        return err;
+      }
+    }
+  }
 
   esp3d_log("Attaching display panel to SPI bus...");
   esp_lcd_panel_io_handle_t disp_io_handle;
-  disp_spi_cfg.on_color_trans_done = disp_flush_ready;
+  display_spi_ili9341_cfg.disp_spi_cfg.on_color_trans_done = disp_flush_ready;
   ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi(
-      (esp_lcd_spi_bus_handle_t)DISP_SPI_HOST, &disp_spi_cfg, &disp_io_handle));
+      (esp_lcd_spi_bus_handle_t)(display_spi_ili9341_cfg.spi_bus_config
+                                     .spi_host_index),
+      &(display_spi_ili9341_cfg.disp_spi_cfg), &disp_io_handle));
 
   /* Display panel initialization */
   esp3d_log("Initializing display...");
-  ESP_ERROR_CHECK(
-      esp_lcd_new_panel_ili9341(disp_io_handle, &disp_panel_cfg, &disp_panel));
-  ESP_ERROR_CHECK(esp_lcd_panel_reset(disp_panel));
-  ESP_ERROR_CHECK(esp_lcd_panel_init(disp_panel));
-  // ESP_ERROR_CHECK(esp_lcd_panel_invert_color(disp_panel, true));
-#if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
-  ESP_ERROR_CHECK(esp_lcd_panel_swap_xy(disp_panel, true));
-#endif                                              // DISP_ORIENTATION
-#if DISP_ORIENTATION == 1 || DISP_ORIENTATION == 3  // mirrored
-  ESP_ERROR_CHECK(esp_lcd_panel_mirror(disp_panel, true, true));
-#endif  // DISP_ORIENTATION
+  ESP_ERROR_CHECK(esp_lcd_new_panel_ili9341(
+      disp_io_handle, &display_spi_ili9341_cfg, &disp_panel));
+  
 
   /* Touch controller initialization */
   esp3d_log("Initializing touch controller...");
