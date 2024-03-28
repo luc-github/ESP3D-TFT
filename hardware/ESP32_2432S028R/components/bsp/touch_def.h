@@ -16,7 +16,6 @@ extern "C" {
 #define TOUCH_X_MAX           3950
 #define TOUCH_Y_MAX           3850
 
-// Touch orientation
 xpt2046_config_t xpt2046_cfg = {
     .irq_pin = 36, // GPIO 36  
     .touch_threshold = 300, // Threshold for touch detection  
