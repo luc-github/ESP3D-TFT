@@ -56,6 +56,8 @@ static xpt2046_touch_detect_t xpt2048_is_touch_detected();
  *  STATIC VARIABLES
  **********************/
 static const xpt2046_config_t *xpt2046_config = NULL;
+static uint16_t _xtp2046_x_max = 0;
+static uint16_t _xtp2046_y_max = 0;
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -75,6 +77,8 @@ esp_err_t xpt2046_init(const xpt2046_config_t *config) {
   if (config == NULL || config->read_reg12_fn == NULL) {
     return ESP_ERR_INVALID_ARG;
   }
+  _xtp2046_x_max = config->x_max;
+  _xtp2046_y_max = config->y_max;
   xpt2046_config = config;
   esp_err_t err = ESP_OK;
   esp3d_log("Init XPT2046 driver");
@@ -126,6 +130,24 @@ xpt2046_data_t xpt2046_read() {
     esp3d_log("P(%d,%d)", data.x, data.y);
   }
   return data;
+}
+
+/**
+ * @brief Retrieves the maximum x-coordinate value for the XPT2046 touch controller.
+ *
+ * @return The maximum x-coordinate value.
+ */
+uint16_t get_xtp2046_x_max() {
+  return _xtp2046_x_max;
+}
+
+/**
+ * @brief Retrieves the maximum Y coordinate value for the XPT2046 touch controller.
+ *
+ * @return The maximum Y coordinate value.
+ */
+uint16_t get_xtp2046_y_max() {
+  return _xtp2046_y_max;
 }
 
 /**********************

@@ -22,6 +22,8 @@ xpt2046_config_t xpt2046_cfg = {
     .swap_xy = true,
     .invert_x = false,
     .invert_y = false,
+    .x_max = 320,  
+    .y_max = 240,
 };
 
 // SPI (BitBang)

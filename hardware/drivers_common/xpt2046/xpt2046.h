@@ -48,6 +48,8 @@ typedef struct {
   bool swap_xy;
   bool invert_x;
   bool invert_y;
+  uint16_t x_max;
+  uint16_t y_max;
 } xpt2046_config_t;
 
 // Data structure for touch position and state
@@ -76,6 +78,20 @@ esp_err_t xpt2046_init(const xpt2046_config_t *config);
  * @return The data read from the XPT2046 touch controller.
  */
 xpt2046_data_t xpt2046_read();
+
+/**
+ * @brief Retrieves the maximum x-coordinate value supported by the XPT2046 touch controller.
+ *
+ * @return The maximum x-coordinate value.
+ */
+uint16_t get_xtp2046_x_max();
+
+/**
+ * @brief Retrieves the maximum Y coordinate value supported by the XPT2046 touch controller.
+ *
+ * @return The maximum Y coordinate value.
+ */
+uint16_t get_xtp2046_y_max();
 
 
 #ifdef __cplusplus
