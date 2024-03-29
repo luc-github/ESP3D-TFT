@@ -72,6 +72,9 @@ const char* esp3dmsgstr[] = {"head", "core", "tail", "unique"};
 ESP3DCommands esp3dCommands;
 
 ESP3DCommands::ESP3DCommands() {
+  #if ESP3D_TFT_LOG
+  (void)esp3dclientstr;
+  #endif  // ESP3D_TFT_LOG
   _output_client = ESP3DClientType::stream;
 }  //_output_client = ESP3DClientType::serial; }
 ESP3DCommands::~ESP3DCommands() {}

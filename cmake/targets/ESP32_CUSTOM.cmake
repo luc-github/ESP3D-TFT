@@ -1,0 +1,6 @@
+if(ESP32_CUSTOM)
+    set(TFT_TARGET "ESP32_CUSTOM")
+    set(SDKCONFIG ${CMAKE_SOURCE_DIR}/hardware/ESP32_CUSTOM/sdkconfig)
+    list(APPEND EXTRA_COMPONENT_DIRS ${CMAKE_SOURCE_DIR}/hardware/ESP32_CUSTOM/components)
+    add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32_CUSTOM/components/bsp")
+endif()

@@ -29,15 +29,37 @@ extern "C" {
  *********************/
 #include "esp_err.h"
 
-/*********************
- *      DEFINES
- *********************/
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * @brief Initializes the Board Support Package (BSP).
+ *
+ * This function initializes the necessary hardware and peripherals required by the BSP.
+ *
+ * @return esp_err_t Returns ESP_OK on success, or an error code if initialization fails.
+ */
 esp_err_t bsp_init(void);
+
+
+/**
+ * @brief Initialize the USB functionality of the board.
+ *
+ * This function initializes the USB functionality of the board.
+ *
+ * @return esp_err_t Returns ESP_OK if the USB initialization is successful, otherwise returns an error code.
+ */
 esp_err_t bsp_init_usb(void);
+
+
+/**
+ * @brief Deinitializes the USB functionality of the BSP.
+ *
+ * This function is responsible for deinitializing the USB functionality of the BSP.
+ *
+ * @return esp_err_t Returns ESP_OK if the USB deinitialization is successful, otherwise returns an error code.
+ */
 esp_err_t bsp_deinit_usb(void);
 
 #ifdef __cplusplus

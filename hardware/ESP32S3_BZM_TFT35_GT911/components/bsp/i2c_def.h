@@ -1,6 +1,10 @@
-//Pins definition for ESP32 ESP32S3_BZM_TFT35_GT911
+//Pins definition for ESP32S3_BZM_TFT35_GT911
 //I2C bus
 #include "i2c_bus.h"
+#pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define I2C_PORT_NUMBER   0
 

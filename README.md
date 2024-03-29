@@ -4,7 +4,7 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<img src="https://img.shields.io/liberapay/patrons/ESP3D.svg?logo=liberapay">](https://liberapay.com/ESP3D)
 
-[![Development Version](https://img.shields.io/badge/Dev-v1.0-yellow?style=plastic) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3D-TFT/main?style=plastic)](https://github.com/luc-github/ESP3D-TFT/tree/main) [![github-ci](https://github.com/luc-github/ESP3D-TFT/workflows/build-ci/badge.svg)](https://github.com/luc-github/ESP3D-TFT/actions/workflows/build-ci.yml) [![Development  Version](https://img.shields.io/badge/Dev-v3.0-yellow?style=plastic&label=WebUI&logo=Preact)](https://github.com/luc-github/ESP3D-WEBUI/tree/3.0) [![IDF 5.1.1](https://img.shields.io/badge/IDF-v5.1.1-blue?style=plastic&label=IDF&logo=espressif)](https://github.com/espressif/esp-idf)
+[![Development Version](https://img.shields.io/badge/Dev-v1.0-yellow?style=plastic) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3D-TFT/main?style=plastic)](https://github.com/luc-github/ESP3D-TFT/tree/main) [![github-ci](https://github.com/luc-github/ESP3D-TFT/workflows/build-ci/badge.svg)](https://github.com/luc-github/ESP3D-TFT/actions/workflows/build-ci.yml) [![Development  Version](https://img.shields.io/badge/Dev-v3.0-yellow?style=plastic&label=WebUI&logo=Preact)](https://github.com/luc-github/ESP3D-WEBUI/tree/3.0) [![IDF 5.1.2](https://img.shields.io/badge/IDF-v5.1.2-blue?style=plastic&label=IDF&logo=espressif)](https://github.com/espressif/esp-idf)
 
 
 > [!WARNING]
@@ -13,30 +13,33 @@
 >It is essential that you carefully read and understand this disclaimer before using this software and its components. If you do not agree with any part of this disclaimer, please refrain from using the software.  
 
 ## Features
-A Serial TFT with all WiFi feature to control 3D Printer or CNC, using same feature as [ESP3D](https://github.com/luc-github/ESP3D/tree/3.0)     
+A Serial TFT with all WiFi feature to control 3D Printer or CNC and [webui](https://githubcom/luc-github/ESP3D-WEBUI)
 
 Unlike ESP3D some features will be fixed:
 * Flash FS = littleFS
 * ESP32 / ESP32-S3
 * WebDav on Both local FS and SD
-  
+
+> [!WARNING]
+>### Disclaimer
+> The software is provided 'as is,' without any warranty of any kind, expressed or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement. In no event shall the authors or copyright holders be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software.
+>It is essential that you carefully read and understand this disclaimer before using this software and its components. If you do not agree with any part of this disclaimer, please refrain from using the software.  
 
 ## UI
 
-To be defined, it will use lvgl library
+lvgl library 8.3.8
 
 ## Framework
 
-Espressif IDF 5.1 
+Espressif IDF 5.1.2 
 
 ## Reference boards
 
-The reference boards I have bought :
+* ESP32 based + SDReader + 2.8'resistive screen (240x320) [model](https://www.aliexpress.com/item/3256804315935867.html)
+* ESP32 + SDReader + 3.5' Resistive screen (480x320) [Rotrics TFT](https://rotrics.com/products/3-5-inch-touchscreen)
+* ESP32-S3 based + SDReader + PSRAM + 4.3' capacitive screen  (800x600) [model](https://www.aliexpress.com/item/1005003814428825.html)
+* ESP32-S3 based + SDReader + PSRAM + 3.5' capacitive screen (320x480) [model](https://www.aliexpress.com/item/1005004309826174.html)
 
-* ESP32 based + SDReader + 2.8'resistive screen (240x320) [model](https://www.aliexpress.com/item/3256804315935867.html) (Received)
-* ESP32-S3 based + SDReader + PSRAM + 4.3' capacitive screen  (800x600) [model](https://www.aliexpress.com/item/1005003814428825.html) (Received)
-* ESP32-S3 based + SDReader + PSRAM + 3.5' capacitive screen (320x480) [model](https://www.aliexpress.com/item/1005004309826174.html) (Received)
-* ESP32 + SDReader + 3.5' Resistive screen (480x320) [Rotrics TFT](https://rotrics.com/products/3-5-inch-touchscreen) (Received)
 * More on https://esp3d.io/esp3d-tft/v1.x/hardware/index.html
 
 ## installation
@@ -48,8 +51,8 @@ Please follow the instructions from https://esp3d.io/esp3d-tft/v1.x/installation
 Everything, code from scratch or almost
 * Design UI (Flow + icon)
 * Code UI / navigation 
-* Add WiFi features :+1:
-* Add Streaming Features :ongoing:
+* Add WiFi features
+* Add Streaming Features 
 * TBD... 
 
 ## Chat
@@ -60,7 +63,7 @@ Please use discord : [![discord](https://img.shields.io/discord/7528221487955969
 Check [Wiki](https://github.com/luc-github/ESP3D/wiki/Install-Instructions) or Join the chat at [![Discord server](https://img.shields.io/discord/752822148795596940?color=blue&label=discord&logo=discord)](https://discord.gg/Z4ujTwE)   
 
 ## :exclamation:Any issue/feedback ?    
-Check [Wiki](https://github.com/luc-github/ESP3D-TFT/wiki) and [FAQ](https://github.com/luc-github/ESP3D-TFT/discussions/categories/q-a) 
+Check [http://esp3dio](http://esp3dio) for more information
 If you still have issue: [submit ticket](https://github.com/luc-github/ESP3D-TFT/issues)    
 If it is not an issue join some discussion [here](https://github.com/luc-github/ESP3D-TFT/discussions)
 
