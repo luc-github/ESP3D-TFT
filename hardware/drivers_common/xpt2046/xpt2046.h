@@ -17,7 +17,7 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#pragma once 
+#pragma once
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -26,9 +26,11 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
+
 #include "esp_err.h"
+
 
 /*********************
  *      DEFINES
@@ -50,6 +52,10 @@ typedef struct {
   bool invert_y;
   uint16_t x_max;
   uint16_t y_max;
+  uint16_t calibration_x_min;
+  uint16_t calibration_y_min;
+  uint16_t calibration_x_max;
+  uint16_t calibration_y_max;
 } xpt2046_config_t;
 
 // Data structure for touch position and state
@@ -65,10 +71,12 @@ typedef struct {
 /**
  * @brief Initializes the XPT2046 touch controller.
  *
- * This function initializes the XPT2046 touch controller with the provided configuration.
+ * This function initializes the XPT2046 touch controller with the provided
+ * configuration.
  *
  * @param config Pointer to the XPT2046 configuration structure.
- * @return `ESP_OK` if the initialization is successful, otherwise an error code.
+ * @return `ESP_OK` if the initialization is successful, otherwise an error
+ * code.
  */
 esp_err_t xpt2046_init(const xpt2046_config_t *config);
 
@@ -80,21 +88,21 @@ esp_err_t xpt2046_init(const xpt2046_config_t *config);
 xpt2046_data_t xpt2046_read();
 
 /**
- * @brief Retrieves the maximum x-coordinate value supported by the XPT2046 touch controller.
+ * @brief Retrieves the maximum x-coordinate value supported by the XPT2046
+ * touch controller.
  *
  * @return The maximum x-coordinate value.
  */
 uint16_t get_xtp2046_x_max();
 
 /**
- * @brief Retrieves the maximum Y coordinate value supported by the XPT2046 touch controller.
+ * @brief Retrieves the maximum Y coordinate value supported by the XPT2046
+ * touch controller.
  *
  * @return The maximum Y coordinate value.
  */
 uint16_t get_xtp2046_y_max();
 
-
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
-
