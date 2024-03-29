@@ -169,14 +169,14 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |Drivers| Status|
 |---|:---:|
 |disp_backlight|Ok|
-|disp_spi| |
+|disp_spi| To be reviewed|
 |ili9341 SPI|Ok|
-|ili9488 SPI| |
+|ili9488 SPI|To be reviewed |
 |st7796 SPI|Ok|
 |st7796 i80|Ok|
 |st7262 RGB|Ok|
 |ili9485 RGB| Ok |
-|ek9716 RGB||
+|ek9716 RGB|Ok|
 |rm68120 i80|Ok |
 |xpt2046 SPI|Ok|
 |ft5x06 ic2|Ok|
@@ -193,13 +193,19 @@ The `hardware` directory contains the hardware specific files like drivers, part
 The `spi_bus` driver is a SPI bus driver that is used to control the SPI bus. The `spi_bus` driver configuration is part of display driver configuration.
 in disp_def.h:
 ```cpp
-// SPI (dedicated)
-#define DISP_SPI_HOST SPI2_HOST  // 1
-
-// SPI pins definition (common)
-#define DISP_SPI_CLK  14  // GPIO 14
-#define DISP_SPI_MOSI 13  // GPIO 13
-#define DISP_SPI_MISO 12  // GPIO 12
+// SPI (dedicated or shared)
+.spi_bus_config =
+    {
+        .spi_host_index = SPI2_HOST,
+        .pin_miso = 12,                       /**< MISO pin number */
+        .pin_mosi = 13,                       /**< MOSI pin number */
+        .pin_clk = 14,                        /**< CLK pin number */
+        .is_master = true,                    /**< SPI master mode */
+        .max_transfer_sz = DISP_BUF_SIZE * 2, /**< Maximum transfer size */
+        .dma_channel = 1,                     /**< DMA channel */
+        .quadwp_io_num = -1,                  /**< QuadWP pin number */
+        .quadhd_io_num = -1                   /**< QuadHD pin number */
+    },
 ```
 
 * sw_spi driver
