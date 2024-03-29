@@ -51,14 +51,38 @@ esp_spi_ili9341_config_t display_spi_ili9341_cfg = {
             .quadhd_io_num = -1                   /**< QuadHD pin number */
         },
     .disp_spi_cfg =
-        {
-            .dc_gpio_num = 2,   // GPIO 2
-            .cs_gpio_num = 15,  // GPIO 15
-            .pclk_hz = 40 * 1000 * 1000,
-            .lcd_cmd_bits = 8,
-            .lcd_param_bits = 8,
-            .spi_mode = 0,
-            .trans_queue_depth = 10,
+        {.dc_gpio_num = 2, /*!< GPIO used to select the D/C line, set this to -1
+                              if the D/C line is not used */
+         .cs_gpio_num = 15, /*!< GPIO used for CS line */
+
+         .spi_mode = 0,               /*!< Traditional SPI mode (0~3) */
+         .pclk_hz = 40 * 1000 * 1000, /*!< Frequency of pixel clock */
+         .trans_queue_depth = 10,     /*!< Size of internal transaction queue */
+         .on_color_trans_done = NULL, /*!< Callback invoked when color data
+                                         transfer has finished */
+         .user_ctx = NULL,            /*!< User private data, passed directly to
+                                         on_color_trans_done's user_ctx */
+         .lcd_cmd_bits = 8,           /*!< Bit-width of LCD command */
+         .lcd_param_bits = 8,         /*!< Bit-width of LCD parameter */
+         .flags =
+             {
+                 /*!< Extra flags to fine-tune the SPI device */
+                 .dc_low_on_data = 0, /*!< If this flag is enabled, DC line = 0
+                                         means transfer data, DC line = 1 means
+                                         transfer command; vice versa */
+                 .octal_mode =
+                     0, /*!< transmit with octal mode (8 data lines), this mode
+                           is used to simulate Intel 8080 timing */
+                 .quad_mode =
+                     0, /*!< transmit with quad mode (4 data lines), this mode
+                           is useful when transmitting LCD parameters (Only use
+                           one line for command) */
+                 .sio_mode =
+                     0, /*!< Read and write through a single data line (MOSI) */
+                 .lsb_first = 0,      /*!< transmit LSB bit first */
+                 .cs_high_active = 0, /*!< CS line is high active */
+             }
+
         },
     .orientation = orientation_landscape,
     .hor_res = DISP_HOR_RES_MAX,
