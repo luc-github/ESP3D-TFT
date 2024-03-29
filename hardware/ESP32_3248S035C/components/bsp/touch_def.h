@@ -24,8 +24,10 @@ const gt911_config_t gt911_cfg = {
     .int_pin = -1,  // INT pin not connected (by default)
 #endif
     .swap_xy = true,
-    .invert_x = true,
+    .invert_x = false,
     .invert_y = false,
+    .x_max = 0,  // auto detect
+    .y_max = 0,  // auto detect
 };
 
 #ifdef __cplusplus

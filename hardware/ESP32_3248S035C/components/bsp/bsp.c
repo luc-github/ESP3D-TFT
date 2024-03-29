@@ -83,52 +83,24 @@ esp_err_t bsp_init(void) {
     return ESP_FAIL;
   }
 
-  /* SPI master initialization */
-  esp3d_log("Initializing SPI master (display)...");
-  if (spi_bus_init(DISP_SPI_HOST, DISP_SPI_MISO, DISP_SPI_MOSI, DISP_SPI_CLK,
-                   DISP_BUF_SIZE_BYTES, 1, -1, -1) != ESP_OK) {
-    esp3d_log_e("SPI master initialization failed!");
-    return ESP_FAIL;
-  }
-
   esp3d_log("Attaching display panel to SPI bus...");
   esp_lcd_panel_io_handle_t disp_io_handle;
-  disp_spi_cfg.on_color_trans_done = disp_flush_ready;
-  if (esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)DISP_SPI_HOST,
-                               &disp_spi_cfg, &disp_io_handle) != ESP_OK) {
+  display_spi_st7262_cfg.disp_spi_cfg.on_color_trans_done = disp_flush_ready;
+  if (esp_lcd_new_panel_io_spi(
+          (esp_lcd_spi_bus_handle_t)(display_spi_st7262_cfg.spi_bus_config
+                                         .spi_host_index),
+          &(display_spi_st7262_cfg.disp_spi_cfg), &disp_io_handle) != ESP_OK) {
     esp3d_log_e("Failed to attach display panel to SPI bus");
     return ESP_FAIL;
   }
 
   /* Display panel initialization */
   esp3d_log("Initializing display...");
-  if (esp_lcd_new_panel_st7796(disp_io_handle, &disp_panel_cfg, &disp_panel) !=
-      ESP_OK) {
+  if (esp_lcd_new_panel_st7796(disp_io_handle, &display_spi_st7262_cfg,
+                               &disp_panel) != ESP_OK) {
     esp3d_log_e("Failed to initialize display panel");
     return ESP_FAIL;
   }
-  if (esp_lcd_panel_reset(disp_panel) != ESP_OK) {
-    esp3d_log_e("Failed to reset display panel");
-    return ESP_FAIL;
-  }
-
-  if (esp_lcd_panel_init(disp_panel) != ESP_OK) {
-    esp3d_log_e("Failed to initialize display panel");
-    return ESP_FAIL;
-  }
-
-#if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
-  if (esp_lcd_panel_swap_xy(disp_panel, true) != ESP_OK) {
-    esp3d_log_e("Failed to swap display panel XY");
-    return ESP_FAIL;
-  }
-#endif                                              // DISP_ORIENTATION
-#if DISP_ORIENTATION == 1 || DISP_ORIENTATION == 3  // mirrored
-  if (esp_lcd_panel_mirror(disp_panel, true, true) != ESP_OK) {
-    esp3d_log_e("Failed to mirror display panel");
-    return ESP_FAIL;
-  }
-#endif  // DISP_ORIENTATION
 
   /* i2c controller initialization */
   esp3d_log("Initializing i2C controller...");
