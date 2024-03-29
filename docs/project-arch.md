@@ -266,43 +266,82 @@ The `ili9341` driver is a SPI display driver that is used to control the ILI9341
 
 in disp_def.h:
 ```cpp
-
-//Resolution according orientation
-#define DISP_ORIENTATION 3  // landscape inverted
-
-#if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
 #define DISP_HOR_RES_MAX 320
 #define DISP_VER_RES_MAX 240
-#else  // portrait mode
-#define DISP_HOR_RES_MAX 240
-#define DISP_VER_RES_MAX 320
-#endif
 
-// ILI9341 display driver configuration
-esp_lcd_panel_dev_config_t disp_panel_cfg = {
-    .reset_gpio_num = 4, // GPIO 4
-    .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_BGR, 
-    .data_endian = LCD_RGB_DATA_ENDIAN_BIG,
-    .bits_per_pixel = 16,
-    .flags = {
-        .reset_active_high = 0
-    },
-    .vendor_config = NULL
-};
-
-//LVGL buffer definition depend if board has PSRAM or not
 #define DISP_USE_DOUBLE_BUFFER (true)
 
 #if WITH_PSRAM
-  // 1/10 (24-line) buffer (15KB) in external PSRAM
-  #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * DISP_VER_RES_MAX / 10)
-  #define DISP_BUF_MALLOC_TYPE  MALLOC_CAP_SPIRAM
+// 1/10 (24-line) buffer (15KB) in external PSRAM
+#define DISP_BUF_SIZE (DISP_HOR_RES_MAX * DISP_VER_RES_MAX / 10)
+#define DISP_BUF_MALLOC_TYPE MALLOC_CAP_SPIRAM
 #else
-  // 1/20 (12-line) buffer (7.5KB) in internal DRAM
-  #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * 12)
-  #define DISP_BUF_MALLOC_TYPE  MALLOC_CAP_DMA
+// 1/20 (12-line) buffer (7.5KB) in internal DRAM
+#define DISP_BUF_SIZE (DISP_HOR_RES_MAX * 12)
+#define DISP_BUF_MALLOC_TYPE MALLOC_CAP_DMA
 #endif  // WITH_PSRAM
-#define DISP_BUF_SIZE_BYTES    (DISP_BUF_SIZE * 2)
+#define DISP_BUF_SIZE_BYTES (DISP_BUF_SIZE * 2)
+
+// Display configuration
+esp_spi_ili9341_config_t display_spi_ili9341_cfg = {
+    .panel_dev_config = {.reset_gpio_num =
+                             4,  // GPIO 4
+                         .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_BGR,
+                         .data_endian = LCD_RGB_DATA_ENDIAN_BIG,
+                         .bits_per_pixel = 16,
+                         .flags = {.reset_active_high = 0},
+                         .vendor_config = NULL},
+
+    .spi_bus_config =
+        {
+            .spi_host_index = SPI2_HOST,
+            .pin_miso = 12,                       /**< MISO pin number */
+            .pin_mosi = 13,                       /**< MOSI pin number */
+            .pin_clk = 14,                        /**< CLK pin number */
+            .is_master = true,                    /**< SPI master mode */
+            .max_transfer_sz = DISP_BUF_SIZE * 2, /**< Maximum transfer size */
+            .dma_channel = 1,                     /**< DMA channel */
+            .quadwp_io_num = -1,                  /**< QuadWP pin number */
+            .quadhd_io_num = -1                   /**< QuadHD pin number */
+        },
+    .disp_spi_cfg =
+        {.dc_gpio_num = 2, /*!< GPIO used to select the D/C line, set this to -1
+                              if the D/C line is not used */
+         .cs_gpio_num = 15, /*!< GPIO used for CS line */
+
+         .spi_mode = 0,               /*!< Traditional SPI mode (0~3) */
+         .pclk_hz = 40 * 1000 * 1000, /*!< Frequency of pixel clock */
+         .trans_queue_depth = 10,     /*!< Size of internal transaction queue */
+         .on_color_trans_done = NULL, /*!< Callback invoked when color data
+                                         transfer has finished */
+         .user_ctx = NULL,            /*!< User private data, passed directly to
+                                         on_color_trans_done's user_ctx */
+         .lcd_cmd_bits = 8,           /*!< Bit-width of LCD command */
+         .lcd_param_bits = 8,         /*!< Bit-width of LCD parameter */
+         .flags =
+             {
+                 /*!< Extra flags to fine-tune the SPI device */
+                 .dc_low_on_data = 0, /*!< If this flag is enabled, DC line = 0
+                                         means transfer data, DC line = 1 means
+                                         transfer command; vice versa */
+                 .octal_mode =
+                     0, /*!< transmit with octal mode (8 data lines), this mode
+                           is used to simulate Intel 8080 timing */
+                 .quad_mode =
+                     0, /*!< transmit with quad mode (4 data lines), this mode
+                           is useful when transmitting LCD parameters (Only use
+                           one line for command) */
+                 .sio_mode =
+                     0, /*!< Read and write through a single data line (MOSI) */
+                 .lsb_first = 0,      /*!< transmit LSB bit first */
+                 .cs_high_active = 0, /*!< CS line is high active */
+             }
+
+        },
+    .orientation = orientation_landscape,
+    .hor_res = DISP_HOR_RES_MAX,
+    .ver_res = DISP_VER_RES_MAX,
+};
 ```
 
 * st7796 spi driver
@@ -310,23 +349,9 @@ The `st7796` driver is a display driver that is used to control the ST7796 displ
 
 disp_def.h:
 ```cpp
-// Display orientation
-/*
-PORTRAIT                0
-PORTRAIT_INVERTED       1
-LANDSCAPE               2
-LANDSCAPE_INVERTED      3
-*/
-#define DISP_ORIENTATION 3  // landscape inverted
 
-// Display resolution
-#if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
 #define DISP_HOR_RES_MAX 480
 #define DISP_VER_RES_MAX 320
-#else  // portrait mode
-#define DISP_HOR_RES_MAX 320
-#define DISP_VER_RES_MAX 480
-#endif
 
 // Display interface
 #define DISP_USE_DOUBLE_BUFFER (true)
@@ -343,51 +368,61 @@ LANDSCAPE_INVERTED      3
 #define DISP_BUF_SIZE_BYTES (DISP_BUF_SIZE * 2)
 
 // LCD panel configuration
-esp_lcd_panel_dev_config_t disp_panel_cfg = {
-    .reset_gpio_num = -1,  // st7796 RST not connected to GPIO
-    .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_BGR,
-    .data_endian = LCD_RGB_DATA_ENDIAN_BIG,
-    .bits_per_pixel = 16,
-    .flags = {.reset_active_high = 0},
-    .vendor_config = NULL};
+esp_spi_st7262_config_t display_spi_st7262_cfg = {
+    .panel_dev_config = {.reset_gpio_num = -1,
+                         .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_BGR,
+                         .data_endian = LCD_RGB_DATA_ENDIAN_BIG,
+                         .bits_per_pixel = 16,
+                         .flags = {.reset_active_high = 0},
+                         .vendor_config = NULL},
 
-// SPI (dedicated)
-#define DISP_SPI_HOST SPI2_HOST  // 1
-// #define DISP_SPI_HOST SPI3_HOST //2
-
-// SPI pins definition (common)
-#define DISP_SPI_CLK 14   // GPIO 14
-#define DISP_SPI_MOSI 13  // GPIO 13
-#define DISP_SPI_MISO 12  // GPIO 12
-
-// SPI definition for LCD
-esp_lcd_panel_io_spi_config_t disp_spi_cfg = {
-    .cs_gpio_num = 15, /*!< GPIO used for CS line */
-    .dc_gpio_num = 2,  /*!< GPIO used to select the D/C line, set this to -1 if
-                          the D/C line is not used */
-    .spi_mode = 0,     /*!< Traditional SPI mode (0~3) */
-    .pclk_hz = 40 * 1000 * 1000, /*!< Frequency of pixel clock */
-    .trans_queue_depth = 10,     /*!< Size of internal transaction queue */
-    .on_color_trans_done =
-        NULL, /*!< Callback invoked when color data transfer has finished */
-    .user_ctx = NULL,    /*!< User private data, passed directly to
-                            on_color_trans_done's user_ctx */
-    .lcd_cmd_bits = 8,   /*!< Bit-width of LCD command */
-    .lcd_param_bits = 8, /*!< Bit-width of LCD parameter */
-    .flags = {
-        /*!< Extra flags to fine-tune the SPI device */
-        .dc_low_on_data =
-            0, /*!< If this flag is enabled, DC line = 0 means transfer data, DC
-                  line = 1 means transfer command; vice versa */
-        .octal_mode = 0, /*!< transmit with octal mode (8 data lines), this mode
-                            is used to simulate Intel 8080 timing */
-        .quad_mode = 0,  /*!< transmit with quad mode (4 data lines), this mode
-                            is useful when transmitting LCD parameters (Only use
-                            one line for command) */
-        .sio_mode = 0,  /*!< Read and write through a single data line (MOSI) */
-        .lsb_first = 0, /*!< transmit LSB bit first */
-        .cs_high_active = 0, /*!< CS line is high active */
-    }};
+    .spi_bus_config =  // SPI (shared with Touch)
+    {
+        .spi_host_index = SPI2_HOST,
+        .pin_miso = 12,                       /**< MISO pin number */
+        .pin_mosi = 13,                       /**< MOSI pin number */
+        .pin_clk = 14,                        /**< CLK pin number */
+        .is_master = true,                    /**< SPI master mode */
+        .max_transfer_sz = DISP_BUF_SIZE * 2, /**< Maximum transfer size */
+        .dma_channel = 1,                     /**< DMA channel */
+        .quadwp_io_num = -1,                  /**< QuadWP pin number */
+        .quadhd_io_num = -1                   /**< QuadHD pin number */
+    },
+    .disp_spi_cfg =
+        {.cs_gpio_num = 15, /*!< GPIO used for CS line */
+         .dc_gpio_num = 2, /*!< GPIO used to select the D/C line, set this to -1
+                              if the D/C line is not used */
+         .spi_mode = 0,    /*!< Traditional SPI mode (0~3) */
+         .pclk_hz = 40 * 1000 * 1000, /*!< Frequency of pixel clock */
+         .trans_queue_depth = 10,     /*!< Size of internal transaction queue */
+         .on_color_trans_done = NULL, /*!< Callback invoked when color data
+                                         transfer has finished */
+         .user_ctx = NULL,            /*!< User private data, passed directly to
+                                         on_color_trans_done's user_ctx */
+         .lcd_cmd_bits = 8,           /*!< Bit-width of LCD command */
+         .lcd_param_bits = 8,         /*!< Bit-width of LCD parameter */
+         .flags =
+             {
+                 /*!< Extra flags to fine-tune the SPI device */
+                 .dc_low_on_data = 0, /*!< If this flag is enabled, DC line = 0
+                                         means transfer data, DC line = 1 means
+                                         transfer command; vice versa */
+                 .octal_mode =
+                     0, /*!< transmit with octal mode (8 data lines), this mode
+                           is used to simulate Intel 8080 timing */
+                 .quad_mode =
+                     0, /*!< transmit with quad mode (4 data lines), this mode
+                           is useful when transmitting LCD parameters (Only use
+                           one line for command) */
+                 .sio_mode =
+                     0, /*!< Read and write through a single data line (MOSI) */
+                 .lsb_first = 0,      /*!< transmit LSB bit first */
+                 .cs_high_active = 0, /*!< CS line is high active */
+             }},
+    .orientation = orientation_landscape,
+    .hor_res = DISP_HOR_RES_MAX,
+    .ver_res = DISP_VER_RES_MAX,
+};
 ```
 
 ### RGB Display drivers
@@ -396,30 +431,117 @@ The `st7262` driver is a RGB display driver that is used to control the ST7262 d
 
 in disp_def.h:
 ```cpp
-// Display orientation
-/*
-PORTRAIT                0
-PORTRAIT_INVERTED       1
-LANDSCAPE               2
-LANDSCAPE_INVERTED      3
-*/
-#define DISP_ORIENTATION 2  // landscape
-
-// Display resolution
-#if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
-#define DISP_HOR_RES_MAX 480
-#define DISP_VER_RES_MAX 272
-#else  // portrait mode
-#define DISP_HOR_RES_MAX 272
+#define DISP_HOR_RES_MAX 800
 #define DISP_VER_RES_MAX 480
-#endif
 
-// Display interface
-#define DISP_CLK_FREQ           (14 * 1000 * 1000)
+#define DISP_CLK_FREQ (14 * 1000 * 1000)
+#define DISP_AVOID_TEAR_EFFECT_WITH_SEM (true)
+#define DISP_USE_BOUNCE_BUFFER (false)
+#define DISP_USE_DOUBLE_BUFFER (true)
+#define DISP_NUM_FB (1)
+
+#define DISP_PATCH_FS_FREQ (6 * 1000 * 1000)  // 6MHz
+#define DISP_PATCH_FS_DELAY (40)
+
+#if DISP_NUM_FB == 2
+// Full frame buffer (255KB) in external PSRAM
+#define DISP_BUF_SIZE (DISP_HOR_RES_MAX * DISP_VER_RES_MAX)
+#else
+// 1/4 (68-line) buffer (63.75KB) in external PSRAM
+#define DISP_BUF_SIZE (DISP_HOR_RES_MAX * DISP_VER_RES_MAX / 4)
+#endif  // WITH_PSRAM
+#define DISP_BUF_SIZE_BYTES (DISP_BUF_SIZE * 2)
+
+const esp_rgb_st7262_config_t disp_panel_cfg = {
+    .panel_config =
+        {.clk_src = LCD_CLK_SRC_DEFAULT,
+         .timings =
+             {
+                 .pclk_hz = DISP_CLK_FREQ,
+                 .h_res = DISP_HOR_RES_MAX,
+                 .v_res = DISP_VER_RES_MAX,
+                 .hsync_pulse_width = 4,
+                 .hsync_back_porch = 8,
+                 .hsync_front_porch = 8,
+                 .vsync_pulse_width = 4,
+                 .vsync_back_porch = 8,
+                 .vsync_front_porch = 8,
+                 .flags =
+                     {
+                         .hsync_idle_low = 0,
+                         .vsync_idle_low = 0,
+                         .de_idle_high = 0,
+                         .pclk_active_neg = true,
+                         .pclk_idle_high = 0,
+                     },
+             },
+         .data_width = 16,  // RGB565 in parallel mode
+         .bits_per_pixel = 0,
+         .num_fbs = DISP_NUM_FB,
+#if DISP_USE_BOUNCE_BUFFER
+         .bounce_buffer_size_px = DISP_BUF_SIZE,
+#else
+          .bounce_buffer_size_px = 0,
+#endif
+         .sram_trans_align = 0,
+         .psram_trans_align = 64,
+         .hsync_gpio_num = 39,  // GPIO 39
+         .vsync_gpio_num = 41,  // GPIO 41
+         .de_gpio_num = 40,     // GPIO 40
+         .pclk_gpio_num = 42,   // GPIO 42
+         .disp_gpio_num = -1,   // EN pin not connected
+         .data_gpio_nums =
+             {
+                 8,   // D0  (B0) - GPIO 8
+                 3,   // D1  (B1) - GPIO 3
+                 46,  // D2  (B2) - GPIO 46
+                 9,   // D3  (B3) - GPIO 9
+                 1,   // D4  (B4) - GPIO 1
+                 5,   // D5  (G0) - GPIO 5
+                 6,   // D6  (G1) - GPIO 6
+                 7,   // D7  (G2) - GPIO 7
+                 15,  // D8  (G3) - GPIO 15
+                 16,  // D9  (G4) - GPIO 16
+                 4,   // D10 (G5) - GPIO 4
+                 45,  // D11 (R0) - GPIO 45
+                 48,  // D12 (R1) - GPIO 48
+                 47,  // D13 (R2) - GPIO 47
+                 21,  // D14 (R3) - GPIO 21
+                 14,  // D15 (R4) - GPIO 14
+             },
+         .flags =
+             {
+                 .disp_active_low = (uint32_t)NULL,
+                 .refresh_on_demand = (uint32_t)NULL,
+                 .fb_in_psram =
+                     true,  // Do not change this, as it is mandatory for RGB
+                            // parallel interface and octal PSRAM
+                 .double_fb = (uint32_t)NULL,
+                 .no_fb = (uint32_t)NULL,
+                 .bb_invalidate_cache = (uint32_t)NULL,
+             }},
+    .orientation = orientation_landscape,
+    .hor_res = DISP_HOR_RES_MAX,
+    .ver_res = DISP_VER_RES_MAX,
+};
+```
+
+ * ek9716 driver
+The `ek9716` driver is a RGB display driver that is used to control the EK9716 display. The `ek9716` driver configuration is part of display driver configuration.
+
+in disp_def.h:
+```cpp
+#define DISP_HOR_RES_MAX 800
+#define DISP_VER_RES_MAX 480
+
+
 #define DISP_AVOID_TEAR_EFFECT_WITH_SEM (true)
 #define DISP_USE_BOUNCE_BUFFER  (false)
+
 #define DISP_USE_DOUBLE_BUFFER  (true)
 #define DISP_NUM_FB             (1)
+
+#define DISP_CLK_FREQ (16 * 1000 * 1000)
 
 #define DISP_PATCH_FS_FREQ (6 * 1000 * 1000)  // 6MHz
 #define DISP_PATCH_FS_DELAY  (40)
@@ -431,26 +553,27 @@ LANDSCAPE_INVERTED      3
   // 1/4 (68-line) buffer (63.75KB) in external PSRAM
   #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * DISP_VER_RES_MAX / 4)
 #endif  // WITH_PSRAM
-#define DISP_BUF_SIZE_BYTES    (DISP_BUF_SIZE * 2)
 
-// Display panel configuration
-const esp_lcd_rgb_panel_config_t disp_panel_cfg = {
+#define DISP_BUF_SIZE_BYTES    (DISP_BUF_SIZE * 2)
+//Panel configuration
+const esp_rgb_ek9716_config_t disp_panel_cfg = {
+    .panel_config = {
     .clk_src = LCD_CLK_SRC_DEFAULT,
     .timings = {
-        .pclk_hz = DISP_CLK_FREQ,
+        .pclk_hz = DISP_CLK_FREQ ,
         .h_res = DISP_HOR_RES_MAX,
         .v_res = DISP_VER_RES_MAX,
-        .hsync_pulse_width = 4,
-        .hsync_back_porch = 8,
-        .hsync_front_porch = 8,
-        .vsync_pulse_width = 4,
-        .vsync_back_porch = 8,
-        .vsync_front_porch = 8,
+        .hsync_pulse_width = 30,
+        .hsync_back_porch = 16,
+        .hsync_front_porch = 210,
+        .vsync_pulse_width = 13,
+        .vsync_back_porch = 10,
+        .vsync_front_porch = 22,
         .flags = {
             .hsync_idle_low = 0,
             .vsync_idle_low = 0,
             .de_idle_high = 0,
-            .pclk_active_neg = 1,
+            .pclk_active_neg = true,
             .pclk_idle_high = 0,
         },
     },
@@ -465,58 +588,52 @@ const esp_lcd_rgb_panel_config_t disp_panel_cfg = {
     .sram_trans_align = 0,
     .psram_trans_align = 64,
     .hsync_gpio_num = 39, // GPIO 39
-    .vsync_gpio_num = 41, // GPIO 41
-    .de_gpio_num = 40, // GPIO 40
+    .vsync_gpio_num = 40, // GPIO 40
+    .de_gpio_num = 41, // GPIO 41
     .pclk_gpio_num = 42, // GPIO 42
     .disp_gpio_num = -1, // EN pin not connected
     .data_gpio_nums = {
-        8,  // D0  (B0) - GPIO 8
-        3,  // D1  (B1) - GPIO 3
-        46, // D2  (B2) - GPIO 46
-        9,  // D3  (B3) - GPIO 9
-        1,  // D4  (B4) - GPIO 1
-        5,  // D5  (G0) - GPIO 5
-        6,  // D6  (G1) - GPIO 6
-        7,  // D7  (G2) - GPIO 7
-        15, // D8  (G3) - GPIO 15
+        15, // D0  (B0) - GPIO 15
+        7,  // D1  (B1) - GPIO 7
+        6,  // D2  (B2) - GPIO 6
+        5,  // D3  (B3) - GPIO 5
+        4,  // D4  (B4) - GPIO 4
+        9,  // D5  (G0) - GPIO 9
+        46, // D6  (G1) - GPIO 46
+        3,  // D7  (G2) - GPIO 3
+        8,  // D8  (G3) - GPIO 8
         16, // D9  (G4) - GPIO 16
-        4,  // D10 (G5) - GPIO 4
-        45, // D11 (R0) - GPIO 45
-        48, // D12 (R1) - GPIO 48
+        1,  // D10 (G5) - GPIO 1
+        14, // D11 (R0) - GPIO 14
+        21, // D12 (R1) - GPIO 21
         47, // D13 (R2) - GPIO 47
-        21, // D14 (R3) - GPIO 21
-        14, // D15 (R4) - GPIO 14
+        48, // D14 (R3) - GPIO 48
+        45, // D15 (R4) - GPIO 45
     },
     .flags = {
-        .disp_active_low = 0,
-        .refresh_on_demand = 0,
-        .fb_in_psram = 1, // Do not change this, as it is mandatory for RGB parallel interface and octal PSRAM
-        .double_fb = 0,
-        .no_fb = 0,
-        .bb_invalidate_cache = 0,
+        .disp_active_low = (uint32_t)NULL,
+        .refresh_on_demand = (uint32_t)NULL,
+        .fb_in_psram = true, // Do not change this, as it is mandatory for RGB parallel interface and octal PSRAM
+        .double_fb = (uint32_t)NULL,
+        .no_fb = (uint32_t)NULL,
+        .bb_invalidate_cache = (uint32_t)NULL,
     }
+},
+    .orientation = orientation_landscape,
+    .hor_res = DISP_HOR_RES_MAX,
+    .ver_res = DISP_VER_RES_MAX,
 };
 ```
 
-* i80 Display drivers
+### i80 Display drivers
 
-rm68120 driver
+* rm68120 driver
 The `rm68120` driver is a display driver that is used to control the RM68120 display. The `rm68120` driver configuration is part of display driver configuration.
 
 disp_def.h:
 ```cpp
-#define DISP_ORIENTATION \
-  (orientation_landscape)  // 0:portrait mode 1:landscape mode 2:portrait mode
-                           // reverse 3:landscape mode reverse
-
-#if DISP_ORIENTATION == orientation_landscape || \
-    DISP_ORIENTATION == orientation_landscape_invert  // landscape mode
 #define DISP_HOR_RES_MAX (800)
 #define DISP_VER_RES_MAX (480)
-#else  // portrait mode
-#define DISP_HOR_RES_MAX (480)
-#define DISP_VER_RES_MAX (800)
-#endif
 
 #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * (DISP_VER_RES_MAX / 10))
 #define DISP_USE_DOUBLE_BUFFER (true)
@@ -588,7 +705,7 @@ const esp_i80_rm68120_config_t rm68120_cfg = {
                 },
             .vendor_config = NULL, /*!< Vendor specific configuration */
         },
-    .orientation = DISP_ORIENTATION,
+    .orientation = orientation_landscape,
     .hor_res = DISP_HOR_RES_MAX,
     .ver_res = DISP_VER_RES_MAX,
 };
@@ -599,19 +716,9 @@ The `st7796` driver is a display driver that is used to control the ST7796 displ
 
 disp_def.h:
 ```cpp
-
-#define DISP_ORIENTATION \
-  (orientation_landscape)  // 0:portrait mode 1:landscape mode 2:portrait mode
-                           // reverse 3:landscape mode reverse
-
-#if DISP_ORIENTATION == orientation_landscape || \
-    DISP_ORIENTATION == orientation_landscape_invert  // landscape mode
 #define DISP_HOR_RES_MAX (480)
 #define DISP_VER_RES_MAX (320)
-#else  // portrait mode
-#define DISP_HOR_RES_MAX (320)
-#define DISP_VER_RES_MAX (480)
-#endif
+
 
 #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * (DISP_VER_RES_MAX / 10))
 
@@ -682,7 +789,7 @@ const esp_i80_st7796_config_t st7796_cfg = {
                 },
             .vendor_config = NULL, /*!< Vendor specific configuration */
         },
-    .orientation = DISP_ORIENTATION,
+    .orientation = orientation_landscape,
     .hor_res = DISP_HOR_RES_MAX,
     .ver_res = DISP_VER_RES_MAX,
 };
@@ -714,18 +821,18 @@ The `xpt2046` driver is a touch driver that is used to control the XPT2046 touch
 
 touch_def.h:
 ```cpp
-// X/Y Calibration Values
-#define TOUCH_X_MIN           380
-#define TOUCH_Y_MIN           200
-#define TOUCH_X_MAX           3950
-#define TOUCH_Y_MAX           3850
-
 xpt2046_config_t xpt2046_cfg = {
-    .irq_pin = 36, // GPIO 36  
-    .touch_threshold = 300, // Threshold for touch detection  
+    .irq_pin = 36,           // GPIO 36
+    .touch_threshold = 300,  // Threshold for touch detection
     .swap_xy = true,
-    .invert_x = true,
-    .invert_y = true,
+    .invert_x = false,
+    .invert_y = false,
+    .x_max = 480,
+    .y_max = 320,
+    .calibration_x_min = 140,
+    .calibration_y_min = 290,
+    .calibration_x_max = 3950,
+    .calibration_y_max = 3890,
 };
 ```
 
