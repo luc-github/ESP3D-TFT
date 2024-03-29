@@ -31,7 +31,6 @@ extern "C" {
 esp_spi_st7262_config_t display_spi_st7262_cfg = {
     .panel_dev_config = {.reset_gpio_num =
                              4,  // GPIO 4
-                                 //.color_space = ESP_LCD_COLOR_SPACE_BGR,
                          .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_BGR,
                          .data_endian = LCD_RGB_DATA_ENDIAN_BIG,
                          .bits_per_pixel = 16,
