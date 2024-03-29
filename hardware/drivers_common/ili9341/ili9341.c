@@ -159,7 +159,7 @@ esp_err_t esp_lcd_new_panel_ili9341(const esp_lcd_panel_io_handle_t io,
 if (panel_cfg->orientation== orientation_landscape || panel_cfg->orientation== orientation_landscape_invert) {
   ESP_GOTO_ON_ERROR(esp_lcd_panel_swap_xy(*disp_panel, true), err, "",
                     "swap ili9341 panel failed");
-}                                          // DISP_ORIENTATION
+}                                          
 if(panel_cfg->orientation == orientation_portrait_invert || panel_cfg->orientation == orientation_landscape_invert){
   ESP_GOTO_ON_ERROR(esp_lcd_panel_mirror(*disp_panel, true, true), err, "",
                     "mirror ili9341 panel failed");

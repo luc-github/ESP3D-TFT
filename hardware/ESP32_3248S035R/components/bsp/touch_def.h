@@ -10,18 +10,19 @@ extern "C" {
 #include "xpt2046.h"
 #include <driver/spi_master.h>
 
-// X/Y Calibration Values
-#define TOUCH_X_MIN   140
-#define TOUCH_Y_MIN   290
-#define TOUCH_X_MAX   3950
-#define TOUCH_Y_MAX   3890
-
+// Touch configuration
 xpt2046_config_t xpt2046_cfg = {
-    .irq_pin = 36, // GPIO 36  
-    .touch_threshold = 300, // Threshold for touch detection  
+    .irq_pin = 36,           // GPIO 36
+    .touch_threshold = 300,  // Threshold for touch detection
     .swap_xy = true,
-    .invert_x = true,
-    .invert_y = true,
+    .invert_x = false,
+    .invert_y = false,
+    .x_max = 480,
+    .y_max = 320,
+    .calibration_x_min = 140,
+    .calibration_y_min = 290,
+    .calibration_x_max = 3950,
+    .calibration_y_max = 3890,
 };
 
 // SPI (shared with Display)

@@ -68,33 +68,32 @@ static esp_err_t lcd_panel_disp_on_off(esp_lcd_panel_t *panel, bool off);
  * handle and panel device configuration.
  *
  * @param io The I/O handle for the LCD panel.
- * @param panel_dev_config The device configuration for the LCD panel.
- * @param ret_panel Pointer to store the created LCD panel handle.
+ * @param panel_cfg The device configuration for the LCD panel.
+ * @param disp_panel Pointer to store the created LCD panel handle.
  * @return `ESP_OK` if the LCD panel is successfully created, or an error code
  * if an error occurred.
  */
-esp_err_t esp_lcd_new_panel_st7796(
-    const esp_lcd_panel_io_handle_t io,
-    const esp_lcd_panel_dev_config_t *panel_dev_config,
-    esp_lcd_panel_handle_t *ret_panel) {
+esp_err_t esp_lcd_new_panel_st7796(const esp_lcd_panel_io_handle_t io,
+                                   const esp_spi_st7262_config_t *panel_cfg,
+                                   esp_lcd_panel_handle_t *disp_panel) {
   esp_err_t ret = ESP_OK;
   lcd_panel_t *lcd_panel = NULL;
-  ESP_GOTO_ON_FALSE(io && panel_dev_config && ret_panel, ESP_ERR_INVALID_ARG,
-                    err, "", "invalid argument");
+  ESP_GOTO_ON_FALSE(io && panel_cfg && disp_panel, ESP_ERR_INVALID_ARG, err, "",
+                    "invalid argument");
   lcd_panel = calloc(1, sizeof(lcd_panel_t));
   ESP_GOTO_ON_FALSE(lcd_panel, ESP_ERR_NO_MEM, err, "",
                     "no mem for st7796 panel");
 
-  if (panel_dev_config->reset_gpio_num >= 0) {
+  if (panel_cfg->panel_dev_config.reset_gpio_num >= 0) {
     gpio_config_t io_conf = {
         .mode = GPIO_MODE_OUTPUT,
-        .pin_bit_mask = 1ULL << panel_dev_config->reset_gpio_num,
+        .pin_bit_mask = 1ULL << panel_cfg->panel_dev_config.reset_gpio_num,
     };
     ESP_GOTO_ON_ERROR(gpio_config(&io_conf), err, "",
                       "configure GPIO for RST line failed");
   }
 
-  switch (panel_dev_config->color_space) {
+  switch (panel_cfg->panel_dev_config.color_space) {
     case ESP_LCD_COLOR_SPACE_RGB:
       lcd_panel->madctl_val = 0;
       break;
@@ -107,7 +106,7 @@ esp_err_t esp_lcd_new_panel_st7796(
       break;
   }
 
-  switch (panel_dev_config->bits_per_pixel) {
+  switch (panel_cfg->panel_dev_config.bits_per_pixel) {
     case 16:
       lcd_panel->colmod_cal = 0x55;
       break;
@@ -121,9 +120,9 @@ esp_err_t esp_lcd_new_panel_st7796(
   }
 
   lcd_panel->io = io;
-  lcd_panel->bits_per_pixel = panel_dev_config->bits_per_pixel;
-  lcd_panel->reset_gpio_num = panel_dev_config->reset_gpio_num;
-  lcd_panel->reset_level = panel_dev_config->flags.reset_active_high;
+  lcd_panel->bits_per_pixel = panel_cfg->panel_dev_config.bits_per_pixel;
+  lcd_panel->reset_gpio_num = panel_cfg->panel_dev_config.reset_gpio_num;
+  lcd_panel->reset_level = panel_cfg->panel_dev_config.flags.reset_active_high;
   lcd_panel->base.del = lcd_panel_del;
   lcd_panel->base.reset = lcd_panel_reset;
   lcd_panel->base.init = lcd_panel_init;
@@ -133,15 +132,33 @@ esp_err_t esp_lcd_new_panel_st7796(
   lcd_panel->base.mirror = lcd_panel_mirror;
   lcd_panel->base.swap_xy = lcd_panel_swap_xy;
   lcd_panel->base.disp_on_off = lcd_panel_disp_on_off;
-  *ret_panel = &(lcd_panel->base);
+  *disp_panel = &(lcd_panel->base);
   esp3d_log("new st7796 panel @%p", lcd_panel);
+
+  // reset st7262 panel
+  ESP_GOTO_ON_ERROR(esp_lcd_panel_reset(*disp_panel), err, "",
+                    "reset st7262 panel failed");
+  // init st7262 panel
+  ESP_GOTO_ON_ERROR(esp_lcd_panel_init(*disp_panel), err, "",
+                    "init st7262 panel failed");
+  // set Orientation
+  if (panel_cfg->orientation == orientation_landscape ||
+      panel_cfg->orientation == orientation_landscape_invert) {
+    ESP_GOTO_ON_ERROR(esp_lcd_panel_swap_xy(*disp_panel, true), err, "",
+                      "swap st7262 panel failed");
+  }
+  if (panel_cfg->orientation == orientation_portrait_invert ||
+      panel_cfg->orientation == orientation_landscape_invert) {
+    ESP_GOTO_ON_ERROR(esp_lcd_panel_mirror(*disp_panel, true, true), err, "",
+                      "mirror st7262 panel failed");
+  }
 
   return ESP_OK;
 
 err:
   if (lcd_panel) {
-    if (panel_dev_config->reset_gpio_num >= 0) {
-      gpio_reset_pin(panel_dev_config->reset_gpio_num);
+    if (panel_cfg->panel_dev_config.reset_gpio_num >= 0) {
+      gpio_reset_pin(panel_cfg->panel_dev_config.reset_gpio_num);
     }
     free(lcd_panel);
   }

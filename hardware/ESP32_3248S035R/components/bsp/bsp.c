@@ -25,11 +25,9 @@
 
 #include "esp3d_log.h"
 
-
 #if ESP3D_DISPLAY_FEATURE
 #include "disp_def.h"
 #include "lvgl.h"
-#include "shared_spi_def.h"
 #include "touch_def.h"
 
 #endif  // ESP3D_DISPLAY_FEATURE
@@ -78,25 +76,46 @@ static spi_device_handle_t touch_spi;
 esp_err_t bsp_init(void) {
 #if ESP3D_DISPLAY_FEATURE
   /* Display backlight initialization */
-  disp_backlight_h bcklt_handle = disp_backlight_create(&disp_bcklt_cfg);
-  disp_backlight_set(bcklt_handle, 0);
-
+  disp_backlight_t *bcklt_handle = NULL;
+  esp3d_log("Initializing display backlight...");
+  esp_err_t err = disp_backlight_create(&disp_bcklt_cfg, &bcklt_handle);
+  if (err != ESP_OK) {
+    esp3d_log_e("Failed to initialize display backlight");
+    return err;
+  }
+  if (disp_backlight_set(bcklt_handle, 0) != ESP_OK) {
+    esp3d_log_e("Failed to set display backlight");
+    return ESP_FAIL;
+  }
   /* SPI master initialization */
   esp3d_log("Initializing SPI master (display,touch)...");
-  spi_bus_init(SHARED_SPI_HOST, SHARED_SPI_MISO, SHARED_SPI_MOSI,
-               SHARED_SPI_CLK, DISP_BUF_SIZE_BYTES, 1, -1, -1);
+  if (display_spi_st7262_cfg.spi_bus_config.is_master) {
+    esp_spi_bus_st7262_config_t *spi_cfg =
+        &(display_spi_st7262_cfg.spi_bus_config);
+    esp3d_log("Initializing SPI master (display)...");
+    err = spi_bus_init(spi_cfg->spi_host_index, spi_cfg->pin_miso,
+                       spi_cfg->pin_mosi, spi_cfg->pin_clk,
+                       spi_cfg->max_transfer_sz, spi_cfg->dma_channel,
+                       spi_cfg->quadwp_io_num, spi_cfg->quadhd_io_num);
+    if (err != ESP_OK) {
+      {
+        esp3d_log_e("Failed to initialize SPI master (display)");
+        return err;
+      }
+    }
+  }
 
   esp3d_log("Attaching display panel to SPI bus...");
   esp_lcd_panel_io_handle_t disp_io_handle;
-  disp_spi_cfg.on_color_trans_done = disp_flush_ready;
-  if (esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)SHARED_SPI_HOST,
-                               &disp_spi_cfg, &disp_io_handle) != ESP_OK) {
+  display_spi_st7262_cfg.disp_spi_cfg.on_color_trans_done = disp_flush_ready;
+  if (esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)(display_spi_st7262_cfg.spi_bus_config.spi_host_index),
+                               &(display_spi_st7262_cfg.disp_spi_cfg), &disp_io_handle) != ESP_OK) {
     esp3d_log_e("Failed to attach display panel to SPI bus");
     return ESP_FAIL;
   }
 
   esp3d_log("Attaching touch controller to SPI bus...");
-  if (spi_bus_add_device(SHARED_SPI_HOST, &touch_spi_cfg, &touch_spi) !=
+  if (spi_bus_add_device(display_spi_st7262_cfg.spi_bus_config.spi_host_index, &touch_spi_cfg, &touch_spi) !=
       ESP_OK) {
     esp3d_log_e("Failed to attach touch controller to SPI bus");
     return ESP_FAIL;
@@ -104,36 +123,11 @@ esp_err_t bsp_init(void) {
 
   /* Display panel initialization */
   esp3d_log("Initializing display...");
-  if (esp_lcd_new_panel_st7796(disp_io_handle, &disp_panel_cfg, &disp_panel) !=
+  if (esp_lcd_new_panel_st7796(disp_io_handle, &display_spi_st7262_cfg, &disp_panel) !=
       ESP_OK) {
     esp3d_log_e("Failed to initialize display panel");
     return ESP_FAIL;
   }
-
-  if (esp_lcd_panel_reset(disp_panel) != ESP_OK) {
-    esp3d_log_e("Failed to reset display panel");
-    return ESP_FAIL;
-  }
-  if (esp_lcd_panel_init(disp_panel) != ESP_OK) {
-    esp3d_log_e("Failed to initialize display panel");
-    return ESP_FAIL;
-  }
-  // if(esp_lcd_panel_invert_color(disp_panel, true)!=ESP_OK){
-  //   esp3d_log_e("Failed to invert display panel color");
-  //   return ESP_FAIL;
-  // }
-#if DISP_ORIENTATION == 2 || DISP_ORIENTATION == 3  // landscape mode
-  if (esp_lcd_panel_swap_xy(disp_panel, true)) {
-    esp3d_log_e("Failed to swap display panel XY");
-    return ESP_FAIL;
-  }
-#endif                                              // DISP_ORIENTATION
-#if DISP_ORIENTATION == 1 || DISP_ORIENTATION == 3  // mirrored
-  if (esp_lcd_panel_mirror(disp_panel, true, true)) {
-    esp3d_log_e("Failed to mirror display panel");
-    return ESP_FAIL;
-  }
-#endif  // DISP_ORIENTATION
 
   /* Touch controller initialization */
   esp3d_log("Initializing touch controller...");
@@ -143,7 +137,12 @@ esp_err_t bsp_init(void) {
     return ESP_FAIL;
   }
 
-  disp_backlight_set(bcklt_handle, DISP_BCKL_DEFAULT_DUTY);
+  // enable display backlight
+  err = disp_backlight_set(bcklt_handle, DISP_BCKL_DEFAULT_DUTY);
+  if (err != ESP_OK) {
+    esp3d_log_e("Failed to set display backlight");
+    return err;
+  }
 
   // Lvgl initialization
   esp3d_log("Initializing LVGL...");
@@ -251,16 +250,18 @@ static uint16_t touch_spi_read_reg12(uint8_t reg) {
  * @param data Pointer to the LVGL input device data structure.
  */
 static void lv_touch_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
-static uint16_t last_x, last_y;
-xpt2046_data_t touch_data = xpt2046_read();
-if (touch_data.is_pressed) {
-  last_x = MAP(touch_data.x, TOUCH_X_MIN, TOUCH_X_MAX, DISP_HOR_RES_MAX);
-  last_y = MAP(touch_data.y, TOUCH_Y_MIN, TOUCH_Y_MAX, DISP_VER_RES_MAX);
-  esp3d_log("Touch x=%d, y=%d", last_x, last_y);
-}
-data->point.x = last_x;
-data->point.y = last_y;
-data->state = touch_data.is_pressed ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
+  static uint16_t last_x, last_y;
+  xpt2046_data_t touch_data = xpt2046_read();
+  if (touch_data.is_pressed) {
+    last_x = MAP(touch_data.x, xpt2046_cfg.calibration_x_min,
+                 xpt2046_cfg.calibration_x_max, xpt2046_cfg.x_max);
+    last_y = MAP(touch_data.y, xpt2046_cfg.calibration_y_min,
+                 xpt2046_cfg.calibration_y_max, xpt2046_cfg.y_max);
+    esp3d_log("Touch x=%d, y=%d", last_x, last_y);
+  }
+  data->point.x = last_x;
+  data->point.y = last_y;
+  data->state = touch_data.is_pressed ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL;
 }
 
 #endif
