@@ -126,7 +126,11 @@ esp_err_t bsp_init(void) {
   }
   /* Touch controller initialization */
   esp3d_log("Initializing touch controller...");
-  sw_spi_init(&touch_spi_cfg);
+  err = sw_spi_init(&touch_spi_cfg);
+  if (err != ESP_OK) {
+    esp3d_log_e("Failed to initialize sw spi for touch controller");
+    return err;
+  }
   xpt2046_cfg.read_reg12_fn = touch_spi_read_reg12;
   err = xpt2046_init(&xpt2046_cfg);
   if (err != ESP_OK) {
