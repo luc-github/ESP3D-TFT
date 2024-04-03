@@ -23,17 +23,21 @@
  *********************/
 
 #include "esp32_camera.h"
+
 #include "esp3d_log.h"
+
+
+int _camera_pin_led = -1;
 
 /*********************
  * GLOBAL PROTOTYPES
  * *********************/
-esp_err_t esp32_camera_init(const esp32_camera_config_t *config){
+esp_err_t esp32_camera_init(const esp32_camera_config_t *config) {
   if (config == NULL) {
     esp3d_log_e("Camera config is NULL");
     return ESP_ERR_INVALID_ARG;
   }
-  //Set extra pullup if needed
+  // Set extra pullup if needed
   if (config->pin_pullup_1 != -1) {
     gpio_set_direction(config->pin_pullup_1, GPIO_MODE_INPUT);
     gpio_set_pull_mode(config->pin_pullup_1, GPIO_PULLUP_ONLY);
@@ -44,41 +48,42 @@ esp_err_t esp32_camera_init(const esp32_camera_config_t *config){
     gpio_set_pull_mode(config->pin_pullup_2, GPIO_PULLUP_ONLY);
   }
 
-  //Set led pin
+  // Set led pin
   if (config->pin_led != -1) {
     gpio_set_direction(config->pin_led, GPIO_MODE_OUTPUT);
     gpio_set_level(config->pin_led, 0);
+    _camera_pin_led = config->pin_led;
   }
-  //Initilize camera
-  esp3d_log("Camera init")
-  esp_err_t err = esp_camera_init(&(config->hw_config));
+  // Initilize camera
+  esp3d_log("Camera init") esp_err_t err =
+      esp_camera_init(&(config->hw_config));
   if (err != ESP_OK) {
     esp3d_log_e("Camera init failed with error 0x%x", err);
     return err;
   }
 
   // camera config
-   sensor_t *s = esp_camera_sensor_get();
-   if (!s){
-      esp3d_log_e("Camera sensor not found");
-      return ESP_FAIL;
-   }
-   //Set camera parameters
-   //framesize
-   s->set_framesize(s,  config->hw_config.frame_size);
-   //brightness
+  sensor_t *s = esp_camera_sensor_get();
+  if (!s) {
+    esp3d_log_e("Camera sensor not found");
+    return ESP_FAIL;
+  }
+  // Set camera parameters
+  // framesize
+  s->set_framesize(s, config->hw_config.frame_size);
+  // brightness
   if (config->brightness != 0) {
     s->set_brightness(s, config->brightness);
   }
-  //contrast
+  // contrast
   if (config->contrast != 0) {
     s->set_contrast(s, config->contrast);
   }
-  //flip H
+  // flip H
   if (config->flip_horizontaly) {
     s->set_hmirror(s, 1);
   }
-  //flip V
+  // flip V
   if (config->flip_vertically) {
     s->set_vflip(s, 1);
   }

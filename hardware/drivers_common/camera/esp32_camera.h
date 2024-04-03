@@ -50,6 +50,8 @@ typedef struct {
  **********************/
 esp_err_t esp32_camera_init(const esp32_camera_config_t *config);
 
+esp_err_t esp32_camera_power_led(bool on);
+
 #ifdef __cplusplus
 }
 #endif
