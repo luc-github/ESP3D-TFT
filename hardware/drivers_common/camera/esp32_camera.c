@@ -1,0 +1,87 @@
+/*
+  esp32_camera.c
+
+  Copyright (c) 2023 Luc Lebosse. All rights reserved.
+
+  This code is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This code is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
+/*********************
+ *      INCLUDES
+ *********************/
+
+#include "esp32_camera.h"
+#include "esp3d_log.h"
+
+/*********************
+ * GLOBAL PROTOTYPES
+ * *********************/
+esp_err_t esp32_camera_init(const esp32_camera_config_t *config){
+  if (config == NULL) {
+    esp3d_log_e("Camera config is NULL");
+    return ESP_ERR_INVALID_ARG;
+  }
+  //Set extra pullup if needed
+  if (config->pin_pullup_1 != -1) {
+    gpio_set_direction(config->pin_pullup_1, GPIO_MODE_INPUT);
+    gpio_set_pull_mode(config->pin_pullup_1, GPIO_PULLUP_ONLY);
+  }
+
+  if (config->pin_pullup_2 != -1) {
+    gpio_set_direction(config->pin_pullup_2, GPIO_MODE_INPUT);
+    gpio_set_pull_mode(config->pin_pullup_2, GPIO_PULLUP_ONLY);
+  }
+
+  //Set led pin
+  if (config->pin_led != -1) {
+    gpio_set_direction(config->pin_led, GPIO_MODE_OUTPUT);
+    gpio_set_level(config->pin_led, 0);
+  }
+  //Initilize camera
+  esp3d_log("Camera init")
+  esp_err_t err = esp_camera_init(&(config->hw_config));
+  if (err != ESP_OK) {
+    esp3d_log_e("Camera init failed with error 0x%x", err);
+    return err;
+  }
+
+  // camera config
+   sensor_t *s = esp_camera_sensor_get();
+   if (!s){
+      esp3d_log_e("Camera sensor not found");
+      return ESP_FAIL;
+   }
+   //Set camera parameters
+   //framesize
+   s->set_framesize(s,  config->hw_config.frame_size);
+   //brightness
+  if (config->brightness != 0) {
+    s->set_brightness(s, config->brightness);
+  }
+  //contrast
+  if (config->contrast != 0) {
+    s->set_contrast(s, config->contrast);
+  }
+  //flip H
+  if (config->flip_horizontaly) {
+    s->set_hmirror(s, 1);
+  }
+  //flip V
+  if (config->flip_vertically) {
+    s->set_vflip(s, 1);
+  }
+
+  return ESP_OK;
+}

@@ -123,6 +123,9 @@ class ESP3DHttpService final {
                                           httpd_err_code_t err);
   static esp_err_t login_handler(httpd_req_t *req);
   static esp_err_t files_handler(httpd_req_t *req);
+#if ESP3D_CAMERA_FEATURE
+  static esp_err_t snap_handler(httpd_req_t *req);
+#endif //ESP3D_CAMERA_FEATURE
 #if ESP3D_SD_CARD_FEATURE
   static esp_err_t sdfiles_handler(httpd_req_t *req);
   static esp_err_t upload_to_sd_handler(const uint8_t *data, size_t datasize,
