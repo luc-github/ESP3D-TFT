@@ -53,7 +53,7 @@ static const char* esp3dclientstr[] = {
     "system",   // origin only
     "all_clients"};
 #define GETCLIENTSTR(id)                                         \
-  static_cast<int8_t>(id) >= 0 &&                               \
+  static_cast<int8_t>(id) >= 0 &&                                \
           static_cast<uint8_t>(id) <=                            \
               static_cast<uint8_t>(ESP3DClientType::all_clients) \
       ? esp3dclientstr[static_cast<uint8_t>(id)]                 \
@@ -61,7 +61,7 @@ static const char* esp3dclientstr[] = {
 
 const char* esp3dmsgstr[] = {"head", "core", "tail", "unique"};
 #define GETMSGTYPESTR(id)                                    \
-  static_cast<int8_t>(id) >= 0 &&                           \
+  static_cast<int8_t>(id) >= 0 &&                            \
           static_cast<uint8_t>(id) <=                        \
               static_cast<uint8_t>(ESP3DMessageType::unique) \
       ? esp3dmsgstr[static_cast<uint8_t>(id)]                \
@@ -72,9 +72,9 @@ const char* esp3dmsgstr[] = {"head", "core", "tail", "unique"};
 ESP3DCommands esp3dCommands;
 
 ESP3DCommands::ESP3DCommands() {
-  #if ESP3D_TFT_LOG
+#if ESP3D_TFT_LOG
   (void)esp3dclientstr;
-  #endif  // ESP3D_TFT_LOG
+#endif  // ESP3D_TFT_LOG
   _output_client = ESP3DClientType::stream;
 }  //_output_client = ESP3DClientType::serial; }
 ESP3DCommands::~ESP3DCommands() {}
@@ -942,6 +942,14 @@ void ESP3DCommands::execute_internal_command(int cmd, int cmd_params_pos,
       ESP160(cmd_params_pos, msg);
       break;
 #endif  // ESP3D_WS_SERVICE_FEATURE
+#if ESP3D_CAMERAS_FEATURE
+    case 170:
+      ESP170(cmd_params_pos, msg);
+      break;
+    case 171:
+      ESP171(cmd_params_pos, msg);
+      break;
+#endif  // ESP3D_CAMERAS_FEATURE
 #if ESP3D_WEBDAV_SERVICES_FEATURE
     case 190:
       ESP190(cmd_params_pos, msg);
@@ -1130,6 +1138,7 @@ ESP3DClientType ESP3DCommands::getOutputClient(bool fromSettings) {
     }
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
   }
-  esp3d_log("Output client is %d (%s)", static_cast<uint8_t>(_output_client), GETCLIENTSTR(_output_client));
+  esp3d_log("Output client is %d (%s)", static_cast<uint8_t>(_output_client),
+            GETCLIENTSTR(_output_client));
   return _output_client;
 }

@@ -71,6 +71,11 @@ const char* help[] = {
 #if ESP3D_WEBDAV_SERVICES_FEATURE
     "[ESP190](State) - display/set WebDav state which can be ON, OFF",
 #endif  // ESP3D_WEBDAV_SERVICES_FEATURE
+#if ESP3D_CAMERA_FEATURE
+    "[ESP170](json) (label=value) - display/set Camera commands",
+    "[ESP171] (path=<target path>) (filename=<target filename>) Save frame to "
+    "target path and filename",
+#endif  // ESP3D_CAMERA_FEATURE
 #endif  // ESP3D_HTTP_FEATURE
 #if ESP3D_SD_CARD_FEATURE
     "[ESP200](RELEASE) (REFRESH)- display/set SD Card Status",
@@ -82,7 +87,7 @@ const char* help[] = {
     "[ESP214](Text) - Output to esp screen status",
 #if LV_USE_SNAPSHOT
     "[ESP216](SNAP) - Do Snapshot of current screen",
-#endif  //LV_USE_SNAPSHOT
+#endif  // LV_USE_SNAPSHOT
 #endif  // ESP3D_DISPLAY_FEATURE
 #endif  // ESP3D_SD_CARD_FEATURE
     "[ESP400] - display ESP3D settings",
@@ -163,6 +168,9 @@ const uint cmdlist[] = {
 #if ESP3D_WS_SERVICE_FEATURE
     160,
 #endif  // ESP3D_WS_SERVICE_FEATURE
+#if ESP3D_CAMERA_FEATURE
+    170, 171,
+#endif  // ESP3D_CAMERA_FEATURE
 #if ESP3D_WEBDAV_SERVICES_FEATURE
     190,
 #endif  // ESP3D_WEBDAV_SERVICES_FEATURE
@@ -176,7 +184,7 @@ const uint cmdlist[] = {
     214,
 #if LV_USE_SNAPSHOT
     216,
-#endif  //LV_USE_SNAPSHOT
+#endif  // LV_USE_SNAPSHOT
 #endif  // ESP3D_DISPLAY_FEATURE
 #endif  // ESP3D_SD_CARD_FEATURE
 

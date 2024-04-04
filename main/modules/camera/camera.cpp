@@ -31,7 +31,8 @@
 
 Camera esp3d_camera;
 
-bool Camera::handle_snap(httpd_req_t *req) {
+bool Camera::handle_snap(httpd_req_t *req, const char *path,
+                         const char *filename) {
   camera_fb_t *fb = NULL;
   esp3d_log("Camera stream reached");
   if (!_started) {
@@ -47,13 +48,15 @@ bool Camera::handle_snap(httpd_req_t *req) {
   fb = esp_camera_fb_get();
   if (!fb) {
     esp3d_log("Camera capture failed");
-    httpd_resp_send_500(req);
+    if (req) httpd_resp_send_500(req);
     return false;
   }
-  httpd_resp_set_type(req, "image/jpeg");
-  httpd_resp_set_hdr(req, "Content-Disposition",
-                     "inline; filename=capture.jpg");
-  httpd_resp_send(req, (const char *)fb->buf, fb->len);
+  if (req) {
+    httpd_resp_set_type(req, "image/jpeg");
+    httpd_resp_set_hdr(req, "Content-Disposition",
+                       "inline; filename=capture.jpg");
+    httpd_resp_send(req, (const char *)fb->buf, fb->len);
+  }
   esp_camera_fb_return(fb);
   return true;
 }
