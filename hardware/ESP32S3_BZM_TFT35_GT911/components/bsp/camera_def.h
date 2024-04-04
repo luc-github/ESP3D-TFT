@@ -7,7 +7,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+// Camera configuration
+// it is a OV2640 camera module
 const esp32_camera_config_t camera_config = {
     .hw_config =
         {
@@ -68,6 +69,7 @@ const esp32_camera_config_t camera_config = {
     .flip_vertically = false, // if vertical flip is needed
     .brightness = 0, // default value is 0
     .contrast = 0,  // default value is 0
+    .name = "OV2640",
 } ;
 
 #ifdef __cplusplus

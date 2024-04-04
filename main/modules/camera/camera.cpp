@@ -21,17 +21,13 @@
 #if defined(ESP3D_CAMERA_FEATURE) && ESP3D_CAMERA_FEATURE == 1
 #include "camera.h"
 
-#include <esp_camera.h>
 #include <esp_system.h>
 #include <string.h>
 #include <sys/param.h>
 
+#include "esp32_camera.h"
 #include "esp3d_log.h"
 #include "http/esp3d_http_service.h"
-
-
-#define DEFAULT_FRAME_SIZE FRAMESIZE_VGA
-// #define JPEG_COMPRESSION 80
 
 Camera esp3d_camera;
 
@@ -75,7 +71,7 @@ int Camera::command(const char *param, const char *value) {
   }
 
   if (!strcmp(param, "light")) {
-   if ( esp32_camera_power_led(val) == ESP_OK) {
+    if (esp32_camera_power_led(val) == ESP_OK) {
       res = 0;
     } else {
       res = -1;
@@ -158,5 +154,5 @@ void Camera::handle() {
   // nothing to do
 }
 uint8_t Camera::GetModel() { return 0; }
-const char *Camera::GetModelString() { return "ESP32 Cam"; }
+const char *Camera::GetModelString() { return esp32_camera_get_name(); }
 #endif  // CAMERA_DEVICE
