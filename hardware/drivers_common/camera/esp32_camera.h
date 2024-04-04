@@ -34,22 +34,42 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+/**
+ * @brief Structure representing the configuration for the ESP32 camera.
+ */
 typedef struct {
-  camera_config_t hw_config;
-  int pin_pullup_1;
-  int pin_pullup_2;
-  int pin_led;
-  bool flip_horizontaly;
-  bool flip_vertically;
-    int brightness;
-    int contrast;
+  camera_config_t hw_config;   /**< Hardware configuration for the camera. */
+  int pin_pullup_1;            /**< Pin number for the first pull-up resistor. */
+  int pin_pullup_2;            /**< Pin number for the second pull-up resistor. */
+  int pin_led;                 /**< Pin number for the LED. */
+  bool flip_horizontaly;       /**< Flag indicating if the image should be flipped horizontally. */
+  bool flip_vertically;        /**< Flag indicating if the image should be flipped vertically. */
+  int brightness;              /**< Brightness level for the camera. */
+  int contrast;                /**< Contrast level for the camera. */
 } esp32_camera_config_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+/**
+ * @brief Initializes the ESP32 camera module with the provided configuration.
+ *
+ * This function initializes the ESP32 camera module with the specified configuration.
+ *
+ * @param config Pointer to the configuration structure containing camera settings.
+ * @return `ESP_OK` if the initialization is successful, otherwise an error code.
+ */
 esp_err_t esp32_camera_init(const esp32_camera_config_t *config);
 
+/**
+ * @brief Controls the power LED of the ESP32 camera.
+ *
+ * This function is used to turn the power LED of the ESP32 camera on or off.
+ *
+ * @param on Boolean value indicating whether to turn the power LED on (true) or off (false).
+ * @return `ESP_OK` if the operation is successful, otherwise an error code indicating the cause of the failure.
+ */
 esp_err_t esp32_camera_power_led(bool on);
 
 #ifdef __cplusplus

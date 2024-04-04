@@ -27,11 +27,22 @@
 #include "esp3d_log.h"
 
 
+/**********************
+ *  STATIC VARIABLES
+ **********************/
 int _camera_pin_led = -1;
 
 /*********************
  * GLOBAL PROTOTYPES
  * *********************/
+/**
+ * @brief Initializes the ESP32 camera module with the provided configuration.
+ *
+ * This function initializes the ESP32 camera module using the specified configuration.
+ *
+ * @param config Pointer to the configuration structure containing camera settings.
+ * @return `ESP_OK` if the initialization is successful, otherwise an error code.
+ */
 esp_err_t esp32_camera_init(const esp32_camera_config_t *config) {
   if (config == NULL) {
     esp3d_log_e("Camera config is NULL");
@@ -88,5 +99,21 @@ esp_err_t esp32_camera_init(const esp32_camera_config_t *config) {
     s->set_vflip(s, 1);
   }
 
+  return ESP_OK;
+}
+
+/**
+ * @brief Controls the power LED of the ESP32 camera.
+ *
+ * This function turns the power LED of the ESP32 camera on or off based on the provided parameter.
+ *
+ * @param on Boolean value indicating whether to turn the power LED on (true) or off (false).
+ * @return `ESP_OK` if the operation is successful, `ESP_ERR_INVALID_STATE` if the camera pin LED is not configured.
+ */
+esp_err_t esp32_camera_power_led(bool on) {
+  if (_camera_pin_led == -1) {
+    return ESP_ERR_INVALID_STATE;
+  }
+  gpio_set_level(_camera_pin_led, on);
   return ESP_OK;
 }
