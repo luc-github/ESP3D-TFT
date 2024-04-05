@@ -2,5 +2,5 @@
 idf_component_register(
     SRCS "bsp.c"
     INCLUDE_DIRS .
-    REQUIRES esp3d_log usb_serial
+    REQUIRES esp3d_log usb_serial camera
 )
