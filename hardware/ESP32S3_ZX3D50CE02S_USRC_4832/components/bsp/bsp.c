@@ -30,7 +30,9 @@
 #include "lvgl.h"
 #include "touch_def.h"
 #endif  // ESP3D_DISPLAY_FEATURE
+#if ESP3D_USB_SERIAL_FEATURE
 #include "usb_serial.h"
+#endif //ESP3D_USB_SERIAL_FEATURE
 
 /**********************
  *  STATIC VARIABLES

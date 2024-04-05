@@ -1,5 +1,5 @@
-// Pins definition for SEEED STUDIO XIAO SENSE CAMERA
-// CAMERA OV2640
+// Pins definition for FREENOVE Camera
+// CAMERA ESP32S3_EYE
 #pragma once
 #include "driver/gpio.h"
 #include "esp32_camera.h"
@@ -14,19 +14,19 @@ const esp32_camera_config_t camera_config = {
         {
             .pin_pwdn = -1,     /*!< GPIO pin for camera power down line */
             .pin_reset = -1,    /*!< GPIO pin for camera reset line */
-            .pin_xclk = 10,      /*!< GPIO pin for camera XCLK line */
-            .pin_sccb_sda = 40, /*!< GPIO pin for camera SDA line */
-            .pin_sccb_scl = 39, /*!< GPIO pin for camera SCL line */
-            .pin_d7 = 48,        /*!< GPIO pin for camera D7 line */
-            .pin_d6 = 11,       /*!< GPIO pin for camera D6 line */
-            .pin_d5 = 12,       /*!< GPIO pin for camera D5 line */
-            .pin_d4 = 14,       /*!< GPIO pin for camera D4 line */
-            .pin_d3 = 16,        /*!< GPIO pin for camera D3 line */
-            .pin_d2 = 18,        /*!< GPIO pin for camera D2 line */
-            .pin_d1 = 17,        /*!< GPIO pin for camera D1 line */
-            .pin_d0 = 15,        /*!< GPIO pin for camera D0 line */
-            .pin_vsync = 38,     /*!< GPIO pin for camera VSYNC line */
-            .pin_href = 47,     /*!< GPIO pin for camera HREF line */
+            .pin_xclk = 1,      /*!< GPIO pin for camera XCLK line */
+            .pin_sccb_sda = 4, /*!< GPIO pin for camera SDA line */
+            .pin_sccb_scl = 5, /*!< GPIO pin for camera SCL line */
+            .pin_d7 = 16,        /*!< GPIO pin for camera D7 line */
+            .pin_d6 = 17,       /*!< GPIO pin for camera D6 line */
+            .pin_d5 = 18,       /*!< GPIO pin for camera D5 line */
+            .pin_d4 = 12,       /*!< GPIO pin for camera D4 line */
+            .pin_d3 = 10,        /*!< GPIO pin for camera D3 line */
+            .pin_d2 = 8,        /*!< GPIO pin for camera D2 line */
+            .pin_d1 = 9,        /*!< GPIO pin for camera D1 line */
+            .pin_d0 = 11,        /*!< GPIO pin for camera D0 line */
+            .pin_vsync = 6,     /*!< GPIO pin for camera VSYNC line */
+            .pin_href = 7,     /*!< GPIO pin for camera HREF line */
             .pin_pclk = 13,     /*!< GPIO pin for camera PCLK line */
 
             .xclk_freq_hz =
@@ -69,7 +69,7 @@ const esp32_camera_config_t camera_config = {
     .flip_vertically = false, // if vertical flip is needed
     .brightness = 0, // default value is 0
     .contrast = 0,  // default value is 0
-    .name = "Xiao-Sense(OV2640)",
+    .name = "Freenove (ESP32S3 Eye)",
 } ;
 
 #ifdef __cplusplus

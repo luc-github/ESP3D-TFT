@@ -64,6 +64,7 @@ OPTION(TFT_UI_SERVICE "TFT UI service" ON)
 OPTION(SD_CARD_SERVICE "SD card service" ON)
 OPTION(NOTIFICATIONS_SERVICE "Notifications service" ON)
 OPTION(UPDATE_SERVICE "Update service" ON)
+OPTION(USB_SERIAL_SERVICE "Use USB Serial if Available" ON)
 OPTION(USE_FAT_INSTEAD_OF_LITTLEFS "Use FAT instead of LittleFS" OFF)
 
 # #######################################
