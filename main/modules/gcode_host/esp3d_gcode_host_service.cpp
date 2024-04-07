@@ -33,6 +33,9 @@
 #include "esp3d_values.h"
 #include "filesystem/esp3d_flash.h"
 #include "filesystem/esp3d_globalfs.h"
+#if ESP3D_NOTIFICATIONS_FEATURE
+#include "notifications/esp3d_notifications_service.h"
+#endif  // ESP3D_NOTIFICATIONS_FEATURE
 
 #if ESP3D_SD_CARD_FEATURE
 #include "filesystem/esp3d_sd.h"
@@ -148,8 +151,7 @@ bool ESP3DGCodeHostService::addStream(
     esp3d_log_e("Empty command");
     return false;
   }
-  return _add_stream(cmd.c_str(), authentication_level,
-                     true);
+  return _add_stream(cmd.c_str(), authentication_level, true);
 }
 
 bool ESP3DGCodeHostService::hasStreamListCommand(const char* command) {
@@ -865,7 +867,9 @@ bool ESP3DGCodeHostService::_processRx(ESP3DMessage* rx) {
 
     _parseResponse(rx);
   } else {
-    esp3d_log("Sending message from: %d to %d", static_cast<uint8_t>(rx->origin), static_cast<uint8_t>(rx->target));
+    esp3d_log("Sending message from: %d to %d",
+              static_cast<uint8_t>(rx->origin),
+              static_cast<uint8_t>(rx->target));
     addStream((const char*)rx->data, rx->size, rx->authentication_level);
   }
   deleteMsg(rx);
@@ -1048,12 +1052,12 @@ void ESP3DGCodeHostService::_handle_stream_selection() {
   // only file stream  can be interrupted, scripts / command streams cannot
   if (!(_current_stream_ptr->type == ESP3DGcodeHostStreamType::fs_stream) &&
       !(_current_stream_ptr->type == ESP3DGcodeHostStreamType::sd_stream)) {
-   /* esp3d_log("Current stream is not a file stream  %lld, state:%s : type: %s",
-              _current_stream_ptr->id,
-              ESP3DGcodeStreamStateStr[static_cast<uint8_t>(
-                  _current_stream_ptr->state)],
-              ESP3DGcodeHostStreamTypeStr[static_cast<uint8_t>(
-                  _current_stream_ptr->type)]);*/
+    /* esp3d_log("Current stream is not a file stream  %lld, state:%s : type:
+       %s", _current_stream_ptr->id,
+               ESP3DGcodeStreamStateStr[static_cast<uint8_t>(
+                   _current_stream_ptr->state)],
+               ESP3DGcodeHostStreamTypeStr[static_cast<uint8_t>(
+                   _current_stream_ptr->type)]);*/
     /*esp3d_log("keep it always active, command:%s",
               _current_command_str.c_str());*/
     _current_stream_ptr->active = true;
@@ -1191,7 +1195,7 @@ ESP3DGcodeStreamState ESP3DGCodeHostService::_getStreamState() {
 // Handle the notifications
 // be sure sdkconfig has CONFIG_FREERTOS_TASK_NOTIFICATION_ARRAY_ENTRIES>=3
 void ESP3DGCodeHostService::_handle_notifications() {
- // esp3d_log("Handle notifications");
+  // esp3d_log("Handle notifications");
   // entry 0
   if (ulTaskNotifyTake(pdTRUE, 0)) {
     ESP3DGcodeStreamState state = ESP3DGcodeStreamState::undefined;
@@ -1239,7 +1243,7 @@ void ESP3DGCodeHostService::_handle_notifications() {
 
 // Handle the messages in the queue
 void ESP3DGCodeHostService::_handle_msgs() {
-  //esp3d_log("Handle messages");
+  // esp3d_log("Handle messages");
   while (getRxMsgsCount() > 0) {
     ESP3DMessage* msg = popRx();
     esp3d_log("RX popped");
@@ -1256,6 +1260,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
   static uint64_t last_ellapsedtime = 0;
   double new_progress;
   std::string new_progress_str;
+  ESP3DRequest requestId = {.id = 0};
 
   if (_current_stream_ptr == nullptr) {
     return;  // nothing to be done if no stream it will changed in next
@@ -1647,12 +1652,31 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       // ?
       // how to notify to user ?
       esp3d_log_e("Stream is in error, cancel it");
-      if (_error != ESP3DGcodeHostError::time_out) {
-        text = esp3dTranslationService.translate(ESP3DLabel::error);
-        text += ": S" + std::to_string(static_cast<uint8_t>(_error));
-        esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
-                                        text.c_str());
+
+      text = esp3dTranslationService.translate(ESP3DLabel::error);
+      text += ": ";
+      text += esp3dTranslationService.translate(ESP3DLabel::streaming_error);
+      text += " S" + std::to_string(static_cast<uint8_t>(_error));
+      esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
+                                      text.c_str());
+
+      // send error message
+      if (!esp3dCommands.dispatch(text.c_str(), ESP3DClientType::all_clients,
+                             requestId, ESP3DMessageType::unique,
+                             ESP3DClientType::stream,
+                             ESP3DAuthenticationLevel::admin)){
+        esp3d_log_e("Failed to send error message");
+                             }
+
+#if ESP3D_NOTIFICATIONS_FEATURE
+      text = "Error:";
+      text += esp3dTranslationService.translate(ESP3DLabel::streaming_error);
+      if (!esp3dNotificationsService.sendMSG(ESP3D_NOTIFICATION_TITLE,
+                                             text.c_str())) {
+        esp3d_log_e("Failed to send notification");
       }
+#endif  // ESP3D_NOTIFICATIONS_FEATURE
+
       // abort the stream because we are in error and we do not know what to
       // do
       _setStreamState(ESP3DGcodeStreamState::end);

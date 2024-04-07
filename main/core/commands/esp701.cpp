@@ -52,7 +52,7 @@ void ESP3DCommands::ESP701(int cmd_params_pos, ESP3DMessage* msg) {
       if (json) {
         ok_msg = "{\"status\":\"no stream\"";
         if (errorNum != ESP3DGcodeHostError::no_error) {
-          ok_msg += "\",\"code\":\"";
+          ok_msg += ",\"code\":\"";
           ok_msg += std::to_string(static_cast<uint8_t>(errorNum));
           ok_msg += "\"";
         }
@@ -97,7 +97,6 @@ void ESP3DCommands::ESP701(int cmd_params_pos, ESP3DMessage* msg) {
                 script->type == ESP3DGcodeHostStreamType::fs_stream) {
               ok_msg += "\",\"name\":\"";
               ok_msg += ((ESP3DGcodeStream*)script)->dataStream;
-              ok_msg += "\"";
             }
             ok_msg += "\"}";
           } else {

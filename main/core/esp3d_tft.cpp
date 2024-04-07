@@ -123,9 +123,10 @@ if (esp3d_camera.begin()) {
   successFs = flashFs.begin();
 #if ESP3D_SD_CARD_FEATURE
   successSd = sd.begin();
-#endif  // ESP3D_SD_CARD_FEATURE
+#endif  // ESP3D_SD_CARD_FEATURE 
+// Init translations service, no need condition as it is mandatory
+esp3dTranslationService.begin();
 #if ESP3D_DISPLAY_FEATURE
-  esp3dTranslationService.begin();
   esp3dTftui.begin();
 #endif  // ESP3D_DISPLAY_FEATURE
 #if ESP3D_UPDATE_FEATURE

@@ -84,6 +84,7 @@ enum class ESP3DLabel : uint16_t {
   communication_recovered,
   ms,
   days,
+  streaming_error,
   unknown_index,  // must be last
 };
 
