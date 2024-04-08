@@ -84,9 +84,9 @@ esp_err_t st7796_init(const esp_i80_st7796_config_t *disp_st7796_cfg, esp_lcd_pa
     esp3d_log_e("st7796 bus already initialized");
     return ESP_FAIL;
   }
-  esp3d_log_d("init st7796 bus");
+  esp3d_log("init st7796 bus");
   esp_lcd_i80_bus_handle_t i80_bus = NULL;
-  esp3d_log_d("init lcd bus");
+  esp3d_log("init lcd bus");
   ESP_ERROR_CHECK(
       esp_lcd_new_i80_bus(&(disp_st7796_cfg->bus_config), &i80_bus));
   if (i80_bus == NULL) {
@@ -101,9 +101,9 @@ esp_err_t st7796_init(const esp_i80_st7796_config_t *disp_st7796_cfg, esp_lcd_pa
   io_config.user_ctx = flush_ready_fn;   // User private data, passed directly to
                                    // on_color_trans_done’s user_ctx
 
-  esp3d_log_d("init lcd panel");
+  esp3d_log("init lcd panel");
   ESP_ERROR_CHECK(esp_lcd_new_panel_io_i80(i80_bus, &io_config, &io_handle));
-  esp3d_log_d("init lcd panel st7796");
+  esp3d_log("init lcd panel st7796");
   ESP_ERROR_CHECK(
       esp_lcd_new_panel_st7796(io_handle, (disp_st7796_cfg), panel_handle));
 
@@ -218,7 +218,7 @@ esp_err_t esp_lcd_new_panel_st7796(
   st7796->base.swap_xy = panel_st7796_swap_xy;
   st7796->base.disp_on_off = panel_st7796_disp_off;
   *ret_panel = &(st7796->base);
-  esp3d_log_d("new st7796 panel @%p", st7796);
+  esp3d_log("new st7796 panel @%p", st7796);
 
   return ESP_OK;
 
@@ -246,7 +246,7 @@ static esp_err_t panel_st7796_del(esp_lcd_panel_t *panel) {
   if (st7796->reset_gpio_num >= 0) {
     gpio_reset_pin(st7796->reset_gpio_num);
   }
-  esp3d_log_d("del st7796 panel @%p", st7796);
+  esp3d_log("del st7796 panel @%p", st7796);
   free(st7796);
   return ESP_OK;
 }
@@ -309,9 +309,9 @@ static esp_err_t panel_st7796_init(esp_lcd_panel_t *panel) {
   // turn on display
   esp_lcd_panel_io_tx_param(io, LCD_CMD_DISPON , NULL, 0);
 
-  esp3d_log_d("LCD=%dx%d dir=%d xgap=%d ygap=%d", st7796->width, st7796->height,
+  esp3d_log("LCD=%dx%d dir=%d xgap=%d ygap=%d", st7796->width, st7796->height,
             st7796->dir, st7796->x_gap, st7796->y_gap);
-  esp3d_log_d("madctl=0x%02X colmod=0x%02X", st7796->madctl_val,
+  esp3d_log("madctl=0x%02X colmod=0x%02X", st7796->madctl_val,
             st7796->colmod_cal);
 
   return ESP_OK;

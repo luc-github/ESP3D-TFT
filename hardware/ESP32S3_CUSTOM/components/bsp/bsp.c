@@ -23,11 +23,14 @@
  *********************/
 #include "esp3d_log.h"
 #include "bsp.h"
+#if ESP3D_USB_SERIAL_FEATURE
 #include "usb_serial.h"
+#endif //ESP3D_USB_SERIAL_FEATURE
 
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+ #if ESP3D_USB_SERIAL_FEATURE
 /**
  * @brief Initializes the USB functionality of the BSP.
  *
@@ -56,6 +59,7 @@ esp_err_t bsp_deinit_usb(void)
     esp3d_log("Remove usb-serial");
     return usb_serial_deinit();
 }
+#endif //ESP3D_USB_SERIAL_FEATURE
 
 /**
  * @brief Initializes the Board Support Package (BSP).
@@ -66,9 +70,11 @@ esp_err_t bsp_deinit_usb(void)
  */
 esp_err_t bsp_init(void)
 {
+#if ESP3D_USB_SERIAL_FEATURE
     if ( usb_serial_init()!=ESP_OK) {
         return ESP_FAIL;
     }
+#endif //ESP3D_USB_SERIAL_FEATURE
     return ESP_OK;
 }
 

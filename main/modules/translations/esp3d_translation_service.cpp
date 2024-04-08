@@ -47,7 +47,10 @@ ESP3DTranslationService::ESP3DTranslationService() { _started = false; }
 ESP3DTranslationService::~ESP3DTranslationService() { _started = false; }
 
 const char *ESP3DTranslationService::getEntry(ESP3DLabel label) {
-  if (!_started) return "???";
+  if (!_started) {
+    esp3d_log_e("Translation Service not started");
+    return "???";
+  }
   static std::string response;
   response = "l_" + std::to_string(static_cast<uint16_t>(label));
   return response.c_str();
@@ -181,6 +184,7 @@ const char *ESP3DTranslationService::translate(ESP3DLabel label, ...) {
   static std::string responseString;
   responseString.clear();
   if (!_started) {
+    esp3d_log_e("Translation Service not started");
     return "???";
   }
   auto it = _translations.find(label);
@@ -214,7 +218,8 @@ const char *ESP3DTranslationService::translate(ESP3DLabel label, ...) {
     }
     return responseString.c_str();
   }
-
+  esp3d_log_e("Key index: %d is not found in translation",
+              static_cast<uint16_t>(label));
   return "???";
 }
 

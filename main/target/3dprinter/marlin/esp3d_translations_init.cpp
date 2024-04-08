@@ -88,5 +88,6 @@ void ESP3DTranslationService::init() {
       {ESP3DLabel::communication_recovered, "Communication recovered"},
       {ESP3DLabel::ms, "ms"},
       {ESP3DLabel::days, "days"},
+      {ESP3DLabel::streaming_error, "Streaming error, operation aborted!"},
   };
 }

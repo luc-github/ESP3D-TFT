@@ -70,6 +70,9 @@
 #if ESP3D_TIMESTAMP_FEATURE
 #include "time/esp3d_time_service.h"
 #endif  // ESP3D_TIMESTAMP_FEATURE
+#if ESP3D_CAMERA_FEATURE
+#include "camera/camera.h"
+#endif  // ESP3D_CAMERA_FEATURE
 
 #define COMMAND_ID 420
 
@@ -581,6 +584,24 @@ void ESP3DCommands::ESP420(int cmd_params_pos, ESP3DMessage *msg) {
     }
   }
 #endif  // ESP3D_WS_SERVICE_FEATURE
+#if ESP3D_CAMERA_FEATURE
+  if (esp3d_camera.started()) {
+    // camera name
+    tmpstr = esp3d_camera.GetModelString();
+    tmpstr += "(";
+    tmpstr += esp3d_camera.GetModel();
+    tmpstr += ")";
+
+    if (!dispatchIdValue(json, "camera name", tmpstr.c_str(), target,
+                         requestId)) {
+      return;
+    }
+  } else {
+    if (!dispatchIdValue(json, "camera name", "OFF", target, requestId)) {
+      return;
+    }
+  }
+#endif  // ESP3D_CAMERA_FEATURE
 #endif  // ESP3D_HTTP_FEATURE
 #if ESP3D_NOTIFICATIONS_FEATURE
   // Notifications

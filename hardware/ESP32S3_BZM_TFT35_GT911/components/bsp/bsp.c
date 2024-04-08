@@ -22,6 +22,7 @@
  *      INCLUDES
  *********************/
 #include "bsp.h"
+
 #include "esp3d_log.h"
 
 #if ESP3D_DISPLAY_FEATURE
@@ -30,7 +31,12 @@
 #include "lvgl.h"
 #include "touch_def.h"
 #endif  // ESP3D_DISPLAY_FEATURE
+#if ESP3D_USB_SERIAL_FEATURE
 #include "usb_serial.h"
+#endif //ESP3D_USB_SERIAL_FEATURE
+#if ESP3D_CAMERA_FEATURE
+#include "camera_def.h"
+#endif  // ESP3D_CAMERA_FEATURE
 
 /**********************
  *  STATIC VARIABLES
@@ -54,7 +60,7 @@ void st7796_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area,
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
-
+#if ESP3D_USB_SERIAL_FEATURE
 /**
  * @brief Initializes the USB functionality of the BSP.
  *
@@ -84,6 +90,7 @@ esp_err_t bsp_deinit_usb(void) {
   esp3d_log("Remove usb-serial");
   return usb_serial_deinit();
 }
+#endif // ESP3D_USB_SERIAL_FEATURE
 
 /**
  * @brief Initializes the Board Support Package (BSP).
@@ -124,12 +131,23 @@ esp_err_t bsp_init(void) {
   }
 #endif  // ESP3D_DISPLAY_FEATURE
 
+#if ESP3D_USB_SERIAL_FEATURE
   // NOTE:
   // this location allows usb-host driver to be installed - later it will failed
   // Do not know why...
   if (usb_serial_init() != ESP_OK) {
     return ESP_FAIL;
   }
+#endif // ESP3D_USB_SERIAL_FEATURE
+
+#if ESP3D_CAMERA_FEATURE
+  if (esp32_camera_init(&camera_config) != ESP_OK) {
+    // initialize camera is not critical
+    // so failure is not blocking
+    esp3d_log_e("Camera init failed");
+  }
+#endif  // ESP3D_CAMERA_FEATURE
+
 #if ESP3D_DISPLAY_FEATURE
   /* Display controller initialization */
   esp3d_log("Initializing display controller");
@@ -225,7 +243,7 @@ void display_flush_ready() { lv_disp_flush_ready(&disp_drv); }
  * @param color_p  Pointer to the color data.
  */
 void st7796_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area,
-          lv_color_t *color_p) {
+                  lv_color_t *color_p) {
   esp_lcd_panel_handle_t panel_handle =
       (esp_lcd_panel_handle_t)disp_drv->user_data;
 

@@ -42,6 +42,8 @@ extern "C" {
  */
 esp_err_t bsp_init(void);
 
+#if ESP3D_USB_SERIAL_FEATURE
+
 /**
  * @brief Initializes the USB functionality in the Board Support Package (BSP).
  *
@@ -59,6 +61,7 @@ esp_err_t bsp_init_usb(void);
  * @return esp_err_t Returns ESP_OK if the USB deinitialization is successful, otherwise returns an error code.
  */
 esp_err_t bsp_deinit_usb(void);
+#endif //ESP3D_USB_SERIAL_FEATURE
 
 #ifdef __cplusplus
 } /* extern "C" */
