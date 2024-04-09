@@ -26,61 +26,73 @@
 extern "C" {
 #endif
 
+/**
+ * @brief Enumeration representing the state of the Gcode stream.
+ */
 enum class ESP3DGcodeStreamState : uint8_t {
-  undefined = 0,
-  start,                 // start of stream / or resume it
-  ready_to_read_cursor,  // ready to read cursor position
-  read_cursor,           // read command at cursor position
-  send_gcode_command,    // gcode command to send
-  resend_gcode_command,  // gcode command to resend
-  send_esp_command,      // esp command to send
-  wait_for_ack,          // wait for ack from pr
-  pause,                 // pause action
-  resume,                // resume action
-  abort,                 // abort action
-  end,                   // end of stream reached
-  paused,                // do nothing until resumed
-  error,                 // error state
+  undefined = 0,              /**< Undefined state */
+  start,                      /**< Start of stream or resume */
+  ready_to_read_cursor,       /**< Ready to read cursor position */
+  read_cursor,                /**< Read command at cursor position */
+  send_gcode_command,         /**< Gcode command to send */
+  resend_gcode_command,       /**< Gcode command to resend */
+  send_esp_command,           /**< ESP command to send */
+  wait_for_ack,               /**< Wait for acknowledgement from printer */
+  pause,                      /**< Pause action */
+  resume,                     /**< Resume action */
+  abort,                      /**< Abort action */
+  end,                        /**< End of stream reached */
+  paused,                     /**< Do nothing until resumed */
+  error,                      /**< Error state */
 };
 
+/**
+ * @brief Enumeration representing the state of the Gcode host.
+ */
 enum class ESP3DGcodeHostState : uint8_t {
-  idle = 0,
-  processing,
-  paused,
-  error,
+  idle = 0,                   /**< Idle state */
+  processing,                 /**< Processing state */
+  paused,                     /**< Paused state */
+  error,                      /**< Error state */
 };
 
+/**
+ * @brief Enumeration representing the error codes of the Gcode host.
+ */
 enum class ESP3DGcodeHostError : uint8_t {
-  no_error = 0,
-  time_out = 1,
-  data_send = 2,
-  line_number = 3,
-  ack_number = 4,
-  memory_allocation = 5,
-  too_many_resend = 6,
-  number_mismatch = 7,
-  line_ignored = 8,
-  check_sum = 9,
-  unknow = 10,
-  file_not_found = 11,
-  file_system = 12,
-  empty_file = 13,
-  access_denied = 14,
-  cursor_out_of_range = 15,
-  list_full = 16,
-  aborted = 17,
-  command_too_long = 18,
+  no_error = 0,               /**< No error */
+  time_out = 1,               /**< Timeout error */
+  data_send = 2,              /**< Data send error */
+  line_number = 3,            /**< Line number error */
+  ack_number = 4,             /**< Acknowledgement number error */
+  memory_allocation = 5,      /**< Memory allocation error */
+  too_many_resend = 6,        /**< Too many resend error */
+  number_mismatch = 7,        /**< Number mismatch error */
+  line_ignored = 8,           /**< Line ignored error */
+  check_sum = 9,              /**< Checksum error */
+  unknow = 10,                /**< Unknown error */
+  file_not_found = 11,        /**< File not found error */
+  file_system = 12,           /**< File system error */
+  empty_file = 13,            /**< Empty file error */
+  access_denied = 14,         /**< Access denied error */
+  cursor_out_of_range = 15,   /**< Cursor out of range error */
+  list_full = 16,             /**< List full error */
+  aborted = 17,               /**< Aborted error */
+  command_too_long = 18,      /**< Command too long error */
 };
 
+/**
+ * @brief Enumeration representing the stream type of the Gcode host.
+ */
 enum class ESP3DGcodeHostStreamType : uint8_t {
-  unknown,
-  single_command,
-  multiple_commands,
-  fs_stream,
-  fs_script,
-  sd_stream,
-  sd_script,
-  invalid,
+  unknown,                    /**< Unknown stream type */
+  single_command,             /**< Single command stream type */
+  multiple_commands,          /**< Multiple commands stream type */
+  fs_stream,                  /**< File system stream type */
+  fs_script,                  /**< File system script type */
+  sd_stream,                  /**< SD card stream type */
+  sd_script,                  /**< SD card script type */
+  invalid,                    /**< Invalid stream type */
 };
 
 #if ESP3D_TFT_LOG

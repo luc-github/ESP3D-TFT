@@ -85,6 +85,8 @@ enum class ESP3DLabel : uint16_t {
   ms,
   days,
   streaming_error,
+  command_error,
+  stream_error,
   unknown_index,  // must be last
 };
 

@@ -1651,12 +1651,19 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       // should we abort the stream? or go to next command in stream if any
       // ?
       // how to notify to user ?
-      esp3d_log_e("Stream is in error, cancel it");
+      esp3d_log_e("Stream is in error, cancel it %s , %s", _current_command_str.c_str(), _current_stream_ptr->dataStream);
 
       text = esp3dTranslationService.translate(ESP3DLabel::error);
       text += ": ";
-      text += esp3dTranslationService.translate(ESP3DLabel::streaming_error);
+      if (_current_stream_ptr->type  == ESP3DGcodeHostStreamType::single_command ||  _current_stream_ptr->type   == ESP3DGcodeHostStreamType::multiple_commands){
+        text += esp3dTranslationService.translate(ESP3DLabel::command_error,_current_command_str.c_str());
+      } else if (_current_stream_ptr->type  == ESP3DGcodeHostStreamType::fs_script ||  _current_stream_ptr->type  == ESP3DGcodeHostStreamType::sd_script|| _current_stream_ptr->type  == ESP3DGcodeHostStreamType::fs_stream ||  _current_stream_ptr->type  == ESP3DGcodeHostStreamType::sd_stream){
+        text += esp3dTranslationService.translate(ESP3DLabel::stream_error,  _current_stream_ptr->dataStream); 
+      } else {
+        text += esp3dTranslationService.translate(ESP3DLabel::streaming_error);
+      }
       text += " S" + std::to_string(static_cast<uint8_t>(_error));
+      text = esp3d_string::str_replace(text.c_str(), "\n", "");
       esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
                                       text.c_str());
 
@@ -1669,8 +1676,15 @@ void ESP3DGCodeHostService::_handle_stream_states() {
                              }
 
 #if ESP3D_NOTIFICATIONS_FEATURE
-      text = "Error:";
-      text += esp3dTranslationService.translate(ESP3DLabel::streaming_error);
+      text = "Error: ";
+      if (_current_stream_ptr->type  == ESP3DGcodeHostStreamType::single_command ||  _current_stream_ptr->type   == ESP3DGcodeHostStreamType::multiple_commands){
+        text += esp3dTranslationService.translate(ESP3DLabel::command_error, _current_command_str.c_str());         
+      } else if (_current_stream_ptr->type  == ESP3DGcodeHostStreamType::fs_script ||  _current_stream_ptr->type  == ESP3DGcodeHostStreamType::sd_script|| _current_stream_ptr->type  == ESP3DGcodeHostStreamType::fs_stream ||  _current_stream_ptr->type  == ESP3DGcodeHostStreamType::sd_stream){
+        text += esp3dTranslationService.translate(ESP3DLabel::stream_error,  _current_stream_ptr->dataStream); 
+      } else {
+        text += esp3dTranslationService.translate(ESP3DLabel::streaming_error);
+      }
+      text = esp3d_string::str_replace(text.c_str(), "\n", "");
       if (!esp3dNotificationsService.sendMSG(ESP3D_NOTIFICATION_TITLE,
                                              text.c_str())) {
         esp3d_log_e("Failed to send notification");

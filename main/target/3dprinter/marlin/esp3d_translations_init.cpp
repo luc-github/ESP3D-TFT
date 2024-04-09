@@ -89,5 +89,7 @@ void ESP3DTranslationService::init() {
       {ESP3DLabel::ms, "ms"},
       {ESP3DLabel::days, "days"},
       {ESP3DLabel::streaming_error, "Streaming error, operation aborted!"},
+      {ESP3DLabel::command_error, "Command failed: '%s'"},
+      {ESP3DLabel::stream_error, "Stream failed: '%s'"},
   };
 }
