@@ -147,47 +147,6 @@ The `hardware` directory contains the hardware specific files like drivers, part
 |usb_serial| OTG Host|esp3d_log| O | O | O | O | X | X | X | X |
 
 
-
-### Refactored hardware directory
-|Board| Status|
-|---|:---:|
- |ESP32_2432S028R | Ok |
- |ESP32_3248S035C | Ok |  
- |ESP32_3248S035R | Ok |
- |ESP32_ROTRICS_DEXARM35| 
- |ESP32_CUSTOM | Ok |
- |ESP32S3_4827S043C | Ok |
- |ESP32S3_8048S043C | Ok |
- |ESP32S3_8048S050C | Ok |
- |ESP32S3_8048S070C | Ok |
- |ESP32S3_BZM_TFT35_GT911 | Ok | 
- |ESP32S3_HMI43V3 |  Ok |
- |ESP32S3_ZX3D50CE02S_USRC_4832 | Ok |
- |ESP32S3_CUSTOM| Ok |
- |ESP32S3_FREENOVE_1_1| Ok |
-
-|Drivers| Status|
-|---|:---:|
-|disp_backlight|Ok|
-|disp_spi| To be reviewed|
-|ili9341 SPI|Ok|
-|ili9488 SPI|To be reviewed |
-|st7796 SPI|Ok|
-|st7796 i80|Ok|
-|st7262 RGB|Ok|
-|ili9485 RGB| Ok |
-|ek9716 RGB|Ok|
-|rm68120 i80|Ok |
-|xpt2046 SPI|Ok|
-|ft5x06 ic2|Ok|
-|gt911 ic2 |Ok|
-|tca9554|Ok|
-|i2c_bus|Ok|
-|spi_bus|Ok|
-|sw_spi| Ok |
-|usb_serial|Ok| 
-
-
 ### Bus drivers
 * spi_bus driver
 The `spi_bus` driver is a SPI bus driver that is used to control the SPI bus. The `spi_bus` driver configuration is part of display driver configuration.
@@ -962,3 +921,48 @@ const esp32_camera_config_t camera_config = {
     .contrast = 0,  // default value is 0
 } ;
 ```
+
+#### main directory
+
+The main directory contains the main application code. The main application code is the code that is executed when the application is started. The main application code is responsible for initializing the application and starting the application tasks. The main application code is also responsible for handling the application events and updating the application state.
+
+The main application code is typically organized into the following files:
+* core directory, which contains the main application code, all common functions and  ESP3D commands.
+  the core directory contains the following files:
+    * commands directory that contains the ESP3D commands.
+    * includes directory that contains the includes files of the core files
+    * esp3d_client.cpp file that contains the internal messaging API
+    * esp3d_commands.cpp file that contains the handle the ESP3D commands and also the API for the commands
+    * esp3d_hal.cpp file that contains the hardware abstraction layer API for all supported hardware
+    * esp3d_json_settings.cpp file that contains the API for reading setting from the JSON file like preferences.json
+    * esp3d_string.h file that contains the helpers to manipulate strings and char arrays
+    * esp3d_tft.cpp file that contains the core initialization of the main program
+    * esp3d_values.cpp file that contains the API for storing and dispaching the values used on TFT
+
+* display directory, which contain the UI code for the TFT display.
+  the display directory contains the following files:
+    *  esp3d_tft.ui.cpp file that contains the UI code for the TFT display
+    *  esp3d_tft.ui.h file that contains the header code for the TFT display
+    * components directory that contains the UI common components for the TFT display
+    * 3dprinter directory that contains the UI code for the 3D printer TFT display
+      this directory contaain one directory for each targeted firmware:
+        * marlin directory that contains the UI code for the Marlin TFT display
+        * repetier directory that contains the UI code for the Repetier TFT display
+        * smoothieware directory that contains the UI code for the Smoothieware TFT display
+
+        each target directory contain the ui code, the style to be used , the resources for each resolution and the screens to be displayed :
+           * res_320_240 directory that contains the resources for the 320x240 resolution
+             Each resolution directory contains the following files:
+                * esp3d_style.h file that contains the specific style to be used on this resolution
+                * logo_320_240.h file that contains the logo to be displayed on the TFT display at this resolution
+           * res_480_272 directory that contains the resources for the 480x272 resolution
+           * res_480_320 directory that contains the resources for the 480x320 resolution
+           * res_800_480 directory that contains the resources for the 800x480 resolution
+           * screens directory that contains the screens to be displayed on the TFT display
+           * esp3d_style.cpp/.h files that contains the common style to be used on the TFT display
+           * esp3d_tft_ui.cpp file that contains the main UI code for the TFT display
+
+    * cnc directory that contains the UI code for the CNC TFT display
+      Same as above but for the CNC firmware
+
+

@@ -89,6 +89,13 @@ void splash_screen() {
   lv_label_set_text(label, "V" ESP3D_TFT_VERSION);
   apply_style(label, ESP3DStyleType::bg_label);
   lv_obj_align(label, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
+
+  //Set Target fw
+  lv_obj_t *labelFw = lv_label_create(ui_Screen);
+  // Set FW text
+  lv_label_set_text(labelFw, "Marlin");
+  apply_style(labelFw, ESP3DStyleType::bg_label);
+  lv_obj_align(labelFw, LV_ALIGN_BOTTOM_LEFT, 10, -10);
   // Set timer to switch to main screen
   boot_timer = lv_timer_create(main_screen_timer_cb, 2000, NULL);
   esp3dTftui.set_current_screen(ESP3DScreenType::splash);
