@@ -157,7 +157,7 @@ esp_err_t bsp_init(void) {
   disp_drv.ver_res = DISP_VER_RES_MAX;
   lv_disp_drv_register(&disp_drv);
 
-  if (has_touch_init) {
+  if (has_touch_init &&  0) {
     /* Register the touch input device */
     static lv_indev_drv_t indev_drv;
     lv_indev_drv_init(&indev_drv);
