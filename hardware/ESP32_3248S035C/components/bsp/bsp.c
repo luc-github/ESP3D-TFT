@@ -83,6 +83,24 @@ esp_err_t bsp_init(void) {
     return ESP_FAIL;
   }
 
+  /* SPI master initialization */
+  esp3d_log("Initializing SPI master (display,touch)...");
+  if (display_spi_st7262_cfg.spi_bus_config.is_master) {
+    esp_spi_bus_st7262_config_t *spi_cfg =
+        &(display_spi_st7262_cfg.spi_bus_config);
+    esp3d_log("Initializing SPI master (display)...");
+    err = spi_bus_init(spi_cfg->spi_host_index, spi_cfg->pin_miso,
+                       spi_cfg->pin_mosi, spi_cfg->pin_clk,
+                       spi_cfg->max_transfer_sz, spi_cfg->dma_channel,
+                       spi_cfg->quadwp_io_num, spi_cfg->quadhd_io_num);
+    if (err != ESP_OK) {
+      {
+        esp3d_log_e("Failed to initialize SPI master (display)");
+        return err;
+      }
+    }
+  }
+
   esp3d_log("Attaching display panel to SPI bus...");
   esp_lcd_panel_io_handle_t disp_io_handle;
   display_spi_st7262_cfg.disp_spi_cfg.on_color_trans_done = disp_flush_ready;
@@ -157,7 +175,7 @@ esp_err_t bsp_init(void) {
   disp_drv.ver_res = DISP_VER_RES_MAX;
   lv_disp_drv_register(&disp_drv);
 
-  if (has_touch_init &&  0) {
+  if (has_touch_init) {
     /* Register the touch input device */
     static lv_indev_drv_t indev_drv;
     lv_indev_drv_init(&indev_drv);
