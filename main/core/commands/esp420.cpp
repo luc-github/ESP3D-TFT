@@ -589,7 +589,7 @@ void ESP3DCommands::ESP420(int cmd_params_pos, ESP3DMessage *msg) {
     // camera name
     tmpstr = esp3d_camera.GetModelString();
     tmpstr += "(";
-    tmpstr += esp3d_camera.GetModel();
+    tmpstr += std::to_string(esp3d_camera.GetModel());
     tmpstr += ")";
 
     if (!dispatchIdValue(json, "camera name", tmpstr.c_str(), target,
