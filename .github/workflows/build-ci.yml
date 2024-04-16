@@ -31,12 +31,12 @@ jobs:
         env:
           STEPS_CONTEXT: ${{ toJson(steps) }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        if: steps.ESP32S3FREENOVE.outcome == 'failure' || steps.ESP32ROTRICSDEXARM35.outcome == 'failure'|| steps.ESP32S3HMI43V3.outcome == 'failure'|| steps.ZX3D50CE02SRC4832.outcome == 'failure' || steps.ESP32S38048S070C.outcome == 'failure'
+        if: steps.ESP32S3FREENOVE.outcome == 'failure' || steps.ESP32S3HMI43V3.outcome == 'failure'|| steps.ZX3D50CE02SRC4832.outcome == 'failure' || steps.ESP32S38048S070C.outcome == 'failure'
         run: bash ./.github/ci/final-check.sh "$GITHUB_RUN_ID" "failure"
-      - name: Final check failure
+      - name: Final check success
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        if: steps.ESP32S3FREENOVE.outcome == 'success' && steps.ESP32ROTRICSDEXARM35.outcome == 'success' && steps.ESP32S3HMI43V3.outcome == 'success' && steps.ZX3D50CE02SRC4832.outcome == 'success' && steps.ESP32S38048S070C.outcome == 'success'
+        if: steps.ESP32S3FREENOVE.outcome == 'success' && steps.ESP32S3HMI43V3.outcome == 'success' && steps.ZX3D50CE02SRC4832.outcome == 'success' && steps.ESP32S38048S070C.outcome == 'success'
         run: bash ./.github/ci/final-check.sh "$GITHUB_RUN_ID" "success"
      
 
