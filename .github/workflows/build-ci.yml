@@ -3,7 +3,7 @@ name: build-ci
 on: [pull_request, push]
 
 jobs:
-  build:
+  checkout:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -11,33 +11,50 @@ jobs:
           submodules: 'recursive'
       - name: esp-idf setup
         run: bash ./.github/ci/idf-setup.sh
-      - name: build ESP32S3_FREENOVE
-        id: ESP32S3FREENOVE
-        run: bash ./.github/ci/ESP32S3_FREENOVE.sh
+      - uses: actions/upload-artifact@v3
+        with:
+          name: esp-idf
+          path: esp-idf
+      - uses: actions/upload-artifact@v3  
+        with:
+          name: project
+          path: .
+
+  build:
+    runs-on: ubuntu-latest
+    needs: checkout
+    strategy:
+      matrix:
+        platform: [ESP32S3_FREENOVE, ESP32S3_HMI43V3, ZX3D50CE02S-SRC-4832, ESP32S3_8048S070C]
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: esp-idf
+          path: esp-idf
+      - uses: actions/download-artifact@v3
+        with:
+          name: project
+          path: .  
+      - name: build ${{ matrix.platform }}
+        run: bash ./.github/ci/${{ matrix.platform }}.sh
         continue-on-error: true
-      - name: build ESP32S3_HMI43V3
-        id: ESP32S3HMI43V3
-        run: bash ./.github/ci/ESP32S3_HMI43V3.sh
-        continue-on-error: true
-      - name: build ZX3D50CE02S-SRC-4832
-        id: ZX3D50CE02SRC4832
-        run: bash ./.github/ci/ZX3D50CE02S-SRC-4832.sh
-        continue-on-error: true
-      - name: build ESP32S3_8048S070C
-        id: ESP32S38048S070C
-        run: bash ./.github/ci/ESP32S3_8048S070C.sh
-        continue-on-error: true
-      - name: Final check failure
+      - name: mark ${{ matrix.platform }} error
+        if: failure()
+        run: echo "BUILD_ERROR=1" >> $GITHUB_ENV
+        
+  finalize:
+    runs-on: ubuntu-latest 
+    needs: build
+    if: always()
+    steps:
+      - name: Final check
         env:
-          STEPS_CONTEXT: ${{ toJson(steps) }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        if: steps.ESP32S3FREENOVE.outcome == 'failure' || steps.ESP32S3HMI43V3.outcome == 'failure'|| steps.ZX3D50CE02SRC4832.outcome == 'failure' || steps.ESP32S38048S070C.outcome == 'failure'
-        run: bash ./.github/ci/final-check.sh "$GITHUB_RUN_ID" "failure"
-      - name: Final check success
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        if: steps.ESP32S3FREENOVE.outcome == 'success' && steps.ESP32S3HMI43V3.outcome == 'success' && steps.ZX3D50CE02SRC4832.outcome == 'success' && steps.ESP32S38048S070C.outcome == 'success'
-        run: bash ./.github/ci/final-check.sh "$GITHUB_RUN_ID" "success"
-     
+        run: |  
+          if [ "${{ env.BUILD_ERROR }}" -ne "0" ]; then
+            bash ./.github/ci/final-check.sh "$GITHUB_RUN_ID" "failure"
+          else  
+            bash ./.github/ci/final-check.sh "$GITHUB_RUN_ID" "success"
+          fi
 
 
