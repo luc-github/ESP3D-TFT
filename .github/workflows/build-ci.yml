@@ -9,7 +9,7 @@ jobs:
   esp-idf:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3.6.0
+      - uses: actions/checkout@v4.0.0
       - name: Get IDF Setup Hash
         id: idf-setup-hash
         run: echo "hash=$(md5sum ./.github/ci/idf-setup.sh | awk '{ print $1 }')" >> $GITHUB_OUTPUT
@@ -24,7 +24,7 @@ jobs:
         run: bash ./.github/ci/idf-setup.sh
       - name: Create ESP-IDF Archive
         run: zip -r esp-idf.zip esp-idf
-      - uses: actions/upload-artifact@v3.1.2
+      - uses: actions/upload-artifact@v4.0.0
         with:
           name: esp-idf
           path: esp-idf.zip
@@ -36,7 +36,7 @@ jobs:
       matrix:
         platform: [ESP32S3_FREENOVE, ESP32S3_HMI43V3, ZX3D50CE02S-SRC-4832, ESP32S3_8048S070C, ESP32_ROTRICS_DEXARM35, ESP32_2432S028R]
     steps:
-      - uses: actions/checkout@v3.6.0
+      - uses: actions/checkout@v4.0.0
         with:
           submodules: 'recursive'
       - uses: actions/download-artifact@v3
@@ -63,7 +63,7 @@ jobs:
     needs: build
     if: always()
     steps:
-      - uses: actions/checkout@v3.6.0
+      - uses: actions/checkout@v4.0.0
       - name: Final check
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
