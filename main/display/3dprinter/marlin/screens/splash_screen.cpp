@@ -30,6 +30,7 @@
 
 extern "C" lv_img_dsc_t *get_splash_logo();
 extern "C" void release_splash_logo(lv_img_dsc_t *splash_logo);
+LV_IMG_DECLARE(Marlin_Logo);
 
 /**********************
  *  STATIC PROTOTYPES
@@ -83,6 +84,11 @@ void splash_screen() {
     lv_obj_center(logo);
   }
 
+  //Marlin Logo
+  lv_obj_t *logo_marlin = lv_img_create(ui_Screen);
+  lv_img_set_src(logo_marlin, &Marlin_Logo);
+  lv_obj_align(logo_marlin, LV_ALIGN_BOTTOM_LEFT, FW_LOGO_X, FW_LOGO_Y);
+
   // Create version text object
   lv_obj_t *label = lv_label_create(ui_Screen);
   // Set version text
@@ -90,12 +96,6 @@ void splash_screen() {
   apply_style(label, ESP3DStyleType::bg_label);
   lv_obj_align(label, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
 
-  //Set Target fw
-  lv_obj_t *labelFw = lv_label_create(ui_Screen);
-  // Set FW text
-  lv_label_set_text(labelFw, "Marlin");
-  apply_style(labelFw, ESP3DStyleType::bg_label);
-  lv_obj_align(labelFw, LV_ALIGN_BOTTOM_LEFT, 10, -10);
   // Set timer to switch to main screen
   boot_timer = lv_timer_create(main_screen_timer_cb, 2000, NULL);
   esp3dTftui.set_current_screen(ESP3DScreenType::splash);

@@ -4,6 +4,7 @@ set -e
 cd $GITHUB_WORKSPACE/esp-idf
 source ./export.sh
 cd $GITHUB_WORKSPACE
+idf.py fullclean
 sed -i '1,32s/ ON/ OFF/g' ./CMakeLists.txt
 sed -i '1,32s/OPTION(ESP32_ROTRICS_DEXARM35 "TFT TARGET is ESP32 Rotrics DexArm 3.5inches" OFF/OPTION(ESP32_ROTRICS_DEXARM35 "TFT TARGET is ESP32 Rotrics DexArm 3.5inches" ON/g' ./CMakeLists.txt
 idf.py fullclean
