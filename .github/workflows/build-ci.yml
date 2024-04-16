@@ -34,7 +34,7 @@ jobs:
     needs: esp-idf
     strategy:
       matrix:
-        platform: [ESP32S3_FREENOVE, ESP32S3_HMI43V3, ZX3D50CE02S-SRC-4832, ESP32S3_8048S070C, ESP32_ROTRICS_DEXARM35]
+        platform: [ESP32S3_FREENOVE, ESP32S3_HMI43V3, ZX3D50CE02S-SRC-4832, ESP32S3_8048S070C, ESP32_ROTRICS_DEXARM35, ESP32_2432S028R]
     steps:
       - uses: actions/checkout@v3
         with:
