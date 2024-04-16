@@ -44,6 +44,10 @@ jobs:
           name: esp-idf
       - name: Unzip ESP-IDF
         run: unzip esp-idf.zip
+      - name: Install ESP-IDF Tools
+        run: |
+          cd esp-idf
+          ./install.sh
       - name: Build ${{ matrix.platform }}
         run: |
           source esp-idf/export.sh
