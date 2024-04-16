@@ -27,10 +27,6 @@ jobs:
         id: ESP32S38048S070C
         run: bash ./.github/ci/ESP32S3_8048S070C.sh
         continue-on-error: true
-      - name: build ESP32_ROTRICS_DEXARM35
-        id: ESP32ROTRICSDEXARM35
-        run: bash ./.github/ci/ESP32_ROTRICS_DEXARM35.sh
-        continue-on-error: true
       - name: Final check failure
         env:
           STEPS_CONTEXT: ${{ toJson(steps) }}
