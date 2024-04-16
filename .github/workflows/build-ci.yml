@@ -15,7 +15,7 @@ jobs:
         run: echo "hash=$(md5sum ./.github/ci/idf-setup.sh | awk '{ print $1 }')" >> $GITHUB_OUTPUT
       - name: Cache ESP-IDF
         id: cache-esp-idf
-        uses: actions/cache@v3.5.2
+        uses: actions/cache@v4.0.0
         with:
           path: esp-idf
           key: ${{ runner.os }}-esp-idf-${{ steps.idf-setup-hash.outputs.hash }}
