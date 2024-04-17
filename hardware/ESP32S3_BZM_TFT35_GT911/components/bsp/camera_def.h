@@ -59,7 +59,7 @@ const esp32_camera_config_t camera_config = {
             .conv_mode = 0, /*!< RGB<->YUV Conversion mode */
 #endif
 
-            .sccb_i2c_port = 0, /*!< If pin_sccb_sda is -1, use the already
+            .sccb_i2c_port = 1, /*!< If pin_sccb_sda is -1, use the already
                                    configured I2C bus by number */
         },
     .pin_pullup_1 = -1, /* if any need */
