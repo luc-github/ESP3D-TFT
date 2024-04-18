@@ -1106,3 +1106,5 @@ The scripts directory contains the scripts used to build the firmware. The scrip
        |0xf544|AUTOMATIC|fa-solid-900.ttf|
     
 
+![](symbols_1.png)    
+![](symbols_2.png)
