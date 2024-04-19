@@ -76,7 +76,7 @@
 #define CAMERA_HANDLER_CNT 1
 #else
 #define CAMERA_HANDLER_CNT 0
-#endif // ESP3D_CAMERA_FEATURE
+#endif  // ESP3D_CAMERA_FEATURE
 
 ESP3DHttpService esp3dHttpService;
 
@@ -179,7 +179,9 @@ const char *ESP3DHttpService::getArg(httpd_req_t *req, const char *argname) {
 ESP3DHttpService::ESP3DHttpService() {
   _started = false;
   _server = nullptr;
+#if ESP3D_WEBDAV_SERVICES_FEATURE
   _webdav_active = false;
+#endif  // ESP3D_WEBDAV_SERVICES_FEATURE
   _post_files_upload_ctx.status = ESP3DUploadStatus::not_started;
 #if ESP3D_SD_CARD_FEATURE
   _post_sdfiles_upload_ctx.status = ESP3DUploadStatus::not_started;
@@ -405,17 +407,15 @@ bool ESP3DHttpService::begin() {
     const httpd_uri_t config_handler_camera = {
         .uri = "/snap",
         .method = HTTP_GET,
-        .handler =
-            (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.snap_handler),
+        .handler = (esp_err_t(*)(httpd_req_t *))(esp3dHttpService.snap_handler),
         .user_ctx = nullptr,
         .is_websocket = false,
         .handle_ws_control_frames = false,
         .supported_subprotocol = nullptr};
-    if (ESP_OK != httpd_register_uri_handler(_server, &config_handler_camera))
-    {
+    if (ESP_OK != httpd_register_uri_handler(_server, &config_handler_camera)) {
       esp3d_log_e("camera handler registration failed");
     }
-#endif // ESP3D_CAMERA_FEATURE
+#endif  // ESP3D_CAMERA_FEATURE
 
 #if ESP3D_UPDATE_FEATURE
     // updatefw upload (POST data)
@@ -678,19 +678,25 @@ bool ESP3DHttpService::begin() {
 void ESP3DHttpService::handle() {}
 
 bool ESP3DHttpService::webdavActive(bool fromSettings) {
+#if ESP3D_WEBDAV_SERVICES_FEATURE
   if (fromSettings) {
     _webdav_active = (ESP3DState)esp3dTftsettings.readByte(
                          ESP3DSettingIndex::esp3d_webdav_on) == ESP3DState::on;
   }
 
   return _webdav_active;
+#else
+  return false;
+#endif  // ESP3D_WEBDAV_SERVICES_FEATURE
 }
 
 void ESP3DHttpService::end() {
   if (!_started && !_server) {
     return;
   }
+#if ESP3D_WEBDAV_SERVICES_FEATURE
   _webdav_active = false;
+#endif  // ESP3D_WEBDAV_SERVICES_FEATURE
   esp3d_log("Stop Http Service");
   if (_server) {
     esp3dWsWebUiService.end();

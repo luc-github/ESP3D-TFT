@@ -965,4 +965,146 @@ The main application code is typically organized into the following files:
     * cnc directory that contains the UI code for the CNC TFT display
       Same as above but for the CNC firmware
 
+* embedded directory, which contains the embedded resources for the ESP32.
+  the embedded directory contains the following files:
+    * favicon.ico.gz file that contains the favicon for the web interface
+    * index.html.gz file that contains the index page for the web interface
 
+* modules directory, which contains the modules code for the TFT display. each subdirectory contains the code for a specific module / feature.
+  the modules directory contains the following files:
+    * authentication directory that contains the code for the authentication feature
+    * camera directory that contains the code for the camera feature
+    * config_files directory that contains the code for the config files feature, which allow to apply settings using ini file
+    * filesystem directory that contains the code for the filesystem feature: SD and flash
+    * gcode_host directory that contains the code for the gcode streaming feature
+    * http directory that contains the code for the http server feature, the different handlers for the web interface are splited in different subdirectories / files according usage \
+       * authentication directory that contains the authentication handlers
+       * camera directory that contains the camera handler
+       * flash directory that contains the flash files management handler
+       * sd directory that contains the sd files managment handler
+       * ssdp directory that contains the ssdp service handler
+       * update directory that contains the firmware update handler
+       * webdav directory that contains the webdav protocol handler
+       * ws directory that contains the websocket handler (data only not webui)
+       * esp3d_commands.cpp file that handle the web commands handler
+       * esp3d_config.cpp file that handle the config handler (shortcut to [ESP420])
+       * esp3d_favicon.cpp file that handle the favicon handler
+       * esp3d_file_not_found.cpp file that handle the file not found handler (which also handle the download of the files)
+       * esp3d_root.cpp file that handle the root handler (including the maintenance mode)
+       * esp3d_websocket_webui.cpp file that handle the websocket handler for the webui
+    * mdns directory that contains the code for the mdns feature
+    * network directory that contains the code for the network feature 
+    * notifications directory that contains the code for the notifications feature
+    * rendering directory that contains the code for the renderer feature (Display)
+    * serial directory that contains the code for the serial communications feature
+    * socket_server directory that contains the code for the socket server feature (Telnet)
+    * ssdp directory that contains the code for the ssdp protocol feature
+    * time directory that contains the code for the time feature (NTP)
+    * translation directory that contains the code for the translation feature
+    * update directory that contains the code for the update feature
+    * usb_serial directory that contains the code for the usb serial feature (OTG)
+    * webdav directory that contains the code for the webdav protocol feature
+    * websocket directory that contains the code for the websocket feature (webui and data)
+
+
+* target directory, which contains the target code specific actions. each subdirectory contains the code for a specific target.
+  the target directory contains the following files:
+  * 3dprinter directory that contains the code for the 3D printer target:
+    * marlin directory that contains the code for the Marlin target
+    * repetier directory that contains the code for the Repetier target
+    * smoothieware directory that contains the code for the Smoothieware target
+* cnc directory that contains the code for the CNC target:
+    * grbl directory that contains the code for the Grbl target
+
+
+
+
+#### scripts directory
+
+The scripts directory contains the scripts used to build the firmware. The scripts directory contains the following files / directories:
+
+* fonts_builder directory that contains the scripts used to build the fonts for the TFT display
+   the scripts will build the c code for the fonts to be used on the TFT display, the gerenated files will be placed in the fonts directory
+   The generated sizes are "8","10","12","14","16","18","20","22","24","26","28","30","32","34","36","38","40","42","44","46","48" pixels.
+   * It use Montserrat-Medium.ttf as base font:
+    - Generic chars are from 0x20 to 0x7F and with 0xB0.
+    - French chars are 0xE0,0xE7,0xE8,0xE9,0xEA,0xF4
+   * I use also FreeSerifBold.ttf  0x2022 char
+   * for the symbols I use Font fa-solid-900 and fa-brands-400.ttf:
+      |code|SYMBOL|font|
+      |-|-|-|
+       |0xe568|HEAT_BED|fa-solid-900.ttf|
+       |0xf2c9|EXTRUDER|fa-solid-900.ttf|
+       |0xf0ca|LIST|fa-solid-900.ttf|
+       |0xf715|SLASH|fa-solid-900.ttf|
+       |0xf012|STATION_MODE|fa-solid-900.ttf|
+       |0xf519|ACCESS_POINT|fa-solid-900.ttf|
+       |0xf00c|OK|fa-solid-900.ttf|
+       |0xe596|PROBE_CHECK|fa-solid-900.ttf|
+       |0xf00d|CLOSE|fa-solid-900.ttf|
+       |0xf011|POWER|fa-solid-900.ttf|
+       |0xf028|VOLUME_HIGH|fa-solid-900.ttf|
+       |0xf027|VOLUME_LOW|fa-solid-900.ttf|
+       |0xf6a9|VOLUME_OFF|fa-solid-900.ttf|
+       |0xf013|SETTINGS|fa-solid-900.ttf|
+       |0xf2d1|NO_HEAT_BED|fa-solid-900.ttf|
+       |0xe040|HEAT_EXTRUDER|fa-solid-900.ttf|
+       |0xf2ed|TRASH|fa-solid-900.ttf|
+       |0xe3af|HOME|fa-solid-900.ttf|
+       |0xf019|DOWNLOAD|fa-solid-900.ttf|
+       |0xf021|REFRESH|fa-solid-900.ttf|
+       |0xf304|EDIT|fa-solid-900.ttf|
+       |0xf048|PREVIOUS|fa-solid-900.ttf|
+       |0xf051|NEXT|fa-solid-900.ttf|
+       |0xf04b|PLAY|fa-solid-900.ttf|
+       |0xf04c|PAUSE|fa-solid-900.ttf|
+       |0xf0c7|SAVE|fa-solid-900.ttf|
+       |0xf0e0|MESSAGE|fa-solid-900.ttf|
+       |0xf0e7|LASER|fa-solid-900.ttf|
+       |0xf76f|VACCUM|fa-solid-900.ttf|
+       |0xf1f6|DISABLE_ALERT|fa-solid-900.ttf|
+       |0xf023|LOCK|fa-solid-900.ttf|
+       |0xf2dc|COOLANT|fa-solid-900.ttf|
+       |0xf04d|STOP|fa-solid-900.ttf|
+       |0xf1eb|WIFI|fa-solid-900.ttf|
+       |0xf071|WARNING|fa-solid-900.ttf|
+       |0xf07b|FOLDER|fa-solid-900.ttf|
+       |0xf15b|FILE|fa-solid-900.ttf|
+       |0xf11c|KEYBOARD|fa-solid-900.ttf|
+       |0xf55a|BACKSPACE|fa-solid-900.ttf|
+       |0xf7c2|SD_CARD|fa-solid-900.ttf|
+       |0xf0b2|JOG|fa-solid-900.ttf|
+       |0xf077|UP|fa-solid-900.ttf|
+       |0xf078|DOWN|fa-solid-900.ttf|
+       |0xf053|LEFT|fa-solid-900.ttf|
+       |0xf054|RIGHT|fa-solid-900.ttf|
+       |0xf120|COMMAND|fa-solid-900.ttf|
+       |0xf624|GAUGE|fa-solid-900.ttf|
+       |0xf1ab|LANGUAGE|fa-solid-900.ttf|
+       |0xf863|FAN|fa-solid-900.ttf|
+       |0xf48b|SPEED|fa-solid-900.ttf|
+       |0xf72b|WIZARD|fa-solid-900.ttf|
+       |0xf185|LIGHT|fa-solid-900.ttf|
+       |0xf5c1|ENGINE|fa-solid-900.ttf|
+       |0xf5fd|LAYERS|fa-solid-900.ttf|
+       |0xe4b8|LEVELING|fa-solid-900.ttf|
+       |0xf4db|FILAMENT|fa-solid-900.ttf|
+       |0xe4bd|CENTER|fa-solid-900.ttf|
+       |0xf002|SEARCH|fa-solid-900.ttf|
+       |0xf4d7|FILAMENT_SENSOR|fa-solid-900.ttf|
+       |0xf2cc|MIST|fa-solid-900.ttf|
+       |0xf13e|UNLOCK|fa-solid-900.ttf|
+       |0xf192|LASER_2|fa-solid-900.ttf|
+       |0xe4c3|MILLING|fa-solid-900.ttf|
+       |0xf3e5|NEW_LINE|fa-solid-900.ttf|
+       |0xf293|BLUETOOTH|fa-brands-400.ttf|
+       |0xf287|USB|fa-brands-400.ttf|
+       |0xf0a1|MORE_INFO|fa-solid-900.ttf|
+       |0xf055|PLUS|fa-solid-900.ttf|
+       |0xf056|MINUS|fa-solid-900.ttf|
+       |0xf256|MANUAL|fa-solid-900.ttf|
+       |0xf544|AUTOMATIC|fa-solid-900.ttf|
+    
+
+![](symbols_1.png)    
+![](symbols_2.png)

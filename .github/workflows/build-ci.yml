@@ -1,0 +1,75 @@
+name: build-ci
+
+on: [pull_request, push]
+
+env:
+  BUILD_ERROR: 0
+
+jobs:
+  esp-idf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.0.0
+      - name: Get IDF Setup Hash
+        id: idf-setup-hash
+        run: echo "hash=$(md5sum ./.github/ci/idf-setup.sh | awk '{ print $1 }')" >> $GITHUB_OUTPUT
+      - name: Cache ESP-IDF
+        id: cache-esp-idf
+        uses: actions/cache@v4.0.0
+        with:
+          path: esp-idf
+          key: ${{ runner.os }}-esp-idf-${{ steps.idf-setup-hash.outputs.hash }}
+      - name: Run IDF Setup
+        if: steps.cache-esp-idf.outputs.cache-hit != 'true'
+        run: bash ./.github/ci/idf-setup.sh
+      - name: Create ESP-IDF Archive
+        run: zip -r esp-idf.zip esp-idf
+      - uses: actions/upload-artifact@v4.0.0
+        with:
+          name: esp-idf
+          path: esp-idf.zip
+
+  build:
+    runs-on: ubuntu-latest
+    needs: esp-idf
+    strategy:
+      matrix:
+        platform: [ESP32S3_FREENOVE, ESP32S3_HMI43V3, ZX3D50CE02S-SRC-4832, ESP32S3_8048S070C, ESP32_ROTRICS_DEXARM35, ESP32_2432S028R]
+    steps:
+      - uses: actions/checkout@v4.0.0
+        with:
+          submodules: 'recursive'
+      - uses: actions/download-artifact@v4.0.0
+        with:
+          name: esp-idf
+      - name: Unzip ESP-IDF
+        run: unzip esp-idf.zip
+      - name: Install ESP-IDF Tools
+        run: |
+          cd esp-idf
+          ./install.sh
+      - name: Build ${{ matrix.platform }}
+        run: |
+          source esp-idf/export.sh
+          idf.py fullclean
+          bash ./.github/ci/${{ matrix.platform }}.sh
+        continue-on-error: true
+      - name: Mark ${{ matrix.platform }} error
+        if: failure()
+        run: echo "BUILD_ERROR=1" >> $GITHUB_ENV
+
+  finalize:
+    runs-on: ubuntu-latest
+    needs: build
+    if: always()
+    steps:
+      - uses: actions/checkout@v4.0.0
+      - name: Final check
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          if [ "${{ env.BUILD_ERROR }}" -ne "0" ]; then
+            bash ./.github/ci/final-check.sh "$GITHUB_RUN_ID" "failure"
+          else
+            bash ./.github/ci/final-check.sh "$GITHUB_RUN_ID" "success"
+          fi

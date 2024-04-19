@@ -107,16 +107,8 @@ esp_err_t bsp_deinit_usb(void)
  */
 esp_err_t bsp_init(void)
 {
-
 #if ESP3D_DISPLAY_FEATURE
-  /* i2c controller initialization */
-  esp3d_log("Initializing i2C controller...");
-  i2c_bus_handle = i2c_bus_create(I2C_PORT_NUMBER, &i2c_cfg);
-  if (i2c_bus_handle == NULL)
-  {
-    esp3d_log_e("I2C bus initialization failed!");
-    return ESP_FAIL;
-  }
+
   /* Display backlight initialization */
   disp_backlight_t *bcklt_handle = NULL;
   esp3d_log("Initializing display backlight...");
@@ -150,18 +142,6 @@ esp_err_t bsp_init(void)
       }
     }
   }
-#endif // ESP3D_DISPLAY_FEATURE
-#if ESP3D_USB_SERIAL_FEATURE
-  // NOTE:
-  // this location allows usb-host driver to be installed - later it will failed
-  // Do not know why...
-  if (usb_serial_init() != ESP_OK)
-  {
-    return ESP_FAIL;
-  }
-#endif // ESP3D_USB_SERIAL_FEATURE
-#if ESP3D_DISPLAY_FEATURE
-
   esp3d_log("Attaching display panel to SPI bus...");
   esp_lcd_panel_io_handle_t disp_io_handle;
   display_spi_st7262_cfg.disp_spi_cfg.on_color_trans_done = disp_flush_ready;
@@ -183,7 +163,25 @@ esp_err_t bsp_init(void)
     return ESP_FAIL;
   }
 
+  /* i2c controller initialization */
+  esp3d_log("Initializing i2C controller...");
+  i2c_bus_handle = i2c_bus_create(I2C_PORT_NUMBER, &i2c_cfg);
+  if (i2c_bus_handle == NULL)
+  {
+    esp3d_log_e("I2C bus initialization failed!");
+    return ESP_FAIL;
+  }
 #endif // ESP3D_DISPLAY_FEATURE
+
+#if ESP3D_USB_SERIAL_FEATURE
+  // NOTE:
+  // this location allows usb-host driver to be installed - later it will failed
+  // Do not know why...
+  if (usb_serial_init() != ESP_OK)
+  {
+    return ESP_FAIL;
+  }
+#endif // ESP3D_USB_SERIAL_FEATURE
 
 #if ESP3D_CAMERA_FEATURE
   if (esp32_camera_init(&camera_config) != ESP_OK)
@@ -259,7 +257,6 @@ esp_err_t bsp_init(void)
     lv_indev_drv_register(&indev_drv);
   }
 #endif // ESP3D_DISPLAY_FEATURE
-
   return ESP_OK;
 }
 
