@@ -29,17 +29,21 @@ ESP3DGCodeParserService esp3dGcodeParser;
 const char* emmergencyGcodeCommand[] = {"M112", "M410", "M999"};
 const char* emmergencyESP3DCommand[] = {"[ESP701]"};
 const char* pollingCommands[] = {
-    "?",  // status
+    "M105",  // Temperatures
+    "M114",  // Positions
+    "M220",  // Speed
 };
 
 uint64_t pollingCommandsLastUpdate[] = {
-    0,  // status
+    0,  // Temperatures
+    0,  // Positions
+    0,  // Speed
 };
 
 const char* screenCommands[] = {"M117",  // TFT screen output
                                 ""};
 const char* no_ack_commands[] = {  // Commands that do not need an ack
-    "?"};
+    ""};
 
 const char* fwCommands[] = {"M110 N0",  // reset stream numbering
                             ""};
@@ -457,7 +461,7 @@ ESP3DDataType ESP3DGCodeParserService::getType(const char* data) {
       strstr(ptr, "heating") == ptr || strstr(ptr, "echo:busy") == ptr ||
       strstr(ptr, "echo:processing") == ptr ||
       strstr(ptr, "echo:heating") == ptr) {
-    esp3d_log("Status: %s", esp3d_string::str_trim(ptr).c_str());
+    esp3d_log("Status: %s", esp3d_string::str_trim(ptr));
     return ESP3DDataType::status;
   }
   /*

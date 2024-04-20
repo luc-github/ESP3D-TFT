@@ -5,11 +5,11 @@
 #define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
-#ifndef LV_ATTRIBUTE_IMG_MARLIN_LOGO
-#define LV_ATTRIBUTE_IMG_MARLIN_LOGO
+#ifndef LV_ATTRIBUTE_IMG_TARGET_FW_LOGO
+#define LV_ATTRIBUTE_IMG_TARGET_FW_LOGO
 #endif
 
-const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_MARLIN_LOGO uint8_t Marlin_Logo_map[] = {
+const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_TARGET_FW_LOGO uint8_t target_fw_logo_map[] = {
   0xfe, 0xfe, 0xfe, 0xff, 	/*Color of index 0*/
   0x23, 0x23, 0x23, 0xff, 	/*Color of index 1*/
   0x0a, 0x0a, 0x0a, 0xff, 	/*Color of index 2*/
@@ -52,12 +52,12 @@ const LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMG_MARLIN_LO
   0xfe, 0x50, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x6f, 0xc0, 
 };
 
-const lv_img_dsc_t Marlin_Logo = {
+const lv_img_dsc_t target_fw_logo = {
   .header.cf = LV_IMG_CF_INDEXED_2BIT,
   .header.always_zero = 0,
   .header.reserved = 0,
   .header.w = 105,
   .header.h = 35,
   .data_size = 961,
-  .data = Marlin_Logo_map,
+  .data = target_fw_logo_map,
 };

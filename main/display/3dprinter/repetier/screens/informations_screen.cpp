@@ -174,6 +174,10 @@ void informations_screen() {
   addInformationToList(ui_info_list_ctl, ESP3DLabel::flash_type,
                        flashFs.getFileSystemName());
 
+//Target fw
+  addInformationToList(ui_info_list_ctl, ESP3DLabel::target_firmware,
+                       "Repertier"); 
+
   esp3dTftui.set_current_screen(ESP3DScreenType::informations);
 }
 }  // namespace informationsScreen

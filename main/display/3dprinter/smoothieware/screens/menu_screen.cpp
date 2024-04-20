@@ -270,11 +270,12 @@ void menu_screen() {
   lv_obj_add_event_cb(main_btn_leveling, event_button_leveling_handler,
                       LV_EVENT_CLICKED, NULL);
 
-  // Create button and label for settings button
-  std::string label3 = LV_SYMBOL_SETTINGS;
-  lv_obj_t *btn3 =
-      menuButton::create_menu_button(ui_top_buttons_container, label3.c_str());
-  lv_obj_add_event_cb(btn3, event_button_settings_handler, LV_EVENT_CLICKED,
+  // Create button and label for disable steppers button
+  main_btn_disable_steppers = symbolButton::create_symbol_button(
+      ui_top_buttons_container, LV_SYMBOL_ENGINE, BUTTON_WIDTH, BUTTON_HEIGHT,
+      true, true, 90);
+  lv_obj_add_event_cb(main_btn_disable_steppers,
+                      event_button_disable_steppers_handler, LV_EVENT_CLICKED,
                       NULL);
 
 #if ESP3D_WIFI_FEATURE
@@ -285,12 +286,11 @@ void menu_screen() {
   lv_obj_add_event_cb(btn4, event_button_wifi_handler, LV_EVENT_CLICKED, NULL);
 #endif  // ESP3D_WIFI_FEATURE
 
-  // Create button and label for disable steppers button
-  main_btn_disable_steppers = symbolButton::create_symbol_button(
-      ui_bottom_buttons_container, LV_SYMBOL_ENGINE, BUTTON_WIDTH,
-      BUTTON_HEIGHT, true, true, 90);
-  lv_obj_add_event_cb(main_btn_disable_steppers,
-                      event_button_disable_steppers_handler, LV_EVENT_CLICKED,
+  // Create button and label for settings button
+  std::string label3 = LV_SYMBOL_SETTINGS;
+  lv_obj_t *btn3 = menuButton::create_menu_button(ui_bottom_buttons_container,
+                                                  label3.c_str());
+  lv_obj_add_event_cb(btn3, event_button_settings_handler, LV_EVENT_CLICKED,
                       NULL);
 
   // Create button and label for informations button

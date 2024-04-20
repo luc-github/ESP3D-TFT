@@ -30,7 +30,7 @@
 
 extern "C" lv_img_dsc_t *get_splash_logo();
 extern "C" void release_splash_logo(lv_img_dsc_t *splash_logo);
-LV_IMG_DECLARE(Marlin_Logo);
+LV_IMG_DECLARE(target_fw_logo);
 
 /**********************
  *  STATIC PROTOTYPES
@@ -86,7 +86,7 @@ void splash_screen() {
 
   //Marlin Logo
   lv_obj_t *logo_marlin = lv_img_create(ui_Screen);
-  lv_img_set_src(logo_marlin, &Marlin_Logo);
+  lv_img_set_src(logo_marlin, &target_fw_logo);
   lv_obj_align(logo_marlin, LV_ALIGN_BOTTOM_LEFT, FW_LOGO_X, FW_LOGO_Y);
 
   // Create version text object
