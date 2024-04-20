@@ -944,6 +944,7 @@ The main application code is typically organized into the following files:
     *  esp3d_tft.ui.cpp file that contains the UI code for the TFT display
     *  esp3d_tft.ui.h file that contains the header code for the TFT display
     * components directory that contains the UI common components for the TFT display
+    * screens directory that contains the common screens to be displayed on the TFT display
     * 3dprinter directory that contains the UI code for the 3D printer TFT display
       this directory contaain one directory for each targeted firmware:
         * marlin directory that contains the UI code for the Marlin TFT display
@@ -958,7 +959,7 @@ The main application code is typically organized into the following files:
            * res_480_272 directory that contains the resources for the 480x272 resolution
            * res_480_320 directory that contains the resources for the 480x320 resolution
            * res_800_480 directory that contains the resources for the 800x480 resolution
-           * screens directory that contains the screens to be displayed on the TFT display
+           * screens directory that contains the specifics screens to be displayed on the TFT display
            * esp3d_style.cpp/.h files that contains the common style to be used on the TFT display
            * esp3d_tft_ui.cpp file that contains the main UI code for the TFT display
 

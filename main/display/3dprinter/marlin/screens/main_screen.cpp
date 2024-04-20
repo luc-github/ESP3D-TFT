@@ -22,13 +22,13 @@
 
 #include <lvgl.h>
 
-#include "empty_screen.h"
+#include "screens/empty_screen.h"
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
-#include "fan_screen.h"
+#include "screens/fan_screen.h"
 
 #if ESP3D_SD_CARD_FEATURE
 #include "files_screen.h"
@@ -38,12 +38,12 @@
 #include "components/status_bar_component.h"
 #include "components/symbol_button_component.h"
 #include "esp3d_json_settings.h"
-#include "filament_screen.h"
+#include "screens/filament_screen.h"
 #include "gcode_host/esp3d_gcode_host_service.h"
-#include "menu_screen.h"
-#include "positions_screen.h"
+#include "screens/menu_screen.h"
+#include "screens/positions_screen.h"
 #include "speed_screen.h"
-#include "temperatures_screen.h"
+#include "screens/temperatures_screen.h"
 #include "translations/esp3d_translation_service.h"
 
 /**********************

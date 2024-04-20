@@ -461,7 +461,7 @@ ESP3DDataType ESP3DGCodeParserService::getType(const char* data) {
       strstr(ptr, "heating") == ptr || strstr(ptr, "echo:busy") == ptr ||
       strstr(ptr, "echo:processing") == ptr ||
       strstr(ptr, "echo:heating") == ptr) {
-    esp3d_log("Status: %s", esp3d_string::str_trim(ptr).c_str());
+    esp3d_log("Status: %s", esp3d_string::str_trim(ptr));
     return ESP3DDataType::status;
   }
   /*
