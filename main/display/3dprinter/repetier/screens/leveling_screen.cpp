@@ -17,11 +17,11 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include "leveling_screen.h"
+#include "screens/leveling_screen.h"
 
 #include <lvgl.h>
 
-#include "auto_leveling_screen.h"
+#include "screens/auto_leveling_screen.h"
 #include "components/back_button_component.h"
 #include "components/main_container_component.h"
 #include "components/spinner_component.h"
@@ -31,8 +31,8 @@
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
-#include "manual_leveling_screen.h"
-#include "menu_screen.h"
+#include "screens/manual_leveling_screen.h"
+#include "screens/menu_screen.h"
 #include "translations/esp3d_translation_service.h"
 
 /**********************

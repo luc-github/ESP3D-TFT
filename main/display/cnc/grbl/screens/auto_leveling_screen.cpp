@@ -18,7 +18,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "auto_leveling_screen.h"
+#include "screens/auto_leveling_screen.h"
 
 #include <lvgl.h>
 
@@ -28,7 +28,7 @@
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
-#include "leveling_screen.h"
+#include "screens/leveling_screen.h"
 #include "rendering/esp3d_rendering_client.h"
 #include "translations/esp3d_translation_service.h"
 
