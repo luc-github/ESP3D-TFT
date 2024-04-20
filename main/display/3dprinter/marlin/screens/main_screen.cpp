@@ -18,7 +18,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "main_screen.h"
+#include "screens/main_screen.h"
 
 #include <lvgl.h>
 
@@ -31,7 +31,7 @@
 #include "screens/fan_screen.h"
 
 #if ESP3D_SD_CARD_FEATURE
-#include "files_screen.h"
+#include "screens/files_screen.h"
 #endif  // ESP3D_SD_CARD_FEATURE
 #include "components/menu_button_component.h"
 #include "components/message_box_component.h"
@@ -42,7 +42,7 @@
 #include "gcode_host/esp3d_gcode_host_service.h"
 #include "screens/menu_screen.h"
 #include "screens/positions_screen.h"
-#include "speed_screen.h"
+#include "screens/speed_screen.h"
 #include "screens/temperatures_screen.h"
 #include "translations/esp3d_translation_service.h"
 

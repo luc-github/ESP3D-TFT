@@ -31,7 +31,7 @@
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
-#include "manual_leveling_screen.h"
+#include "screens/manual_leveling_screen.h"
 #include "screens/menu_screen.h"
 #include "translations/esp3d_translation_service.h"
 

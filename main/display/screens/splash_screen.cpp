@@ -18,7 +18,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "splash_screen.h"
+#include "screens/splash_screen.h"
 
 #include <lvgl.h>
 
