@@ -18,7 +18,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #if ESP3D_SD_CARD_FEATURE
-#include "files_screen.h"
+#include "screens/files_screen.h"
 
 #include <lvgl.h>
 
@@ -39,7 +39,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "gcode_host/esp3d_gcode_host_service.h"
-#include "main_screen.h"
+#include "screens/main_screen.h"
 #include "tasks_def.h"
 #include "translations/esp3d_translation_service.h"
 

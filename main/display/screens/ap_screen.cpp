@@ -19,7 +19,7 @@
 */
 #if ESP3D_WIFI_FEATURE
 
-#include "ap_screen.h"
+#include "screens/ap_screen.h"
 
 #include <lvgl.h>
 
@@ -37,7 +37,7 @@
 #include "esp3d_tft_ui.h"
 #include "network/esp3d_network.h"
 #include "translations/esp3d_translation_service.h"
-#include "wifi_screen.h"
+#include "screens/wifi_screen.h"
 
 /**********************
  *  STATIC PROTOTYPES

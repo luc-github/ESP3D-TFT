@@ -18,14 +18,14 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "empty_screen.h"
+#include "screens/empty_screen.h"
 
 #include <lvgl.h>
 
 #include "esp3d_log.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
-#include "main_screen.h"
+#include "screens/main_screen.h"
 
 /**********************
  *  STATIC PROTOTYPES

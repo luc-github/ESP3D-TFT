@@ -26,7 +26,7 @@
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "esp3d_version.h"
-#include "main_screen.h"
+#include "screens/main_screen.h"
 
 extern "C" lv_img_dsc_t *get_splash_logo();
 extern "C" void release_splash_logo(lv_img_dsc_t *splash_logo);

@@ -18,7 +18,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "status_screen.h"
+#include "screens/status_screen.h"
 
 #include <lvgl.h>
 
@@ -29,7 +29,7 @@
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "esp3d_values.h"
-#include "main_screen.h"
+#include "screens/main_screen.h"
 
 /**********************
  *  STATIC PROTOTYPES

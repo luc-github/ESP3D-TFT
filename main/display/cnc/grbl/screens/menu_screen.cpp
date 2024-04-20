@@ -18,10 +18,10 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "menu_screen.h"
+#include "screens/menu_screen.h"
 
 #include <lvgl.h>
-
+#include "rendering/esp3d_rendering_client.h"
 #include "components/back_button_component.h"
 #include "components/main_container_component.h"
 #include "components/menu_button_component.h"
@@ -32,18 +32,17 @@
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "esp3d_values.h"
-#include "filament_screen.h"
-#include "informations_screen.h"
-#include "leveling_screen.h"
-#include "main_screen.h"
-#include "manual_leveling_screen.h"
-#include "menu_screen.h"
-#include "rendering/esp3d_rendering_client.h"
-#include "settings_screen.h"
+#include "screens/filament_screen.h"
+#include "screens/informations_screen.h"
+#include "screens/leveling_screen.h"
+#include "screens/main_screen.h"
+#include "screens/manual_leveling_screen.h"
+#include "screens/menu_screen.h"
+#include "screens/settings_screen.h"
 #include "translations/esp3d_translation_service.h"
 
 #if ESP3D_WIFI_FEATURE
-#include "wifi_screen.h"
+#include "screens/wifi_screen.h"
 #endif  // ESP3D_WIFI_FEATURE
 
 /**********************

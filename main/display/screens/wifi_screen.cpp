@@ -18,11 +18,11 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #if ESP3D_WIFI_FEATURE
-#include "wifi_screen.h"
+#include "screens/wifi_screen.h"
 
 #include <lvgl.h>
 
-#include "ap_screen.h"
+#include "screens/ap_screen.h"
 #include "bsp.h"
 #include "components/back_button_component.h"
 #include "components/main_container_component.h"
@@ -35,9 +35,9 @@
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
-#include "menu_screen.h"
+#include "screens/menu_screen.h"
 #include "network/esp3d_network.h"
-#include "sta_screen.h"
+#include "screens/sta_screen.h"
 #include "translations/esp3d_translation_service.h"
 
 /**********************

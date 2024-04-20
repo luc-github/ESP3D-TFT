@@ -18,7 +18,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #if ESP3D_WIFI_FEATURE
-#include "sta_screen.h"
+#include "screens/sta_screen.h"
 
 #include <lvgl.h>
 
@@ -43,7 +43,7 @@
 #include "network/esp3d_network.h"
 #include "tasks_def.h"
 #include "translations/esp3d_translation_service.h"
-#include "wifi_screen.h"
+#include "screens/wifi_screen.h"
 
 /**********************
  *  STATIC PROTOTYPES
