@@ -39,9 +39,9 @@ OPTION(HARDWARE_MOD_EXT_PSRAM "Hardware Mod: External PSRAM" OFF)
 # #######################################
 # Select the targeted firmware
 # #######################################
-OPTION(TARGET_FW_MARLIN "Marlin firmware" OFF)
+OPTION(TARGET_FW_MARLIN "Marlin firmware" ON)
 OPTION(TARGET_FW_REPETIER "Repetier firmware" OFF)
-OPTION(TARGET_FW_SMOOTHIEWARE "Smoothieware firmware" ON)
+OPTION(TARGET_FW_SMOOTHIEWARE "Smoothieware firmware" OFF)
 OPTION(TARGET_FW_GRBL "GRBL firmware" OFF)
 
 
