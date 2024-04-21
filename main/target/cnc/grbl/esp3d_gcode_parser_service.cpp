@@ -29,15 +29,17 @@ ESP3DGCodeParserService esp3dGcodeParser;
 const char* emmergencyGcodeCommand[] = {"M112", "M410", "M999"};
 const char* emmergencyESP3DCommand[] = {"[ESP701]"};
 const char* pollingCommands[] = {
-    "M105",  // Temperatures
-    "M114",  // Positions
-    "M220",  // Speed
+    "?",  // Status
+    "$G",  // GCode parser state
+    "$#",  // GCode Parameters
+    "[ESP701]json",  // streaming status
 };
 
 uint64_t pollingCommandsLastUpdate[] = {
-    0,  // Temperatures
-    0,  // Positions
-    0,  // Speed
+    0,  // Status
+    0,  // GCode parser state
+    0,  // GCode Parameters
+    0,  // streaming status
 };
 
 const char* screenCommands[] = {"M117",  // TFT screen output
@@ -115,275 +117,275 @@ bool ESP3DGCodeParserService::hasMultiLineReport(const char* data) {
 
 bool ESP3DGCodeParserService::processCommand(const char* data) {
   esp3d_log("processing Command %s", data);
-  if (data != nullptr && strlen(data) > 0) {
-    // is temperature
-    if (strstr(data, "T:") != nullptr) {
-      // ok T:25.00 /120.00 B:25.00 /0.00 @:127 B@:0
-      // T:25.00 /0.00 B:25.00 /50.00 T0:25.00 /0.00 T1:105.00 /0.00 @:0 B@:127
-      char* ptrt = strstr(data, "T:");
-      char* ptrt0 = strstr(data, "T0:");
-      char* ptrt1 = strstr(data, "T1:");
-      char* ptrb = strstr(data, "B:");
-      if (ptrt0 && ptrt1) {  // dual extruder
-        esp3d_log("Temperature dual extruders");
-        ptrt0 += 3;
-        ptrt1 += 3;
-        // Extruder 0 current temperature
-        char* ptre = strstr(ptrt0, " /");
-        if (!ptre) {
-          esp3d_log_e("Error parsing temperature T0 value");
-          return false;
-        }
-        ptre[0] = '\0';
-        // Extruder 0 target temperature
-        char* ptrtt = ptre + 2;
-        ptre = strstr(ptrtt, " ");
-        if (!ptre) {
-          esp3d_log_e("Error parsing temperature T0 target");
-          return false;
-        }
-        ptre[0] = '\0';
-        // Dispatch values
-        esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_0_temperature,
-                                        ptrt0);
-        esp3dTftValues.set_string_value(
-            ESP3DValuesIndex::ext_0_target_temperature, ptrtt);
-        esp3d_log("T0: %s / %s", ptrt0, ptrtt);
+  // if (data != nullptr && strlen(data) > 0) {
+  //   // is temperature
+  //   if (strstr(data, "T:") != nullptr) {
+  //     // ok T:25.00 /120.00 B:25.00 /0.00 @:127 B@:0
+  //     // T:25.00 /0.00 B:25.00 /50.00 T0:25.00 /0.00 T1:105.00 /0.00 @:0 B@:127
+  //     char* ptrt = strstr(data, "T:");
+  //     char* ptrt0 = strstr(data, "T0:");
+  //     char* ptrt1 = strstr(data, "T1:");
+  //     char* ptrb = strstr(data, "B:");
+  //     if (ptrt0 && ptrt1) {  // dual extruder
+  //       esp3d_log("Temperature dual extruders");
+  //       ptrt0 += 3;
+  //       ptrt1 += 3;
+  //       // Extruder 0 current temperature
+  //       char* ptre = strstr(ptrt0, " /");
+  //       if (!ptre) {
+  //         esp3d_log_e("Error parsing temperature T0 value");
+  //         return false;
+  //       }
+  //       ptre[0] = '\0';
+  //       // Extruder 0 target temperature
+  //       char* ptrtt = ptre + 2;
+  //       ptre = strstr(ptrtt, " ");
+  //       if (!ptre) {
+  //         esp3d_log_e("Error parsing temperature T0 target");
+  //         return false;
+  //       }
+  //       ptre[0] = '\0';
+  //       // Dispatch values
+  //       esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_0_temperature,
+  //                                       ptrt0);
+  //       esp3dTftValues.set_string_value(
+  //           ESP3DValuesIndex::ext_0_target_temperature, ptrtt);
+  //       esp3d_log("T0: %s / %s", ptrt0, ptrtt);
 
-        // Extruder 1 current temperature
-        ptre = strstr(ptrt1, " /");
-        if (!ptre) {
-          esp3d_log_e("Error parsing temperature T1 value");
-          esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_temperature,
-                                          "#");
-          esp3dTftValues.set_string_value(
-              ESP3DValuesIndex::ext_1_target_temperature, "#");
-          return false;
-        }
-        ptre[0] = '\0';
-        // Extruder 1 target temperature
-        ptrtt = ptre + 2;
-        ptre = strstr(ptrtt, " ");
-        if (!ptre) {
-          esp3d_log_e("Error parsing temperature T1 target");
-          esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_temperature,
-                                          "#");
-          esp3dTftValues.set_string_value(
-              ESP3DValuesIndex::ext_1_target_temperature, "#");
-          return false;
-        }
-        ptre[0] = '\0';
-        // Dispatch values
-        esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_temperature,
-                                        ptrt1);
-        esp3dTftValues.set_string_value(
-            ESP3DValuesIndex::ext_1_target_temperature, ptrtt);
-        esp3d_log("T1: %s / %s", ptrt1, ptrtt);
-      } else {  // single extruder
-        esp3d_log("Temperature single extruder");
-        esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_temperature,
-                                        "#");
-        esp3dTftValues.set_string_value(
-            ESP3DValuesIndex::ext_1_target_temperature, "#");
-        ptrt += 2;
-        // Extruder 0 current temperature
-        char* ptre = strstr(ptrt, " /");
-        if (!ptre) {
-          esp3d_log_e("Error parsing temperature T0 value");
-          return false;
-        }
-        ptre[0] = '\0';
-        // Extruder 0 target temperature
-        char* ptrtt = ptre + 2;
-        ptre = strstr(ptrtt, " ");
-        if (!ptre) {
-          esp3d_log_e("Error parsing temperature T0 target");
-          return false;
-        }
-        ptre[0] = '\0';
-        // Dispatch values
-        esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_0_temperature,
-                                        ptrt);
-        esp3dTftValues.set_string_value(
-            ESP3DValuesIndex::ext_0_target_temperature, ptrtt);
+  //       // Extruder 1 current temperature
+  //       ptre = strstr(ptrt1, " /");
+  //       if (!ptre) {
+  //         esp3d_log_e("Error parsing temperature T1 value");
+  //         esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_temperature,
+  //                                         "#");
+  //         esp3dTftValues.set_string_value(
+  //             ESP3DValuesIndex::ext_1_target_temperature, "#");
+  //         return false;
+  //       }
+  //       ptre[0] = '\0';
+  //       // Extruder 1 target temperature
+  //       ptrtt = ptre + 2;
+  //       ptre = strstr(ptrtt, " ");
+  //       if (!ptre) {
+  //         esp3d_log_e("Error parsing temperature T1 target");
+  //         esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_temperature,
+  //                                         "#");
+  //         esp3dTftValues.set_string_value(
+  //             ESP3DValuesIndex::ext_1_target_temperature, "#");
+  //         return false;
+  //       }
+  //       ptre[0] = '\0';
+  //       // Dispatch values
+  //       esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_temperature,
+  //                                       ptrt1);
+  //       esp3dTftValues.set_string_value(
+  //           ESP3DValuesIndex::ext_1_target_temperature, ptrtt);
+  //       esp3d_log("T1: %s / %s", ptrt1, ptrtt);
+  //     } else {  // single extruder
+  //       esp3d_log("Temperature single extruder");
+  //       esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_temperature,
+  //                                       "#");
+  //       esp3dTftValues.set_string_value(
+  //           ESP3DValuesIndex::ext_1_target_temperature, "#");
+  //       ptrt += 2;
+  //       // Extruder 0 current temperature
+  //       char* ptre = strstr(ptrt, " /");
+  //       if (!ptre) {
+  //         esp3d_log_e("Error parsing temperature T0 value");
+  //         return false;
+  //       }
+  //       ptre[0] = '\0';
+  //       // Extruder 0 target temperature
+  //       char* ptrtt = ptre + 2;
+  //       ptre = strstr(ptrtt, " ");
+  //       if (!ptre) {
+  //         esp3d_log_e("Error parsing temperature T0 target");
+  //         return false;
+  //       }
+  //       ptre[0] = '\0';
+  //       // Dispatch values
+  //       esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_0_temperature,
+  //                                       ptrt);
+  //       esp3dTftValues.set_string_value(
+  //           ESP3DValuesIndex::ext_0_target_temperature, ptrtt);
 
-        esp3d_log("T: %s / %s", ptrt, ptrtt);
-      }
-      if (ptrb) {  // bed
-        esp3d_log("Temperature bed");
-        ptrb += 2;
-        // Bed current temperature
-        char* ptre = strstr(ptrb, " /");
-        if (!ptre) {
-          esp3d_log_e("Error parsing temperature bed value");
-          return false;
-        }
-        ptre[0] = '\0';
-        // Bed target temperature
-        char* ptrtt = ptre + 2;
-        ptre = strstr(ptrtt, " ");
-        if (!ptre) {
-          esp3d_log_e("Error parsing temperature Bed target");
-          return false;
-        }
-        ptre[0] = '\0';
-        // Dispatch values
-        esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_temperature,
-                                        ptrb);
-        esp3dTftValues.set_string_value(
-            ESP3DValuesIndex::bed_target_temperature, ptrtt);
-        esp3d_log("Bed: %s / %s", ptrb, ptrtt);
-      } else {
-        esp3d_log("No Temperature bed");
-        esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_temperature, "#");
-        esp3dTftValues.set_string_value(
-            ESP3DValuesIndex::bed_target_temperature, "#");
-      }
-      setPollingCommandsLastRun(
-          ESP3D_POLLING_COMMANDS_INDEX_TEMPERATURE_TEMPERATURE,
-          esp3d_hal::millis());
-      return true;
-      // is position but not bed leveling
-    } else if (strstr(data, "X:") != nullptr &&
-               strstr(data, "Bed X:") == nullptr) {
-      // X:0.00 Y:0.00 Z:0.00 E:0.00 Count X:0 Y:0 Z:0
-      esp3d_log("Positions");
-      char* ptrx = strstr(data, "X:");
-      char* ptry = strstr(data, "Y:");
-      char* ptrz = strstr(data, "Z:");
-      char* ptre = strstr(data, "E:");
+  //       esp3d_log("T: %s / %s", ptrt, ptrtt);
+  //     }
+  //     if (ptrb) {  // bed
+  //       esp3d_log("Temperature bed");
+  //       ptrb += 2;
+  //       // Bed current temperature
+  //       char* ptre = strstr(ptrb, " /");
+  //       if (!ptre) {
+  //         esp3d_log_e("Error parsing temperature bed value");
+  //         return false;
+  //       }
+  //       ptre[0] = '\0';
+  //       // Bed target temperature
+  //       char* ptrtt = ptre + 2;
+  //       ptre = strstr(ptrtt, " ");
+  //       if (!ptre) {
+  //         esp3d_log_e("Error parsing temperature Bed target");
+  //         return false;
+  //       }
+  //       ptre[0] = '\0';
+  //       // Dispatch values
+  //       esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_temperature,
+  //                                       ptrb);
+  //       esp3dTftValues.set_string_value(
+  //           ESP3DValuesIndex::bed_target_temperature, ptrtt);
+  //       esp3d_log("Bed: %s / %s", ptrb, ptrtt);
+  //     } else {
+  //       esp3d_log("No Temperature bed");
+  //       esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_temperature, "#");
+  //       esp3dTftValues.set_string_value(
+  //           ESP3DValuesIndex::bed_target_temperature, "#");
+  //     }
+  //     setPollingCommandsLastRun(
+  //         ESP3D_POLLING_COMMANDS_INDEX_TEMPERATURE_TEMPERATURE,
+  //         esp3d_hal::millis());
+  //     return true;
+  //     // is position but not bed leveling
+  //   } else if (strstr(data, "X:") != nullptr &&
+  //              strstr(data, "Bed X:") == nullptr) {
+  //     // X:0.00 Y:0.00 Z:0.00 E:0.00 Count X:0 Y:0 Z:0
+  //     esp3d_log("Positions");
+  //     char* ptrx = strstr(data, "X:");
+  //     char* ptry = strstr(data, "Y:");
+  //     char* ptrz = strstr(data, "Z:");
+  //     char* ptre = strstr(data, "E:");
 
-      if (ptrx && ptry && ptrz && ptre) {
-        ptrx += 2;
-        ptry[0] = '\0';
-        ptry += 2;
-        ptrz[0] = '\0';
-        ptrz += 2;
-        if (ptre) {
-          ptre[0] = '\0';
-        }
-        esp3dTftValues.set_string_value(ESP3DValuesIndex::position_x, ptrx);
-        esp3dTftValues.set_string_value(ESP3DValuesIndex::position_y, ptry);
-        esp3dTftValues.set_string_value(ESP3DValuesIndex::position_z, ptrz);
-        setPollingCommandsLastRun(
-            ESP3D_POLLING_COMMANDS_INDEX_TEMPERATURE_POSITION,
-            esp3d_hal::millis());
-        return true;
-      } else {
-        esp3d_log_e("Error parsing positions");
-      }
-    } else if (strstr(data, "FR:") != nullptr) {
-      char* ptrfr = strstr(data, "FR:");
-      char* ptrpc = strstr(data, "%");
-      if (ptrfr && ptrpc) {
-        ptrfr += 3;
-        ptrpc[0] = '\0';
-        esp3dTftValues.set_string_value(ESP3DValuesIndex::speed, ptrfr);
-        setPollingCommandsLastRun(
-            ESP3D_POLLING_COMMANDS_INDEX_TEMPERATURE_SPEED,
-            esp3d_hal::millis());
-        return true;
-      } else {
-        esp3d_log_e("Error parsing progress");
-      }
-      // is fan speed ?
-    } else if (strstr(data, "M106") != nullptr ||
-               strstr(data, "M107") != nullptr) {
-      char* ptr106 = strstr(data, "M106");
-      char* ptr107 = strstr(data, "M107");
-      if (ptr106) {
-        ptr106 += 4;
-        char* ptrS = strstr(ptr106, "S");
-        if (!ptrS) {
-          esp3d_log_e("Error parsing fan speed");
-          return false;
-        }
+  //     if (ptrx && ptry && ptrz && ptre) {
+  //       ptrx += 2;
+  //       ptry[0] = '\0';
+  //       ptry += 2;
+  //       ptrz[0] = '\0';
+  //       ptrz += 2;
+  //       if (ptre) {
+  //         ptre[0] = '\0';
+  //       }
+  //       esp3dTftValues.set_string_value(ESP3DValuesIndex::position_x, ptrx);
+  //       esp3dTftValues.set_string_value(ESP3DValuesIndex::position_y, ptry);
+  //       esp3dTftValues.set_string_value(ESP3DValuesIndex::position_z, ptrz);
+  //       setPollingCommandsLastRun(
+  //           ESP3D_POLLING_COMMANDS_INDEX_TEMPERATURE_POSITION,
+  //           esp3d_hal::millis());
+  //       return true;
+  //     } else {
+  //       esp3d_log_e("Error parsing positions");
+  //     }
+  //   } else if (strstr(data, "FR:") != nullptr) {
+  //     char* ptrfr = strstr(data, "FR:");
+  //     char* ptrpc = strstr(data, "%");
+  //     if (ptrfr && ptrpc) {
+  //       ptrfr += 3;
+  //       ptrpc[0] = '\0';
+  //       esp3dTftValues.set_string_value(ESP3DValuesIndex::speed, ptrfr);
+  //       setPollingCommandsLastRun(
+  //           ESP3D_POLLING_COMMANDS_INDEX_TEMPERATURE_SPEED,
+  //           esp3d_hal::millis());
+  //       return true;
+  //     } else {
+  //       esp3d_log_e("Error parsing progress");
+  //     }
+  //     // is fan speed ?
+  //   } else if (strstr(data, "M106") != nullptr ||
+  //              strstr(data, "M107") != nullptr) {
+  //     char* ptr106 = strstr(data, "M106");
+  //     char* ptr107 = strstr(data, "M107");
+  //     if (ptr106) {
+  //       ptr106 += 4;
+  //       char* ptrS = strstr(ptr106, "S");
+  //       if (!ptrS) {
+  //         esp3d_log_e("Error parsing fan speed");
+  //         return false;
+  //       }
 
-        ptrS++;
-        // get fan speed
-        static std::string fanSpeed = "";
-        fanSpeed = "";
+  //       ptrS++;
+  //       // get fan speed
+  //       static std::string fanSpeed = "";
+  //       fanSpeed = "";
 
-        for (uint8_t i = 0; i < 3; i++) {
-          if (ptrS[i] >= '0' && ptrS[i] <= '9') {
-            fanSpeed += ptrS[i];
-          } else {
-            break;
-          }
-        }
-        // is there an index ?
-        esp3d_log("Check index in %s", ptr106);
-        uint8_t index = 0;
-        char* ptrI = strstr(ptr106, "P");
-        if (ptrI) {
-          esp3d_log("Index found %s", ptrI);
-          if (ptrI[1] == '1') {
-            index = 1;
-          }
-        }
-        // conversion 0~255 to 0~100
-        double fspeed = (std::stod(fanSpeed.c_str()) * 100) / 255;
-        // limit to 100%
-        if (fspeed > 100) {
-          fspeed = 100;
-        }
+  //       for (uint8_t i = 0; i < 3; i++) {
+  //         if (ptrS[i] >= '0' && ptrS[i] <= '9') {
+  //           fanSpeed += ptrS[i];
+  //         } else {
+  //           break;
+  //         }
+  //       }
+  //       // is there an index ?
+  //       esp3d_log("Check index in %s", ptr106);
+  //       uint8_t index = 0;
+  //       char* ptrI = strstr(ptr106, "P");
+  //       if (ptrI) {
+  //         esp3d_log("Index found %s", ptrI);
+  //         if (ptrI[1] == '1') {
+  //           index = 1;
+  //         }
+  //       }
+  //       // conversion 0~255 to 0~100
+  //       double fspeed = (std::stod(fanSpeed.c_str()) * 100) / 255;
+  //       // limit to 100%
+  //       if (fspeed > 100) {
+  //         fspeed = 100;
+  //       }
 
-        fanSpeed = esp3d_string::set_precision(std::to_string(fspeed), 0);
-        // set fan speed according index
-        esp3d_log("Fan speed 106, index: %d, %s", index, fanSpeed.c_str());
-        if (index == 0) {
-          esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_0_fan,
-                                          fanSpeed.c_str());
-        } else {
-          esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_fan,
-                                          fanSpeed.c_str());
-        }
-        return true;
-      } else if (ptr107) {
-        ptr107 += 4;
-        char* ptrI = strstr(ptr107, "P");
-        uint8_t index = 0;
-        // is there an index ?
-        if (ptrI) {
-          if (ptrI[1] == '1') {
-            index = 1;
-          }
-        }
-        esp3d_log("Fan speed 107, index: %d", index);
-        // set fan speed to 0 according index
-        if (index == 0) {
-          esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_0_fan, "0");
-        } else {
-          esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_fan, "0");
-        }
-        return true;
-      } else {
-        esp3d_log_e("Error parsing fan speed");
-      }
-      // G29 Auto Bed Leveling
-    } else if (strstr(data, "G29 Auto Bed Leveling") != nullptr ||
-               strstr(data, "Bed X:") != nullptr ||
-               strstr(data, "Bilinear Leveling Grid:") != nullptr) {
-      static bool isLeveling = false;
-      if (strstr(data, "G29 Auto Bed Leveling") != nullptr) {
-        isLeveling = true;
-        // Send start of leveling
-        esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_leveling, "Start",
-                                        ESP3DValuesCbAction::Add);
-      } else if (isLeveling) {
-        if (strstr(data, "Bilinear Leveling Grid:") != nullptr) {
-          isLeveling = false;
-          // Send end of leveling
-          esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_leveling, "End",
-                                          ESP3DValuesCbAction::Delete);
-        } else {
-          // Send leveling data
-          esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_leveling, data,
-                                          ESP3DValuesCbAction::Update);
-        }
-      }
-    }
-  }
+  //       fanSpeed = esp3d_string::set_precision(std::to_string(fspeed), 0);
+  //       // set fan speed according index
+  //       esp3d_log("Fan speed 106, index: %d, %s", index, fanSpeed.c_str());
+  //       if (index == 0) {
+  //         esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_0_fan,
+  //                                         fanSpeed.c_str());
+  //       } else {
+  //         esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_fan,
+  //                                         fanSpeed.c_str());
+  //       }
+  //       return true;
+  //     } else if (ptr107) {
+  //       ptr107 += 4;
+  //       char* ptrI = strstr(ptr107, "P");
+  //       uint8_t index = 0;
+  //       // is there an index ?
+  //       if (ptrI) {
+  //         if (ptrI[1] == '1') {
+  //           index = 1;
+  //         }
+  //       }
+  //       esp3d_log("Fan speed 107, index: %d", index);
+  //       // set fan speed to 0 according index
+  //       if (index == 0) {
+  //         esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_0_fan, "0");
+  //       } else {
+  //         esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_fan, "0");
+  //       }
+  //       return true;
+  //     } else {
+  //       esp3d_log_e("Error parsing fan speed");
+  //     }
+  //     // G29 Auto Bed Leveling
+  //   } else if (strstr(data, "G29 Auto Bed Leveling") != nullptr ||
+  //              strstr(data, "Bed X:") != nullptr ||
+  //              strstr(data, "Bilinear Leveling Grid:") != nullptr) {
+  //     static bool isLeveling = false;
+  //     if (strstr(data, "G29 Auto Bed Leveling") != nullptr) {
+  //       isLeveling = true;
+  //       // Send start of leveling
+  //       esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_leveling, "Start",
+  //                                       ESP3DValuesCbAction::Add);
+  //     } else if (isLeveling) {
+  //       if (strstr(data, "Bilinear Leveling Grid:") != nullptr) {
+  //         isLeveling = false;
+  //         // Send end of leveling
+  //         esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_leveling, "End",
+  //                                         ESP3DValuesCbAction::Delete);
+  //       } else {
+  //         // Send leveling data
+  //         esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_leveling, data,
+  //                                         ESP3DValuesCbAction::Update);
+  //       }
+  //     }
+  //   }
+  // }
   return false;
 }
 

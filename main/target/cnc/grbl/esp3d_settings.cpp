@@ -174,9 +174,9 @@ const ESP3DSettingDescription ESP3DSettingsData[] = {
     {ESP3DSettingIndex::esp3d_inverved_x, ESP3DSettingType::byte_t, 1, "0"},
     {ESP3DSettingIndex::esp3d_inverved_y, ESP3DSettingType::byte_t, 1, "0"},
     {ESP3DSettingIndex::esp3d_auto_level_on, ESP3DSettingType::byte_t, 1, "0"},
-    {ESP3DSettingIndex::esp3d_bed_width, ESP3DSettingType::float_t, 3,
+    {ESP3DSettingIndex::esp3d_workspace_width, ESP3DSettingType::float_t, 3,
      "100.00"},
-    {ESP3DSettingIndex::esp3d_bed_depth, ESP3DSettingType::float_t, 3,
+    {ESP3DSettingIndex::esp3d_workspace_depth, ESP3DSettingType::float_t, 3,
      "100.00"},
 #endif  // ESP3D_DISPLAY_FEATURE
     {ESP3DSettingIndex::esp3d_stop_script, ESP3DSettingType::string_t,
@@ -212,8 +212,8 @@ bool ESP3DSettings::isValidStringSetting(const char* value,
       return false;
     }
     switch (settingElement) {
-      case ESP3DSettingIndex::esp3d_bed_width:
-      case ESP3DSettingIndex::esp3d_bed_depth:
+      case ESP3DSettingIndex::esp3d_workspace_width:
+      case ESP3DSettingIndex::esp3d_workspace_depth:
         if (strtod(value, NULL) == 0) {
           return false;
         }
@@ -486,7 +486,7 @@ bool ESP3DSettings::isValidByteSetting(uint8_t value,
           static_cast<ESP3DTargetFirmware>(value) ==
               ESP3DTargetFirmware::marlin ||
           static_cast<ESP3DTargetFirmware>(value) ==
-              ESP3DTargetFirmware::marlin_embedded ||
+              ESP3DTargetFirmware::marlin_emworkspaceded ||
           static_cast<ESP3DTargetFirmware>(value) ==
               ESP3DTargetFirmware::smoothieware ||
           static_cast<ESP3DTargetFirmware>(value) ==
@@ -595,7 +595,7 @@ const char* ESP3DSettings::GetFirmwareTargetShortName(
       return "grbl";
     case ESP3DTargetFirmware::marlin:
       return "marlin";
-    case ESP3DTargetFirmware::marlin_embedded:
+    case ESP3DTargetFirmware::marlin_emworkspaceded:
       return "marlin";
     case ESP3DTargetFirmware::smoothieware:
       return "smoothieware";

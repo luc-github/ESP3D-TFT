@@ -28,7 +28,6 @@
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
-#include "screens/fan_screen.h"
 
 #if ESP3D_SD_CARD_FEATURE
 #include "screens/files_screen.h"
@@ -38,24 +37,16 @@
 #include "components/status_bar_component.h"
 #include "components/symbol_button_component.h"
 #include "esp3d_json_settings.h"
-#include "screens/filament_screen.h"
 #include "gcode_host/esp3d_gcode_host_service.h"
 #include "screens/menu_screen.h"
-#include "screens/positions_screen.h"
-#include "screens/speed_screen.h"
-#include "screens/temperatures_screen.h"
+//#include "screens/positions_screen.h"
 #include "translations/esp3d_translation_service.h"
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
 namespace mainScreen {
-void main_display_extruder_0();
-void main_display_extruder_1();
-void main_display_bed();
-void main_display_fan();
-void main_display_speed();
-void main_display_positions();
+//void main_display_positions();
 void main_display_status_area();
 void main_display_pause();
 void main_display_resume();
@@ -65,22 +56,15 @@ void main_display_files();
 #endif  // ESP3D_SD_CARD_FEATURE
 void main_display_menu();
 
-uint8_t main_screen_temperature_target = 0;
 lv_timer_t *main_screen_delay_timer = NULL;
 ESP3DScreenType next_screen = ESP3DScreenType::none;
-uint8_t nb_fans = 2;
-bool show_fan_button = true;
 bool intialization_done = false;
 
 /**********************
  *   STATIC VARIABLES
  **********************/
-lv_obj_t *main_btn_extruder_0 = nullptr;
-lv_obj_t *main_btn_extruder_1 = nullptr;
-lv_obj_t *main_btn_bed = nullptr;
-lv_obj_t *main_btn_fan = nullptr;
-lv_obj_t *main_btn_speed = nullptr;
-lv_obj_t *main_btn_positions = nullptr;
+
+//lv_obj_t *main_btn_positions = nullptr;
 lv_obj_t *main_btn_files = nullptr;
 lv_obj_t *main_btn_pause = nullptr;
 lv_obj_t *main_btn_stop = nullptr;
@@ -92,111 +76,17 @@ lv_obj_t *main_btn_menu = nullptr;
  *   GLOBAL FUNCTIONS
  **********************/
 std::string progression_area_str = "";
-void update_show_fan_controls(bool show) { show_fan_button = show; }
-
-bool extruder_0_value_cb(ESP3DValuesIndex index, const char *value,
-                         ESP3DValuesCbAction action) {
-  if (action == ESP3DValuesCbAction::Update) {
-    if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
-      main_display_extruder_0();
-    } else {
-      // update other screens calling each callback update function
-      temperaturesScreen::extruder_0_value_cb(index, value, action);
-      filamentScreen::filament_value_cb(index, value, action);
-    }
-  }
-  return true;
-}
-
-bool extruder_1_value_cb(ESP3DValuesIndex index, const char *value,
-                         ESP3DValuesCbAction action) {
-  if (action == ESP3DValuesCbAction::Update) {
-    if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
-      main_display_extruder_1();
-      fan_value_cb(index, value, action);
-    } else {
-      //  update other screens calling each callback update function
-      temperaturesScreen::extruder_1_value_cb(index, value, action);
-      fanScreen::fan_value_cb(index, value, action);
-      filamentScreen::filament_value_cb(index, value, action);
-    }
-  }
-  return true;
-}
-
-bool bed_value_cb(ESP3DValuesIndex index, const char *value,
-                  ESP3DValuesCbAction action) {
-  if (action == ESP3DValuesCbAction::Update) {
-    if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
-      main_display_bed();
-    } else {
-      // update other screens calling each callback update function
-      temperaturesScreen::bed_value_cb(index, value, action);
-    }
-  }
-  return true;
-}
-
-bool position_value_cb(ESP3DValuesIndex index, const char *value,
-                       ESP3DValuesCbAction action) {
-  if (action == ESP3DValuesCbAction::Update) {
-    if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
-      main_display_positions();
-    } else {
-      positionsScreen::positions_values_cb(index, value, action);
-    }
-  }
-  return true;
-}
-
-bool fan_value_cb(ESP3DValuesIndex index, const char *value,
-                  ESP3DValuesCbAction action) {
-  esp3d_log("fan_value_cb");
-  if (!show_fan_button) {
-    esp3d_log("No control to show");
-    return false;
-  }
-
-  if (action == ESP3DValuesCbAction::Update) {
-    esp3d_log("Check if main screen");
-    if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
-      // this call back is called for each fan value, so check if need to update
-      // and for each extruder 1 update, so check if need to update nb of fans
-      if (index == ESP3DValuesIndex::ext_1_temperature ||
-          index == ESP3DValuesIndex::ext_1_target_temperature) {
-        esp3d_log("Check if extruder 1 data %s:", value);
-        uint nb_fans_tmp = 2;
-        if (strcmp(value, "#") == 0) {
-          esp3d_log("No extruder 1, only one fan");
-          nb_fans_tmp = 1;
-        }
-        if (nb_fans_tmp != nb_fans) {
-          esp3d_log("Update nb of fans");
-          nb_fans = nb_fans_tmp;
-        } else {
-          // no update needed
-          esp3d_log("No update needed");
-          return false;
-        }
-      }
-      main_display_fan();
-    } else {
-      fanScreen::fan_value_cb(index, value, action);
-    }
-  }
-  return true;
-}
-bool speed_value_cb(ESP3DValuesIndex index, const char *value,
-                    ESP3DValuesCbAction action) {
-  if (action == ESP3DValuesCbAction::Update) {
-    if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
-      main_display_speed();
-    } else {
-      speedScreen::speed_value_cb(index, value, action);
-    }
-  }
-  return true;
-}
+// bool position_value_cb(ESP3DValuesIndex index, const char *value,
+//                        ESP3DValuesCbAction action) {
+//   if (action == ESP3DValuesCbAction::Update) {
+//     if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
+//       main_display_positions();
+//     } else {
+//       positionsScreen::positions_values_cb(index, value, action);
+//     }
+//   }
+//   return true;
+// }
 bool job_status_value_cb(ESP3DValuesIndex index, const char *value,
                          ESP3DValuesCbAction action) {
   if (action == ESP3DValuesCbAction::Update) {
@@ -293,110 +183,18 @@ bool job_status_value_cb(ESP3DValuesIndex index, const char *value,
 /**********************
  *   LOCAL FUNCTIONS
  **********************/
-
-void main_display_extruder_0() {
-  std::string label_text = esp3dTftValues.get_string_value(
-      ESP3DValuesIndex::ext_0_target_temperature);
-  std::string tmpstr;
-  if (std::stod(label_text) == 0) {
-    tmpstr = LV_SYMBOL_EXTRUDER;
-  } else {
-    tmpstr = LV_SYMBOL_HEAT_EXTRUDER;
-  }
-  lv_label_set_text_fmt(
-      lv_obj_get_child(main_btn_extruder_0, 0), "%s\n%s\n%s1",
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::ext_0_temperature),
-      esp3dTftValues.get_string_value(
-          ESP3DValuesIndex::ext_0_target_temperature),
-      tmpstr.c_str());
-}
-
-void main_display_extruder_1() {
-  std::string label_text = esp3dTftValues.get_string_value(
-      ESP3DValuesIndex::ext_1_target_temperature);
-  if (label_text == "#") {
-    lv_obj_add_flag(main_btn_extruder_1, LV_OBJ_FLAG_HIDDEN);
-    return;
-  }
-  lv_obj_clear_flag(main_btn_extruder_1, LV_OBJ_FLAG_HIDDEN);
-  std::string tmpstr;
-  if (std::stod(label_text) == 0) {
-    tmpstr = LV_SYMBOL_EXTRUDER;
-  } else {
-    tmpstr = LV_SYMBOL_HEAT_EXTRUDER;
-  }
-  lv_label_set_text_fmt(
-      lv_obj_get_child(main_btn_extruder_1, 0), "%s\n%s\n%s2",
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::ext_1_temperature),
-      esp3dTftValues.get_string_value(
-          ESP3DValuesIndex::ext_1_target_temperature),
-      tmpstr.c_str());
-}
-
-void main_display_bed() {
-  std::string label_text =
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::bed_target_temperature);
-  if (label_text == "#") {
-    lv_obj_add_flag(main_btn_bed, LV_OBJ_FLAG_HIDDEN);
-    return;
-  }
-  lv_obj_clear_flag(main_btn_bed, LV_OBJ_FLAG_HIDDEN);
-  std::string tmpstr;
-  if (std::stod(label_text) == 0) {
-    tmpstr = LV_SYMBOL_NO_HEAT_BED;
-  } else {
-    tmpstr = LV_SYMBOL_HEAT_BED;
-  }
-  lv_label_set_text_fmt(
-      lv_obj_get_child(main_btn_bed, 0), "%s\n%s\n%s",
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::bed_temperature),
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::bed_target_temperature),
-      tmpstr.c_str());
-}
-
-void main_display_positions() {
-  lv_label_set_text_fmt(
-      lv_obj_get_child(main_btn_positions, 0), "X: %s\nY: %s\nZ: %s",
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::position_x),
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::position_y),
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::position_z));
-}
+// void main_display_positions() {
+//   lv_label_set_text_fmt(
+//       lv_obj_get_child(main_btn_positions, 0), "X: %s\nY: %s\nZ: %s",
+//       esp3dTftValues.get_string_value(ESP3DValuesIndex::position_x),
+//       esp3dTftValues.get_string_value(ESP3DValuesIndex::position_y),
+//       esp3dTftValues.get_string_value(ESP3DValuesIndex::position_z));
+// }
 
 void main_display_status_area() {
   if (main_label_progression_area)
     lv_label_set_text(main_label_progression_area,
                       progression_area_str.c_str());
-}
-
-void main_display_fan() {
-  esp3d_log("main_display_fan");
-  if (!show_fan_button) {
-    esp3d_log("No control to show");
-    return;
-  }
-  if (nb_fans == 2) {
-    esp3d_log("Update button with 2 fans");
-    lv_label_set_text_fmt(
-        lv_obj_get_child(main_btn_fan, 0), "%s%%\n%s%%\n%s",
-        esp3dTftValues.get_string_value(ESP3DValuesIndex::ext_0_fan),
-
-        esp3dTftValues.get_string_value(ESP3DValuesIndex::ext_1_fan),
-        LV_SYMBOL_FAN);
-  } else {
-    esp3d_log("Update button with 1 fan");
-    lv_label_set_text_fmt(
-
-        lv_obj_get_child(main_btn_fan, 0), "%s%%\n%s",
-        esp3dTftValues.get_string_value(ESP3DValuesIndex::ext_0_fan),
-        LV_SYMBOL_FAN);
-  }
-}
-
-void main_display_speed() {
-  lv_label_set_text_fmt(
-      lv_obj_get_child(main_btn_speed, 0), "%s%%\n%s",
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::speed),
-      LV_SYMBOL_SPEED);
 }
 
 void main_display_pause() {
@@ -472,18 +270,9 @@ void main_screen_delay_timer_cb(lv_timer_t *timer) {
     case ESP3DScreenType::none:
       emptyScreen::empty_screen();
       break;
-    case ESP3DScreenType::temperatures:
-      temperaturesScreen::temperatures_screen(main_screen_temperature_target);
-      break;
-    case ESP3DScreenType::positions:
-      positionsScreen::positions_screen();
-      break;
-    case ESP3DScreenType::fan:
-      fanScreen::fan_screen();
-      break;
-    case ESP3DScreenType::speed:
-      speedScreen::speed_screen();
-      break;
+    // case ESP3DScreenType::positions:
+    //   positionsScreen::positions_screen();
+    //   break;
 #if ESP3D_SD_CARD_FEATURE
     case ESP3DScreenType::files:
       filesScreen::files_screen();
@@ -500,47 +289,6 @@ void main_screen_delay_timer_cb(lv_timer_t *timer) {
   next_screen = ESP3DScreenType::none;
 }
 
-void event_button_E0_handler(lv_event_t *e) {
-  esp3d_log("E0 Clicked");
-  if (main_screen_delay_timer) return;
-  next_screen = ESP3DScreenType::temperatures;
-  main_screen_temperature_target = 0;
-  if (BUTTON_ANIMATION_DELAY) {
-    if (main_screen_delay_timer) return;
-    main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
-                                              BUTTON_ANIMATION_DELAY, NULL);
-  } else {
-    main_screen_delay_timer_cb(NULL);
-  }
-}
-
-void event_button_E1_handler(lv_event_t *e) {
-  esp3d_log("E1 Clicked");
-  if (main_screen_delay_timer) return;
-  next_screen = ESP3DScreenType::temperatures;
-  main_screen_temperature_target = 1;
-  if (BUTTON_ANIMATION_DELAY) {
-    if (main_screen_delay_timer) return;
-    main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
-                                              BUTTON_ANIMATION_DELAY, NULL);
-  } else {
-    main_screen_delay_timer_cb(NULL);
-  }
-}
-
-void event_button_Bed_handler(lv_event_t *e) {
-  esp3d_log("Bed Clicked");
-  if (main_screen_delay_timer) return;
-  next_screen = ESP3DScreenType::temperatures;
-  main_screen_temperature_target = 2;
-  if (BUTTON_ANIMATION_DELAY) {
-    if (main_screen_delay_timer) return;
-    main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
-                                              BUTTON_ANIMATION_DELAY, NULL);
-  } else {
-    main_screen_delay_timer_cb(NULL);
-  }
-}
 
 void event_button_positions_handler(lv_event_t *e) {
   esp3d_log("Positions Clicked");
@@ -555,31 +303,18 @@ void event_button_positions_handler(lv_event_t *e) {
   }
 }
 
-void event_button_fan_handler(lv_event_t *e) {
-  esp3d_log("Fan Clicked");
-  if (main_screen_delay_timer) return;
-  next_screen = ESP3DScreenType::fan;
-  if (BUTTON_ANIMATION_DELAY) {
-    if (main_screen_delay_timer) return;
-    main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
-                                              BUTTON_ANIMATION_DELAY, NULL);
-  } else {
-    main_screen_delay_timer_cb(NULL);
-  }
-}
-
-void event_button_speed_handler(lv_event_t *e) {
-  esp3d_log("Speed Clicked");
-  if (main_screen_delay_timer) return;
-  next_screen = ESP3DScreenType::speed;
-  if (BUTTON_ANIMATION_DELAY) {
-    if (main_screen_delay_timer) return;
-    main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
-                                              BUTTON_ANIMATION_DELAY, NULL);
-  } else {
-    main_screen_delay_timer_cb(NULL);
-  }
-}
+// void event_button_fan_handler(lv_event_t *e) {
+//   esp3d_log("Fan Clicked");
+//   if (main_screen_delay_timer) return;
+//   next_screen = ESP3DScreenType::fan;
+//   if (BUTTON_ANIMATION_DELAY) {
+//     if (main_screen_delay_timer) return;
+//     main_screen_delay_timer = lv_timer_create(main_screen_delay_timer_cb,
+//                                               BUTTON_ANIMATION_DELAY, NULL);
+//   } else {
+//     main_screen_delay_timer_cb(NULL);
+//   }
+// }
 
 #if ESP3D_SD_CARD_FEATURE
 void event_button_files_handler(lv_event_t *e) {
@@ -640,14 +375,6 @@ void main_screen() {
   // Screen creation
   esp3d_log("Main screen creation");
   if (!intialization_done) {
-    esp3d_log("main screen initialization");
-    std::string value =
-        esp3dTftJsonSettings.readString("settings", "showfanctrls");
-    if (value == "true") {
-      show_fan_button = true;
-    } else {
-      show_fan_button = false;
-    }
     intialization_done = true;
   }
   // Background
@@ -691,33 +418,12 @@ void main_screen() {
   apply_outline_pad(ui_bottom_buttons_container);
   lv_obj_clear_flag(ui_bottom_buttons_container, LV_OBJ_FLAG_SCROLLABLE);
 
-  //**********************************
-  // Create button and label for Extruder 0
-  main_btn_extruder_0 =
-      menuButton::create_menu_button(ui_top_buttons_container, "");
-
-  lv_obj_add_event_cb(main_btn_extruder_0, event_button_E0_handler,
-                      LV_EVENT_CLICKED, NULL);
-
-  // Create button and label for Extruder 1
-  main_btn_extruder_1 =
-      menuButton::create_menu_button(ui_top_buttons_container, "");
-
-  lv_obj_add_event_cb(main_btn_extruder_1, event_button_E1_handler,
-                      LV_EVENT_CLICKED, NULL);
-
-  // Create button and label for Bed
-  main_btn_bed = menuButton::create_menu_button(ui_top_buttons_container, "");
-
-  lv_obj_add_event_cb(main_btn_bed, event_button_Bed_handler, LV_EVENT_CLICKED,
-                      NULL);
-
   // Create button and label for positions
-  main_btn_positions = symbolButton::create_symbol_button(
-      ui_top_buttons_container, "", BUTTON_WIDTH * 1.5, BUTTON_HEIGHT);
+  // main_btn_positions = symbolButton::create_symbol_button(
+  //     ui_top_buttons_container, "", BUTTON_WIDTH * 1.5, BUTTON_HEIGHT);
 
-  lv_obj_add_event_cb(main_btn_positions, event_button_positions_handler,
-                      LV_EVENT_CLICKED, NULL);
+  // lv_obj_add_event_cb(main_btn_positions, event_button_positions_handler,
+  //                     LV_EVENT_CLICKED, NULL);
 
   // Create button and label for middle container
   main_label_progression_area = lv_label_create(ui_middle_container);
@@ -726,22 +432,7 @@ void main_screen() {
   lv_obj_center(main_label_progression_area);
   lv_obj_set_size(main_label_progression_area, CURRENT_STATUS_AREA_WIDTH,
                   CURRENT_STATUS_AREA_HEIGHT);
-  if (show_fan_button) {
-    // Create button and label for fan
-    main_btn_fan =
-        menuButton::create_menu_button(ui_bottom_buttons_container, "");
-
-    lv_obj_add_event_cb(main_btn_fan, event_button_fan_handler,
-                        LV_EVENT_CLICKED, NULL);
-  }
-
-  // Create button and label for speed
-  main_btn_speed =
-      menuButton::create_menu_button(ui_bottom_buttons_container, "");
-
-  lv_obj_add_event_cb(main_btn_speed, event_button_speed_handler,
-                      LV_EVENT_CLICKED, NULL);
-
+ 
   // Create button and label for pause
   main_btn_pause = menuButton::create_menu_button(ui_bottom_buttons_container,
                                                   LV_SYMBOL_PAUSE);
@@ -773,10 +464,7 @@ void main_screen() {
   lv_obj_add_event_cb(main_btn_menu, event_button_menu_handler,
                       LV_EVENT_CLICKED, NULL);
   esp3dTftui.set_current_screen(ESP3DScreenType::main);
-  main_display_extruder_0();
-  main_display_extruder_1();
-  main_display_bed();
-  main_display_positions();
+  //main_display_positions();
   main_display_status_area();
   main_display_pause();
   main_display_resume();
@@ -785,7 +473,5 @@ void main_screen() {
 #endif  // ESP3D_SD_CARD_FEATURE
   main_display_stop();
   main_display_menu();
-  main_display_speed();
-  if (show_fan_button) main_display_fan();
 }
 }  // namespace mainScreen

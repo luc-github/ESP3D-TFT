@@ -24,20 +24,7 @@
 
 namespace mainScreen {
 extern void main_screen();
-extern bool extruder_0_value_cb(ESP3DValuesIndex index, const char *value,
-                                ESP3DValuesCbAction action);
-extern bool extruder_1_value_cb(ESP3DValuesIndex index, const char *value,
-                                ESP3DValuesCbAction action);
-extern bool bed_value_cb(ESP3DValuesIndex index, const char *value,
-                         ESP3DValuesCbAction action);
-extern bool position_value_cb(ESP3DValuesIndex index, const char *value,
-                              ESP3DValuesCbAction action);
-extern bool fan_value_cb(ESP3DValuesIndex index, const char *value,
-                         ESP3DValuesCbAction action);
-extern bool speed_value_cb(ESP3DValuesIndex index, const char *value,
-                           ESP3DValuesCbAction action);
 extern bool job_status_value_cb(ESP3DValuesIndex index, const char *value,
                                 ESP3DValuesCbAction action);
-extern void update_show_fan_controls(bool show);
 
 }  // namespace mainScreen
