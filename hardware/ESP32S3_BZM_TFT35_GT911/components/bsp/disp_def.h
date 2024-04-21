@@ -2,102 +2,80 @@
 // Display driver ST7796 parallele 8080
 #pragma once
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
-#include "st7796.h"
-#include "disp_backlight.h"
 
 #define TFT_DISPLAY_CONTROLLER "ST7796"
+
+#include "spi_bus.h"
+#include "st7796.h"
+#include "disp_backlight.h"
 
 #define DISP_HOR_RES_MAX (480)
 #define DISP_VER_RES_MAX (320)
 
-#define DISP_BUF_SIZE (DISP_HOR_RES_MAX * (DISP_VER_RES_MAX / 10))
+#if WITH_PSRAM
+// 1/10 (32-line) buffer (30KB) in external PSRAM
+#define DISP_BUF_SIZE (DISP_HOR_RES_MAX * DISP_VER_RES_MAX / 10)
+#define DISP_BUF_MALLOC_TYPE MALLOC_CAP_DMA
+#else
+// 1/40 (8-line) buffer (7.5KB) in internal DRAM
+#define DISP_BUF_SIZE (DISP_HOR_RES_MAX * 8)
+#define DISP_BUF_MALLOC_TYPE MALLOC_CAP_DMA
+#endif // WITH_PSRAM
+#define DISP_BUF_SIZE_BYTES (DISP_BUF_SIZE * sizeof(uint16_t))
 
-const esp_i80_st7796_config_t st7796_cfg = {
-    .bus_config =
-        {
-            .clk_src = LCD_CLK_SRC_DEFAULT,
-            .dc_gpio_num = 10,  // DISP_RS_PIN=10
-            .wr_gpio_num = 9,  // DISP_WR_PIN=GPIO9
-            .data_gpio_nums =
-                {
-                    8,   // DISP_D00_PIN = GPIO8
-                    18,   // DISP_D01_PIN = GPIO18
-                    17,   // DISP_D02_PIN = GPIO17
-                    16,  // DISP_D03_PIN = GPIO16
-                    15,   // DISP_D04_PIN = GPIO15
-                    7,  // DISP_D05_PIN = GPIO7
-                    6,   // DISP_D06_PIN = GPIO6
-                    5,  // DISP_D07_PIN = GPIO5
-                    -1,   // DISP_D08_PIN = N/C
-                    -1,  // DISP_D09_PIN = N/C
-                    -1,   // DISP_D10_PIN = N/C
-                    -1,  // DISP_D11_PIN = N/C
-                    -1,   // DISP_D12_PIN = N/C
-                    -1,  // DISP_D13_PIN = N/C
-                    -1,   // DISP_D14_PIN = N/C
-                    -1,  // DISP_D15_PIN = N/C
-                },
-            .bus_width = 8,  // DISP_BITS_WIDTH
-            .max_transfer_bytes = DISP_BUF_SIZE * sizeof(uint16_t),
-            .psram_trans_align = 64,
-            .sram_trans_align = 4,
-        },
-    .io_config =
-        {
-            .cs_gpio_num = 11, //DISP_CS_PIN
-            .pclk_hz =
-                (8 * 1000 *
-                 1000),  // could be 10 if no PSRAM memory= DISP_CLK_FREQ,
-            .trans_queue_depth = 10,
-            .dc_levels =
-                {
-                    .dc_idle_level = 0,
-                    .dc_cmd_level = 0,
-                    .dc_dummy_level = 0,
-                    .dc_data_level = 1,
-                },
-            .on_color_trans_done =
-                NULL,  // Callback invoked when color data
-                       // transfer has finished updated in bdsp.c
-            .user_ctx =
-                NULL,  // User private data, passed directly to
-                       // on_color_trans_done’s user_ctx updated in bdsp.c
-            .lcd_cmd_bits = 8,    // DISP_CMD_BITS_WIDTH
-            .lcd_param_bits = 8,  // DISP_PARAM_BITS_WIDTH
-        },
-    .panel_config =
-        {
-            .reset_gpio_num = 3,  // DISP_RST_PIN = GPIO3 - Same as touch
-            .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_BGR,
-            .data_endian =
-                0, /*!< Set the data endian for color data larger than 1 byte */
-            .bits_per_pixel = 16, /*!< Color depth, in bpp */
-            .flags =
-                {
-                    .reset_active_high = 0, /*!< Setting this if the panel reset
-                                               is high level active */
-                },
-            .vendor_config = NULL, /*!< Vendor specific configuration */
-        },
-    .orientation = orientation_landscape,
-    .hor_res = DISP_HOR_RES_MAX,
-    .ver_res = DISP_VER_RES_MAX,
-};
+    // LCD panel configuration
+    esp_spi_st7262_config_t display_spi_st7262_cfg = {
+        .panel_dev_config = {.reset_gpio_num = 45,
+                             .rgb_ele_order = LCD_RGB_ELEMENT_ORDER_RGB,
+                             .data_endian = LCD_RGB_DATA_ENDIAN_BIG,
+                             .bits_per_pixel = 16,
+                             .flags = {.reset_active_high = 0},
+                             .vendor_config = NULL},
+
+        .spi_bus_config =
+            {
+                .spi_host_index = SPI3_HOST,
+                .pin_miso = -1,                         /**< MISO pin number */
+                .pin_mosi = 38,                         /**< MOSI pin number */
+                .pin_clk = 39,                          /**< CLK pin number */
+                .is_master = true,                      /**< SPI master mode */
+                .max_transfer_sz = DISP_BUF_SIZE_BYTES, /**< Maximum transfer size */
+                .dma_channel = SPI_DMA_CH_AUTO,         /**< DMA channel */
+                .quadwp_io_num = -1,                    /**< QuadWP pin number */
+                .quadhd_io_num = -1                     /**< QuadHD pin number */
+            },
+        .disp_spi_cfg =
+            {
+                .cs_gpio_num = 41,           /*!< GPIO used for CS line */
+                .dc_gpio_num = 40,           /*!< GPIO used to select the D/C line, set this to -1
+                                               if the D/C line is not used */
+                .spi_mode = 0,               /*!< Traditional SPI mode (0~3) */
+                .pclk_hz = 40 * 1000 * 1000, /*!< Frequency of pixel clock */
+                .trans_queue_depth = 10,     /*!< Size of internal transaction queue */
+                .on_color_trans_done = NULL, /*!< Callback invoked when color data
+                                                transfer has finished */
+                .user_ctx = NULL,            /*!< User private data, passed directly to
+                                                on_color_trans_done's user_ctx */
+                .lcd_cmd_bits = 8,           /*!< Bit-width of LCD command */
+                .lcd_param_bits = 8          /*!< Bit-width of LCD parameter */
+            },
+        .orientation = orientation_landscape,
+        .hor_res = DISP_HOR_RES_MAX,
+        .ver_res = DISP_VER_RES_MAX,
+    };
 
 // Display backlight configuration
-#define DISP_BCKL_DEFAULT_DUTY 100  //%
+#define DISP_BCKL_DEFAULT_DUTY 100 //%
 
-const disp_backlight_config_t disp_bcklt_cfg = {
-    .pwm_control = false,
-    .output_invert = false,
-    .gpio_num = 4, // DISP_BL_PIN=GPIO4
-    .timer_idx = 0,
-    .channel_idx = 0
-};
-
-
+    const disp_backlight_config_t disp_bcklt_cfg = {
+        .pwm_control = false,
+        .output_invert = false,
+        .gpio_num = 48, // DISP_BL_PIN=GPIO48
+        .timer_idx = 0,
+        .channel_idx = 0};
 
 #ifdef __cplusplus
 } /* extern "C" */

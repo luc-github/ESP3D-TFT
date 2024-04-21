@@ -18,7 +18,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "menu_screen.h"
+#include "screens/menu_screen.h"
 
 #include <lvgl.h>
 
@@ -32,18 +32,18 @@
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "esp3d_values.h"
-#include "filament_screen.h"
-#include "informations_screen.h"
-#include "leveling_screen.h"
-#include "main_screen.h"
-#include "manual_leveling_screen.h"
-#include "menu_screen.h"
+#include "screens/filament_screen.h"
+#include "screens/informations_screen.h"
+#include "screens/leveling_screen.h"
+#include "screens/main_screen.h"
+#include "screens/manual_leveling_screen.h"
+#include "screens/menu_screen.h"
 #include "rendering/esp3d_rendering_client.h"
-#include "settings_screen.h"
+#include "screens/settings_screen.h"
 #include "translations/esp3d_translation_service.h"
 
 #if ESP3D_WIFI_FEATURE
-#include "wifi_screen.h"
+#include "screens/wifi_screen.h"
 #endif  // ESP3D_WIFI_FEATURE
 
 /**********************
@@ -270,11 +270,12 @@ void menu_screen() {
   lv_obj_add_event_cb(main_btn_leveling, event_button_leveling_handler,
                       LV_EVENT_CLICKED, NULL);
 
-  // Create button and label for settings button
-  std::string label3 = LV_SYMBOL_SETTINGS;
-  lv_obj_t *btn3 =
-      menuButton::create_menu_button(ui_top_buttons_container, label3.c_str());
-  lv_obj_add_event_cb(btn3, event_button_settings_handler, LV_EVENT_CLICKED,
+  // Create button and label for disable steppers button
+  main_btn_disable_steppers = symbolButton::create_symbol_button(
+      ui_top_buttons_container, LV_SYMBOL_ENGINE, BUTTON_WIDTH, BUTTON_HEIGHT,
+      true, true, 90);
+  lv_obj_add_event_cb(main_btn_disable_steppers,
+                      event_button_disable_steppers_handler, LV_EVENT_CLICKED,
                       NULL);
 
 #if ESP3D_WIFI_FEATURE
@@ -285,12 +286,11 @@ void menu_screen() {
   lv_obj_add_event_cb(btn4, event_button_wifi_handler, LV_EVENT_CLICKED, NULL);
 #endif  // ESP3D_WIFI_FEATURE
 
-  // Create button and label for disable steppers button
-  main_btn_disable_steppers = symbolButton::create_symbol_button(
-      ui_bottom_buttons_container, LV_SYMBOL_ENGINE, BUTTON_WIDTH,
-      BUTTON_HEIGHT, true, true, 90);
-  lv_obj_add_event_cb(main_btn_disable_steppers,
-                      event_button_disable_steppers_handler, LV_EVENT_CLICKED,
+  // Create button and label for settings button
+  std::string label3 = LV_SYMBOL_SETTINGS;
+  lv_obj_t *btn3 = menuButton::create_menu_button(ui_bottom_buttons_container,
+                                                  label3.c_str());
+  lv_obj_add_event_cb(btn3, event_button_settings_handler, LV_EVENT_CLICKED,
                       NULL);
 
   // Create button and label for informations button

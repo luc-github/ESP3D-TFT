@@ -18,7 +18,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "settings_screen.h"
+#include "screens/settings_screen.h"
 
 #include <lvgl.h>
 
@@ -39,9 +39,9 @@
 #include "filesystem/esp3d_flash.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "main_screen.h"
-#include "manual_leveling_screen.h"
-#include "menu_screen.h"
+#include "screens/main_screen.h"
+#include "screens/manual_leveling_screen.h"
+#include "screens/menu_screen.h"
 #include "rendering/esp3d_rendering_client.h"
 #include "tasks_def.h"
 #include "translations/esp3d_translation_service.h"

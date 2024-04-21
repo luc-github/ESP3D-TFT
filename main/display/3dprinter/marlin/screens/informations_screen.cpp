@@ -18,7 +18,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "informations_screen.h"
+#include "screens/informations_screen.h"
 
 #include <lvgl.h>
 
@@ -34,7 +34,7 @@
 #include "esp_heap_caps.h"
 #include "esp_system.h"
 #include "filesystem/esp3d_flash.h"
-#include "menu_screen.h"
+#include "screens/menu_screen.h"
 #include "rom/ets_sys.h"
 #include "sdkconfig.h"
 #include "spi_flash_mmap.h"
