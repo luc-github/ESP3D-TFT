@@ -17,3 +17,50 @@ if (NOT (TFT_TARGET))
         "\n"
         "Now cmake will exit")
 endif()
+
+#Check only one platform is selected
+unset (system_selected)
+
+foreach(platform_enabled ${PLATFORMS_LIST})
+  if(${platform_enabled})
+   if (system_selected)
+    # Display the selected platforms
+    foreach(platforms_option ${PLATFORMS_LIST})
+        if(${platforms_option})
+            message(STATUS "Platform ${platforms_option} enabled")
+        endif()
+    endforeach()
+    message(FATAL_ERROR
+        "\n"
+        "Multiple platforms selected, please select only one platform in CMakeLists.txt"
+        "\n"
+        "Now cmake will exit")
+    else()
+        set(system_selected ${platform_enabled})
+    endif()
+  endif()
+endforeach()
+
+
+#check if multiple Fw targets are selected
+unset (fw_selected)
+
+foreach(fw_enabled ${FIRMWARES_LIST})
+  if(${fw_enabled})
+   if (fw_selected)
+    # Display the selected platforms
+    foreach(fw_option ${FIRMWARES_LIST})
+        if(${fw_option})
+            message(STATUS "Firmware ${fw_option} enabled")
+        endif()
+    endforeach()
+    message(FATAL_ERROR
+        "\n"
+        "Multiple firmwares selected, please select only one firmware in CMakeLists.txt"
+        "\n"
+        "Now cmake will exit")
+    else()
+        set(fw_selected ${fw_enabled})
+    endif()
+  endif()
+endforeach()

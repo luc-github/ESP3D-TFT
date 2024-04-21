@@ -1,5 +1,5 @@
 # #######################################
-# Select the targeted hardware
+# Select one targeted hardware
 # #######################################
 
 # With TFT:
@@ -37,7 +37,7 @@ OPTION(HARDWARE_MOD_EXT_PSRAM "Hardware Mod: External PSRAM" OFF)
 
 
 # #######################################
-# Select the targeted firmware
+# Select one targeted firmware
 # #######################################
 OPTION(TARGET_FW_MARLIN "Marlin firmware" ON)
 OPTION(TARGET_FW_REPETIER "Repetier firmware" OFF)
@@ -70,6 +70,32 @@ OPTION(USE_FAT_INSTEAD_OF_LITTLEFS "Use FAT instead of LittleFS" OFF)
 # #######################################
 # Do not change anything below this line
 # #######################################
+
+set(PLATFORMS_LIST
+  ESP32S3_HMI43V3
+  ESP32S3_ZX3D50CE02S_USRC_4832
+  ESP32S3_BZM_TFT35_GT911
+  ESP32S3_8048S070C
+  ESP32S3_8048S050C
+  ESP32S3_8048S043C
+  ESP32S3_4827S043C
+  ESP32_ROTRICS_DEXARM35
+  ESP32_3248S035C
+  ESP32_3248S035R
+  ESP32_2432S028R
+  ESP32S3_FREENOVE_1_1
+  ESP32S3_SEEED_STUDIO_XIAO
+  ESP32S3_CUSTOM
+  ESP32_CUSTOM
+)
+
+set(FIRMWARES_LIST
+  TARGET_FW_MARLIN
+  TARGET_FW_REPETIER
+  TARGET_FW_SMOOTHIEWARE
+  TARGET_FW_GRBL
+)
+
 cmake_minimum_required(VERSION 3.12.4)
 set(CMAKE_CXX_STANDARD 20)
 
