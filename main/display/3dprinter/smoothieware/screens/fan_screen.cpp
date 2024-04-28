@@ -89,7 +89,7 @@ bool updateBtnMatrix() {
   //  if yes update
   // then apply style
   lv_btnmatrix_set_map(btnm_target, get_fan_buttons_map());
-  apply_style(btnm_target, ESP3DStyleType::buttons_matrix);
+  ESP3DStyle::apply(btnm_target, ESP3DStyleType::buttons_matrix);
   lv_obj_update_layout(btnm_target);
   size_t i = get_map_size();
   lv_obj_set_size(btnm_target, MATRIX_BUTTON_WIDTH * i, MATRIX_BUTTON_HEIGHT);
@@ -305,7 +305,7 @@ void fan_screen() {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
-  apply_style(ui_new_screen, ESP3DStyleType::main_bg);
+  ESP3DStyle::apply(ui_new_screen, ESP3DStyleType::main_bg);
   lv_obj_del(ui_current_screen);
 
   btnback = backButton::create_back_button(ui_new_screen);
@@ -315,7 +315,7 @@ void fan_screen() {
   // Steps in button matrix
   lv_obj_t *btnm = lv_btnmatrix_create(ui_new_screen);
   lv_btnmatrix_set_map(btnm, fan_steps_buttons_map);
-  apply_style(btnm, ESP3DStyleType::buttons_matrix);
+  ESP3DStyle::apply(btnm, ESP3DStyleType::buttons_matrix);
   size_t i =
       (sizeof(fan_steps_buttons_map) / sizeof(fan_steps_buttons_map[0])) - 1;
   lv_obj_set_size(btnm, MATRIX_BUTTON_WIDTH * i, MATRIX_BUTTON_HEIGHT);
@@ -329,7 +329,7 @@ void fan_screen() {
   // Current Fan label
   label_current_fan = lv_label_create(ui_new_screen);
   lv_label_set_text(label_current_fan, fan_buttons_map[fan_buttons_map_id]);
-  apply_style(label_current_fan, ESP3DStyleType::bg_label);
+  ESP3DStyle::apply(label_current_fan, ESP3DStyleType::bg_label);
   lv_obj_align(label_current_fan, LV_ALIGN_TOP_LEFT,
                CURRENT_BUTTON_PRESSED_OUTLINE, CURRENT_BUTTON_PRESSED_OUTLINE);
   lv_obj_update_layout(label_current_fan);
@@ -340,7 +340,7 @@ void fan_screen() {
 
   label_current_fan_value = lv_label_create(ui_new_screen);
   lv_label_set_text(label_current_fan_value, current_fan_value_init.c_str());
-  apply_style(label_current_fan_value, ESP3DStyleType::read_only_value);
+  ESP3DStyle::apply(label_current_fan_value, ESP3DStyleType::read_only_value);
   lv_obj_set_width(label_current_fan_value, LV_HOR_RES / 6);
   lv_obj_align_to(label_current_fan_value, label_current_fan,
                   LV_ALIGN_OUT_RIGHT_MID, CURRENT_BUTTON_PRESSED_OUTLINE / 2,
@@ -349,7 +349,7 @@ void fan_screen() {
   // unit
   lv_obj_t *label_unit1 = lv_label_create(ui_new_screen);
   lv_label_set_text(label_unit1, "%");
-  apply_style(label_unit1, ESP3DStyleType::bg_label);
+  ESP3DStyle::apply(label_unit1, ESP3DStyleType::bg_label);
   lv_obj_align_to(label_unit1, label_current_fan_value, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
 
@@ -373,14 +373,14 @@ void fan_screen() {
   // label
   lv_obj_t *label_ta = lv_label_create(ui_new_screen);
   lv_label_set_text(label_ta, LV_SYMBOL_FAN);
-  apply_style(label_ta, ESP3DStyleType::bg_label);
+  ESP3DStyle::apply(label_ta, ESP3DStyleType::bg_label);
   lv_obj_align_to(label_ta, fan_ta, LV_ALIGN_OUT_LEFT_MID,
                   -CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
 
   // unit
   lv_obj_t *label_unit2 = lv_label_create(ui_new_screen);
   lv_label_set_text(label_unit2, "%");
-  apply_style(label_unit2, ESP3DStyleType::bg_label);
+  ESP3DStyle::apply(label_unit2, ESP3DStyleType::bg_label);
   lv_obj_align_to(label_unit2, fan_ta, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
 

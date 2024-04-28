@@ -48,6 +48,6 @@ enum class ESP3DStyleType : uint8_t {
   text_container,
 };
 
-extern bool init_styles();
-extern bool apply_style(lv_obj_t* obj, ESP3DStyleType type);
-extern bool apply_outline_pad(lv_obj_t* obj);
+extern bool ESP3DStyle::init();
+extern bool ESP3DStyle::apply(lv_obj_t* obj, ESP3DStyleType type);
+extern bool ESP3DStyle::add_pad(lv_obj_t* obj);

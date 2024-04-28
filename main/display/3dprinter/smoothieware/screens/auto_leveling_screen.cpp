@@ -259,7 +259,7 @@ void auto_leveling_screen() {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
-  apply_style(ui_new_screen, ESP3DStyleType::main_bg);
+  ESP3DStyle::apply(ui_new_screen, ESP3DStyleType::main_bg);
   lv_obj_del(ui_current_screen);
 
   homing_done = false;
@@ -288,7 +288,7 @@ void auto_leveling_screen() {
                       LV_EVENT_CLICKED, NULL);
 
   label_status = lv_label_create(ui_new_screen);
-  apply_style(label_status, ESP3DStyleType::bg_label);
+  ESP3DStyle::apply(label_status, ESP3DStyleType::bg_label);
   lv_label_set_text(label_status, "");
   lv_obj_align_to(label_status, auto_leveling_screen_table,
                   LV_ALIGN_OUT_BOTTOM_LEFT, 0, CURRENT_BUTTON_PRESSED_OUTLINE);

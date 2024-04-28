@@ -382,7 +382,7 @@ void main_screen() {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_main_screen);
-  apply_style(ui_main_screen, ESP3DStyleType::main_bg);
+  ESP3DStyle::apply(ui_main_screen, ESP3DStyleType::main_bg);
   lv_obj_del(ui_current_screen);
 
   lv_obj_t *ui_status_bar_container = statusBar::status_bar(ui_main_screen);
@@ -390,7 +390,7 @@ void main_screen() {
 
   // create container for main screen buttons
   lv_obj_t *ui_container_main_screen = lv_obj_create(ui_main_screen);
-  apply_style(ui_container_main_screen, ESP3DStyleType::col_container);
+  ESP3DStyle::apply(ui_container_main_screen, ESP3DStyleType::col_container);
   lv_obj_clear_flag(ui_container_main_screen, LV_OBJ_FLAG_SCROLLABLE);
   lv_obj_set_size(ui_container_main_screen, LV_HOR_RES,
                   LV_VER_RES - lv_obj_get_height(ui_status_bar_container));
@@ -399,23 +399,23 @@ void main_screen() {
 
   // Add buttons top container to main container
   lv_obj_t *ui_top_buttons_container = lv_obj_create(ui_container_main_screen);
-  apply_style(ui_top_buttons_container, ESP3DStyleType::row_container);
+  ESP3DStyle::apply(ui_top_buttons_container, ESP3DStyleType::row_container);
   lv_obj_set_size(ui_top_buttons_container, LV_HOR_RES, LV_SIZE_CONTENT);
-  apply_outline_pad(ui_top_buttons_container);
+  ESP3DStyle::add_pad(ui_top_buttons_container);
   lv_obj_clear_flag(ui_top_buttons_container, LV_OBJ_FLAG_SCROLLABLE);
 
   // Middle container
   lv_obj_t *ui_middle_container = lv_btn_create(ui_container_main_screen);
-  apply_style(ui_middle_container, ESP3DStyleType::row_container);
+  ESP3DStyle::apply(ui_middle_container, ESP3DStyleType::row_container);
   lv_obj_set_size(ui_middle_container, LV_HOR_RES, LV_SIZE_CONTENT);
-  apply_outline_pad(ui_middle_container);
+  ESP3DStyle::add_pad(ui_middle_container);
 
   // Add buttons bottom container to main container
   lv_obj_t *ui_bottom_buttons_container =
       lv_obj_create(ui_container_main_screen);
-  apply_style(ui_bottom_buttons_container, ESP3DStyleType::row_container);
+  ESP3DStyle::apply(ui_bottom_buttons_container, ESP3DStyleType::row_container);
   lv_obj_set_size(ui_bottom_buttons_container, LV_HOR_RES, LV_SIZE_CONTENT);
-  apply_outline_pad(ui_bottom_buttons_container);
+  ESP3DStyle::add_pad(ui_bottom_buttons_container);
   lv_obj_clear_flag(ui_bottom_buttons_container, LV_OBJ_FLAG_SCROLLABLE);
 
   // Create button and label for positions
@@ -427,7 +427,7 @@ void main_screen() {
 
   // Create button and label for middle container
   main_label_progression_area = lv_label_create(ui_middle_container);
-  apply_style(main_label_progression_area, ESP3DStyleType::status_bar);
+  ESP3DStyle::apply(main_label_progression_area, ESP3DStyleType::status_bar);
 
   lv_obj_center(main_label_progression_area);
   lv_obj_set_size(main_label_progression_area, CURRENT_STATUS_AREA_WIDTH,

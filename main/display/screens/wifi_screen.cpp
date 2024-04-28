@@ -205,7 +205,7 @@ void wifi_screen() {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
-  apply_style(ui_new_screen, ESP3DStyleType::main_bg);
+  ESP3DStyle::apply(ui_new_screen, ESP3DStyleType::main_bg);
   lv_obj_del(ui_current_screen);
 
   btnback = backButton::create_back_button(ui_new_screen);
@@ -216,9 +216,9 @@ void wifi_screen() {
       ui_new_screen, btnback, ESP3DStyleType::col_container);
 
   lv_obj_t *ui_buttons_container = lv_obj_create(ui_main_container);
-  apply_style(ui_buttons_container, ESP3DStyleType::row_container);
+  ESP3DStyle::apply(ui_buttons_container, ESP3DStyleType::row_container);
   lv_obj_set_size(ui_buttons_container, LV_HOR_RES, LV_SIZE_CONTENT);
-  apply_outline_pad(ui_buttons_container);
+  ESP3DStyle::add_pad(ui_buttons_container);
   lv_obj_clear_flag(ui_buttons_container, LV_OBJ_FLAG_SCROLLABLE);
 
   lv_obj_t *btn = nullptr;

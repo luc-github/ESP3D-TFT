@@ -1,5 +1,5 @@
 /*
-  esp3d_tft
+  esp3d_styles_splash_screen.h - ESP3D screens styles definition
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -17,14 +17,8 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-#include "esp3d_log.h"
-#include "esp3d_styles.h"
-#include "screens/splash_screen.h"
-/**********************
- *  STATIC PROTOTYPES
- **********************/
 
-void create_application(void) {
-  ESP3DStyle::init();
-  splashScreen::enter();
-}
+#pragma once
+
+#define FW_LOGO_X 1
+#define FW_LOGO_Y -1

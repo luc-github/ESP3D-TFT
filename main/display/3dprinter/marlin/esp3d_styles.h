@@ -25,6 +25,7 @@
 #include "esp3d_styles_res.h"
 #include "lvgl.h"
 
+//Styles for common controls
 enum class ESP3DStyleType : uint8_t {
   default_style = 0,
   main_bg,
@@ -48,6 +49,31 @@ enum class ESP3DStyleType : uint8_t {
   text_container,
 };
 
-extern bool init_styles();
-extern bool apply_style(lv_obj_t* obj, ESP3DStyleType type);
-extern bool apply_outline_pad(lv_obj_t* obj);
+//Name space for styles
+namespace ESP3DStyle {
+ bool init();
+ bool apply(lv_obj_t* obj, ESP3DStyleType type);
+ bool add_pad(lv_obj_t* obj);
+};  // namespace ESP3DStyle
+
+//Colors definition
+//Screen colors 
+#define ESP3D_SCREEN_BACKGROUND_COLOR lv_color_hex(0x000000)
+#define ESP3D_SCREEN_BACKGROUND_TEXT_COLOR lv_color_hex(0xFFFFFF)
+
+
+#define CURRENT_STATUS_BAR_TEXT_COLOR lv_color_hex(0x000000)
+#define CURRENT_STATUS_BAR_BG_COLOR lv_color_hex(0xFFFFFF)
+#define CURRENT_STATUS_BAR_BORDER_COLOR lv_palette_main(LV_PALETTE_GREY)
+
+#define CURRENT_BUTTON_COLOR_PALETTE LV_PALETTE_GREY
+#define CURRENT_BUTTON_COLOR_PALETTE_DARKEN 2
+
+#define CURRENT_BUTTON_BORDER_COLOR \
+  lv_color_hex(0xFFFFFF)  // lv_palette_main(LV_PALETTE_GREY)
+#define CURRENT_BUTTON_TEXT_COLOR lv_color_hex(0xFFFFFF)
+#define CURRENT_BUTTON_OUTLINE_COLOR_PALETTE LV_PALETTE_GREEN
+#define CURRENT_BUTTON_PRESSED_COLOR_PALETTE LV_PALETTE_GREY
+#define CURRENT_BUTTON_PRESSED_TEXT_COLOR lv_color_hex(0x00FF00)
+#define CURRENT_BUTTON_PRESSED_BORDER_COLOR lv_color_hex(0x00FF00)
+

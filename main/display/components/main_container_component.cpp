@@ -30,7 +30,7 @@ namespace mainContainer {
 lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
                                 ESP3DStyleType style) {
   lv_obj_t *ui_container = lv_obj_create(parent);
-  if (ESP3DStyleType::default_style != style) apply_style(ui_container, style);
+  if (ESP3DStyleType::default_style != style) ESP3DStyle::apply(ui_container, style);
   lv_obj_clear_flag(ui_container, LV_OBJ_FLAG_SCROLLABLE);
   lv_obj_update_layout(button_back);
   lv_obj_set_size(ui_container, LV_HOR_RES,

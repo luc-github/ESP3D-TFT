@@ -122,7 +122,7 @@ lv_obj_t *create_choice_editor(lv_obj_t *container, const char *text,
   lv_obj_t *choice_container = lv_obj_create(main_container);
   size_t heigth = y_bottom - y_top - 2 * CURRENT_BUTTON_PRESSED_OUTLINE;
 
-  apply_style(choice_container, ESP3DStyleType::list_container);
+  ESP3DStyle::apply(choice_container, ESP3DStyleType::list_container);
 
   lv_obj_align_to(choice_container, editor_title, LV_ALIGN_OUT_BOTTOM_MID, 0,
                   CURRENT_BUTTON_PRESSED_OUTLINE);
@@ -142,7 +142,7 @@ lv_obj_t *create_choice_editor(lv_obj_t *container, const char *text,
     if (!found)
       active_pos += lv_obj_get_height(obj) + CURRENT_BUTTON_PRESSED_OUTLINE;
     lv_obj_add_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE);
-    apply_style(obj, ESP3DStyleType::radio_button);
+    ESP3DStyle::apply(obj, ESP3DStyleType::radio_button);
     index++;
   }
 

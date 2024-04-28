@@ -129,7 +129,7 @@ bool updateBtnMatrix() {
   //  if yes update
   // then apply style
   lv_btnmatrix_set_map(btnm_target, get_heater_buttons_map());
-  apply_style(btnm_target, ESP3DStyleType::buttons_matrix);
+  ESP3DStyle::apply(btnm_target, ESP3DStyleType::buttons_matrix);
   lv_obj_update_layout(btnm_target);
   size_t i = get_map_size();
   lv_obj_set_size(btnm_target, MATRIX_BUTTON_WIDTH * i, MATRIX_BUTTON_HEIGHT);
@@ -442,7 +442,7 @@ void temperatures_screen(uint8_t target, ESP3DScreenType screenreturn) {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
-  apply_style(ui_new_screen, ESP3DStyleType::main_bg);
+  ESP3DStyle::apply(ui_new_screen, ESP3DStyleType::main_bg);
   lv_obj_del(ui_current_screen);
 
   // back button
@@ -453,7 +453,7 @@ void temperatures_screen(uint8_t target, ESP3DScreenType screenreturn) {
   // Steps in button matrix
   lv_obj_t *btnm = lv_btnmatrix_create(ui_new_screen);
   lv_btnmatrix_set_map(btnm, temperatures_buttons_map);
-  apply_style(btnm, ESP3DStyleType::buttons_matrix);
+  ESP3DStyle::apply(btnm, ESP3DStyleType::buttons_matrix);
   size_t i =
       (sizeof(temperatures_buttons_map) / sizeof(temperatures_buttons_map[0])) -
       1;
@@ -484,7 +484,7 @@ void temperatures_screen(uint8_t target, ESP3DScreenType screenreturn) {
       label_current_temperature,
       heater_buttons_map[heater_buttons_map_id]);  // need to change according
                                                    // heater
-  apply_style(label_current_temperature, ESP3DStyleType::bg_label);
+  ESP3DStyle::apply(label_current_temperature, ESP3DStyleType::bg_label);
   lv_obj_align(label_current_temperature, LV_ALIGN_TOP_LEFT,
                CURRENT_BUTTON_PRESSED_OUTLINE, CURRENT_BUTTON_PRESSED_OUTLINE);
   lv_obj_update_layout(label_current_temperature);
@@ -523,7 +523,7 @@ void temperatures_screen(uint8_t target, ESP3DScreenType screenreturn) {
   }
   lv_label_set_text(label_current_temperature_value,
                     current_temperature_value_init.c_str());
-  apply_style(label_current_temperature_value, ESP3DStyleType::read_only_value);
+  ESP3DStyle::apply(label_current_temperature_value, ESP3DStyleType::read_only_value);
   lv_obj_set_width(label_current_temperature_value, LV_HOR_RES / 6);
   lv_obj_align_to(label_current_temperature_value, label_current_temperature,
                   LV_ALIGN_OUT_RIGHT_MID, CURRENT_BUTTON_PRESSED_OUTLINE / 2,
@@ -532,7 +532,7 @@ void temperatures_screen(uint8_t target, ESP3DScreenType screenreturn) {
   lv_obj_t *label_unit1 = lv_label_create(ui_new_screen);
   lv_label_set_text(label_unit1,
                     esp3dTranslationService.translate(ESP3DLabel::celsius));
-  apply_style(label_unit1, ESP3DStyleType::bg_label);
+  ESP3DStyle::apply(label_unit1, ESP3DStyleType::bg_label);
   lv_obj_align_to(label_unit1, label_current_temperature_value,
                   LV_ALIGN_OUT_RIGHT_MID, CURRENT_BUTTON_PRESSED_OUTLINE / 2,
                   0);
@@ -573,7 +573,7 @@ void temperatures_screen(uint8_t target, ESP3DScreenType screenreturn) {
   lv_label_set_text(label_target,
                     LV_SYMBOL_HEAT_EXTRUDER);  // need to change according
                                                // heater
-  apply_style(label_target, ESP3DStyleType::bg_label);
+  ESP3DStyle::apply(label_target, ESP3DStyleType::bg_label);
   lv_obj_align_to(label_target, temperatures_ta, LV_ALIGN_OUT_LEFT_MID,
                   -CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
 
@@ -581,7 +581,7 @@ void temperatures_screen(uint8_t target, ESP3DScreenType screenreturn) {
   lv_obj_t *label_unit2 = lv_label_create(ui_new_screen);
   lv_label_set_text(label_unit2,
                     esp3dTranslationService.translate(ESP3DLabel::celsius));
-  apply_style(label_unit2, ESP3DStyleType::bg_label);
+  ESP3DStyle::apply(label_unit2, ESP3DStyleType::bg_label);
 
   lv_obj_align_to(label_unit2, temperatures_ta, LV_ALIGN_OUT_RIGHT_MID,
                   CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
@@ -628,7 +628,7 @@ void temperatures_screen(uint8_t target, ESP3DScreenType screenreturn) {
 
   lv_label_set_text(label_target_temperature_value,
                     temperatures_value_init.c_str());
-  apply_style(label_target_temperature_value,
+  ESP3DStyle::apply(label_target_temperature_value,
               ESP3DStyleType::read_only_setting);
   lv_obj_set_width(label_target_temperature_value, LV_HOR_RES / 6);
   lv_obj_align_to(label_target_temperature_value, btn_down,
@@ -639,7 +639,7 @@ void temperatures_screen(uint8_t target, ESP3DScreenType screenreturn) {
   label_unit1 = lv_label_create(ui_new_screen);
   lv_label_set_text(label_unit1,
                     esp3dTranslationService.translate(ESP3DLabel::celsius));
-  apply_style(label_unit1, ESP3DStyleType::bg_label);
+  ESP3DStyle::apply(label_unit1, ESP3DStyleType::bg_label);
   lv_obj_align_to(label_unit1, label_target_temperature_value,
                   LV_ALIGN_OUT_RIGHT_MID, CURRENT_BUTTON_PRESSED_OUTLINE / 2,
                   0);
@@ -650,7 +650,7 @@ void temperatures_screen(uint8_t target, ESP3DScreenType screenreturn) {
       label_target_temperature,
       heater_buttons_map[heater_buttons_map_id]);  // need to change according
                                                    // heater
-  apply_style(label_target_temperature, ESP3DStyleType::bg_label);
+  ESP3DStyle::apply(label_target_temperature, ESP3DStyleType::bg_label);
 
   lv_obj_align_to(label_target_temperature, label_target_temperature_value,
                   LV_ALIGN_OUT_LEFT_MID, -CURRENT_BUTTON_PRESSED_OUTLINE / 2,

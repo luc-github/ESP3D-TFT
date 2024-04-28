@@ -22,9 +22,9 @@
 
 #include "esp3d_log.h"
 
-#define CURRENT_MAIN_BG_COLOR lv_color_hex(0x000000)
+#define ESP3D_SCREEN_BACKGROUND_COLOR lv_color_hex(0x000000)
 
-#define CURRENT_BG_LABEL_TEXT_COLOR lv_color_hex(0xFFFFFF)
+#define ESP3D_SCREEN_BACKGROUND_TEXT_COLOR lv_color_hex(0xFFFFFF)
 
 #define CURRENT_STATUS_BAR_TEXT_COLOR lv_color_hex(0x000000)
 #define CURRENT_STATUS_BAR_BG_COLOR lv_color_hex(0xFFFFFF)
@@ -82,45 +82,45 @@ lv_style_t style_text_container;
 lv_style_t style_spinner_screen;
 lv_style_t style_spinner_text;
 
-bool init_styles() {
+bool ESP3DStyle::init() {
   /*
   Spinner screen
   */
   lv_style_init(&style_spinner_screen);
   lv_style_set_text_opa(&style_spinner_screen, LV_OPA_COVER);
-  lv_style_set_text_color(&style_spinner_screen, CURRENT_BG_LABEL_TEXT_COLOR);
-  lv_style_set_bg_color(&style_spinner_screen, CURRENT_MAIN_BG_COLOR);
+  lv_style_set_text_color(&style_spinner_screen, ESP3D_SCREEN_BACKGROUND_TEXT_COLOR);
+  lv_style_set_bg_color(&style_spinner_screen, ESP3D_SCREEN_BACKGROUND_COLOR);
   lv_style_set_bg_opa(&style_spinner_screen, LV_OPA_50);
   /*
   Spinner text
   */
   lv_style_init(&style_spinner_text);
   lv_style_set_text_opa(&style_spinner_text, LV_OPA_COVER);
-  lv_style_set_text_color(&style_spinner_text, CURRENT_BG_LABEL_TEXT_COLOR);
+  lv_style_set_text_color(&style_spinner_text, ESP3D_SCREEN_BACKGROUND_TEXT_COLOR);
 
   /*
   Main background
   */
   lv_style_init(&style_main_bg);
   lv_style_set_text_opa(&style_main_bg, LV_OPA_COVER);
-  lv_style_set_text_color(&style_main_bg, CURRENT_BG_LABEL_TEXT_COLOR);
-  lv_style_set_bg_color(&style_main_bg, CURRENT_MAIN_BG_COLOR);
+  lv_style_set_text_color(&style_main_bg, ESP3D_SCREEN_BACKGROUND_TEXT_COLOR);
+  lv_style_set_bg_color(&style_main_bg, ESP3D_SCREEN_BACKGROUND_COLOR);
 
   /*
   Label on main background
   */
   lv_style_init(&style_bg_label);
   lv_style_set_text_opa(&style_bg_label, LV_OPA_COVER);
-  lv_style_set_text_color(&style_bg_label, CURRENT_BG_LABEL_TEXT_COLOR);
-  lv_style_set_bg_color(&style_bg_label, CURRENT_MAIN_BG_COLOR);
+  lv_style_set_text_color(&style_bg_label, ESP3D_SCREEN_BACKGROUND_TEXT_COLOR);
+  lv_style_set_bg_color(&style_bg_label, ESP3D_SCREEN_BACKGROUND_COLOR);
 
   /*
   read only value on main background
   */
   lv_style_init(&style_read_only_value);
   lv_style_set_text_opa(&style_read_only_value, LV_OPA_COVER);
-  lv_style_set_text_color(&style_read_only_value, CURRENT_BG_LABEL_TEXT_COLOR);
-  lv_style_set_bg_color(&style_read_only_value, CURRENT_MAIN_BG_COLOR);
+  lv_style_set_text_color(&style_read_only_value, ESP3D_SCREEN_BACKGROUND_TEXT_COLOR);
+  lv_style_set_bg_color(&style_read_only_value, ESP3D_SCREEN_BACKGROUND_COLOR);
   lv_style_set_radius(&style_read_only_value, CURRENT_STATUS_BAR_RADIUS);
   lv_style_set_border_width(&style_read_only_value,
                             CURRENT_STATUS_BAR_BORDER_VALUE);
@@ -137,7 +137,7 @@ bool init_styles() {
   lv_style_set_text_opa(&style_read_only_setting, LV_OPA_COVER);
   lv_style_set_text_color(&style_read_only_setting,
                           CURRENT_BUTTON_PRESSED_TEXT_COLOR);
-  lv_style_set_bg_color(&style_read_only_setting, CURRENT_MAIN_BG_COLOR);
+  lv_style_set_bg_color(&style_read_only_setting, ESP3D_SCREEN_BACKGROUND_COLOR);
   lv_style_set_radius(&style_read_only_setting, CURRENT_STATUS_BAR_RADIUS);
   lv_style_set_border_width(&style_read_only_setting,
                             CURRENT_STATUS_BAR_BORDER_VALUE);
@@ -541,17 +541,17 @@ bool init_styles() {
   */
   lv_style_init(&style_simple_container_default);
   lv_style_set_bg_opa(&style_simple_container_default, LV_OPA_COVER);
-  lv_style_set_bg_color(&style_simple_container_default, CURRENT_MAIN_BG_COLOR);
+  lv_style_set_bg_color(&style_simple_container_default, ESP3D_SCREEN_BACKGROUND_COLOR);
 
   // Text Container
   lv_style_init(&style_text_container);
   lv_style_set_bg_opa(&style_text_container, LV_OPA_COVER);
-  lv_style_set_bg_color(&style_text_container, CURRENT_MAIN_BG_COLOR);
+  lv_style_set_bg_color(&style_text_container, ESP3D_SCREEN_BACKGROUND_COLOR);
 
   return true;
 }
 
-bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
+bool ESP3DStyle::apply(lv_obj_t* obj, ESP3DStyleType type) {
   if (type != ESP3DStyleType::main_bg && type != ESP3DStyleType::status_list &&
       type != ESP3DStyleType::buttons_msgbox &&
       type != ESP3DStyleType::message_box &&
@@ -625,8 +625,8 @@ bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
       break;
     case ESP3DStyleType::message_box:
       lv_obj_set_width(obj, LV_PCT(80));
-      apply_style(lv_msgbox_get_close_btn(obj), ESP3DStyleType::button);
-      apply_style(lv_msgbox_get_btns(obj), ESP3DStyleType::buttons_msgbox);
+      ESP3DStyle::apply(lv_msgbox_get_close_btn(obj), ESP3DStyleType::button);
+      ESP3DStyle::apply(lv_msgbox_get_btns(obj), ESP3DStyleType::buttons_msgbox);
       lv_obj_set_height(lv_msgbox_get_btns(obj), SYMBOL_BUTTON_HEIGHT);
       lv_obj_set_width(lv_msgbox_get_btns(obj), MSGBOX_BUTTON_WIDTH);
       break;
@@ -651,7 +651,7 @@ bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
                                   LV_PART_MAIN);
       break;
     case ESP3DStyleType::list_container:
-      apply_style(obj, ESP3DStyleType::col_container);
+      ESP3DStyle::apply(obj, ESP3DStyleType::col_container);
       lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_ELASTIC);
       lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
       lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_AUTO);
@@ -675,7 +675,7 @@ bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
     case ESP3DStyleType::simple_container:
       lv_obj_add_style(obj, &style_simple_container_default, LV_STATE_DEFAULT);
       lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-      apply_outline_pad(obj);
+      ESP3DStyle::add_pad(obj);
       break;
     case ESP3DStyleType::status_list:
       lv_obj_add_style(obj, &style_status_list_default, LV_STATE_DEFAULT);
@@ -688,7 +688,7 @@ bool apply_style(lv_obj_t* obj, ESP3DStyleType type) {
   return true;
 }
 
-bool apply_outline_pad(lv_obj_t* obj) {
+bool ESP3DStyle::add_pad(lv_obj_t* obj) {
   lv_obj_set_style_pad_left(obj, CURRENT_BUTTON_PRESSED_OUTLINE, LV_PART_MAIN);
   lv_obj_set_style_pad_right(obj, CURRENT_BUTTON_PRESSED_OUTLINE, LV_PART_MAIN);
   lv_obj_set_style_pad_top(obj, CURRENT_BUTTON_PRESSED_OUTLINE, LV_PART_MAIN);

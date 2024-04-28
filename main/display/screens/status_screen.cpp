@@ -89,19 +89,19 @@ void status_screen() {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_status_screen);  // Apply background color
-  apply_style(ui_status_screen, ESP3DStyleType::main_bg);
+  ESP3DStyle::apply(ui_status_screen, ESP3DStyleType::main_bg);
   lv_obj_del(ui_current_screen);
 
   // Create screen container
   lv_obj_t *ui_status_screen_container = lv_obj_create(ui_status_screen);
-  apply_style(ui_status_screen_container, ESP3DStyleType::col_container);
+  ESP3DStyle::apply(ui_status_screen_container, ESP3DStyleType::col_container);
   lv_obj_set_size(ui_status_screen_container, LV_HOR_RES, LV_VER_RES);
   lv_obj_clear_flag(ui_status_screen_container, LV_OBJ_FLAG_SCROLLABLE);
   lv_obj_set_style_pad_top(ui_status_screen_container, 0, LV_PART_MAIN);
   lv_obj_set_style_pad_bottom(ui_status_screen_container, 0, LV_PART_MAIN);
 
   lv_obj_t *ui_status_list_ctl = lv_list_create(ui_status_screen_container);
-  apply_style(ui_status_list_ctl, ESP3DStyleType::status_list);
+  ESP3DStyle::apply(ui_status_list_ctl, ESP3DStyleType::status_list);
   lv_obj_set_align(ui_status_list_ctl, LV_ALIGN_TOP_MID);
   esp3d_log("status_list size is %d", ui_status_screen_list.size());
   for (auto &line : ui_status_screen_list) {
@@ -109,7 +109,7 @@ void status_screen() {
   }
 
   lv_obj_t *btn_back = lv_btn_create(ui_status_screen_container);
-  apply_style(btn_back, ESP3DStyleType::embedded_button);
+  ESP3DStyle::apply(btn_back, ESP3DStyleType::embedded_button);
   lv_obj_set_width(btn_back, LV_HOR_RES);
   lv_obj_t *label_btn_back = lv_label_create(btn_back);
   lv_label_set_text(label_btn_back, LV_SYMBOL_UP);

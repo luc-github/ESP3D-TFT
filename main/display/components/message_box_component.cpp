@@ -64,7 +64,7 @@ lv_obj_t *messageBoxMain(lv_obj_t *container, MsgBoxType type,
 
   lv_obj_t *mbox =
       lv_msgbox_create(NULL, title.c_str(), content, (const char **)btns, true);
-  apply_style(mbox, ESP3DStyleType::message_box);
+  ESP3DStyle::apply(mbox, ESP3DStyleType::message_box);
   lv_obj_center(mbox);
   return mbox;
 }

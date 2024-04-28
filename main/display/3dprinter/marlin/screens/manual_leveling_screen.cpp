@@ -368,7 +368,7 @@ void manual_leveling_screen(bool autoleveling) {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
-  apply_style(ui_new_screen, ESP3DStyleType::main_bg);
+  ESP3DStyle::apply(ui_new_screen, ESP3DStyleType::main_bg);
   lv_obj_del(ui_current_screen);
 
   // Button back
@@ -380,7 +380,7 @@ void manual_leveling_screen(bool autoleveling) {
   // Manual leveling button matrix
   btnm_leveling_position = lv_btnmatrix_create(ui_new_screen);
   lv_btnmatrix_set_map(btnm_leveling_position, leveling_position_buttons_map);
-  apply_style(btnm_leveling_position, ESP3DStyleType::buttons_matrix);
+  ESP3DStyle::apply(btnm_leveling_position, ESP3DStyleType::buttons_matrix);
   lv_obj_update_layout(btnm_leveling_position);
   lv_obj_set_pos(btnm_leveling_position, CURRENT_BUTTON_PRESSED_OUTLINE,
                  CURRENT_BUTTON_PRESSED_OUTLINE);
@@ -427,7 +427,7 @@ void manual_leveling_screen(bool autoleveling) {
   // Status container
   status_container = lv_obj_create(ui_new_screen);
 
-  apply_style(status_container, ESP3DStyleType::text_container);
+  ESP3DStyle::apply(status_container, ESP3DStyleType::text_container);
   lv_obj_set_size(status_container,
                   (LV_HOR_RES / 2) - (3 * CURRENT_BUTTON_PRESSED_OUTLINE),
                   LV_VER_RES - (CURRENT_BUTTON_PRESSED_OUTLINE * 4) -

@@ -255,7 +255,7 @@ void ap_screen() {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
-  apply_style(ui_new_screen, ESP3DStyleType::main_bg);
+  ESP3DStyle::apply(ui_new_screen, ESP3DStyleType::main_bg);
   lv_obj_del(ui_current_screen);
   lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_ap_back_handler, LV_EVENT_CLICKED,
@@ -264,7 +264,7 @@ void ap_screen() {
   // SSID
   lv_obj_t *label_ssid = lv_label_create(ui_new_screen);
   lv_label_set_text(label_ssid, LV_SYMBOL_ACCESS_POINT);
-  apply_style(label_ssid, ESP3DStyleType::bg_label);
+  ESP3DStyle::apply(label_ssid, ESP3DStyleType::bg_label);
   lv_obj_update_layout(label_ssid);
   int width_label = lv_obj_get_width(label_ssid);
   esp3d_log("width_label %d", lv_obj_get_width(label_ssid));
@@ -293,7 +293,7 @@ void ap_screen() {
   // Password
   lv_obj_t *label_pwd = lv_label_create(ui_new_screen);
   lv_label_set_text(label_pwd, LV_SYMBOL_UNLOCK);
-  apply_style(label_pwd, ESP3DStyleType::bg_label);
+  ESP3DStyle::apply(label_pwd, ESP3DStyleType::bg_label);
 
   ap_ta_password = lv_textarea_create(ui_new_screen);
   lv_textarea_set_password_mode(ap_ta_password, false);

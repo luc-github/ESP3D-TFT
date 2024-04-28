@@ -63,5 +63,3 @@
 #define CURRENT_SCROLL_BAR_WIDTH 10
 #define CURRENT_SCROLL_BAR_RADIUS 5
 
-#define FW_LOGO_X 1
-#define FW_LOGO_Y -1

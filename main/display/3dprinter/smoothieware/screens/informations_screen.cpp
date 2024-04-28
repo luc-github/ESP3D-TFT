@@ -94,7 +94,7 @@ void informations_screen() {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
-  apply_style(ui_new_screen, ESP3DStyleType::main_bg);
+  ESP3DStyle::apply(ui_new_screen, ESP3DStyleType::main_bg);
   lv_obj_del(ui_current_screen);
 
   lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
@@ -104,7 +104,7 @@ void informations_screen() {
   lv_obj_set_style_flex_flow(ui_new_screen, LV_FLEX_FLOW_ROW,
                              LV_FLEX_ALIGN_SPACE_EVENLY);
   lv_obj_t *ui_info_list_ctl = lv_list_create(ui_new_screen);
-  apply_style(ui_info_list_ctl, ESP3DStyleType::status_list);
+  ESP3DStyle::apply(ui_info_list_ctl, ESP3DStyleType::status_list);
 
   lv_obj_update_layout(ui_new_screen);
   lv_obj_set_pos(ui_info_list_ctl, CURRENT_BUTTON_PRESSED_OUTLINE,

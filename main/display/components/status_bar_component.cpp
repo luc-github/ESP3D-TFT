@@ -66,7 +66,7 @@ lv_obj_t *status_bar(lv_obj_t *screen) {
 
   lv_obj_t *status_bar_container = lv_obj_create(screen);
   status_bar_label = lv_label_create(status_bar_container);
-  apply_style(status_bar_label, ESP3DStyleType::status_bar);
+  ESP3DStyle::apply(status_bar_label, ESP3DStyleType::status_bar);
   if (status_bar_desc == nullptr) {
     esp3d_log_e("status_bar: description is null cancel");
 

@@ -269,7 +269,7 @@ void files_screen() {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
-  apply_style(ui_new_screen, ESP3DStyleType::main_bg);
+  ESP3DStyle::apply(ui_new_screen, ESP3DStyleType::main_bg);
   lv_obj_del(ui_current_screen);
 
   // button back
@@ -290,7 +290,7 @@ void files_screen() {
   lv_obj_t *labelpath = lv_label_create(ui_new_screen);
   lv_label_set_text(labelpath, files_path.c_str());
   lv_label_set_long_mode(labelpath, LV_LABEL_LONG_SCROLL_CIRCULAR);
-  apply_style(labelpath, ESP3DStyleType::bg_label);
+  ESP3DStyle::apply(labelpath, ESP3DStyleType::bg_label);
   lv_obj_set_pos(labelpath, CURRENT_STATUS_BAR_V_PAD, CURRENT_STATUS_BAR_V_PAD);
   lv_obj_set_width(labelpath, LV_HOR_RES - (2 * CURRENT_STATUS_BAR_V_PAD));
   lv_obj_set_style_pad_left(labelpath, CURRENT_BUTTON_PRESSED_OUTLINE,

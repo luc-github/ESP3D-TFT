@@ -58,7 +58,7 @@ void show_spinner(const char* msg, lv_obj_t* backtbn) {
   esp3d_log("Spinner index is %d", spinner_index);
   screen_displaying_spinner = lv_scr_act();
   spinnerObj = lv_obj_create(screen_displaying_spinner);
-  apply_style(spinnerObj, ESP3DStyleType::spinner_screen);
+  ESP3DStyle::apply(spinnerObj, ESP3DStyleType::spinner_screen);
   lv_obj_move_foreground(spinnerObj);
   lv_obj_set_size(spinnerObj, LV_HOR_RES, LV_VER_RES);
   lv_obj_set_pos(spinnerObj, 0, 0);
@@ -68,14 +68,14 @@ void show_spinner(const char* msg, lv_obj_t* backtbn) {
 
   std::string text = esp3dTranslationService.translate(ESP3DLabel::please_wait);
   lv_obj_t* lbl = lv_label_create(spinnerObj);
-  apply_style(lbl, ESP3DStyleType::spinner_text);
+  ESP3DStyle::apply(lbl, ESP3DStyleType::spinner_text);
   lv_label_set_text(lbl, text.c_str());
   lv_obj_align_to(lbl, spinner, LV_ALIGN_OUT_BOTTOM_MID, 0,
                   CURRENT_BUTTON_PRESSED_OUTLINE);
   lblextra = NULL;
   if (msg != nullptr) {
     lblextra = lv_label_create(spinnerObj);
-    apply_style(lblextra, ESP3DStyleType::spinner_text);
+    ESP3DStyle::apply(lblextra, ESP3DStyleType::spinner_text);
     lv_label_set_text(lblextra, msg);
     lv_obj_align_to(lblextra, lbl, LV_ALIGN_OUT_BOTTOM_MID, 0,
                     CURRENT_BUTTON_PRESSED_OUTLINE);

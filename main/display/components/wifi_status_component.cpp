@@ -79,7 +79,7 @@ void wifi_display_mode() {
 lv_obj_t *wifi_status(lv_obj_t *parent, lv_obj_t *btnback) {
   lv_obj_update_layout(btnback);
   lv_obj_t *status_container = lv_obj_create(parent);
-  apply_style(status_container, ESP3DStyleType::default_style);
+  ESP3DStyle::apply(status_container, ESP3DStyleType::default_style);
   lv_obj_clear_flag(status_container, LV_OBJ_FLAG_SCROLLABLE);
   lv_obj_set_size(status_container,
                   LV_HOR_RES - (lv_obj_get_width(btnback) +
