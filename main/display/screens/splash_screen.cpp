@@ -83,6 +83,10 @@ void main_screen_timer_cb(lv_timer_t *timer) {
 void enter() {
   ESP3DStyle::apply(lv_scr_act(), ESP3DStyleType::main_bg);
   boot_timer = lv_timer_create(splash_in_timer_cb, 10, NULL);
+  if (boot_timer == NULL) {
+    esp3d_log_e("Failed to create timer");
+    return;
+  }
 }
 
 // Display function to show splash screen
@@ -95,6 +99,10 @@ void display() {
   if (splash_logo != NULL) {
     // Create logo object
     lv_obj_t *logo = lv_img_create(ui_Screen);
+    if (!lv_obj_is_valid(logo)) {
+      esp3d_log_e("Invalid logo object");
+      return;
+    }
     // Set logo image
     lv_img_set_src(logo, splash_logo);
     // align object in screen
@@ -103,11 +111,19 @@ void display() {
 
   // Set target Logo
   lv_obj_t *logo_target = lv_img_create(ui_Screen);
+  if(!lv_obj_is_valid(logo_target)) {
+    esp3d_log_e("Invalid target logo object");
+    return;
+  }
   lv_img_set_src(logo_target, &target_fw_logo);
   lv_obj_align(logo_target, LV_ALIGN_BOTTOM_LEFT, FW_LOGO_X, FW_LOGO_Y);
 
   // Create version text object
   lv_obj_t *label = lv_label_create(ui_Screen);
+  if (!lv_obj_is_valid(label)) {
+    esp3d_log_e("Invalid label object");
+    return;
+  }
   // Set version text
   lv_label_set_text(label, "V" ESP3D_TFT_VERSION);
   ESP3DStyle::apply(label, ESP3DStyleType::bg_label);
@@ -115,6 +131,10 @@ void display() {
 
   // Set timer to switch to main screen
   boot_timer = lv_timer_create(main_screen_timer_cb, 2000, NULL);
+  if (boot_timer == NULL) {
+    esp3d_log_e("Failed to create timer");
+    return;
+  }
   esp3dTftui.set_current_screen(ESP3DScreenType::splash);
 }
 

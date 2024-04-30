@@ -52,10 +52,10 @@ void speed_screen_delay_timer_cb(lv_timer_t *timer) {
 
 void event_button_speed_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
-  if (BUTTON_ANIMATION_DELAY) {
+  if (ESP3D_BUTTON_ANIMATION_DELAY) {
     if (speed_screen_delay_timer) return;
     speed_screen_delay_timer = lv_timer_create(speed_screen_delay_timer_cb,
-                                               BUTTON_ANIMATION_DELAY, NULL);
+                                               ESP3D_BUTTON_ANIMATION_DELAY, NULL);
   } else {
     speed_screen_delay_timer_cb(NULL);
   }
@@ -165,7 +165,7 @@ void speed_screen() {
   ESP3DStyle::apply(ui_new_screen, ESP3DStyleType::main_bg);
   lv_obj_del(ui_current_screen);
 
-  lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
+  lv_obj_t *btnback = backButton::create(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_speed_back_handler,
                       LV_EVENT_CLICKED, NULL);
 
@@ -174,9 +174,9 @@ void speed_screen() {
   lv_btnmatrix_set_map(btnm, speed_buttons_map);
   ESP3DStyle::apply(btnm, ESP3DStyleType::buttons_matrix);
   size_t i = (sizeof(speed_buttons_map) / sizeof(speed_buttons_map[0])) - 1;
-  lv_obj_set_size(btnm, MATRIX_BUTTON_WIDTH * i, MATRIX_BUTTON_HEIGHT);
-  lv_obj_align(btnm, LV_ALIGN_TOP_RIGHT, -CURRENT_BUTTON_PRESSED_OUTLINE,
-               CURRENT_BUTTON_PRESSED_OUTLINE / 2);
+  lv_obj_set_size(btnm, ESP3D_MATRIX_BUTTON_WIDTH * i, ESP3D_MATRIX_BUTTON_HEIGHT);
+  lv_obj_align(btnm, LV_ALIGN_TOP_RIGHT, -ESP3D_BUTTON_PRESSED_OUTLINE,
+               ESP3D_BUTTON_PRESSED_OUTLINE / 2);
   lv_btnmatrix_set_btn_ctrl(btnm, speed_buttons_map_id,
                             LV_BTNMATRIX_CTRL_CHECKED);
   lv_obj_add_event_cb(btnm, speed_matrix_buttons_event_cb,
@@ -187,7 +187,7 @@ void speed_screen() {
   lv_label_set_text(label_current_speed, LV_SYMBOL_SPEED);
   ESP3DStyle::apply(label_current_speed, ESP3DStyleType::bg_label);
   lv_obj_align(label_current_speed, LV_ALIGN_TOP_LEFT,
-               CURRENT_BUTTON_PRESSED_OUTLINE, CURRENT_BUTTON_PRESSED_OUTLINE);
+               ESP3D_BUTTON_PRESSED_OUTLINE, ESP3D_BUTTON_PRESSED_OUTLINE);
   lv_obj_update_layout(label_current_speed);
 
   // Current Speed value
@@ -200,7 +200,7 @@ void speed_screen() {
   ESP3DStyle::apply(label_current_speed_value, ESP3DStyleType::read_only_value);
   lv_obj_set_width(label_current_speed_value, LV_HOR_RES / 6);
   lv_obj_align_to(label_current_speed_value, label_current_speed,
-                  LV_ALIGN_OUT_RIGHT_MID, CURRENT_BUTTON_PRESSED_OUTLINE / 2,
+                  LV_ALIGN_OUT_RIGHT_MID, ESP3D_BUTTON_PRESSED_OUTLINE / 2,
                   0);
 
   // unit
@@ -208,14 +208,14 @@ void speed_screen() {
   lv_label_set_text(label_unit1, "%");
   ESP3DStyle::apply(label_unit1, ESP3DStyleType::bg_label);
   lv_obj_align_to(label_unit1, label_current_speed_value,
-                  LV_ALIGN_OUT_RIGHT_MID, CURRENT_BUTTON_PRESSED_OUTLINE / 2,
+                  LV_ALIGN_OUT_RIGHT_MID, ESP3D_BUTTON_PRESSED_OUTLINE / 2,
                   0);
 
   // Button up
   lv_obj_t *btn_up = symbolButton::create_symbol_button(
       ui_new_screen, LV_SYMBOL_UP "\n" LV_SYMBOL_PLUS);
   lv_obj_align_to(btn_up, label_current_speed_value, LV_ALIGN_OUT_BOTTOM_MID, 0,
-                  CURRENT_BUTTON_PRESSED_OUTLINE / 2);
+                  ESP3D_BUTTON_PRESSED_OUTLINE / 2);
   // speed input
   lv_obj_t *speed_ta = lv_textarea_create(ui_new_screen);
   lv_obj_add_event_cb(speed_ta, speed_ta_event_cb, LV_EVENT_VALUE_CHANGED,
@@ -227,27 +227,27 @@ void speed_screen() {
   lv_obj_set_style_text_align(speed_ta, LV_TEXT_ALIGN_CENTER, 0);
   lv_obj_set_width(speed_ta, LV_HOR_RES / 6);
   lv_obj_align_to(speed_ta, btn_up, LV_ALIGN_OUT_BOTTOM_MID, 0,
-                  CURRENT_BUTTON_PRESSED_OUTLINE / 2);
+                  ESP3D_BUTTON_PRESSED_OUTLINE / 2);
 
   // label
   lv_obj_t *label_ta = lv_label_create(ui_new_screen);
   lv_label_set_text(label_ta, LV_SYMBOL_SPEED);
   ESP3DStyle::apply(label_ta, ESP3DStyleType::bg_label);
   lv_obj_align_to(label_ta, speed_ta, LV_ALIGN_OUT_LEFT_MID,
-                  -CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
+                  -ESP3D_BUTTON_PRESSED_OUTLINE / 2, 0);
 
   // unit
   lv_obj_t *label_unit2 = lv_label_create(ui_new_screen);
   lv_label_set_text(label_unit2, "%");
   ESP3DStyle::apply(label_unit2, ESP3DStyleType::bg_label);
   lv_obj_align_to(label_unit2, speed_ta, LV_ALIGN_OUT_RIGHT_MID,
-                  CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
+                  ESP3D_BUTTON_PRESSED_OUTLINE / 2, 0);
 
   // button down
   lv_obj_t *btn_down = symbolButton::create_symbol_button(
       ui_new_screen, LV_SYMBOL_MINUS "\n" LV_SYMBOL_DOWN);
   lv_obj_align_to(btn_down, speed_ta, LV_ALIGN_OUT_BOTTOM_MID, 0,
-                  CURRENT_BUTTON_PRESSED_OUTLINE / 2);
+                  ESP3D_BUTTON_PRESSED_OUTLINE / 2);
   lv_obj_add_event_cb(btn_down, speed_btn_down_event_cb, LV_EVENT_CLICKED,
                       speed_ta);
 
@@ -258,7 +258,7 @@ void speed_screen() {
   lv_obj_t *btn_ok =
       symbolButton::create_symbol_button(ui_new_screen, LV_SYMBOL_OK);
   lv_obj_align_to(btn_ok, label_unit2, LV_ALIGN_OUT_RIGHT_MID,
-                  CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+                  ESP3D_BUTTON_PRESSED_OUTLINE, 0);
   lv_obj_add_event_cb(btn_ok, speed_btn_ok_event_cb, LV_EVENT_CLICKED,
                       speed_ta);
 
@@ -266,7 +266,7 @@ void speed_screen() {
   lv_obj_t *btn_reset =
       symbolButton::create_symbol_button(ui_new_screen, LV_SYMBOL_GAUGE);
   lv_obj_align_to(btn_reset, btn_ok, LV_ALIGN_OUT_RIGHT_MID,
-                  CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+                  ESP3D_BUTTON_PRESSED_OUTLINE, 0);
   lv_obj_add_event_cb(btn_reset, speed_btn_reset_event_cb, LV_EVENT_CLICKED,
                       speed_ta);
 
@@ -275,11 +275,11 @@ void speed_screen() {
   lv_keyboard_set_mode(speed_kb, LV_KEYBOARD_MODE_NUMBER);
   lv_keyboard_set_textarea(speed_kb, NULL);
   lv_obj_align_to(speed_kb, speed_ta, LV_ALIGN_OUT_RIGHT_MID,
-                  CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
+                  ESP3D_BUTTON_PRESSED_OUTLINE / 2, 0);
   lv_obj_update_layout(speed_kb);
   lv_obj_set_content_width(speed_kb, LV_HOR_RES - lv_obj_get_x(speed_kb) -
-                                         2 * CURRENT_BUTTON_PRESSED_OUTLINE);
-  lv_obj_set_style_radius(speed_kb, CURRENT_BUTTON_RADIUS_VALUE, LV_PART_MAIN);
+                                         2 * ESP3D_BUTTON_PRESSED_OUTLINE);
+  lv_obj_set_style_radius(speed_kb, ESP3D_BUTTON_RADIUS , LV_PART_MAIN);
   lv_obj_add_flag(speed_kb, LV_OBJ_FLAG_HIDDEN);
   lv_obj_add_event_cb(speed_ta, speed_ta_event_cb, LV_EVENT_ALL, speed_kb);
 

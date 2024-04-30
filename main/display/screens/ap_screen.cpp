@@ -158,7 +158,7 @@ void ap_screen_delay_timer_cb(lv_timer_t *timer) {
 void event_button_ap_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
   ap_screen_delay_timer =
-      lv_timer_create(ap_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+      lv_timer_create(ap_screen_delay_timer_cb, ESP3D_BUTTON_ANIMATION_DELAY, NULL);
 }
 
 void ap_ta_event_cb(lv_event_t *e) {
@@ -257,7 +257,7 @@ void ap_screen() {
   lv_scr_load(ui_new_screen);
   ESP3DStyle::apply(ui_new_screen, ESP3DStyleType::main_bg);
   lv_obj_del(ui_current_screen);
-  lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
+  lv_obj_t *btnback = backButton::create(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_ap_back_handler, LV_EVENT_CLICKED,
                       NULL);
 
@@ -272,11 +272,11 @@ void ap_screen() {
   lv_textarea_set_one_line(ap_ta_ssid, true);
   lv_textarea_set_max_length(ap_ta_ssid, 32);
   lv_obj_align(ap_ta_ssid, LV_ALIGN_TOP_LEFT,
-               width_label + (CURRENT_BUTTON_PRESSED_OUTLINE * 3),
-               CURRENT_BUTTON_PRESSED_OUTLINE);
+               width_label + (ESP3D_BUTTON_PRESSED_OUTLINE * 3),
+               ESP3D_BUTTON_PRESSED_OUTLINE);
   lv_obj_set_width(ap_ta_ssid, (LV_HOR_RES / 2));
   lv_obj_align_to(label_ssid, ap_ta_ssid, LV_ALIGN_OUT_LEFT_MID,
-                  -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+                  -ESP3D_BUTTON_PRESSED_OUTLINE, 0);
   std::string tmp_str;
   char out_str[255] = {0};
   const ESP3DSettingDescription *settingPtr =
@@ -303,10 +303,10 @@ void ap_screen() {
   lv_obj_set_width(ap_ta_password, (LV_HOR_RES / 2));
 
   lv_obj_align_to(ap_ta_password, ap_ta_ssid, LV_ALIGN_OUT_BOTTOM_LEFT, 0,
-                  CURRENT_BUTTON_PRESSED_OUTLINE);
+                  ESP3D_BUTTON_PRESSED_OUTLINE);
   lv_obj_align_to(
       label_pwd, ap_ta_password, LV_ALIGN_OUT_LEFT_MID,
-      -(CURRENT_BUTTON_PRESSED_OUTLINE + lv_obj_get_width(label_pwd) / 2), 0);
+      -(ESP3D_BUTTON_PRESSED_OUTLINE + lv_obj_get_width(label_pwd) / 2), 0);
 
   settingPtr =
       esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_ap_password);
@@ -326,27 +326,27 @@ void ap_screen() {
   lv_obj_t *kb = lv_keyboard_create(ui_new_screen);
   lv_keyboard_set_textarea(kb, NULL);
   lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
-  lv_obj_set_style_radius(kb, CURRENT_BUTTON_RADIUS_VALUE, LV_PART_MAIN);
+  lv_obj_set_style_radius(kb, ESP3D_BUTTON_RADIUS , LV_PART_MAIN);
   lv_obj_add_event_cb(ap_ta_ssid, ap_ta_event_cb, LV_EVENT_ALL, kb);
   lv_obj_add_event_cb(ap_ta_password, ap_ta_event_cb, LV_EVENT_ALL, kb);
 
   // Create button and label for ok
   btn_ok = symbolButton::create_symbol_button(
-      ui_new_screen, LV_SYMBOL_OK, SYMBOL_BUTTON_WIDTH, SYMBOL_BUTTON_WIDTH);
+      ui_new_screen, LV_SYMBOL_OK, ESP3D_SYMBOL_BUTTON_WIDTH, ESP3D_SYMBOL_BUTTON_WIDTH);
 
   lv_obj_add_event_cb(btn_ok, ap_event_button_ok_handler, LV_EVENT_CLICKED,
                       NULL);
-  lv_obj_align(btn_ok, LV_ALIGN_TOP_RIGHT, -CURRENT_BUTTON_PRESSED_OUTLINE,
-               CURRENT_BUTTON_PRESSED_OUTLINE);
+  lv_obj_align(btn_ok, LV_ALIGN_TOP_RIGHT, -ESP3D_BUTTON_PRESSED_OUTLINE,
+               ESP3D_BUTTON_PRESSED_OUTLINE);
 
   // Create button and label for ok
   btn_save = symbolButton::create_symbol_button(
-      ui_new_screen, LV_SYMBOL_SAVE, SYMBOL_BUTTON_WIDTH, SYMBOL_BUTTON_WIDTH);
+      ui_new_screen, LV_SYMBOL_SAVE, ESP3D_SYMBOL_BUTTON_WIDTH, ESP3D_SYMBOL_BUTTON_WIDTH);
   lv_obj_add_event_cb(btn_save, ap_event_button_save_handler, LV_EVENT_CLICKED,
                       NULL);
 
   lv_obj_align_to(btn_save, btn_ok, LV_ALIGN_OUT_LEFT_MID,
-                  -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+                  -ESP3D_BUTTON_PRESSED_OUTLINE, 0);
   update_button_ok();
   update_button_save();
   esp3dTftui.set_current_screen(ESP3DScreenType::access_point);

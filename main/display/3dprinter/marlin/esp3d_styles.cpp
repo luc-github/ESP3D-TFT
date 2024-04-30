@@ -101,14 +101,14 @@ bool init() {
   lv_style_set_text_opa(&style_read_only_value, LV_OPA_COVER);
   lv_style_set_text_color(&style_read_only_value, ESP3D_SCREEN_BACKGROUND_TEXT_COLOR);
   lv_style_set_bg_color(&style_read_only_value, ESP3D_SCREEN_BACKGROUND_COLOR);
-  lv_style_set_radius(&style_read_only_value, CURRENT_STATUS_BAR_RADIUS);
+  lv_style_set_radius(&style_read_only_value, ESP3D_STATUS_BAR_RADIUS);
   lv_style_set_border_width(&style_read_only_value,
-                            CURRENT_STATUS_BAR_BORDER_VALUE);
+                            ESP3D_STATUS_BAR_BORDER_VALUE);
   lv_style_set_border_color(&style_read_only_value,
-                            CURRENT_STATUS_BAR_BORDER_COLOR);
+                            ESP3D_STATUS_BAR_BORDER_COLOR);
   lv_style_set_text_align(&style_read_only_value, LV_TEXT_ALIGN_CENTER);
-  lv_style_set_pad_top(&style_read_only_value, CURRENT_BUTTON_PAD);
-  lv_style_set_pad_bottom(&style_read_only_value, CURRENT_BUTTON_PAD);
+  lv_style_set_pad_top(&style_read_only_value, ESP3D_BUTTON_PAD);
+  lv_style_set_pad_bottom(&style_read_only_value, ESP3D_BUTTON_PAD);
 
   /*
   read only setting on main background
@@ -116,16 +116,16 @@ bool init() {
   lv_style_init(&style_read_only_setting);
   lv_style_set_text_opa(&style_read_only_setting, LV_OPA_COVER);
   lv_style_set_text_color(&style_read_only_setting,
-                          CURRENT_BUTTON_PRESSED_TEXT_COLOR);
+                          ESP3D_BUTTON_PRESSED_TEXT_COLOR);
   lv_style_set_bg_color(&style_read_only_setting, ESP3D_SCREEN_BACKGROUND_COLOR);
-  lv_style_set_radius(&style_read_only_setting, CURRENT_STATUS_BAR_RADIUS);
+  lv_style_set_radius(&style_read_only_setting, ESP3D_STATUS_BAR_RADIUS);
   lv_style_set_border_width(&style_read_only_setting,
-                            CURRENT_STATUS_BAR_BORDER_VALUE);
+                            ESP3D_STATUS_BAR_BORDER_VALUE);
   lv_style_set_border_color(&style_read_only_setting,
-                            CURRENT_STATUS_BAR_BORDER_COLOR);
+                            ESP3D_STATUS_BAR_BORDER_COLOR);
   lv_style_set_text_align(&style_read_only_setting, LV_TEXT_ALIGN_CENTER);
-  lv_style_set_pad_top(&style_read_only_setting, CURRENT_BUTTON_PAD);
-  lv_style_set_pad_bottom(&style_read_only_setting, CURRENT_BUTTON_PAD);
+  lv_style_set_pad_top(&style_read_only_setting, ESP3D_BUTTON_PAD);
+  lv_style_set_pad_bottom(&style_read_only_setting, ESP3D_BUTTON_PAD);
 
   /*
   Status bar
@@ -134,16 +134,16 @@ bool init() {
 
   lv_style_set_text_opa(&style_status_bar_default, LV_OPA_COVER);
   lv_style_set_text_color(&style_status_bar_default,
-                          CURRENT_STATUS_BAR_TEXT_COLOR);
+                          ESP3D_STATUS_BAR_TEXT_COLOR);
   lv_style_set_bg_opa(&style_status_bar_default, LV_OPA_COVER);
-  lv_style_set_bg_color(&style_status_bar_default, CURRENT_STATUS_BAR_BG_COLOR);
-  lv_style_set_radius(&style_status_bar_default, CURRENT_STATUS_BAR_RADIUS);
-  lv_style_set_pad_hor(&style_status_bar_default, CURRENT_STATUS_BAR_H_PAD);
-  lv_style_set_pad_ver(&style_status_bar_default, CURRENT_STATUS_BAR_V_PAD);
+  lv_style_set_bg_color(&style_status_bar_default, ESP3D_STATUS_BAR_BG_COLOR);
+  lv_style_set_radius(&style_status_bar_default, ESP3D_STATUS_BAR_RADIUS);
+  lv_style_set_pad_hor(&style_status_bar_default, ESP3D_STATUS_BAR_H_PAD);
+  lv_style_set_pad_ver(&style_status_bar_default, ESP3D_STATUS_BAR_V_PAD);
   lv_style_set_border_width(&style_status_bar_default,
-                            CURRENT_STATUS_BAR_BORDER_VALUE);
+                            ESP3D_STATUS_BAR_BORDER_VALUE);
   lv_style_set_border_color(&style_status_bar_default,
-                            CURRENT_STATUS_BAR_BORDER_COLOR);
+                            ESP3D_STATUS_BAR_BORDER_COLOR);
 
   /*
    Scrollbar
@@ -151,7 +151,7 @@ bool init() {
 
   // Create style for scrollbar default state
   lv_style_init(&style_scrollbar_default);
-  lv_style_set_width(&style_scrollbar_default, CURRENT_SCROLL_BAR_WIDTH);
+  lv_style_set_width(&style_scrollbar_default, ESP3D_SCROLL_BAR_WIDTH);
   lv_style_set_bg_opa(&style_scrollbar_default, LV_OPA_COVER);
   lv_style_set_bg_color(&style_scrollbar_default,
                         lv_palette_main(LV_PALETTE_GREY));
@@ -159,12 +159,12 @@ bool init() {
   lv_style_set_border_color(
       &style_scrollbar_default,
       lv_palette_darken(LV_PALETTE_GREY,
-                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN * 2));
+                        ESP3D_BUTTON_COLOR_PALETTE_DARKEN * 2));
 
   lv_style_set_border_opa(&style_scrollbar_default, LV_OPA_COVER);
   lv_style_set_border_width(&style_scrollbar_default,
-                            CURRENT_BUTTON_BORDER_VALUE);
-  lv_style_set_radius(&style_scrollbar_default, CURRENT_SCROLL_BAR_RADIUS);
+                            ESP3D_BUTTON_BORDER_SIZE);
+  lv_style_set_radius(&style_scrollbar_default, ESP3D_SCROLL_BAR_RADIUS);
   lv_style_set_pad_all(&style_scrollbar_default, 8);
   // Create style for scrollbar active state
   lv_style_init(&style_scrollbar_active);
@@ -172,11 +172,11 @@ bool init() {
   lv_style_set_bg_color(&style_scrollbar_active,
                         lv_palette_main(LV_PALETTE_GREEN));
   lv_style_set_shadow_width(&style_scrollbar_active,
-                            CURRENT_BUTTON_PRESSED_OUTLINE);
+                            ESP3D_BUTTON_PRESSED_OUTLINE);
   lv_style_set_shadow_color(&style_scrollbar_active,
                             lv_palette_main(LV_PALETTE_GREEN));
   lv_style_set_shadow_spread(&style_scrollbar_active,
-                             CURRENT_BUTTON_COLOR_PRESSED_SHADOW_OFFSET);
+                             ESP3D_BUTTON_PRESSED_SHADOW_OFFSET);
 
   /*
    Radio Buttons
@@ -187,16 +187,16 @@ bool init() {
   lv_style_set_border_color(
       &style_btn_radio_default,
       lv_palette_darken(LV_PALETTE_GREY,
-                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN * 2));
+                        ESP3D_BUTTON_COLOR_PALETTE_DARKEN * 2));
 
   // Create style for button pressed state
   lv_style_init(&style_btn_radio_pressed);
   lv_style_set_shadow_width(&style_btn_radio_pressed,
-                            CURRENT_BUTTON_PRESSED_OUTLINE);
+                            ESP3D_BUTTON_PRESSED_OUTLINE);
   lv_style_set_shadow_color(&style_btn_radio_pressed,
                             lv_palette_main(LV_PALETTE_GREEN));
   lv_style_set_shadow_spread(&style_btn_radio_pressed,
-                             CURRENT_BUTTON_COLOR_PRESSED_SHADOW_OFFSET);
+                             ESP3D_BUTTON_PRESSED_SHADOW_OFFSET);
   lv_style_set_bg_color(&style_btn_radio_pressed,
                         lv_palette_main(LV_PALETTE_GREEN));
 
@@ -212,57 +212,57 @@ bool init() {
   // Create style for button default state
   lv_style_init(&style_btn_default);
 
-  lv_style_set_radius(&style_btn_default, CURRENT_BUTTON_RADIUS_VALUE);
+  lv_style_set_radius(&style_btn_default, ESP3D_BUTTON_RADIUS );
   lv_style_set_bg_opa(&style_btn_default, LV_OPA_100);
   lv_style_set_bg_color(&style_btn_default,
-                        lv_palette_main(CURRENT_BUTTON_COLOR_PALETTE));
+                        lv_palette_main(ESP3D_BUTTON_COLOR_PALETTE));
   lv_style_set_bg_grad_color(
       &style_btn_default,
-      lv_palette_darken(CURRENT_BUTTON_COLOR_PALETTE,
-                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN));
+      lv_palette_darken(ESP3D_BUTTON_COLOR_PALETTE,
+                        ESP3D_BUTTON_COLOR_PALETTE_DARKEN));
   lv_style_set_bg_grad_dir(&style_btn_default, LV_GRAD_DIR_VER);
 
   lv_style_set_border_opa(&style_btn_default, LV_OPA_40);
-  lv_style_set_border_width(&style_btn_default, CURRENT_BUTTON_BORDER_VALUE);
-  lv_style_set_border_color(&style_btn_default, CURRENT_BUTTON_BORDER_COLOR);
+  lv_style_set_border_width(&style_btn_default, ESP3D_BUTTON_BORDER_SIZE);
+  lv_style_set_border_color(&style_btn_default, ESP3D_BUTTON_BORDER_COLOR);
 
   lv_style_set_outline_opa(&style_btn_default, LV_OPA_COVER);
   lv_style_set_outline_color(
       &style_btn_default,
-      lv_palette_main(CURRENT_BUTTON_OUTLINE_COLOR_PALETTE));
+      lv_palette_main(ESP3D_BUTTON_OUTLINE_COLOR_PALETTE));
 
-  lv_style_set_text_color(&style_btn_default, CURRENT_BUTTON_TEXT_COLOR);
-  lv_style_set_pad_all(&style_btn_default, CURRENT_BUTTON_PAD);
+  lv_style_set_text_color(&style_btn_default, ESP3D_BUTTON_TEXT_COLOR);
+  lv_style_set_pad_all(&style_btn_default, ESP3D_BUTTON_PAD);
 
   // Create style for button pressed state
   lv_style_init(&style_btn_pressed);
 
   /*Add a large outline when pressed*/
   lv_style_set_outline_width(&style_btn_pressed,
-                             CURRENT_BUTTON_PRESSED_OUTLINE);
+                             ESP3D_BUTTON_PRESSED_OUTLINE);
   lv_style_set_outline_opa(&style_btn_pressed, LV_OPA_TRANSP);
 
   lv_style_set_shadow_ofs_y(&style_btn_pressed,
-                            CURRENT_BUTTON_COLOR_PRESSED_SHADOW_OFFSET);
+                            ESP3D_BUTTON_PRESSED_SHADOW_OFFSET);
   lv_style_set_bg_color(&style_btn_pressed,
-                        lv_palette_darken(CURRENT_BUTTON_PRESSED_COLOR_PALETTE,
-                                          CURRENT_BUTTON_COLOR_PALETTE_DARKEN));
+                        lv_palette_darken(ESP3D_BUTTON_PRESSED_COLOR_PALETTE,
+                                          ESP3D_BUTTON_COLOR_PALETTE_DARKEN));
   lv_style_set_bg_grad_color(
       &style_btn_pressed,
-      lv_palette_darken(CURRENT_BUTTON_PRESSED_COLOR_PALETTE,
-                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN * 2));
+      lv_palette_darken(ESP3D_BUTTON_PRESSED_COLOR_PALETTE,
+                        ESP3D_BUTTON_COLOR_PALETTE_DARKEN * 2));
 
   lv_style_set_text_color(&style_btn_pressed,
-                          CURRENT_BUTTON_PRESSED_TEXT_COLOR);
+                          ESP3D_BUTTON_PRESSED_TEXT_COLOR);
   lv_style_set_border_color(&style_btn_pressed,
-                            CURRENT_BUTTON_PRESSED_BORDER_COLOR);
-  if (BUTTON_ANIMATION_DELAY) {
+                            ESP3D_BUTTON_PRESSED_BORDER_COLOR);
+  if (ESP3D_BUTTON_ANIMATION_DELAY) {
     /*Add a transition to the outline*/
     static lv_style_transition_dsc_t trans;
     static lv_style_prop_t props[] = {LV_STYLE_OUTLINE_WIDTH,
                                       LV_STYLE_OUTLINE_OPA, LV_STYLE_PROP_INV};
     lv_style_transition_dsc_init(&trans, props, lv_anim_path_linear,
-                                 BUTTON_ANIMATION_DELAY, 0, NULL);
+                                 ESP3D_BUTTON_ANIMATION_DELAY, 0, NULL);
     lv_style_set_transition(&style_btn_pressed, &trans);
   }
 
@@ -275,44 +275,44 @@ bool init() {
   lv_style_set_radius(&style_embedded_btn_default, 0);
   lv_style_set_bg_opa(&style_embedded_btn_default, LV_OPA_100);
   lv_style_set_bg_color(&style_embedded_btn_default,
-                        lv_palette_main(CURRENT_BUTTON_COLOR_PALETTE));
+                        lv_palette_main(ESP3D_BUTTON_COLOR_PALETTE));
   lv_style_set_bg_grad_color(
       &style_embedded_btn_default,
-      lv_palette_darken(CURRENT_BUTTON_COLOR_PALETTE,
-                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN));
+      lv_palette_darken(ESP3D_BUTTON_COLOR_PALETTE,
+                        ESP3D_BUTTON_COLOR_PALETTE_DARKEN));
   lv_style_set_bg_grad_dir(&style_embedded_btn_default, LV_GRAD_DIR_VER);
 
   lv_style_set_border_opa(&style_embedded_btn_default, LV_OPA_40);
   lv_style_set_border_width(&style_embedded_btn_default,
-                            CURRENT_BUTTON_BORDER_VALUE);
+                            ESP3D_BUTTON_BORDER_SIZE);
   lv_style_set_border_color(&style_embedded_btn_default,
-                            CURRENT_BUTTON_BORDER_COLOR);
+                            ESP3D_BUTTON_BORDER_COLOR);
 
   lv_style_set_outline_opa(&style_embedded_btn_default, LV_OPA_COVER);
   lv_style_set_outline_color(
       &style_embedded_btn_default,
-      lv_palette_main(CURRENT_BUTTON_OUTLINE_COLOR_PALETTE));
+      lv_palette_main(ESP3D_BUTTON_OUTLINE_COLOR_PALETTE));
 
   lv_style_set_text_color(&style_embedded_btn_default,
-                          CURRENT_BUTTON_TEXT_COLOR);
-  lv_style_set_pad_all(&style_embedded_btn_default, CURRENT_BUTTON_PAD);
+                          ESP3D_BUTTON_TEXT_COLOR);
+  lv_style_set_pad_all(&style_embedded_btn_default, ESP3D_BUTTON_PAD);
 
   // Create style for embedded button pressed state
   lv_style_init(&style_embedded_btn_pressed);
 
   lv_style_set_shadow_ofs_y(&style_embedded_btn_pressed,
-                            CURRENT_BUTTON_COLOR_PRESSED_SHADOW_OFFSET);
+                            ESP3D_BUTTON_PRESSED_SHADOW_OFFSET);
   lv_style_set_bg_color(&style_embedded_btn_pressed,
-                        lv_palette_darken(CURRENT_BUTTON_COLOR_PALETTE,
-                                          CURRENT_BUTTON_COLOR_PALETTE_DARKEN));
+                        lv_palette_darken(ESP3D_BUTTON_COLOR_PALETTE,
+                                          ESP3D_BUTTON_COLOR_PALETTE_DARKEN));
   lv_style_set_bg_grad_color(
       &style_embedded_btn_pressed,
-      lv_palette_darken(CURRENT_BUTTON_COLOR_PALETTE,
-                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN * 2));
+      lv_palette_darken(ESP3D_BUTTON_COLOR_PALETTE,
+                        ESP3D_BUTTON_COLOR_PALETTE_DARKEN * 2));
   lv_style_set_text_color(&style_embedded_btn_pressed,
-                          CURRENT_BUTTON_PRESSED_TEXT_COLOR);
+                          ESP3D_BUTTON_PRESSED_TEXT_COLOR);
   lv_style_set_border_color(&style_embedded_btn_pressed,
-                            CURRENT_BUTTON_PRESSED_BORDER_COLOR);
+                            ESP3D_BUTTON_PRESSED_BORDER_COLOR);
 
   /*
   Buttons matrix
@@ -323,33 +323,33 @@ bool init() {
   lv_style_set_pad_all(&style_btn_matrix_bar, 1);
   lv_style_set_pad_gap(&style_btn_matrix_bar, 0);
   lv_style_set_clip_corner(&style_btn_matrix_bar, true);
-  lv_style_set_radius(&style_btn_matrix_bar, CURRENT_BUTTON_RADIUS_VALUE);
+  lv_style_set_radius(&style_btn_matrix_bar, ESP3D_BUTTON_RADIUS );
   lv_style_set_pad_left(&style_btn_matrix_bar, 4);
   lv_style_set_pad_top(&style_btn_matrix_bar, 4);
 
   // border
   lv_style_set_border_opa(&style_btn_matrix_bar, LV_OPA_40);
-  lv_style_set_border_width(&style_btn_matrix_bar, CURRENT_BUTTON_BORDER_VALUE);
-  lv_style_set_border_color(&style_btn_matrix_bar, CURRENT_BUTTON_BORDER_COLOR);
+  lv_style_set_border_width(&style_btn_matrix_bar, ESP3D_BUTTON_BORDER_SIZE);
+  lv_style_set_border_color(&style_btn_matrix_bar, ESP3D_BUTTON_BORDER_COLOR);
 
   // bg
   lv_style_set_bg_opa(&style_btn_matrix_bar, LV_OPA_100);
   lv_style_set_bg_color(&style_btn_matrix_bar,
-                        lv_palette_main(CURRENT_BUTTON_COLOR_PALETTE));
+                        lv_palette_main(ESP3D_BUTTON_COLOR_PALETTE));
   lv_style_set_bg_grad_color(
       &style_btn_matrix_bar,
-      lv_palette_darken(CURRENT_BUTTON_COLOR_PALETTE,
-                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN));
+      lv_palette_darken(ESP3D_BUTTON_COLOR_PALETTE,
+                        ESP3D_BUTTON_COLOR_PALETTE_DARKEN));
   lv_style_set_bg_grad_dir(&style_btn_matrix_bar, LV_GRAD_DIR_VER);
 
   // text
-  lv_style_set_text_color(&style_btn_matrix_bar, CURRENT_BUTTON_TEXT_COLOR);
+  lv_style_set_text_color(&style_btn_matrix_bar, ESP3D_BUTTON_TEXT_COLOR);
 
   //*****************************************************************
 
   // Default
   lv_style_init(&style_btn_matrix_default);
-  lv_style_set_radius(&style_btn_matrix_default, CURRENT_BUTTON_RADIUS_VALUE);
+  lv_style_set_radius(&style_btn_matrix_default, ESP3D_BUTTON_RADIUS );
 
   // bg
   // text
@@ -360,32 +360,32 @@ bool init() {
   // Pressed
   lv_style_init(&style_btn_matrix_pressed);
   lv_style_set_pad_all(&style_btn_matrix_pressed, 10);
-  lv_style_set_radius(&style_btn_matrix_pressed, CURRENT_BUTTON_RADIUS_VALUE);
+  lv_style_set_radius(&style_btn_matrix_pressed, ESP3D_BUTTON_RADIUS );
   lv_style_set_outline_opa(&style_btn_matrix_pressed, LV_OPA_40);
   lv_style_set_outline_color(
       &style_btn_matrix_pressed,
-      lv_palette_main(CURRENT_BUTTON_OUTLINE_COLOR_PALETTE));
+      lv_palette_main(ESP3D_BUTTON_OUTLINE_COLOR_PALETTE));
   lv_style_set_outline_width(&style_btn_matrix_pressed, 1);
 
   // bg
   lv_style_set_bg_opa(&style_btn_matrix_pressed, LV_OPA_60);
   lv_style_set_bg_color(
       &style_btn_matrix_pressed,
-      lv_palette_darken(CURRENT_BUTTON_PRESSED_COLOR_PALETTE,
-                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN * 2));
+      lv_palette_darken(ESP3D_BUTTON_PRESSED_COLOR_PALETTE,
+                        ESP3D_BUTTON_COLOR_PALETTE_DARKEN * 2));
   lv_style_set_bg_grad_color(
       &style_btn_matrix_pressed,
-      lv_palette_darken(CURRENT_BUTTON_PRESSED_COLOR_PALETTE,
-                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN * 2));
+      lv_palette_darken(ESP3D_BUTTON_PRESSED_COLOR_PALETTE,
+                        ESP3D_BUTTON_COLOR_PALETTE_DARKEN * 2));
   // text
   lv_style_set_text_color(
       &style_btn_matrix_pressed,
-      lv_palette_darken(CURRENT_BUTTON_OUTLINE_COLOR_PALETTE,
-                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN));
+      lv_palette_darken(ESP3D_BUTTON_OUTLINE_COLOR_PALETTE,
+                        ESP3D_BUTTON_COLOR_PALETTE_DARKEN));
 
   // border
   lv_style_set_border_color(&style_btn_matrix_pressed,
-                            CURRENT_BUTTON_PRESSED_BORDER_COLOR);
+                            ESP3D_BUTTON_PRESSED_BORDER_COLOR);
   lv_style_set_border_width(&style_btn_matrix_pressed, 3);
   lv_style_set_border_opa(&style_btn_matrix_pressed, LV_OPA_60);
 
@@ -393,24 +393,24 @@ bool init() {
   // checked
   lv_style_init(&style_btn_matrix_checked);
   lv_style_set_pad_all(&style_btn_matrix_checked, 10);
-  lv_style_set_radius(&style_btn_matrix_checked, CURRENT_BUTTON_RADIUS_VALUE);
+  lv_style_set_radius(&style_btn_matrix_checked, ESP3D_BUTTON_RADIUS );
 
   // bg
   lv_style_set_bg_opa(&style_btn_matrix_checked, LV_OPA_40);
   lv_style_set_bg_color(
       &style_btn_matrix_checked,
-      lv_palette_darken(CURRENT_BUTTON_PRESSED_COLOR_PALETTE,
-                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN * 2));
+      lv_palette_darken(ESP3D_BUTTON_PRESSED_COLOR_PALETTE,
+                        ESP3D_BUTTON_COLOR_PALETTE_DARKEN * 2));
   lv_style_set_bg_grad_color(
       &style_btn_matrix_checked,
-      lv_palette_darken(CURRENT_BUTTON_PRESSED_COLOR_PALETTE,
-                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN * 2));
+      lv_palette_darken(ESP3D_BUTTON_PRESSED_COLOR_PALETTE,
+                        ESP3D_BUTTON_COLOR_PALETTE_DARKEN * 2));
   // text
   lv_style_set_text_color(&style_btn_matrix_checked,
-                          CURRENT_BUTTON_PRESSED_TEXT_COLOR);
+                          ESP3D_BUTTON_PRESSED_TEXT_COLOR);
   // border
   lv_style_set_border_color(&style_btn_matrix_checked,
-                            CURRENT_BUTTON_PRESSED_BORDER_COLOR);
+                            ESP3D_BUTTON_PRESSED_BORDER_COLOR);
   lv_style_set_border_width(&style_btn_matrix_checked, 2);
   lv_style_set_border_opa(&style_btn_matrix_checked, LV_OPA_40);
 
@@ -419,30 +419,30 @@ bool init() {
   */
   /*Default*/
   lv_style_init(&style_btn_msb_box_default);
-  lv_style_set_radius(&style_btn_msb_box_default, CURRENT_BUTTON_RADIUS_VALUE);
+  lv_style_set_radius(&style_btn_msb_box_default, ESP3D_BUTTON_RADIUS );
   lv_style_set_bg_opa(&style_btn_msb_box_default, LV_OPA_100);
   lv_style_set_bg_color(&style_btn_msb_box_default,
-                        lv_palette_main(CURRENT_BUTTON_COLOR_PALETTE));
+                        lv_palette_main(ESP3D_BUTTON_COLOR_PALETTE));
   lv_style_set_bg_grad_color(
       &style_btn_msb_box_default,
-      lv_palette_darken(CURRENT_BUTTON_COLOR_PALETTE,
-                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN));
+      lv_palette_darken(ESP3D_BUTTON_COLOR_PALETTE,
+                        ESP3D_BUTTON_COLOR_PALETTE_DARKEN));
   lv_style_set_bg_grad_dir(&style_btn_msb_box_default, LV_GRAD_DIR_VER);
 
   lv_style_set_border_opa(&style_btn_msb_box_default, LV_OPA_40);
   lv_style_set_border_width(&style_btn_msb_box_default,
-                            CURRENT_BUTTON_BORDER_VALUE);
+                            ESP3D_BUTTON_BORDER_SIZE);
   lv_style_set_border_color(&style_btn_msb_box_default,
-                            CURRENT_BUTTON_BORDER_COLOR);
+                            ESP3D_BUTTON_BORDER_COLOR);
 
   lv_style_set_outline_opa(&style_btn_msb_box_default, LV_OPA_COVER);
   lv_style_set_outline_color(
       &style_btn_msb_box_default,
-      lv_palette_main(CURRENT_BUTTON_OUTLINE_COLOR_PALETTE));
+      lv_palette_main(ESP3D_BUTTON_OUTLINE_COLOR_PALETTE));
 
   lv_style_set_text_color(&style_btn_msb_box_default,
-                          CURRENT_BUTTON_TEXT_COLOR);
-  lv_style_set_pad_all(&style_btn_msb_box_default, CURRENT_BUTTON_PAD);
+                          ESP3D_BUTTON_TEXT_COLOR);
+  lv_style_set_pad_all(&style_btn_msb_box_default, ESP3D_BUTTON_PAD);
 
   /*Pressed*/
 
@@ -450,30 +450,30 @@ bool init() {
 
   /*Add a large outline when pressed*/
   lv_style_set_outline_width(&style_btn_msb_box_pressed,
-                             CURRENT_BUTTON_PRESSED_OUTLINE);
+                             ESP3D_BUTTON_PRESSED_OUTLINE);
   lv_style_set_outline_opa(&style_btn_msb_box_pressed, LV_OPA_TRANSP);
 
   lv_style_set_shadow_ofs_y(&style_btn_msb_box_pressed,
-                            CURRENT_BUTTON_COLOR_PRESSED_SHADOW_OFFSET);
+                            ESP3D_BUTTON_PRESSED_SHADOW_OFFSET);
   lv_style_set_bg_color(&style_btn_msb_box_pressed,
-                        lv_palette_darken(CURRENT_BUTTON_PRESSED_COLOR_PALETTE,
-                                          CURRENT_BUTTON_COLOR_PALETTE_DARKEN));
+                        lv_palette_darken(ESP3D_BUTTON_PRESSED_COLOR_PALETTE,
+                                          ESP3D_BUTTON_COLOR_PALETTE_DARKEN));
   lv_style_set_bg_grad_color(
       &style_btn_msb_box_pressed,
-      lv_palette_darken(CURRENT_BUTTON_PRESSED_COLOR_PALETTE,
-                        CURRENT_BUTTON_COLOR_PALETTE_DARKEN * 2));
+      lv_palette_darken(ESP3D_BUTTON_PRESSED_COLOR_PALETTE,
+                        ESP3D_BUTTON_COLOR_PALETTE_DARKEN * 2));
 
   lv_style_set_text_color(&style_btn_msb_box_pressed,
-                          CURRENT_BUTTON_PRESSED_TEXT_COLOR);
+                          ESP3D_BUTTON_PRESSED_TEXT_COLOR);
   lv_style_set_border_color(&style_btn_msb_box_pressed,
-                            CURRENT_BUTTON_PRESSED_BORDER_COLOR);
-  if (BUTTON_ANIMATION_DELAY) {
+                            ESP3D_BUTTON_PRESSED_BORDER_COLOR);
+  if (ESP3D_BUTTON_ANIMATION_DELAY) {
     /*Add a transition to the outline*/
     static lv_style_transition_dsc_t trans;
     static lv_style_prop_t props[] = {LV_STYLE_OUTLINE_WIDTH,
                                       LV_STYLE_OUTLINE_OPA, LV_STYLE_PROP_INV};
     lv_style_transition_dsc_init(&trans, props, lv_anim_path_linear,
-                                 BUTTON_ANIMATION_DELAY, 0, NULL);
+                                 ESP3D_BUTTON_ANIMATION_DELAY, 0, NULL);
     lv_style_set_transition(&style_btn_msb_box_pressed, &trans);
   }
 
@@ -483,24 +483,24 @@ bool init() {
   lv_style_init(&style_status_list_default);
   lv_style_set_text_opa(&style_status_list_default, LV_OPA_COVER);
   lv_style_set_text_color(&style_status_list_default,
-                          CURRENT_STATUS_BAR_TEXT_COLOR);
+                          ESP3D_STATUS_BAR_TEXT_COLOR);
   lv_style_set_bg_opa(&style_status_list_default, LV_OPA_COVER);
   lv_style_set_bg_color(&style_status_list_default,
-                        CURRENT_STATUS_BAR_BG_COLOR);
+                        ESP3D_STATUS_BAR_BG_COLOR);
   lv_style_set_radius(&style_status_list_default, 0);
   // lv_style_set_pad_hor(&style_status_list_default,
-  // CURRENT_STATUS_BAR_H_PAD);
+  // ESP3D_STATUS_BAR_H_PAD);
   // lv_style_set_pad_ver(&style_status_list_default,
-  // CURRENT_STATUS_BAR_V_PAD);
+  // ESP3D_STATUS_BAR_V_PAD);
   lv_style_set_border_width(&style_status_list_default,
-                            CURRENT_STATUS_BAR_BORDER_VALUE);
+                            ESP3D_STATUS_BAR_BORDER_VALUE);
   lv_style_set_border_color(&style_status_list_default,
-                            CURRENT_STATUS_BAR_BORDER_COLOR);
+                            ESP3D_STATUS_BAR_BORDER_COLOR);
   /*
   Col Container
   */
   lv_style_init(&style_col_container_default);
-  lv_style_set_radius(&style_col_container_default, CURRENT_CONTAINER_RADIUS);
+  lv_style_set_radius(&style_col_container_default, ESP3D_CONTAINER_RADIUS);
   lv_style_set_layout(&style_col_container_default, LV_LAYOUT_FLEX);
   lv_style_set_flex_flow(&style_col_container_default, LV_FLEX_FLOW_COLUMN);
   lv_style_set_flex_main_place(&style_col_container_default,
@@ -510,7 +510,7 @@ bool init() {
   Row Container
   */
   lv_style_init(&style_row_container_default);
-  lv_style_set_radius(&style_row_container_default, CURRENT_CONTAINER_RADIUS);
+  lv_style_set_radius(&style_row_container_default, ESP3D_CONTAINER_RADIUS);
   lv_style_set_layout(&style_row_container_default, LV_LAYOUT_FLEX);
   lv_style_set_flex_flow(&style_row_container_default, LV_FLEX_FLOW_ROW);
   lv_style_set_flex_main_place(&style_row_container_default,
@@ -607,8 +607,8 @@ bool apply(lv_obj_t* obj, ESP3DStyleType type) {
       lv_obj_set_width(obj, LV_PCT(80));
       ESP3DStyle::apply(lv_msgbox_get_close_btn(obj), ESP3DStyleType::button);
       ESP3DStyle::apply(lv_msgbox_get_btns(obj), ESP3DStyleType::buttons_msgbox);
-      lv_obj_set_height(lv_msgbox_get_btns(obj), SYMBOL_BUTTON_HEIGHT);
-      lv_obj_set_width(lv_msgbox_get_btns(obj), MSGBOX_BUTTON_WIDTH);
+      lv_obj_set_height(lv_msgbox_get_btns(obj), ESP3D_SYMBOL_BUTTON_HEIGHT);
+      lv_obj_set_width(lv_msgbox_get_btns(obj), ESP3D_MSGBOX_BUTTON_WIDTH);
       break;
     case ESP3DStyleType::embedded_button:
       lv_obj_add_style(obj, &style_embedded_btn_default, LV_STATE_DEFAULT);
@@ -618,16 +618,16 @@ bool apply(lv_obj_t* obj, ESP3DStyleType type) {
     case ESP3DStyleType::row_container:
       lv_obj_add_style(obj, &style_row_container_default, LV_STATE_DEFAULT);
       lv_obj_set_style_clip_corner(obj, true, 0);
-      lv_obj_set_style_pad_column(obj, CURRENT_BUTTON_PRESSED_OUTLINE,
+      lv_obj_set_style_pad_column(obj, ESP3D_BUTTON_PRESSED_OUTLINE,
                                   LV_PART_MAIN);
       break;
 
     case ESP3DStyleType::col_container:
       lv_obj_add_style(obj, &style_col_container_default, LV_STATE_DEFAULT);
       lv_obj_set_style_clip_corner(obj, true, 0);
-      lv_obj_set_style_pad_top(obj, CURRENT_BUTTON_PRESSED_OUTLINE,
+      lv_obj_set_style_pad_top(obj, ESP3D_BUTTON_PRESSED_OUTLINE,
                                LV_PART_MAIN);
-      lv_obj_set_style_pad_bottom(obj, CURRENT_BUTTON_PRESSED_OUTLINE,
+      lv_obj_set_style_pad_bottom(obj, ESP3D_BUTTON_PRESSED_OUTLINE,
                                   LV_PART_MAIN);
       break;
     case ESP3DStyleType::list_container:
@@ -635,10 +635,10 @@ bool apply(lv_obj_t* obj, ESP3DStyleType type) {
       lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLL_ELASTIC);
       lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
       lv_obj_set_scrollbar_mode(obj, LV_SCROLLBAR_MODE_AUTO);
-      lv_obj_set_style_pad_row(obj, CURRENT_BUTTON_PRESSED_OUTLINE,
+      lv_obj_set_style_pad_row(obj, ESP3D_BUTTON_PRESSED_OUTLINE,
                                LV_PART_MAIN);
       lv_obj_set_style_flex_main_place(obj, LV_FLEX_ALIGN_START, LV_PART_MAIN);
-      lv_obj_set_style_pad_all(obj, CURRENT_BUTTON_PRESSED_OUTLINE,
+      lv_obj_set_style_pad_all(obj, ESP3D_BUTTON_PRESSED_OUTLINE,
                                LV_PART_MAIN);
       lv_obj_add_style(obj, &style_scrollbar_default, LV_PART_SCROLLBAR);
 #pragma GCC diagnostic push
@@ -669,10 +669,10 @@ bool apply(lv_obj_t* obj, ESP3DStyleType type) {
 }
 
 bool add_pad(lv_obj_t* obj) {
-  lv_obj_set_style_pad_left(obj, CURRENT_BUTTON_PRESSED_OUTLINE, LV_PART_MAIN);
-  lv_obj_set_style_pad_right(obj, CURRENT_BUTTON_PRESSED_OUTLINE, LV_PART_MAIN);
-  lv_obj_set_style_pad_top(obj, CURRENT_BUTTON_PRESSED_OUTLINE, LV_PART_MAIN);
-  lv_obj_set_style_pad_bottom(obj, CURRENT_BUTTON_PRESSED_OUTLINE,
+  lv_obj_set_style_pad_left(obj, ESP3D_BUTTON_PRESSED_OUTLINE, LV_PART_MAIN);
+  lv_obj_set_style_pad_right(obj, ESP3D_BUTTON_PRESSED_OUTLINE, LV_PART_MAIN);
+  lv_obj_set_style_pad_top(obj, ESP3D_BUTTON_PRESSED_OUTLINE, LV_PART_MAIN);
+  lv_obj_set_style_pad_bottom(obj, ESP3D_BUTTON_PRESSED_OUTLINE,
                               LV_PART_MAIN);
   return true;
 }

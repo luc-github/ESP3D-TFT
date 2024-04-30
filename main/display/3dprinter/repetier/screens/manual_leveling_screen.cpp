@@ -84,10 +84,10 @@ void manual_leveling_screen_delay_timer_cb(lv_timer_t *timer) {
 
 void event_button_manual_leveling_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
-  if (BUTTON_ANIMATION_DELAY) {
+  if (ESP3D_BUTTON_ANIMATION_DELAY) {
     if (manual_leveling_screen_delay_timer) return;
     manual_leveling_screen_delay_timer = lv_timer_create(
-        manual_leveling_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+        manual_leveling_screen_delay_timer_cb, ESP3D_BUTTON_ANIMATION_DELAY, NULL);
   } else {
     manual_leveling_screen_delay_timer_cb(NULL);
   }
@@ -372,7 +372,7 @@ void manual_leveling_screen(bool autoleveling) {
   lv_obj_del(ui_current_screen);
 
   // Button back
-  lv_obj_t *btn_back = backButton::create_back_button(ui_new_screen);
+  lv_obj_t *btn_back = backButton::create(ui_new_screen);
   lv_obj_add_event_cb(btn_back, event_button_manual_leveling_back_handler,
                       LV_EVENT_CLICKED, NULL);
   lv_obj_update_layout(btn_back);
@@ -382,10 +382,10 @@ void manual_leveling_screen(bool autoleveling) {
   lv_btnmatrix_set_map(btnm_leveling_position, leveling_position_buttons_map);
   ESP3DStyle::apply(btnm_leveling_position, ESP3DStyleType::buttons_matrix);
   lv_obj_update_layout(btnm_leveling_position);
-  lv_obj_set_pos(btnm_leveling_position, CURRENT_BUTTON_PRESSED_OUTLINE,
-                 CURRENT_BUTTON_PRESSED_OUTLINE);
+  lv_obj_set_pos(btnm_leveling_position, ESP3D_BUTTON_PRESSED_OUTLINE,
+                 ESP3D_BUTTON_PRESSED_OUTLINE);
   lv_obj_set_size(btnm_leveling_position, LV_HOR_RES / 2,
-                  LV_VER_RES - (CURRENT_BUTTON_PRESSED_OUTLINE * 3) -
+                  LV_VER_RES - (ESP3D_BUTTON_PRESSED_OUTLINE * 3) -
                       lv_obj_get_height(btn_back));
   lv_obj_add_event_cb(btnm_leveling_position,
                       leveling_posiiton_matrix_buttons_event_cb,
@@ -393,34 +393,34 @@ void manual_leveling_screen(bool autoleveling) {
 
   // Button Previous
   btn_previous = symbolButton::create_symbol_button(
-      ui_new_screen, LV_SYMBOL_PREVIOUS, BACK_BUTTON_WIDTH, BACK_BUTTON_HEIGHT);
+      ui_new_screen, LV_SYMBOL_PREVIOUS, ESP3D_BACK_BUTTON_WIDTH, ESP3D_BACK_BUTTON_HEIGHT);
   lv_obj_align(btn_previous, LV_ALIGN_BOTTOM_LEFT,
-               CURRENT_BUTTON_PRESSED_OUTLINE, -CURRENT_BUTTON_PRESSED_OUTLINE);
+               ESP3D_BUTTON_PRESSED_OUTLINE, -ESP3D_BUTTON_PRESSED_OUTLINE);
   lv_obj_add_event_cb(btn_previous,
                       event_button_manual_leveling_previous_handler,
                       LV_EVENT_CLICKED, btnm_leveling_position);
 
   // Button Next
   btn_next = symbolButton::create_symbol_button(
-      ui_new_screen, LV_SYMBOL_NEXT, BACK_BUTTON_WIDTH, BACK_BUTTON_HEIGHT);
+      ui_new_screen, LV_SYMBOL_NEXT, ESP3D_BACK_BUTTON_WIDTH, ESP3D_BACK_BUTTON_HEIGHT);
   lv_obj_align_to(btn_next, btnm_leveling_position, LV_ALIGN_OUT_BOTTOM_RIGHT,
-                  0, CURRENT_BUTTON_PRESSED_OUTLINE);
+                  0, ESP3D_BUTTON_PRESSED_OUTLINE);
 
   lv_obj_add_event_cb(btn_next, event_button_manual_leveling_next_handler,
                       LV_EVENT_CLICKED, btnm_leveling_position);
 
   // Help button
   lv_obj_t *btn_help = symbolButton::create_symbol_button(
-      ui_new_screen, "?", BACK_BUTTON_WIDTH, BACK_BUTTON_HEIGHT);
-  lv_obj_align(btn_help, LV_ALIGN_TOP_RIGHT, -CURRENT_BUTTON_PRESSED_OUTLINE,
-               CURRENT_BUTTON_PRESSED_OUTLINE);
+      ui_new_screen, "?", ESP3D_BACK_BUTTON_WIDTH, ESP3D_BACK_BUTTON_HEIGHT);
+  lv_obj_align(btn_help, LV_ALIGN_TOP_RIGHT, -ESP3D_BUTTON_PRESSED_OUTLINE,
+               ESP3D_BUTTON_PRESSED_OUTLINE);
   lv_obj_add_event_cb(btn_help, event_button_manual_leveling_help_handler,
                       LV_EVENT_CLICKED, NULL);
 
   // Start button
   btn_start = symbolButton::create_symbol_button(ui_new_screen, LV_SYMBOL_PLAY);
   lv_obj_align_to(btn_start, btnm_leveling_position, LV_ALIGN_OUT_RIGHT_MID,
-                  (LV_HOR_RES / 4) - SYMBOL_BUTTON_WIDTH / 2, 0);
+                  (LV_HOR_RES / 4) - ESP3D_SYMBOL_BUTTON_WIDTH / 2, 0);
   lv_obj_add_event_cb(btn_start, event_button_manual_leveling_start_handler,
                       LV_EVENT_CLICKED, btnm_leveling_position);
 
@@ -429,11 +429,11 @@ void manual_leveling_screen(bool autoleveling) {
 
   ESP3DStyle::apply(status_container, ESP3DStyleType::text_container);
   lv_obj_set_size(status_container,
-                  (LV_HOR_RES / 2) - (3 * CURRENT_BUTTON_PRESSED_OUTLINE),
-                  LV_VER_RES - (CURRENT_BUTTON_PRESSED_OUTLINE * 4) -
+                  (LV_HOR_RES / 2) - (3 * ESP3D_BUTTON_PRESSED_OUTLINE),
+                  LV_VER_RES - (ESP3D_BUTTON_PRESSED_OUTLINE * 4) -
                       lv_obj_get_height(btn_back) * 2);
   lv_obj_align_to(status_container, btn_help, LV_ALIGN_OUT_BOTTOM_RIGHT, 0,
-                  CURRENT_BUTTON_PRESSED_OUTLINE);
+                  ESP3D_BUTTON_PRESSED_OUTLINE);
 
   // status text
   std::string t =

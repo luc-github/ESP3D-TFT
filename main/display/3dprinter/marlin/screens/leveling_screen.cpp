@@ -72,10 +72,10 @@ void event_button_leveling_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
   if (leveling_screen_delay_timer) return;
   leveling_next_screen = ESP3DScreenType::menu;
-  if (BUTTON_ANIMATION_DELAY) {
+  if (ESP3D_BUTTON_ANIMATION_DELAY) {
     if (leveling_screen_delay_timer) return;
     leveling_screen_delay_timer = lv_timer_create(
-        leveling_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+        leveling_screen_delay_timer_cb, ESP3D_BUTTON_ANIMATION_DELAY, NULL);
   } else {
     leveling_screen_delay_timer_cb(NULL);
   }
@@ -85,10 +85,10 @@ void event_button_manual_handler(lv_event_t *e) {
   esp3d_log("MANUAL Clicked");
   if (leveling_screen_delay_timer) return;
   leveling_next_screen = ESP3DScreenType::manual_leveling;
-  if (BUTTON_ANIMATION_DELAY) {
+  if (ESP3D_BUTTON_ANIMATION_DELAY) {
     if (leveling_screen_delay_timer) return;
     leveling_screen_delay_timer = lv_timer_create(
-        leveling_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+        leveling_screen_delay_timer_cb, ESP3D_BUTTON_ANIMATION_DELAY, NULL);
   } else {
     leveling_screen_delay_timer_cb(NULL);
   }
@@ -98,10 +98,10 @@ void event_button_auto_handler(lv_event_t *e) {
   esp3d_log("AUTO Clicked");
   if (leveling_screen_delay_timer) return;
   leveling_next_screen = ESP3DScreenType::auto_leveling;
-  if (BUTTON_ANIMATION_DELAY) {
+  if (ESP3D_BUTTON_ANIMATION_DELAY) {
     if (leveling_screen_delay_timer) return;
     leveling_screen_delay_timer = lv_timer_create(
-        leveling_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+        leveling_screen_delay_timer_cb, ESP3D_BUTTON_ANIMATION_DELAY, NULL);
   } else {
     leveling_screen_delay_timer_cb(NULL);
   }
@@ -119,7 +119,7 @@ void leveling_screen(bool autoleveling) {
   ESP3DStyle::apply(ui_new_screen, ESP3DStyleType::main_bg);
   lv_obj_del(ui_current_screen);
 
-  btnback = backButton::create_back_button(ui_new_screen);
+  btnback = backButton::create(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_leveling_back_handler,
                       LV_EVENT_CLICKED, NULL);
 
@@ -137,13 +137,13 @@ void leveling_screen(bool autoleveling) {
   // Create button and label for manual leveling
   btn = symbolButton::create_symbol_button(
       ui_buttons_container, LV_SYMBOL_MANUAL "\n" LV_SYMBOL_LEVELING,
-      BUTTON_WIDTH, BUTTON_WIDTH);
+      ESP3D_BUTTON_WIDTH, ESP3D_BUTTON_WIDTH);
   lv_obj_add_event_cb(btn, event_button_manual_handler, LV_EVENT_CLICKED, NULL);
 
   // Create button and label for auto leveling
   btn = symbolButton::create_symbol_button(
       ui_buttons_container, LV_SYMBOL_AUTOMATIC "\n" LV_SYMBOL_LEVELING,
-      BUTTON_WIDTH, BUTTON_WIDTH);
+      ESP3D_BUTTON_WIDTH, ESP3D_BUTTON_WIDTH);
   lv_obj_add_event_cb(btn, event_button_auto_handler, LV_EVENT_CLICKED, NULL);
   esp3dTftui.set_current_screen(ESP3DScreenType::leveling);
 }

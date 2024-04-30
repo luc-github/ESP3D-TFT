@@ -92,14 +92,14 @@ bool updateBtnMatrix() {
   ESP3DStyle::apply(btnm_target, ESP3DStyleType::buttons_matrix);
   lv_obj_update_layout(btnm_target);
   size_t i = get_map_size();
-  lv_obj_set_size(btnm_target, MATRIX_BUTTON_WIDTH * i, MATRIX_BUTTON_HEIGHT);
+  lv_obj_set_size(btnm_target, ESP3D_MATRIX_BUTTON_WIDTH * i, ESP3D_MATRIX_BUTTON_HEIGHT);
   esp3d_log("child count: %d", i);
   // lv_obj_add_state(obj, LV_STATE_DISABLED);
   if (fan_buttons_map_id > i) fan_buttons_map_id = 0;
   lv_btnmatrix_set_btn_ctrl(btnm_target, fan_buttons_map_id,
                             LV_BTNMATRIX_CTRL_CHECKED);
   lv_obj_align_to(btnm_target, btnback, LV_ALIGN_OUT_LEFT_BOTTOM,
-                  -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+                  -ESP3D_BUTTON_PRESSED_OUTLINE, 0);
   return true;
 }
 
@@ -113,10 +113,10 @@ void fan_screen_delay_timer_cb(lv_timer_t *timer) {
 
 void event_button_fan_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
-  if (BUTTON_ANIMATION_DELAY) {
+  if (ESP3D_BUTTON_ANIMATION_DELAY) {
     if (fan_screen_delay_timer) return;
     fan_screen_delay_timer = lv_timer_create(fan_screen_delay_timer_cb,
-                                             BUTTON_ANIMATION_DELAY, NULL);
+                                             ESP3D_BUTTON_ANIMATION_DELAY, NULL);
   } else {
     fan_screen_delay_timer_cb(NULL);
   }
@@ -308,7 +308,7 @@ void fan_screen() {
   ESP3DStyle::apply(ui_new_screen, ESP3DStyleType::main_bg);
   lv_obj_del(ui_current_screen);
 
-  btnback = backButton::create_back_button(ui_new_screen);
+  btnback = backButton::create(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_fan_back_handler, LV_EVENT_CLICKED,
                       NULL);
 
@@ -318,9 +318,9 @@ void fan_screen() {
   ESP3DStyle::apply(btnm, ESP3DStyleType::buttons_matrix);
   size_t i =
       (sizeof(fan_steps_buttons_map) / sizeof(fan_steps_buttons_map[0])) - 1;
-  lv_obj_set_size(btnm, MATRIX_BUTTON_WIDTH * i, MATRIX_BUTTON_HEIGHT);
-  lv_obj_align(btnm, LV_ALIGN_TOP_RIGHT, -CURRENT_BUTTON_PRESSED_OUTLINE,
-               CURRENT_BUTTON_PRESSED_OUTLINE / 2);
+  lv_obj_set_size(btnm, ESP3D_MATRIX_BUTTON_WIDTH * i, ESP3D_MATRIX_BUTTON_HEIGHT);
+  lv_obj_align(btnm, LV_ALIGN_TOP_RIGHT, -ESP3D_BUTTON_PRESSED_OUTLINE,
+               ESP3D_BUTTON_PRESSED_OUTLINE / 2);
   lv_btnmatrix_set_btn_ctrl(btnm, fan_steps_buttons_map_id,
                             LV_BTNMATRIX_CTRL_CHECKED);
   lv_obj_add_event_cb(btnm, fan_steps_matrix_buttons_event_cb,
@@ -331,7 +331,7 @@ void fan_screen() {
   lv_label_set_text(label_current_fan, fan_buttons_map[fan_buttons_map_id]);
   ESP3DStyle::apply(label_current_fan, ESP3DStyleType::bg_label);
   lv_obj_align(label_current_fan, LV_ALIGN_TOP_LEFT,
-               CURRENT_BUTTON_PRESSED_OUTLINE, CURRENT_BUTTON_PRESSED_OUTLINE);
+               ESP3D_BUTTON_PRESSED_OUTLINE, ESP3D_BUTTON_PRESSED_OUTLINE);
   lv_obj_update_layout(label_current_fan);
 
   // Current Fan value
@@ -343,7 +343,7 @@ void fan_screen() {
   ESP3DStyle::apply(label_current_fan_value, ESP3DStyleType::read_only_value);
   lv_obj_set_width(label_current_fan_value, LV_HOR_RES / 6);
   lv_obj_align_to(label_current_fan_value, label_current_fan,
-                  LV_ALIGN_OUT_RIGHT_MID, CURRENT_BUTTON_PRESSED_OUTLINE / 2,
+                  LV_ALIGN_OUT_RIGHT_MID, ESP3D_BUTTON_PRESSED_OUTLINE / 2,
                   0);
 
   // unit
@@ -351,13 +351,13 @@ void fan_screen() {
   lv_label_set_text(label_unit1, "%");
   ESP3DStyle::apply(label_unit1, ESP3DStyleType::bg_label);
   lv_obj_align_to(label_unit1, label_current_fan_value, LV_ALIGN_OUT_RIGHT_MID,
-                  CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
+                  ESP3D_BUTTON_PRESSED_OUTLINE / 2, 0);
 
   // Button up
   lv_obj_t *btn_up = symbolButton::create_symbol_button(
       ui_new_screen, LV_SYMBOL_UP "\n" LV_SYMBOL_PLUS);
   lv_obj_align_to(btn_up, label_current_fan_value, LV_ALIGN_OUT_BOTTOM_MID, 0,
-                  CURRENT_BUTTON_PRESSED_OUTLINE / 2);
+                  ESP3D_BUTTON_PRESSED_OUTLINE / 2);
   // fan input
   lv_obj_t *fan_ta = lv_textarea_create(ui_new_screen);
   lv_obj_add_event_cb(fan_ta, fan_ta_event_cb, LV_EVENT_VALUE_CHANGED, NULL);
@@ -368,27 +368,27 @@ void fan_screen() {
   lv_obj_set_style_text_align(fan_ta, LV_TEXT_ALIGN_CENTER, 0);
   lv_obj_set_width(fan_ta, LV_HOR_RES / 6);
   lv_obj_align_to(fan_ta, btn_up, LV_ALIGN_OUT_BOTTOM_MID, 0,
-                  CURRENT_BUTTON_PRESSED_OUTLINE / 2);
+                  ESP3D_BUTTON_PRESSED_OUTLINE / 2);
 
   // label
   lv_obj_t *label_ta = lv_label_create(ui_new_screen);
   lv_label_set_text(label_ta, LV_SYMBOL_FAN);
   ESP3DStyle::apply(label_ta, ESP3DStyleType::bg_label);
   lv_obj_align_to(label_ta, fan_ta, LV_ALIGN_OUT_LEFT_MID,
-                  -CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
+                  -ESP3D_BUTTON_PRESSED_OUTLINE / 2, 0);
 
   // unit
   lv_obj_t *label_unit2 = lv_label_create(ui_new_screen);
   lv_label_set_text(label_unit2, "%");
   ESP3DStyle::apply(label_unit2, ESP3DStyleType::bg_label);
   lv_obj_align_to(label_unit2, fan_ta, LV_ALIGN_OUT_RIGHT_MID,
-                  CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
+                  ESP3D_BUTTON_PRESSED_OUTLINE / 2, 0);
 
   // button down
   lv_obj_t *btn_down = symbolButton::create_symbol_button(
       ui_new_screen, LV_SYMBOL_MINUS "\n" LV_SYMBOL_DOWN);
   lv_obj_align_to(btn_down, fan_ta, LV_ALIGN_OUT_BOTTOM_MID, 0,
-                  CURRENT_BUTTON_PRESSED_OUTLINE / 2);
+                  ESP3D_BUTTON_PRESSED_OUTLINE / 2);
   lv_obj_add_event_cb(btn_down, fan_btn_down_event_cb, LV_EVENT_CLICKED,
                       fan_ta);
 
@@ -398,14 +398,14 @@ void fan_screen() {
   lv_obj_t *btn_ok =
       symbolButton::create_symbol_button(ui_new_screen, LV_SYMBOL_OK);
   lv_obj_align_to(btn_ok, label_unit2, LV_ALIGN_OUT_RIGHT_MID,
-                  CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+                  ESP3D_BUTTON_PRESSED_OUTLINE, 0);
   lv_obj_add_event_cb(btn_ok, fan_btn_ok_event_cb, LV_EVENT_CLICKED, fan_ta);
 
   // Button Reset
   lv_obj_t *btn_reset =
       symbolButton::create_symbol_button(ui_new_screen, LV_SYMBOL_POWER);
   lv_obj_align_to(btn_reset, btn_ok, LV_ALIGN_OUT_RIGHT_MID,
-                  CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+                  ESP3D_BUTTON_PRESSED_OUTLINE, 0);
   lv_obj_add_event_cb(btn_reset, fan_btn_reset_event_cb, LV_EVENT_CLICKED,
                       fan_ta);
 
@@ -414,11 +414,11 @@ void fan_screen() {
   lv_keyboard_set_mode(fan_kb, LV_KEYBOARD_MODE_NUMBER);
   lv_keyboard_set_textarea(fan_kb, NULL);
   lv_obj_align_to(fan_kb, fan_ta, LV_ALIGN_OUT_RIGHT_MID,
-                  CURRENT_BUTTON_PRESSED_OUTLINE / 2, 0);
+                  ESP3D_BUTTON_PRESSED_OUTLINE / 2, 0);
   lv_obj_update_layout(fan_kb);
   lv_obj_set_content_width(fan_kb, LV_HOR_RES - lv_obj_get_x(fan_kb) -
-                                       2 * CURRENT_BUTTON_PRESSED_OUTLINE);
-  lv_obj_set_style_radius(fan_kb, CURRENT_BUTTON_RADIUS_VALUE, LV_PART_MAIN);
+                                       2 * ESP3D_BUTTON_PRESSED_OUTLINE);
+  lv_obj_set_style_radius(fan_kb, ESP3D_BUTTON_RADIUS , LV_PART_MAIN);
   lv_obj_add_flag(fan_kb, LV_OBJ_FLAG_HIDDEN);
   lv_obj_add_event_cb(fan_ta, fan_ta_event_cb, LV_EVENT_ALL, fan_kb);
 

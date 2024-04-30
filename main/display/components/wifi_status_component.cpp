@@ -83,14 +83,14 @@ lv_obj_t *wifi_status(lv_obj_t *parent, lv_obj_t *btnback) {
   lv_obj_clear_flag(status_container, LV_OBJ_FLAG_SCROLLABLE);
   lv_obj_set_size(status_container,
                   LV_HOR_RES - (lv_obj_get_width(btnback) +
-                                (2 * CURRENT_BUTTON_PRESSED_OUTLINE)),
+                                (2 * ESP3D_BUTTON_PRESSED_OUTLINE)),
                   LV_SIZE_CONTENT);
   lv_obj_set_style_pad_all(status_container, 0, LV_PART_MAIN);
   lv_obj_set_style_layout(status_container, LV_LAYOUT_FLEX, LV_PART_MAIN);
   lv_obj_set_style_flex_flow(status_container, LV_FLEX_FLOW_ROW_REVERSE,
                              LV_PART_MAIN);
   lv_obj_set_style_pad_column(status_container,
-                              CURRENT_BUTTON_PRESSED_OUTLINE / 2, LV_PART_MAIN);
+                              ESP3D_BUTTON_PRESSED_OUTLINE / 2, LV_PART_MAIN);
   lv_obj_set_style_flex_main_place(status_container, LV_FLEX_ALIGN_END,
                                    LV_PART_MAIN);
 
@@ -105,7 +105,7 @@ lv_obj_t *wifi_status(lv_obj_t *parent, lv_obj_t *btnback) {
   lv_label_set_text(wifi_mode_label, "?");
   lv_obj_update_layout(status_container);
   lv_obj_align_to(status_container, btnback, LV_ALIGN_OUT_LEFT_MID,
-                  -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+                  -ESP3D_BUTTON_PRESSED_OUTLINE, 0);
   slash_overlay = lv_label_create(wifi_mode_label);
   lv_label_set_text(slash_overlay, LV_SYMBOL_SLASH);
   lv_obj_center(slash_overlay);

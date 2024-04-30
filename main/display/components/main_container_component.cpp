@@ -35,8 +35,8 @@ lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
   lv_obj_update_layout(button_back);
   lv_obj_set_size(ui_container, LV_HOR_RES,
                   LV_VER_RES - lv_obj_get_height(button_back) -
-                      (1 * CURRENT_BUTTON_PRESSED_OUTLINE));
-  lv_obj_set_style_pad_top(ui_container, CURRENT_BUTTON_PRESSED_OUTLINE * 1,
+                      (1 * ESP3D_BUTTON_PRESSED_OUTLINE));
+  lv_obj_set_style_pad_top(ui_container, ESP3D_BUTTON_PRESSED_OUTLINE * 1,
                            LV_PART_MAIN);
   return ui_container;
 }

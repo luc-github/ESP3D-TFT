@@ -26,8 +26,8 @@
 
 namespace symbolButton {
 extern lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text,
-                                      int width = SYMBOL_BUTTON_WIDTH,
-                                      int height = SYMBOL_BUTTON_HEIGHT,
+                                      int width = ESP3D_SYMBOL_BUTTON_WIDTH,
+                                      int height = ESP3D_SYMBOL_BUTTON_HEIGHT,
                                       bool center = true, bool slash = false,
                                       int rotation = 0);
 }  // namespace symbolButton

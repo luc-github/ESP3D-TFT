@@ -159,7 +159,7 @@ bool auto_leveling_value_cb(ESP3DValuesIndex index, const char *value,
               for (uint8_t i = 0; i <= col; i++) {
                 lv_table_set_col_width(
                     auto_leveling_screen_table, i,
-                    ((LV_HOR_RES) - (2 * CURRENT_BUTTON_PRESSED_OUTLINE)) /
+                    ((LV_HOR_RES) - (2 * ESP3D_BUTTON_PRESSED_OUTLINE)) /
                         (col + 1));
               }
             }
@@ -186,13 +186,13 @@ bool auto_leveling_value_cb(ESP3DValuesIndex index, const char *value,
       if (max_col != -1 && col == max_col && row == 1) {
         esp3d_log(
             "Max col found is:%d, col wdith:%d", max_col,
-            ((LV_HOR_RES) - (2 * CURRENT_BUTTON_PRESSED_OUTLINE)) / max_col);
+            ((LV_HOR_RES) - (2 * ESP3D_BUTTON_PRESSED_OUTLINE)) / max_col);
         lv_table_set_col_cnt(auto_leveling_screen_table, max_col + 1);
 
         for (uint8_t i = 0; i <= max_col; i++) {
           lv_table_set_col_width(
               auto_leveling_screen_table, i,
-              ((LV_HOR_RES) - (2 * CURRENT_BUTTON_PRESSED_OUTLINE)) /
+              ((LV_HOR_RES) - (2 * ESP3D_BUTTON_PRESSED_OUTLINE)) /
                   (max_col + 1));
         }
       }
@@ -242,10 +242,10 @@ void event_button_auto_leveling_start_handler(lv_event_t *e) {
 
 void event_button_fan_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
-  if (BUTTON_ANIMATION_DELAY) {
+  if (ESP3D_BUTTON_ANIMATION_DELAY) {
     if (auto_leveling_screen_delay_timer) return;
     auto_leveling_screen_delay_timer = lv_timer_create(
-        auto_leveling_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+        auto_leveling_screen_delay_timer_cb, ESP3D_BUTTON_ANIMATION_DELAY, NULL);
   } else {
     auto_leveling_screen_delay_timer_cb(NULL);
   }
@@ -263,26 +263,26 @@ void auto_leveling_screen() {
   lv_obj_del(ui_current_screen);
 
   homing_done = false;
-  btn_back = backButton::create_back_button(ui_new_screen);
+  btn_back = backButton::create(ui_new_screen);
   lv_obj_add_event_cb(btn_back, event_button_fan_back_handler, LV_EVENT_CLICKED,
                       NULL);
   lv_obj_update_layout(btn_back);
   // Create a table
   auto_leveling_screen_table = lv_table_create(ui_new_screen);
   lv_obj_set_size(auto_leveling_screen_table,
-                  (LV_HOR_RES) - (2 * CURRENT_BUTTON_PRESSED_OUTLINE),
-                  LV_VER_RES - (3 * CURRENT_BUTTON_PRESSED_OUTLINE) -
+                  (LV_HOR_RES) - (2 * ESP3D_BUTTON_PRESSED_OUTLINE),
+                  LV_VER_RES - (3 * ESP3D_BUTTON_PRESSED_OUTLINE) -
                       lv_obj_get_height(btn_back));
-  lv_obj_set_pos(auto_leveling_screen_table, CURRENT_BUTTON_PRESSED_OUTLINE,
-                 CURRENT_BUTTON_PRESSED_OUTLINE);
+  lv_obj_set_pos(auto_leveling_screen_table, ESP3D_BUTTON_PRESSED_OUTLINE,
+                 ESP3D_BUTTON_PRESSED_OUTLINE);
   lv_obj_clear_flag(auto_leveling_screen_table, LV_OBJ_FLAG_SCROLL_ELASTIC);
   lv_obj_set_style_radius(auto_leveling_screen_table,
-                          CURRENT_BUTTON_RADIUS_VALUE, 0);
+                          ESP3D_BUTTON_RADIUS , 0);
   // button start
   btn_start = symbolButton::create_symbol_button(
-      ui_new_screen, LV_SYMBOL_PLAY, BACK_BUTTON_WIDTH, BACK_BUTTON_HEIGHT);
+      ui_new_screen, LV_SYMBOL_PLAY, ESP3D_BACK_BUTTON_WIDTH, ESP3D_BACK_BUTTON_HEIGHT);
   lv_obj_align_to(btn_start, auto_leveling_screen_table,
-                  LV_ALIGN_OUT_BOTTOM_MID, 0, CURRENT_BUTTON_PRESSED_OUTLINE);
+                  LV_ALIGN_OUT_BOTTOM_MID, 0, ESP3D_BUTTON_PRESSED_OUTLINE);
 
   lv_obj_add_event_cb(btn_start, event_button_auto_leveling_start_handler,
                       LV_EVENT_CLICKED, NULL);
@@ -291,9 +291,9 @@ void auto_leveling_screen() {
   ESP3DStyle::apply(label_status, ESP3DStyleType::bg_label);
   lv_label_set_text(label_status, "");
   lv_obj_align_to(label_status, auto_leveling_screen_table,
-                  LV_ALIGN_OUT_BOTTOM_LEFT, 0, CURRENT_BUTTON_PRESSED_OUTLINE);
+                  LV_ALIGN_OUT_BOTTOM_LEFT, 0, ESP3D_BUTTON_PRESSED_OUTLINE);
   lv_obj_set_width(label_status, LV_HOR_RES -
-                                     (3 * CURRENT_BUTTON_PRESSED_OUTLINE) -
+                                     (3 * ESP3D_BUTTON_PRESSED_OUTLINE) -
                                      lv_obj_get_width(btn_start));
   lv_label_set_long_mode(label_status, LV_LABEL_LONG_SCROLL_CIRCULAR);
   esp3dTftui.set_current_screen(ESP3DScreenType::auto_leveling);

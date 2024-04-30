@@ -109,6 +109,10 @@ void status_screen() {
   }
 
   lv_obj_t *btn_back = lv_btn_create(ui_status_screen_container);
+  if (!lv_obj_is_valid(btn_back)) {
+    esp3d_log_e("btn_back is not valid");
+    return;
+  }
   ESP3DStyle::apply(btn_back, ESP3DStyleType::embedded_button);
   lv_obj_set_width(btn_back, LV_HOR_RES);
   lv_obj_t *label_btn_back = lv_label_create(btn_back);

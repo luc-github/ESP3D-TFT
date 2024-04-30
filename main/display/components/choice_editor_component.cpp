@@ -27,16 +27,24 @@
 #include "symbol_button_component.h"
 
 /**********************
- *  STATIC PROTOTYPES
+ *  Namespace
  **********************/
 namespace choiceEditor {
 
+//Static variables
 std::string choiceValue;
 lv_obj_t *main_container = nullptr;
 lv_timer_t *choice_editor_delay_timer = NULL;
 uint32_t active_index = 0;
 void *user_data_ptr = NULL;
 
+/**
+ * @brief Callback function for the choice editor delay timer.
+ *
+ * This function is called when the delay timer for the choice editor component expires.
+ *
+ * @param timer Pointer to the timer object that triggered the callback.
+ */
 void choice_editor_delay_timer_cb(lv_timer_t *timer) {
   void (*callbackFn)(const char *str, void *user_data) =
       (void (*)(const char *, void *))timer->user_data;
@@ -57,13 +65,18 @@ void choice_editor_delay_timer_cb(lv_timer_t *timer) {
   }
 }
 
+/**
+ * Handles the event for the choice editor button.
+ *
+ * @param e The event object.
+ */
 void event_button_choice_editor_handler(lv_event_t *e) {
   void *cbFn = lv_event_get_user_data(e);
   esp3d_log("Button Clicked");
-  if (BUTTON_ANIMATION_DELAY) {
+  if (ESP3D_BUTTON_ANIMATION_DELAY) {
     if (choice_editor_delay_timer) return;
     choice_editor_delay_timer = lv_timer_create(choice_editor_delay_timer_cb,
-                                                BUTTON_ANIMATION_DELAY, cbFn);
+                                                ESP3D_BUTTON_ANIMATION_DELAY, cbFn);
   } else {
     lv_timer_t timer;
     timer.user_data = cbFn;
@@ -71,6 +84,14 @@ void event_button_choice_editor_handler(lv_event_t *e) {
   }
 }
 
+/**
+ * Event handler for the choice editor radio button.
+ *
+ * This function is called when an event occurs on the choice editor radio button.
+ * It handles the event and performs the necessary actions based on the event type.
+ *
+ * @param e Pointer to the event object.
+ */
 void choice_editor_radio_event_handler(lv_event_t *e) {
   uint32_t *active_id = (uint32_t *)lv_event_get_user_data(e);
   lv_obj_t *cont = lv_event_get_current_target(e);
@@ -91,7 +112,7 @@ void choice_editor_radio_event_handler(lv_event_t *e) {
   choiceValue = lv_checkbox_get_text(act_cb);
 }
 
-lv_obj_t *create_choice_editor(lv_obj_t *container, const char *text,
+lv_obj_t *create(lv_obj_t *container, const char *text,
                                const char *title,
                                std::list<std::string> &choices,
                                void (*callbackFn)(const char *, void *),
@@ -104,29 +125,30 @@ lv_obj_t *create_choice_editor(lv_obj_t *container, const char *text,
   lv_obj_t *editor_title = lv_label_create(main_container);
   lv_label_set_text(editor_title, title);
   lv_obj_align(editor_title, LV_ALIGN_TOP_MID, 0,
-               CURRENT_BUTTON_PRESSED_OUTLINE);
+               ESP3D_BUTTON_PRESSED_OUTLINE);
   lv_obj_update_layout(editor_title);
   size_t y_top = lv_obj_get_y(editor_title) + lv_obj_get_height(editor_title);
-  lv_obj_t *btnback = backButton::create_back_button(main_container);
+  lv_obj_t *btnback = backButton::create(main_container);
   lv_obj_add_event_cb(btnback, event_button_choice_editor_handler,
                       LV_EVENT_CLICKED, NULL);
   lv_obj_update_layout(btnback);
   size_t y_bottom = lv_obj_get_y(btnback);
   lv_obj_t *btnOk = symbolButton::create_symbol_button(
-      main_container, LV_SYMBOL_OK, BACK_BUTTON_WIDTH, BACK_BUTTON_HEIGHT);
+      main_container, LV_SYMBOL_OK, ESP3D_BACK_BUTTON_WIDTH, ESP3D_BACK_BUTTON_HEIGHT);
   lv_obj_align_to(btnOk, btnback, LV_ALIGN_OUT_LEFT_MID,
-                  -CURRENT_BUTTON_PRESSED_OUTLINE, 0);
+                  -ESP3D_BUTTON_PRESSED_OUTLINE, 0);
   lv_obj_add_event_cb(btnOk, event_button_choice_editor_handler,
                       LV_EVENT_CLICKED, (void *)callbackFn);
 
   lv_obj_t *choice_container = lv_obj_create(main_container);
-  size_t heigth = y_bottom - y_top - 2 * CURRENT_BUTTON_PRESSED_OUTLINE;
+  size_t heigth = y_bottom - y_top - 2 * ESP3D_BUTTON_PRESSED_OUTLINE;
 
   ESP3DStyle::apply(choice_container, ESP3DStyleType::list_container);
 
   lv_obj_align_to(choice_container, editor_title, LV_ALIGN_OUT_BOTTOM_MID, 0,
-                  CURRENT_BUTTON_PRESSED_OUTLINE);
+                  ESP3D_BUTTON_PRESSED_OUTLINE);
   lv_obj_set_scrollbar_mode(choice_container, LV_SCROLLBAR_MODE_AUTO);
+  
   uint32_t index = 0;
   size_t active_pos = 0;
   bool found = false;
@@ -140,17 +162,17 @@ lv_obj_t *create_choice_editor(lv_obj_t *container, const char *text,
     lv_checkbox_set_text(obj, choice.c_str());
     lv_obj_update_layout(obj);
     if (!found)
-      active_pos += lv_obj_get_height(obj) + CURRENT_BUTTON_PRESSED_OUTLINE;
+      active_pos += lv_obj_get_height(obj) + ESP3D_BUTTON_PRESSED_OUTLINE;
     lv_obj_add_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE);
     ESP3DStyle::apply(obj, ESP3DStyleType::radio_button);
     index++;
   }
 
-  lv_obj_set_size(choice_container, CURRENT_CHOICE_LIST_WIDTH, heigth);
+  lv_obj_set_size(choice_container, ESP3D_CHOICE_LIST_WIDTH, heigth);
   lv_obj_update_layout(choice_container);
   size_t width = lv_obj_get_width(choice_container);
   lv_obj_set_x(choice_container, LV_HOR_RES / 2 - width / 2);
-  if (heigth < active_pos + CURRENT_BUTTON_PRESSED_OUTLINE)
+  if (heigth < active_pos + ESP3D_BUTTON_PRESSED_OUTLINE)
     lv_obj_scroll_to_y(choice_container, active_pos, LV_ANIM_ON);
   // check first one by default
   lv_obj_add_state(lv_obj_get_child(choice_container, active_index),
