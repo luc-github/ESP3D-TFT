@@ -24,12 +24,26 @@
 #include "esp3d_styles.h"
 
 /**********************
- *  STATIC PROTOTYPES
+ *  Namespace
  **********************/
 namespace mainContainer {
-lv_obj_t *create_main_container(lv_obj_t *parent, lv_obj_t *button_back,
+/**
+ * @brief Creates a main container component.
+ *
+ * This function creates a main container component and returns a pointer to the created object.
+ *
+ * @param parent The parent object to which the main container component will be added.
+ * @param button_back The button object that represents the back button.
+ * @param style The style type of the main container component.
+ * @return A pointer to the created main container component object.
+ */
+lv_obj_t *create(lv_obj_t *parent, lv_obj_t *button_back,
                                 ESP3DStyleType style) {
   lv_obj_t *ui_container = lv_obj_create(parent);
+  if (!lv_obj_is_valid(ui_container)) {
+    esp3d_log_e("Failed to create main container");
+    return nullptr;
+  }
   if (ESP3DStyleType::default_style != style) ESP3DStyle::apply(ui_container, style);
   lv_obj_clear_flag(ui_container, LV_OBJ_FLAG_SCROLLABLE);
   lv_obj_update_layout(button_back);

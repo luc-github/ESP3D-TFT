@@ -91,7 +91,7 @@ void settings_ui_update_delay_timer_cb(lv_timer_t *timer) {
     settings_screen_delay_timer = NULL;
   }
   esp3dTranslationService.begin();
-  spinnerScreen::hide_spinner();
+  spinnerScreen::hide();
   settings_screen();
 }
 
@@ -105,7 +105,7 @@ void refresh_settings_list_cb(lv_timer_t *timer) {
     lv_timer_del(settings_screen_apply_timer);
     settings_screen_apply_timer = NULL;
   }
-  spinnerScreen::hide_spinner();
+  spinnerScreen::hide();
   if (refresh) settings_screen();
 }
 
@@ -151,7 +151,7 @@ static void bgSaveJSONSettingsTask(void *pvParameter) {
     esp3d_log_e("Failed to save %s", data->entry.c_str());
     std::string text =
         esp3dTranslationService.translate(ESP3DLabel::error_applying_setting);
-    msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+    msgBox::create(NULL, MsgBoxType::error, text.c_str());
   }
 
   if (!settings_screen_apply_timer) {
@@ -162,7 +162,7 @@ static void bgSaveJSONSettingsTask(void *pvParameter) {
 }
 
 void CreateSaveJSONSettingTask(ESP3DSettingsData *settingData) {
-  spinnerScreen::show_spinner();
+  spinnerScreen::show();
   TaskHandle_t xHandle = NULL;
 
   BaseType_t res = xTaskCreatePinnedToCore(
@@ -342,14 +342,14 @@ void setting_edit_done_cb(const char *str, void *data) {
       esp3d_log_e("Invalid value %s", str);
       std::string text =
           esp3dTranslationService.translate(ESP3DLabel::error_applying_setting);
-      msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+      msgBox::create(NULL, MsgBoxType::error, text.c_str());
       return;
     }
     if (!success_saving) {
       esp3d_log_e("Failed to save setting %s", str);
       std::string text =
           esp3dTranslationService.translate(ESP3DLabel::error_applying_setting);
-      msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+      msgBox::create(NULL, MsgBoxType::error, text.c_str());
       return;
     }
     if (settingData->label) {
@@ -358,7 +358,7 @@ void setting_edit_done_cb(const char *str, void *data) {
     // now apply the setting if needed
     switch (settingData->index) {
       case ESP3DSettingIndex::esp3d_ui_language:
-        spinnerScreen::show_spinner();
+        spinnerScreen::show();
         if (settings_screen_delay_timer) return;
         settings_screen_delay_timer =
             lv_timer_create(settings_ui_update_delay_timer_cb, 100, NULL);
@@ -519,7 +519,7 @@ void event_button_edit_setting_cb(lv_event_t *e) {
     if (data.entry != "") {
       switch (data.index) {
         case ESP3DSettingIndex::esp3d_extensions:
-          textEditor::create_text_editor(lv_scr_act(), data.value.c_str(),
+          textEditor::create(lv_scr_act(), data.value.c_str(),
                                          setting_edit_done_cb, 0, NULL, false,
                                          (void *)(&data));
           break;
@@ -532,13 +532,13 @@ void event_button_edit_setting_cb(lv_event_t *e) {
           esp3dTftsettings.getSettingPtr(data.index);
       switch (data.index) {
         case ESP3DSettingIndex::esp3d_hostname:
-          textEditor::create_text_editor(lv_scr_act(), data.value.c_str(),
+          textEditor::create(lv_scr_act(), data.value.c_str(),
                                          setting_edit_done_cb, settingPtr->size,
                                          NULL, false, (void *)(&data));
           break;
         case ESP3DSettingIndex::esp3d_workspace_width:
         case ESP3DSettingIndex::esp3d_workspace_depth:
-          textEditor::create_text_editor(lv_scr_act(), data.value.c_str(),
+          textEditor::create(lv_scr_act(), data.value.c_str(),
                                          setting_edit_done_cb, 15,
                                          "0123456789.", true, (void *)(&data));
           break;
@@ -864,7 +864,7 @@ void settings_screen() {
   }
 
   esp3dTftui.set_current_screen(ESP3DScreenType::settings);
-  spinnerScreen::show_spinner();
+  spinnerScreen::show();
   TaskHandle_t xHandle = NULL;
   BaseType_t res = xTaskCreatePinnedToCore(
       bgLoadJSONSettingsTask, "loadjsonsettingsTask", STACKDEPTH, NULL,

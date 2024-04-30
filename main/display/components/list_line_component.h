@@ -23,8 +23,8 @@
 #include <lvgl.h>
 
 namespace listLine {
-extern lv_obj_t *create(lv_obj_t *container);
-extern lv_obj_t *add_label(const char *lbl, lv_obj_t *line_container,
+lv_obj_t *create(lv_obj_t *container);
+lv_obj_t *add_label(const char *lbl, lv_obj_t *line_container,
                                    bool grow);
-extern lv_obj_t *add_button(const char *lbl, lv_obj_t *line_container);
+lv_obj_t *add_button(const char *lbl, lv_obj_t *line_container);
 }  // namespace listLine

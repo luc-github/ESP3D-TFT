@@ -212,7 +212,7 @@ void speed_screen() {
                   0);
 
   // Button up
-  lv_obj_t *btn_up = symbolButton::create_symbol_button(
+  lv_obj_t *btn_up = symbolButton::create(
       ui_new_screen, LV_SYMBOL_UP "\n" LV_SYMBOL_PLUS);
   lv_obj_align_to(btn_up, label_current_speed_value, LV_ALIGN_OUT_BOTTOM_MID, 0,
                   ESP3D_BUTTON_PRESSED_OUTLINE / 2);
@@ -244,7 +244,7 @@ void speed_screen() {
                   ESP3D_BUTTON_PRESSED_OUTLINE / 2, 0);
 
   // button down
-  lv_obj_t *btn_down = symbolButton::create_symbol_button(
+  lv_obj_t *btn_down = symbolButton::create(
       ui_new_screen, LV_SYMBOL_MINUS "\n" LV_SYMBOL_DOWN);
   lv_obj_align_to(btn_down, speed_ta, LV_ALIGN_OUT_BOTTOM_MID, 0,
                   ESP3D_BUTTON_PRESSED_OUTLINE / 2);
@@ -256,7 +256,7 @@ void speed_screen() {
 
   // Button Ok
   lv_obj_t *btn_ok =
-      symbolButton::create_symbol_button(ui_new_screen, LV_SYMBOL_OK);
+      symbolButton::create(ui_new_screen, LV_SYMBOL_OK);
   lv_obj_align_to(btn_ok, label_unit2, LV_ALIGN_OUT_RIGHT_MID,
                   ESP3D_BUTTON_PRESSED_OUTLINE, 0);
   lv_obj_add_event_cb(btn_ok, speed_btn_ok_event_cb, LV_EVENT_CLICKED,
@@ -264,7 +264,7 @@ void speed_screen() {
 
   // Button Reset
   lv_obj_t *btn_reset =
-      symbolButton::create_symbol_button(ui_new_screen, LV_SYMBOL_GAUGE);
+      symbolButton::create(ui_new_screen, LV_SYMBOL_GAUGE);
   lv_obj_align_to(btn_reset, btn_ok, LV_ALIGN_OUT_RIGHT_MID,
                   ESP3D_BUTTON_PRESSED_OUTLINE, 0);
   lv_obj_add_event_cb(btn_reset, speed_btn_reset_event_cb, LV_EVENT_CLICKED,

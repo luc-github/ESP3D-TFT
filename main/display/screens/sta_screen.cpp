@@ -61,7 +61,7 @@ void sta_screen_delay_refresh_timer_cb(lv_timer_t *timer) {
     lv_timer_del(sta_screen_delay_refresh_timer);
     sta_screen_delay_refresh_timer = NULL;
   }
-  spinnerScreen::hide_spinner();
+  spinnerScreen::hide();
 }
 #endif  // ESP3D_PATCH_DELAY_REFRESH
 lv_obj_t *sta_ta_ssid = NULL;
@@ -185,7 +185,7 @@ void fill_ui_sta_ssid_list() {
     lv_obj_add_event_cb(btnJoin, event_button_join_cb, LV_EVENT_CLICKED,
                         (void *)&ssid_desc);
   }
-  spinnerScreen::hide_spinner();
+  spinnerScreen::hide();
 }
 
 void do_scan_now() {
@@ -221,7 +221,7 @@ bool save_parameters() {
                                     ssid_current.c_str())) {
     std::string text =
         esp3dTranslationService.translate(ESP3DLabel::error_applying_mode);
-    msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+    msgBox::create(NULL, MsgBoxType::error, text.c_str());
     esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
                                     text.c_str());
     res = false;
@@ -231,7 +231,7 @@ bool save_parameters() {
                                       password_current.c_str())) {
       std::string text =
           esp3dTranslationService.translate(ESP3DLabel::error_applying_mode);
-      msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+      msgBox::create(NULL, MsgBoxType::error, text.c_str());
       esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
                                       text.c_str());
       res = false;
@@ -286,14 +286,14 @@ void update_button_ok() {
     sta_screen_delay_refresh_timer =
         lv_timer_create(sta_screen_delay_refresh_timer_cb, 100, NULL);
 #else
-    spinnerScreen::hide_spinner();
+    spinnerScreen::hide();
 #endif  // ESP3D_PATCH_DELAY_REFRESH
   } else {
     esp3d_log("Ok visible");
     lv_obj_clear_flag(btn_ok, LV_OBJ_FLAG_HIDDEN);
     if ((mode == LV_SYMBOL_ACCESS_POINT && status == "+") ||
         (mode == LV_SYMBOL_WIFI && status == ".")) {
-      spinnerScreen::hide_spinner();
+      spinnerScreen::hide();
     }
   }
 }
@@ -362,7 +362,7 @@ void sta_ta_event_cb(lv_event_t *e) {
     if (status_component)
       lv_obj_clear_flag(status_component, LV_OBJ_FLAG_HIDDEN);
 
-    spinnerScreen::hide_spinner();
+    spinnerScreen::hide();
     update_button_ok();
     update_button_save();
   }
@@ -410,7 +410,7 @@ void sta_event_button_scan_handler(lv_event_t *e) {
   if (ui_sta_ssid_list_ctl) {
     lv_obj_clear_flag(ui_sta_ssid_list_ctl, LV_OBJ_FLAG_HIDDEN);
     if (status_component) lv_obj_add_flag(status_component, LV_OBJ_FLAG_HIDDEN);
-    spinnerScreen::show_spinner();
+    spinnerScreen::show();
     start_scan_timer = lv_timer_create(start_scan_timer_cb, 100, NULL);
     size_t i = lv_obj_get_child_cnt(ui_sta_ssid_list_ctl);
     while (i > 0) {
@@ -434,11 +434,11 @@ void sta_event_button_ok_handler(lv_event_t *e) {
           static_cast<uint8_t>(ESP3DRadioMode::wifi_sta))) {
     std::string text =
         esp3dTranslationService.translate(ESP3DLabel::error_applying_mode);
-    msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+    msgBox::create(NULL, MsgBoxType::error, text.c_str());
     esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
                                     text.c_str());
   } else {
-    spinnerScreen::show_spinner();
+    spinnerScreen::show();
     esp3dNetwork.setModeAsync(ESP3DRadioMode::wifi_sta);
   }
 }
@@ -525,7 +525,7 @@ void sta_screen() {
   }
   lv_textarea_set_password_mode(sta_ta_password, true);
 
-  status_component = wifiStatus::wifi_status(ui_new_screen, btnback);
+  status_component = wifiStatus::create(ui_new_screen, btnback);
 
   // Keyboard
   lv_obj_t *kb = lv_keyboard_create(ui_new_screen);
@@ -536,7 +536,7 @@ void sta_screen() {
   lv_obj_add_event_cb(sta_ta_password, sta_ta_event_cb, LV_EVENT_ALL, kb);
 
   // Create button and label for ok
-  btn_ok = symbolButton::create_symbol_button(
+  btn_ok = symbolButton::create(
       ui_new_screen, LV_SYMBOL_OK, ESP3D_SYMBOL_BUTTON_WIDTH, ESP3D_SYMBOL_BUTTON_WIDTH);
 
   lv_obj_add_event_cb(btn_ok, sta_event_button_ok_handler, LV_EVENT_CLICKED,
@@ -545,7 +545,7 @@ void sta_screen() {
                ESP3D_BUTTON_PRESSED_OUTLINE);
 
   // Create button and label for ok
-  btn_save = symbolButton::create_symbol_button(
+  btn_save = symbolButton::create(
       ui_new_screen, LV_SYMBOL_SAVE, ESP3D_SYMBOL_BUTTON_WIDTH, ESP3D_SYMBOL_BUTTON_WIDTH);
   lv_obj_add_event_cb(btn_save, sta_event_button_save_handler, LV_EVENT_CLICKED,
                       NULL);
@@ -553,7 +553,7 @@ void sta_screen() {
   lv_obj_align_to(btn_save, btn_ok, LV_ALIGN_OUT_LEFT_MID,
                   -ESP3D_BUTTON_PRESSED_OUTLINE, 0);
 
-  btn_scan = symbolButton::create_symbol_button(ui_new_screen, LV_SYMBOL_SEARCH,
+  btn_scan = symbolButton::create(ui_new_screen, LV_SYMBOL_SEARCH,
                                                 ESP3D_SYMBOL_BUTTON_WIDTH,
                                                 ESP3D_SYMBOL_BUTTON_WIDTH);
 

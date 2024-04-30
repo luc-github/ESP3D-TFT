@@ -25,11 +25,11 @@
 #include "esp3d_values.h"
 
 namespace wifiStatus {
-extern lv_obj_t *wifi_status(lv_obj_t *parent, lv_obj_t *backbutton);
+lv_obj_t *create(lv_obj_t *parent, lv_obj_t *backbutton);
 
-extern bool network_status_value_cb(ESP3DValuesIndex index, const char *value,
+bool network_status_cb(ESP3DValuesIndex index, const char *value,
                                     ESP3DValuesCbAction action);
-extern bool network_mode_value_cb(ESP3DValuesIndex index, const char *value,
+bool network_mode_cb(ESP3DValuesIndex index, const char *value,
                                   ESP3DValuesCbAction action);
 
 }  // namespace wifiStatus

@@ -342,7 +342,7 @@ void positions_screen(uint8_t target_id) {
   lv_obj_align_to(btnm_target, btnback, LV_ALIGN_OUT_LEFT_BOTTOM,
                   -ESP3D_BUTTON_PRESSED_OUTLINE, 0);
   // Home all axis
-  lv_obj_t *btn_home_all = symbolButton::create_symbol_button(
+  lv_obj_t *btn_home_all = symbolButton::create(
       ui_new_screen, LV_SYMBOL_HOME "xyz", ESP3D_MATRIX_BUTTON_WIDTH,
       ESP3D_MATRIX_BUTTON_HEIGHT);
   lv_obj_align_to(btn_home_all, btnm_target, LV_ALIGN_OUT_LEFT_BOTTOM,
@@ -397,7 +397,7 @@ void positions_screen(uint8_t target_id) {
                   LV_ALIGN_OUT_RIGHT_MID, ESP3D_BUTTON_PRESSED_OUTLINE / 2,
                   0);
   // Button up
-  lv_obj_t *btn_up = symbolButton::create_symbol_button(
+  lv_obj_t *btn_up = symbolButton::create(
       ui_new_screen, LV_SYMBOL_UP "\n" LV_SYMBOL_PLUS);
   lv_obj_align_to(btn_up, label_current_position_value, LV_ALIGN_OUT_BOTTOM_MID,
                   0, ESP3D_BUTTON_PRESSED_OUTLINE);
@@ -442,14 +442,14 @@ void positions_screen(uint8_t target_id) {
   lv_obj_align_to(label_unit2, position_ta, LV_ALIGN_OUT_RIGHT_MID,
                   ESP3D_BUTTON_PRESSED_OUTLINE / 2, 0);
   // set button
-  btn_set = symbolButton::create_symbol_button(ui_new_screen, LV_SYMBOL_OK);
+  btn_set = symbolButton::create(ui_new_screen, LV_SYMBOL_OK);
   lv_obj_align_to(btn_set, label_unit2, LV_ALIGN_OUT_RIGHT_MID,
                   ESP3D_BUTTON_PRESSED_OUTLINE, 0);
   lv_obj_add_event_cb(btn_set, positions_btn_ok_event_cb, LV_EVENT_CLICKED,
                       position_ta);
   // Home axis
   lv_obj_t *btn_home_axis =
-      symbolButton::create_symbol_button(ui_new_screen, LV_SYMBOL_HOME);
+      symbolButton::create(ui_new_screen, LV_SYMBOL_HOME);
   lv_obj_align_to(btn_home_axis, btn_set, LV_ALIGN_OUT_RIGHT_MID,
                   ESP3D_BUTTON_PRESSED_OUTLINE, 0);
   lv_obj_add_event_cb(btn_home_axis, positions_btn_home_axis_event_cb,
@@ -488,7 +488,7 @@ void positions_screen(uint8_t target_id) {
   lv_obj_add_event_cb(position_ta, position_ta_event_cb, LV_EVENT_ALL,
                       positions_kb);
   // Button down
-  lv_obj_t *btn_down = symbolButton::create_symbol_button(
+  lv_obj_t *btn_down = symbolButton::create(
       ui_new_screen, LV_SYMBOL_MINUS "\n" LV_SYMBOL_DOWN);
   lv_obj_align_to(btn_down, position_ta, LV_ALIGN_OUT_BOTTOM_MID, 0,
                   ESP3D_BUTTON_PRESSED_OUTLINE / 2);

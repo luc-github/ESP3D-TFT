@@ -54,7 +54,7 @@ void wifi_screen_delay_refresh_timer_cb(lv_timer_t *timer) {
     lv_timer_del(wifi_screen_delay_refresh_timer);
     wifi_screen_delay_refresh_timer = NULL;
   }
-  spinnerScreen::hide_spinner();
+  spinnerScreen::hide();
 }
 #endif  // ESP3D_PATCH_DELAY_REFRESH
 lv_timer_t *wifi_screen_delay_connecting_timer = nullptr;
@@ -85,7 +85,7 @@ void wifi_screen_delay_connecting_timer_cb(lv_timer_t *timer) {
       lv_timer_del(wifi_screen_delay_connecting_timer);
       wifi_screen_delay_connecting_timer = NULL;
     }
-    spinnerScreen::hide_spinner();
+    spinnerScreen::hide();
     wifi_next_screen = ESP3DScreenType::wifi;
     wifi_screen_delay_timer =
         lv_timer_create(wifi_screen_delay_timer_cb, 50, NULL);
@@ -109,7 +109,7 @@ void update_button_no_wifi() {
     wifi_screen_delay_refresh_timer =
         lv_timer_create(wifi_screen_delay_refresh_timer_cb, 100, NULL);
 #else
-    spinnerScreen::hide_spinner();
+    spinnerScreen::hide();
 #endif  // ESP3D_PATCH_DELAY_REFRESH
   } else {
     lv_obj_clear_flag(btn_no_wifi, LV_OBJ_FLAG_HIDDEN);
@@ -188,11 +188,11 @@ void event_button_no_wifi_handler(lv_event_t *e) {
                                   static_cast<uint8_t>(ESP3DRadioMode::off))) {
     std::string text =
         esp3dTranslationService.translate(ESP3DLabel::error_applying_mode);
-    msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+    msgBox::create(NULL, MsgBoxType::error, text.c_str());
     esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
                                     text.c_str());
   } else {
-    spinnerScreen::show_spinner();
+    spinnerScreen::show();
     esp3dNetwork.setModeAsync(ESP3DRadioMode::off);
   }
 }
@@ -211,8 +211,8 @@ void wifi_screen() {
   btnback = backButton::create(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_wifi_back_handler, LV_EVENT_CLICKED,
                       NULL);
-  wifiStatus::wifi_status(ui_new_screen, btnback);
-  lv_obj_t *ui_main_container = mainContainer::create_main_container(
+  wifiStatus::create(ui_new_screen, btnback);
+  lv_obj_t *ui_main_container = mainContainer::create(
       ui_new_screen, btnback, ESP3DStyleType::col_container);
 
   lv_obj_t *ui_buttons_container = lv_obj_create(ui_main_container);
@@ -224,17 +224,17 @@ void wifi_screen() {
   lv_obj_t *btn = nullptr;
 
   // Create button and label for ap
-  btn = symbolButton::create_symbol_button(
+  btn = symbolButton::create(
       ui_buttons_container, LV_SYMBOL_ACCESS_POINT, ESP3D_BUTTON_WIDTH, ESP3D_BUTTON_WIDTH);
   lv_obj_add_event_cb(btn, event_button_ap_handler, LV_EVENT_CLICKED, NULL);
 
   // Create button and label for sta
-  btn = symbolButton::create_symbol_button(
+  btn = symbolButton::create(
       ui_buttons_container, LV_SYMBOL_STATION_MODE, ESP3D_BUTTON_WIDTH, ESP3D_BUTTON_WIDTH);
   lv_obj_add_event_cb(btn, event_button_sta_handler, LV_EVENT_CLICKED, NULL);
 
   // Create button and label for no wifi
-  btn_no_wifi = symbolButton::create_symbol_button(ui_buttons_container,
+  btn_no_wifi = symbolButton::create(ui_buttons_container,
                                                    LV_SYMBOL_WIFI, ESP3D_BUTTON_WIDTH,
                                                    ESP3D_BUTTON_WIDTH, true, true);
   lv_obj_add_event_cb(btn_no_wifi, event_button_no_wifi_handler,
@@ -254,7 +254,7 @@ void wifi_screen() {
   if (mode == LV_SYMBOL_WIFI && status == "x") {
     std::string text =
         esp3dTranslationService.translate(ESP3DLabel::connecting);
-    spinnerScreen::show_spinner(text.c_str(), btnback);
+    spinnerScreen::show(text.c_str(), btnback);
     wifi_screen_delay_connecting_timer =
         lv_timer_create(wifi_screen_delay_connecting_timer_cb, 500, NULL);
   } else {

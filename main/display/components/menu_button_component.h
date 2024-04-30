@@ -24,6 +24,6 @@
 #include <stdio.h>
 
 namespace menuButton {
-lv_obj_t *create_menu_button(lv_obj_t *container, const char *text);
+lv_obj_t *create(lv_obj_t *container, const char *text);
 
 }  // namespace menuButton

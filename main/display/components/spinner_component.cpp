@@ -26,7 +26,7 @@
 #include "translations/esp3d_translation_service.h"
 
 /**********************
- *  STATIC PROTOTYPES
+ *  Namespace
  **********************/
 namespace spinnerScreen {
 lv_obj_t* spinnerObj = NULL;
@@ -34,23 +34,16 @@ size_t spinner_index = 0;
 lv_obj_t* lblextra = NULL;
 lv_obj_t* screen_displaying_spinner = NULL;
 
-void update_spinner(const char* msg) {
-  esp3d_log("Update spinner %s", msg);
-  if (spinnerObj == NULL) {
-    esp3d_log_w("Spinner not displayed");
-    return;
-  }
-  if (msg != nullptr) {
-    if (lblextra != NULL) {
-      lv_label_set_text(lblextra, msg);
-    }
-  }
-}
-
-void show_spinner(const char* msg, lv_obj_t* backtbn) {
+/**
+ * Displays a message on the screen and updates the spinner component.
+ *
+ * @param msg The message to be displayed.
+ * @param backtbn The background button object.
+ */
+void show(const char* msg, lv_obj_t* backtbn) {
   // to avoid multiple call to show spinner
   esp3d_log("Show spinner");
-  if (spinnerObj != NULL) {
+  if (spinnerObj != NULL && lv_obj_is_valid(spinnerObj)) {
     esp3d_log_w("Spinner already displayed");
     return;
   }
@@ -58,11 +51,19 @@ void show_spinner(const char* msg, lv_obj_t* backtbn) {
   esp3d_log("Spinner index is %d", spinner_index);
   screen_displaying_spinner = lv_scr_act();
   spinnerObj = lv_obj_create(screen_displaying_spinner);
+  if (!lv_obj_is_valid(spinnerObj)) {
+    esp3d_log_e("Spinner not created");
+    return;
+  }
   ESP3DStyle::apply(spinnerObj, ESP3DStyleType::spinner_screen);
   lv_obj_move_foreground(spinnerObj);
   lv_obj_set_size(spinnerObj, LV_HOR_RES, LV_VER_RES);
   lv_obj_set_pos(spinnerObj, 0, 0);
   lv_obj_t* spinner = lv_spinner_create(spinnerObj, 1000, 60);
+  if (!lv_obj_is_valid(spinner)) {
+    esp3d_log_e("Spinner not created");
+    return;
+  }
   lv_obj_set_size(spinner, ESP3D_SPINNER_SIZE, ESP3D_SPINNER_SIZE);
   lv_obj_center(spinner);
 
@@ -75,6 +76,10 @@ void show_spinner(const char* msg, lv_obj_t* backtbn) {
   lblextra = NULL;
   if (msg != nullptr) {
     lblextra = lv_label_create(spinnerObj);
+    if (!lv_obj_is_valid(lblextra)) {
+      esp3d_log_e("Extra label not created");
+      return;
+    }
     ESP3DStyle::apply(lblextra, ESP3DStyleType::spinner_text);
     lv_label_set_text(lblextra, msg);
     lv_obj_align_to(lblextra, lbl, LV_ALIGN_OUT_BOTTOM_MID, 0,
@@ -85,9 +90,19 @@ void show_spinner(const char* msg, lv_obj_t* backtbn) {
   }
 }
 
-void hide_spinner() {
+/**
+ * @brief Hides the spinner component.
+ *
+ * This function hides the spinner component by adding the LV_OBJ_FLAG_HIDDEN flag to the spinner object.
+ * If the spinner is not currently displayed on the active screen, an error message is logged.
+ * If the spinner is displayed on the active screen, the spinner object is deleted.
+ * The spinner index is decremented and the spinner object and screen displaying the spinner are set to NULL.
+ *
+ * @note If the spinner is already hidden, a warning message is logged.
+ */
+void hide() {
   esp3d_log("Hide spinner, index is %d", spinner_index);
-  if (spinnerObj != NULL) {
+  if (spinnerObj != NULL && lv_obj_is_valid(spinnerObj)) {
     lv_obj_add_flag(spinnerObj, LV_OBJ_FLAG_HIDDEN);
     if (screen_displaying_spinner != lv_scr_act()) {
       esp3d_log_e("Spinner not displayed on current screen");

@@ -123,7 +123,7 @@ void leveling_screen(bool autoleveling) {
   lv_obj_add_event_cb(btnback, event_button_leveling_back_handler,
                       LV_EVENT_CLICKED, NULL);
 
-  lv_obj_t *ui_main_container = mainContainer::create_main_container(
+  lv_obj_t *ui_main_container = mainContainer::create(
       ui_new_screen, btnback, ESP3DStyleType::col_container);
 
   lv_obj_t *ui_buttons_container = lv_obj_create(ui_main_container);
@@ -135,13 +135,13 @@ void leveling_screen(bool autoleveling) {
   lv_obj_t *btn = nullptr;
 
   // Create button and label for manual leveling
-  btn = symbolButton::create_symbol_button(
+  btn = symbolButton::create(
       ui_buttons_container, LV_SYMBOL_MANUAL "\n" LV_SYMBOL_LEVELING,
       ESP3D_BUTTON_WIDTH, ESP3D_BUTTON_WIDTH);
   lv_obj_add_event_cb(btn, event_button_manual_handler, LV_EVENT_CLICKED, NULL);
 
   // Create button and label for auto leveling
-  btn = symbolButton::create_symbol_button(
+  btn = symbolButton::create(
       ui_buttons_container, LV_SYMBOL_AUTOMATIC "\n" LV_SYMBOL_LEVELING,
       ESP3D_BUTTON_WIDTH, ESP3D_BUTTON_WIDTH);
   lv_obj_add_event_cb(btn, event_button_auto_handler, LV_EVENT_CLICKED, NULL);

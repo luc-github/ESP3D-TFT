@@ -35,7 +35,7 @@ bool ESP3DValues::intialize() {
   // status bar label
   _values.push_back({ESP3DValuesIndex::status_bar_label,
                      ESP3DValuesType::string_t, 200, std::string(""),
-                     statusBar::status_bar_cb});
+                     statusBar::callback});
 
   //  current ip
   _values.push_back({
@@ -116,7 +116,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::string_t,
       1,  // size
       std::string("?"),
-      wifiStatus::network_status_value_cb,
+      wifiStatus::network_status_cb,
   });
   //  network mode
   _values.push_back({
@@ -124,7 +124,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::string_t,
       1,  // size
       std::string("?"),
-      wifiStatus::network_mode_value_cb,
+      wifiStatus::network_mode_cb,
   });
 #endif  // ESP3D_WIFI_FEATURE
   //  job progress

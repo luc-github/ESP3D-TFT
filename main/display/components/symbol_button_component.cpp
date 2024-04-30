@@ -26,18 +26,26 @@
 #include "symbol_button_component.h"
 
 /**********************
- *  STATIC PROTOTYPES
+ *  Namespace
  **********************/
 namespace symbolButton {
 
-lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text, int width,
+lv_obj_t *create(lv_obj_t *container, const char *text, int width,
                                int height, bool center, bool slash,
                                int rotation) {
   lv_obj_t *btn = lv_btn_create(container);
+  if (!lv_obj_is_valid(btn)) {
+    esp3d_log_e("Failed to create button");
+    return nullptr;
+  }
   ESP3DStyle::apply(btn, ESP3DStyleType::button);
   if (width != -1) lv_obj_set_width(btn, width);
   if (height != -1) lv_obj_set_height(btn, height);
   lv_obj_t *label = lv_label_create(btn);
+  if (!lv_obj_is_valid(label)) {
+    esp3d_log_e("Failed to create label");
+    return nullptr;
+  }
   lv_label_set_text(label, text);
   lv_obj_update_layout(label);
 
@@ -56,6 +64,10 @@ lv_obj_t *create_symbol_button(lv_obj_t *container, const char *text, int width,
 
   if (slash) {
     lv_obj_t *label2 = lv_label_create(btn);
+    if (!lv_obj_is_valid(label2)) {
+      esp3d_log_e("Failed to create label");
+      return nullptr;
+    }
     lv_label_set_text(label2, LV_SYMBOL_SLASH);
     lv_obj_center(label2);
   }

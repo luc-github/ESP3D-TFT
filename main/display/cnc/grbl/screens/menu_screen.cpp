@@ -157,7 +157,7 @@ void menu_screen() {
   lv_obj_t *btnback = backButton::create(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_menu_back_handler, LV_EVENT_CLICKED,
                       NULL);
-  lv_obj_t *ui_main_container = mainContainer::create_main_container(
+  lv_obj_t *ui_main_container = mainContainer::create(
       ui_new_screen, btnback, ESP3DStyleType::col_container);
 
   // Add buttons top container to main container
@@ -177,7 +177,7 @@ void menu_screen() {
   //**********************************
 
   // Create button and label for filament button
-  // lv_obj_t *btn1 = symbolButton::create_symbol_button(
+  // lv_obj_t *btn1 = symbolButton::create(
   //     ui_top_buttons_container, LV_SYMBOL_FILAMENT, ESP3D_BUTTON_WIDTH, ESP3D_BUTTON_HEIGHT,
   //     true, false, 90);
   // lv_obj_add_event_cb(btn1, event_button_filament_handler, LV_EVENT_CLICKED,
@@ -186,21 +186,21 @@ void menu_screen() {
 #if ESP3D_WIFI_FEATURE
   // Create button and label for wifi button
   std::string label4 = LV_SYMBOL_WIFI;
-  lv_obj_t *btn4 = menuButton::create_menu_button(ui_bottom_buttons_container,
+  lv_obj_t *btn4 = menuButton::create(ui_bottom_buttons_container,
                                                   label4.c_str());
   lv_obj_add_event_cb(btn4, event_button_wifi_handler, LV_EVENT_CLICKED, NULL);
 #endif  // ESP3D_WIFI_FEATURE
 
   // Create button and label for settings button
   std::string label3 = LV_SYMBOL_SETTINGS;
-  lv_obj_t *btn3 = menuButton::create_menu_button(ui_bottom_buttons_container,
+  lv_obj_t *btn3 = menuButton::create(ui_bottom_buttons_container,
                                                   label3.c_str());
   lv_obj_add_event_cb(btn3, event_button_settings_handler, LV_EVENT_CLICKED,
                       NULL);
 
   // Create button and label for informations button
   std::string label6 = LV_SYMBOL_MORE_INFO;
-  lv_obj_t *btn6 = menuButton::create_menu_button(ui_bottom_buttons_container,
+  lv_obj_t *btn6 = menuButton::create(ui_bottom_buttons_container,
                                                   label6.c_str());
   lv_obj_add_event_cb(btn6, event_button_informations_handler, LV_EVENT_CLICKED,
                       NULL);

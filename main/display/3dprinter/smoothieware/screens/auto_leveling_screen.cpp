@@ -279,7 +279,7 @@ void auto_leveling_screen() {
   lv_obj_set_style_radius(auto_leveling_screen_table,
                           ESP3D_BUTTON_RADIUS , 0);
   // button start
-  btn_start = symbolButton::create_symbol_button(
+  btn_start = symbolButton::create(
       ui_new_screen, LV_SYMBOL_PLAY, ESP3D_BACK_BUTTON_WIDTH, ESP3D_BACK_BUTTON_HEIGHT);
   lv_obj_align_to(btn_start, auto_leveling_screen_table,
                   LV_ALIGN_OUT_BOTTOM_MID, 0, ESP3D_BUTTON_PRESSED_OUTLINE);

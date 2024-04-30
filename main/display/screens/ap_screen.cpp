@@ -57,7 +57,7 @@ void ap_screen_delay_refresh_timer_cb(lv_timer_t *timer) {
     lv_timer_del(ap_screen_delay_refresh_timer);
     ap_screen_delay_refresh_timer = NULL;
   }
-  spinnerScreen::hide_spinner();
+  spinnerScreen::hide();
 }
 #endif  // ESP3D_PATCH_DELAY_REFRESH
 std::string ssid_ini;
@@ -73,7 +73,7 @@ bool save_parameters() {
                                     ssid_current.c_str())) {
     std::string text =
         esp3dTranslationService.translate(ESP3DLabel::error_applying_mode);
-    msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+    msgBox::create(NULL, MsgBoxType::error, text.c_str());
     esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
                                     text.c_str());
     res = false;
@@ -83,7 +83,7 @@ bool save_parameters() {
                                       password_current.c_str())) {
       std::string text =
           esp3dTranslationService.translate(ESP3DLabel::error_applying_mode);
-      msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+      msgBox::create(NULL, MsgBoxType::error, text.c_str());
       esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
                                       text.c_str());
       res = false;
@@ -115,7 +115,7 @@ void update_button_ok() {
     ap_screen_delay_refresh_timer =
         lv_timer_create(ap_screen_delay_refresh_timer_cb, 100, NULL);
 #else
-    spinnerScreen::hide_spinner();
+    spinnerScreen::hide();
 #endif  // ESP3D_PATCH_DELAY_REFRESH
   } else {
     esp3d_log("Ok visible");
@@ -231,11 +231,11 @@ void ap_event_button_ok_handler(lv_event_t *e) {
           static_cast<uint8_t>(ESP3DRadioMode::wifi_ap))) {
     std::string text =
         esp3dTranslationService.translate(ESP3DLabel::error_applying_mode);
-    msgBox::messageBox(NULL, MsgBoxType::error, text.c_str());
+    msgBox::create(NULL, MsgBoxType::error, text.c_str());
     esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
                                     text.c_str());
   } else {
-    spinnerScreen::show_spinner();
+    spinnerScreen::show();
     esp3dNetwork.setModeAsync(ESP3DRadioMode::wifi_ap);
   }
 }
@@ -320,7 +320,7 @@ void ap_screen() {
   }
   lv_textarea_set_password_mode(ap_ta_password, true);
 
-  wifiStatus::wifi_status(ui_new_screen, btnback);
+  wifiStatus::create(ui_new_screen, btnback);
 
   // Keyboard
   lv_obj_t *kb = lv_keyboard_create(ui_new_screen);
@@ -331,7 +331,7 @@ void ap_screen() {
   lv_obj_add_event_cb(ap_ta_password, ap_ta_event_cb, LV_EVENT_ALL, kb);
 
   // Create button and label for ok
-  btn_ok = symbolButton::create_symbol_button(
+  btn_ok = symbolButton::create(
       ui_new_screen, LV_SYMBOL_OK, ESP3D_SYMBOL_BUTTON_WIDTH, ESP3D_SYMBOL_BUTTON_WIDTH);
 
   lv_obj_add_event_cb(btn_ok, ap_event_button_ok_handler, LV_EVENT_CLICKED,
@@ -340,7 +340,7 @@ void ap_screen() {
                ESP3D_BUTTON_PRESSED_OUTLINE);
 
   // Create button and label for ok
-  btn_save = symbolButton::create_symbol_button(
+  btn_save = symbolButton::create(
       ui_new_screen, LV_SYMBOL_SAVE, ESP3D_SYMBOL_BUTTON_WIDTH, ESP3D_SYMBOL_BUTTON_WIDTH);
   lv_obj_add_event_cb(btn_save, ap_event_button_save_handler, LV_EVENT_CLICKED,
                       NULL);

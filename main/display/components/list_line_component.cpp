@@ -45,7 +45,7 @@ namespace listLine {
  */
 lv_obj_t *create(lv_obj_t *container) {
   lv_obj_t *line_container = lv_obj_create(container);
-  if (line_container) {
+  if (lv_obj_is_valid(line_container)) {
     lv_obj_update_layout(container);
     lv_obj_set_size(line_container, lv_obj_get_content_width(container),
                     ESP3D_LIST_LINE_HEIGHT);
@@ -65,6 +65,8 @@ lv_obj_t *create(lv_obj_t *container) {
     lv_obj_clear_flag(line_container, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_pad_column(line_container, ESP3D_BUTTON_PRESSED_OUTLINE,
                                 LV_PART_MAIN);
+  } else {
+    esp3d_log_e("Failed to create list line container");
   }
   return line_container;
 }
@@ -106,7 +108,7 @@ lv_obj_t *add_label(const char *lbl, lv_obj_t *line_container, bool grow) {
  * @return The created button object.
  */
 lv_obj_t *add_button(const char *lbl, lv_obj_t *line_container) {
-  lv_obj_t *button_list = symbolButton::create_symbol_button(
+  lv_obj_t *button_list = symbolButton::create(
       line_container, lbl, ESP3D_LIST_LINE_BUTTON_WIDTH,
       LIST_LINE_CONTENT_HEIGHT);
   return button_list;

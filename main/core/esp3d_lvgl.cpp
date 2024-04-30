@@ -1,5 +1,5 @@
 /*
- symbol_button_component.h - ESP3D screens definition
+  esp3d_hal helper functions
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -17,17 +17,19 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#if ESP3D_DISPLAY_FEATURE
+#include "esp3d_lvgl.h"
 
-#pragma once
+bool lv_timer_is_valid(lv_timer_t *timer){
+    if (timer == NULL) return false;
+    //parse all timers to check if the timer is valid
+    lv_timer_t *t = lv_timer_get_next(NULL);
+    while (t != NULL) {
+        if (t == timer) return true;
+        t = lv_timer_get_next(t);
+    }
+    return false;
+}
 
-#include <lvgl.h>
+#endif // ESP3D_DISPLAY_FEATURE
 
-#include "esp3d_styles.h"
-
-namespace symbolButton {
-lv_obj_t *create(lv_obj_t *container, const char *text,
-                                      int width = ESP3D_SYMBOL_BUTTON_WIDTH,
-                                      int height = ESP3D_SYMBOL_BUTTON_HEIGHT,
-                                      bool center = true, bool slash = false,
-                                      int rotation = 0);
-}  // namespace symbolButton

@@ -631,7 +631,7 @@ void event_confirm_stop_cb(lv_event_t *e) {
 void event_button_stop_handler(lv_event_t *e) {
   esp3d_log("Stop Clicked");
   std::string text = esp3dTranslationService.translate(ESP3DLabel::stop_print);
-  msgBox::confirmationBox(NULL, MsgBoxType::confirmation, text.c_str(),
+  msgBox::confirmation(NULL, MsgBoxType::confirmation, text.c_str(),
                           event_confirm_stop_cb);
 }
 
@@ -658,7 +658,7 @@ void main_screen() {
   ESP3DStyle::apply(ui_main_screen, ESP3DStyleType::main_bg);
   lv_obj_del(ui_current_screen);
 
-  lv_obj_t *ui_status_bar_container = statusBar::status_bar(ui_main_screen);
+  lv_obj_t *ui_status_bar_container = statusBar::create(ui_main_screen);
   lv_obj_update_layout(ui_status_bar_container);
 
   // create container for main screen buttons
@@ -694,26 +694,26 @@ void main_screen() {
   //**********************************
   // Create button and label for Extruder 0
   main_btn_extruder_0 =
-      menuButton::create_menu_button(ui_top_buttons_container, "");
+      menuButton::create(ui_top_buttons_container, "");
 
   lv_obj_add_event_cb(main_btn_extruder_0, event_button_E0_handler,
                       LV_EVENT_CLICKED, NULL);
 
   // Create button and label for Extruder 1
   main_btn_extruder_1 =
-      menuButton::create_menu_button(ui_top_buttons_container, "");
+      menuButton::create(ui_top_buttons_container, "");
 
   lv_obj_add_event_cb(main_btn_extruder_1, event_button_E1_handler,
                       LV_EVENT_CLICKED, NULL);
 
   // Create button and label for Bed
-  main_btn_bed = menuButton::create_menu_button(ui_top_buttons_container, "");
+  main_btn_bed = menuButton::create(ui_top_buttons_container, "");
 
   lv_obj_add_event_cb(main_btn_bed, event_button_Bed_handler, LV_EVENT_CLICKED,
                       NULL);
 
   // Create button and label for positions
-  main_btn_positions = symbolButton::create_symbol_button(
+  main_btn_positions = symbolButton::create(
       ui_top_buttons_container, "", ESP3D_BUTTON_WIDTH * 1.5, ESP3D_BUTTON_HEIGHT);
 
   lv_obj_add_event_cb(main_btn_positions, event_button_positions_handler,
@@ -729,7 +729,7 @@ void main_screen() {
   if (show_fan_button) {
     // Create button and label for fan
     main_btn_fan =
-        menuButton::create_menu_button(ui_bottom_buttons_container, "");
+        menuButton::create(ui_bottom_buttons_container, "");
 
     lv_obj_add_event_cb(main_btn_fan, event_button_fan_handler,
                         LV_EVENT_CLICKED, NULL);
@@ -737,38 +737,38 @@ void main_screen() {
 
   // Create button and label for speed
   main_btn_speed =
-      menuButton::create_menu_button(ui_bottom_buttons_container, "");
+      menuButton::create(ui_bottom_buttons_container, "");
 
   lv_obj_add_event_cb(main_btn_speed, event_button_speed_handler,
                       LV_EVENT_CLICKED, NULL);
 
   // Create button and label for pause
-  main_btn_pause = menuButton::create_menu_button(ui_bottom_buttons_container,
+  main_btn_pause = menuButton::create(ui_bottom_buttons_container,
                                                   LV_SYMBOL_PAUSE);
   lv_obj_add_event_cb(main_btn_pause, event_button_pause_handler,
                       LV_EVENT_CLICKED, NULL);
 
   // Create button and label for resume
-  main_btn_resume = menuButton::create_menu_button(ui_bottom_buttons_container,
+  main_btn_resume = menuButton::create(ui_bottom_buttons_container,
                                                    LV_SYMBOL_PLAY);
   lv_obj_add_event_cb(main_btn_resume, event_button_resume_handler,
                       LV_EVENT_CLICKED, NULL);
 
   // Create button and label for stop
-  main_btn_stop = menuButton::create_menu_button(ui_bottom_buttons_container,
+  main_btn_stop = menuButton::create(ui_bottom_buttons_container,
                                                  LV_SYMBOL_STOP);
   lv_obj_add_event_cb(main_btn_stop, event_button_stop_handler,
                       LV_EVENT_CLICKED, NULL);
 #if ESP3D_SD_CARD_FEATURE
   // Create button and label for files
-  main_btn_files = menuButton::create_menu_button(ui_bottom_buttons_container,
+  main_btn_files = menuButton::create(ui_bottom_buttons_container,
                                                   LV_SYMBOL_SD_CARD);
   lv_obj_add_event_cb(main_btn_files, event_button_files_handler,
                       LV_EVENT_CLICKED, NULL);
 #endif  // ESP3D_SD_CARD_FEATURE
   // Create button and label for menu
   std::string label_text8 = LV_SYMBOL_LIST;
-  main_btn_menu = menuButton::create_menu_button(ui_bottom_buttons_container,
+  main_btn_menu = menuButton::create(ui_bottom_buttons_container,
                                                  LV_SYMBOL_LIST);
   lv_obj_add_event_cb(main_btn_menu, event_button_menu_handler,
                       LV_EVENT_CLICKED, NULL);

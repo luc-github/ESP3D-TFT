@@ -320,7 +320,7 @@ void event_button_manual_leveling_help_handler(lv_event_t *e) {
   esp3d_log("Help Clicked");
   std::string text =
       esp3dTranslationService.translate(ESP3DLabel::manual_leveling_help);
-  msgBox::messageBox(NULL, MsgBoxType::information, text.c_str());
+  msgBox::create(NULL, MsgBoxType::information, text.c_str());
 }
 
 void event_button_manual_leveling_start_handler(lv_event_t *e) {
@@ -392,7 +392,7 @@ void manual_leveling_screen(bool autoleveling) {
                       LV_EVENT_VALUE_CHANGED, NULL);
 
   // Button Previous
-  btn_previous = symbolButton::create_symbol_button(
+  btn_previous = symbolButton::create(
       ui_new_screen, LV_SYMBOL_PREVIOUS, ESP3D_BACK_BUTTON_WIDTH, ESP3D_BACK_BUTTON_HEIGHT);
   lv_obj_align(btn_previous, LV_ALIGN_BOTTOM_LEFT,
                ESP3D_BUTTON_PRESSED_OUTLINE, -ESP3D_BUTTON_PRESSED_OUTLINE);
@@ -401,7 +401,7 @@ void manual_leveling_screen(bool autoleveling) {
                       LV_EVENT_CLICKED, btnm_leveling_position);
 
   // Button Next
-  btn_next = symbolButton::create_symbol_button(
+  btn_next = symbolButton::create(
       ui_new_screen, LV_SYMBOL_NEXT, ESP3D_BACK_BUTTON_WIDTH, ESP3D_BACK_BUTTON_HEIGHT);
   lv_obj_align_to(btn_next, btnm_leveling_position, LV_ALIGN_OUT_BOTTOM_RIGHT,
                   0, ESP3D_BUTTON_PRESSED_OUTLINE);
@@ -410,7 +410,7 @@ void manual_leveling_screen(bool autoleveling) {
                       LV_EVENT_CLICKED, btnm_leveling_position);
 
   // Help button
-  lv_obj_t *btn_help = symbolButton::create_symbol_button(
+  lv_obj_t *btn_help = symbolButton::create(
       ui_new_screen, "?", ESP3D_BACK_BUTTON_WIDTH, ESP3D_BACK_BUTTON_HEIGHT);
   lv_obj_align(btn_help, LV_ALIGN_TOP_RIGHT, -ESP3D_BUTTON_PRESSED_OUTLINE,
                ESP3D_BUTTON_PRESSED_OUTLINE);
@@ -418,7 +418,7 @@ void manual_leveling_screen(bool autoleveling) {
                       LV_EVENT_CLICKED, NULL);
 
   // Start button
-  btn_start = symbolButton::create_symbol_button(ui_new_screen, LV_SYMBOL_PLAY);
+  btn_start = symbolButton::create(ui_new_screen, LV_SYMBOL_PLAY);
   lv_obj_align_to(btn_start, btnm_leveling_position, LV_ALIGN_OUT_RIGHT_MID,
                   (LV_HOR_RES / 4) - ESP3D_SYMBOL_BUTTON_WIDTH / 2, 0);
   lv_obj_add_event_cb(btn_start, event_button_manual_leveling_start_handler,

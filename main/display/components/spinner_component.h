@@ -28,8 +28,7 @@ spinner_component.h - ESP3D screens definition
 #include "esp3d_values.h"
 
 namespace spinnerScreen {
-extern void show_spinner(const char* msg = nullptr,
+extern void show(const char* msg = nullptr,
                          lv_obj_t* backtbn = nullptr);
-extern void update_spinner(const char* msg = nullptr);
-extern void hide_spinner();
+extern void hide();
 }  // namespace spinnerScreen

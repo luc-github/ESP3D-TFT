@@ -1,5 +1,5 @@
 /*
- symbol_button_component.h - ESP3D screens definition
+  esp3d_hal helper functions
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -19,15 +19,13 @@
 */
 
 #pragma once
-
 #include <lvgl.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include "esp3d_styles.h"
+bool lv_timer_is_valid(lv_timer_t *timer);
 
-namespace symbolButton {
-lv_obj_t *create(lv_obj_t *container, const char *text,
-                                      int width = ESP3D_SYMBOL_BUTTON_WIDTH,
-                                      int height = ESP3D_SYMBOL_BUTTON_HEIGHT,
-                                      bool center = true, bool slash = false,
-                                      int rotation = 0);
-}  // namespace symbolButton
+#ifdef __cplusplus
+}  // extern "C"
+#endif

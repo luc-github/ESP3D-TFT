@@ -72,7 +72,7 @@ void refresh_files_list_cb(lv_timer_t *timer) {
     lv_timer_del(start_files_list_timer);
     start_files_list_timer = NULL;
   }
-  spinnerScreen::hide_spinner();
+  spinnerScreen::hide();
   files_screen();
 }
 static void bgFilesTask(void *pvParameter) {
@@ -173,7 +173,7 @@ void fill_files_list() {
 }
 
 void do_files_list_now() {
-  spinnerScreen::show_spinner();
+  spinnerScreen::show();
   if (msg) lv_label_set_text(msg, "");
   TaskHandle_t xHandle = NULL;
   BaseType_t res =
@@ -182,7 +182,7 @@ void do_files_list_now() {
   if (res == pdPASS && xHandle) {
     esp3d_log("Created Files Task");
   } else {
-    spinnerScreen::hide_spinner();
+    spinnerScreen::hide();
     esp3d_log_e("Scan Task creation failed %d , %d", (int)res, (int)xHandle);
   }
 }
@@ -279,7 +279,7 @@ void files_screen() {
   lv_obj_update_layout(btnback);
 
   // button refresh
-  refresh_button = symbolButton::create_symbol_button(
+  refresh_button = symbolButton::create(
       ui_new_screen, LV_SYMBOL_REFRESH, ESP3D_SYMBOL_BUTTON_WIDTH,
       lv_obj_get_height(btnback));
   lv_obj_align(refresh_button, LV_ALIGN_BOTTOM_MID, 0,

@@ -471,7 +471,7 @@ void temperatures_screen(uint8_t target, ESP3DScreenType screenreturn) {
   updateBtnMatrix();
 
   // Power off all heater
-  lv_obj_t *btn_power_off_all = symbolButton::create_symbol_button(
+  lv_obj_t *btn_power_off_all = symbolButton::create(
       ui_new_screen, LV_SYMBOL_POWER "...", ESP3D_MATRIX_BUTTON_WIDTH,
       ESP3D_MATRIX_BUTTON_HEIGHT);
   lv_obj_align_to(btn_power_off_all, btnm_target, LV_ALIGN_OUT_LEFT_BOTTOM,
@@ -537,7 +537,7 @@ void temperatures_screen(uint8_t target, ESP3DScreenType screenreturn) {
                   LV_ALIGN_OUT_RIGHT_MID, ESP3D_BUTTON_PRESSED_OUTLINE / 2,
                   0);
   // Button up
-  lv_obj_t *btn_up = symbolButton::create_symbol_button(
+  lv_obj_t *btn_up = symbolButton::create(
       ui_new_screen, LV_SYMBOL_UP "\n" LV_SYMBOL_PLUS);
   lv_obj_align_to(btn_up, label_current_temperature_value,
                   LV_ALIGN_OUT_BOTTOM_MID, 0,
@@ -587,14 +587,14 @@ void temperatures_screen(uint8_t target, ESP3DScreenType screenreturn) {
                   ESP3D_BUTTON_PRESSED_OUTLINE / 2, 0);
   // set button
   lv_obj_t *btn_set =
-      symbolButton::create_symbol_button(ui_new_screen, LV_SYMBOL_OK);
+      symbolButton::create(ui_new_screen, LV_SYMBOL_OK);
   lv_obj_align_to(btn_set, label_unit2, LV_ALIGN_OUT_RIGHT_MID,
                   ESP3D_BUTTON_PRESSED_OUTLINE, 0);
   lv_obj_add_event_cb(btn_set, temperatures_btn_ok_event_cb, LV_EVENT_CLICKED,
                       temperatures_ta);
   // Power off button to 0
   lv_obj_t *btn_stop =
-      symbolButton::create_symbol_button(ui_new_screen, LV_SYMBOL_POWER);
+      symbolButton::create(ui_new_screen, LV_SYMBOL_POWER);
   lv_obj_align_to(btn_stop, btn_set, LV_ALIGN_OUT_RIGHT_MID,
                   ESP3D_BUTTON_PRESSED_OUTLINE, 0);
   lv_obj_add_event_cb(btn_stop, temperatures_btn_power_off_event_cb,
@@ -616,7 +616,7 @@ void temperatures_screen(uint8_t target, ESP3DScreenType screenreturn) {
   lv_obj_add_event_cb(temperatures_ta, temperatures_ta_event_cb, LV_EVENT_ALL,
                       temperatures_kb);
   // Button down
-  lv_obj_t *btn_down = symbolButton::create_symbol_button(
+  lv_obj_t *btn_down = symbolButton::create(
       ui_new_screen, LV_SYMBOL_MINUS "\n" LV_SYMBOL_DOWN);
   lv_obj_align_to(btn_down, temperatures_ta, LV_ALIGN_OUT_BOTTOM_MID, 0,
                   ESP3D_BUTTON_PRESSED_OUTLINE / 2);
