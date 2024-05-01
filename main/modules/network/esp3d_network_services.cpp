@@ -54,30 +54,47 @@ ESP3DNetworkServices::ESP3DNetworkServices() { _started = false; }
 ESP3DNetworkServices::~ESP3DNetworkServices() {}
 
 bool ESP3DNetworkServices::begin() {
+  bool start = false;
   esp3dTftValues.set_string_value(ESP3DValuesIndex::network_status, "+");
   esp3d_log("Starting Services");
   _started = esp3dAuthenthicationService.begin();
+  esp3d_log("Starting autenthication Service %s", _started ? "OK" : "KO");
 #if ESP3D_TIMESTAMP_FEATURE
-  _started = _started && esp3dTimeService.begin();
+  start = esp3dTimeService.begin();
+  esp3d_log("Starting Time Service %s", start ? "OK" : "KO");
+  _started = _started && start;
 #endif  // ESP3D_TIMESTAMP_FEATURE
 
 #if ESP3D_HTTP_FEATURE
-  _started = _started && esp3dHttpService.begin();
+  start = esp3dHttpService.begin();
+  esp3d_log("Starting Http Service %s", start ? "OK" : "KO");
+  _started = _started && start;
 #endif  // ESP3D_HTTP_FEATURE
 
 #if ESP3D_NOTIFICATIONS_FEATURE
-  _started = _started && esp3dNotificationsService.begin(true);
+  start = esp3dNotificationsService.begin(true);
+  esp3d_log("Starting Notifications Service %s", start ? "OK" : "KO");
+  _started = _started && start;
 #endif  // ESP3D_NOTIFICATIONS_FEATURE
 
 #if ESP3D_MDNS_FEATURE
-  _started = _started && esp3dmDNS.begin();
+  start = esp3dmDNS.begin();
+  esp3d_log("Starting mDNS Service %s", start ? "OK" : "KO");
+  _started = _started && start;
 #endif  // ESP3D_MDNS_FEATURE
+
 #if ESP3D_SSDP_FEATURE
-  _started = _started && esp3d_ssdp_service.begin();
+  start = esp3d_ssdp_service.begin();
+  esp3d_log("Starting SSDP Service %s", start ? "OK" : "KO");
+  _started = _started && start;
 #endif  // ESP3D_SSDP_FEATURE
+
 #if ESP3D_TELNET_FEATURE
-  _started = _started && esp3dSocketServer.begin();
+   start = esp3dSocketServer.begin();
+  esp3d_log("Starting Telnet Service %s", start ? "OK" : "KO");
+  _started = _started && start;
 #endif  // ESP3D_TELNET_FEATURE
+  esp3d_log("Services started %s", _started ? "OK" : "KO");
   return _started;
 }
 
