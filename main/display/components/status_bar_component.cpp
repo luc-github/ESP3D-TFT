@@ -60,7 +60,7 @@ bool callback(ESP3DValuesIndex index, const char *value,
       lv_label_set_text(status_bar_label, svalue_one_line.c_str());
     }
   }
-  return statusScreen::status_list_cb(index, svalue_one_line.c_str(), action);
+  return statusScreen::callback(index, svalue_one_line.c_str(), action);
 }
 
 /**
@@ -76,7 +76,7 @@ static void event_handler_status_list(lv_event_t *e) {
 
   if (code == LV_EVENT_CLICKED) {
     esp3d_log("Clicked");
-    statusScreen::status_screen();
+    statusScreen::create();
   }
 }
 
