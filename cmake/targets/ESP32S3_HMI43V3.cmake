@@ -10,10 +10,10 @@ if(ESP32S3_HMI43V3)
     list(APPEND EXTRA_COMPONENT_DIRS ${CMAKE_SOURCE_DIR}/hardware/drivers_video_i80)
     # Add specific bsp path for board definition 
     add_compile_options("-I${CMAKE_SOURCE_DIR}/hardware/ESP32S3_HMI43V3/components/bsp")
+    # Add specific usb driver for otg
+    list(APPEND EXTRA_COMPONENT_DIRS ${CMAKE_SOURCE_DIR}/hardware/drivers_usb_otg)
     if (USB_SERIAL_SERVICE)
         # Enable USB-OTG as serial alternative for communications
         add_compile_options(-DESP3D_USB_SERIAL_FEATURE=1)
-        # Add specific usb driver for otg
-        list(APPEND EXTRA_COMPONENT_DIRS ${CMAKE_SOURCE_DIR}/hardware/drivers_usb_otg)
     endif()
 endif()
