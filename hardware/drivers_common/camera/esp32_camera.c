@@ -23,11 +23,10 @@
  *********************/
 
 #include "esp32_camera.h"
+
 #include <string.h>
 
 #include "esp3d_log.h"
-
-
 
 /**********************
  *  STATIC VARIABLES
@@ -73,7 +72,7 @@ esp_err_t esp32_camera_init(const esp32_camera_config_t *config) {
     _camera_pin_led = config->pin_led;
   }
   // Save camera name
-  _camera_name  = (char *)calloc(strlen(config->name) + 1, sizeof(char));
+  _camera_name = (char *)calloc(strlen(config->name) + 1, sizeof(char));
   if (_camera_name == NULL) {
     esp3d_log_e("Camera name allocation failed");
     return ESP_ERR_NO_MEM;
@@ -81,8 +80,8 @@ esp_err_t esp32_camera_init(const esp32_camera_config_t *config) {
   _camera_name = strcpy(_camera_name, config->name);
 
   // Initilize camera
-  esp3d_log("Camera init") esp_err_t err =
-      esp_camera_init(&(config->hw_config));
+  esp3d_log("Camera init");
+  esp_err_t err = esp_camera_init(&(config->hw_config));
   if (err != ESP_OK) {
     esp3d_log_e("Camera init failed with error 0x%x", err);
     return err;

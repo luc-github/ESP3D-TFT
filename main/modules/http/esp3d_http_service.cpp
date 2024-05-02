@@ -220,7 +220,6 @@ void ESP3DHttpService::onClose(int socketFd) {
 
 bool ESP3DHttpService::begin() {
   esp3d_log("Starting Http Service");
-
   end();
   // check if start
   if (ESP3DState::on !=
@@ -672,6 +671,7 @@ bool ESP3DHttpService::begin() {
   } else {
     esp3d_log_e("Web server start failed %s", esp_err_to_name(err));
   }
+  esp3d_log("Http Service started %s", _started ? "successfully" : "failed");
   return _started;
 }
 
