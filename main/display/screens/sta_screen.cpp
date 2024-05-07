@@ -328,7 +328,7 @@ void sta_screen_delay_timer_cb(lv_timer_t *timer) {
     sta_screen_delay_timer = NULL;
     if (esp3dTftui.get_current_screen() != ESP3DScreenType::none &&
         esp3dTftui.get_current_screen() != ESP3DScreenType::wifi) {
-      wifiScreen::wifi_screen();
+      wifiScreen::create();
     }
   }
 }

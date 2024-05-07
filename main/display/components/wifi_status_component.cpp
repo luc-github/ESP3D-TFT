@@ -210,7 +210,7 @@ bool network_mode_cb(ESP3DValuesIndex index, const char *value,
         staScreen::update_sta_button_scan();
       }
       if (esp3dTftui.get_current_screen() == ESP3DScreenType::wifi) {
-        wifiScreen::update_button_no_wifi();
+        wifiScreen::callback();
       }
     } else {
       // Todo : update other screens calling each callback update function

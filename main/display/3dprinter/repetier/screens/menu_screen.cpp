@@ -121,7 +121,7 @@ void menu_screen_delay_timer_cb(lv_timer_t *timer) {
       break;
 #if ESP3D_WIFI_FEATURE
     case ESP3DScreenType::wifi:
-      wifiScreen::wifi_screen();
+      wifiScreen::create();
       break;
 #endif  // ESP3D_WIFI_FEATURE
     default:

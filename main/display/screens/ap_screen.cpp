@@ -152,7 +152,7 @@ void ap_screen_delay_timer_cb(lv_timer_t *timer) {
     lv_timer_del(ap_screen_delay_timer);
     ap_screen_delay_timer = NULL;
   }
-  wifiScreen::wifi_screen();
+  wifiScreen::create();
 }
 
 void event_button_ap_back_handler(lv_event_t *e) {
