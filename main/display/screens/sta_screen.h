@@ -20,7 +20,7 @@
 #pragma once
 
 namespace staScreen {
-extern void sta_screen();
-extern void update_button_ok();
-extern void update_sta_button_scan();
+void create();
+void callback();
+void callback_scan();
 }  // namespace staScreen

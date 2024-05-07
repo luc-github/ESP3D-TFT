@@ -20,5 +20,5 @@
 #pragma once
 
 namespace splashScreen {
- void enter();
+ void create();
 }  // namespace splashScreen

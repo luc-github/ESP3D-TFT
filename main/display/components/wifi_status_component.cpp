@@ -203,11 +203,11 @@ bool network_mode_cb(ESP3DValuesIndex index, const char *value,
       wifi_display_signal();
       wifi_display_mode();
       if (esp3dTftui.get_current_screen() == ESP3DScreenType::access_point) {
-        apScreen::update_button_ok();
+        apScreen::callback();
       }
       if (esp3dTftui.get_current_screen() == ESP3DScreenType::station) {
-        staScreen::update_button_ok();
-        staScreen::update_sta_button_scan();
+        staScreen::callback();
+        staScreen::callback_scan();
       }
       if (esp3dTftui.get_current_screen() == ESP3DScreenType::wifi) {
         wifiScreen::callback();

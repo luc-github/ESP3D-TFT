@@ -470,7 +470,7 @@ void main_screen_delay_timer_cb(lv_timer_t *timer) {
   }
   switch (next_screen) {
     case ESP3DScreenType::none:
-      emptyScreen::empty_screen();
+      emptyScreen::create();
       break;
     case ESP3DScreenType::temperatures:
       temperaturesScreen::temperatures_screen(main_screen_temperature_target);
@@ -486,7 +486,7 @@ void main_screen_delay_timer_cb(lv_timer_t *timer) {
       break;
 #if ESP3D_SD_CARD_FEATURE
     case ESP3DScreenType::files:
-      filesScreen::files_screen();
+      filesScreen::create();
       break;
 #endif  // ESP3D_SD_CARD_FEATURE
     case ESP3DScreenType::menu:

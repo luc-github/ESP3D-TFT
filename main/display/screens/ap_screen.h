@@ -21,6 +21,6 @@
 #pragma once
 
 namespace apScreen {
-extern void ap_screen();
-extern void update_button_ok();
+void create();
+void callback();
 }  // namespace apScreen

@@ -170,10 +170,10 @@ void wifi_screen_delay_timer_cb(lv_timer_t *timer) {
   wifi_screen_delay_connecting_timer = NULL;
   switch (wifi_next_screen) {
     case ESP3DScreenType::access_point:
-      apScreen::ap_screen();
+      apScreen::create();
       break;
     case ESP3DScreenType::station:
-      staScreen::sta_screen();
+      staScreen::create();
       break;
     case ESP3DScreenType::menu:
       menuScreen::menu_screen();

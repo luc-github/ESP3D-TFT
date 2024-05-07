@@ -28,25 +28,49 @@
 #include "screens/main_screen.h"
 
 /**********************
- *  STATIC PROTOTYPES
+ *  Namespace
  **********************/
 namespace emptyScreen {
+  
+/**
+ * Handles the event when a button is clicked.
+ *
+ * @param e The event object containing information about the event.
+ */
 void event_button_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
   mainScreen::main_screen();
 }
 
-void empty_screen() {
+/**
+ * @brief Creates a new screen and sets it as the current screen.
+ * 
+ * This function creates a new screen, sets it as the current screen, and applies the main background style to it.
+ * The previous screen is deleted.
+ * 
+ * @note This function assumes that the `esp3dTftui` object and the `esp3d_log` function are defined and accessible.
+ * 
+ * @param None
+ * @return None
+ */
+void create() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Main screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
+  if (!lv_obj_is_valid(ui_new_screen)) {
+    esp3d_log_e("Failed to create new screen");
+    return;
+  }
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
   ESP3DStyle::apply(ui_new_screen, ESP3DStyleType::main_bg);
-  lv_obj_del(ui_current_screen);
 
+  if (lv_obj_is_valid(ui_current_screen)){
+    lv_obj_del(ui_current_screen);
+  }
+ 
   lv_obj_add_event_cb(ui_new_screen, event_button_handler, LV_EVENT_CLICKED,
                       NULL);
 }

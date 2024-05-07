@@ -26,5 +26,5 @@
 
 void create_application(void) {
   ESP3DStyle::init();
-  splashScreen::enter();
+  splashScreen::create();
 }

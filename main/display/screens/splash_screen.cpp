@@ -23,12 +23,13 @@
 #include <lvgl.h>
 
 #include "esp3d_log.h"
+#include "esp3d_lvgl.h"
 #include "esp3d_styles.h"
-
+#include "esp3d_styles_splash_screen.h"
 #include "esp3d_tft_ui.h"
 #include "esp3d_version.h"
 #include "screens/main_screen.h"
-#include "esp3d_styles_splash_screen.h"
+
 
 // Images are stored in the flash memory
 // the logo is an rle image
@@ -46,24 +47,35 @@ lv_img_dsc_t *splash_logo = NULL;
 // Static functions
 void display();
 
-// Callback for the timer to to display screen
+/** @brief Callback function for the splash screen timer.
+ *
+ * This function is called when the splash screen timer expires. It deletes the
+ * timer to avoid multiple calls and then calls the display function.
+ *
+ * @param timer The timer object that triggered the callback.
+ */
 void splash_in_timer_cb(lv_timer_t *timer) {
   // If timer is not null, delete it to avoid multiple call
-  if (boot_timer) {
+  if (boot_timer && lv_timer_is_valid(boot_timer)) {
     lv_timer_del(boot_timer);
-    boot_timer = NULL;
   }
+  boot_timer = NULL;
   // Call display function
   display();
 }
 
-// leave function to delete timer and release image
+/**
+ * @brief Function to clean up resources and exit the splash screen.
+ *
+ * This function deletes the boot timer if it is not null and releases the
+ * splash logo if it is not null.
+ */
 void leave() {
   // If timer is not null, delete it to avoid multiple call
-  if (boot_timer) {
+  if (boot_timer && lv_timer_is_valid(boot_timer)) {
     lv_timer_del(boot_timer);
-    boot_timer = NULL;
   }
+  boot_timer = NULL;
   // If splash_logo is not null, release it
   if (splash_logo != NULL) {
     release_splash_logo(splash_logo);
@@ -71,7 +83,13 @@ void leave() {
   }
 }
 
-// Callback for the timer to leave and switch to main screen
+/**
+ * Callback function for the main screen timer.
+ * This function is called when the timer expires.
+ * It calls the leave function and then the main screen function.
+ *
+ * @param timer Pointer to the timer object that triggered the callback.
+ */
 void main_screen_timer_cb(lv_timer_t *timer) {
   // Call leave function
   leave();
@@ -79,8 +97,14 @@ void main_screen_timer_cb(lv_timer_t *timer) {
   mainScreen::main_screen();
 }
 
-// Enter function to set style and create timer
-void enter() {
+/**
+ * @brief Creates the splash screen.
+ *
+ * This function applies the main background style to the active screen and
+ * creates a timer for the splash screen animation. If the timer creation fails,
+ * an error message is logged and the function returns.
+ */
+void create() {
   ESP3DStyle::apply(lv_scr_act(), ESP3DStyleType::main_bg);
   boot_timer = lv_timer_create(splash_in_timer_cb, 10, NULL);
   if (boot_timer == NULL) {
@@ -89,7 +113,15 @@ void enter() {
   }
 }
 
-// Display function to show splash screen
+/**
+ * @brief Displays the splash screen.
+ * 
+ * This function sets up and displays the splash screen on the UI. It creates and positions
+ * the splash logo, target logo, and version text objects. It also sets a timer to switch
+ * to the main screen after a certain duration.
+ * 
+ * @note This function assumes that the UI has already been initialized.
+ */
 void display() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Get active screen
@@ -111,7 +143,7 @@ void display() {
 
   // Set target Logo
   lv_obj_t *logo_target = lv_img_create(ui_Screen);
-  if(!lv_obj_is_valid(logo_target)) {
+  if (!lv_obj_is_valid(logo_target)) {
     esp3d_log_e("Invalid target logo object");
     return;
   }
