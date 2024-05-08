@@ -47,7 +47,7 @@ void speed_screen_delay_timer_cb(lv_timer_t *timer) {
     lv_timer_del(speed_screen_delay_timer);
     speed_screen_delay_timer = NULL;
   }
-  mainScreen::main_screen();
+  mainScreen::create();
 }
 
 void event_button_speed_back_handler(lv_event_t *e) {

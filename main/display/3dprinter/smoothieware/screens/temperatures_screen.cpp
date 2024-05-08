@@ -171,7 +171,7 @@ void temperatures_screen_delay_timer_cb(lv_timer_t *timer) {
     temperatures_screen_delay_timer = NULL;
   }
   if (screen_return == ESP3DScreenType::main) {
-    mainScreen::main_screen();
+    mainScreen::create();
   } else if (screen_return == ESP3DScreenType::filament) {
     filamentScreen::filament_screen();
   } else {

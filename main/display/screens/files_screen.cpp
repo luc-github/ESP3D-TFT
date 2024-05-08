@@ -283,7 +283,7 @@ void files_screen_delay_timer_cb(lv_timer_t *timer) {
     lv_timer_del(files_screen_delay_timer);
   }
   files_screen_delay_timer = NULL;
-  mainScreen::main_screen();
+  mainScreen::create();
 }
 
 /**

@@ -101,7 +101,7 @@ void menu_screen_delay_timer_cb(lv_timer_t *timer) {
   }
   switch (menu_next_screen) {
     case ESP3DScreenType::main:
-      mainScreen::main_screen();
+      mainScreen::create();
       break;
     case ESP3DScreenType::filament:
       filamentScreen::filament_screen();

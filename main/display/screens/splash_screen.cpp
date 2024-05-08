@@ -94,7 +94,7 @@ void main_screen_timer_cb(lv_timer_t *timer) {
   // Call leave function
   leave();
   // Call main screen
-  mainScreen::main_screen();
+  mainScreen::create();
 }
 
 /**

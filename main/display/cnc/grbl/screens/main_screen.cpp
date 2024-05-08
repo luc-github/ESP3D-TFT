@@ -370,7 +370,7 @@ void event_button_stop_handler(lv_event_t *e) {
                           event_confirm_stop_cb);
 }
 
-void main_screen() {
+void create() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Main screen creation");

@@ -92,7 +92,7 @@ lv_obj_t *main_btn_menu = nullptr;
  *   GLOBAL FUNCTIONS
  **********************/
 std::string progression_area_str = "";
-void update_show_fan_controls(bool show) { show_fan_button = show; }
+void show_fan_controls(bool show) { show_fan_button = show; }
 
 bool extruder_0_value_cb(ESP3DValuesIndex index, const char *value,
                          ESP3DValuesCbAction action) {
@@ -635,7 +635,7 @@ void event_button_stop_handler(lv_event_t *e) {
                           event_confirm_stop_cb);
 }
 
-void main_screen() {
+void create() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Main screen creation");

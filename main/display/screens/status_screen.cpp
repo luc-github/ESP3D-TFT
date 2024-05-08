@@ -104,7 +104,7 @@ static void event_handler_button_back(lv_event_t *e) {
     esp3d_log("Clicked");
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::status_list) {
       esp3d_log("Back to main screen");
-      mainScreen::main_screen();
+      mainScreen::create();
     }
   }
 }

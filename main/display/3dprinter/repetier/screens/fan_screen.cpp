@@ -108,7 +108,7 @@ void fan_screen_delay_timer_cb(lv_timer_t *timer) {
     lv_timer_del(fan_screen_delay_timer);
     fan_screen_delay_timer = NULL;
   }
-  mainScreen::main_screen();
+  mainScreen::create();
 }
 
 void event_button_fan_back_handler(lv_event_t *e) {

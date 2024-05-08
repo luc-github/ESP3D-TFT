@@ -23,7 +23,7 @@
 #include "esp3d_values.h"
 
 namespace mainScreen {
-extern void main_screen();
+extern void create();
 extern bool job_status_value_cb(ESP3DValuesIndex index, const char *value,
                                 ESP3DValuesCbAction action);
 

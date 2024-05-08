@@ -156,13 +156,13 @@ static void bgSaveJSONSettingsTask(void *pvParameter) {
         break;
       case ESP3DSettingIndex::esp3d_show_fan_controls:
         if (strcmp(data->value.c_str(), "true") == 0) {
-          mainScreen::update_show_fan_controls(true);
+          mainScreen::show_fan_controls(true);
           if (data->label) {
             lv_label_set_text(data->label, esp3dTranslationService.translate(
                                                ESP3DLabel::enabled));
           }
         } else {
-          mainScreen::update_show_fan_controls(false);
+          mainScreen::show_fan_controls(false);
           if (data->label) {
             lv_label_set_text(data->label, esp3dTranslationService.translate(
                                                ESP3DLabel::disabled));

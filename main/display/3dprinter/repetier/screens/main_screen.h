@@ -23,7 +23,7 @@
 #include "esp3d_values.h"
 
 namespace mainScreen {
-extern void main_screen();
+extern void create();
 extern bool extruder_0_value_cb(ESP3DValuesIndex index, const char *value,
                                 ESP3DValuesCbAction action);
 extern bool extruder_1_value_cb(ESP3DValuesIndex index, const char *value,
@@ -38,6 +38,6 @@ extern bool speed_value_cb(ESP3DValuesIndex index, const char *value,
                            ESP3DValuesCbAction action);
 extern bool job_status_value_cb(ESP3DValuesIndex index, const char *value,
                                 ESP3DValuesCbAction action);
-extern void update_show_fan_controls(bool show);
+extern void show_fan_controls(bool show);
 
 }  // namespace mainScreen

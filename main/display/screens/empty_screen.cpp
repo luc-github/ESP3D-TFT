@@ -39,7 +39,7 @@ namespace emptyScreen {
  */
 void event_button_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
-  mainScreen::main_screen();
+  mainScreen::create();
 }
 
 /**

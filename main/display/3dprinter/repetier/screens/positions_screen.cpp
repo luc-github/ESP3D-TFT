@@ -88,7 +88,7 @@ void positions_screen_delay_timer_cb(lv_timer_t *timer) {
     lv_timer_del(positions_screen_delay_timer);
     positions_screen_delay_timer = NULL;
   }
-  mainScreen::main_screen();
+  mainScreen::create();
 }
 
 void event_button_positions_back_handler(lv_event_t *e) {
