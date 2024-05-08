@@ -92,7 +92,7 @@ void settings_ui_update_delay_timer_cb(lv_timer_t *timer) {
   }
   esp3dTranslationService.begin();
   spinnerScreen::hide();
-  settings_screen();
+  create();
 }
 
 // refresh_settings_list_cb
@@ -106,7 +106,7 @@ void refresh_settings_list_cb(lv_timer_t *timer) {
     settings_screen_apply_timer = NULL;
   }
   spinnerScreen::hide();
-  if (refresh) settings_screen();
+  if (refresh) create();
 }
 
 // bgLoadJSONSettingsTask
@@ -562,7 +562,7 @@ void event_button_settings_back_handler(lv_event_t *e) {
   }
 }
 
-void settings_screen() {
+void create() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Settings screen creation");

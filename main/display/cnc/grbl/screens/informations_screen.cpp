@@ -86,7 +86,7 @@ void addInformationToList(lv_obj_t *list, ESP3DLabel label, ESP3DLabel info) {
   lv_list_add_btn(list, "", infoStr.c_str());
 }
 
-void informations_screen() {
+void create() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Settings screen creation");

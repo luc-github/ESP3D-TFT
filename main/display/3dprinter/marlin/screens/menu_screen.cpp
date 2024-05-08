@@ -147,7 +147,7 @@ void menu_screen_delay_timer_cb(lv_timer_t *timer) {
       filamentScreen::filament_screen();
       break;
     case ESP3DScreenType::settings:
-      settingsScreen::settings_screen();
+      settingsScreen::create();
       break;
     case ESP3DScreenType::leveling:
       if (auto_leveling) {
@@ -157,7 +157,7 @@ void menu_screen_delay_timer_cb(lv_timer_t *timer) {
       }
       break;
     case ESP3DScreenType::informations:
-      informationsScreen::informations_screen();
+      informationsScreen::create();
       break;
 #if ESP3D_WIFI_FEATURE
     case ESP3DScreenType::wifi:

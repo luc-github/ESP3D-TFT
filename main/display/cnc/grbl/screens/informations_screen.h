@@ -21,5 +21,5 @@ informations_screen.h - ESP3D screens styles definition
 #pragma once
 
 namespace informationsScreen {
-extern void informations_screen();
+extern void create();
 }  // namespace informationsScreen

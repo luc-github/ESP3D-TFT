@@ -25,6 +25,7 @@
 #include "components/back_button_component.h"
 #include "components/main_container_component.h"
 #include "esp3d_log.h"
+#include "esp3d_lvgl.h"
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
@@ -34,8 +35,8 @@
 #include "esp_heap_caps.h"
 #include "esp_system.h"
 #include "filesystem/esp3d_flash.h"
-#include "screens/menu_screen.h"
 #include "rom/ets_sys.h"
+#include "screens/menu_screen.h"
 #include "sdkconfig.h"
 #include "spi_flash_mmap.h"
 #include "translations/esp3d_translation_service.h"
@@ -49,19 +50,41 @@
 #endif  // ESP3D_UPDATE_FEATURE
 
 /**********************
- *  STATIC PROTOTYPES
+ * Namespace
  **********************/
 namespace informationsScreen {
+// Static variables
 lv_timer_t *informations_screen_delay_timer = NULL;
 
+// Static functions
+
+/**
+ * @brief Callback function for the delay timer in the informations screen.
+ *
+ * This function is called when the delay timer expires. It checks if the delay
+ * timer is valid and deletes it if necessary. Then, it calls the create()
+ * function of the menuScreen class to create the menu screen.
+ *
+ * @param timer Pointer to the timer object that triggered the callback.
+ */
 void informations_screen_delay_timer_cb(lv_timer_t *timer) {
-  if (informations_screen_delay_timer) {
+  if (informations_screen_delay_timer &&
+      lv_timer_is_valid(informations_screen_delay_timer)) {
     lv_timer_del(informations_screen_delay_timer);
-    informations_screen_delay_timer = NULL;
   }
+  informations_screen_delay_timer = NULL;
   menuScreen::create();
 }
 
+/**
+ * Event handler for the back button in the informations screen.
+ * This function is called when the back button is clicked.
+ * It logs a message and creates a timer if a delay is specified.
+ * If no delay is specified, it directly calls the delay timer callback
+ * function.
+ *
+ * @param e The event object.
+ */
 void event_button_informations_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
   if (ESP3D_BUTTON_ANIMATION_DELAY) {
@@ -72,6 +95,18 @@ void event_button_informations_back_handler(lv_event_t *e) {
     informations_screen_delay_timer_cb(NULL);
 }
 
+/**
+ * @brief Adds information to a list in the user interface.
+ *
+ * This function takes a list object, an `ESP3DLabel` enum value, and a string
+ * of information as parameters. It translates the label using the
+ * `esp3dTranslationService` and appends the information to it. The resulting
+ * string is then added as a button to the list.
+ *
+ * @param list The list object to which the information will be added.
+ * @param label The label enum value representing the type of information.
+ * @param info The string of information to be added.
+ */
 void addInformationToList(lv_obj_t *list, ESP3DLabel label, const char *info) {
   std::string infoStr = esp3dTranslationService.translate(label);
   infoStr += ": ";
@@ -79,6 +114,19 @@ void addInformationToList(lv_obj_t *list, ESP3DLabel label, const char *info) {
   lv_list_add_btn(list, "", infoStr.c_str());
 }
 
+/**
+ * @brief Adds information to a list in the user interface.
+ *
+ * This function takes a list object, a label, and an info string as parameters.
+ * It translates the label and info strings using the esp3dTranslationService.
+ * Then it concatenates the translated label and info strings with a colon
+ * separator. Finally, it adds a button with the concatenated string to the
+ * list.
+ *
+ * @param list The list object to which the information will be added.
+ * @param label The label representing the type of information.
+ * @param info The information string to be displayed.
+ */
 void addInformationToList(lv_obj_t *list, ESP3DLabel label, ESP3DLabel info) {
   std::string infoStr = esp3dTranslationService.translate(label);
   infoStr += ": ";
@@ -86,24 +134,55 @@ void addInformationToList(lv_obj_t *list, ESP3DLabel label, ESP3DLabel info) {
   lv_list_add_btn(list, "", infoStr.c_str());
 }
 
-void informations_screen() {
+/**
+ * @brief Creates the information screen.
+ *
+ * This function creates the information screen for the ESP3D TFT UI. It sets
+ * the current screen to none, creates a new screen, and displays it. It also
+ * applies the main background style and deletes the old screen. Various UI
+ * elements such as buttons and list controls are created and added to the
+ * screen. Information about the system, such as the screen, version,
+ * architecture, SDK version, CPU frequency, free heap size, flash size, and
+ * flash type, is added to the list control. If the ESP3D update feature is
+ * enabled, information about the maximum update size and SD updater status is
+ * also added. Finally, the current screen is set to the information screen.
+ *
+ * @note This function assumes that the necessary libraries and objects have
+ * been initialized before calling it.
+ */
+void create() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Settings screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
+  if (!lv_obj_is_valid(ui_new_screen)) {
+    esp3d_log_e("Failed to create settings screen");
+    return;
+  }
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
   ESP3DStyle::apply(ui_new_screen, ESP3DStyleType::main_bg);
-  lv_obj_del(ui_current_screen);
-
+  if (lv_obj_is_valid(ui_current_screen)) {
+    lv_obj_del(ui_current_screen);
+  }
+  // Add back button
   lv_obj_t *btnback = backButton::create(ui_new_screen);
+  if (!lv_obj_is_valid(btnback)) {
+    esp3d_log_e("Failed to create back button");
+    return;
+  }
   lv_obj_add_event_cb(btnback, event_button_informations_back_handler,
                       LV_EVENT_CLICKED, NULL);
   lv_obj_update_layout(btnback);
   lv_obj_set_style_flex_flow(ui_new_screen, LV_FLEX_FLOW_ROW,
                              LV_FLEX_ALIGN_SPACE_EVENLY);
+  // Add main container
   lv_obj_t *ui_info_list_ctl = lv_list_create(ui_new_screen);
+  if (!lv_obj_is_valid(ui_info_list_ctl)) {
+    esp3d_log_e("Failed to create list");
+    return;
+  }
   ESP3DStyle::apply(ui_info_list_ctl, ESP3DStyleType::status_list);
 
   lv_obj_update_layout(ui_new_screen);
@@ -174,9 +253,8 @@ void informations_screen() {
   addInformationToList(ui_info_list_ctl, ESP3DLabel::flash_type,
                        flashFs.getFileSystemName());
 
-//Target fw
-  addInformationToList(ui_info_list_ctl, ESP3DLabel::target_firmware,
-                       "Marlin"); 
+  // Target fw
+  addInformationToList(ui_info_list_ctl, ESP3DLabel::target_firmware, "Marlin");
 
   esp3dTftui.set_current_screen(ESP3DScreenType::informations);
 }
