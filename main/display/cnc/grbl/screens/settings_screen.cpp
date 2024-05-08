@@ -82,7 +82,7 @@ void settings_screen_delay_timer_cb(lv_timer_t *timer) {
     lv_timer_del(settings_screen_delay_timer);
     settings_screen_delay_timer = NULL;
   }
-  menuScreen::menu_screen();
+  menuScreen::create();
 }
 
 void settings_ui_update_delay_timer_cb(lv_timer_t *timer) {

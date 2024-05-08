@@ -110,7 +110,7 @@ void filament_screen_delay_timer_cb(lv_timer_t *timer) {
     lv_timer_del(filament_screen_delay_timer);
     filament_screen_delay_timer = NULL;
   }
-  menuScreen::menu_screen();
+  menuScreen::create();
 }
 
 void filament_screen_edit_delay_timer_cb(lv_timer_t *timer) {

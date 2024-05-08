@@ -368,7 +368,7 @@ bool job_status_value_cb(ESP3DValuesIndex index, const char *value,
 #endif  // ESP3D_SD_CARD_FEATURE
       main_display_menu();
     } else {
-      menuScreen::menu_screen_job_status_value_cb(index, value, action);
+      menuScreen::job_status_value_cb(index, value, action);
       // Todo : update other screens calling each callback update function
     }
   }
@@ -628,10 +628,10 @@ void main_display_menu() {
  */
 void main_screen_delay_timer_cb(lv_timer_t *timer) {
   // If timer is not null, delete it to avoid multiple call
-  if (main_screen_delay_timer) {
+  if (main_screen_delay_timer && lv_timer_is_valid(main_screen_delay_timer)) {
     lv_timer_del(main_screen_delay_timer);
-    main_screen_delay_timer = NULL;
-  }
+  } 
+  main_screen_delay_timer = NULL;
   switch (next_screen) {
     case ESP3DScreenType::none:
       emptyScreen::create();
@@ -654,7 +654,7 @@ void main_screen_delay_timer_cb(lv_timer_t *timer) {
       break;
 #endif  // ESP3D_SD_CARD_FEATURE
     case ESP3DScreenType::menu:
-      menuScreen::menu_screen();
+      menuScreen::create();
       break;
 
     default:

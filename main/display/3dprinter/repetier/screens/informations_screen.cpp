@@ -59,7 +59,7 @@ void informations_screen_delay_timer_cb(lv_timer_t *timer) {
     lv_timer_del(informations_screen_delay_timer);
     informations_screen_delay_timer = NULL;
   }
-  menuScreen::menu_screen();
+  menuScreen::create();
 }
 
 void event_button_informations_back_handler(lv_event_t *e) {

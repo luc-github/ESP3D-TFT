@@ -50,7 +50,7 @@ lv_timer_t *menu_screen_delay_timer = NULL;
 ESP3DScreenType menu_next_screen = ESP3DScreenType::none;
 bool intialization_done = false;
 
-void menu_screen_job_status_value_cb(ESP3DValuesIndex index, const char *value,
+void job_status_value_cb(ESP3DValuesIndex index, const char *value,
                                      ESP3DValuesCbAction action) {
   if (action == ESP3DValuesCbAction::Update) {
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::menu) {
@@ -139,7 +139,7 @@ void event_button_informations_handler(lv_event_t *e) {
     menu_screen_delay_timer_cb(NULL);
 }
 
-void menu_screen() {
+void create() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   if (!intialization_done) {
     esp3d_log("menu screen initialization");

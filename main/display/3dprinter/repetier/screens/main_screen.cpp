@@ -283,7 +283,7 @@ bool job_status_value_cb(ESP3DValuesIndex index, const char *value,
 #endif  // ESP3D_SD_CARD_FEATURE
       main_display_menu();
     } else {
-      menuScreen::menu_screen_job_status_value_cb(index, value, action);
+      menuScreen::job_status_value_cb(index, value, action);
       // Todo : update other screens calling each callback update function
     }
   }
@@ -490,7 +490,7 @@ void main_screen_delay_timer_cb(lv_timer_t *timer) {
       break;
 #endif  // ESP3D_SD_CARD_FEATURE
     case ESP3DScreenType::menu:
-      menuScreen::menu_screen();
+      menuScreen::create();
       break;
 
     default:

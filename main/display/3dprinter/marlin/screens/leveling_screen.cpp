@@ -61,7 +61,7 @@ void leveling_screen_delay_timer_cb(lv_timer_t *timer) {
       manualLevelingScreen::manual_leveling_screen(auto_leveling);
       break;
     case ESP3DScreenType::menu:
-      menuScreen::menu_screen();
+      menuScreen::create();
       break;
     default:
       break;

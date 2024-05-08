@@ -78,7 +78,7 @@ void manual_leveling_screen_delay_timer_cb(lv_timer_t *timer) {
   if (auto_leveling) {
     levelingScreen::leveling_screen(auto_leveling);
   } else {
-    menuScreen::menu_screen();
+    menuScreen::create();
   }
 }
 

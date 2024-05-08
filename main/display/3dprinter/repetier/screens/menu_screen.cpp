@@ -83,7 +83,7 @@ void menu_display_disable_steppers() {
   }
 }
 
-void menu_screen_job_status_value_cb(ESP3DValuesIndex index, const char *value,
+void job_status_value_cb(ESP3DValuesIndex index, const char *value,
                                      ESP3DValuesCbAction action) {
   if (action == ESP3DValuesCbAction::Update) {
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::menu) {
@@ -216,7 +216,7 @@ void event_button_disable_steppers_handler(lv_event_t *e) {
                                   text.c_str());
 }
 
-void menu_screen() {
+void create() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   if (!intialization_done) {
     esp3d_log("menu screen initialization");
