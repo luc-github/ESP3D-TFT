@@ -20,9 +20,9 @@
 #pragma once
 
 namespace manualLevelingScreen {
-extern void create(bool auto_leveling);
-extern void bed_width(double value);
-extern void bed_depth(double value);
-extern void invert_x(bool value);
-extern void invert_y(bool value);
+void create(bool auto_leveling);
+void bed_width(double value);
+void bed_depth(double value);
+void invert_x(bool value);
+void invert_y(bool value);
 }  // namespace manualLevelingScreen

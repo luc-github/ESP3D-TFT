@@ -25,12 +25,14 @@
 #include "components/back_button_component.h"
 #include "components/symbol_button_component.h"
 #include "esp3d_log.h"
+#include "esp3d_lvgl.h"
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
-#include "screens/leveling_screen.h"
 #include "rendering/esp3d_rendering_client.h"
+#include "screens/leveling_screen.h"
 #include "translations/esp3d_translation_service.h"
+
 
 /*
 Command
@@ -68,9 +70,10 @@ ok
 */
 
 /**********************
- *  STATIC PROTOTYPES
+ *  Namespace
  **********************/
 namespace autoLevelingScreen {
+// Static variables
 lv_timer_t *auto_leveling_screen_delay_timer = NULL;
 lv_timer_t *auto_leveling_screen_probe_delay_timer = NULL;
 bool auto_leveling_started = false;
@@ -80,6 +83,18 @@ lv_obj_t *btn_start = NULL;
 lv_obj_t *label_status = nullptr;
 bool homing_done = false;
 
+// Static functions
+/**
+ * @brief Extracts a numerical value from a string based on a given value.
+ *
+ * This function searches for the occurrence of a given value within a string
+ * and extracts the numerical value that follows it.
+ *
+ * @param str The string to search within.
+ * @param value The value to search for.
+ * @return The extracted numerical value. If the value is not found, 0 is
+ * returned.
+ */
 double get_value(const char *str, const char *value) {
   char *pstr = strstr(str, value);
   if (pstr == NULL) return 0;
@@ -88,21 +103,40 @@ double get_value(const char *str, const char *value) {
   return val;
 }
 
+/**
+ * Callback function for the auto leveling screen probe delay timer.
+ * This function is called when the timer expires.
+ *
+ * @param timer The timer object that triggered the callback.
+ */
 void auto_leveling_screen_probe_delay_timer_cb(lv_timer_t *timer) {
   if (esp3dTftui.get_current_screen() != ESP3DScreenType::auto_leveling) {
     return;
   }
-  if (auto_leveling_screen_probe_delay_timer) {
+  if (auto_leveling_screen_probe_delay_timer &&
+      lv_timer_is_valid(auto_leveling_screen_probe_delay_timer)) {
     lv_timer_del(auto_leveling_screen_probe_delay_timer);
-    auto_leveling_screen_probe_delay_timer = NULL;
   }
+  auto_leveling_screen_probe_delay_timer = NULL;
   const char *text = (const char *)timer->user_data;
   esp3d_log("Update status %s", text);
   lv_label_set_text(label_status, text);
 }
 
+/**
+ * @brief Callback function for auto leveling.
+ *
+ * This function is called when a value related to auto leveling is received.
+ * It handles different actions such as adding, deleting, and updating auto
+ * leveling data.
+ *
+ * @param index The index of the value received.
+ * @param value The value received.
+ * @param action The action to be performed on the value.
+ * @return True if the callback handled the value successfully, false otherwise.
+ */
 bool callback(ESP3DValuesIndex index, const char *value,
-                            ESP3DValuesCbAction action) {
+              ESP3DValuesCbAction action) {
   static uint8_t col = 0;
   static uint8_t row = 0;
   static double x = 0;
@@ -206,11 +240,20 @@ bool callback(ESP3DValuesIndex index, const char *value,
   return false;
 }
 
+/**
+ * @brief Callback function for the auto leveling screen delay timer.
+ *
+ * This function is called when the auto leveling screen delay timer expires.
+ * It performs various actions such as deleting timers, sending abort commands,
+ * and clearing flags.
+ *
+ * @param timer A pointer to the timer that triggered the callback.
+ */
 void auto_leveling_screen_delay_timer_cb(lv_timer_t *timer) {
-  if (auto_leveling_screen_delay_timer) {
-    lv_timer_del(auto_leveling_screen_delay_timer);
-    auto_leveling_screen_delay_timer = NULL;
+  if (auto_leveling_screen_delay_timer && lv_timer_is_valid(auto_leveling_screen_delay_timer)) {
+    lv_timer_del(auto_leveling_screen_delay_timer);  
   }
+  auto_leveling_screen_delay_timer = NULL;
   if (auto_leveling_started) {
     auto_leveling_started = false;
     // TODO send abort command if any and if supported / have emergency parser
@@ -224,6 +267,17 @@ void auto_leveling_screen_delay_timer_cb(lv_timer_t *timer) {
   levelingScreen::create(true);
 }
 
+/**
+ * Event handler for the "auto leveling start" button click event.
+ * This function is responsible for handling the logic when the "auto leveling
+ * start" button is clicked. It checks if auto leveling has already started, and
+ * if not, it performs homing if necessary and starts the leveling process. It
+ * also hides the "start" button and clears the table before sending the G29 V4
+ * command to start auto leveling.
+ *
+ * @param e The pointer to the lv_event_t structure containing information about
+ * the event.
+ */
 void event_button_auto_leveling_start_handler(lv_event_t *e) {
   esp3d_log("start Clicked");
   if (auto_leveling_started) return;
@@ -240,35 +294,77 @@ void event_button_auto_leveling_start_handler(lv_event_t *e) {
   renderingClient.sendGcode("G29 V4");
 }
 
+/**
+ * @brief Event handler for the "back" button in the auto leveling screen.
+ *
+ * This function is called when the "back" button is clicked in the auto
+ * leveling screen. It logs a message indicating that the button has been
+ * clicked and then checks if there is a delay set for button animation. If
+ * there is a delay, it creates a timer to delay the execution of the callback
+ * function. If there is no delay, it directly calls the callback function.
+ *
+ * @param e Pointer to the lv_event_t structure containing information about the
+ * event.
+ */
 void event_button_fan_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
   if (ESP3D_BUTTON_ANIMATION_DELAY) {
     if (auto_leveling_screen_delay_timer) return;
-    auto_leveling_screen_delay_timer = lv_timer_create(
-        auto_leveling_screen_delay_timer_cb, ESP3D_BUTTON_ANIMATION_DELAY, NULL);
+    auto_leveling_screen_delay_timer =
+        lv_timer_create(auto_leveling_screen_delay_timer_cb,
+                        ESP3D_BUTTON_ANIMATION_DELAY, NULL);
   } else {
     auto_leveling_screen_delay_timer_cb(NULL);
   }
 }
 
+/**
+ * @brief Creates the auto leveling screen.
+ *
+ * This function creates the auto leveling screen by performing the following
+ * steps:
+ * 1. Sets the current screen to none.
+ * 2. Creates a new UI screen.
+ * 3. Displays the new screen and deletes the old one.
+ * 4. Applies the main background style to the new screen.
+ * 5. Initializes some variables and creates a back button.
+ * 6. Creates a table for displaying auto leveling data.
+ * 7. Creates a start button for initiating auto leveling.
+ * 8. Creates a label for displaying the status of auto leveling.
+ * 9. Sets the current screen to auto leveling.
+ */
 void create() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Auto leveling screen creation");
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
+  if (!lv_obj_is_valid(ui_new_screen)) {
+    esp3d_log_e("Failed to create auto leveling screen");
+    return;
+  }
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
   ESP3DStyle::apply(ui_new_screen, ESP3DStyleType::main_bg);
-  lv_obj_del(ui_current_screen);
+  if (lv_obj_is_valid(ui_current_screen)) {
+    lv_obj_del(ui_current_screen);
+  }
 
   homing_done = false;
   btn_back = backButton::create(ui_new_screen);
+  if (!lv_obj_is_valid(btn_back)) {
+    esp3d_log_e("Failed to create back button");
+    return;
+  }
   lv_obj_add_event_cb(btn_back, event_button_fan_back_handler, LV_EVENT_CLICKED,
                       NULL);
   lv_obj_update_layout(btn_back);
   // Create a table
   auto_leveling_screen_table = lv_table_create(ui_new_screen);
+  if (!lv_obj_is_valid(auto_leveling_screen_table)) {
+    esp3d_log_e("Failed to create auto leveling table");
+    return;
+  }
   lv_obj_set_size(auto_leveling_screen_table,
                   (LV_HOR_RES) - (2 * ESP3D_BUTTON_PRESSED_OUTLINE),
                   LV_VER_RES - (3 * ESP3D_BUTTON_PRESSED_OUTLINE) -
@@ -276,11 +372,15 @@ void create() {
   lv_obj_set_pos(auto_leveling_screen_table, ESP3D_BUTTON_PRESSED_OUTLINE,
                  ESP3D_BUTTON_PRESSED_OUTLINE);
   lv_obj_clear_flag(auto_leveling_screen_table, LV_OBJ_FLAG_SCROLL_ELASTIC);
-  lv_obj_set_style_radius(auto_leveling_screen_table,
-                          ESP3D_BUTTON_RADIUS , 0);
+  lv_obj_set_style_radius(auto_leveling_screen_table, ESP3D_BUTTON_RADIUS, 0);
   // button start
-  btn_start = symbolButton::create(
-      ui_new_screen, LV_SYMBOL_PLAY, ESP3D_BACK_BUTTON_WIDTH, ESP3D_BACK_BUTTON_HEIGHT);
+  btn_start =
+      symbolButton::create(ui_new_screen, LV_SYMBOL_PLAY,
+                           ESP3D_BACK_BUTTON_WIDTH, ESP3D_BACK_BUTTON_HEIGHT);
+  if (!lv_obj_is_valid(btn_start)) {
+    esp3d_log_e("Failed to create start button");
+    return;
+  }
   lv_obj_align_to(btn_start, auto_leveling_screen_table,
                   LV_ALIGN_OUT_BOTTOM_MID, 0, ESP3D_BUTTON_PRESSED_OUTLINE);
 
@@ -288,6 +388,10 @@ void create() {
                       LV_EVENT_CLICKED, NULL);
 
   label_status = lv_label_create(ui_new_screen);
+  if (!lv_obj_is_valid(label_status)) {
+    esp3d_log_e("Failed to create status label");
+    return;
+  }
   ESP3DStyle::apply(label_status, ESP3DStyleType::bg_label);
   lv_label_set_text(label_status, "");
   lv_obj_align_to(label_status, auto_leveling_screen_table,

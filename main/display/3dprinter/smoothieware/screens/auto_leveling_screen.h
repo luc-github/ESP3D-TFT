@@ -20,7 +20,7 @@
 #pragma once
 #include "esp3d_values.h"
 namespace autoLevelingScreen {
-extern void create();
-extern bool callback(ESP3DValuesIndex index, const char *value,
+void create();
+bool callback(ESP3DValuesIndex index, const char *value,
                                    ESP3DValuesCbAction action);
 }  // namespace autoLevelingScreen

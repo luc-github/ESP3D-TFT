@@ -20,5 +20,5 @@
 #pragma once
 
 namespace levelingScreen {
-extern void create(bool auto_leveling);
+void create(bool auto_leveling);
 }  // namespace levelingScreen
