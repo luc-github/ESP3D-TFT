@@ -264,7 +264,7 @@ bool speed_value_cb(ESP3DValuesIndex index, const char *value,
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
       main_display_speed();
     } else {
-      speedScreen::speed_value_cb(index, value, action);
+      speedScreen::callback(index, value, action);
     }
   }
   return true;
@@ -637,7 +637,7 @@ void main_screen_delay_timer_cb(lv_timer_t *timer) {
       emptyScreen::create();
       break;
     case ESP3DScreenType::temperatures:
-      temperaturesScreen::temperatures_screen(main_screen_temperature_target);
+      temperaturesScreen::create(main_screen_temperature_target);
       break;
     case ESP3DScreenType::positions:
       positionsScreen::create();
@@ -646,7 +646,7 @@ void main_screen_delay_timer_cb(lv_timer_t *timer) {
       fanScreen::create();
       break;
     case ESP3DScreenType::speed:
-      speedScreen::speed_screen();
+      speedScreen::create();
       break;
 #if ESP3D_SD_CARD_FEATURE
     case ESP3DScreenType::files:

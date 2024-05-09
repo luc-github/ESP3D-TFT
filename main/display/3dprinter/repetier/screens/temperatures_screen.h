@@ -23,7 +23,7 @@
 #include "screens/esp3d_screen_type.h"
 
 namespace temperaturesScreen {
-extern void temperatures_screen(
+extern void create(
     uint8_t target, ESP3DScreenType screenreturn = ESP3DScreenType::main);
 extern bool extruder_0_value_cb(ESP3DValuesIndex index, const char *value,
                                 ESP3DValuesCbAction action);

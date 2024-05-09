@@ -404,7 +404,7 @@ void heater_matrix_buttons_event_cb(lv_event_t *e) {
   }
 }
 
-void temperatures_screen(uint8_t target, ESP3DScreenType screenreturn) {
+void create(uint8_t target, ESP3DScreenType screenreturn) {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   screen_return = screenreturn;
   if (!intialization_done) {

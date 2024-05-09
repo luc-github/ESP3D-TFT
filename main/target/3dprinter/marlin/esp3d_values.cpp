@@ -125,7 +125,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::integer_t,
       0,  // precision
       std::string("100"),
-      mainScreen::speed_value_cb,
+      mainScreen::callback,
   });
 
   //  x position

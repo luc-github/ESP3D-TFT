@@ -146,7 +146,7 @@ void speed_matrix_buttons_event_cb(lv_event_t *e) {
   esp3d_log("Button %s clicked", speed_buttons_map[id]);
 }
 
-bool speed_value_cb(ESP3DValuesIndex index, const char *value,
+bool callback(ESP3DValuesIndex index, const char *value,
                     ESP3DValuesCbAction action) {
   if (esp3dTftui.get_current_screen() != ESP3DScreenType::speed) return false;
   esp3d_log("Speed value  %s", value);
@@ -154,7 +154,7 @@ bool speed_value_cb(ESP3DValuesIndex index, const char *value,
   return true;
 }
 
-void speed_screen() {
+void create() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Speed screen creation");
