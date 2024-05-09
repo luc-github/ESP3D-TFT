@@ -101,7 +101,7 @@ void auto_leveling_screen_probe_delay_timer_cb(lv_timer_t *timer) {
   lv_label_set_text(label_status, text);
 }
 
-bool auto_leveling_value_cb(ESP3DValuesIndex index, const char *value,
+bool callback(ESP3DValuesIndex index, const char *value,
                             ESP3DValuesCbAction action) {
   static uint8_t col = 0;
   static uint8_t row = 0;
@@ -201,7 +201,7 @@ bool auto_leveling_value_cb(ESP3DValuesIndex index, const char *value,
       return true;
     }
   }
-  esp3d_log("auto_leveling_value_cb %d, action: %d, value: %s", (uint16_t)index,
+  esp3d_log("callback %d, action: %d, value: %s", (uint16_t)index,
             (uint16_t)action, value);
   return false;
 }
@@ -251,7 +251,7 @@ void event_button_fan_back_handler(lv_event_t *e) {
   }
 }
 
-void auto_leveling_screen() {
+void create() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Auto leveling screen creation");

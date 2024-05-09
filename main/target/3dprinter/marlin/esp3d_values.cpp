@@ -107,7 +107,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::integer_t,
       0,  // precision
       std::string("0"),
-      mainScreen::fan_value_cb,
+      mainScreen::callback,
   });
 
   //  ext 1 fan
@@ -116,7 +116,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::integer_t,
       0,  // precision
       std::string("0"),
-      mainScreen::fan_value_cb,
+      mainScreen::callback,
   });
 
   //
@@ -164,7 +164,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::string_t,
       100,  // precision
       std::string("?"),
-      autoLevelingScreen::auto_leveling_value_cb,
+      autoLevelingScreen::callback,
   });
 
   //  print status

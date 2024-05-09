@@ -32,7 +32,7 @@ bool bed_value_cb(ESP3DValuesIndex index, const char *value,
                          ESP3DValuesCbAction action);
 bool position_value_cb(ESP3DValuesIndex index, const char *value,
                               ESP3DValuesCbAction action);
-bool fan_value_cb(ESP3DValuesIndex index, const char *value,
+bool callback(ESP3DValuesIndex index, const char *value,
                          ESP3DValuesCbAction action);
 bool speed_value_cb(ESP3DValuesIndex index, const char *value,
                            ESP3DValuesCbAction action);

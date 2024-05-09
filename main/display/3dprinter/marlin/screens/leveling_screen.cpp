@@ -55,7 +55,7 @@ void leveling_screen_delay_timer_cb(lv_timer_t *timer) {
 
   switch (leveling_next_screen) {
     case ESP3DScreenType::auto_leveling:
-      autoLevelingScreen::auto_leveling_screen();
+      autoLevelingScreen::create();
       break;
     case ESP3DScreenType::manual_leveling:
       manualLevelingScreen::manual_leveling_screen(auto_leveling);

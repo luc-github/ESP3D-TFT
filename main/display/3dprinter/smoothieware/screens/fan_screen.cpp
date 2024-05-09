@@ -234,9 +234,9 @@ void fan_matrix_buttons_event_cb(lv_event_t *e) {
   esp3d_log("Button %s clicked", fan_buttons_map[id]);
 }
 
-bool fan_value_cb(ESP3DValuesIndex index, const char *value,
+bool callback(ESP3DValuesIndex index, const char *value,
                   ESP3DValuesCbAction action) {
-  esp3d_log("fan_value_cb %s", value);
+  esp3d_log("callback %s", value);
   if (esp3dTftui.get_current_screen() != ESP3DScreenType::fan) {
     esp3d_log("Not current screen");
     return false;
@@ -280,7 +280,7 @@ bool fan_value_cb(ESP3DValuesIndex index, const char *value,
   return false;
 }
 
-void fan_screen() {
+void create() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Fan screen creation");

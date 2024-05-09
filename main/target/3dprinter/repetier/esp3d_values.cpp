@@ -164,7 +164,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::string_t,
       100,  // precision
       std::string("?"),
-      autoLevelingScreen::auto_leveling_value_cb,
+      autoLevelingScreen::callback,
   });
 
   //  print status
