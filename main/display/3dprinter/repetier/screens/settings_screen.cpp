@@ -393,20 +393,20 @@ void setting_edit_done_cb(const char *str, void *data) {
         renderingClient.setPolling(val_byte);
         break;
       case ESP3DSettingIndex::esp3d_inverved_x:
-        manualLevelingScreen::update_invert_x(val_byte);
+        manualLevelingScreen::invert_x(val_byte);
         break;
       case ESP3DSettingIndex::esp3d_inverved_y:
-        manualLevelingScreen::update_invert_y(val_byte);
+        manualLevelingScreen::invert_y(val_byte);
         break;
       case ESP3DSettingIndex::esp3d_auto_level_on:
         menuScreen::enable_auto_leveling(val_byte);
         break;
       case ESP3DSettingIndex::esp3d_bed_width:
-        manualLevelingScreen::update_bed_width(
+        manualLevelingScreen::bed_width(
             strtod(val_string.c_str(), NULL));
         break;
       case ESP3DSettingIndex::esp3d_bed_depth:
-        manualLevelingScreen::update_bed_depth(
+        manualLevelingScreen::bed_depth(
             strtod(val_string.c_str(), NULL));
         break;
       default:

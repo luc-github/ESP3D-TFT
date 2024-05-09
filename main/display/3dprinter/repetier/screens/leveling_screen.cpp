@@ -58,7 +58,7 @@ void leveling_screen_delay_timer_cb(lv_timer_t *timer) {
       autoLevelingScreen::create();
       break;
     case ESP3DScreenType::manual_leveling:
-      manualLevelingScreen::manual_leveling_screen(auto_leveling);
+      manualLevelingScreen::create(auto_leveling);
       break;
     case ESP3DScreenType::menu:
       menuScreen::create();
@@ -107,7 +107,7 @@ void event_button_auto_handler(lv_event_t *e) {
   }
 }
 
-void leveling_screen(bool autoleveling) {
+void create(bool autoleveling) {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   auto_leveling = autoleveling;
   // Screen creation

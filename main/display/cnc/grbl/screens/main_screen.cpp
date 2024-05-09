@@ -82,7 +82,7 @@ std::string progression_area_str = "";
 //     if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
 //       main_display_positions();
 //     } else {
-//       positionsScreen::positions_values_cb(index, value, action);
+//       positionsScreen::callback(index, value, action);
 //     }
 //   }
 //   return true;
@@ -271,7 +271,7 @@ void main_screen_delay_timer_cb(lv_timer_t *timer) {
       emptyScreen::create();
       break;
     // case ESP3DScreenType::positions:
-    //   positionsScreen::positions_screen();
+    //   positionsScreen::create();
     //   break;
 #if ESP3D_SD_CARD_FEATURE
     case ESP3DScreenType::files:

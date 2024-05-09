@@ -104,16 +104,16 @@ void menu_screen_delay_timer_cb(lv_timer_t *timer) {
       mainScreen::create();
       break;
     case ESP3DScreenType::filament:
-      filamentScreen::filament_screen();
+      filamentScreen::create();
       break;
     case ESP3DScreenType::settings:
       settingsScreen::create();
       break;
     case ESP3DScreenType::leveling:
       if (auto_leveling) {
-        levelingScreen::leveling_screen(auto_leveling);
+        levelingScreen::create(auto_leveling);
       } else {
-        manualLevelingScreen::manual_leveling_screen(auto_leveling);
+        manualLevelingScreen::create(auto_leveling);
       }
       break;
     case ESP3DScreenType::informations:

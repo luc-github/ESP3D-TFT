@@ -64,11 +64,11 @@ bool invert_x = false;
 bool invert_y = false;
 #define DEFAULT_Z_DISTANCE 15
 lv_timer_t *manual_leveling_screen_delay_timer = NULL;
-void update_bed_width(double value) { bed_width = value; }
+void bed_width(double value) { bed_width = value; }
 
-void update_bed_depth(double value) { bed_depth = value; }
-void update_invert_x(bool value) { invert_x = value; }
-void update_invert_y(bool value) { invert_y = value; }
+void bed_depth(double value) { bed_depth = value; }
+void invert_x(bool value) { invert_x = value; }
+void invert_y(bool value) { invert_y = value; }
 
 void manual_leveling_screen_delay_timer_cb(lv_timer_t *timer) {
   if (manual_leveling_screen_delay_timer) {
@@ -76,7 +76,7 @@ void manual_leveling_screen_delay_timer_cb(lv_timer_t *timer) {
     manual_leveling_screen_delay_timer = NULL;
   }
   if (auto_leveling) {
-    levelingScreen::leveling_screen(auto_leveling);
+    levelingScreen::create(auto_leveling);
   } else {
     menuScreen::create();
   }
@@ -339,7 +339,7 @@ void event_button_manual_leveling_start_handler(lv_event_t *e) {
                             LV_BTNMATRIX_CTRL_CHECKED);
   move_to_position(leveling_position_buttons_map_id);
 }
-void manual_leveling_screen(bool autoleveling) {
+void create(bool autoleveling) {
   auto_leveling = autoleveling;
   leveling_position_buttons_map_id = -1;
   homing_done = false;
@@ -351,16 +351,16 @@ void manual_leveling_screen(bool autoleveling) {
     char buffer[16];
     uint8_t byte_value =
         esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_inverved_x);
-    update_invert_x(byte_value == 1 ? true : false);
+    invert_x(byte_value == 1 ? true : false);
     byte_value = esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_inverved_y);
-    update_invert_y(byte_value == 1 ? true : false);
+    invert_y(byte_value == 1 ? true : false);
     std::string str_value = esp3dTftsettings.readString(
         ESP3DSettingIndex::esp3d_bed_width, buffer, 16);
-    update_bed_width(std::strtod(str_value.c_str(),
+    bed_width(std::strtod(str_value.c_str(),
                                  NULL));  // update width value
     str_value = esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_bed_depth,
                                             buffer, 16);
-    update_bed_depth(std::strtod(str_value.c_str(),
+    bed_depth(std::strtod(str_value.c_str(),
                                  NULL));  // update depth value
     intialization_done = true;
   }

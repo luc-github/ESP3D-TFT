@@ -56,7 +56,7 @@ lv_obj_t *btn_set = NULL;
 
 bool intialization_done = false;
 
-bool positions_values_cb(ESP3DValuesIndex index, const char *value,
+bool callback(ESP3DValuesIndex index, const char *value,
                          ESP3DValuesCbAction action) {
   if (esp3dTftui.get_current_screen() != ESP3DScreenType::positions)
     return false;
@@ -290,7 +290,7 @@ void axis_matrix_buttons_event_cb(lv_event_t *e) {
   lv_textarea_set_text(position_ta, position_value_init.c_str());
 }
 
-void positions_screen(uint8_t target_id) {
+void create(uint8_t target_id) {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   if (target_id != 255) {
     axis_buttons_map_id = target_id;

@@ -223,7 +223,7 @@ void filament_matrix_buttons_event_cb(lv_event_t *e) {
   esp3d_log("Button %s clicked", filament_buttons_map[filament_buttons_map_id]);
 }
 
-bool filament_value_cb(ESP3DValuesIndex index, const char *value,
+bool callback(ESP3DValuesIndex index, const char *value,
                        ESP3DValuesCbAction action) {
   if (esp3dTftui.get_current_screen() != ESP3DScreenType::filament)
     return false;
@@ -263,7 +263,7 @@ bool filament_value_cb(ESP3DValuesIndex index, const char *value,
   return false;
 }
 
-void filament_screen() {
+void create() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Filament screen creation");

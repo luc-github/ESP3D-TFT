@@ -102,7 +102,7 @@ bool extruder_0_value_cb(ESP3DValuesIndex index, const char *value,
     } else {
       // update other screens calling each callback update function
       temperaturesScreen::extruder_0_value_cb(index, value, action);
-      filamentScreen::filament_value_cb(index, value, action);
+      filamentScreen::callback(index, value, action);
     }
   }
   return true;
@@ -118,7 +118,7 @@ bool extruder_1_value_cb(ESP3DValuesIndex index, const char *value,
       //  update other screens calling each callback update function
       temperaturesScreen::extruder_1_value_cb(index, value, action);
       fanScreen::callback(index, value, action);
-      filamentScreen::filament_value_cb(index, value, action);
+      filamentScreen::callback(index, value, action);
     }
   }
   return true;
@@ -143,7 +143,7 @@ bool position_value_cb(ESP3DValuesIndex index, const char *value,
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
       main_display_positions();
     } else {
-      positionsScreen::positions_values_cb(index, value, action);
+      positionsScreen::callback(index, value, action);
     }
   }
   return true;
@@ -476,7 +476,7 @@ void main_screen_delay_timer_cb(lv_timer_t *timer) {
       temperaturesScreen::temperatures_screen(main_screen_temperature_target);
       break;
     case ESP3DScreenType::positions:
-      positionsScreen::positions_screen();
+      positionsScreen::create();
       break;
     case ESP3DScreenType::fan:
       fanScreen::create();

@@ -264,7 +264,7 @@ void auto_leveling_screen_delay_timer_cb(lv_timer_t *timer) {
     auto_leveling_screen_probe_delay_timer = NULL;
   }
   lv_obj_clear_flag(btn_start, LV_OBJ_FLAG_HIDDEN);
-  levelingScreen::leveling_screen(true);
+  levelingScreen::create(true);
 }
 
 /**
