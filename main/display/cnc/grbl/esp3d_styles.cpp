@@ -21,27 +21,7 @@
 #include "esp3d_styles.h"
 
 #include "esp3d_log.h"
-
-#define ESP3D_SCREEN_BACKGROUND_COLOR lv_color_hex(0x000000)
-
-#define ESP3D_SCREEN_BACKGROUND_TEXT_COLOR lv_color_hex(0xFFFFFF)
-
-#define ESP3D_STATUS_BAR_TEXT_COLOR lv_color_hex(0x000000)
-#define ESP3D_STATUS_BAR_BG_COLOR lv_color_hex(0xFFFFFF)
-
-#define ESP3D_STATUS_BAR_BORDER_COLOR lv_palette_main(LV_PALETTE_GREY)
-
-#define ESP3D_BUTTON_COLOR_PALETTE LV_PALETTE_GREY
-#define ESP3D_BUTTON_COLOR_PALETTE_DARKEN 2
-
-#define ESP3D_BUTTON_BORDER_COLOR \
-  lv_color_hex(0xFFFFFF)  // lv_palette_main(LV_PALETTE_GREY)
-#define ESP3D_BUTTON_TEXT_COLOR lv_color_hex(0xFFFFFF)
-#define ESP3D_BUTTON_OUTLINE_COLOR_PALETTE LV_PALETTE_GREEN
-#define ESP3D_BUTTON_PRESSED_COLOR_PALETTE LV_PALETTE_GREY
-#define ESP3D_BUTTON_PRESSED_TEXT_COLOR lv_color_hex(0x00FF00)
-#define ESP3D_BUTTON_PRESSED_BORDER_COLOR lv_color_hex(0x00FF00)
-
+namespace ESP3DStyle {
 // Create styles for main background
 lv_style_t style_main_bg;
 lv_style_t style_bg_label;
@@ -82,7 +62,7 @@ lv_style_t style_text_container;
 lv_style_t style_spinner_screen;
 lv_style_t style_spinner_text;
 
-bool ESP3DStyle::init() {
+bool init() {
   /*
   Spinner screen
   */
@@ -551,7 +531,7 @@ bool ESP3DStyle::init() {
   return true;
 }
 
-bool ESP3DStyle::apply(lv_obj_t* obj, ESP3DStyleType type) {
+bool apply(lv_obj_t* obj, ESP3DStyleType type) {
   if (type != ESP3DStyleType::main_bg && type != ESP3DStyleType::status_list &&
       type != ESP3DStyleType::buttons_msgbox &&
       type != ESP3DStyleType::message_box &&
@@ -688,7 +668,7 @@ bool ESP3DStyle::apply(lv_obj_t* obj, ESP3DStyleType type) {
   return true;
 }
 
-bool ESP3DStyle::add_pad(lv_obj_t* obj) {
+bool add_pad(lv_obj_t* obj) {
   lv_obj_set_style_pad_left(obj, ESP3D_BUTTON_PRESSED_OUTLINE, LV_PART_MAIN);
   lv_obj_set_style_pad_right(obj, ESP3D_BUTTON_PRESSED_OUTLINE, LV_PART_MAIN);
   lv_obj_set_style_pad_top(obj, ESP3D_BUTTON_PRESSED_OUTLINE, LV_PART_MAIN);
@@ -696,3 +676,4 @@ bool ESP3DStyle::add_pad(lv_obj_t* obj) {
                               LV_PART_MAIN);
   return true;
 }
+}  // namespace ESP3DStyle

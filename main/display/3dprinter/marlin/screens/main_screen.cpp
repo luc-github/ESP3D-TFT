@@ -1139,7 +1139,7 @@ void create() {
   main_display_pause();
   main_display_resume();
 #if ESP3D_SD_CARD_FEATURE
-  main_display_files();
+  main_display_files();  
 #endif  // ESP3D_SD_CARD_FEATURE
   main_display_stop();
   main_display_menu();

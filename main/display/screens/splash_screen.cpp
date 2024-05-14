@@ -159,7 +159,7 @@ void display() {
   // Set version text
   lv_label_set_text(label, "V" ESP3D_TFT_VERSION);
   ESP3DStyle::apply(label, ESP3DStyleType::bg_label);
-  lv_obj_align(label, LV_ALIGN_BOTTOM_RIGHT, -10, -10);
+  lv_obj_align(label, LV_ALIGN_BOTTOM_RIGHT, VERSION_X, VERSION_Y);
 
   // Set timer to switch to main screen
   boot_timer = lv_timer_create(main_screen_timer_cb, 2000, NULL);
