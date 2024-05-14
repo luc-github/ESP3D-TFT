@@ -25,6 +25,7 @@
 #include "esp3d_styles_res.h"
 #include "lvgl.h"
 
+//Styles for common controls
 enum class ESP3DStyleType : uint8_t {
   default_style = 0,
   main_bg,
@@ -77,10 +78,9 @@ namespace ESP3DStyle {
 #define ESP3D_STATUS_BAR_BG_COLOR lv_color_hex(0xFFFFFF)
 #define ESP3D_STATUS_BAR_BORDER_COLOR lv_palette_main(LV_PALETTE_GREY)
 
-// Progression area styles
-//Status bar colors
-#define ESP3D_PROGRESSSION_AREA_TEXT_COLOR lv_color_hex(0x000000)
-#define ESP3D_PROGRESSSION_AREA_BG_COLOR lv_color_hex(0xFFFFFF)
-#define ESP3D_PROGRESSSION_AREA_BORDER_COLOR lv_palette_main(LV_PALETTE_GREY)
 
+//Progression area colors
+#define ESP3D_PROGRESSION_AREA_TEXT_COLOR lv_color_hex(0x000000)
+#define ESP3D_PROGRESSION_AREA_BG_COLOR lv_color_hex(0xFFFFFF)
+#define ESP3D_PROGRESSION_AREA_BORDER_COLOR lv_palette_main(LV_PALETTE_GREY)
 

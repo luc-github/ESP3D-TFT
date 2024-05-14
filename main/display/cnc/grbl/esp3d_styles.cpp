@@ -19,6 +19,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "esp3d_styles.h"
+#include "esp3d_styles_res.h"
 
 #include "esp3d_log.h"
 namespace ESP3DStyle {
@@ -150,29 +151,25 @@ bool init() {
                             ESP3D_STATUS_BAR_BORDER_VALUE);
   lv_style_set_border_color(&style_status_bar_default,
                             ESP3D_STATUS_BAR_BORDER_COLOR);
-
   /*
-  Progression area
+    Progression area
   */
-   /*
-  Status bar
-  */
+
   lv_style_init(&style_progression_area);
 
   lv_style_set_text_opa(&style_progression_area, LV_OPA_COVER);
   lv_style_set_text_color(&style_progression_area,
                           ESP3D_PROGRESSION_AREA_TEXT_COLOR);
   lv_style_set_bg_opa(&style_progression_area, LV_OPA_COVER);
-  lv_style_set_bg_color(&style_progression_area, ESP3D_PROGRESSION_AREA_BG_COLOR);
-  lv_style_set_radius(&style_progression_area, ESP3D_PROGRESSION_AREA_RADIUS);
-  lv_style_set_pad_hor(&style_progression_area, ESP3D_PROGRESSION_AREA_H_PAD);
-  lv_style_set_pad_ver(&style_progression_area, ESP3D_PROGRESSION_AREA_V_PAD);
+  lv_style_set_bg_color(&style_progression_area,
+                        ESP3D_PROGRESSION_AREA_BG_COLOR);
+  lv_style_set_radius(&style_progression_area, ESP3D_STATUS_BAR_RADIUS);
+  lv_style_set_pad_hor(&style_progression_area, ESP3D_STATUS_BAR_H_PAD);
+  lv_style_set_pad_ver(&style_progression_area, ESP3D_STATUS_BAR_V_PAD);
   lv_style_set_border_width(&style_progression_area,
-                            ESP3D_PROGRESSION_AREA_BORDER_VALUE);
+                            ESP3D_STATUS_BAR_BORDER_VALUE);
   lv_style_set_border_color(&style_progression_area,
                             ESP3D_PROGRESSION_AREA_BORDER_COLOR);
-
-
   /*
    Scrollbar
   */
@@ -584,7 +581,13 @@ bool apply(lv_obj_t* obj, ESP3DStyleType type) {
       lv_label_set_long_mode(obj, LV_LABEL_LONG_SCROLL_CIRCULAR);
       lv_obj_set_width(obj, LV_HOR_RES);
       lv_obj_set_align(obj, LV_ALIGN_CENTER);
-
+      break;
+    case ESP3DStyleType::progression_area:
+      lv_obj_add_style(obj, &style_progression_area, LV_STATE_DEFAULT);
+      lv_label_set_long_mode(obj, LV_LABEL_LONG_SCROLL_CIRCULAR);
+      lv_obj_set_width(obj, ESP3D_PROGRESSION_AREA_WIDTH-ESP3D_SYMBOL_BUTTON_WIDTH);
+      lv_obj_set_height(obj, ESP3D_PROGRESSION_AREA_HEIGHT);
+      lv_obj_set_align(obj, LV_ALIGN_CENTER);
       break;
     case ESP3DStyleType::radio_button:
 #pragma GCC diagnostic push
