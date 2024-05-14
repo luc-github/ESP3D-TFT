@@ -47,6 +47,7 @@ enum class ESP3DStyleType : uint8_t {
   radio_button,
   list_container,
   text_container,
+  progression_area,
 };
 
 //Name space for styles
@@ -78,4 +79,8 @@ namespace ESP3DStyle {
 #define ESP3D_STATUS_BAR_BORDER_COLOR lv_palette_main(LV_PALETTE_GREY)
 
 
+//Progression area colors
+#define ESP3D_PROGRESSION_AREA_TEXT_COLOR lv_color_hex(0x000000)
+#define ESP3D_PROGRESSION_AREA_BG_COLOR lv_color_hex(0xFFFFFF)
+#define ESP3D_PROGRESSION_AREA_BORDER_COLOR lv_palette_main(LV_PALETTE_GREY)
 

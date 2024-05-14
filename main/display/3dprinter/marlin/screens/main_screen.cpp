@@ -1058,11 +1058,10 @@ void create() {
     esp3d_log_e("Error creating progression area label");
     return;
   }
-  ESP3DStyle::apply(main_label_progression_area, ESP3DStyleType::status_bar);
+  ESP3DStyle::apply(main_label_progression_area, ESP3DStyleType::progression_area);
 
   lv_obj_center(main_label_progression_area);
-  lv_obj_set_size(main_label_progression_area, ESP3D_STATUS_BAR_WIDTH,
-                  ESP3D_STATUS_BAR_HEIGHT);
+
   if (show_fan_button) {
     // Create button and label for fan
     main_btn_fan = menuButton::create(ui_bottom_buttons_container, "");

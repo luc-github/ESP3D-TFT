@@ -445,15 +445,15 @@ void create() {
 
   // Create button and label for middle container
   main_label_progression_area = lv_label_create(ui_middle_container);
-  ESP3DStyle::apply(main_label_progression_area, ESP3DStyleType::status_bar);
+  ESP3DStyle::apply(main_label_progression_area, ESP3DStyleType::progression_area);
 
    // Create button and label for reset
   main_btn_reset = symbolButton::create(ui_middle_container,
                                                   LV_SYMBOL_RESET);
 
   lv_obj_center(main_label_progression_area);
-  lv_obj_set_size(main_label_progression_area, ESP3D_STATUS_BAR_WIDTH-ESP3D_SYMBOL_BUTTON_WIDTH,
-                  ESP3D_STATUS_BAR_HEIGHT);
+  lv_obj_set_size(main_label_progression_area, ESP3D_PROGRESSION_AREA_WIDTH-ESP3D_SYMBOL_BUTTON_WIDTH,
+                  ESP3D_PROGRESSION_AREA_HEIGHT);
  
   // Create button and label for pause
   main_btn_pause = menuButton::create(ui_bottom_buttons_container,
