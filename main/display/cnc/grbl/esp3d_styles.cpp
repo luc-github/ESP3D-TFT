@@ -585,7 +585,7 @@ bool apply(lv_obj_t* obj, ESP3DStyleType type) {
     case ESP3DStyleType::progression_area:
       lv_obj_add_style(obj, &style_progression_area, LV_STATE_DEFAULT);
       lv_label_set_long_mode(obj, LV_LABEL_LONG_SCROLL_CIRCULAR);
-      lv_obj_set_width(obj, ESP3D_PROGRESSION_AREA_WIDTH-ESP3D_SYMBOL_BUTTON_WIDTH);
+      lv_obj_set_width(obj, ESP3D_PROGRESSION_AREA_WIDTH);
       lv_obj_set_height(obj, ESP3D_PROGRESSION_AREA_HEIGHT);
       lv_obj_set_align(obj, LV_ALIGN_CENTER);
       break;
