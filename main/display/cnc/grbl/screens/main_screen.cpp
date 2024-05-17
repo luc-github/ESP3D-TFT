@@ -69,10 +69,14 @@ lv_obj_t *main_btn_position_x = nullptr;
 lv_obj_t *main_btn_position_y = nullptr;
 lv_obj_t *main_btn_position_z = nullptr;
 lv_obj_t *main_btn_position_a = nullptr;
-lv_obj_t *main_btn_overload = nullptr;
+lv_obj_t *main_btn_override = nullptr;
+lv_obj_t *main_btn_milling = nullptr;
 
 lv_obj_t *main_btn_reset = nullptr;
 lv_obj_t *main_btn_switch_positions = nullptr;
+
+lv_obj_t *main_btn_unlock = nullptr;
+lv_obj_t *main_btn_abort = nullptr;
 
 lv_obj_t *main_btn_files = nullptr;
 lv_obj_t *main_btn_pause = nullptr;
@@ -438,13 +442,14 @@ void create() {
 
   // Create button for positionx
   main_btn_position_x = symbolButton::create(ui_positions_buttons_container,
-                                             "X: 0.0000", LV_HOR_RES / 3, 60);
+                                             "X: 0.0000", LV_HOR_RES / 3.5, 60);
   main_btn_position_y = symbolButton::create(ui_positions_buttons_container,
-                                             "Y: 0.0000", LV_HOR_RES / 3, 60);
+                                             "Y: 0.0000", LV_HOR_RES / 3.5, 60);
   main_btn_position_z = symbolButton::create(ui_positions_buttons_container,
                                              "Z: 0.0000", LV_HOR_RES / 3, 60);
   main_btn_position_a = symbolButton::create(ui_positions_buttons_container,
                                              "A: 0.0000", LV_HOR_RES / 3, 60);
+  //lv_obj_add_flag(main_btn_position_y, LV_OBJ_FLAG_HIDDEN);
   lv_obj_add_flag(main_btn_position_z, LV_OBJ_FLAG_HIDDEN);
   lv_obj_add_flag(main_btn_position_a, LV_OBJ_FLAG_HIDDEN);
   // Create button for switch positions
@@ -474,9 +479,17 @@ void create() {
   ESP3DStyle::add_pad(ui_bottom_buttons_container);
   lv_obj_clear_flag(ui_bottom_buttons_container, LV_OBJ_FLAG_SCROLLABLE);
 
-  // Create buttons for top container
+  // Create buttons for middle container
 
-  // Create button and label for middle container
+  // Create button and label for unlock
+  main_btn_unlock = symbolButton::create(ui_middle_container, LV_SYMBOL_UNLOCK);
+  lv_obj_add_flag(main_btn_unlock, LV_OBJ_FLAG_HIDDEN);
+
+  // Create button and label for abort
+  main_btn_abort = symbolButton::create(ui_middle_container, LV_SYMBOL_POWER);
+ // lv_obj_add_flag(main_btn_abort, LV_OBJ_FLAG_HIDDEN);
+
+  // Create progression area for middle container
   main_label_progression_area = lv_label_create(ui_middle_container);
   ESP3DStyle::apply(main_label_progression_area,
                     ESP3DStyleType::progression_area);
@@ -484,39 +497,40 @@ void create() {
   // Create button and label for reset
   main_btn_reset = symbolButton::create(ui_middle_container, LV_SYMBOL_RESET);
 
-  lv_obj_center(main_label_progression_area);
+  main_btn_override =
+      symbolButton::create(ui_bottom_buttons_container, LV_SYMBOL_GAUGE);
 
-
-   main_btn_overload = menuButton::create(ui_bottom_buttons_container, LV_SYMBOL_SPEED);
+  main_btn_milling =
+      symbolButton::create(ui_bottom_buttons_container, LV_SYMBOL_MILLING);
 
   // Create button and label for pause
   main_btn_pause =
-      menuButton::create(ui_bottom_buttons_container, LV_SYMBOL_PAUSE);
+      symbolButton::create(ui_bottom_buttons_container, LV_SYMBOL_PAUSE);
   lv_obj_add_event_cb(main_btn_pause, event_button_pause_handler,
                       LV_EVENT_CLICKED, NULL);
 
   // Create button and label for resume
   main_btn_resume =
-      menuButton::create(ui_bottom_buttons_container, LV_SYMBOL_PLAY);
+      symbolButton::create(ui_bottom_buttons_container, LV_SYMBOL_PLAY);
   lv_obj_add_event_cb(main_btn_resume, event_button_resume_handler,
                       LV_EVENT_CLICKED, NULL);
 
   // Create button and label for stop
   main_btn_stop =
-      menuButton::create(ui_bottom_buttons_container, LV_SYMBOL_STOP);
+      symbolButton::create(ui_bottom_buttons_container, LV_SYMBOL_STOP);
   lv_obj_add_event_cb(main_btn_stop, event_button_stop_handler,
                       LV_EVENT_CLICKED, NULL);
 #if ESP3D_SD_CARD_FEATURE
   // Create button and label for files
   main_btn_files =
-      menuButton::create(ui_bottom_buttons_container, LV_SYMBOL_SD_CARD);
+      symbolButton::create(ui_bottom_buttons_container, LV_SYMBOL_SD_CARD);
   lv_obj_add_event_cb(main_btn_files, event_button_files_handler,
                       LV_EVENT_CLICKED, NULL);
 #endif  // ESP3D_SD_CARD_FEATURE
   // Create button and label for menu
   std::string label_text8 = LV_SYMBOL_LIST;
   main_btn_menu =
-      menuButton::create(ui_bottom_buttons_container, LV_SYMBOL_LIST);
+      symbolButton::create(ui_bottom_buttons_container, LV_SYMBOL_LIST);
   lv_obj_add_event_cb(main_btn_menu, event_button_menu_handler,
                       LV_EVENT_CLICKED, NULL);
   esp3dTftui.set_current_screen(ESP3DScreenType::main);
