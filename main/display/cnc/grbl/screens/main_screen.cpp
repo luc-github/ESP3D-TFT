@@ -84,23 +84,27 @@ lv_obj_t *main_btn_stop = nullptr;
 lv_obj_t *main_btn_resume = nullptr;
 lv_obj_t *main_label_progression_area = nullptr;
 lv_obj_t *main_btn_menu = nullptr;
-std::string progression_area_str = "Progress 10/122222\nmygcode.nc";
+std::string progression_area_str = "";
+bool display_machine_position = true;
 
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
 
-// bool position_value_cb(ESP3DValuesIndex index, const char *value,
-//                        ESP3DValuesCbAction action) {
-//   if (action == ESP3DValuesCbAction::Update) {
-//     if (esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
-//       main_display_positions();
-//     } else {
-//       positionsScreen::callback(index, value, action);
-//     }
-//   }
-//   return true;
-// }
+bool position_values(ESP3DValuesIndex index, const char *value,
+                     ESP3DValuesCbAction action) {
+  return true;
+
+}
+bool state_value_cb(ESP3DValuesIndex index, const char *value,
+                    ESP3DValuesCbAction action) {
+  return true;
+}
+
+bool state_comment_value_cb(ESP3DValuesIndex index, const char *value,
+                             ESP3DValuesCbAction action) {
+  return true;
+}
 bool job_status_value_cb(ESP3DValuesIndex index, const char *value,
                          ESP3DValuesCbAction action) {
   if (action == ESP3DValuesCbAction::Update) {
@@ -449,7 +453,7 @@ void create() {
                                              "Z: 0.0000", LV_HOR_RES / 3, 60);
   main_btn_position_a = symbolButton::create(ui_positions_buttons_container,
                                              "A: 0.0000", LV_HOR_RES / 3, 60);
-  //lv_obj_add_flag(main_btn_position_y, LV_OBJ_FLAG_HIDDEN);
+  // lv_obj_add_flag(main_btn_position_y, LV_OBJ_FLAG_HIDDEN);
   lv_obj_add_flag(main_btn_position_z, LV_OBJ_FLAG_HIDDEN);
   lv_obj_add_flag(main_btn_position_a, LV_OBJ_FLAG_HIDDEN);
   // Create button for switch positions
@@ -487,7 +491,7 @@ void create() {
 
   // Create button and label for abort
   main_btn_abort = symbolButton::create(ui_middle_container, LV_SYMBOL_POWER);
- // lv_obj_add_flag(main_btn_abort, LV_OBJ_FLAG_HIDDEN);
+  // lv_obj_add_flag(main_btn_abort, LV_OBJ_FLAG_HIDDEN);
 
   // Create progression area for middle container
   main_label_progression_area = lv_label_create(ui_middle_container);

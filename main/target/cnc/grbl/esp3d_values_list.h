@@ -41,10 +41,18 @@ extern "C" {
 enum class ESP3DValuesIndex : uint16_t {
   status_bar_label,
   current_ip,
-  position_x,
-  position_y,
-  position_z,
-  position_a,
+  m_position_x,
+  m_position_y,
+  m_position_z,
+  m_position_a,
+  m_position_b,
+  m_position_c,
+  w_position_x,
+  w_position_y,
+  w_position_z,
+  w_position_a,
+  w_position_b,
+  w_position_c,
   job_status,
   file_path,
   file_name,
@@ -53,6 +61,8 @@ enum class ESP3DValuesIndex : uint16_t {
   job_progress,
   job_duration,
   job_id,
+  state,
+  state_comment,
   unknown_index
 };
 

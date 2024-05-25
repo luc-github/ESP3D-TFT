@@ -46,44 +46,128 @@ bool ESP3DValues::intialize() {
       nullptr,
   });
 
-  
-  // //  x position
+  //  x machine position
+  _values.push_back({
+      ESP3DValuesIndex::m_position_x,
+      ESP3DValuesType::float_t,
+      4,  // precision
+      std::string("?"),
+      mainScreen::position_values,
+  });
 
-  // _values.push_back({
-  //     ESP3DValuesIndex::position_x,
-  //     ESP3DValuesType::float_t,
-  //     4,  // precision
-  //     std::string("?"),
-  //     mainScreen::position_value_cb,
-  // });
+  //  y machine position
+  _values.push_back({
+      ESP3DValuesIndex::m_position_y,
+      ESP3DValuesType::float_t,
+      4,  // precision
+      std::string("?"),
+      nullptr,
+  });
 
-  // //  y position
-  // _values.push_back({
-  //     ESP3DValuesIndex::position_y,
-  //     ESP3DValuesType::float_t,
-  //     4,  // precision
-  //     std::string("?"),
-  //     mainScreen::position_value_cb,
-  // });
+  //  z machine position
+  _values.push_back({
+      ESP3DValuesIndex::m_position_z,
+      ESP3DValuesType::float_t,
+      4,  // precision
+      std::string("?"),
+      nullptr,
+  });
 
-  // //  z position
-  // _values.push_back({
-  //     ESP3DValuesIndex::position_z,
-  //     ESP3DValuesType::float_t,
-  //     4,  // precision
-  //     std::string("?"),
-  //     mainScreen::position_value_cb,
-  // });
+  //  a machine position
+  _values.push_back({
+      ESP3DValuesIndex::m_position_a,
+      ESP3DValuesType::float_t,
+      4,  // precision
+      std::string("?"),
+      nullptr,
+  });
 
-  //   //  a position
-  // _values.push_back({
-  //     ESP3DValuesIndex::position_a,
-  //     ESP3DValuesType::float_t,
-  //     4,  // precision
-  //     std::string("?"),
-  //     mainScreen::position_value_cb,
-  // });
+  //  b machine position
+  _values.push_back({
+      ESP3DValuesIndex::m_position_b,
+      ESP3DValuesType::float_t,
+      4,  // precision
+      std::string("?"),
+      nullptr,
+  });
 
+  //  c machine position
+
+  _values.push_back({
+      ESP3DValuesIndex::m_position_c,
+      ESP3DValuesType::float_t,
+      4,  // precision
+      std::string("?"),
+      nullptr,
+  });
+
+  //  x work position
+  _values.push_back({
+      ESP3DValuesIndex::w_position_x,
+      ESP3DValuesType::float_t,
+      4,  // precision
+      std::string("?"),
+      nullptr,
+  });
+
+  //  y work position
+  _values.push_back({
+      ESP3DValuesIndex::w_position_y,
+      ESP3DValuesType::float_t,
+      4,  // precision
+      std::string("?"),
+      nullptr,
+  });
+
+  //  z work position
+  _values.push_back({
+      ESP3DValuesIndex::w_position_z,
+      ESP3DValuesType::float_t,
+      4,  // precision
+      std::string("?"),
+      nullptr,
+  });
+
+  //  a work position
+  _values.push_back({
+      ESP3DValuesIndex::w_position_a,
+      ESP3DValuesType::float_t,
+      4,  // precision
+      std::string("?"),
+      nullptr,
+  });
+
+  //  b work position
+  _values.push_back({
+      ESP3DValuesIndex::w_position_b,
+      ESP3DValuesType::float_t,
+      4,  // precision
+      std::string("?"),
+      nullptr,
+  });
+
+  //  c work position
+  _values.push_back({
+      ESP3DValuesIndex::w_position_c,
+      ESP3DValuesType::float_t,
+      4,  // precision
+      std::string("?"),
+      nullptr,
+  });
+
+  // state
+  _values.push_back({ESP3DValuesIndex::state, ESP3DValuesType::string_t,
+                     10,  // precision
+                     std::string("idle"), mainScreen::state_value_cb});
+
+  //  state comment
+  _values.push_back({
+      ESP3DValuesIndex::state_comment,
+      ESP3DValuesType::string_t,
+      100,  // precision
+      std::string(""),
+      mainScreen::state_comment_value_cb,
+  });
 
   //  print status
   _values.push_back({
@@ -93,6 +177,7 @@ bool ESP3DValues::intialize() {
       std::string("idle"),
       mainScreen::job_status_value_cb,
   });
+
   //  file path
   _values.push_back({
       ESP3DValuesIndex::file_path,
