@@ -1,5 +1,5 @@
 /*
-  esp3d_screens_type.h - ESP3D screens type definition
+  basic_screen.h - ESP3D screens definition
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -20,26 +20,8 @@
 
 #pragma once
 
-#include <stdio.h>
+#include "esp3d_values.h"
 
-enum class ESP3DScreenType : uint8_t
-{
-  none = 0,
-  splash,
-  main,
-  status_list,
-  files,
-  settings,
-  wifi,
-  menu,
-  informations,
-  station,
-  access_point,
-  positions,
-  probe,
-  milling,
-  laser,
-  override,
-  macro,
-  empty
-};
+namespace basicScreen {
+void create();
+}  // namespace basicScreen
