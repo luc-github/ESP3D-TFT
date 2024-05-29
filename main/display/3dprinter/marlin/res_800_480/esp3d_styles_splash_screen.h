@@ -1,5 +1,6 @@
 /*
-    positions_screen.h - esp3d
+  esp3d_styles_splash_screen.h - ESP3D screens styles definition
+
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
   This code is free software; you can redistribute it and/or
@@ -19,14 +20,10 @@
 
 #pragma once
 
-#include <stdio.h>
+//Splash screen positions
 
-#include "esp3d_values.h"
+ #define VERSION_X -10
+ #define VERSION_Y -10
 
-
-namespace positionsScreen {
-extern void positions_screen(uint8_t target = 255);
-extern bool positions_values_cb(ESP3DValuesIndex index, const char *value,
-                                ESP3DValuesCbAction action);
-
-}  // namespace positionsScreen
+#define FW_LOGO_X 10
+#define FW_LOGO_Y -10

@@ -59,15 +59,15 @@ void informations_screen_delay_timer_cb(lv_timer_t *timer) {
     lv_timer_del(informations_screen_delay_timer);
     informations_screen_delay_timer = NULL;
   }
-  menuScreen::menu_screen();
+  menuScreen::create();
 }
 
 void event_button_informations_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
-  if (BUTTON_ANIMATION_DELAY) {
+  if (ESP3D_BUTTON_ANIMATION_DELAY) {
     if (informations_screen_delay_timer) return;
     informations_screen_delay_timer = lv_timer_create(
-        informations_screen_delay_timer_cb, BUTTON_ANIMATION_DELAY, NULL);
+        informations_screen_delay_timer_cb, ESP3D_BUTTON_ANIMATION_DELAY, NULL);
   } else
     informations_screen_delay_timer_cb(NULL);
 }
@@ -86,7 +86,7 @@ void addInformationToList(lv_obj_t *list, ESP3DLabel label, ESP3DLabel info) {
   lv_list_add_btn(list, "", infoStr.c_str());
 }
 
-void informations_screen() {
+void create() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   // Screen creation
   esp3d_log("Settings screen creation");
@@ -94,29 +94,29 @@ void informations_screen() {
   // Display new screen and delete old one
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
-  apply_style(ui_new_screen, ESP3DStyleType::main_bg);
+  ESP3DStyle::apply(ui_new_screen, ESP3DStyleType::main_bg);
   lv_obj_del(ui_current_screen);
 
-  lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
+  lv_obj_t *btnback = backButton::create(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_informations_back_handler,
                       LV_EVENT_CLICKED, NULL);
   lv_obj_update_layout(btnback);
   lv_obj_set_style_flex_flow(ui_new_screen, LV_FLEX_FLOW_ROW,
                              LV_FLEX_ALIGN_SPACE_EVENLY);
   lv_obj_t *ui_info_list_ctl = lv_list_create(ui_new_screen);
-  apply_style(ui_info_list_ctl, ESP3DStyleType::status_list);
+  ESP3DStyle::apply(ui_info_list_ctl, ESP3DStyleType::status_list);
 
   lv_obj_update_layout(ui_new_screen);
-  lv_obj_set_pos(ui_info_list_ctl, CURRENT_BUTTON_PRESSED_OUTLINE,
-                 CURRENT_BUTTON_PRESSED_OUTLINE);
+  lv_obj_set_pos(ui_info_list_ctl, ESP3D_BUTTON_PRESSED_OUTLINE,
+                 ESP3D_BUTTON_PRESSED_OUTLINE);
   lv_obj_set_size(
-      ui_info_list_ctl, LV_HOR_RES - CURRENT_BUTTON_PRESSED_OUTLINE * 2,
-      lv_obj_get_height(ui_new_screen) - (CURRENT_BUTTON_PRESSED_OUTLINE * 3) -
+      ui_info_list_ctl, LV_HOR_RES - ESP3D_BUTTON_PRESSED_OUTLINE * 2,
+      lv_obj_get_height(ui_new_screen) - (ESP3D_BUTTON_PRESSED_OUTLINE * 3) -
           lv_obj_get_height(btnback));
-  lv_obj_set_style_radius(ui_info_list_ctl, CURRENT_CONTAINER_RADIUS, 0);
-  lv_obj_set_style_pad_left(ui_info_list_ctl, LIST_CONTAINER_LR_PAD,
+  lv_obj_set_style_radius(ui_info_list_ctl, ESP3D_CONTAINER_RADIUS, 0);
+  lv_obj_set_style_pad_left(ui_info_list_ctl, ESP3D_LIST_CONTAINER_LR_PAD,
                             LV_PART_MAIN);
-  lv_obj_set_style_pad_right(ui_info_list_ctl, LIST_CONTAINER_LR_PAD,
+  lv_obj_set_style_pad_right(ui_info_list_ctl, ESP3D_LIST_CONTAINER_LR_PAD,
                              LV_PART_MAIN);
 
   addInformationToList(ui_info_list_ctl, ESP3DLabel::screen, TFT_TARGET);

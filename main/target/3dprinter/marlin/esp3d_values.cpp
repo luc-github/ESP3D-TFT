@@ -36,7 +36,7 @@ bool ESP3DValues::intialize() {
   // status bar label
   _values.push_back({ESP3DValuesIndex::status_bar_label,
                      ESP3DValuesType::string_t, 200, std::string(""),
-                     statusBar::status_bar_cb});
+                     statusBar::callback});
 
   //  current ip
   _values.push_back({
@@ -107,7 +107,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::integer_t,
       0,  // precision
       std::string("0"),
-      mainScreen::fan_value_cb,
+      mainScreen::callback,
   });
 
   //  ext 1 fan
@@ -116,7 +116,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::integer_t,
       0,  // precision
       std::string("0"),
-      mainScreen::fan_value_cb,
+      mainScreen::callback,
   });
 
   //
@@ -125,7 +125,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::integer_t,
       0,  // precision
       std::string("100"),
-      mainScreen::speed_value_cb,
+      mainScreen::callback,
   });
 
   //  x position
@@ -164,7 +164,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::string_t,
       100,  // precision
       std::string("?"),
-      autoLevelingScreen::auto_leveling_value_cb,
+      autoLevelingScreen::callback,
   });
 
   //  print status
@@ -198,7 +198,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::string_t,
       1,  // size
       std::string("?"),
-      wifiStatus::network_status_value_cb,
+      wifiStatus::network_status_cb,
   });
   //  network mode
   _values.push_back({
@@ -206,7 +206,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::string_t,
       1,  // size
       std::string("?"),
-      wifiStatus::network_mode_value_cb,
+      wifiStatus::network_mode_cb,
   });
 #endif  // ESP3D_WIFI_FEATURE
   //  job progress

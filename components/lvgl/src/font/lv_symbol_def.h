@@ -20,15 +20,15 @@ extern "C" {
 *-----------------------------*/
 
 /*In the font converter use this list as range:
-      58728,62153,61642,63253,61458,62745,61452,58774,
+      58728,62153,61642,63253,61458,62745,61452,61470,
       61453,61457,61480,61479,63145,61459,62161,57408,
       62189,58287,61465,61473,62212,61512,61521,61515,
-      61516,61639,61664,61671,63343,61942,61475,62172,
+      61516,61639,63246,61556,63343,61942,61475,62172,
       61517,61931,61553,61563,61787,61724,62810,63426,
-      61618,61559,61560,61523,61524,61728,63012,61867,
+      61618,61559,61560,61523,61524,62880,63012,61867,
       63587,62603,63275,61829,62913,62973,58552,62683,
       58557,61442,62679,62156,61758,61842,58563,62437,
-      62099,62087,61601,61525,61526,62038,62788
+      62099,62405,61601,61525,61526,62038,62788
 */
 
 /* These symbols can be prefined in the lv_conf.h file.
@@ -63,8 +63,8 @@ extern "C" {
 #define LV_SYMBOL_OK           "\xEF\x80\x8C" /*61452, 0xF00C*/
 #endif
 
-#if !defined LV_SYMBOL_PROBE_CHECK
-#define LV_SYMBOL_PROBE_CHECK           "\xEE\x96\x96" /*58774, 0xE596*/
+#if !defined LV_SYMBOL_RESET
+#define LV_SYMBOL_RESET           "\xEF\x80\x9E" /*61470, 0xF01E*/
 #endif
 
 #if !defined LV_SYMBOL_CLOSE
@@ -139,12 +139,12 @@ extern "C" {
 #define LV_SYMBOL_SAVE           "\xEF\x83\x87" /*61639, 0xF0C7*/
 #endif
 
-#if !defined LV_SYMBOL_MESSAGE
-#define LV_SYMBOL_MESSAGE           "\xEF\x83\xA0" /*61664, 0xF0E0*/
+#if !defined LV_SYMBOL_MACRO
+#define LV_SYMBOL_MACRO           "\xEF\x9C\x8E" /*63246, 0xF70E*/
 #endif
 
-#if !defined LV_SYMBOL_LASER
-#define LV_SYMBOL_LASER           "\xEF\x83\xA7" /*61671, 0xF0E7*/
+#if !defined LV_SYMBOL_SHUFFLE
+#define LV_SYMBOL_SHUFFLE           "\xEF\x81\xB4" /*61556, 0xF074*/
 #endif
 
 #if !defined LV_SYMBOL_VACCUM
@@ -215,8 +215,8 @@ extern "C" {
 #define LV_SYMBOL_RIGHT           "\xEF\x81\x94" /*61524, 0xF054*/
 #endif
 
-#if !defined LV_SYMBOL_COMMAND
-#define LV_SYMBOL_COMMAND           "\xEF\x84\xA0" /*61728, 0xF120*/
+#if !defined LV_SYMBOL_W_POSITION
+#define LV_SYMBOL_W_POSITION           "\xEF\x96\xA0" /*62880, 0xF5A0*/
 #endif
 
 #if !defined LV_SYMBOL_GAUGE
@@ -295,8 +295,8 @@ extern "C" {
 #define LV_SYMBOL_BLUETOOTH           "\xEF\x8A\x93" /*62099, 0xF293*/
 #endif
 
-#if !defined LV_SYMBOL_USB
-#define LV_SYMBOL_USB           "\xEF\x8A\x87" /*62087, 0xF287*/
+#if !defined LV_SYMBOL_M_POSITION
+#define LV_SYMBOL_M_POSITION           "\xEF\x8F\x85" /*62405, 0xF3C5*/
 #endif
 
 #if !defined LV_SYMBOL_MORE_INFO
@@ -332,7 +332,7 @@ enum {
     _LV_STR_SYMBOL_STATION_MODE,
     _LV_STR_SYMBOL_ACCESS_POINT,
     _LV_STR_SYMBOL_OK,
-    _LV_STR_SYMBOL_PROBE_CHECK,
+    _LV_STR_SYMBOL_RESET,
     _LV_STR_SYMBOL_CLOSE,
     _LV_STR_SYMBOL_POWER,
     _LV_STR_SYMBOL_VOLUME_HIGH,
@@ -351,8 +351,8 @@ enum {
     _LV_STR_SYMBOL_PLAY,
     _LV_STR_SYMBOL_PAUSE,
     _LV_STR_SYMBOL_SAVE,
-    _LV_STR_SYMBOL_MESSAGE,
-    _LV_STR_SYMBOL_LASER,
+    _LV_STR_SYMBOL_MACRO,
+    _LV_STR_SYMBOL_SHUFFLE,
     _LV_STR_SYMBOL_VACCUM,
     _LV_STR_SYMBOL_DISABLE_ALERT,
     _LV_STR_SYMBOL_LOCK,
@@ -370,7 +370,7 @@ enum {
     _LV_STR_SYMBOL_DOWN,
     _LV_STR_SYMBOL_LEFT,
     _LV_STR_SYMBOL_RIGHT,
-    _LV_STR_SYMBOL_COMMAND,
+    _LV_STR_SYMBOL_W_POSITION,
     _LV_STR_SYMBOL_GAUGE,
     _LV_STR_SYMBOL_LANGUAGE,
     _LV_STR_SYMBOL_FAN,
@@ -390,7 +390,7 @@ enum {
     _LV_STR_SYMBOL_MILLING,
     _LV_STR_SYMBOL_NEW_LINE,
     _LV_STR_SYMBOL_BLUETOOTH,
-    _LV_STR_SYMBOL_USB,
+    _LV_STR_SYMBOL_M_POSITION,
     _LV_STR_SYMBOL_MORE_INFO,
     _LV_STR_SYMBOL_PLUS,
     _LV_STR_SYMBOL_MINUS,

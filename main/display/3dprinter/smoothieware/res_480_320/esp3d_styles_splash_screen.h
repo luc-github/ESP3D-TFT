@@ -1,5 +1,6 @@
 /*
-    manual_leveling__screen.h - esp3d
+  esp3d_styles_splash_screen.h - ESP3D screens styles definition
+
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
   This code is free software; you can redistribute it and/or
@@ -19,10 +20,10 @@
 
 #pragma once
 
-namespace manualLevelingScreen {
-extern void manual_leveling_screen(bool auto_leveling);
-extern void update_bed_width(double value);
-extern void update_bed_depth(double value);
-extern void update_invert_x(bool value);
-extern void update_invert_y(bool value);
-}  // namespace manualLevelingScreen
+//Splash screen positions
+
+ #define VERSION_X -10
+ #define VERSION_Y -10
+
+#define FW_LOGO_X 10
+#define FW_LOGO_Y -10

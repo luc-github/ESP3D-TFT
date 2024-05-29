@@ -22,25 +22,24 @@
 
 #include <stdio.h>
 
-enum class ESP3DScreenType : uint8_t {
+enum class ESP3DScreenType : uint8_t
+{
   none = 0,
   splash,
   main,
   status_list,
-  temperatures,
-  positions,
   files,
-  fan,
-  speed,
   settings,
   wifi,
-  leveling,
-  filament,
   menu,
   informations,
   station,
   access_point,
-  manual_leveling,
-  auto_leveling,
+  positions,
+  probe,
+  milling,
+  laser,
+  override,
+  macro,
   empty
 };

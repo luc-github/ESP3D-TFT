@@ -25,11 +25,11 @@
 #include "symbol_button_component.h"
 
 /**********************
- *  STATIC PROTOTYPES
+ *  Namespace
  **********************/
 namespace menuButton {
-lv_obj_t *create_menu_button(lv_obj_t *container, const char *text) {
-  return symbolButton::create_symbol_button(container, text, BUTTON_WIDTH,
-                                            BUTTON_HEIGHT);
+lv_obj_t *create(lv_obj_t *container, const char *text) {
+  return symbolButton::create(container, text, ESP3D_BUTTON_WIDTH,
+                                            ESP3D_BUTTON_HEIGHT);
 }
 }  // namespace menuButton

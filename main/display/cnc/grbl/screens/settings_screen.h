@@ -20,5 +20,5 @@
 #pragma once
 
 namespace settingsScreen {
-extern void settings_screen();
+extern void create();
 }  // namespace settingsScreen

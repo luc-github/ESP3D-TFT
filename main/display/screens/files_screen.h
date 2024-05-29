@@ -23,5 +23,5 @@
 #include <stdio.h>
 
 namespace filesScreen {
-extern void files_screen();
+void create();
 }

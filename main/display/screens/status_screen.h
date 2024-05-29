@@ -22,7 +22,7 @@
 #include "esp3d_values.h"
 
 namespace statusScreen {
-extern void status_screen();
-extern bool status_list_cb(ESP3DValuesIndex index, const char *value,
+void create();
+bool callback(ESP3DValuesIndex index, const char *value,
                            ESP3DValuesCbAction action);
 }  // namespace statusScreen

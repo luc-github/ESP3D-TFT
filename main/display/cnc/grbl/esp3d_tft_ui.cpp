@@ -25,6 +25,6 @@
  **********************/
 
 void create_application(void) {
-  init_styles();
-  splashScreen::boot_screen();
+  ESP3DStyle::init();
+  splashScreen::create();
 }

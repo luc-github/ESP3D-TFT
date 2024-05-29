@@ -23,13 +23,13 @@
 #include "screens/esp3d_screen_type.h"
 
 namespace temperaturesScreen {
-extern void temperatures_screen(
+void create(
     uint8_t target, ESP3DScreenType screenreturn = ESP3DScreenType::main);
-extern bool extruder_0_value_cb(ESP3DValuesIndex index, const char *value,
+bool extruder_0_value_cb(ESP3DValuesIndex index, const char *value,
                                 ESP3DValuesCbAction action);
-extern bool extruder_1_value_cb(ESP3DValuesIndex index, const char *value,
+bool extruder_1_value_cb(ESP3DValuesIndex index, const char *value,
                                 ESP3DValuesCbAction action);
-extern bool bed_value_cb(ESP3DValuesIndex index, const char *value,
+bool bed_value_cb(ESP3DValuesIndex index, const char *value,
                          ESP3DValuesCbAction action);
 
 }  // namespace temperaturesScreen

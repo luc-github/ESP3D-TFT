@@ -25,8 +25,8 @@
 
 
 namespace positionsScreen {
-extern void positions_screen(uint8_t target = 255);
-extern bool positions_values_cb(ESP3DValuesIndex index, const char *value,
+void create(uint8_t target = 255);
+bool callback(ESP3DValuesIndex index, const char *value,
                                 ESP3DValuesCbAction action);
 
 }  // namespace positionsScreen

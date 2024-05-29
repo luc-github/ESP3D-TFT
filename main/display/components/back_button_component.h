@@ -23,5 +23,5 @@
 #include <lvgl.h>
 
 namespace backButton {
-extern lv_obj_t *create_back_button(lv_obj_t *parent);
+lv_obj_t *create(lv_obj_t *parent);
 }  // namespace backButton

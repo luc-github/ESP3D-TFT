@@ -467,9 +467,10 @@ bool ESP3DNetwork::startStaMode() {
     stmp = "Connect to ";
     stmp += ssid_str;
     stmp += " failed";
-  }
-  esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
+    esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
                                   stmp.c_str());
+  }
+  
   if (stmp.length() > 0) {
     stmp += "\n";
   }

@@ -20,5 +20,5 @@
 #pragma once
 
 namespace splashScreen {
-extern void boot_screen();
+ void create();
 }  // namespace splashScreen

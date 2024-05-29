@@ -20,5 +20,5 @@
 #pragma once
 
 namespace emptyScreen {
-extern void empty_screen();
+void create();
 }  // namespace emptyScreen

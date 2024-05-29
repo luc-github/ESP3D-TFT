@@ -25,8 +25,8 @@
 #include "esp3d_values.h"
 
 namespace statusBar {
-extern bool status_bar_cb(ESP3DValuesIndex index, const char *value,
+bool callback(ESP3DValuesIndex index, const char *value,
                           ESP3DValuesCbAction action);
-extern lv_obj_t *status_bar(lv_obj_t *screen);
+lv_obj_t *create(lv_obj_t *screen);
 
 }  // namespace statusBar

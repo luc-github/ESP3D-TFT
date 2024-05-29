@@ -27,7 +27,7 @@
 #include "screens/status_screen.h"
 
 /**********************
- *  STATIC PROTOTYPES
+ *  Namespace
  **********************/
 namespace statusBar {
 /**********************
@@ -35,38 +35,69 @@ namespace statusBar {
  **********************/
 lv_obj_t *status_bar_label = nullptr;
 
-bool status_bar_cb(ESP3DValuesIndex index, const char *value,
+/**
+ * @brief Callback function for handling ESP3D values.
+ *
+ * This function is used as a callback for handling ESP3D values. It takes three parameters:
+ * - `index`: An enum value representing the index of the ESP3D value.
+ * - `value`: A pointer to a character array representing the value of the ESP3D value.
+ * - `action`: An enum value representing the action to be performed on the ESP3D value.
+ *
+ * @param index The index of the ESP3D value.
+ * @param value The value of the ESP3D value.
+ * @param action The action to be performed on the ESP3D value.
+ * @return `true` if the callback was successful, `false` otherwise.
+ */
+bool callback(ESP3DValuesIndex index, const char *value,
                    ESP3DValuesCbAction action) {
   std::string svalue_one_line = esp3d_string::str_replace(value, "\n", "");
   svalue_one_line =
       esp3d_string::str_replace(svalue_one_line.c_str(), "\r", "");
   if (action == ESP3DValuesCbAction::Add ||
       action == ESP3DValuesCbAction::Update) {
-    if (status_bar_label != nullptr &&
+    if (status_bar_label != nullptr && lv_obj_is_valid(status_bar_label) &&
         esp3dTftui.get_current_screen() == ESP3DScreenType::main) {
       lv_label_set_text(status_bar_label, svalue_one_line.c_str());
     }
   }
-  return statusScreen::status_list_cb(index, svalue_one_line.c_str(), action);
+  return statusScreen::callback(index, svalue_one_line.c_str(), action);
 }
 
+/**
+ * @brief Event handler for the status list.
+ *
+ * This function is responsible for handling events related to the status list component.
+ * It is called whenever an event occurs on the status list.
+ *
+ * @param e Pointer to the event object.
+ */
 static void event_handler_status_list(lv_event_t *e) {
   lv_event_code_t code = lv_event_get_code(e);
 
   if (code == LV_EVENT_CLICKED) {
     esp3d_log("Clicked");
-    statusScreen::status_screen();
+    statusScreen::create();
   }
 }
 
-lv_obj_t *status_bar(lv_obj_t *screen) {
+/**
+ * @brief Creates a status bar component and adds it to the given screen.
+ *
+ * @param screen The screen to which the status bar component will be added.
+ * @return The created status bar component object.
+ */
+lv_obj_t *create(lv_obj_t *screen) {
   // Create style for status bar
   const ESP3DValuesDescription *status_bar_desc =
       esp3dTftValues.get_description(ESP3DValuesIndex::status_bar_label);
 
   lv_obj_t *status_bar_container = lv_obj_create(screen);
+  if (!lv_obj_is_valid(status_bar_container)) {
+    esp3d_log_e("Invalid object");
+    return nullptr;
+  }
   status_bar_label = lv_label_create(status_bar_container);
-  apply_style(status_bar_label, ESP3DStyleType::status_bar);
+  ESP3DStyle::apply(status_bar_label, ESP3DStyleType::status_bar);
   if (status_bar_desc == nullptr) {
     esp3d_log_e("status_bar: description is null cancel");
 

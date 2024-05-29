@@ -25,7 +25,6 @@
 #if ESP3D_DISPLAY_FEATURE
 #include "components/status_bar_component.h"
 #include "components/wifi_status_component.h"
-#include "screens/auto_leveling_screen.h"
 #include "screens/main_screen.h"
 
 #endif  // ESP3D_DISPLAY_FEATURE
@@ -36,7 +35,7 @@ bool ESP3DValues::intialize() {
   // status bar label
   _values.push_back({ESP3DValuesIndex::status_bar_label,
                      ESP3DValuesType::string_t, 200, std::string(""),
-                     statusBar::status_bar_cb});
+                     statusBar::callback});
 
   //  current ip
   _values.push_back({
@@ -47,124 +46,127 @@ bool ESP3DValues::intialize() {
       nullptr,
   });
 
-  //  ext 0 temperature
+  //  x machine position
   _values.push_back({
-      ESP3DValuesIndex::ext_0_temperature,
+      ESP3DValuesIndex::m_position_x,
       ESP3DValuesType::float_t,
-      2,  // precision
+      4,  // precision
       std::string("?"),
-      mainScreen::extruder_0_value_cb,
+      mainScreen::position_values,
   });
 
-  //  ext 1 temperature
+  //  y machine position
   _values.push_back({
-      ESP3DValuesIndex::ext_1_temperature,
+      ESP3DValuesIndex::m_position_y,
       ESP3DValuesType::float_t,
-      2,  // precision
+      4,  // precision
       std::string("?"),
-      mainScreen::extruder_1_value_cb,
+      nullptr,
   });
 
-  //  bed temperature
+  //  z machine position
   _values.push_back({
-      ESP3DValuesIndex::bed_temperature,
+      ESP3DValuesIndex::m_position_z,
       ESP3DValuesType::float_t,
-      2,  // precision
+      4,  // precision
       std::string("?"),
-      mainScreen::bed_value_cb,
+      nullptr,
   });
 
-  //  ext 0 target temperature
+  //  a machine position
   _values.push_back({
-      ESP3DValuesIndex::ext_0_target_temperature,
+      ESP3DValuesIndex::m_position_a,
       ESP3DValuesType::float_t,
-      2,  // precision
-      std::string("0"),
-      mainScreen::extruder_0_value_cb,
-  });
-
-  //  ext 1 target temperature
-  _values.push_back({
-      ESP3DValuesIndex::ext_1_target_temperature,
-      ESP3DValuesType::float_t,
-      2,  // precision
-      std::string("0"),
-      mainScreen::extruder_1_value_cb,
-  });
-
-  //  bed target temperature
-  _values.push_back({
-      ESP3DValuesIndex::bed_target_temperature,
-      ESP3DValuesType::float_t,
-      2,  // precision
-      std::string("0"),
-      mainScreen::bed_value_cb,
-  });
-
-  //  ext 0 fan
-  _values.push_back({
-      ESP3DValuesIndex::ext_0_fan,
-      ESP3DValuesType::integer_t,
-      0,  // precision
-      std::string("0"),
-      mainScreen::fan_value_cb,
-  });
-
-  //  ext 1 fan
-  _values.push_back({
-      ESP3DValuesIndex::ext_1_fan,
-      ESP3DValuesType::integer_t,
-      0,  // precision
-      std::string("0"),
-      mainScreen::fan_value_cb,
-  });
-
-  //
-  _values.push_back({
-      ESP3DValuesIndex::speed,
-      ESP3DValuesType::integer_t,
-      0,  // precision
-      std::string("100"),
-      mainScreen::speed_value_cb,
-  });
-
-  //  x position
-
-  _values.push_back({
-      ESP3DValuesIndex::position_x,
-      ESP3DValuesType::float_t,
-      2,  // precision
+      4,  // precision
       std::string("?"),
-      mainScreen::position_value_cb,
+      nullptr,
   });
 
-  //  y position
+  //  b machine position
   _values.push_back({
-      ESP3DValuesIndex::position_y,
+      ESP3DValuesIndex::m_position_b,
       ESP3DValuesType::float_t,
-      2,  // precision
+      4,  // precision
       std::string("?"),
-      mainScreen::position_value_cb,
+      nullptr,
   });
 
-  //  z position
+  //  c machine position
 
   _values.push_back({
-      ESP3DValuesIndex::position_z,
+      ESP3DValuesIndex::m_position_c,
       ESP3DValuesType::float_t,
-      2,  // precision
+      4,  // precision
       std::string("?"),
-      mainScreen::position_value_cb,
+      nullptr,
   });
 
-  //  bed leveling
-
+  //  x work position
   _values.push_back({
-      ESP3DValuesIndex::bed_leveling,
+      ESP3DValuesIndex::w_position_x,
+      ESP3DValuesType::float_t,
+      4,  // precision
+      std::string("?"),
+      nullptr,
+  });
+
+  //  y work position
+  _values.push_back({
+      ESP3DValuesIndex::w_position_y,
+      ESP3DValuesType::float_t,
+      4,  // precision
+      std::string("?"),
+      nullptr,
+  });
+
+  //  z work position
+  _values.push_back({
+      ESP3DValuesIndex::w_position_z,
+      ESP3DValuesType::float_t,
+      4,  // precision
+      std::string("?"),
+      nullptr,
+  });
+
+  //  a work position
+  _values.push_back({
+      ESP3DValuesIndex::w_position_a,
+      ESP3DValuesType::float_t,
+      4,  // precision
+      std::string("?"),
+      nullptr,
+  });
+
+  //  b work position
+  _values.push_back({
+      ESP3DValuesIndex::w_position_b,
+      ESP3DValuesType::float_t,
+      4,  // precision
+      std::string("?"),
+      nullptr,
+  });
+
+  //  c work position
+  _values.push_back({
+      ESP3DValuesIndex::w_position_c,
+      ESP3DValuesType::float_t,
+      4,  // precision
+      std::string("?"),
+      nullptr,
+  });
+
+  // state
+  _values.push_back({ESP3DValuesIndex::state, ESP3DValuesType::string_t,
+                     10,  // precision
+                     std::string("idle"), mainScreen::state_value_cb});
+
+  //  state comment
+  _values.push_back({
+      ESP3DValuesIndex::state_comment,
       ESP3DValuesType::string_t,
       100,  // precision
-      std::string("?"),
-      autoLevelingScreen::auto_leveling_value_cb,
+      std::string(""),
+      mainScreen::state_comment_value_cb,
   });
 
   //  print status
@@ -175,6 +177,7 @@ bool ESP3DValues::intialize() {
       std::string("idle"),
       mainScreen::job_status_value_cb,
   });
+
   //  file path
   _values.push_back({
       ESP3DValuesIndex::file_path,
@@ -198,7 +201,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::string_t,
       1,  // size
       std::string("?"),
-      wifiStatus::network_status_value_cb,
+      wifiStatus::network_status_cb,
   });
   //  network mode
   _values.push_back({
@@ -206,7 +209,7 @@ bool ESP3DValues::intialize() {
       ESP3DValuesType::string_t,
       1,  // size
       std::string("?"),
-      wifiStatus::network_mode_value_cb,
+      wifiStatus::network_mode_cb,
   });
 #endif  // ESP3D_WIFI_FEATURE
   //  job progress

@@ -20,6 +20,6 @@
 #pragma once
 
 namespace wifiScreen {
-extern void wifi_screen();
-extern void update_button_no_wifi();
+void create();
+void callback();
 }  // namespace wifiScreen

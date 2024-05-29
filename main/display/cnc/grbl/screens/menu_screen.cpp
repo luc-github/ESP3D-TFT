@@ -32,11 +32,8 @@
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
 #include "esp3d_values.h"
-#include "screens/filament_screen.h"
 #include "screens/informations_screen.h"
-#include "screens/leveling_screen.h"
 #include "screens/main_screen.h"
-#include "screens/manual_leveling_screen.h"
 #include "screens/menu_screen.h"
 #include "screens/settings_screen.h"
 #include "translations/esp3d_translation_service.h"
@@ -51,43 +48,13 @@
 namespace menuScreen {
 lv_timer_t *menu_screen_delay_timer = NULL;
 ESP3DScreenType menu_next_screen = ESP3DScreenType::none;
-lv_obj_t *main_btn_leveling = NULL;
-lv_obj_t *main_btn_disable_steppers = NULL;
 bool intialization_done = false;
-bool auto_leveling = false;
 
-void enable_auto_leveling(bool enable) { auto_leveling = enable; }
-
-void menu_display_leveling() {
-  std::string label_text =
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::job_status);
-  if (label_text == "paused") {
-    lv_obj_add_flag(main_btn_leveling, LV_OBJ_FLAG_HIDDEN);
-  } else if (label_text == "processing") {
-    lv_obj_add_flag(main_btn_leveling, LV_OBJ_FLAG_HIDDEN);
-  } else {
-    lv_obj_clear_flag(main_btn_leveling, LV_OBJ_FLAG_HIDDEN);
-  }
-}
-
-void menu_display_disable_steppers() {
-  std::string label_text =
-      esp3dTftValues.get_string_value(ESP3DValuesIndex::job_status);
-  if (label_text == "paused") {
-    lv_obj_add_flag(main_btn_disable_steppers, LV_OBJ_FLAG_HIDDEN);
-  } else if (label_text == "processing") {
-    lv_obj_add_flag(main_btn_disable_steppers, LV_OBJ_FLAG_HIDDEN);
-  } else {
-    lv_obj_clear_flag(main_btn_disable_steppers, LV_OBJ_FLAG_HIDDEN);
-  }
-}
-
-void menu_screen_job_status_value_cb(ESP3DValuesIndex index, const char *value,
+void job_status_value_cb(ESP3DValuesIndex index, const char *value,
                                      ESP3DValuesCbAction action) {
   if (action == ESP3DValuesCbAction::Update) {
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::menu) {
-      menu_display_leveling();
-      menu_display_disable_steppers();
+      // Update buttons display according status
     }
   }
   // Todo update buttons display according status
@@ -100,27 +67,19 @@ void menu_screen_delay_timer_cb(lv_timer_t *timer) {
   }
   switch (menu_next_screen) {
     case ESP3DScreenType::main:
-      mainScreen::main_screen();
+      mainScreen::create();
       break;
-    case ESP3DScreenType::filament:
-      filamentScreen::filament_screen();
-      break;
+   
     case ESP3DScreenType::settings:
-      settingsScreen::settings_screen();
+      settingsScreen::create();
       break;
-    case ESP3DScreenType::leveling:
-      if (auto_leveling) {
-        levelingScreen::leveling_screen(auto_leveling);
-      } else {
-        manualLevelingScreen::manual_leveling_screen(auto_leveling);
-      }
-      break;
+    
     case ESP3DScreenType::informations:
-      informationsScreen::informations_screen();
+      informationsScreen::create();
       break;
 #if ESP3D_WIFI_FEATURE
     case ESP3DScreenType::wifi:
-      wifiScreen::wifi_screen();
+      wifiScreen::create();
       break;
 #endif  // ESP3D_WIFI_FEATURE
     default:
@@ -132,23 +91,10 @@ void event_button_menu_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
   if (menu_screen_delay_timer) return;
   menu_next_screen = ESP3DScreenType::main;
-  if (BUTTON_ANIMATION_DELAY) {
+  if (ESP3D_BUTTON_ANIMATION_DELAY) {
     if (menu_screen_delay_timer) return;
     menu_screen_delay_timer = lv_timer_create(menu_screen_delay_timer_cb,
-                                              BUTTON_ANIMATION_DELAY, NULL);
-  } else {
-    menu_screen_delay_timer_cb(NULL);
-  }
-}
-
-void event_button_filament_handler(lv_event_t *e) {
-  esp3d_log("filament Clicked");
-  if (menu_screen_delay_timer) return;
-  menu_next_screen = ESP3DScreenType::filament;
-  if (BUTTON_ANIMATION_DELAY) {
-    if (menu_screen_delay_timer) return;
-    menu_screen_delay_timer = lv_timer_create(menu_screen_delay_timer_cb,
-                                              BUTTON_ANIMATION_DELAY, NULL);
+                                              ESP3D_BUTTON_ANIMATION_DELAY, NULL);
   } else {
     menu_screen_delay_timer_cb(NULL);
   }
@@ -159,10 +105,10 @@ void event_button_wifi_handler(lv_event_t *e) {
   esp3d_log("wifi Clicked");
   if (menu_screen_delay_timer) return;
   menu_next_screen = ESP3DScreenType::wifi;
-  if (BUTTON_ANIMATION_DELAY) {
+  if (ESP3D_BUTTON_ANIMATION_DELAY) {
     if (menu_screen_delay_timer) return;
     menu_screen_delay_timer = lv_timer_create(menu_screen_delay_timer_cb,
-                                              BUTTON_ANIMATION_DELAY, NULL);
+                                              ESP3D_BUTTON_ANIMATION_DELAY, NULL);
   } else {
     menu_screen_delay_timer_cb(NULL);
   }
@@ -173,22 +119,10 @@ void event_button_settings_handler(lv_event_t *e) {
   esp3d_log("settings Clicked");
   if (menu_screen_delay_timer) return;
   menu_next_screen = ESP3DScreenType::settings;
-  if (BUTTON_ANIMATION_DELAY) {
+  if (ESP3D_BUTTON_ANIMATION_DELAY) {
     if (menu_screen_delay_timer) return;
     menu_screen_delay_timer = lv_timer_create(menu_screen_delay_timer_cb,
-                                              BUTTON_ANIMATION_DELAY, NULL);
-  } else
-    menu_screen_delay_timer_cb(NULL);
-}
-
-void event_button_leveling_handler(lv_event_t *e) {
-  esp3d_log("leveling Clicked");
-  if (menu_screen_delay_timer) return;
-  menu_next_screen = ESP3DScreenType::leveling;
-  if (BUTTON_ANIMATION_DELAY) {
-    if (menu_screen_delay_timer) return;
-    menu_screen_delay_timer = lv_timer_create(menu_screen_delay_timer_cb,
-                                              BUTTON_ANIMATION_DELAY, NULL);
+                                              ESP3D_BUTTON_ANIMATION_DELAY, NULL);
   } else
     menu_screen_delay_timer_cb(NULL);
 }
@@ -197,32 +131,19 @@ void event_button_informations_handler(lv_event_t *e) {
   esp3d_log("informations Clicked");
   if (menu_screen_delay_timer) return;
   menu_next_screen = ESP3DScreenType::informations;
-  if (BUTTON_ANIMATION_DELAY) {
+  if (ESP3D_BUTTON_ANIMATION_DELAY) {
     if (menu_screen_delay_timer) return;
     menu_screen_delay_timer = lv_timer_create(menu_screen_delay_timer_cb,
-                                              BUTTON_ANIMATION_DELAY, NULL);
+                                              ESP3D_BUTTON_ANIMATION_DELAY, NULL);
   } else
     menu_screen_delay_timer_cb(NULL);
 }
 
-void event_button_disable_steppers_handler(lv_event_t *e) {
-  esp3d_log("Disable Steppers Clicked");
-  renderingClient.sendGcode("M84");
-  std::string text =
-      esp3dTranslationService.translate(ESP3DLabel::motors_disabled);
-  msgBox::messageBox(NULL, MsgBoxType::information, text.c_str());
-  esp3dTftValues.set_string_value(ESP3DValuesIndex::status_bar_label,
-                                  text.c_str());
-}
-
-void menu_screen() {
+void create() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);
   if (!intialization_done) {
     esp3d_log("menu screen initialization");
-    uint8_t byteValue =
-        esp3dTftsettings.readByte(ESP3DSettingIndex::esp3d_auto_level_on);
-
-    auto_leveling = byteValue == 1 ? true : false;
+    
     intialization_done = true;
   }
   // Screen creation
@@ -230,76 +151,59 @@ void menu_screen() {
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
-  apply_style(ui_new_screen, ESP3DStyleType::main_bg);
+  ESP3DStyle::apply(ui_new_screen, ESP3DStyleType::main_bg);
   lv_obj_del(ui_current_screen);
 
-  lv_obj_t *btnback = backButton::create_back_button(ui_new_screen);
+  lv_obj_t *btnback = backButton::create(ui_new_screen);
   lv_obj_add_event_cb(btnback, event_button_menu_back_handler, LV_EVENT_CLICKED,
                       NULL);
-  lv_obj_t *ui_main_container = mainContainer::create_main_container(
+  lv_obj_t *ui_main_container = mainContainer::create(
       ui_new_screen, btnback, ESP3DStyleType::col_container);
 
   // Add buttons top container to main container
   lv_obj_t *ui_top_buttons_container = lv_obj_create(ui_main_container);
-  apply_style(ui_top_buttons_container, ESP3DStyleType::row_container);
+  ESP3DStyle::apply(ui_top_buttons_container, ESP3DStyleType::row_container);
   lv_obj_set_size(ui_top_buttons_container, LV_HOR_RES, LV_SIZE_CONTENT);
-  apply_outline_pad(ui_top_buttons_container);
+  ESP3DStyle::add_pad(ui_top_buttons_container);
   lv_obj_clear_flag(ui_top_buttons_container, LV_OBJ_FLAG_SCROLLABLE);
 
   // Add buttons bottom container to main container
   lv_obj_t *ui_bottom_buttons_container = lv_obj_create(ui_main_container);
-  apply_style(ui_bottom_buttons_container, ESP3DStyleType::row_container);
+  ESP3DStyle::apply(ui_bottom_buttons_container, ESP3DStyleType::row_container);
   lv_obj_set_size(ui_bottom_buttons_container, LV_HOR_RES, LV_SIZE_CONTENT);
-  apply_outline_pad(ui_bottom_buttons_container);
+  ESP3DStyle::add_pad(ui_bottom_buttons_container);
   lv_obj_clear_flag(ui_bottom_buttons_container, LV_OBJ_FLAG_SCROLLABLE);
 
   //**********************************
 
   // Create button and label for filament button
-  lv_obj_t *btn1 = symbolButton::create_symbol_button(
-      ui_top_buttons_container, LV_SYMBOL_FILAMENT, BUTTON_WIDTH, BUTTON_HEIGHT,
-      true, false, 90);
-  lv_obj_add_event_cb(btn1, event_button_filament_handler, LV_EVENT_CLICKED,
-                      NULL);
-
-  // Create button and label for leveling button
-  std::string label2 = LV_SYMBOL_LEVELING;
-  main_btn_leveling =
-      menuButton::create_menu_button(ui_top_buttons_container, label2.c_str());
-  lv_obj_add_event_cb(main_btn_leveling, event_button_leveling_handler,
-                      LV_EVENT_CLICKED, NULL);
-
-  // Create button and label for disable steppers button
-  main_btn_disable_steppers = symbolButton::create_symbol_button(
-      ui_top_buttons_container, LV_SYMBOL_ENGINE, BUTTON_WIDTH, BUTTON_HEIGHT,
-      true, true, 90);
-  lv_obj_add_event_cb(main_btn_disable_steppers,
-                      event_button_disable_steppers_handler, LV_EVENT_CLICKED,
-                      NULL);
+  // lv_obj_t *btn1 = symbolButton::create(
+  //     ui_top_buttons_container, LV_SYMBOL_FILAMENT, ESP3D_BUTTON_WIDTH, ESP3D_BUTTON_HEIGHT,
+  //     true, false, 90);
+  // lv_obj_add_event_cb(btn1, event_button_filament_handler, LV_EVENT_CLICKED,
+  //                     NULL);
 
 #if ESP3D_WIFI_FEATURE
   // Create button and label for wifi button
   std::string label4 = LV_SYMBOL_WIFI;
-  lv_obj_t *btn4 = menuButton::create_menu_button(ui_bottom_buttons_container,
+  lv_obj_t *btn4 = menuButton::create(ui_bottom_buttons_container,
                                                   label4.c_str());
   lv_obj_add_event_cb(btn4, event_button_wifi_handler, LV_EVENT_CLICKED, NULL);
 #endif  // ESP3D_WIFI_FEATURE
 
   // Create button and label for settings button
   std::string label3 = LV_SYMBOL_SETTINGS;
-  lv_obj_t *btn3 = menuButton::create_menu_button(ui_bottom_buttons_container,
+  lv_obj_t *btn3 = menuButton::create(ui_bottom_buttons_container,
                                                   label3.c_str());
   lv_obj_add_event_cb(btn3, event_button_settings_handler, LV_EVENT_CLICKED,
                       NULL);
 
   // Create button and label for informations button
   std::string label6 = LV_SYMBOL_MORE_INFO;
-  lv_obj_t *btn6 = menuButton::create_menu_button(ui_bottom_buttons_container,
+  lv_obj_t *btn6 = menuButton::create(ui_bottom_buttons_container,
                                                   label6.c_str());
   lv_obj_add_event_cb(btn6, event_button_informations_handler, LV_EVENT_CLICKED,
                       NULL);
   esp3dTftui.set_current_screen(ESP3DScreenType::menu);
-  menu_display_disable_steppers();
-  menu_display_leveling();
 }
 }  // namespace menuScreen

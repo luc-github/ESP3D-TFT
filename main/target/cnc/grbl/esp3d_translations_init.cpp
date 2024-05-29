@@ -65,21 +65,11 @@ void ESP3DTranslationService::init() {
       {ESP3DLabel::polling, "Polling"},
       {ESP3DLabel::enabled, "Enabled"},
       {ESP3DLabel::disabled, "Disabled"},
-      {ESP3DLabel::motors_disabled, "Motors disabled"},
       {ESP3DLabel::information, "Information"},
       {ESP3DLabel::fan_controls, "Fan controls"},
       {ESP3DLabel::serial, "Serial"},
-      {ESP3DLabel::auto_leveling, "Auto leveling"},
-      {ESP3DLabel::manual_leveling_help,
-       "Adjust each knobs corresponding to active position until a sheet of "
-       "paper just slides amid nozzle and plate.\n"
-       "Repeat operation for each point until no correction is needed."},
-      {ESP3DLabel::manual_leveling_text,
-       "Adjust knobs to level, then click on next.\nYou can also select "
-       "manually each point."},
-      {ESP3DLabel::bed_width, "Bed width"},
-      {ESP3DLabel::bed_depth, "Bed depth"},
-      {ESP3DLabel::auto_bed_probing, "Probing location: %s"},
+      {ESP3DLabel::workspace_width, "Workspace width"},
+      {ESP3DLabel::workspace_depth, "Workspace depth"},
       {ESP3DLabel::invert_axis, "Invert %s axis"},
       {ESP3DLabel::start_probing, "Start probing"},
       {ESP3DLabel::ui_language, "Language"},

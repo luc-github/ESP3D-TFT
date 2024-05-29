@@ -3,12 +3,12 @@
 # Debug = 2
 # Error only = 1
 # Disabled = 0
-add_compile_options(-DESP3D_TFT_LOG=0)
+add_compile_options(-DESP3D_TFT_LOG=1)
 # Disable ANSI color to fit some serial terminals 
 add_compile_options(-DDISABLE_COLOR_LOG=0)
 
 #Use the Snapshot API of LVGL to dump screens to the SD card
-add_compile_options(-DLV_USE_SNAPSHOT=0)
+add_compile_options(-DLV_USE_SNAPSHOT=1)
 
 # ESP3D-TFT specific bechmark
 # Enabled  = 1
