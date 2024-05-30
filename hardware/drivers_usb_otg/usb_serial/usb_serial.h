@@ -13,18 +13,16 @@ extern "C" {
  *********************/
 #include <stdbool.h>
 #include <stdint.h>
-#include "esp_err.h"
 
+#include "esp_err.h"
 
 /*********************
  *      DEFINES
  *********************/
 
-
 /**********************
  *      TYPEDEFS
  **********************/
-
 
 /**********************
  * GLOBAL PROTOTYPES

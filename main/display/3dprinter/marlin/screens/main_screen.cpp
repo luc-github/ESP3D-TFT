@@ -210,7 +210,7 @@ bool position_value_cb(ESP3DValuesIndex index, const char *value,
  * @return True if the callback was handled successfully, false otherwise.
  */
 bool callback(ESP3DValuesIndex index, const char *value,
-                  ESP3DValuesCbAction action) {
+              ESP3DValuesCbAction action) {
   esp3d_log("callback");
   if (!show_fan_button) {
     esp3d_log("No control to show");
@@ -630,7 +630,7 @@ void main_screen_delay_timer_cb(lv_timer_t *timer) {
   // If timer is not null, delete it to avoid multiple call
   if (main_screen_delay_timer && lv_timer_is_valid(main_screen_delay_timer)) {
     lv_timer_del(main_screen_delay_timer);
-  } 
+  }
   main_screen_delay_timer = NULL;
   switch (next_screen) {
     case ESP3DScreenType::none:
@@ -1058,7 +1058,8 @@ void create() {
     esp3d_log_e("Error creating progression area label");
     return;
   }
-  ESP3DStyle::apply(main_label_progression_area, ESP3DStyleType::progression_area);
+  ESP3DStyle::apply(main_label_progression_area,
+                    ESP3DStyleType::progression_area);
 
   lv_obj_center(main_label_progression_area);
 
@@ -1138,7 +1139,7 @@ void create() {
   main_display_pause();
   main_display_resume();
 #if ESP3D_SD_CARD_FEATURE
-  main_display_files();  
+  main_display_files();
 #endif  // ESP3D_SD_CARD_FEATURE
   main_display_stop();
   main_display_menu();

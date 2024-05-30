@@ -18,14 +18,14 @@
 */
 #if LV_USE_SNAPSHOT && ESP3D_DISPLAY_FEATURE
 
+#include <lvgl.h>
+
 #include "authentication/esp3d_authentication.h"
 #include "esp3d_client.h"
 #include "esp3d_commands.h"
+#include "esp3d_hal.h"
 #include "esp3d_string.h"
 #include "filesystem/esp3d_sd.h"
-#include <lvgl.h>
-
-#include "esp3d_hal.h"
 
 #define COMMAND_ID 216
 
@@ -50,41 +50,42 @@ void ESP3DCommands::ESP216(int cmd_params_pos, ESP3DMessage* msg) {
 #endif  // ESP3D_AUTHENTICATION_FEATURE
   tmpstr = get_clean_param(msg, cmd_params_pos);
   if (tmpstr.length() == 0) {
-   hasError = true;
+    hasError = true;
   } else {
-    //TODO: do the snapshot
-    lv_obj_t * currentt_scr = lv_scr_act();
-    lv_img_dsc_t snapshot ;
-    uint32_t buffer_size = lv_snapshot_buf_size_needed(currentt_scr, LV_IMG_CF_TRUE_COLOR);
+    // TODO: do the snapshot
+    lv_obj_t* currentt_scr = lv_scr_act();
+    lv_img_dsc_t snapshot;
+    uint32_t buffer_size =
+        lv_snapshot_buf_size_needed(currentt_scr, LV_IMG_CF_TRUE_COLOR);
     esp3d_log("Snapshot buffer size needed: %ld", buffer_size);
-    uint8_t      *buffer_image = (uint8_t *)malloc(buffer_size);
+    uint8_t* buffer_image = (uint8_t*)malloc(buffer_size);
     if (!buffer_image) {
-        hasError = true;
-        error_msg = "Not enough memory";
-    }
-    else {
-        lv_snapshot_take_to_buf(currentt_scr,LV_IMG_CF_TRUE_COLOR, &snapshot, buffer_image, buffer_size);
-         if (sd.accessFS()) {
-            std::string filename = "snapshot";
-            filename+=std::to_string(esp3d_hal::millis()) + ".raw";
-             FILE* fd = sd.open(filename.c_str(), "w");
-          if (fd) {
-             if (fwrite(buffer_image, buffer_size, 1, fd) != 1) {
-                hasError = true;
-                error_msg = "write failed";
-             }
-            sd.close(fd);
-          } else {
+      hasError = true;
+      error_msg = "Not enough memory";
+    } else {
+      lv_snapshot_take_to_buf(currentt_scr, LV_IMG_CF_TRUE_COLOR, &snapshot,
+                              buffer_image, buffer_size);
+      if (sd.accessFS()) {
+        std::string filename = "snapshot";
+        filename += std::to_string(esp3d_hal::millis()) + ".raw";
+        FILE* fd = sd.open(filename.c_str(), "w");
+        if (fd) {
+          if (fwrite(buffer_image, buffer_size, 1, fd) != 1) {
             hasError = true;
-            error_msg = "creation failed";
+            error_msg = "write failed";
           }
-            sd.releaseFS();
-         } else {
-            hasError = true;
-            error_msg = "access SD failed";
-         }
+          sd.close(fd);
+        } else {
+          hasError = true;
+          error_msg = "creation failed";
+        }
+        sd.releaseFS();
+      } else {
+        hasError = true;
+        error_msg = "access SD failed";
+      }
 
-        free(buffer_image);
+      free(buffer_image);
     }
   }
 
@@ -93,4 +94,4 @@ void ESP3DCommands::ESP216(int cmd_params_pos, ESP3DMessage* msg) {
     esp3d_log_e("Error sending response to clients");
   }
 }
-#endif  //LV_USE_SNAPSHOT && ESP3D_DISPLAY_FEATURE
+#endif  // LV_USE_SNAPSHOT && ESP3D_DISPLAY_FEATURE

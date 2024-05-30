@@ -22,10 +22,10 @@
 
 #include "back_button_component.h"
 #include "esp3d_log.h"
+#include "esp3d_lvgl.h"
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "symbol_button_component.h"
-#include "esp3d_lvgl.h"
 
 /**********************
  *  Namespace
@@ -51,12 +51,13 @@ void choice_editor_delay_timer_cb(lv_timer_t *timer) {
   void (*callbackFn)(const char *str, void *user_data) =
       (void (*)(const char *, void *))timer->user_data;
 
-  if (choice_editor_delay_timer && lv_timer_is_valid(choice_editor_delay_timer)) {
-    lv_timer_del(choice_editor_delay_timer); 
+  if (choice_editor_delay_timer &&
+      lv_timer_is_valid(choice_editor_delay_timer)) {
+    lv_timer_del(choice_editor_delay_timer);
   }
   choice_editor_delay_timer = NULL;
   if (main_container && lv_obj_is_valid(main_container)) {
-    lv_obj_del(main_container);  
+    lv_obj_del(main_container);
   }
   main_container = nullptr;
   if (callbackFn) {

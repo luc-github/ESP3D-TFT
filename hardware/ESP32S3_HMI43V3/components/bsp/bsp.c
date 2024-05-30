@@ -25,11 +25,10 @@
 
 #include "esp3d_log.h"
 
-
 #if ESP3D_DISPLAY_FEATURE
 
-#include "i2c_def.h"
 #include "disp_def.h"
+#include "i2c_def.h"
 #include "lvgl.h"
 #include "tca9554_def.h"
 #include "touch_def.h"
@@ -37,8 +36,7 @@
 
 #if ESP3D_USB_SERIAL_FEATURE
 #include "usb_serial.h"
-#endif //ESP3D_USB_SERIAL_FEATURE
-
+#endif  // ESP3D_USB_SERIAL_FEATURE
 
 /**********************
  *  STATIC PROTOTYPES
@@ -46,9 +44,9 @@
 #if ESP3D_DISPLAY_FEATURE
 static void lv_touch_read(lv_indev_drv_t* drv, lv_indev_data_t* data);
 void display_flush_ready();
-void rm68120_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area,
-                   lv_color_t *color_p);
-#endif // ESP3D_DISPLAY_FEATURE
+void rm68120_flush(lv_disp_drv_t* disp_drv, const lv_area_t* area,
+                   lv_color_t* color_p);
+#endif  // ESP3D_DISPLAY_FEATURE
 
 /**********************
  *  STATIC VARIABLES
@@ -59,12 +57,10 @@ static lv_disp_drv_t disp_drv;
 static esp_lcd_panel_handle_t panel_handle = NULL;
 #endif  // ESP3D_DISPLAY_FEATURE
 
-
-
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
- #if ESP3D_USB_SERIAL_FEATURE
+#if ESP3D_USB_SERIAL_FEATURE
 /**
  * @brief Initializes the USB functionality of the BSP.
  *
@@ -94,7 +90,7 @@ esp_err_t bsp_deinit_usb(void) {
   esp3d_log("Remove usb-serial");
   return usb_serial_deinit();
 }
-#endif // ESP3D_USB_SERIAL_FEATURE
+#endif  // ESP3D_USB_SERIAL_FEATURE
 
 /**
  * @brief Initializes the Board Support Package (BSP).
@@ -126,7 +122,7 @@ esp_err_t bsp_init(void) {
   if (usb_serial_init() != ESP_OK) {
     return ESP_FAIL;
   }
-#endif //ESP3D_USB_SERIAL_FEATURE
+#endif  // ESP3D_USB_SERIAL_FEATURE
 
 #if ESP3D_DISPLAY_FEATURE
   /* tca9554 controller initialization */
@@ -136,10 +132,10 @@ esp_err_t bsp_init(void) {
     return ESP_FAIL;
   }
 
-
   /* Display controller initialization */
   esp3d_log("Initializing display controller");
-  if (rm68120_init(&rm68120_cfg, &panel_handle, (void*)display_flush_ready) != ESP_OK) {
+  if (rm68120_init(&rm68120_cfg, &panel_handle, (void*)display_flush_ready) !=
+      ESP_OK) {
     return ESP_FAIL;
   }
 
@@ -180,15 +176,15 @@ esp_err_t bsp_init(void) {
   /* Initialize the working buffer depending on the selected display.*/
   lv_disp_draw_buf_init(&draw_buf, buf1, buf2, size_in_px);
 
- 
   lv_disp_drv_init(&disp_drv);       /*Basic initialization*/
   disp_drv.flush_cb = rm68120_flush; /*Set your driver function*/
   disp_drv.draw_buf = &draw_buf;     /*Assign the buffer to the display*/
-  disp_drv.hor_res = rm68120_cfg.hor_res ; /*Set the horizontal resolution of the display*/
-  disp_drv.ver_res =  rm68120_cfg.ver_res; /*Set the vertical resolution of the display*/
+  disp_drv.hor_res =
+      rm68120_cfg.hor_res; /*Set the horizontal resolution of the display*/
+  disp_drv.ver_res =
+      rm68120_cfg.ver_res; /*Set the vertical resolution of the display*/
   disp_drv.user_data = panel_handle;
   lv_disp_drv_register(&disp_drv); /*Finally register the driver*/
-
 
   if (has_touch) {
     /* Register an input device */
@@ -211,14 +207,13 @@ esp_err_t bsp_init(void) {
 /**
  * @brief Indicates that the display flush is ready.
  *
- * This function is called to indicate that the display flush operation has completed and the display is ready for the next operation.
+ * This function is called to indicate that the display flush operation has
+ * completed and the display is ready for the next operation.
  */
-void display_flush_ready(){
-  lv_disp_flush_ready(&disp_drv);
-}
+void display_flush_ready() { lv_disp_flush_ready(&disp_drv); }
 
-void rm68120_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area,
-                   lv_color_t *color_p) {
+void rm68120_flush(lv_disp_drv_t* disp_drv, const lv_area_t* area,
+                   lv_color_t* color_p) {
   esp_lcd_panel_handle_t panel_handle =
       (esp_lcd_panel_handle_t)disp_drv->user_data;
 

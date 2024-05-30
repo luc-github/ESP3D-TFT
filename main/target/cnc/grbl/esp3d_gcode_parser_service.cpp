@@ -29,9 +29,9 @@ ESP3DGCodeParserService esp3dGcodeParser;
 const char* emmergencyGcodeCommand[] = {"M112", "M410", "M999"};
 const char* emmergencyESP3DCommand[] = {"[ESP701]"};
 const char* pollingCommands[] = {
-    "?",  // Status
-    "$G",  // GCode parser state
-    "$#",  // GCode Parameters
+    "?",             // Status
+    "$G",            // GCode parser state
+    "$#",            // GCode Parameters
     "[ESP701]json",  // streaming status
 };
 
@@ -121,12 +121,10 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
   //   // is temperature
   //   if (strstr(data, "T:") != nullptr) {
   //     // ok T:25.00 /120.00 B:25.00 /0.00 @:127 B@:0
-  //     // T:25.00 /0.00 B:25.00 /50.00 T0:25.00 /0.00 T1:105.00 /0.00 @:0 B@:127
-  //     char* ptrt = strstr(data, "T:");
-  //     char* ptrt0 = strstr(data, "T0:");
-  //     char* ptrt1 = strstr(data, "T1:");
-  //     char* ptrb = strstr(data, "B:");
-  //     if (ptrt0 && ptrt1) {  // dual extruder
+  //     // T:25.00 /0.00 B:25.00 /50.00 T0:25.00 /0.00 T1:105.00 /0.00 @:0
+  //     B@:127 char* ptrt = strstr(data, "T:"); char* ptrt0 = strstr(data,
+  //     "T0:"); char* ptrt1 = strstr(data, "T1:"); char* ptrb = strstr(data,
+  //     "B:"); if (ptrt0 && ptrt1) {  // dual extruder
   //       esp3d_log("Temperature dual extruders");
   //       ptrt0 += 3;
   //       ptrt1 += 3;
@@ -237,8 +235,8 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
   //       esp3d_log("Bed: %s / %s", ptrb, ptrtt);
   //     } else {
   //       esp3d_log("No Temperature bed");
-  //       esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_temperature, "#");
-  //       esp3dTftValues.set_string_value(
+  //       esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_temperature,
+  //       "#"); esp3dTftValues.set_string_value(
   //           ESP3DValuesIndex::bed_target_temperature, "#");
   //     }
   //     setPollingCommandsLastRun(
@@ -370,17 +368,20 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
   //     if (strstr(data, "G29 Auto Bed Leveling") != nullptr) {
   //       isLeveling = true;
   //       // Send start of leveling
-  //       esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_leveling, "Start",
+  //       esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_leveling,
+  //       "Start",
   //                                       ESP3DValuesCbAction::Add);
   //     } else if (isLeveling) {
   //       if (strstr(data, "Bilinear Leveling Grid:") != nullptr) {
   //         isLeveling = false;
   //         // Send end of leveling
-  //         esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_leveling, "End",
+  //         esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_leveling,
+  //         "End",
   //                                         ESP3DValuesCbAction::Delete);
   //       } else {
   //         // Send leveling data
-  //         esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_leveling, data,
+  //         esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_leveling,
+  //         data,
   //                                         ESP3DValuesCbAction::Update);
   //       }
   //     }

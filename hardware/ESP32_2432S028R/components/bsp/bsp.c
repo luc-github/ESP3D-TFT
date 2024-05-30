@@ -249,8 +249,10 @@ static void lv_touch_read(lv_indev_drv_t *drv, lv_indev_data_t *data) {
   static uint16_t last_x, last_y;
   xpt2046_data_t touch_data = xpt2046_read();
   if (touch_data.is_pressed) {
-    last_x = MAP(touch_data.x, xpt2046_cfg.calibration_x_min , xpt2046_cfg.calibration_x_max , xpt2046_cfg.x_max );
-    last_y = MAP(touch_data.y, xpt2046_cfg.calibration_y_min , xpt2046_cfg.calibration_y_max , xpt2046_cfg.y_max);
+    last_x = MAP(touch_data.x, xpt2046_cfg.calibration_x_min,
+                 xpt2046_cfg.calibration_x_max, xpt2046_cfg.x_max);
+    last_y = MAP(touch_data.y, xpt2046_cfg.calibration_y_min,
+                 xpt2046_cfg.calibration_y_max, xpt2046_cfg.y_max);
     esp3d_log("Touch x=%d, y=%d", last_x, last_y);
   }
   data->point.x = last_x;

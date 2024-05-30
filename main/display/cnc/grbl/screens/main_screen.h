@@ -31,6 +31,6 @@ bool position_values(ESP3DValuesIndex index, const char *value,
 bool state_value_cb(ESP3DValuesIndex index, const char *value,
                     ESP3DValuesCbAction action);
 bool state_comment_value_cb(ESP3DValuesIndex index, const char *value,
-                             ESP3DValuesCbAction action);
+                            ESP3DValuesCbAction action);
 
 }  // namespace mainScreen

@@ -93,10 +93,12 @@ void show(const char* msg, lv_obj_t* backtbn) {
 /**
  * @brief Hides the spinner component.
  *
- * This function hides the spinner component by adding the LV_OBJ_FLAG_HIDDEN flag to the spinner object.
- * If the spinner is not currently displayed on the active screen, an error message is logged.
- * If the spinner is displayed on the active screen, the spinner object is deleted.
- * The spinner index is decremented and the spinner object and screen displaying the spinner are set to NULL.
+ * This function hides the spinner component by adding the LV_OBJ_FLAG_HIDDEN
+ * flag to the spinner object. If the spinner is not currently displayed on the
+ * active screen, an error message is logged. If the spinner is displayed on the
+ * active screen, the spinner object is deleted. The spinner index is
+ * decremented and the spinner object and screen displaying the spinner are set
+ * to NULL.
  *
  * @note If the spinner is already hidden, a warning message is logged.
  */

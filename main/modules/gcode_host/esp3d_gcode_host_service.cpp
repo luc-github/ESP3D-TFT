@@ -1651,14 +1651,28 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       // should we abort the stream? or go to next command in stream if any
       // ?
       // how to notify to user ?
-      esp3d_log_e("Stream is in error, cancel it %s , %s", _current_command_str.c_str(), _current_stream_ptr->dataStream);
+      esp3d_log_e("Stream is in error, cancel it %s , %s",
+                  _current_command_str.c_str(),
+                  _current_stream_ptr->dataStream);
 
       text = esp3dTranslationService.translate(ESP3DLabel::error);
       text += ": ";
-      if (_current_stream_ptr->type  == ESP3DGcodeHostStreamType::single_command ||  _current_stream_ptr->type   == ESP3DGcodeHostStreamType::multiple_commands){
-        text += esp3dTranslationService.translate(ESP3DLabel::command_error,_current_command_str.c_str());
-      } else if (_current_stream_ptr->type  == ESP3DGcodeHostStreamType::fs_script ||  _current_stream_ptr->type  == ESP3DGcodeHostStreamType::sd_script|| _current_stream_ptr->type  == ESP3DGcodeHostStreamType::fs_stream ||  _current_stream_ptr->type  == ESP3DGcodeHostStreamType::sd_stream){
-        text += esp3dTranslationService.translate(ESP3DLabel::stream_error,  _current_stream_ptr->dataStream); 
+      if (_current_stream_ptr->type ==
+              ESP3DGcodeHostStreamType::single_command ||
+          _current_stream_ptr->type ==
+              ESP3DGcodeHostStreamType::multiple_commands) {
+        text += esp3dTranslationService.translate(ESP3DLabel::command_error,
+                                                  _current_command_str.c_str());
+      } else if (_current_stream_ptr->type ==
+                     ESP3DGcodeHostStreamType::fs_script ||
+                 _current_stream_ptr->type ==
+                     ESP3DGcodeHostStreamType::sd_script ||
+                 _current_stream_ptr->type ==
+                     ESP3DGcodeHostStreamType::fs_stream ||
+                 _current_stream_ptr->type ==
+                     ESP3DGcodeHostStreamType::sd_stream) {
+        text += esp3dTranslationService.translate(
+            ESP3DLabel::stream_error, _current_stream_ptr->dataStream);
       } else {
         text += esp3dTranslationService.translate(ESP3DLabel::streaming_error);
       }
@@ -1669,18 +1683,30 @@ void ESP3DGCodeHostService::_handle_stream_states() {
 
       // send error message
       if (!esp3dCommands.dispatch(text.c_str(), ESP3DClientType::all_clients,
-                             requestId, ESP3DMessageType::unique,
-                             ESP3DClientType::stream,
-                             ESP3DAuthenticationLevel::admin)){
+                                  requestId, ESP3DMessageType::unique,
+                                  ESP3DClientType::stream,
+                                  ESP3DAuthenticationLevel::admin)) {
         esp3d_log_e("Failed to send error message");
-                             }
+      }
 
 #if ESP3D_NOTIFICATIONS_FEATURE
       text = "Error: ";
-      if (_current_stream_ptr->type  == ESP3DGcodeHostStreamType::single_command ||  _current_stream_ptr->type   == ESP3DGcodeHostStreamType::multiple_commands){
-        text += esp3dTranslationService.translate(ESP3DLabel::command_error, _current_command_str.c_str());         
-      } else if (_current_stream_ptr->type  == ESP3DGcodeHostStreamType::fs_script ||  _current_stream_ptr->type  == ESP3DGcodeHostStreamType::sd_script|| _current_stream_ptr->type  == ESP3DGcodeHostStreamType::fs_stream ||  _current_stream_ptr->type  == ESP3DGcodeHostStreamType::sd_stream){
-        text += esp3dTranslationService.translate(ESP3DLabel::stream_error,  _current_stream_ptr->dataStream); 
+      if (_current_stream_ptr->type ==
+              ESP3DGcodeHostStreamType::single_command ||
+          _current_stream_ptr->type ==
+              ESP3DGcodeHostStreamType::multiple_commands) {
+        text += esp3dTranslationService.translate(ESP3DLabel::command_error,
+                                                  _current_command_str.c_str());
+      } else if (_current_stream_ptr->type ==
+                     ESP3DGcodeHostStreamType::fs_script ||
+                 _current_stream_ptr->type ==
+                     ESP3DGcodeHostStreamType::sd_script ||
+                 _current_stream_ptr->type ==
+                     ESP3DGcodeHostStreamType::fs_stream ||
+                 _current_stream_ptr->type ==
+                     ESP3DGcodeHostStreamType::sd_stream) {
+        text += esp3dTranslationService.translate(
+            ESP3DLabel::stream_error, _current_stream_ptr->dataStream);
       } else {
         text += esp3dTranslationService.translate(ESP3DLabel::streaming_error);
       }

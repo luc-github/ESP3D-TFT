@@ -43,7 +43,6 @@
 #include "screens/settings_screen.h"
 #include "translations/esp3d_translation_service.h"
 
-
 #if ESP3D_WIFI_FEATURE
 #include "screens/wifi_screen.h"
 #endif  // ESP3D_WIFI_FEATURE
@@ -137,7 +136,7 @@ void job_status_value_cb(ESP3DValuesIndex index, const char *value,
 void menu_screen_delay_timer_cb(lv_timer_t *timer) {
   if (menu_screen_delay_timer && lv_timer_is_valid(menu_screen_delay_timer)) {
     lv_timer_del(menu_screen_delay_timer);
-  } 
+  }
   menu_screen_delay_timer = NULL;
   switch (menu_next_screen) {
     case ESP3DScreenType::main:

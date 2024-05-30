@@ -29,7 +29,6 @@
 #include "esp3d_log.h"
 #include "esp_system.h"
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -133,22 +132,20 @@ xpt2046_data_t xpt2046_read() {
 }
 
 /**
- * @brief Retrieves the maximum x-coordinate value for the XPT2046 touch controller.
+ * @brief Retrieves the maximum x-coordinate value for the XPT2046 touch
+ * controller.
  *
  * @return The maximum x-coordinate value.
  */
-uint16_t get_xtp2046_x_max() {
-  return _xtp2046_x_max;
-}
+uint16_t get_xtp2046_x_max() { return _xtp2046_x_max; }
 
 /**
- * @brief Retrieves the maximum Y coordinate value for the XPT2046 touch controller.
+ * @brief Retrieves the maximum Y coordinate value for the XPT2046 touch
+ * controller.
  *
  * @return The maximum Y coordinate value.
  */
-uint16_t get_xtp2046_y_max() {
-  return _xtp2046_y_max;
-}
+uint16_t get_xtp2046_y_max() { return _xtp2046_y_max; }
 
 /**********************
  *   STATIC FUNCTIONS

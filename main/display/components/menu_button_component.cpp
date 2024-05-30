@@ -30,6 +30,6 @@
 namespace menuButton {
 lv_obj_t *create(lv_obj_t *container, const char *text) {
   return symbolButton::create(container, text, ESP3D_BUTTON_WIDTH,
-                                            ESP3D_BUTTON_HEIGHT);
+                              ESP3D_BUTTON_HEIGHT);
 }
 }  // namespace menuButton

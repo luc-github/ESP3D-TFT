@@ -24,11 +24,9 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-bool spi_driver_init(int host,
-                     int miso_pin, int mosi_pin, int sclk_pin,
-                     int max_transfer_sz,
-                     int dma_channel,
-                     int quadwp_pin, int quadhd_pin);
+bool spi_driver_init(int host, int miso_pin, int mosi_pin, int sclk_pin,
+                     int max_transfer_sz, int dma_channel, int quadwp_pin,
+                     int quadhd_pin);
 
 /**********************
  *      MACROS
@@ -37,4 +35,3 @@ bool spi_driver_init(int host,
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
-

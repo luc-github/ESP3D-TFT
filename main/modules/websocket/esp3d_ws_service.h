@@ -66,7 +66,7 @@ class ESP3DWsService {
   bool isEndChar(uint8_t ch);
   int getFreeClientIndex();
   uint clientsConnected();
-  bool isConnected(){return clientsConnected()>0;}
+  bool isConnected() { return clientsConnected() > 0; }
   ESP3DWebSocketInfos *getClientInfos(uint index);
   ESP3DWebSocketInfos *getClientInfosFromSocketId(int socketId);
   bool addClient(int socketid);

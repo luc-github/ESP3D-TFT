@@ -20,10 +20,10 @@
 
 #pragma once
 
-//Splash screen positions
+// Splash screen positions
 
- #define VERSION_X -10
- #define VERSION_Y -10
+#define VERSION_X -10
+#define VERSION_Y -10
 
 #define FW_LOGO_X 10
 #define FW_LOGO_Y -10

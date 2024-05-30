@@ -30,12 +30,12 @@ extern "C" {
 #include <stdint.h>
 
 #include "esp_err.h"
-#include "esp_lcd_panel_io.h"
-#include "esp_lcd_panel_vendor.h"
-#include "esp_lcd_panel_ops.h"
-#include "esp_lcd_panel_interface.h"
 #include "esp_lcd_panel_commands.h"
+#include "esp_lcd_panel_interface.h"
+#include "esp_lcd_panel_io.h"
+#include "esp_lcd_panel_ops.h"
 #include "esp_lcd_panel_rgb.h"
+#include "esp_lcd_panel_vendor.h"
 
 /**********************
  *      TYPEDEFS
@@ -50,17 +50,18 @@ extern "C" {
  * - `orientation_landscape_invert`: The display is in inverted landscape mode.
  */
 typedef enum {
-    orientation_portrait = 0,
-    orientation_landscape = 1,
-    orientation_portrait_invert = 2,
-    orientation_landscape_invert = 3,
+  orientation_portrait = 0,
+  orientation_landscape = 1,
+  orientation_portrait_invert = 2,
+  orientation_landscape_invert = 3,
 } esp_i80_ek9716_orientation_t;
 
 /**
  * @brief Structure representing the configuration for the ek9716 RGB panel.
  */
 typedef struct {
-  esp_lcd_rgb_panel_config_t panel_config; /**< Configuration for the RGB panel. */
+  esp_lcd_rgb_panel_config_t
+      panel_config; /**< Configuration for the RGB panel. */
   esp_i80_ek9716_orientation_t orientation; /**< Orientation of the panel. */
   uint16_t hor_res; /**< Horizontal resolution of the panel. */
   uint16_t ver_res; /**< Vertical resolution of the panel. */
@@ -72,14 +73,19 @@ typedef struct {
 /**
  * @brief Initializes a new ek9716 LCD panel.
  *
- * This function initializes a new ek9716 LCD panel with the provided configuration.
+ * This function initializes a new ek9716 LCD panel with the provided
+ * configuration.
  *
- * @param disp_panel_cfg Pointer to the configuration structure for the ek9716 panel.
+ * @param disp_panel_cfg Pointer to the configuration structure for the ek9716
+ * panel.
  * @param disp_panel Pointer to the handle of the initialized ek9716 panel.
  *
- * @return `ESP_OK` if the panel is successfully initialized, or an error code if initialization fails.
+ * @return `ESP_OK` if the panel is successfully initialized, or an error code
+ * if initialization fails.
  */
-esp_err_t esp_lcd_new_panel_ek9716(const esp_rgb_ek9716_config_t *disp_panel_cfg, esp_lcd_panel_handle_t *disp_panel);
+esp_err_t esp_lcd_new_panel_ek9716(
+    const esp_rgb_ek9716_config_t *disp_panel_cfg,
+    esp_lcd_panel_handle_t *disp_panel);
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -82,11 +82,11 @@ void ESP3DValues::handle() {
                   (int)element.index);
         if (element.description->callbackFn) {
           element.description->callbackFn(element.index, element.value.c_str(),
-                         element.action);
+                                          element.action);
         }
-         // remove front element from queue
-      _updated_values_queue.pop_front();
-      nb++;
+        // remove front element from queue
+        _updated_values_queue.pop_front();
+        nb++;
       }
     }
   }

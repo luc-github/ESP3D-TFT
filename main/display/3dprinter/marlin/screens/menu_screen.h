@@ -24,8 +24,7 @@
 
 namespace menuScreen {
 void create();
-void job_status_value_cb(ESP3DValuesIndex index,
-                                            const char *value,
-                                            ESP3DValuesCbAction action);
+void job_status_value_cb(ESP3DValuesIndex index, const char *value,
+                         ESP3DValuesCbAction action);
 void enable_auto_leveling(bool enable);
 }  // namespace menuScreen

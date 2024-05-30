@@ -850,7 +850,7 @@ void create(uint8_t target, ESP3DScreenType screenreturn) {
 
   // unit
   label_unit1 = lv_label_create(ui_new_screen);
-  if(!lv_obj_is_valid(label_unit1)) {
+  if (!lv_obj_is_valid(label_unit1)) {
     esp3d_log_e("Failed to create label");
     return;
   }
@@ -899,14 +899,15 @@ bool extruder_0_value_cb(ESP3DValuesIndex index, const char *value,
 
 /**
  * @brief Callback function for extruder 1 value.
- * 
+ *
  * This function is called when the value of extruder 1 is received from ESP3D.
  * It is used to handle the received value and perform any necessary actions.
- * 
+ *
  * @param index The index of the value.
  * @param value The value received from ESP3D.
  * @param action The action to be performed on the value.
- * @return bool Returns true if the callback function successfully handles the value, false otherwise.
+ * @return bool Returns true if the callback function successfully handles the
+ * value, false otherwise.
  */
 bool extruder_1_value_cb(ESP3DValuesIndex index, const char *value,
                          ESP3DValuesCbAction action) {
@@ -917,8 +918,9 @@ bool extruder_1_value_cb(ESP3DValuesIndex index, const char *value,
 
 /**
  *  @brief Updates the UI values for the temperature screen.
- * This function sets the current and target temperature values on the UI based on the selected heater target.
- * It also updates the labels for the current and target temperature.
+ * This function sets the current and target temperature values on the UI based
+ * on the selected heater target. It also updates the labels for the current and
+ * target temperature.
  */
 void updateUiValues() {
   uint8_t target = get_heater_buttons_map_id(heater_buttons_map_id);
@@ -963,11 +965,12 @@ void updateUiValues() {
 
 /**
  * @brief Callback function for handling bed temperature value changes.
- * 
- * This function is called when the bed temperature value is updated. It checks if an update is needed
- * based on the visibility of the heater buttons and the current temperature values. If an update is needed,
- * it updates the heater values and the UI button matrix.
- * 
+ *
+ * This function is called when the bed temperature value is updated. It checks
+ * if an update is needed based on the visibility of the heater buttons and the
+ * current temperature values. If an update is needed, it updates the heater
+ * values and the UI button matrix.
+ *
  * @param index The index of the ESP3D value that triggered the callback.
  * @param value The new value of the ESP3D value.
  * @param action The action performed on the ESP3D value.

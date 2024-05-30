@@ -34,8 +34,8 @@
 #include "esp_heap_caps.h"
 #include "esp_system.h"
 #include "filesystem/esp3d_flash.h"
-#include "screens/menu_screen.h"
 #include "rom/ets_sys.h"
+#include "screens/menu_screen.h"
 #include "sdkconfig.h"
 #include "spi_flash_mmap.h"
 #include "translations/esp3d_translation_service.h"
@@ -174,9 +174,8 @@ void create() {
   addInformationToList(ui_info_list_ctl, ESP3DLabel::flash_type,
                        flashFs.getFileSystemName());
 
-//Target fw
-  addInformationToList(ui_info_list_ctl, ESP3DLabel::target_firmware,
-                       "Grbl"); 
+  // Target fw
+  addInformationToList(ui_info_list_ctl, ESP3DLabel::target_firmware, "Grbl");
 
   esp3dTftui.set_current_screen(ESP3DScreenType::informations);
 }

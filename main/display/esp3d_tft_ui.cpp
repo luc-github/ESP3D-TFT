@@ -24,6 +24,7 @@
 
 #include "esp3d_hal.h"
 #include "esp3d_log.h"
+#include "esp3d_values.h"
 #include "esp3d_version.h"
 #include "esp_freertos_hooks.h"
 #include "esp_timer.h"
@@ -33,7 +34,6 @@
 #include "lvgl.h"
 #include "rendering/esp3d_rendering_client.h"
 #include "tasks_def.h"
-#include "esp3d_values.h"
 
 #define STACKDEPTH UI_STACK_DEPTH
 #define TASKPRIORITY UI_TASK_PRIORITY

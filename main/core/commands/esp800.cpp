@@ -38,10 +38,10 @@
 #endif  // ESP3D_UPDATE_FEATURE
 #if ESP3D_TIMESTAMP_FEATURE
 #include "time/esp3d_time_service.h"
-#endif // ESP3D_TIMESTAMP_FEATURE
+#endif  // ESP3D_TIMESTAMP_FEATURE
 #ifdef ESP3D_CAMERA_FEATURE
 #include "camera/camera.h"
-#endif // ESP3D_CAMERA_FEATURE
+#endif  // ESP3D_CAMERA_FEATURE
 
 #define COMMAND_ID 800
 
@@ -273,18 +273,17 @@ void ESP3DCommands::ESP800(int cmd_params_pos, ESP3DMessage* msg) {
 
 #ifdef ESP3D_CAMERA_FEATURE
   // camera ID
-  
+
   tmpstr = esp3d_camera.GetModel();
-  if (!dispatchKeyValue(json, "CameraID", tmpstr.c_str(), target, requestId))
-  {
+  if (!dispatchKeyValue(json, "CameraID", tmpstr.c_str(), target, requestId)) {
     return;
   }
   // camera Name
-  if (!dispatchKeyValue(json, "CameraName", esp3d_camera.GetModelString(), target, requestId))
-  {
+  if (!dispatchKeyValue(json, "CameraName", esp3d_camera.GetModelString(),
+                        target, requestId)) {
     return;
   }
-#endif // ESP3D_CAMERA_FEATURE
+#endif  // ESP3D_CAMERA_FEATURE
 
   // end of list
   if (json) {

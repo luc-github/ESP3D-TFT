@@ -38,10 +38,13 @@ lv_obj_t *status_bar_label = nullptr;
 /**
  * @brief Callback function for handling ESP3D values.
  *
- * This function is used as a callback for handling ESP3D values. It takes three parameters:
+ * This function is used as a callback for handling ESP3D values. It takes three
+ * parameters:
  * - `index`: An enum value representing the index of the ESP3D value.
- * - `value`: A pointer to a character array representing the value of the ESP3D value.
- * - `action`: An enum value representing the action to be performed on the ESP3D value.
+ * - `value`: A pointer to a character array representing the value of the ESP3D
+ * value.
+ * - `action`: An enum value representing the action to be performed on the
+ * ESP3D value.
  *
  * @param index The index of the ESP3D value.
  * @param value The value of the ESP3D value.
@@ -49,7 +52,7 @@ lv_obj_t *status_bar_label = nullptr;
  * @return `true` if the callback was successful, `false` otherwise.
  */
 bool callback(ESP3DValuesIndex index, const char *value,
-                   ESP3DValuesCbAction action) {
+              ESP3DValuesCbAction action) {
   std::string svalue_one_line = esp3d_string::str_replace(value, "\n", "");
   svalue_one_line =
       esp3d_string::str_replace(svalue_one_line.c_str(), "\r", "");
@@ -66,8 +69,8 @@ bool callback(ESP3DValuesIndex index, const char *value,
 /**
  * @brief Event handler for the status list.
  *
- * This function is responsible for handling events related to the status list component.
- * It is called whenever an event occurs on the status list.
+ * This function is responsible for handling events related to the status list
+ * component. It is called whenever an event occurs on the status list.
  *
  * @param e Pointer to the event object.
  */

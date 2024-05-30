@@ -65,12 +65,12 @@ const esp32_camera_config_t camera_config = {
     .pin_pullup_1 = -1, /* if any need */
     .pin_pullup_2 = -1, /* if any need */
     .pin_led = -1,
-    .flip_horizontaly = false, // if horizontal flip is needed
-    .flip_vertically = false, // if vertical flip is needed
-    .brightness = 0, // default value is 0
-    .contrast = 0,  // default value is 0
+    .flip_horizontaly = false,  // if horizontal flip is needed
+    .flip_vertically = false,   // if vertical flip is needed
+    .brightness = 0,            // default value is 0
+    .contrast = 0,              // default value is 0
     .name = "OV2640",
-} ;
+};
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -476,12 +476,10 @@ void setting_edit_done_cb(const char *str, void *data) {
         menuScreen::enable_auto_leveling(val_byte);
         break;
       case ESP3DSettingIndex::esp3d_bed_width:
-        manualLevelingScreen::bed_width(
-            strtod(val_string.c_str(), NULL));
+        manualLevelingScreen::bed_width(strtod(val_string.c_str(), NULL));
         break;
       case ESP3DSettingIndex::esp3d_bed_depth:
-        manualLevelingScreen::bed_depth(
-            strtod(val_string.c_str(), NULL));
+        manualLevelingScreen::bed_depth(strtod(val_string.c_str(), NULL));
         break;
       default:
         break;

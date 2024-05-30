@@ -26,12 +26,12 @@
 #include "components/message_box_component.h"
 #include "components/symbol_button_component.h"
 #include "esp3d_log.h"
+#include "esp3d_lvgl.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
-#include "esp3d_lvgl.h"
+#include "rendering/esp3d_rendering_client.h"
 #include "screens/leveling_screen.h"
 #include "screens/menu_screen.h"
-#include "rendering/esp3d_rendering_client.h"
 #include "translations/esp3d_translation_service.h"
 
 /**********************
@@ -41,7 +41,7 @@ namespace manualLevelingScreen {
 
 #define DEFAULT_Z_DISTANCE 15
 
-  // Static variables
+// Static variables
 bool auto_leveling = false;
 bool homing_done = false;
 const char *leveling_position_buttons_map[] = {"4",
@@ -80,7 +80,7 @@ void bed_width(double value) { bed_width_val = value; }
 
 /**
  * @brief Sets the bed depth value.
- * 
+ *
  * @param value The depth value to set.
  */
 void bed_depth(double value) { bed_depth_val = value; }
@@ -94,7 +94,7 @@ void invert_x(bool value) { invert_x_val = value; }
 
 /**
  * @brief Sets the invert_y flag to the specified value.
- * 
+ *
  * @param value The value to set the invert_y flag to.
  */
 void invert_y(bool value) { invert_y_val = value; }
@@ -102,16 +102,18 @@ void invert_y(bool value) { invert_y_val = value; }
 /**
  * @brief Callback function for the delay timer in the manual leveling screen.
  *
- * This function is called when the delay timer expires. It is responsible for handling the timer event
- * and creating the appropriate screen based on the current state of auto leveling.
+ * This function is called when the delay timer expires. It is responsible for
+ * handling the timer event and creating the appropriate screen based on the
+ * current state of auto leveling.
  *
- * If auto leveling is enabled, it creates the leveling screen with auto leveling enabled.
- * If auto leveling is disabled, it creates the menu screen.
+ * If auto leveling is enabled, it creates the leveling screen with auto
+ * leveling enabled. If auto leveling is disabled, it creates the menu screen.
  *
  * @param timer A pointer to the timer object that triggered the callback.
  */
 void manual_leveling_screen_delay_timer_cb(lv_timer_t *timer) {
-  if (manual_leveling_screen_delay_timer && lv_timer_is_valid(manual_leveling_screen_delay_timer)) {
+  if (manual_leveling_screen_delay_timer &&
+      lv_timer_is_valid(manual_leveling_screen_delay_timer)) {
     lv_timer_del(manual_leveling_screen_delay_timer);
   }
   manual_leveling_screen_delay_timer = NULL;
@@ -134,8 +136,9 @@ void event_button_manual_leveling_back_handler(lv_event_t *e) {
   esp3d_log("back Clicked");
   if (ESP3D_BUTTON_ANIMATION_DELAY) {
     if (manual_leveling_screen_delay_timer) return;
-    manual_leveling_screen_delay_timer = lv_timer_create(
-        manual_leveling_screen_delay_timer_cb, ESP3D_BUTTON_ANIMATION_DELAY, NULL);
+    manual_leveling_screen_delay_timer =
+        lv_timer_create(manual_leveling_screen_delay_timer_cb,
+                        ESP3D_BUTTON_ANIMATION_DELAY, NULL);
   } else {
     manual_leveling_screen_delay_timer_cb(NULL);
   }
@@ -285,11 +288,12 @@ void move_to_position(int pos) {
 /**
  * @brief Event handler for the "Next" button in the manual leveling screen.
  *
- * This function is called when the "Next" button is clicked in the manual leveling screen.
- * It updates the `leveling_position_buttons_map_id` variable based on its current value,
- * and sets the corresponding button in the table to be checked. It also calls the
- * `move_to_position` function with the updated `leveling_position_buttons_map_id` as
- * the parameter. Finally, it logs a message indicating that the "Next" button was clicked.
+ * This function is called when the "Next" button is clicked in the manual
+ * leveling screen. It updates the `leveling_position_buttons_map_id` variable
+ * based on its current value, and sets the corresponding button in the table to
+ * be checked. It also calls the `move_to_position` function with the updated
+ * `leveling_position_buttons_map_id` as the parameter. Finally, it logs a
+ * message indicating that the "Next" button was clicked.
  *
  * @param e Pointer to the event object.
  */
@@ -338,8 +342,9 @@ void event_button_manual_leveling_next_handler(lv_event_t *e) {
 }
 
 /**
- * @brief Handles the event when the previous button is clicked in the manual leveling screen.
- * 
+ * @brief Handles the event when the previous button is clicked in the manual
+ * leveling screen.
+ *
  * @param e The pointer to the lv_event_t structure containing the event data.
  */
 void event_button_manual_leveling_previous_handler(lv_event_t *e) {
@@ -386,8 +391,9 @@ void event_button_manual_leveling_previous_handler(lv_event_t *e) {
 }
 
 /**
- * @brief Callback function for the event of pressing buttons in the leveling position matrix.
- * This function is responsible for handling the button press event and performing the necessary actions.
+ * @brief Callback function for the event of pressing buttons in the leveling
+ * position matrix. This function is responsible for handling the button press
+ * event and performing the necessary actions.
  *
  * @param e Pointer to the event object.
  */
@@ -403,9 +409,9 @@ void leveling_posiiton_matrix_buttons_event_cb(lv_event_t *e) {
 /**
  * @brief Handles the event when the manual leveling help button is clicked.
  *
- * This function logs a message indicating that the help button has been clicked,
- * retrieves the translated text for the manual leveling help label, and creates
- * a message box with the translated text.
+ * This function logs a message indicating that the help button has been
+ * clicked, retrieves the translated text for the manual leveling help label,
+ * and creates a message box with the translated text.
  *
  * @param e A pointer to the lv_event_t structure representing the event.
  */
@@ -439,7 +445,6 @@ void event_button_manual_leveling_start_handler(lv_event_t *e) {
   move_to_position(leveling_position_buttons_map_id);
 }
 
-
 /**
  * @brief Creates the manual leveling screen.
  *
@@ -463,11 +468,11 @@ void create(bool autoleveling) {
     std::string str_value = esp3dTftsettings.readString(
         ESP3DSettingIndex::esp3d_bed_width, buffer, 16);
     bed_width(std::strtod(str_value.c_str(),
-                                 NULL));  // update width value
+                          NULL));  // update width value
     str_value = esp3dTftsettings.readString(ESP3DSettingIndex::esp3d_bed_depth,
                                             buffer, 16);
     bed_depth(std::strtod(str_value.c_str(),
-                                 NULL));  // update depth value
+                          NULL));  // update depth value
     intialization_done = true;
   }
   lv_obj_t *ui_new_screen = lv_obj_create(NULL);
@@ -479,10 +484,10 @@ void create(bool autoleveling) {
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
   ESP3DStyle::apply(ui_new_screen, ESP3DStyleType::main_bg);
-  if (lv_obj_is_valid(ui_current_screen)){
+  if (lv_obj_is_valid(ui_current_screen)) {
     lv_obj_del(ui_current_screen);
   }
-  
+
   // Button back
   lv_obj_t *btn_back = backButton::create(ui_new_screen);
   if (!lv_obj_is_valid(btn_back)) {
@@ -512,23 +517,25 @@ void create(bool autoleveling) {
                       LV_EVENT_VALUE_CHANGED, NULL);
 
   // Button Previous
-  btn_previous = symbolButton::create(
-      ui_new_screen, LV_SYMBOL_PREVIOUS, ESP3D_BACK_BUTTON_WIDTH, ESP3D_BACK_BUTTON_HEIGHT);
+  btn_previous =
+      symbolButton::create(ui_new_screen, LV_SYMBOL_PREVIOUS,
+                           ESP3D_BACK_BUTTON_WIDTH, ESP3D_BACK_BUTTON_HEIGHT);
   if (!lv_obj_is_valid(btn_previous)) {
     esp3d_log_e("Failed to create previous button");
     return;
   }
-  lv_obj_align(btn_previous, LV_ALIGN_BOTTOM_LEFT,
-               ESP3D_BUTTON_PRESSED_OUTLINE, -ESP3D_BUTTON_PRESSED_OUTLINE);
+  lv_obj_align(btn_previous, LV_ALIGN_BOTTOM_LEFT, ESP3D_BUTTON_PRESSED_OUTLINE,
+               -ESP3D_BUTTON_PRESSED_OUTLINE);
   lv_obj_add_event_cb(btn_previous,
                       event_button_manual_leveling_previous_handler,
                       LV_EVENT_CLICKED, btnm_leveling_position);
 
   // Button Next
-  btn_next = symbolButton::create(
-      ui_new_screen, LV_SYMBOL_NEXT, ESP3D_BACK_BUTTON_WIDTH, ESP3D_BACK_BUTTON_HEIGHT);
+  btn_next =
+      symbolButton::create(ui_new_screen, LV_SYMBOL_NEXT,
+                           ESP3D_BACK_BUTTON_WIDTH, ESP3D_BACK_BUTTON_HEIGHT);
 
-if (!lv_obj_is_valid(btn_next)) {
+  if (!lv_obj_is_valid(btn_next)) {
     esp3d_log_e("Failed to create next button");
     return;
   }
@@ -565,7 +572,7 @@ if (!lv_obj_is_valid(btn_next)) {
 
   // Status container
   status_container = lv_obj_create(ui_new_screen);
-if (!lv_obj_is_valid(status_container)) {
+  if (!lv_obj_is_valid(status_container)) {
     esp3d_log_e("Failed to create status container");
     return;
   }

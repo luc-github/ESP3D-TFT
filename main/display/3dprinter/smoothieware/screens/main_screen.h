@@ -25,19 +25,19 @@
 namespace mainScreen {
 void create();
 bool extruder_0_value_cb(ESP3DValuesIndex index, const char *value,
-                                ESP3DValuesCbAction action);
+                         ESP3DValuesCbAction action);
 bool extruder_1_value_cb(ESP3DValuesIndex index, const char *value,
-                                ESP3DValuesCbAction action);
+                         ESP3DValuesCbAction action);
 bool bed_value_cb(ESP3DValuesIndex index, const char *value,
-                         ESP3DValuesCbAction action);
+                  ESP3DValuesCbAction action);
 bool position_value_cb(ESP3DValuesIndex index, const char *value,
-                              ESP3DValuesCbAction action);
+                       ESP3DValuesCbAction action);
 bool callback(ESP3DValuesIndex index, const char *value,
-                         ESP3DValuesCbAction action);
+              ESP3DValuesCbAction action);
 bool speed_value_cb(ESP3DValuesIndex index, const char *value,
-                           ESP3DValuesCbAction action);
+                    ESP3DValuesCbAction action);
 bool job_status_value_cb(ESP3DValuesIndex index, const char *value,
-                                ESP3DValuesCbAction action);
+                         ESP3DValuesCbAction action);
 void show_fan_controls(bool show);
 
 }  // namespace mainScreen

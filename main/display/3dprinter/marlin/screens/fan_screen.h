@@ -23,5 +23,5 @@ fan_screen.h - ESP3D screens styles definition
 namespace fanScreen {
 void create();
 bool callback(ESP3DValuesIndex index, const char *value,
-                         ESP3DValuesCbAction action);
+              ESP3DValuesCbAction action);
 }  // namespace fanScreen

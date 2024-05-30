@@ -167,7 +167,7 @@ lv_obj_t *create(lv_obj_t *parent, lv_obj_t *btnback) {
  * @return bool Returns true if the callback was successful, false otherwise.
  */
 bool network_status_cb(ESP3DValuesIndex index, const char *value,
-                             ESP3DValuesCbAction action) {
+                       ESP3DValuesCbAction action) {
   if (action == ESP3DValuesCbAction::Update) {
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::wifi ||
         esp3dTftui.get_current_screen() == ESP3DScreenType::station ||
@@ -195,7 +195,7 @@ bool network_status_cb(ESP3DValuesIndex index, const char *value,
  * otherwise.
  */
 bool network_mode_cb(ESP3DValuesIndex index, const char *value,
-                           ESP3DValuesCbAction action) {
+                     ESP3DValuesCbAction action) {
   if (action == ESP3DValuesCbAction::Update) {
     if (esp3dTftui.get_current_screen() == ESP3DScreenType::wifi ||
         esp3dTftui.get_current_screen() == ESP3DScreenType::station ||

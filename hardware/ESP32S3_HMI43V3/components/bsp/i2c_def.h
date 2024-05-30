@@ -1,4 +1,4 @@
-//I2C definitions for ESP32 ESP32S3_HMI43V3
+// I2C definitions for ESP32 ESP32S3_HMI43V3
 #pragma once
 
 #ifdef __cplusplus
@@ -8,19 +8,17 @@ extern "C" {
 #include "i2c_bus.h"
 
 // I2C definitions
-#define I2C_PORT_NUMBER   0
+#define I2C_PORT_NUMBER 0
 
-//Configure I2C
+// Configure I2C
 
-//Configure I2C
-const i2c_config_t i2c_cfg = {
-    .mode = I2C_MODE_MASTER,
-    .scl_io_num = 39, // GPIO 39
-    .sda_io_num = 40, // GPIO 40
-    .scl_pullup_en = GPIO_PULLUP_ENABLE,
-    .sda_pullup_en = GPIO_PULLUP_ENABLE,
-    .master.clk_speed = 400*1000
-};
+// Configure I2C
+const i2c_config_t i2c_cfg = {.mode = I2C_MODE_MASTER,
+                              .scl_io_num = 39,  // GPIO 39
+                              .sda_io_num = 40,  // GPIO 40
+                              .scl_pullup_en = GPIO_PULLUP_ENABLE,
+                              .sda_pullup_en = GPIO_PULLUP_ENABLE,
+                              .master.clk_speed = 400 * 1000};
 
 #ifdef __cplusplus
 } /* extern "C" */

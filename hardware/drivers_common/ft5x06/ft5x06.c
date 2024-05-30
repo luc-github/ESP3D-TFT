@@ -240,7 +240,7 @@ esp_err_t ft5x06_init(i2c_bus_handle_t i2c_bus, const ft5x06_config_t *config) {
 
   while (config->i2c_addr[i2c_addr_index] != 0 && err != ESP_OK) {
     esp3d_log("Checking  ft5x06 i2c addr: 0x%02x",
-                config->i2c_addr[i2c_addr_index]);
+              config->i2c_addr[i2c_addr_index]);
     _i2c_dev = i2c_bus_device_create(i2c_bus, config->i2c_addr[i2c_addr_index],
                                      config->i2c_clk_speed);
     if (_i2c_dev == NULL) {
@@ -288,10 +288,10 @@ esp_err_t ft5x06_init(i2c_bus_handle_t i2c_bus, const ft5x06_config_t *config) {
 
     if (err == ESP_OK) {
       esp3d_log("ft5x06 device found at addr: 0x%02x",
-                  config->i2c_addr[i2c_addr_index]);
+                config->i2c_addr[i2c_addr_index]);
     } else {
       // go next address
-      //i2c_bus_device_delete(_i2c_dev);
+      // i2c_bus_device_delete(_i2c_dev);
       _i2c_dev = NULL;
       i2c_addr_index++;
     }
@@ -303,7 +303,7 @@ esp_err_t ft5x06_init(i2c_bus_handle_t i2c_bus, const ft5x06_config_t *config) {
 
   // Display Product ID
   esp3d_log("ft5x06 Vendor ID: 0x%02x, Version: %d.%d.%d", buf[0], buf[1],
-              buf[2], buf[3]);
+            buf[2], buf[3]);
 
   // Get Width and Height resolution of the touch panel if not set in config
   /// Note: even following specs the values are not consistents

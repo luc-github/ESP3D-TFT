@@ -117,7 +117,6 @@ esp_err_t esp_lcd_new_panel_rm68120(
     const esp_i80_rm68120_config_t *rm68120_config,
     esp_lcd_panel_handle_t *ret_panel);
 
-
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
@@ -125,14 +124,19 @@ esp_err_t esp_lcd_new_panel_rm68120(
 /**
  * @brief Initializes the RM68120 display driver.
  *
- * This function initializes the RM68120 display driver with the provided configuration.
+ * This function initializes the RM68120 display driver with the provided
+ * configuration.
  *
- * @param disp_rm68120_cfg Pointer to the configuration structure for the RM68120 display driver.
+ * @param disp_rm68120_cfg Pointer to the configuration structure for the
+ * RM68120 display driver.
  * @param panel_handle Pointer to the handle of the LCD panel.
  * @param flush_ready_fn Pointer to the flush ready function.
- * @return `ESP_OK` if the initialization is successful, otherwise an error code.
+ * @return `ESP_OK` if the initialization is successful, otherwise an error
+ * code.
  */
-esp_err_t rm68120_init(const esp_i80_rm68120_config_t *disp_rm68120_cfg, esp_lcd_panel_handle_t *panel_handle, void * flush_ready_fn) {
+esp_err_t rm68120_init(const esp_i80_rm68120_config_t *disp_rm68120_cfg,
+                       esp_lcd_panel_handle_t *panel_handle,
+                       void *flush_ready_fn) {
   if (*panel_handle != NULL || disp_rm68120_cfg == NULL) {
     esp3d_log_e("rm68120 bus already initialized");
     return ESP_FAIL;
@@ -149,10 +153,10 @@ esp_err_t rm68120_init(const esp_i80_rm68120_config_t *disp_rm68120_cfg, esp_lcd
   esp_lcd_panel_io_handle_t io_handle = NULL;
   esp_lcd_panel_io_i80_config_t io_config = disp_rm68120_cfg->io_config;
   io_config.on_color_trans_done =
-      rm68120_notify_flush_ready;  // Callback invoked when color data
-                                   // transfer has finished
-  io_config.user_ctx = flush_ready_fn;   // User private data, passed directly to
-                                   // on_color_trans_done’s user_ctx
+      rm68120_notify_flush_ready;       // Callback invoked when color data
+                                        // transfer has finished
+  io_config.user_ctx = flush_ready_fn;  // User private data, passed directly to
+                                        // on_color_trans_done’s user_ctx
 
   esp3d_log("init lcd panel");
   ESP_ERROR_CHECK(esp_lcd_new_panel_io_i80(i80_bus, &io_config, &io_handle));
@@ -166,7 +170,6 @@ esp_err_t rm68120_init(const esp_i80_rm68120_config_t *disp_rm68120_cfg, esp_lcd
   return ESP_OK;
 }
 
-
 /**********************
  *   Static FUNCTIONS
  **********************/
@@ -174,7 +177,8 @@ esp_err_t rm68120_init(const esp_i80_rm68120_config_t *disp_rm68120_cfg, esp_lcd
 /**
  * @brief Notifies when the flush operation is ready.
  *
- * This function is called to notify when the flush operation is ready for the RM68120 LCD panel.
+ * This function is called to notify when the flush operation is ready for the
+ * RM68120 LCD panel.
  *
  * @param panel_io The handle to the LCD panel I/O.
  * @param edata The event data associated with the flush operation.
@@ -184,7 +188,7 @@ esp_err_t rm68120_init(const esp_i80_rm68120_config_t *disp_rm68120_cfg, esp_lcd
 static bool rm68120_notify_flush_ready(esp_lcd_panel_io_handle_t panel_io,
                                        esp_lcd_panel_io_event_data_t *edata,
                                        void *user_ctx) {
-   void (*flush_ready)(void) = (void (*)(void))user_ctx;
+  void (*flush_ready)(void) = (void (*)(void))user_ctx;
   flush_ready();
   return false;
 }
@@ -192,12 +196,14 @@ static bool rm68120_notify_flush_ready(esp_lcd_panel_io_handle_t panel_io,
 /**
  * @brief Initializes a new RM68120 LCD panel.
  *
- * This function initializes a new RM68120 LCD panel using the provided I/O handle and configuration.
+ * This function initializes a new RM68120 LCD panel using the provided I/O
+ * handle and configuration.
  *
  * @param io The I/O handle for the LCD panel.
  * @param rm68120_config The configuration for the RM68120 LCD panel.
  * @param ret_panel Pointer to store the handle of the initialized LCD panel.
- * @return `ESP_OK` if the LCD panel is successfully initialized, or an error code if initialization fails.
+ * @return `ESP_OK` if the LCD panel is successfully initialized, or an error
+ * code if initialization fails.
  */
 esp_err_t esp_lcd_new_panel_rm68120(
     const esp_lcd_panel_io_handle_t io,
@@ -205,8 +211,8 @@ esp_err_t esp_lcd_new_panel_rm68120(
     esp_lcd_panel_handle_t *ret_panel) {
   esp_err_t ret = ESP_OK;
   lcd_panel_t *rm68120 = NULL;
-  ESP_GOTO_ON_FALSE(io && rm68120_config && ret_panel, ESP_ERR_INVALID_ARG,
-                    err, "", "invalid argument");
+  ESP_GOTO_ON_FALSE(io && rm68120_config && ret_panel, ESP_ERR_INVALID_ARG, err,
+                    "", "invalid argument");
   rm68120 = calloc(1, sizeof(lcd_panel_t));
   ESP_GOTO_ON_FALSE(rm68120, ESP_ERR_NO_MEM, err, "",
                     "no mem for rm68120 panel");
@@ -220,36 +226,35 @@ esp_err_t esp_lcd_new_panel_rm68120(
                       "configure GPIO for RST line failed");
   }
 
-switch(rm68120_config->orientation){
- case orientation_portrait:
-    rm68120->dir = SCR_DIR_TBLR;
-    rm68120->madctl_val = 0x00;
-    rm68120->width = rm68120_config->hor_res;
-    rm68120->height = rm68120_config->ver_res;
-    break;
-case orientation_landscape:
-    rm68120->dir = SCR_DIR_LRTB;
-    rm68120->madctl_val = 0x60;
-    rm68120->width = rm68120_config->ver_res;
-    rm68120->height = rm68120_config->hor_res;
-    break;
-case orientation_portrait_invert:
-    rm68120->dir = SCR_DIR_BTRL;
-    rm68120->madctl_val = 0xC0;
-    rm68120->width = rm68120_config->hor_res;
-    rm68120->height = rm68120_config->ver_res;
-    break;
-case orientation_landscape_invert:
-    rm68120->dir = SCR_DIR_RLBT;
-    rm68120->madctl_val = 0xA0;
-    rm68120->width = rm68120_config->ver_res;
-    rm68120->height = rm68120_config->hor_res;
-    break;
-default:
-esp3d_log_e("undefine, do not use!!!!");
-return ESP_ERR_NOT_SUPPORTED;
-
-}
+  switch (rm68120_config->orientation) {
+    case orientation_portrait:
+      rm68120->dir = SCR_DIR_TBLR;
+      rm68120->madctl_val = 0x00;
+      rm68120->width = rm68120_config->hor_res;
+      rm68120->height = rm68120_config->ver_res;
+      break;
+    case orientation_landscape:
+      rm68120->dir = SCR_DIR_LRTB;
+      rm68120->madctl_val = 0x60;
+      rm68120->width = rm68120_config->ver_res;
+      rm68120->height = rm68120_config->hor_res;
+      break;
+    case orientation_portrait_invert:
+      rm68120->dir = SCR_DIR_BTRL;
+      rm68120->madctl_val = 0xC0;
+      rm68120->width = rm68120_config->hor_res;
+      rm68120->height = rm68120_config->ver_res;
+      break;
+    case orientation_landscape_invert:
+      rm68120->dir = SCR_DIR_RLBT;
+      rm68120->madctl_val = 0xA0;
+      rm68120->width = rm68120_config->ver_res;
+      rm68120->height = rm68120_config->hor_res;
+      break;
+    default:
+      esp3d_log_e("undefine, do not use!!!!");
+      return ESP_ERR_NOT_SUPPORTED;
+  }
 
   switch (rm68120_config->panel_config.rgb_ele_order) {
     case LCD_RGB_ELEMENT_ORDER_RGB:
@@ -317,7 +322,8 @@ err:
  * This function is responsible for deleting the RM68120 panel.
  *
  * @param panel Pointer to the ESP LCD panel structure.
- * @return `ESP_OK` if the panel is successfully deleted, otherwise an error code.
+ * @return `ESP_OK` if the panel is successfully deleted, otherwise an error
+ * code.
  */
 static esp_err_t panel_rm68120_del(esp_lcd_panel_t *panel) {
   lcd_panel_t *rm68120 = __containerof(panel, lcd_panel_t, base);
@@ -335,8 +341,10 @@ static esp_err_t panel_rm68120_del(esp_lcd_panel_t *panel) {
  *
  * This function is responsible for resetting the RM68120 LCD panel.
  *
- * @param panel Pointer to the esp_lcd_panel_t structure representing the LCD panel.
- * @return `ESP_OK` if the reset operation is successful, otherwise an error code.
+ * @param panel Pointer to the esp_lcd_panel_t structure representing the LCD
+ * panel.
+ * @return `ESP_OK` if the reset operation is successful, otherwise an error
+ * code.
  */
 static esp_err_t panel_rm68120_reset(esp_lcd_panel_t *panel) {
   lcd_panel_t *rm68120 = __containerof(panel, lcd_panel_t, base);
@@ -363,8 +371,10 @@ static esp_err_t panel_rm68120_reset(esp_lcd_panel_t *panel) {
  *
  * This function is responsible for initializing the RM68120 LCD panel.
  *
- * @param panel Pointer to the esp_lcd_panel_t structure representing the LCD panel.
- * @return `ESP_OK` if the initialization is successful, otherwise an error code.
+ * @param panel Pointer to the esp_lcd_panel_t structure representing the LCD
+ * panel.
+ * @return `ESP_OK` if the initialization is successful, otherwise an error
+ * code.
  */
 static esp_err_t panel_rm68120_init(esp_lcd_panel_t *panel) {
   lcd_panel_t *rm68120 = __containerof(panel, lcd_panel_t, base);
@@ -401,7 +411,10 @@ static esp_err_t panel_rm68120_init(esp_lcd_panel_t *panel) {
 /**
  * @brief Draws a bitmap on the RM68120 LCD panel.
  *
- * This function draws a bitmap on the RM68120 LCD panel starting from the specified coordinates (x_start, y_start) and ending at the specified coordinates (x_end, y_end). The bitmap data is provided in the color_data parameter.
+ * This function draws a bitmap on the RM68120 LCD panel starting from the
+ * specified coordinates (x_start, y_start) and ending at the specified
+ * coordinates (x_end, y_end). The bitmap data is provided in the color_data
+ * parameter.
  *
  * @param panel The RM68120 LCD panel.
  * @param x_start The starting x-coordinate of the bitmap.
@@ -479,9 +492,11 @@ static esp_err_t panel_rm68120_draw_bitmap(esp_lcd_panel_t *panel, int x_start,
  * This function is used to invert the color data of the RM68120 LCD panel.
  *
  * @param panel The pointer to the ESP LCD panel structure.
- * @param invert_color_data A boolean value indicating whether to invert the color data.
- *                          Set to `true` to invert the color data, or `false` to keep it unchanged.
- * @return `ESP_OK` if the color data inversion is successful, or an error code if it fails.
+ * @param invert_color_data A boolean value indicating whether to invert the
+ * color data. Set to `true` to invert the color data, or `false` to keep it
+ * unchanged.
+ * @return `ESP_OK` if the color data inversion is successful, or an error code
+ * if it fails.
  */
 static esp_err_t panel_rm68120_invert_color(esp_lcd_panel_t *panel,
                                             bool invert_color_data) {
@@ -581,10 +596,12 @@ static esp_err_t panel_rm68120_set_gap(esp_lcd_panel_t *panel, int x_gap,
 /**
  * @brief Turns the display on or off for the RM68120 panel.
  *
- * This function is used to control the display power state of the RM68120 panel.
+ * This function is used to control the display power state of the RM68120
+ * panel.
  *
  * @param panel Pointer to the ESP LCD panel structure.
- * @param off   Boolean value indicating whether to turn off the display (true) or turn it on (false).
+ * @param off   Boolean value indicating whether to turn off the display (true)
+ * or turn it on (false).
  *
  * @return
  *     - ESP_OK if the display power state was successfully changed.

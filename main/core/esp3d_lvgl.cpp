@@ -20,16 +20,15 @@
 #if ESP3D_DISPLAY_FEATURE
 #include "esp3d_lvgl.h"
 
-bool lv_timer_is_valid(lv_timer_t *timer){
-    if (timer == NULL) return false;
-    //parse all timers to check if the timer is valid
-    lv_timer_t *t = lv_timer_get_next(NULL);
-    while (t != NULL) {
-        if (t == timer) return true;
-        t = lv_timer_get_next(t);
-    }
-    return false;
+bool lv_timer_is_valid(lv_timer_t *timer) {
+  if (timer == NULL) return false;
+  // parse all timers to check if the timer is valid
+  lv_timer_t *t = lv_timer_get_next(NULL);
+  while (t != NULL) {
+    if (t == timer) return true;
+    t = lv_timer_get_next(t);
+  }
+  return false;
 }
 
-#endif // ESP3D_DISPLAY_FEATURE
-
+#endif  // ESP3D_DISPLAY_FEATURE

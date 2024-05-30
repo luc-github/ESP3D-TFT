@@ -24,5 +24,5 @@
 namespace statusScreen {
 void create();
 bool callback(ESP3DValuesIndex index, const char *value,
-                           ESP3DValuesCbAction action);
+              ESP3DValuesCbAction action);
 }  // namespace statusScreen

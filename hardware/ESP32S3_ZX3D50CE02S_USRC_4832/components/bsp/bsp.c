@@ -22,6 +22,7 @@
  *      INCLUDES
  *********************/
 #include "bsp.h"
+
 #include "esp3d_log.h"
 
 #if ESP3D_DISPLAY_FEATURE
@@ -32,7 +33,7 @@
 #endif  // ESP3D_DISPLAY_FEATURE
 #if ESP3D_USB_SERIAL_FEATURE
 #include "usb_serial.h"
-#endif //ESP3D_USB_SERIAL_FEATURE
+#endif  // ESP3D_USB_SERIAL_FEATURE
 
 /**********************
  *  STATIC VARIABLES
@@ -227,7 +228,7 @@ void display_flush_ready() { lv_disp_flush_ready(&disp_drv); }
  * @param color_p  Pointer to the color data.
  */
 void st7796_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area,
-          lv_color_t *color_p) {
+                  lv_color_t *color_p) {
   esp_lcd_panel_handle_t panel_handle =
       (esp_lcd_panel_handle_t)disp_drv->user_data;
 

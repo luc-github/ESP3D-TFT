@@ -20,9 +20,10 @@
 #include "esp3d_network_services.h"
 
 #include <stdio.h>
-#include "esp3d_network.h"
+
 #include "esp3d_commands.h"
 #include "esp3d_log.h"
+#include "esp3d_network.h"
 #include "esp3d_settings.h"
 #include "esp3d_string.h"
 #include "esp3d_values.h"
@@ -55,7 +56,7 @@ ESP3DNetworkServices::~ESP3DNetworkServices() {}
 
 bool ESP3DNetworkServices::begin() {
   bool start = false;
-  
+
   esp3dTftValues.set_string_value(ESP3DValuesIndex::network_status, "+");
   esp3d_log("Starting Services");
   _started = esp3dAuthenthicationService.begin();
@@ -91,7 +92,7 @@ bool ESP3DNetworkServices::begin() {
 #endif  // ESP3D_SSDP_FEATURE
 
 #if ESP3D_TELNET_FEATURE
-   start = esp3dSocketServer.begin();
+  start = esp3dSocketServer.begin();
   esp3d_log("Starting Telnet Service %s", start ? "OK" : "KO");
   _started = _started && start;
 #endif  // ESP3D_TELNET_FEATURE

@@ -1,9 +1,9 @@
-//Pins definition for ESP32S3_BZM_TFT35_GT911
-//Serial
+// Pins definition for ESP32S3_BZM_TFT35_GT911
+// Serial
 #pragma once
 
-#include "driver/uart.h"
 #include "driver/gpio.h"
+#include "driver/uart.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,7 +23,6 @@ extern "C" {
 #define ESP3D_SERIAL_RX_TASK_SIZE 4096
 #define ESP3D_SERIAL_TASK_CORE 1
 #define ESP3D_SERIAL_TASK_PRIORITY 10
-
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -14,18 +14,18 @@ const esp32_camera_config_t camera_config = {
         {
             .pin_pwdn = -1,     /*!< GPIO pin for camera power down line */
             .pin_reset = -1,    /*!< GPIO pin for camera reset line */
-            .pin_xclk = 10,      /*!< GPIO pin for camera XCLK line */
+            .pin_xclk = 10,     /*!< GPIO pin for camera XCLK line */
             .pin_sccb_sda = 40, /*!< GPIO pin for camera SDA line */
             .pin_sccb_scl = 39, /*!< GPIO pin for camera SCL line */
-            .pin_d7 = 48,        /*!< GPIO pin for camera D7 line */
+            .pin_d7 = 48,       /*!< GPIO pin for camera D7 line */
             .pin_d6 = 11,       /*!< GPIO pin for camera D6 line */
             .pin_d5 = 12,       /*!< GPIO pin for camera D5 line */
             .pin_d4 = 14,       /*!< GPIO pin for camera D4 line */
-            .pin_d3 = 16,        /*!< GPIO pin for camera D3 line */
-            .pin_d2 = 18,        /*!< GPIO pin for camera D2 line */
-            .pin_d1 = 17,        /*!< GPIO pin for camera D1 line */
-            .pin_d0 = 15,        /*!< GPIO pin for camera D0 line */
-            .pin_vsync = 38,     /*!< GPIO pin for camera VSYNC line */
+            .pin_d3 = 16,       /*!< GPIO pin for camera D3 line */
+            .pin_d2 = 18,       /*!< GPIO pin for camera D2 line */
+            .pin_d1 = 17,       /*!< GPIO pin for camera D1 line */
+            .pin_d0 = 15,       /*!< GPIO pin for camera D0 line */
+            .pin_vsync = 38,    /*!< GPIO pin for camera VSYNC line */
             .pin_href = 47,     /*!< GPIO pin for camera HREF line */
             .pin_pclk = 13,     /*!< GPIO pin for camera PCLK line */
 
@@ -65,12 +65,12 @@ const esp32_camera_config_t camera_config = {
     .pin_pullup_1 = -1, /* if any need */
     .pin_pullup_2 = -1, /* if any need */
     .pin_led = -1,
-    .flip_horizontaly = false, // if horizontal flip is needed
-    .flip_vertically = false, // if vertical flip is needed
-    .brightness = 0, // default value is 0
-    .contrast = 0,  // default value is 0
+    .flip_horizontaly = false,  // if horizontal flip is needed
+    .flip_vertically = false,   // if vertical flip is needed
+    .brightness = 0,            // default value is 0
+    .contrast = 0,              // default value is 0
     .name = "Xiao-Sense(OV2640)",
-} ;
+};
 
 #ifdef __cplusplus
 } /* extern "C" */

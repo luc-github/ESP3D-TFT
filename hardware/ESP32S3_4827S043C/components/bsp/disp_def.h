@@ -25,10 +25,10 @@ extern "C" {
 #define DISP_PATCH_FS_DELAY (40)
 
 #if DISP_NUM_FB == 2
-// Full frame buffer 
+// Full frame buffer
 #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * DISP_VER_RES_MAX)
 #else
-// 1/4 buffer 
+// 1/4 buffer
 #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * DISP_VER_RES_MAX / 4)
 #endif  // WITH_PSRAM
 

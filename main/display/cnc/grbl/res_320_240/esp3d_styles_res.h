@@ -19,14 +19,14 @@
 */
 
 #pragma once
-//Styles for common controls
+// Styles for common controls
 
-//Back button size
+// Back button size
 #define ESP3D_BACK_BUTTON_WIDTH 50
 #define ESP3D_BACK_BUTTON_HEIGHT 40
 
-//Buttons
-#define ESP3D_BUTTON_RADIUS  4
+// Buttons
+#define ESP3D_BUTTON_RADIUS 4
 #define ESP3D_BUTTON_BORDER_SIZE 2
 #define ESP3D_BUTTON_PRESSED_OUTLINE 5
 #define ESP3D_BUTTON_PRESSED_SHADOW_OFFSET 3
@@ -37,34 +37,34 @@
 #define ESP3D_BUTTON_ANIMATION_DELAY 300
 #endif  // ESP3D_BUTTON_ANIMATION_DELAY
 
-//Symbol buttons
+// Symbol buttons
 #define ESP3D_SYMBOL_BUTTON_WIDTH 50
 #define ESP3D_SYMBOL_BUTTON_HEIGHT 44
 
-//Matrix buttons
+// Matrix buttons
 #define ESP3D_MATRIX_BUTTON_WIDTH 48
 #define ESP3D_MATRIX_BUTTON_HEIGHT 40
 
-//Message box buttons
+// Message box buttons
 #define ESP3D_MSGBOX_BUTTON_WIDTH 130
 
-//Spinner size
+// Spinner size
 #define ESP3D_SPINNER_SIZE 70
 
-//List styles
+// List styles
 #define ESP3D_LIST_CONTAINER_LR_PAD 6
 #define ESP3D_LIST_LINE_HEIGHT 36
 #define ESP3D_LIST_LINE_BORDER_SIZE 2
 #define ESP3D_LIST_LINE_BUTTON_WIDTH 40
 
-//Container styles
+// Container styles
 #define ESP3D_CONTAINER_RADIUS 5
 
-//Scroll bar styles
+// Scroll bar styles
 #define ESP3D_SCROLL_BAR_WIDTH 10
 #define ESP3D_SCROLL_BAR_RADIUS 5
 
-//Choice List styles
+// Choice List styles
 #define ESP3D_CHOICE_LIST_WIDTH LV_HOR_RES / 2
 
 // Status bar styles
@@ -75,12 +75,10 @@
 #define ESP3D_STATUS_BAR_HEIGHT 50
 #define ESP3D_STATUS_BAR_WIDTH LV_HOR_RES - (2 * 10)
 
-//Progression area styles
+// Progression area styles
 #define ESP3D_PROGRESSION_AREA_RADIUS 4
 #define ESP3D_PROGRESSION_AREA_H_PAD 5
 #define ESP3D_PROGRESSION_AREA_V_PAD 3
 #define ESP3D_PROGRESSION_AREA_BORDER_VALUE 1
 #define ESP3D_PROGRESSION_AREA_HEIGHT 50
 #define ESP3D_PROGRESSION_AREA_WIDTH (LV_HOR_RES - (2 * 10))
-
-

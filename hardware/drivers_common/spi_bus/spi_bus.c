@@ -29,7 +29,6 @@
 
 #include "esp3d_log.h"
 
-
 /*********************
  *      DEFINES
  *********************/
@@ -106,12 +105,11 @@ esp_err_t spi_bus_init(int host, int miso_pin, int mosi_pin, int sclk_pin,
   esp3d_log("Initializing SPI bus...");
   esp_err_t ret =
       spi_bus_initialize(host, &buscfg, (spi_dma_chan_t)dma_channel);
- 
-    if (ret != ESP_OK) {
-    esp3d_log_e("Failed to initialize SPI bus");
-    } else {
-    esp3d_log("SPI bus initialized successfully");
-    }
-    return ret;
-}
 
+  if (ret != ESP_OK) {
+    esp3d_log_e("Failed to initialize SPI bus");
+  } else {
+    esp3d_log("SPI bus initialized successfully");
+  }
+  return ret;
+}

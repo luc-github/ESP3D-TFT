@@ -31,7 +31,7 @@
  *  Namespace
  **********************/
 namespace emptyScreen {
-  
+
 /**
  * Handles the event when a button is clicked.
  *
@@ -44,12 +44,13 @@ void event_button_handler(lv_event_t *e) {
 
 /**
  * @brief Creates a new screen and sets it as the current screen.
- * 
- * This function creates a new screen, sets it as the current screen, and applies the main background style to it.
- * The previous screen is deleted.
- * 
- * @note This function assumes that the `esp3dTftui` object and the `esp3d_log` function are defined and accessible.
- * 
+ *
+ * This function creates a new screen, sets it as the current screen, and
+ * applies the main background style to it. The previous screen is deleted.
+ *
+ * @note This function assumes that the `esp3dTftui` object and the `esp3d_log`
+ * function are defined and accessible.
+ *
  * @param None
  * @return None
  */
@@ -67,10 +68,10 @@ void create() {
   lv_scr_load(ui_new_screen);
   ESP3DStyle::apply(ui_new_screen, ESP3DStyleType::main_bg);
 
-  if (lv_obj_is_valid(ui_current_screen)){
+  if (lv_obj_is_valid(ui_current_screen)) {
     lv_obj_del(ui_current_screen);
   }
- 
+
   lv_obj_add_event_cb(ui_new_screen, event_button_handler, LV_EVENT_CLICKED,
                       NULL);
 }

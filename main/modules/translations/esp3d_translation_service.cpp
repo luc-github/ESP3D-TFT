@@ -79,7 +79,7 @@ bool ESP3DTranslationService::begin() {
     esp3d_log("Using default language pack: %s",
               translate(ESP3DLabel::language));
     _started = true;
-    esp3d_log("Start is %s", _started?"Ok":"KO");
+    esp3d_log("Start is %s", _started ? "Ok" : "KO");
     return _started;
   }
   esp3d_log("Using language pack: %s over %s", filename.c_str(),
@@ -113,7 +113,7 @@ bool ESP3DTranslationService::begin() {
     _languageCode = DEFAULT_LANGUAGE;
     _started = true;
   }
-  esp3d_log("Start is %s", _started?"Ok":"KO");
+  esp3d_log("Start is %s", _started ? "Ok" : "KO");
   return _started;
 }
 

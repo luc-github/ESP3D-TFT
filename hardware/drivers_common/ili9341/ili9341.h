@@ -90,13 +90,16 @@ typedef struct {
 /**
  * @brief Creates a new ILI9341 LCD panel.
  *
- * This function creates a new ILI9341 LCD panel using the provided I/O handle and panel configuration.
+ * This function creates a new ILI9341 LCD panel using the provided I/O handle
+ * and panel configuration.
  *
  * @param io The I/O handle for the LCD panel.
  * @param panel_cfg The configuration settings for the ILI9341 panel.
- * @param disp_panel Pointer to the variable that will hold the created LCD panel handle.
+ * @param disp_panel Pointer to the variable that will hold the created LCD
+ * panel handle.
  *
- * @return `ESP_OK` if the LCD panel is created successfully, or an error code if an error occurred.
+ * @return `ESP_OK` if the LCD panel is created successfully, or an error code
+ * if an error occurred.
  */
 esp_err_t esp_lcd_new_panel_ili9341(const esp_lcd_panel_io_handle_t io,
                                     const esp_spi_ili9341_config_t *panel_cfg,

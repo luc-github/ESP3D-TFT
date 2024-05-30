@@ -22,8 +22,7 @@
 
 #include <stdio.h>
 
-enum class ESP3DScreenType : uint8_t
-{
+enum class ESP3DScreenType : uint8_t {
   none = 0,
   splash,
   main,

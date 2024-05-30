@@ -115,10 +115,11 @@ void create() {
 
 /**
  * @brief Leaves the current screen and performs necessary actions.
- * 
- * This function is called when the user wants to leave the current screen and navigate to another screen.
- * Any necessary actions or cleanup can be performed in this function.
- * 
+ *
+ * This function is called when the user wants to leave the current screen and
+ * navigate to another screen. Any necessary actions or cleanup can be performed
+ * in this function.
+ *
  * @note This function is currently empty and needs to be implemented.
  */
 void leave() {

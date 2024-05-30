@@ -111,10 +111,11 @@ static void event_handler_button_back(lv_event_t *e) {
 
 /**
  * @brief Creates the status screen.
- * 
+ *
  * This function is responsible for creating the status screen.
- * It initializes the necessary components and sets up the initial state of the screen.
- * 
+ * It initializes the necessary components and sets up the initial state of the
+ * screen.
+ *
  * @return void
  */
 void create() {
@@ -130,7 +131,7 @@ void create() {
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_status_screen);  // Apply background color
   ESP3DStyle::apply(ui_status_screen, ESP3DStyleType::main_bg);
-  if (lv_obj_is_valid(ui_current_screen)){
+  if (lv_obj_is_valid(ui_current_screen)) {
     lv_obj_del(ui_current_screen);
   }
 

@@ -27,7 +27,6 @@
 
 #include "lvgl.h"
 
-
 namespace choiceEditor {
 lv_obj_t *create(lv_obj_t *container, const char *text, const char *title,
                  std::list<std::string> &choices,

@@ -117,12 +117,12 @@ void ESP3DUsbSerialClient::connectDevice() {
   // You don't need to know the device's VID and PID. Just plug in any device
   // and the VCP service will pick correct (already registered) driver for the
   // device
-   //esp3d_log("Opening any VCP device...");
+  // esp3d_log("Opening any VCP device...");
   // TODO try to identify device
   _vcp = std::unique_ptr<CdcAcmDevice>(esp_usb::VCP::open(&dev_config));
 
   if (_vcp == nullptr) {
-   // esp3d_log_w("Failed to open VCP device, retrying...");
+    // esp3d_log_w("Failed to open VCP device, retrying...");
     return;
   }
 

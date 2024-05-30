@@ -94,7 +94,6 @@ bool display_machine_position = true;
 bool position_values(ESP3DValuesIndex index, const char *value,
                      ESP3DValuesCbAction action) {
   return true;
-
 }
 bool state_value_cb(ESP3DValuesIndex index, const char *value,
                     ESP3DValuesCbAction action) {
@@ -102,7 +101,7 @@ bool state_value_cb(ESP3DValuesIndex index, const char *value,
 }
 
 bool state_comment_value_cb(ESP3DValuesIndex index, const char *value,
-                             ESP3DValuesCbAction action) {
+                            ESP3DValuesCbAction action) {
   return true;
 }
 bool job_status_value_cb(ESP3DValuesIndex index, const char *value,

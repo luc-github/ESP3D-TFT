@@ -23,7 +23,6 @@ extern "C" {
 #include "esp_lcd_panel_ops.h"
 #include "esp_lcd_panel_vendor.h"
 
-
 /**********************
  *      TYPEDEFS
  **********************/

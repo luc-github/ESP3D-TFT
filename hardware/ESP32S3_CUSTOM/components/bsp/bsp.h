@@ -35,7 +35,8 @@ extern "C" {
 /**
  * @brief Initializes the Board Support Package (BSP).
  *
- * This function initializes the necessary hardware and peripherals required by the BSP.
+ * This function initializes the necessary hardware and peripherals required by
+ * the BSP.
  *
  * @return
  *     - ESP_OK if the BSP initialization is successful.
@@ -47,21 +48,25 @@ esp_err_t bsp_init(void);
 /**
  * @brief Initialize USB in the BSP.
  *
- * This function initializes the USB functionality in the Board Support Package (BSP) for ESP32S3_CUSTOM.
+ * This function initializes the USB functionality in the Board Support Package
+ * (BSP) for ESP32S3_CUSTOM.
  *
- * @return esp_err_t Returns ESP_OK on success, or an error code if initialization fails.
+ * @return esp_err_t Returns ESP_OK on success, or an error code if
+ * initialization fails.
  */
 esp_err_t bsp_init_usb(void);
 
 /**
  * @brief Deinitializes the USB functionality of the BSP.
  *
- * This function is responsible for deinitializing the USB functionality of the BSP.
+ * This function is responsible for deinitializing the USB functionality of the
+ * BSP.
  *
- * @return esp_err_t Returns ESP_OK if the USB deinitialization is successful, otherwise returns an error code.
+ * @return esp_err_t Returns ESP_OK if the USB deinitialization is successful,
+ * otherwise returns an error code.
  */
 esp_err_t bsp_deinit_usb(void);
-#endif // ESP3D_USB_SERIAL_FEATURE
+#endif  // ESP3D_USB_SERIAL_FEATURE
 
 #ifdef __cplusplus
 } /* extern "C" */

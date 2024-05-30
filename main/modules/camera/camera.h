@@ -18,26 +18,24 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #pragma once
-#include "http/esp3d_http_service.h"
 #include "esp_camera.h"
-    class Camera final
-    {
-    public:
-        Camera();
-        ~Camera();
-        bool begin();
-        void end();
-        bool handle_snap(httpd_req_t *req=NULL, const char *path=NULL, const char* filename=NULL );
-        void handle();
-        int command(const char *param, const char *value);
-        uint8_t GetModel();
-        const char *GetModelString();
-        bool started()
-        {
-            return _started;
-        }
-    private:
-        bool _started;
-    };
+#include "http/esp3d_http_service.h"
+class Camera final {
+ public:
+  Camera();
+  ~Camera();
+  bool begin();
+  void end();
+  bool handle_snap(httpd_req_t *req = NULL, const char *path = NULL,
+                   const char *filename = NULL);
+  void handle();
+  int command(const char *param, const char *value);
+  uint8_t GetModel();
+  const char *GetModelString();
+  bool started() { return _started; }
 
-    extern Camera esp3d_camera;
+ private:
+  bool _started;
+};
+
+extern Camera esp3d_camera;

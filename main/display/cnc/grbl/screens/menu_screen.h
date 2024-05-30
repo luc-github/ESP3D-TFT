@@ -24,7 +24,6 @@
 
 namespace menuScreen {
 extern void create();
-extern void job_status_value_cb(ESP3DValuesIndex index,
-                                            const char *value,
-                                            ESP3DValuesCbAction action);
+extern void job_status_value_cb(ESP3DValuesIndex index, const char *value,
+                                ESP3DValuesCbAction action);
 }  // namespace menuScreen

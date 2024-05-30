@@ -32,7 +32,6 @@
 #include "rendering/esp3d_rendering_client.h"
 #include "screens/main_screen.h"
 
-
 /**********************
  *  Namespace
  **********************/
@@ -357,7 +356,7 @@ void create() {
 
   // label
   lv_obj_t *label_ta = lv_label_create(ui_new_screen);
-  if(!lv_obj_is_valid(label_ta)){
+  if (!lv_obj_is_valid(label_ta)) {
     esp3d_log_e("Failed to create label");
     return;
   }
@@ -368,7 +367,7 @@ void create() {
 
   // unit
   lv_obj_t *label_unit2 = lv_label_create(ui_new_screen);
-  if(!lv_obj_is_valid(label_unit2)){
+  if (!lv_obj_is_valid(label_unit2)) {
     esp3d_log_e("Failed to create unit label");
     return;
   }
@@ -380,7 +379,7 @@ void create() {
   // button down
   lv_obj_t *btn_down =
       symbolButton::create(ui_new_screen, LV_SYMBOL_MINUS "\n" LV_SYMBOL_DOWN);
-  if(!lv_obj_is_valid(btn_down)){
+  if (!lv_obj_is_valid(btn_down)) {
     esp3d_log_e("Failed to create down button");
     return;
   }
@@ -394,7 +393,7 @@ void create() {
 
   // Button Ok
   lv_obj_t *btn_ok = symbolButton::create(ui_new_screen, LV_SYMBOL_OK);
-  if(!lv_obj_is_valid(btn_ok)){
+  if (!lv_obj_is_valid(btn_ok)) {
     esp3d_log_e("Failed to create ok button");
     return;
   }
@@ -405,7 +404,7 @@ void create() {
 
   // Button Reset
   lv_obj_t *btn_reset = symbolButton::create(ui_new_screen, LV_SYMBOL_GAUGE);
-  if(!lv_obj_is_valid(btn_reset)){
+  if (!lv_obj_is_valid(btn_reset)) {
     esp3d_log_e("Failed to create reset button");
     return;
   }
@@ -416,7 +415,7 @@ void create() {
 
   // keypad
   lv_obj_t *speed_kb = lv_keyboard_create(ui_new_screen);
-  if(!lv_obj_is_valid(speed_kb)){
+  if (!lv_obj_is_valid(speed_kb)) {
     esp3d_log_e("Failed to create keyboard");
     return;
   }

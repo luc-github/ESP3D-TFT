@@ -26,7 +26,6 @@
 #include <esp_err.h>
 #include <stdbool.h>
 
-
 #ifdef __cplusplus
 extern "C" { /* extern "C" */
 #endif
@@ -52,9 +51,10 @@ typedef struct {
  * Must be passed to disp_backlight_create() for correct configuration
  */
 typedef struct {
-  bool pwm_control; // true: LEDC is used, false: GPIO is used
-  bool output_invert; // true: LEDC output is inverted, false: LEDC output is not inverted
-  int gpio_num;  // see gpio_num_t
+  bool pwm_control;    // true: LEDC is used, false: GPIO is used
+  bool output_invert;  // true: LEDC output is inverted, false: LEDC output is
+                       // not inverted
+  int gpio_num;        // see gpio_num_t
 
   // Relevant only for PWM controlled backlight
   // Ignored for switch (ON/OFF) backlight control

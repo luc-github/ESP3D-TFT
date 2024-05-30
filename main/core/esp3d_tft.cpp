@@ -35,12 +35,11 @@
 #include "network/esp3d_tft_network.h"
 #endif  // ESP3D_WIFI_FEATURE
 #include "esp_freertos_hooks.h"
-#include "gcode_host/esp3d_tft_stream.h"
-
 #include "filesystem/esp3d_flash.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include "freertos/task.h"
+#include "gcode_host/esp3d_tft_stream.h"
 #include "nvs_flash.h"
 #include "translations/esp3d_translation_service.h"
 
@@ -54,7 +53,7 @@
 
 #if ESP3D_CAMERA_FEATURE
 #include "camera/camera.h"
-#endif // ESP3D_CAMERA_FEATURE
+#endif  // ESP3D_CAMERA_FEATURE
 
 /**********************
  *  STATIC PROTOTYPES
@@ -109,12 +108,12 @@ bool ESP3DTft::begin() {
 #endif  // #if ESP3D_USB_SERIAL_FEATURE
 
 #if ESP3D_CAMERA_FEATURE
-if (esp3d_camera.begin()) {
+  if (esp3d_camera.begin()) {
     esp3d_log("Camera started");
   } else {
     esp3d_log_e("Camera failed to start");
   }
-#endif // ESP3D_CAMERA_FEATURE
+#endif  // ESP3D_CAMERA_FEATURE
   bool success = true;
   bool successFs = true;
   bool successSd = true;
@@ -123,9 +122,9 @@ if (esp3d_camera.begin()) {
   successFs = flashFs.begin();
 #if ESP3D_SD_CARD_FEATURE
   successSd = sd.begin();
-#endif  // ESP3D_SD_CARD_FEATURE 
-// Init translations service, no need condition as it is mandatory
-esp3dTranslationService.begin();
+#endif  // ESP3D_SD_CARD_FEATURE
+  // Init translations service, no need condition as it is mandatory
+  esp3dTranslationService.begin();
 #if ESP3D_DISPLAY_FEATURE
   esp3dTftui.begin();
 #endif  // ESP3D_DISPLAY_FEATURE

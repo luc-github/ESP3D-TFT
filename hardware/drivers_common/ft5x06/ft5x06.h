@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "esp_err.h"
 #include "i2c_bus.h"
 
@@ -50,7 +51,7 @@ typedef struct {
 typedef struct {
   bool is_pressed;
   int16_t x;
-  int16_t y;  
+  int16_t y;
 } ft5x06_data_t;
 
 /**********************
@@ -77,14 +78,16 @@ esp_err_t ft5x06_init(i2c_bus_handle_t i2c_bus, const ft5x06_config_t *config);
 ft5x06_data_t ft5x06_read();
 
 /**
- * @brief Get the maximum x-coordinate value supported by the ft5x06 touch controller.
+ * @brief Get the maximum x-coordinate value supported by the ft5x06 touch
+ * controller.
  *
  * @return The maximum x-coordinate value.
  */
 uint16_t get_ft5x06_x_max();
 
 /**
- * @brief Retrieves the maximum Y coordinate value supported by the ft5x06 touch controller.
+ * @brief Retrieves the maximum Y coordinate value supported by the ft5x06 touch
+ * controller.
  *
  * @return The maximum Y coordinate value.
  */

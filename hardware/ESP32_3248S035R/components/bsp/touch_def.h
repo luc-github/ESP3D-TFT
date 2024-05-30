@@ -7,8 +7,9 @@ extern "C" {
 
 #define TOUCH_CONTROLLER "XPT2046"
 
-#include "xpt2046.h"
 #include <driver/spi_master.h>
+
+#include "xpt2046.h"
 
 // Touch configuration
 xpt2046_config_t xpt2046_cfg = {
@@ -27,9 +28,9 @@ xpt2046_config_t xpt2046_cfg = {
 
 // SPI (shared with Display)
 const spi_device_interface_config_t touch_spi_cfg = {
-    .clock_speed_hz = 2*1000*1000,
+    .clock_speed_hz = 2 * 1000 * 1000,
     .mode = 0,
-    .spics_io_num = 33, // GPIO 33
+    .spics_io_num = 33,  // GPIO 33
     .queue_size = 1,
     .pre_cb = NULL,
     .post_cb = NULL,

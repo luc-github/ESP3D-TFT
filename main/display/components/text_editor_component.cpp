@@ -69,16 +69,22 @@ void input_area_cb(lv_event_t *e) {
 /**
  * @brief Creates a text editor component.
  *
- * This function creates a text editor component and adds it to the specified container.
+ * This function creates a text editor component and adds it to the specified
+ * container.
  *
  * @param container The container object where the text editor will be added.
  * @param text The initial text to be displayed in the text editor.
- * @param callbackFn A function pointer to the callback function that will be called when the text is changed.
- * @param max_length The maximum length of the text that can be entered in the text editor.
- * @param accepted_chars A string containing the characters that are allowed to be entered in the text editor.
- * @param is_number A boolean value indicating whether the text editor should only accept numeric input.
- * @param user_data A pointer to user-defined data that will be passed to the callback function.
- * 
+ * @param callbackFn A function pointer to the callback function that will be
+ * called when the text is changed.
+ * @param max_length The maximum length of the text that can be entered in the
+ * text editor.
+ * @param accepted_chars A string containing the characters that are allowed to
+ * be entered in the text editor.
+ * @param is_number A boolean value indicating whether the text editor should
+ * only accept numeric input.
+ * @param user_data A pointer to user-defined data that will be passed to the
+ * callback function.
+ *
  * @return The created text editor object.
  */
 lv_obj_t *create(lv_obj_t *container, const char *text,

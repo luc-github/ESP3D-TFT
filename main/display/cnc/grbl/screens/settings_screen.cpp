@@ -39,9 +39,9 @@
 #include "filesystem/esp3d_flash.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "rendering/esp3d_rendering_client.h"
 #include "screens/main_screen.h"
 #include "screens/menu_screen.h"
-#include "rendering/esp3d_rendering_client.h"
 #include "tasks_def.h"
 #include "translations/esp3d_translation_service.h"
 
@@ -142,7 +142,7 @@ static void bgSaveJSONSettingsTask(void *pvParameter) {
           lv_label_set_text(data->label, data->value.c_str());
         }
         break;
-      
+
       default:
         break;
     }
@@ -367,13 +367,13 @@ void setting_edit_done_cb(const char *str, void *data) {
         renderingClient.setPolling(val_byte);
         break;
       case ESP3DSettingIndex::esp3d_inverved_x:
-        //manualLevelingScreen::invert_x(val_byte);
+        // manualLevelingScreen::invert_x(val_byte);
         break;
       case ESP3DSettingIndex::esp3d_inverved_y:
-        //manualLevelingScreen::invert_y(val_byte);
+        // manualLevelingScreen::invert_y(val_byte);
         break;
       case ESP3DSettingIndex::esp3d_auto_level_on:
-        //menuScreen::enable_auto_leveling(val_byte);
+        // menuScreen::enable_auto_leveling(val_byte);
         break;
 
       case ESP3DSettingIndex::esp3d_workspace_depth:
@@ -511,17 +511,16 @@ void event_button_edit_setting_cb(lv_event_t *e) {
   }
   data.value = lv_label_get_text(data.label);
   if (data.choices.size() > 0) {
-    choiceEditor::create(lv_scr_act(), data.value.c_str(),
-                                       title.c_str(), data.choices,
-                                       setting_edit_done_cb, (void *)(&data));
+    choiceEditor::create(lv_scr_act(), data.value.c_str(), title.c_str(),
+                         data.choices, setting_edit_done_cb, (void *)(&data));
   } else {
     // it is json setting so no getSettingPtr
     if (data.entry != "") {
       switch (data.index) {
         case ESP3DSettingIndex::esp3d_extensions:
           textEditor::create(lv_scr_act(), data.value.c_str(),
-                                         setting_edit_done_cb, 0, NULL, false,
-                                         (void *)(&data));
+                             setting_edit_done_cb, 0, NULL, false,
+                             (void *)(&data));
           break;
         default:
           esp3d_log_e("Unknown setting index %d", (uint16_t)data.index);
@@ -533,14 +532,14 @@ void event_button_edit_setting_cb(lv_event_t *e) {
       switch (data.index) {
         case ESP3DSettingIndex::esp3d_hostname:
           textEditor::create(lv_scr_act(), data.value.c_str(),
-                                         setting_edit_done_cb, settingPtr->size,
-                                         NULL, false, (void *)(&data));
+                             setting_edit_done_cb, settingPtr->size, NULL,
+                             false, (void *)(&data));
           break;
         case ESP3DSettingIndex::esp3d_workspace_width:
         case ESP3DSettingIndex::esp3d_workspace_depth:
           textEditor::create(lv_scr_act(), data.value.c_str(),
-                                         setting_edit_done_cb, 15,
-                                         "0123456789.", true, (void *)(&data));
+                             setting_edit_done_cb, 15, "0123456789.", true,
+                             (void *)(&data));
           break;
         default:
           esp3d_log_e("Unknown setting index %d", (uint16_t)data.index);
@@ -617,8 +616,7 @@ void create() {
     }
     language_label =
         listLine::add_label(ui_language.c_str(), line_container, true);
-    lv_obj_t *btnEdit =
-        listLine::add_button(LV_SYMBOL_EDIT, line_container);
+    lv_obj_t *btnEdit = listLine::add_button(LV_SYMBOL_EDIT, line_container);
     lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb, LV_EVENT_CLICKED,
                         (void *)(&(settingPtr->index)));
   }
@@ -638,8 +636,7 @@ void create() {
     }
     hostname_label =
         listLine::add_label(hostname.c_str(), line_container, true);
-    lv_obj_t *btnEdit =
-        listLine::add_button(LV_SYMBOL_EDIT, line_container);
+    lv_obj_t *btnEdit = listLine::add_button(LV_SYMBOL_EDIT, line_container);
     lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb, LV_EVENT_CLICKED,
                         (void *)(&(settingPtr->index)));
   }
@@ -652,8 +649,7 @@ void create() {
   if (line_container) {
     listLine::add_label(LabelStr.c_str(), line_container, true);
     extensions_label = listLine::add_label("", line_container, true);
-    lv_obj_t *btnEdit =
-        listLine::add_button(LV_SYMBOL_EDIT, line_container);
+    lv_obj_t *btnEdit = listLine::add_button(LV_SYMBOL_EDIT, line_container);
     lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb, LV_EVENT_CLICKED,
                         (void *)&(extensions_setting_index));
   }
@@ -677,8 +673,7 @@ void create() {
               : "???";
       output_client_label =
           listLine::add_label(value.c_str(), line_container, true);
-      lv_obj_t *btnEdit =
-          listLine::add_button(LV_SYMBOL_EDIT, line_container);
+      lv_obj_t *btnEdit = listLine::add_button(LV_SYMBOL_EDIT, line_container);
       lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb,
                           LV_EVENT_CLICKED, (void *)(&(settingPtr->index)));
     }
@@ -698,8 +693,7 @@ void create() {
       std::string value = std::to_string(val);
       serial_baud_rate_label =
           listLine::add_label(value.c_str(), line_container, true);
-      lv_obj_t *btnEdit =
-          listLine::add_button(LV_SYMBOL_EDIT, line_container);
+      lv_obj_t *btnEdit = listLine::add_button(LV_SYMBOL_EDIT, line_container);
       lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb,
                           LV_EVENT_CLICKED, (void *)(&(settingPtr->index)));
     }
@@ -719,8 +713,7 @@ void create() {
       std::string value = std::to_string(val);
       usb_serial_baud_rate_label =
           listLine::add_label(value.c_str(), line_container, true);
-      lv_obj_t *btnEdit =
-          listLine::add_button(LV_SYMBOL_EDIT, line_container);
+      lv_obj_t *btnEdit = listLine::add_button(LV_SYMBOL_EDIT, line_container);
       lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb,
                           LV_EVENT_CLICKED, (void *)(&(settingPtr->index)));
     }
@@ -740,10 +733,8 @@ void create() {
       std::string value =
           val == 0 ? esp3dTranslationService.translate(ESP3DLabel::relative)
                    : esp3dTranslationService.translate(ESP3DLabel::absolute);
-      jog_type_label =
-          listLine::add_label(value.c_str(), line_container, true);
-      lv_obj_t *btnEdit =
-          listLine::add_button(LV_SYMBOL_EDIT, line_container);
+      jog_type_label = listLine::add_label(value.c_str(), line_container, true);
+      lv_obj_t *btnEdit = listLine::add_button(LV_SYMBOL_EDIT, line_container);
       lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb,
                           LV_EVENT_CLICKED, (void *)(&(settingPtr->index)));
     }
@@ -762,25 +753,23 @@ void create() {
       std::string value =
           val == 0 ? esp3dTranslationService.translate(ESP3DLabel::disabled)
                    : esp3dTranslationService.translate(ESP3DLabel::enabled);
-      polling_label =
-          listLine::add_label(value.c_str(), line_container, true);
-      lv_obj_t *btnEdit =
-          listLine::add_button(LV_SYMBOL_EDIT, line_container);
+      polling_label = listLine::add_label(value.c_str(), line_container, true);
+      lv_obj_t *btnEdit = listLine::add_button(LV_SYMBOL_EDIT, line_container);
       lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb,
                           LV_EVENT_CLICKED, (void *)(&(settingPtr->index)));
     }
   }
 
   // JSON
-  
+
   // workspace width
   line_container = listLine::create(ui_settings_list_ctl);
   LabelStr = esp3dTranslationService.translate(ESP3DLabel::workspace_width);
   if (line_container) {
     std::string workspace_width_str;
     listLine::add_label(LabelStr.c_str(), line_container, true);
-    const ESP3DSettingDescription *settingPtr =
-        esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_workspace_width);
+    const ESP3DSettingDescription *settingPtr = esp3dTftsettings.getSettingPtr(
+        ESP3DSettingIndex::esp3d_workspace_width);
     if (settingPtr) {
       char out_str[15 + 1] = {0};
       workspace_width_str = esp3dTftsettings.readString(
@@ -788,10 +777,9 @@ void create() {
     } else {
       esp3d_log_e("Failed to get workspace width setting");
     }
-    workspace_width_label = listLine::add_label(workspace_width_str.c_str(),
-                                                  line_container, true);
-    lv_obj_t *btnEdit =
-        listLine::add_button(LV_SYMBOL_EDIT, line_container);
+    workspace_width_label =
+        listLine::add_label(workspace_width_str.c_str(), line_container, true);
+    lv_obj_t *btnEdit = listLine::add_button(LV_SYMBOL_EDIT, line_container);
     lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb, LV_EVENT_CLICKED,
                         (void *)(&(settingPtr->index)));
   }
@@ -802,8 +790,8 @@ void create() {
   if (line_container) {
     std::string workspace_depth_str;
     listLine::add_label(LabelStr.c_str(), line_container, true);
-    const ESP3DSettingDescription *settingPtr =
-        esp3dTftsettings.getSettingPtr(ESP3DSettingIndex::esp3d_workspace_depth);
+    const ESP3DSettingDescription *settingPtr = esp3dTftsettings.getSettingPtr(
+        ESP3DSettingIndex::esp3d_workspace_depth);
     if (settingPtr) {
       char out_str[15 + 1] = {0};
       workspace_depth_str = esp3dTftsettings.readString(
@@ -811,10 +799,9 @@ void create() {
     } else {
       esp3d_log_e("Failed to get workspace depth setting");
     }
-    workspace_depth_label = listLine::add_label(workspace_depth_str.c_str(),
-                                                  line_container, true);
-    lv_obj_t *btnEdit =
-        listLine::add_button(LV_SYMBOL_EDIT, line_container);
+    workspace_depth_label =
+        listLine::add_label(workspace_depth_str.c_str(), line_container, true);
+    lv_obj_t *btnEdit = listLine::add_button(LV_SYMBOL_EDIT, line_container);
     lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb, LV_EVENT_CLICKED,
                         (void *)(&(settingPtr->index)));
   }
@@ -834,8 +821,7 @@ void create() {
                    : esp3dTranslationService.translate(ESP3DLabel::enabled);
       inverted_x_label =
           listLine::add_label(value.c_str(), line_container, true);
-      lv_obj_t *btnEdit =
-          listLine::add_button(LV_SYMBOL_EDIT, line_container);
+      lv_obj_t *btnEdit = listLine::add_button(LV_SYMBOL_EDIT, line_container);
       lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb,
                           LV_EVENT_CLICKED, (void *)(&(settingPtr->index)));
     }
@@ -856,8 +842,7 @@ void create() {
                    : esp3dTranslationService.translate(ESP3DLabel::enabled);
       inverted_y_label =
           listLine::add_label(value.c_str(), line_container, true);
-      lv_obj_t *btnEdit =
-          listLine::add_button(LV_SYMBOL_EDIT, line_container);
+      lv_obj_t *btnEdit = listLine::add_button(LV_SYMBOL_EDIT, line_container);
       lv_obj_add_event_cb(btnEdit, event_button_edit_setting_cb,
                           LV_EVENT_CLICKED, (void *)(&(settingPtr->index)));
     }

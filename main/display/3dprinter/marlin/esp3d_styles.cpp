@@ -19,9 +19,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "esp3d_styles.h"
-#include "esp3d_styles_res.h"
 
 #include "esp3d_log.h"
+#include "esp3d_styles_res.h"
 namespace ESP3DStyle {
 // Create styles for main background
 lv_style_t style_main_bg;

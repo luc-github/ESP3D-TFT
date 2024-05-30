@@ -30,17 +30,16 @@
 #include "components/symbol_button_component.h"
 #include "components/wifi_status_component.h"
 #include "esp3d_log.h"
+#include "esp3d_lvgl.h"
 #include "esp3d_settings.h"
 #include "esp3d_string.h"
 #include "esp3d_styles.h"
 #include "esp3d_tft_ui.h"
-#include "esp3d_lvgl.h"
 #include "network/esp3d_network.h"
 #include "screens/ap_screen.h"
 #include "screens/menu_screen.h"
 #include "screens/sta_screen.h"
 #include "translations/esp3d_translation_service.h"
-
 
 /**********************
  * Namespace
@@ -59,8 +58,9 @@ lv_timer_t *wifi_screen_delay_refresh_timer = NULL;
 /**
  * @brief Callback function for the WiFi screen delay refresh timer.
  *
- * This function is called when the delay refresh timer for the WiFi screen expires.
- * It is responsible for deleting the timer and hiding the spinner screen.
+ * This function is called when the delay refresh timer for the WiFi screen
+ * expires. It is responsible for deleting the timer and hiding the spinner
+ * screen.
  *
  * @param timer Pointer to the timer object that triggered the callback.
  */
@@ -82,16 +82,20 @@ void wifi_screen_delay_timer_cb(lv_timer_t *timer);
 /**
  * @brief Callback function for the delay connecting timer in the WiFi screen.
  *
- * This function is called when the delay connecting timer expires. It checks the current screen and network status to determine the next action.
- * If the current screen is not the WiFi screen or the network status is not "x", the timer is deleted and the function returns.
- * Otherwise, the spinner screen is hidden, the next screen is set to the WiFi screen, and a new delay timer is created.
+ * This function is called when the delay connecting timer expires. It checks
+ * the current screen and network status to determine the next action. If the
+ * current screen is not the WiFi screen or the network status is not "x", the
+ * timer is deleted and the function returns. Otherwise, the spinner screen is
+ * hidden, the next screen is set to the WiFi screen, and a new delay timer is
+ * created.
  *
  * @param timer Pointer to the timer object that triggered the callback.
  */
 void wifi_screen_delay_connecting_timer_cb(lv_timer_t *timer) {
   esp3d_log("wifi_screen_delay_connecting_timer_cb");
   if (esp3dTftui.get_current_screen() != ESP3DScreenType::wifi) {
-    if (wifi_screen_delay_connecting_timer && lv_timer_is_valid(wifi_screen_delay_connecting_timer)) {
+    if (wifi_screen_delay_connecting_timer &&
+        lv_timer_is_valid(wifi_screen_delay_connecting_timer)) {
       lv_timer_del(wifi_screen_delay_connecting_timer);
     }
     wifi_screen_delay_connecting_timer = NULL;
@@ -109,8 +113,9 @@ void wifi_screen_delay_connecting_timer_cb(lv_timer_t *timer) {
             status.c_str());
   if (mode == LV_SYMBOL_WIFI && status == "x") {
   } else {
-    if (wifi_screen_delay_connecting_timer && lv_timer_is_valid(wifi_screen_delay_connecting_timer)) {
-      lv_timer_del(wifi_screen_delay_connecting_timer);  
+    if (wifi_screen_delay_connecting_timer &&
+        lv_timer_is_valid(wifi_screen_delay_connecting_timer)) {
+      lv_timer_del(wifi_screen_delay_connecting_timer);
     }
     wifi_screen_delay_connecting_timer = NULL;
     spinnerScreen::hide();
@@ -125,8 +130,12 @@ void wifi_screen_delay_connecting_timer_cb(lv_timer_t *timer) {
 
 /**
  * @brief Callback function for handling updates on the WiFi screen.
- * 
- * This function is called when there is a need to update the WiFi screen. It checks if the current screen is the WiFi screen and performs the necessary updates based on the network mode. If the network mode is set to LV_SYMBOL_WIFI, the "No WiFi" button is hidden. Otherwise, the "No WiFi" button is shown.
+ *
+ * This function is called when there is a need to update the WiFi screen. It
+ * checks if the current screen is the WiFi screen and performs the necessary
+ * updates based on the network mode. If the network mode is set to
+ * LV_SYMBOL_WIFI, the "No WiFi" button is hidden. Otherwise, the "No WiFi"
+ * button is shown.
  */
 void callback() {
   if (esp3dTftui.get_current_screen() != ESP3DScreenType::wifi) return;
@@ -153,20 +162,22 @@ void callback() {
 /**
  * @brief Callback function for the WiFi screen delay timer.
  *
- * This function is called when the WiFi screen delay timer expires. It performs the necessary cleanup
- * and navigation logic based on the next screen to be displayed.
+ * This function is called when the WiFi screen delay timer expires. It performs
+ * the necessary cleanup and navigation logic based on the next screen to be
+ * displayed.
  *
  * @param timer Pointer to the timer object that triggered the callback.
  */
 void wifi_screen_delay_timer_cb(lv_timer_t *timer) {
   esp3d_log("wifi_screen_delay_timer_cb");
   if (wifi_screen_delay_timer && lv_timer_is_valid(wifi_screen_delay_timer)) {
-    lv_timer_del(wifi_screen_delay_timer); 
-  } 
+    lv_timer_del(wifi_screen_delay_timer);
+  }
   wifi_screen_delay_timer = NULL;
-  if (wifi_screen_delay_connecting_timer  && lv_timer_is_valid(wifi_screen_delay_connecting_timer)) {
+  if (wifi_screen_delay_connecting_timer &&
+      lv_timer_is_valid(wifi_screen_delay_connecting_timer)) {
     lv_timer_del(wifi_screen_delay_connecting_timer);
-  } 
+  }
   wifi_screen_delay_connecting_timer = NULL;
   switch (wifi_next_screen) {
     case ESP3DScreenType::access_point:
@@ -189,8 +200,9 @@ void wifi_screen_delay_timer_cb(lv_timer_t *timer) {
 /**
  * Event handler for the "back" button in the WiFi screen.
  * This function is called when the "back" button is clicked.
- * It logs a message, sets the next screen to the menu screen, and starts a timer for button animation delay if enabled.
- * If the button animation delay is not enabled, it directly calls the callback function.
+ * It logs a message, sets the next screen to the menu screen, and starts a
+ * timer for button animation delay if enabled. If the button animation delay is
+ * not enabled, it directly calls the callback function.
  *
  * @param e The event object associated with the button click event.
  */
@@ -233,8 +245,8 @@ void event_button_ap_handler(lv_event_t *e) {
  * @brief Event handler for the STA button click event.
  *
  * This function is called when the STA button is clicked on the WiFi screen.
- * It logs a message, sets the next screen to the station screen, and creates a timer
- * to delay the screen transition if animation delay is enabled.
+ * It logs a message, sets the next screen to the station screen, and creates a
+ * timer to delay the screen transition if animation delay is enabled.
  *
  * @param e Pointer to the event object.
  */
@@ -256,7 +268,8 @@ void event_button_sta_handler(lv_event_t *e) {
  * This function is called when the "no wifi" button is clicked.
  * It sets the ESP3D radio mode to "off" and updates the UI accordingly.
  * If the mode change fails, an error message is displayed.
- * After setting the mode, a spinner screen is shown and the network mode is updated asynchronously.
+ * After setting the mode, a spinner screen is shown and the network mode is
+ * updated asynchronously.
  *
  * @param e The event object associated with the button click event.
  */
@@ -277,13 +290,14 @@ void event_button_no_wifi_handler(lv_event_t *e) {
 
 /**
  * @brief Creates the WiFi screen.
- * 
- * This function is responsible for creating the WiFi screen in the ESP3D-TFT application.
- * It sets the current screen to none, creates the UI elements for the WiFi screen,
- * and handles the logic for connecting to WiFi.
- * 
- * @note This function assumes that the necessary UI elements and styles have been defined.
- * 
+ *
+ * This function is responsible for creating the WiFi screen in the ESP3D-TFT
+ * application. It sets the current screen to none, creates the UI elements for
+ * the WiFi screen, and handles the logic for connecting to WiFi.
+ *
+ * @note This function assumes that the necessary UI elements and styles have
+ * been defined.
+ *
  * @return void
  */
 void create() {
@@ -299,7 +313,7 @@ void create() {
   lv_obj_t *ui_current_screen = lv_scr_act();
   lv_scr_load(ui_new_screen);
   ESP3DStyle::apply(ui_new_screen, ESP3DStyleType::main_bg);
-  if (lv_obj_is_valid(ui_current_screen)){
+  if (lv_obj_is_valid(ui_current_screen)) {
     lv_obj_del(ui_current_screen);
   }
   btnback = backButton::create(ui_new_screen);

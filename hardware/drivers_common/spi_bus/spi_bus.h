@@ -27,9 +27,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <stdbool.h>
 #include <driver/spi_master.h>
 #include <esp_err.h>
+#include <stdbool.h>
 
 /*********************
  *      DEFINES
@@ -45,8 +45,8 @@ extern "C" {
 /**
  * @brief Initializes the SPI bus with the specified parameters.
  *
- * This function initializes the SPI bus with the given host, MISO, MOSI, and SCLK pins,
- * maximum transfer size, DMA channel, quadwp pin, and quadhd pin.
+ * This function initializes the SPI bus with the given host, MISO, MOSI, and
+ * SCLK pins, maximum transfer size, DMA channel, quadwp pin, and quadhd pin.
  *
  * @param host The SPI host number.
  * @param miso_pin The MISO pin number.
@@ -56,13 +56,12 @@ extern "C" {
  * @param dma_channel The DMA channel number.
  * @param quadwp_pin The quadwp pin number.
  * @param quadhd_pin The quadhd pin number.
- * @return `ESP_OK` if the SPI bus is successfully initialized, otherwise an error code.
+ * @return `ESP_OK` if the SPI bus is successfully initialized, otherwise an
+ * error code.
  */
-esp_err_t  spi_bus_init(int host,
-                  int miso_pin, int mosi_pin, int sclk_pin,
-                  int max_transfer_sz,
-                  int dma_channel,
-                  int quadwp_pin, int quadhd_pin);
+esp_err_t spi_bus_init(int host, int miso_pin, int mosi_pin, int sclk_pin,
+                       int max_transfer_sz, int dma_channel, int quadwp_pin,
+                       int quadhd_pin);
 
 /**********************
  *      MACROS

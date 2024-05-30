@@ -108,23 +108,25 @@ esp_err_t bsp_init(void) {
   esp3d_log("Attaching display panel to SPI bus...");
   esp_lcd_panel_io_handle_t disp_io_handle;
   display_spi_st7262_cfg.disp_spi_cfg.on_color_trans_done = disp_flush_ready;
-  if (esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)(display_spi_st7262_cfg.spi_bus_config.spi_host_index),
-                               &(display_spi_st7262_cfg.disp_spi_cfg), &disp_io_handle) != ESP_OK) {
+  if (esp_lcd_new_panel_io_spi(
+          (esp_lcd_spi_bus_handle_t)(display_spi_st7262_cfg.spi_bus_config
+                                         .spi_host_index),
+          &(display_spi_st7262_cfg.disp_spi_cfg), &disp_io_handle) != ESP_OK) {
     esp3d_log_e("Failed to attach display panel to SPI bus");
     return ESP_FAIL;
   }
 
   esp3d_log("Attaching touch controller to SPI bus...");
-  if (spi_bus_add_device(display_spi_st7262_cfg.spi_bus_config.spi_host_index, &touch_spi_cfg, &touch_spi) !=
-      ESP_OK) {
+  if (spi_bus_add_device(display_spi_st7262_cfg.spi_bus_config.spi_host_index,
+                         &touch_spi_cfg, &touch_spi) != ESP_OK) {
     esp3d_log_e("Failed to attach touch controller to SPI bus");
     return ESP_FAIL;
   }
 
   /* Display panel initialization */
   esp3d_log("Initializing display...");
-  if (esp_lcd_new_panel_st7796(disp_io_handle, &display_spi_st7262_cfg, &disp_panel) !=
-      ESP_OK) {
+  if (esp_lcd_new_panel_st7796(disp_io_handle, &display_spi_st7262_cfg,
+                               &disp_panel) != ESP_OK) {
     esp3d_log_e("Failed to initialize display panel");
     return ESP_FAIL;
   }

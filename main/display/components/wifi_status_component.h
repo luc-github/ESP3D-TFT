@@ -28,8 +28,8 @@ namespace wifiStatus {
 lv_obj_t *create(lv_obj_t *parent, lv_obj_t *backbutton);
 
 bool network_status_cb(ESP3DValuesIndex index, const char *value,
-                                    ESP3DValuesCbAction action);
+                       ESP3DValuesCbAction action);
 bool network_mode_cb(ESP3DValuesIndex index, const char *value,
-                                  ESP3DValuesCbAction action);
+                     ESP3DValuesCbAction action);
 
 }  // namespace wifiStatus

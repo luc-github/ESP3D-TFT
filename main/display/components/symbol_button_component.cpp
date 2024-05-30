@@ -30,9 +30,8 @@
  **********************/
 namespace symbolButton {
 
-lv_obj_t *create(lv_obj_t *container, const char *text, int width,
-                               int height, bool center, bool slash,
-                               int rotation) {
+lv_obj_t *create(lv_obj_t *container, const char *text, int width, int height,
+                 bool center, bool slash, int rotation) {
   lv_obj_t *btn = lv_btn_create(container);
   if (!lv_obj_is_valid(btn)) {
     esp3d_log_e("Failed to create button");

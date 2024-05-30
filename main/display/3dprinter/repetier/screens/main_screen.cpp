@@ -210,7 +210,7 @@ bool position_value_cb(ESP3DValuesIndex index, const char *value,
  * @return True if the callback was handled successfully, false otherwise.
  */
 bool callback(ESP3DValuesIndex index, const char *value,
-                  ESP3DValuesCbAction action) {
+              ESP3DValuesCbAction action) {
   esp3d_log("callback");
   if (!show_fan_button) {
     esp3d_log("No control to show");
@@ -630,7 +630,7 @@ void main_screen_delay_timer_cb(lv_timer_t *timer) {
   // If timer is not null, delete it to avoid multiple call
   if (main_screen_delay_timer && lv_timer_is_valid(main_screen_delay_timer)) {
     lv_timer_del(main_screen_delay_timer);
-  } 
+  }
   main_screen_delay_timer = NULL;
   switch (next_screen) {
     case ESP3DScreenType::none:

@@ -40,7 +40,6 @@
 #include "screens/wifi_screen.h"
 #include "translations/esp3d_translation_service.h"
 
-
 /**********************
  * Namespace
  **********************/
@@ -351,7 +350,7 @@ void create() {
 
   // SSID
   lv_obj_t *label_ssid = lv_label_create(ui_new_screen);
-  if(!lv_obj_is_valid(label_ssid)) {
+  if (!lv_obj_is_valid(label_ssid)) {
     esp3d_log_e("Failed to create label");
     return;
   }
@@ -392,7 +391,7 @@ void create() {
     esp3d_log_e("Failed to create label");
     return;
   }
-  
+
   lv_label_set_text(label_pwd, LV_SYMBOL_UNLOCK);
   ESP3DStyle::apply(label_pwd, ESP3DStyleType::bg_label);
 
@@ -444,7 +443,7 @@ void create() {
                                 ESP3D_SYMBOL_BUTTON_WIDTH,
                                 ESP3D_SYMBOL_BUTTON_WIDTH);
 
-if (!lv_obj_is_valid(btn_ok)) {
+  if (!lv_obj_is_valid(btn_ok)) {
     esp3d_log_e("Failed to create button");
     return;
   }

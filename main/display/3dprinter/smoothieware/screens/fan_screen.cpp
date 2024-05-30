@@ -32,7 +32,6 @@
 #include "rendering/esp3d_rendering_client.h"
 #include "screens/main_screen.h"
 
-
 /**********************
  *  Namespace
  **********************/

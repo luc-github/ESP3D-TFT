@@ -43,9 +43,11 @@ extern "C" {
 /**
  * @brief Initializes the Board Support Package (BSP).
  *
- * This function initializes the necessary hardware and peripherals required by the BSP.
+ * This function initializes the necessary hardware and peripherals required by
+ * the BSP.
  *
- * @return `ESP_OK` if the initialization is successful, otherwise an error code indicating the cause of failure.
+ * @return `ESP_OK` if the initialization is successful, otherwise an error code
+ * indicating the cause of failure.
  */
 esp_err_t bsp_init(void);
 
@@ -62,10 +64,12 @@ esp_err_t bsp_accessFs(void);
 /**
  * @brief Releases the file system resources used by the BSP.
  *
- * This function releases the file system resources used by the Board Support Package (BSP).
- * It should be called when the BSP is no longer needed to free up any allocated resources.
+ * This function releases the file system resources used by the Board Support
+ * Package (BSP). It should be called when the BSP is no longer needed to free
+ * up any allocated resources.
  *
- * @return `ESP_OK` if the file system resources were successfully released, or an error code if an error occurred.
+ * @return `ESP_OK` if the file system resources were successfully released, or
+ * an error code if an error occurred.
  */
 esp_err_t bsp_releaseFs(void);
 

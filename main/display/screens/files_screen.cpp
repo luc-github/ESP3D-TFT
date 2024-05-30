@@ -44,7 +44,6 @@
 #include "tasks_def.h"
 #include "translations/esp3d_translation_service.h"
 
-
 /**********************
  *  Namespace
  **********************/
@@ -475,10 +474,10 @@ void create() {
       }
     }
   } else {
-    if (lv_obj_is_valid(ui_files_list_ctl)){
+    if (lv_obj_is_valid(ui_files_list_ctl)) {
       lv_obj_del(ui_files_list_ctl);
     }
-    ui_files_list_ctl =  NULL;
+    ui_files_list_ctl = NULL;
     msg = lv_label_create(ui_new_screen);
     if (!lv_obj_is_valid(msg)) {
       esp3d_log_e("Failed to create label");

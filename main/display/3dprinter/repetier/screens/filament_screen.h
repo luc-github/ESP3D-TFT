@@ -25,6 +25,6 @@ filament_screen.h - ESP3D screens styles definition
 namespace filamentScreen {
 void create();
 bool callback(ESP3DValuesIndex index, const char *value,
-                              ESP3DValuesCbAction action);
+              ESP3DValuesCbAction action);
 
 }  // namespace filamentScreen

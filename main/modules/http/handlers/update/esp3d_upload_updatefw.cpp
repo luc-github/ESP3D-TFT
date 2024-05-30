@@ -120,4 +120,3 @@ esp_err_t ESP3DHttpService::upload_to_updatefw_handler(
   }
   return ESP_OK;
 }
-

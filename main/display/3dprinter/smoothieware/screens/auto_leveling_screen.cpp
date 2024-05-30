@@ -33,7 +33,6 @@
 #include "screens/leveling_screen.h"
 #include "translations/esp3d_translation_service.h"
 
-
 /*
 Command
 G29 V4
@@ -250,8 +249,9 @@ bool callback(ESP3DValuesIndex index, const char *value,
  * @param timer A pointer to the timer that triggered the callback.
  */
 void auto_leveling_screen_delay_timer_cb(lv_timer_t *timer) {
-  if (auto_leveling_screen_delay_timer && lv_timer_is_valid(auto_leveling_screen_delay_timer)) {
-    lv_timer_del(auto_leveling_screen_delay_timer);  
+  if (auto_leveling_screen_delay_timer &&
+      lv_timer_is_valid(auto_leveling_screen_delay_timer)) {
+    lv_timer_del(auto_leveling_screen_delay_timer);
   }
   auto_leveling_screen_delay_timer = NULL;
   if (auto_leveling_started) {

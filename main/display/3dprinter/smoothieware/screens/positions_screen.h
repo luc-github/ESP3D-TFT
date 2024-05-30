@@ -23,10 +23,9 @@
 
 #include "esp3d_values.h"
 
-
 namespace positionsScreen {
 void create(uint8_t target = 255);
 bool callback(ESP3DValuesIndex index, const char *value,
-                                ESP3DValuesCbAction action);
+              ESP3DValuesCbAction action);
 
 }  // namespace positionsScreen

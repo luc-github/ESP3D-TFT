@@ -167,7 +167,7 @@ void filament_screen_edit_delay_timer_cb(lv_timer_t *timer) {
   }
   filament_screen_delay_timer = NULL;
   temperaturesScreen::create(filament_buttons_map_id,
-                                          ESP3DScreenType::filament);
+                             ESP3DScreenType::filament);
 }
 
 /**

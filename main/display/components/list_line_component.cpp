@@ -108,9 +108,9 @@ lv_obj_t *add_label(const char *lbl, lv_obj_t *line_container, bool grow) {
  * @return The created button object.
  */
 lv_obj_t *add_button(const char *lbl, lv_obj_t *line_container) {
-  lv_obj_t *button_list = symbolButton::create(
-      line_container, lbl, ESP3D_LIST_LINE_BUTTON_WIDTH,
-      LIST_LINE_CONTENT_HEIGHT);
+  lv_obj_t *button_list =
+      symbolButton::create(line_container, lbl, ESP3D_LIST_LINE_BUTTON_WIDTH,
+                           LIST_LINE_CONTENT_HEIGHT);
   return button_list;
 }
 }  // namespace listLine

@@ -35,9 +35,11 @@ extern "C" {
 /**
  * @brief Initializes the Board Support Package (BSP).
  *
- * This function initializes the necessary hardware and peripherals required by the BSP.
+ * This function initializes the necessary hardware and peripherals required by
+ * the BSP.
  *
- * @return esp_err_t Returns ESP_OK if the initialization is successful, otherwise an error code.
+ * @return esp_err_t Returns ESP_OK if the initialization is successful,
+ * otherwise an error code.
  */
 esp_err_t bsp_init(void);
 

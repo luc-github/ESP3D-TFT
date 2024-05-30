@@ -17,13 +17,14 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #if ESP3D_CAMERA_FEATURE
+#include <time.h>
+
 #include "authentication/esp3d_authentication.h"
 #include "camera/camera.h"
 #include "esp3d_client.h"
 #include "esp3d_commands.h"
 #include "esp3d_settings.h"
 #include "esp3d_string.h"
-#include <time.h>
 
 #define COMMAND_ID 171
 // Save frame to target path and filename (default target = today date, default
@@ -40,7 +41,7 @@ void ESP3DCommands::ESP171(int cmd_params_pos, ESP3DMessage* msg) {
   std::string error_msg = "Invalid parameters";
   std::string ok_msg = "ok";
   std::string path;
-    std::string filename;
+  std::string filename;
   bool json = hasTag(msg, cmd_params_pos, "json");
   std::string tmpstr;
 #if ESP3D_AUTHENTICATION_FEATURE
@@ -54,7 +55,7 @@ void ESP3DCommands::ESP171(int cmd_params_pos, ESP3DMessage* msg) {
     error_msg = "No camera initialized";
     esp3d_log_e("%s", error_msg.c_str());
   } else {
-   tmpstr = get_param(msg, cmd_params_pos, "path=");
+    tmpstr = get_param(msg, cmd_params_pos, "path=");
     if (tmpstr.length() != 0) {
       // get path
       path = tmpstr;

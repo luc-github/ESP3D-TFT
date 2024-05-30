@@ -623,7 +623,7 @@ void create(uint8_t target_id) {
                   ESP3D_BUTTON_PRESSED_OUTLINE / 2, 0);
   // set button
   btn_set = symbolButton::create(ui_new_screen, LV_SYMBOL_OK);
-  if(!lv_obj_is_valid(btn_set)){
+  if (!lv_obj_is_valid(btn_set)) {
     esp3d_log_e("Error creating button");
     return;
   }
@@ -646,7 +646,7 @@ void create(uint8_t target_id) {
 
   // absolute /relative mode button
   lv_obj_t *btn_mode = lv_btn_create(ui_new_screen);
-  if(!lv_obj_is_valid(btn_mode)){
+  if (!lv_obj_is_valid(btn_mode)) {
     esp3d_log_e("Error creating button");
     return;
   }

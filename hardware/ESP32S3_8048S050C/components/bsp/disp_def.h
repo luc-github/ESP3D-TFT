@@ -60,7 +60,7 @@ const esp_rgb_st7262_config_t disp_panel_cfg = {
 #if DISP_USE_BOUNCE_BUFFER
          .bounce_buffer_size_px = DISP_BUF_SIZE,
 #else
-          .bounce_buffer_size_px = 0,
+         .bounce_buffer_size_px = 0,
 #endif
          .sram_trans_align = 0,
          .psram_trans_align = 64,

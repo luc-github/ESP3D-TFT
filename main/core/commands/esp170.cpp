@@ -256,7 +256,7 @@ void ESP3DCommands::ESP170(int cmd_params_pos, ESP3DMessage* msg) {
         }
         return;
       } else {
-         size_t s = sizeof(camcmd) / sizeof(const char*);
+        size_t s = sizeof(camcmd) / sizeof(const char*);
         for (size_t i = 0; i < s; i++) {
           std::string label = camcmd[i];
           label += "=";

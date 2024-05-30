@@ -30,7 +30,6 @@
 #include "esp3d_version.h"
 #include "screens/main_screen.h"
 
-
 // Images are stored in the flash memory
 // the logo is an rle image
 extern "C" lv_img_dsc_t *get_splash_logo();
@@ -115,11 +114,11 @@ void create() {
 
 /**
  * @brief Displays the splash screen.
- * 
- * This function sets up and displays the splash screen on the UI. It creates and positions
- * the splash logo, target logo, and version text objects. It also sets a timer to switch
- * to the main screen after a certain duration.
- * 
+ *
+ * This function sets up and displays the splash screen on the UI. It creates
+ * and positions the splash logo, target logo, and version text objects. It also
+ * sets a timer to switch to the main screen after a certain duration.
+ *
  * @note This function assumes that the UI has already been initialized.
  */
 void display() {

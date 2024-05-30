@@ -31,7 +31,6 @@ extern "C" {
 
 #include "esp_camera.h"
 
-
 /**********************
  *      TYPEDEFS
  **********************/

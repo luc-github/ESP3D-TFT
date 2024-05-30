@@ -240,12 +240,14 @@ bool ESP3DClient::setDataContent(ESP3DMessage* msg, const uint8_t* data,
     free(msg->data);
   }
 
-  //this is centralize if a `\n` is missing at the end of the message, if a client need another end it will handle on it's own
-  size_t allocation_needed =  length + 1;
+  // this is centralize if a `\n` is missing at the end of the message, if a
+  // client need another end it will handle on it's own
+  size_t allocation_needed = length + 1;
   size_t msg_size = length;
   bool missing_endline = false;
-  if (msg->type== ESP3DMessageType::unique || msg->type== ESP3DMessageType::tail) {
-   if (data[length - 1] != '\n') {
+  if (msg->type == ESP3DMessageType::unique ||
+      msg->type == ESP3DMessageType::tail) {
+    if (data[length - 1] != '\n') {
       missing_endline = true;
       allocation_needed++;
     }

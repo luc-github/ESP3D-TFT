@@ -38,16 +38,19 @@
 /**
  * @brief Initializes a new ST7262 LCD panel.
  *
- * This function initializes a new ST7262 LCD panel using the provided configuration.
+ * This function initializes a new ST7262 LCD panel using the provided
+ * configuration.
  *
- * @param disp_panel_cfg Pointer to the configuration structure for the ST7262 panel.
+ * @param disp_panel_cfg Pointer to the configuration structure for the ST7262
+ * panel.
  * @param disp_panel Pointer to the handle of the initialized ST7262 panel.
  *
- * @return `ESP_OK` if the ST7262 panel is successfully initialized, or an error code if initialization fails.
+ * @return `ESP_OK` if the ST7262 panel is successfully initialized, or an error
+ * code if initialization fails.
  */
 esp_err_t esp_lcd_new_panel_st7262(
-  const esp_rgb_st7262_config_t *disp_panel_cfg,
-  esp_lcd_panel_handle_t *disp_panel) {
+    const esp_rgb_st7262_config_t *disp_panel_cfg,
+    esp_lcd_panel_handle_t *disp_panel) {
   esp_err_t ret = ESP_OK;
   if (esp_lcd_new_rgb_panel(&(disp_panel_cfg->panel_config), disp_panel) !=
       ESP_OK) {

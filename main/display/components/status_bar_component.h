@@ -26,7 +26,7 @@
 
 namespace statusBar {
 bool callback(ESP3DValuesIndex index, const char *value,
-                          ESP3DValuesCbAction action);
+              ESP3DValuesCbAction action);
 lv_obj_t *create(lv_obj_t *screen);
 
 }  // namespace statusBar

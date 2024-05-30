@@ -10,7 +10,6 @@ extern "C" {
 #define DISP_HOR_RES_MAX (800)
 #define DISP_VER_RES_MAX (480)
 
-
 #define DISP_BUF_SIZE (DISP_HOR_RES_MAX * (DISP_VER_RES_MAX / 10))
 #define DISP_USE_DOUBLE_BUFFER (true)
 

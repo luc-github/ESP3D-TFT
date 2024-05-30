@@ -1,7 +1,8 @@
 /*
   sw_spi.h
 
-  Copyright (c) 2023 serisman (https://github.com/serisman). All rights reserved.
+  Copyright (c) 2023 serisman (https://github.com/serisman). All rights
+  reserved.
 
   This code is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -26,8 +27,8 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include <stdint.h>
 #include <esp_err.h>
+#include <stdint.h>
 
 /*********************
  *      DEFINES
@@ -47,12 +48,16 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 /**
- * @brief Initializes the software SPI interface with the provided configuration.
+ * @brief Initializes the software SPI interface with the provided
+ * configuration.
  *
- * This function initializes the software SPI interface using the provided configuration.
+ * This function initializes the software SPI interface using the provided
+ * configuration.
  *
- * @param config Pointer to the configuration structure containing the SPI settings.
- * @return `ESP_OK` if the initialization is successful, otherwise an error code.
+ * @param config Pointer to the configuration structure containing the SPI
+ * settings.
+ * @return `ESP_OK` if the initialization is successful, otherwise an error
+ * code.
  */
 esp_err_t sw_spi_init(const sw_spi_config_t *config);
 
@@ -70,8 +75,6 @@ uint16_t sw_spi_read_reg16(uint8_t reg);
  *      MACROS
  **********************/
 
-
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
-

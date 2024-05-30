@@ -4,8 +4,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "st7796.h"
 #include "disp_backlight.h"
+#include "st7796.h"
 
 #define TFT_DISPLAY_CONTROLLER "ST7796"
 
@@ -18,25 +18,25 @@ const esp_i80_st7796_config_t st7796_cfg = {
     .bus_config =
         {
             .clk_src = LCD_CLK_SRC_DEFAULT,
-            .dc_gpio_num = 0,  // DISP_RS_PIN=0
+            .dc_gpio_num = 0,   // DISP_RS_PIN=0
             .wr_gpio_num = 47,  // DISP_WR_PIN=GPIO47
             .data_gpio_nums =
                 {
                     9,   // DISP_D00_PIN = GPIO9
-                    46,   // DISP_D01_PIN = GPIO46
+                    46,  // DISP_D01_PIN = GPIO46
                     3,   // DISP_D02_PIN = GPIO3
-                    8,  // DISP_D03_PIN = GPIO8
-                    18,   // DISP_D04_PIN = GPIO18
+                    8,   // DISP_D03_PIN = GPIO8
+                    18,  // DISP_D04_PIN = GPIO18
                     17,  // DISP_D05_PIN = GPIO17
-                    16,   // DISP_D06_PIN = GPIO16
+                    16,  // DISP_D06_PIN = GPIO16
                     15,  // DISP_D07_PIN = GPIO15
-                    -1,   // DISP_D08_PIN = N/C
+                    -1,  // DISP_D08_PIN = N/C
                     -1,  // DISP_D09_PIN = N/C
-                    -1,   // DISP_D10_PIN = N/C
+                    -1,  // DISP_D10_PIN = N/C
                     -1,  // DISP_D11_PIN = N/C
-                    -1,   // DISP_D12_PIN = N/C
+                    -1,  // DISP_D12_PIN = N/C
                     -1,  // DISP_D13_PIN = N/C
-                    -1,   // DISP_D14_PIN = N/C
+                    -1,  // DISP_D14_PIN = N/C
                     -1,  // DISP_D15_PIN = N/C
                 },
             .bus_width = 8,  // DISP_BITS_WIDTH
@@ -46,7 +46,7 @@ const esp_i80_st7796_config_t st7796_cfg = {
         },
     .io_config =
         {
-            .cs_gpio_num = 48, //DISP_CS_PIN
+            .cs_gpio_num = 48,  // DISP_CS_PIN
             .pclk_hz =
                 (8 * 1000 *
                  1000),  // could be 10 if no PSRAM memory= DISP_CLK_FREQ,
@@ -92,10 +92,9 @@ const esp_i80_st7796_config_t st7796_cfg = {
 const disp_backlight_config_t disp_bcklt_cfg = {
     .pwm_control = false,
     .output_invert = false,
-    .gpio_num = 45, // DISP_BL_PIN=GPIO45 
+    .gpio_num = 45,  // DISP_BL_PIN=GPIO45
     .timer_idx = 0,
-    .channel_idx = 0
-};
+    .channel_idx = 0};
 
 #ifdef __cplusplus
 } /* extern "C" */
