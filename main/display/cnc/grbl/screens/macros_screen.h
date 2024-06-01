@@ -1,5 +1,5 @@
 /*
-  basic_screen.h - ESP3D screens definition
+  macros_screen.h - ESP3D screens definition
 
   Copyright (c) 2022 Luc Lebosse. All rights reserved.
 
@@ -22,6 +22,6 @@
 
 #include "esp3d_values.h"
 
-namespace basicScreen {
+namespace macrosScreen {
 void create();
-}  // namespace basicScreen
+}  // namespace macrosScreen

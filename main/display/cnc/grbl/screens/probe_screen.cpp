@@ -18,7 +18,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "screens/basic_screen.h"
+#include "screens/probe_screen.h"
 
 #include <lvgl.h>
 
@@ -33,7 +33,7 @@
 /**********************
  *  Namespace
  **********************/
-namespace basicScreen {
+namespace probeScreen {
 // Static prototypes
 void init();
 void display();
@@ -125,4 +125,4 @@ void create() {
 void leave() {
   // TODO: Add your code here
 }
-}  // namespace basicScreen
+}  // namespace probeScreen
