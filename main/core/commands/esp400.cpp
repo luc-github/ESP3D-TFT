@@ -433,6 +433,17 @@ void ESP3DCommands::ESP400(int cmd_params_pos, ESP3DMessage* msg) {
                        false, target, requestId)) {
     esp3d_log_e("Error sending response to clients");
   }
+#if ESP3D_DISPLAY_FEATURE
+  //Polling on
+  if (!dispatchSetting(json, "service/gcodehost",
+                       ESP3DSettingIndex::esp3d_polling_on, "polling_on",
+                       YesNoValues, YesNoLabels,
+                       sizeof(YesNoValues) / sizeof(char*), -1, -1, -1, nullptr,
+                       false, target, requestId)) {
+    esp3d_log_e("Error sending response to clients");
+  }
+#endif  // ESP3D_DISPLAY_FEATURE
+
 #if ESP3D_SD_CARD_FEATURE
 #if ESP3D_SD_IS_SPI
   // SPI Divider factor

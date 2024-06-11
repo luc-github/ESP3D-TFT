@@ -79,12 +79,12 @@ void addInformationToList(lv_obj_t *list, ESP3DLabel label, const char *info) {
   lv_list_add_btn(list, "", infoStr.c_str());
 }
 
-void addInformationToList(lv_obj_t *list, ESP3DLabel label, ESP3DLabel info) {
+/*void addInformationToList(lv_obj_t *list, ESP3DLabel label, ESP3DLabel info) {
   std::string infoStr = esp3dTranslationService.translate(label);
   infoStr += ": ";
   infoStr += esp3dTranslationService.translate(info);
   lv_list_add_btn(list, "", infoStr.c_str());
-}
+}*/
 
 void create() {
   esp3dTftui.set_current_screen(ESP3DScreenType::none);

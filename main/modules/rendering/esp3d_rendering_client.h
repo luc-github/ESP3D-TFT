@@ -43,6 +43,7 @@ class ESP3DRenderingClient : public ESP3DClient {
   void flush();
   bool started() { return _started; }
   void setPolling(bool polling_on) { _polling_on = polling_on; }
+  bool isPolling() { return _polling_on; }
 
  private:
   TaskHandle_t _xHandle;

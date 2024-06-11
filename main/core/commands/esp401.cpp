@@ -35,6 +35,9 @@
 #if ESP3D_TIMESTAMP_FEATURE
 #include "time/esp3d_time_service.h"
 #endif  // ESP3D_TIMESTAMP_FEATURE
+#if ESP3D_DISPLAY_FEATURE
+#include "rendering/esp3d_rendering_client.h"
+#endif  // ESP3D_DISPLAY_FEATURE
 #if ESP3D_WEBDAV_SERVICES_FEATURE
 #include "http/esp3d_http_service.h"
 #endif  // ESP3D_WEBDAV_SERVICES_FEATURE
@@ -251,6 +254,11 @@ void ESP3DCommands::ESP401(int cmd_params_pos, ESP3DMessage* msg) {
         case ESP3DSettingIndex::esp3d_resume_script:
           gcodeHostService.updateScripts();
           break;
+#if ESP3D_DISPLAY_FEATURE
+        case ESP3DSettingIndex::esp3d_polling_on:
+          renderingClient.setPolling(valueb);
+          break;
+#endif
         case ESP3DSettingIndex::esp3d_target_firmware:
           esp3dTftstream.getTargetFirmware(true);
 
