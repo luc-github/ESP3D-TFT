@@ -22,9 +22,9 @@ OPTION(ESP32S3_CUSTOM "HARDWARE TARGET is ESP32S3 custom board" OFF)
 OPTION(ESP32_CUSTOM "HARDWARE TARGET is ESP32 custom board" OFF)
 
 
-# #######################################
+# ===========================================
 # Optionally: Select hardware mods applied
-# #######################################
+# ===========================================
 #only for ESP32S3_8048S070C OR ESP32S3_8048S050C OR ESP32S3_8048S043C OR ESP32S3_4827S043C OR ESP32_3248S035C
 OPTION(HARDWARE_MOD_GT911_INT "Hardware Mod: GT911 INT pin" OFF)
 
@@ -36,18 +36,18 @@ OPTION(HARDWARE_MOD_EXT_PSRAM "Hardware Mod: External PSRAM" OFF)
 
 
 
-# #######################################
+# ===========================================
 # Select one targeted firmware
-# #######################################
-OPTION(TARGET_FW_MARLIN "Marlin firmware" OFF)
+# ===========================================
+OPTION(TARGET_FW_MARLIN "Marlin firmware" ON)
 OPTION(TARGET_FW_REPETIER "Repetier firmware" OFF)
 OPTION(TARGET_FW_SMOOTHIEWARE "Smoothieware firmware" OFF)
-OPTION(TARGET_FW_GRBL "GRBL firmware" ON)
+OPTION(TARGET_FW_GRBL "GRBL firmware"OFF)
 
 
-# #######################################
+# ===========================================
 # Select the Features
-# #######################################
+# ===========================================
 OPTION(ESP3D_AUTHENTICATION "Authentication on all clients" OFF)
 OPTION(DISABLE_SERIAL_AUTHENTICATION "Disable Serial Authentication" ON)
 OPTION(TIME_SERVICE  "Time service" ON)
@@ -67,9 +67,9 @@ OPTION(UPDATE_SERVICE "Update service" ON)
 OPTION(USB_SERIAL_SERVICE "Use USB Serial if Available" ON)
 OPTION(USE_FAT_INSTEAD_OF_LITTLEFS "Use FAT instead of LittleFS" OFF)
 
-# #######################################
-# Do not change anything below this line
-# #######################################
+# ===========================================
+# Internal Configuration (Do Not Modify)
+# ===========================================
 
 set(PLATFORMS_LIST
   ESP32S3_HMI43V3

@@ -294,7 +294,9 @@ bool ESP3DSocketServer::getClient() {
               sizeof(addr_str) - 1);
   esp3d_log("Socket accepted ip address: %s", addr_str);
 #endif
+#if !DISABLE_TELNET_WELCOME_MESSAGE
   sendToSocket(sock, WELCOME_MSG, strlen(WELCOME_MSG));
+#endif  // DISABLE_TELNET_WELCOME_MESSAGE
   return true;
 }
 
