@@ -140,7 +140,7 @@ include(cmake/sanity_check.cmake)
 # ===========================================
 # Final Configuration Summary
 # ===========================================
-
+set(IDF_VERSION "${IDF_VERSION_MAJOR}.${IDF_VERSION_MINOR}.${IDF_VERSION_PATCH}")
 message(STATUS "")
 message(STATUS "${BoldCyan}Configuration Summary:${ColourReset}")
 message(STATUS "${Cyan}------------------------${ColourReset}")
@@ -148,6 +148,7 @@ message(STATUS "${Cyan}PROJECT_NAME:  ${White}ESP3D TFT${ColourReset}")
 message(STATUS "${Cyan}Hardware Target: ${White}${board_target}${ColourReset}")
 message(STATUS "${Cyan}Firmware Target: ${White}${fw_target}${ColourReset}")
 message(STATUS "${Cyan}Platform: ${White}${IDF_TARGET}${ColourReset}")
+message(STATUS "${Cyan}ESP-IDF version: ${White} ${IDF_VERSION}${ColourReset}")
 message(STATUS "${Cyan}WiFi:  ${White}${WIFI_SERVICE} ${ColourReset}")
 message(STATUS "${Cyan}Bluetooth:  ${White}${BT_SERVICE} ${ColourReset}")
 message(STATUS "${Cyan}TFT UI:  ${White}${TFT_UI_SERVICE} ${ColourReset}")
