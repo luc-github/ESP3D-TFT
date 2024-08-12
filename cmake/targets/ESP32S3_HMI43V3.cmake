@@ -16,4 +16,5 @@ if(ESP32S3_HMI43V3)
         # Enable USB-OTG as serial alternative for communications
         add_compile_options(-DESP3D_USB_SERIAL_FEATURE=1)
     endif()
+    set (RESOLUTION_SCREEN "res_800_480")
 endif()

@@ -11,4 +11,5 @@ if(ESP32S3_BZM_TFT35_GT911)
         # Enable USB-OTG as serial alternative for communications
         add_compile_options(-DESP3D_USB_SERIAL_FEATURE=1)
     endif()
+    set (RESOLUTION_SCREEN "res_480_320")
 endif()

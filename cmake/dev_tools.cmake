@@ -9,7 +9,7 @@
 # 2 = Debug
 # 1 = Error only
 # 0 = Disabled
-set(ESP3D_TFT_LOG_LEVEL 0)
+set(ESP3D_TFT_LOG_LEVEL 3)
 add_compile_options(-DESP3D_TFT_LOG=${ESP3D_TFT_LOG_LEVEL})
 
 # ANSI Color in Logs
