@@ -27,7 +27,6 @@
 #if ESP3D_TIMESTAMP_FEATURE
 #include "time/esp3d_time_service.h"
 #else
-#include <ctime.h>
 #include <time.h>
 
 #endif  // ESP3D_TIMESTAMP_FEATURE
