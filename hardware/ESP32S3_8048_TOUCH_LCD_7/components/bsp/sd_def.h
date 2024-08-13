@@ -14,7 +14,7 @@ extern "C" {
 #define ESP3D_SD_MOSI_PIN (11)  // GPIO 11
 #define ESP3D_SD_MISO_PIN (13)  // GPIO 13
 #define ESP3D_SD_CLK_PIN (12)   // GPIO 12
-#define ESP3D_SD_CS_PIN (34)    // GPIO 34 (we use GPIO34 because  is not connected, because actually cs pin is connected to IO expander pin EXI03)
+#define ESP3D_SD_CS_PIN (-1)    // GPIO -1 (we use -1 because actually cs pin is connected to IO expander pin EXI03)
 
 // #define ESP3D_SD_DETECT_PIN (-1) //GPIO -1
 // #define ESP3D_SD_DETECT_VALUE (0) //LOW

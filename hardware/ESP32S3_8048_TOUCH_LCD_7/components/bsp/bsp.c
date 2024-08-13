@@ -24,7 +24,8 @@
 #include "bsp.h"
 
 #include "esp3d_log.h"
-
+#include "driver/i2c.h"
+#include "esp_timer.h"
 #if ESP3D_DISPLAY_FEATURE
 #include "disp_def.h"
 #include "i2c_def.h"
@@ -34,6 +35,8 @@
 #if ESP3D_USB_SERIAL_FEATURE
 #include "usb_serial.h"
 #endif  // ESP3D_USB_SERIAL_FEATURE
+
+#define I2C_MASTER_TIMEOUT_MS       1000
 
 /**********************
  *  STATIC PROTOTYPES
@@ -150,7 +153,7 @@ esp_err_t bsp_init(void) {
     esp3d_log_e("Failed to register VSync event callback");
     return ESP_FAIL;
   }
-
+#endif  // ESP3D_DISPLAY_FEATURE  
   /* i2c controller initialization */
   esp3d_log("Initializing i2C controller...");
   i2c_bus_handle = i2c_bus_create(I2C_PORT_NUMBER, &i2c_cfg);
@@ -159,8 +162,22 @@ esp_err_t bsp_init(void) {
     return ESP_FAIL;
   }
 
+
   //TODO: Enable IO expander
   // Which has : Touch Reset pin, Display Reset pin, Display Backlight pin, SD Cs pin
+    uint8_t write_buf = 0x01;
+    i2c_master_write_to_device(I2C_PORT_NUMBER, 0x24, &write_buf, 1, I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
+
+    //Reset the touch screen. It is recommended that you reset the touch screen before using it.
+    write_buf = 0x2C;
+    i2c_master_write_to_device(I2C_PORT_NUMBER, 0x38, &write_buf, 1, I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
+    esp_rom_delay_us(100 * 1000);
+
+    write_buf = 0x2E;
+    i2c_master_write_to_device(I2C_PORT_NUMBER, 0x38, &write_buf, 1, I2C_MASTER_TIMEOUT_MS / portTICK_PERIOD_MS);
+    esp_rom_delay_us(200 * 1000);
+
+#if ESP3D_DISPLAY_FEATURE
 
   /* Touch controller initialization */
   esp3d_log("Initializing touch controller...");
