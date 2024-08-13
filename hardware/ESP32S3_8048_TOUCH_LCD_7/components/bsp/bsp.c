@@ -26,9 +26,9 @@
 #include "esp3d_log.h"
 #include "driver/i2c.h"
 #include "esp_timer.h"
+#include "i2c_def.h"
 #if ESP3D_DISPLAY_FEATURE
 #include "disp_def.h"
-#include "i2c_def.h"
 #include "lvgl.h"
 #include "touch_def.h"
 #endif  // ESP3D_DISPLAY_FEATURE
@@ -53,8 +53,8 @@ static void lv_touch_read(lv_indev_drv_t *drv, lv_indev_data_t *data);
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if ESP3D_DISPLAY_FEATURE
 static i2c_bus_handle_t i2c_bus_handle = NULL;
+#if ESP3D_DISPLAY_FEATURE
 static lv_disp_drv_t disp_drv;
 static esp_lcd_panel_handle_t disp_panel;
 
