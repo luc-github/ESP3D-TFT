@@ -56,7 +56,7 @@ ESP3DNetworkServices::~ESP3DNetworkServices() {}
 
 bool ESP3DNetworkServices::begin() {
   bool start = false;
-
+  (void)start;
   esp3dTftValues.set_string_value(ESP3DValuesIndex::network_status, "+");
   esp3d_log("Starting Services");
   _started = esp3dAuthenthicationService.begin();

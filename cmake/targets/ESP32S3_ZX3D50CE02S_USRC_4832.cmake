@@ -10,4 +10,5 @@ if(ESP32S3_ZX3D50CE02S_USRC_4832)
         # Enable USB-OTG as serial alternative for communications
         add_compile_options(-DESP3D_USB_SERIAL_FEATURE=1)
     endif()
+    set (RESOLUTION_SCREEN "res_480_320")
 endif()

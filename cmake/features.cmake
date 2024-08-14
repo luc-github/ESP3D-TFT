@@ -157,9 +157,17 @@ message(STATUS "${Cyan}Update Service:  ${White}${UPDATE_SERVICE} ${ColourReset}
 message(STATUS "${Cyan}Use FAT instead of LittleFS: ${White}${USE_FAT_INSTEAD_OF_LITTLEFS} ${ColourReset}")
 message(STATUS "${Cyan}Authentication:  ${White}${ESP3D_AUTHENTICATION} ${ColourReset}")
 message(STATUS "${Cyan}Time Service:  ${White}${TIME_SERVICE} ${ColourReset}")
+message(STATUS "${Cyan}SSDP Service:  ${White}${SSDP_SERVICE} ${ColourReset}")
+message(STATUS "${Cyan}MDNS Service:  ${White}${MDNS_SERVICE} ${ColourReset}")
+message(STATUS "${Cyan}Web Services:  ${White}${WEB_SERVICES} ${ColourReset}")
+message(STATUS "${Cyan}Camera Service:  ${White}${CAMERA_SERVICE} ${ColourReset}")
+message(STATUS "${Cyan}WebDav Services:  ${White}${WEBDAV_SERVICES} ${ColourReset}")
+message(STATUS "${Cyan}Telnet Service:  ${White}${TELNET_SERVICE} ${ColourReset}")
+message(STATUS "${Cyan}WebSocket Service:  ${White}${WS_SERVICE} ${ColourReset}")
+message(STATUS "${Cyan}Notifications Service:  ${White}${NOTIFICATIONS_SERVICE} ${ColourReset}")
+message(STATUS "${Cyan}USB Serial Service:  ${White}${USB_SERIAL_SERVICE} ${ColourReset}")
 message(STATUS "${Cyan}------------------------${ColourReset}")
 message(STATUS "")
-
 
 # ===========================================
 # Development  Configuration Summary
