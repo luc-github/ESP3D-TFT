@@ -12,7 +12,7 @@ extern "C" {
 #define DISP_HOR_RES_MAX 800
 #define DISP_VER_RES_MAX 480
 
-#define DISP_CLK_FREQ (18 * 1000 * 1000)
+#define DISP_CLK_FREQ (14 * 1000 * 1000)
 #define DISP_AVOID_TEAR_EFFECT_WITH_SEM (true)
 #define DISP_USE_BOUNCE_BUFFER (false)
 #define DISP_USE_DOUBLE_BUFFER (true)
