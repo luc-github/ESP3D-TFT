@@ -35,6 +35,15 @@
 #include "esp3d_values.h"
 #include "translations/esp3d_translation_service.h"
 
+#define ESP_WIFI_SCAN_AUTH_MODE_THRESHOLD WIFI_AUTH_OPEN
+#if ESP3D_WIFI_FEATURE
+#define WIFI_CONNECTED_BIT BIT0
+#define WIFI_FAIL_BIT BIT1
+#define WIFI_STA_LOST_IP BIT2
+#define MIN_RSSI -78
+#define ESP3D_STA_MAXIMUM_RETRY 10
+#endif  // ESP3D_WIFI_FEATURE
+
 ESP3DNetwork esp3dNetwork;
 
 /* The event group allows multiple bits for each event, but we only care about
@@ -42,12 +51,6 @@ ESP3DNetwork esp3dNetwork;
  * - we are connected to the AP with an IP
  * - we failed to connect after the maximum amount of retries */
 #if ESP3D_WIFI_FEATURE
-#define WIFI_CONNECTED_BIT BIT0
-#define WIFI_FAIL_BIT BIT1
-#define WIFI_STA_LOST_IP BIT2
-
-#define MIN_RSSI -78
-#define ESP3D_STA_MAXIMUM_RETRY 10
 
 static void wifi_ap_event_handler(void* arg, esp_event_base_t event_base,
                                   int32_t event_id, void* event_data) {
@@ -365,6 +368,7 @@ bool ESP3DNetwork::startStaMode() {
             ipMode == static_cast<uint8_t>(ESP3DIpMode::staticIp) ? "Static"
                                                                   : "DHCP");
   wifi_config_t wifi_config;
+  memset(&wifi_config, 0, sizeof(wifi_config_t));
   strcpy((char*)wifi_config.sta.ssid, ssid_str);
   strcpy((char*)wifi_config.sta.password, ssid_pwd_str);
   wifi_config.sta.threshold.authmode = WIFI_AUTH_OPEN;
@@ -438,9 +442,10 @@ bool ESP3DNetwork::startStaMode() {
   netbiosns_set_name(_hostname.c_str());
   ESP_ERROR_CHECK(esp_wifi_start());
   _current_radio_mode = ESP3DRadioMode::wifi_sta;
-  /* Waiting until either the connection is established (WIFI_CONNECTED_BIT) or
-   * connection failed for the maximum number of re-tries (WIFI_FAIL_BIT). The
-   * bits are set by event_handler() (see above) */
+
+  // Waiting until either the connection is established (WIFI_CONNECTED_BIT) or
+  // connection failed for the maximum number of re-tries (WIFI_FAIL_BIT). The
+  // bits are set by event_handler() (see above)
   EventBits_t bits = xEventGroupWaitBits(_s_wifi_event_group,
                                          WIFI_CONNECTED_BIT | WIFI_FAIL_BIT,
                                          pdFALSE, pdFALSE, portMAX_DELAY);
