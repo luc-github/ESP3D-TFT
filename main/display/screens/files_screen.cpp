@@ -87,7 +87,7 @@ void refresh_files_list_cb(lv_timer_t *timer) {
  */
 static void bgFilesTask(void *pvParameter) {
   (void)pvParameter;
-  vTaskDelay(pdMS_TO_TICKS(100));
+  esp3d_hal::wait(100);
   fill_files_list();
   if (!start_files_list_timer) {
     start_files_list_timer = lv_timer_create(refresh_files_list_cb, 100, NULL);
@@ -207,7 +207,7 @@ void fill_files_list() {
           files_list.push_back(file);
         }
         esp3d_log("Found %s, %s", file.name.c_str(), file.size.c_str());
-        esp3d_hal::wait(2);
+        esp3d_hal::wait(1);
       }
       esp3d_log("Files list size %d", files_list.size());
       closedir(dir);

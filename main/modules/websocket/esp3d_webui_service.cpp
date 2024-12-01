@@ -50,7 +50,7 @@ esp_err_t ESP3DWebUiService::onOpen(httpd_req_t *req) {
           pushMsgTxt(currentSocketId, tmpstr.c_str());
           esp3d_hal::wait(500);
           closeClient(currentSocketId);
-          esp3d_hal::wait(100);
+          esp3d_hal::wait(10);
         }
       }
     } else {

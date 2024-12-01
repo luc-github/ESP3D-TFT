@@ -79,10 +79,10 @@ void ESP3DCommands::ESP410(int cmd_params_pos, ESP3DMessage *msg) {
     wifi_ap_record_t ap_info[MAX_SCAN_LIST_SIZE];
     uint16_t ap_count = 0;
     memset(ap_info, 0, sizeof(ap_info));
-    uint16_t real_count = 0;
-    ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&number, ap_info));
+    uint16_t real_count = 0; 
     ESP_ERROR_CHECK(esp_wifi_scan_get_ap_num(&ap_count));
-    esp3d_log("Total : %d", ap_count);
+    ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&number, ap_info));
+    esp3d_log("Total : %d / %d (max : %d)", ap_count, number, MAX_SCAN_LIST_SIZE);
 
     for (int i = 0; (i < MAX_SCAN_LIST_SIZE) && (i < ap_count); i++) {
       esp3d_log("%s %d %d", ap_info[i].ssid, ap_info[i].rssi,

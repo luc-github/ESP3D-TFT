@@ -4,7 +4,7 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[<img src="https://img.shields.io/liberapay/patrons/ESP3D.svg?logo=liberapay">](https://liberapay.com/ESP3D)
 
-[![Development Version](https://img.shields.io/badge/Dev-v1.0-yellow?style=plastic) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3D-TFT/main?style=plastic)](https://github.com/luc-github/ESP3D-TFT/tree/main) [![github-ci](https://github.com/luc-github/ESP3D-TFT/workflows/build-ci/badge.svg)](https://github.com/luc-github/ESP3D-TFT/actions/workflows/build-ci.yml) [![Development  Version](https://img.shields.io/badge/Dev-v3.0-yellow?style=plastic&label=WebUI&logo=Preact)](https://github.com/luc-github/ESP3D-WEBUI/tree/3.0) [![IDF 5.1.2](https://img.shields.io/badge/IDF-v5.1.2-blue?style=plastic&label=IDF&logo=espressif)](https://github.com/espressif/esp-idf)
+[![Development Version](https://img.shields.io/badge/Dev-v1.0-yellow?style=plastic) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3D-TFT/main?style=plastic)](https://github.com/luc-github/ESP3D-TFT/tree/main) [![github-ci](https://github.com/luc-github/ESP3D-TFT/workflows/build-ci/badge.svg)](https://github.com/luc-github/ESP3D-TFT/actions/workflows/build-ci.yml) [![Development  Version](https://img.shields.io/badge/Dev-v3.0-yellow?style=plastic&label=WebUI&logo=Preact)](https://github.com/luc-github/ESP3D-WEBUI/tree/3.0) [![IDF 5.1.5](https://img.shields.io/badge/IDF-v5.1.2-blue?style=plastic&label=IDF&logo=espressif)](https://github.com/espressif/esp-idf)
 
 
 > [!WARNING]
@@ -31,7 +31,7 @@ lvgl library 8.3.8
 
 ## Framework
 
-Espressif IDF 5.1.2 
+Espressif IDF 5.1.5 
 
 ## Reference boards
 

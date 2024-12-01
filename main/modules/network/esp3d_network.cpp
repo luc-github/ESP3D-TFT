@@ -616,7 +616,7 @@ bool ESP3DNetwork::startApMode(bool configMode, bool limited) {
   }
 #if ESP3D_TFT_LOG
   // to avoid esp3d_log merge with dispatch message on serial output
-  vTaskDelay(pdMS_TO_TICKS(500));
+  esp3d_hal::wait(500);
 #endif  // ESP3D_TFT_LOG
   esp3dCommands.dispatch(stmp.c_str(), ESP3DClientType::all_clients, requestId,
                          ESP3DMessageType::unique, ESP3DClientType::system,

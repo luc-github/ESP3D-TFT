@@ -33,6 +33,7 @@
 #include "components/symbol_button_component.h"
 #include "components/wifi_status_component.h"
 #include "esp3d_log.h"
+#include "esp3d_hal.h"
 #include "esp3d_lvgl.h"
 #include "esp3d_settings.h"
 #include "esp3d_string.h"
@@ -134,7 +135,7 @@ void refresh_ssid_scanned_list_cb(lv_timer_t *timer) {
 static void bgScanTask(void *pvParameter) {
   esp3d_log("Scan task");
   (void)pvParameter;
-  vTaskDelay(pdMS_TO_TICKS(100));
+  esp3d_hal::wait(100);
   fill_ssid_scanned_list();
   if (!start_scan_timer) {
     start_scan_timer = lv_timer_create(refresh_ssid_scanned_list_cb, 100, NULL);
@@ -181,8 +182,8 @@ void fill_ssid_scanned_list() {
     wifi_ap_record_t ap_info[MAX_SCAN_LIST_SIZE];
     uint16_t ap_count = 0;
     memset(ap_info, 0, sizeof(ap_info));
-    ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&number, ap_info));
     ESP_ERROR_CHECK(esp_wifi_scan_get_ap_num(&ap_count));
+    ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&number, ap_info));
     esp3d_log("Got %d ssid in scan", ap_count);
     for (int i = 0; (i < MAX_SCAN_LIST_SIZE) && (i < ap_count); i++) {
       esp3d_log("%s %d %d", ap_info[i].ssid, ap_info[i].rssi,

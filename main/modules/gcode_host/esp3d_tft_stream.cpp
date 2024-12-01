@@ -24,6 +24,7 @@
 
 #include "esp3d_commands.h"
 #include "esp3d_log.h"
+#include "esp3d_hal.h"
 #include "esp_freertos_hooks.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
@@ -58,15 +59,15 @@ static void streamTask(void *pvParameter) {
   if (!gcodeHostService.begin()) {
     esp3d_log_e("Failed to begin gcode host service");
   }
-
+  esp3d_hal::wait(100);
   while (1) {
     /* Delay */
-    vTaskDelay(pdMS_TO_TICKS(10));
 
     if (pdTRUE == xSemaphoreTake(xStreamSemaphore, portMAX_DELAY)) {
       esp3dTftstream.handle();
       xSemaphoreGive(xStreamSemaphore);
     }
+    esp3d_hal::wait(10);
   }
 
   /* A task should NEVER return */
@@ -96,7 +97,7 @@ bool ESP3DTftStream::begin() {
     esp3d_log("Created Stream Task");
     // to let buffer time to empty
 #if ESP3D_TFT_LOG
-    vTaskDelay(pdMS_TO_TICKS(100));
+    esp3d_hal::wait(100);
 #endif  // ESP3D_TFT_LOG
     getTargetFirmware(true);
 
