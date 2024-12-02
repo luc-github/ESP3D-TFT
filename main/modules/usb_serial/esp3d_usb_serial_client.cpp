@@ -85,11 +85,11 @@ void handle_event(const cdc_acm_host_dev_event_data_t *event, void *user_ctx) {
 #endif  // ESP3D_HTTP_FEATURE
       break;
     case CDC_ACM_HOST_DEVICE_DISCONNECTED:
-      esp3d_log_d("Device suddenly disconnected");
+      esp3d_log("Device suddenly disconnected");
       usbSerialClient.setConnected(false);
       break;
     case CDC_ACM_HOST_SERIAL_STATE:
-      esp3d_log_d("Serial state notif 0x%04X", event->data.serial_state.val);
+      esp3d_log("Serial state notif 0x%04X", event->data.serial_state.val);
       break;
     case CDC_ACM_HOST_NETWORK_CONNECTION:
     default:
@@ -130,15 +130,15 @@ void ESP3DUsbSerialClient::connectDevice() {
 
   esp3d_hal::wait(10);
 
-  esp3d_log_d("USB device found");
+  esp3d_log("USB device found");
 
   if (_vcp_ptr->line_coding_set(&line_coding) == ESP_OK) {
-    esp3d_log_d("USB Connected");
+    esp3d_log("USB Connected");
     usbSerialClient.setConnected(true);
     esp3d_hal::wait(10);
     _vcp_ptr = nullptr;
   } else {
-    esp3d_log_d("USB device not identified");
+    esp3d_log("USB device not identified");
   }
 }
 
@@ -152,7 +152,7 @@ static void esp3d_usb_serial_connection_task(void *pvParameter) {
     if (usbSerialClient.started()) {
       usbSerialClient.connectDevice();
     } else {
-      esp3d_log_d("USB serial client not started");
+      esp3d_log("USB serial client not started");
     }
    
   }
@@ -164,7 +164,7 @@ void ESP3DUsbSerialClient::setConnected(bool connected) {
   _connected = connected;
 
   if (_connected) {
-    esp3d_log_d("USB device connected");
+    esp3d_log("USB device connected");
 #if ESP3D_HTTP_FEATURE
     esp3dWsWebUiService.pushNotification("Connected");
 #endif  // ESP3D_HTTP_FEATURE
@@ -173,7 +173,7 @@ void ESP3DUsbSerialClient::setConnected(bool connected) {
       _connected=false;
     }
   } else {
-    esp3d_log_d("USB device disconnected");
+    esp3d_log("USB device disconnected");
 #if ESP3D_HTTP_FEATURE
     esp3dWsWebUiService.pushNotification("Disconnected");
 #endif  // ESP3D_HTTP_FEATURE
@@ -195,7 +195,7 @@ ESP3DUsbSerialClient::ESP3DUsbSerialClient() {
 ESP3DUsbSerialClient::~ESP3DUsbSerialClient() { end(); }
 
 void ESP3DUsbSerialClient::process(ESP3DMessage *msg) {
-  esp3d_log_d("Add message to queue");
+  esp3d_log("Add message to queue");
   if (!addTxData(msg)) {
     flush();
     if (!addTxData(msg)) {
@@ -244,7 +244,7 @@ bool ESP3DUsbSerialClient::begin() {
     _baudrate = esp3dTftsettings.getDefaultIntegerSetting(
         ESP3DSettingIndex::esp3d_usb_serial_baud_rate);
   }
-  esp3d_log_d("Use %ld USB Serial Baud Rate", _baudrate);
+  esp3d_log("Use %ld USB Serial Baud Rate", _baudrate);
 
   // Serial is never stopped so no need to kill the task from outside
   _started = true;
@@ -254,8 +254,8 @@ bool ESP3DUsbSerialClient::begin() {
       &_xHandle, ESP3D_USB_SERIAL_TASK_CORE);
 
   if (res == pdPASS && _xHandle) {
-    esp3d_log_d("Created USB Serial Connection Task");
-    esp3d_log_d("USB serial client started");
+    esp3d_log("Created USB Serial Connection Task");
+    esp3d_log("USB serial client started");
     flush();
     return true;
   } else {
@@ -303,13 +303,13 @@ void ESP3DUsbSerialClient::handle() {
     if (getTxMsgsCount() > 0) {
       ESP3DMessage *msg = popTx();
       if (msg) {
-        esp3d_log_d("Got message to send");
+        esp3d_log("Got message to send");
         if (_connected) {
-          esp3d_log_d("Send message");
+          esp3d_log("Send message");
           // TODO: check if msg->size < ESP3D_USB_SERIAL_TX_BUFFER_SIZE
           if (_vcp_ptr && _vcp_ptr->tx_blocking(msg->data, msg->size) == ESP_OK) {
             if (!(_vcp_ptr && _vcp_ptr->set_control_line_state(true, true) == ESP_OK)) {
-              esp3d_log_d("Failed set line");
+              esp3d_log("Failed set line");
             }
           } else {
             esp3d_log_e("Failed to send message");
@@ -328,9 +328,9 @@ void ESP3DUsbSerialClient::end() {
   if (_started) {
     flush();
     _started = false;
-    esp3d_log_d("Clearing queue Rx messages");
+    esp3d_log("Clearing queue Rx messages");
     clearRxQueue();
-    esp3d_log_d("Clearing queue Tx messages");
+    esp3d_log("Clearing queue Tx messages");
     clearTxQueue();
     esp3d_hal::wait(1000);
     if (pthread_mutex_destroy(&_tx_mutex) != 0) {
@@ -339,7 +339,7 @@ void ESP3DUsbSerialClient::end() {
     if (pthread_mutex_destroy(&_rx_mutex) != 0) {
       esp3d_log_w("Mutex destruction for rx failed");
     }
-    esp3d_log_d("Uninstalling USB Serial drivers");
+    esp3d_log("Uninstalling USB Serial drivers");
     setConnected(false);
     vSemaphoreDelete(_device_disconnected_sem);
     _device_disconnected_sem = NULL;
