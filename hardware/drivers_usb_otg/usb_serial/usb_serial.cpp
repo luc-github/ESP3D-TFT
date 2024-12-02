@@ -42,7 +42,7 @@ void usb_lib_task(void *arg) {
     try {
       usb_host_lib_handle_events(portMAX_DELAY, &event_flags);
     } catch (...) {
-      esp3d_log("Error handling usb event");
+      esp3d_log_d("Error handling usb event");
     }
     if (event_flags & USB_HOST_LIB_EVENT_FLAGS_NO_CLIENTS) {
       if (ESP_OK != usb_host_device_free_all()) {
@@ -50,7 +50,7 @@ void usb_lib_task(void *arg) {
       }
     }
     if (event_flags & USB_HOST_LIB_EVENT_FLAGS_ALL_FREE) {
-      esp3d_log("USB: All devices freed");
+      esp3d_log_d("USB: All devices freed");
       // Continue handling USB events to allow device reconnection
     }
   }
@@ -103,10 +103,10 @@ esp_err_t usb_serial_init() {
   const usb_host_config_t host_config = {
       .skip_phy_setup = true,
       .intr_flags = ESP_INTR_FLAG_LEVEL1,
-      .enum_filter_cb = NULL,
+      //.enum_filter_cb = NULL,
   };
   // Install USB Host driver. Should only be called once in entire application
-  esp3d_log("Installing USB Host");
+  esp3d_log_d("Installing USB Host");
   esp_err_t err = usb_host_install(&host_config);
   if (err != ESP_OK) {
     esp3d_log_e("Failed to install USB Host %s", esp_err_to_name(err));
@@ -133,14 +133,14 @@ esp_err_t usb_serial_create_task() {
                               NULL, ESP3D_USB_LIB_TASK_PRIORITY,
                               &usb_serial_xHandle, ESP3D_USB_LIB_TASK_CORE);
   if (res == pdPASS && usb_serial_xHandle) {
-    esp3d_log("Installing CDC-ACM driver");
+    esp3d_log_d("Installing CDC-ACM driver");
     if (cdc_acm_host_install(NULL) == ESP_OK) {
       // Register VCP drivers to VCP service.
-      esp3d_log("Registering FT23x driver");
+      esp3d_log_d("Registering FT23x driver");
       esp_usb::VCP::register_driver<esp_usb::FT23x>();
-      esp3d_log("Registering CP210x driver");
+      esp3d_log_d("Registering CP210x driver");
       esp_usb::VCP::register_driver<esp_usb::CP210x>();
-      esp3d_log("Registering CH34x driver");
+      esp3d_log_d("Registering CH34x driver");
       esp_usb::VCP::register_driver<esp_usb::CH34x>();
       return ESP_OK;
     } else {
