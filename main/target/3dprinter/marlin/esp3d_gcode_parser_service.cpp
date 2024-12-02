@@ -410,7 +410,7 @@ ESP3DDataType ESP3DGCodeParserService::getType(const char* data) {
   // is it ack ?
   if (((ptr[0] == 'o' && ptr[1] == 'k') &&
       (ptr[2] == '\n' || ptr[2] == '\r' || ptr[2] == ' ' || ptr[2] == 0x0)) || strstr(ptr, "ok") != nullptr) {
-    esp3d_log_d("Ack found in %s", ptr);
+    esp3d_log("Ack found in %s", ptr);
     return ESP3DDataType::ack;
   }
 
