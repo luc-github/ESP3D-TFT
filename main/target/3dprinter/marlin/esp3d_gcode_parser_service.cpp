@@ -114,7 +114,7 @@ bool ESP3DGCodeParserService::hasMultiLineReport(const char* data) {
 }
 
 bool ESP3DGCodeParserService::processCommand(const char* data) {
-  esp3d_log("processing Command %s", data);
+  esp3d_log_d("processing Command %s", data);
   if (data != nullptr && strlen(data) > 0) {
     // is temperature
     if (strstr(data, "T:") != nullptr) {
@@ -125,7 +125,7 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
       char* ptrt1 = strstr(data, "T1:");
       char* ptrb = strstr(data, "B:");
       if (ptrt0 && ptrt1) {  // dual extruder
-        esp3d_log("Temperature dual extruders");
+        esp3d_log_d("Temperature dual extruders");
         ptrt0 += 3;
         ptrt1 += 3;
         // Extruder 0 current temperature
@@ -148,7 +148,7 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
                                         ptrt0);
         esp3dTftValues.set_string_value(
             ESP3DValuesIndex::ext_0_target_temperature, ptrtt);
-        esp3d_log("T0: %s / %s", ptrt0, ptrtt);
+        esp3d_log_d("T0: %s / %s", ptrt0, ptrtt);
 
         // Extruder 1 current temperature
         ptre = strstr(ptrt1, " /");
@@ -178,9 +178,9 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
                                         ptrt1);
         esp3dTftValues.set_string_value(
             ESP3DValuesIndex::ext_1_target_temperature, ptrtt);
-        esp3d_log("T1: %s / %s", ptrt1, ptrtt);
+        esp3d_log_d("T1: %s / %s", ptrt1, ptrtt);
       } else {  // single extruder
-        esp3d_log("Temperature single extruder");
+        esp3d_log_d("Temperature single extruder");
         esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_1_temperature,
                                         "#");
         esp3dTftValues.set_string_value(
@@ -207,10 +207,10 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
         esp3dTftValues.set_string_value(
             ESP3DValuesIndex::ext_0_target_temperature, ptrtt);
 
-        esp3d_log("T: %s / %s", ptrt, ptrtt);
+        esp3d_log_d("T: %s / %s", ptrt, ptrtt);
       }
       if (ptrb) {  // bed
-        esp3d_log("Temperature bed");
+        esp3d_log_d("Temperature bed");
         ptrb += 2;
         // Bed current temperature
         char* ptre = strstr(ptrb, " /");
@@ -232,9 +232,9 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
                                         ptrb);
         esp3dTftValues.set_string_value(
             ESP3DValuesIndex::bed_target_temperature, ptrtt);
-        esp3d_log("Bed: %s / %s", ptrb, ptrtt);
+        esp3d_log_d("Bed: %s / %s", ptrb, ptrtt);
       } else {
-        esp3d_log("No Temperature bed");
+        esp3d_log_d("No Temperature bed");
         esp3dTftValues.set_string_value(ESP3DValuesIndex::bed_temperature, "#");
         esp3dTftValues.set_string_value(
             ESP3DValuesIndex::bed_target_temperature, "#");
@@ -247,7 +247,7 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
     } else if (strstr(data, "X:") != nullptr &&
                strstr(data, "Bed X:") == nullptr) {
       // X:0.00 Y:0.00 Z:0.00 E:0.00 Count X:0 Y:0 Z:0
-      esp3d_log("Positions");
+      esp3d_log_d("Positions");
       char* ptrx = strstr(data, "X:");
       char* ptry = strstr(data, "Y:");
       char* ptrz = strstr(data, "Z:");
@@ -312,11 +312,11 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
           }
         }
         // is there an index ?
-        esp3d_log("Check index in %s", ptr106);
+        esp3d_log_d("Check index in %s", ptr106);
         uint8_t index = 0;
         char* ptrI = strstr(ptr106, "P");
         if (ptrI) {
-          esp3d_log("Index found %s", ptrI);
+          esp3d_log_d("Index found %s", ptrI);
           if (ptrI[1] == '1') {
             index = 1;
           }
@@ -330,7 +330,7 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
 
         fanSpeed = esp3d_string::set_precision(std::to_string(fspeed), 0);
         // set fan speed according index
-        esp3d_log("Fan speed 106, index: %d, %s", index, fanSpeed.c_str());
+        esp3d_log_d("Fan speed 106, index: %d, %s", index, fanSpeed.c_str());
         if (index == 0) {
           esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_0_fan,
                                           fanSpeed.c_str());
@@ -349,7 +349,7 @@ bool ESP3DGCodeParserService::processCommand(const char* data) {
             index = 1;
           }
         }
-        esp3d_log("Fan speed 107, index: %d", index);
+        esp3d_log_d("Fan speed 107, index: %d", index);
         // set fan speed to 0 according index
         if (index == 0) {
           esp3dTftValues.set_string_value(ESP3DValuesIndex::ext_0_fan, "0");
@@ -409,8 +409,8 @@ ESP3DDataType ESP3DGCodeParserService::getType(const char* data) {
 
   // is it ack ?
   if (((ptr[0] == 'o' && ptr[1] == 'k') &&
-      (ptr[2] == '\n' || ptr[2] == '\r' || ptr[2] == ' ' || ptr[2] == 0x0)) || strstr(ptr, "ok") != nullptr) {
-    esp3d_log("Ack found in %s", ptr);
+      (ptr[2] == '\n' || ptr[2] == '\r' || ptr[2] == ' ' || ptr[2] == 0x0)) || strstr(ptr, "ok") != nullptr  || strstr(ptr, "o`") != nullptr  || strstr(ptr, "`k") != nullptr) {
+    esp3d_log_d("Ack found in %s", ptr);
     return ESP3DDataType::ack;
   }
 
@@ -462,7 +462,7 @@ ESP3DDataType ESP3DGCodeParserService::getType(const char* data) {
       strstr(ptr, "heating") == ptr || strstr(ptr, "echo:busy") == ptr ||
       strstr(ptr, "echo:processing") == ptr ||
       strstr(ptr, "echo:heating") == ptr) {
-    esp3d_log("Status: %s", esp3d_string::str_trim(ptr));
+    esp3d_log_d("Status: %s", esp3d_string::str_trim(ptr));
     return ESP3DDataType::status;
   }
   /*
