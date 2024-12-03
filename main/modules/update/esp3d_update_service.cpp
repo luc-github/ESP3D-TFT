@@ -23,6 +23,7 @@
 
 #include "esp3d_client.h"
 #include "esp3d_log.h"
+#include "esp3d_hal.h"
 #include "esp3d_string.h"
 #include "esp_ota_ops.h"
 #include "esp_system.h"
@@ -379,10 +380,10 @@ bool ESP3DUpdateService::begin() {
 #endif  // ESP3D_SD_CARD_FEATURE
   if (restart) {
     esp3d_log("Restarting  firmware");
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    esp3d_hal::wait(1000);
     esp_restart();
     while (1) {
-      vTaskDelay(pdMS_TO_TICKS(10));
+      esp3d_hal::wait(10);
     }
   }
   return true;

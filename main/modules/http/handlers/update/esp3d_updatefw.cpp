@@ -17,6 +17,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "esp3d_log.h"
+#include "esp3d_hal.h"
 #include "esp3d_string.h"
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
@@ -29,7 +30,7 @@ esp_err_t ESP3DHttpService::updatefw_handler(httpd_req_t *req) {
   // Send httpd header
   httpd_resp_set_http_hdr(req);
   httpd_resp_sendstr(req, "Update firmware done restarting");
-  vTaskDelay(pdMS_TO_TICKS(1000));
+  esp3d_hal::wait(1000);
   esp_restart();
   return ESP_OK;
 }

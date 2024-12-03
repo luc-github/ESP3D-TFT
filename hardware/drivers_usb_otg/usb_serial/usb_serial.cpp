@@ -103,6 +103,7 @@ esp_err_t usb_serial_init() {
   const usb_host_config_t host_config = {
       .skip_phy_setup = true,
       .intr_flags = ESP_INTR_FLAG_LEVEL1,
+      .enum_filter_cb = NULL,
   };
   // Install USB Host driver. Should only be called once in entire application
   esp3d_log("Installing USB Host");

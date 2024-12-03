@@ -43,7 +43,7 @@ static void esp3d_rendering_rx_task(void *pvParameter) {
 
   while (1) {
     /* Delay */
-    vTaskDelay(pdMS_TO_TICKS(10));
+    esp3d_hal::wait(10);
     renderingClient.handle();
   }
   /* A task should NEVER return */
@@ -183,7 +183,7 @@ void ESP3DRenderingClient::end() {
     _started = false;
     esp3d_log("Clearing queue Rx messages");
     clearRxQueue();
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    esp3d_hal::wait(1000);
     if (pthread_mutex_destroy(&_rx_mutex) != 0) {
       esp3d_log_w("Mutex destruction for rx failed");
     }

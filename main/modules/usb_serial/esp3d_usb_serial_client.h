@@ -65,7 +65,7 @@ class ESP3DUsbSerialClient : public ESP3DClient {
   pthread_mutex_t _tx_mutex;
   pthread_mutex_t _rx_mutex;
   SemaphoreHandle_t _device_disconnected_sem;
-  std::unique_ptr<CdcAcmDevice> _vcp;
+  std::unique_ptr<CdcAcmDevice> _vcp_ptr;
 };
 
 extern ESP3DUsbSerialClient usbSerialClient;

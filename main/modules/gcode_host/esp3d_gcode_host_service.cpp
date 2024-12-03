@@ -81,10 +81,11 @@ ESP3DGCodeHostService gcodeHostService;
 static void esp3d_gcode_host_task(void* pvParameter) {
   (void)pvParameter;
   gcodeHostService.updateScripts();
+  esp3d_hal::wait(100);
   while (1) {
     /* Delay */
-    vTaskDelay(pdMS_TO_TICKS(10));
-    gcodeHostService.handle();
+    gcodeHostService.handle(); 
+    esp3d_hal::wait(10);
   }
   vTaskDelete(NULL);
 }
@@ -1762,7 +1763,7 @@ void ESP3DGCodeHostService::end() {
     clearRxQueue();
     esp3d_log("Clearing queue Tx messages");
     clearTxQueue();
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    esp3d_hal::wait(1000);
     while (!_scripts.empty()) {
       _popFrontGCodeStream(false);
     }

@@ -32,6 +32,7 @@
 #include "esp3d_client_types.h"
 #include "esp3d_json_settings.h"
 #include "esp3d_log.h"
+#include "esp3d_hal.h"
 #include "esp3d_lvgl.h"
 #include "esp3d_settings.h"
 #include "esp3d_string.h"
@@ -158,7 +159,7 @@ void refresh_settings_list_cb(lv_timer_t *timer) {
  */
 static void bgLoadJSONSettingsTask(void *pvParameter) {
   (void)pvParameter;
-  vTaskDelay(pdMS_TO_TICKS(100));
+  esp3d_hal::wait(100);
   std::string value =
       esp3dTftJsonSettings.readString("settings", "filesfilter");
   if (extensions_label) {
@@ -192,7 +193,7 @@ static void bgLoadJSONSettingsTask(void *pvParameter) {
  * @param pvParameter A pointer to the `ESP3DSettingsData` object.
  */
 static void bgSaveJSONSettingsTask(void *pvParameter) {
-  vTaskDelay(pdMS_TO_TICKS(100));
+  esp3d_hal::wait(100);
   ESP3DSettingsData *data = (ESP3DSettingsData *)pvParameter;
   esp3d_log("Got value %s in task", data->value.c_str());
   // do the change

@@ -230,7 +230,7 @@ static void esp3d_socket_rx_task(void *pvParameter) {
       esp3dSocketServer.getClient();
       esp3dSocketServer.readSockets();
       esp3dSocketServer.handle();
-      vTaskDelay(pdMS_TO_TICKS(10));
+      esp3d_hal::wait(10);
     }
 
   } else {
@@ -528,7 +528,7 @@ void ESP3DSocketServer::end() {
   if (_started) {
     esp3d_log("End socket server");
     _isRunning = false;
-    vTaskDelay(pdMS_TO_TICKS(500));
+    esp3d_hal::wait(500);
     flush();
     closeAllClients();
     _started = false;
@@ -536,7 +536,7 @@ void ESP3DSocketServer::end() {
     clearRxQueue();
     esp3d_log("Clearing queue Tx messages");
     clearTxQueue();
-    vTaskDelay(pdMS_TO_TICKS(500));
+    esp3d_hal::wait(500);
     if (pthread_mutex_destroy(&_tx_mutex) != 0) {
       esp3d_log_w("Mutex destruction for tx failed");
     }
