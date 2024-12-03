@@ -122,9 +122,9 @@ class ESP3DGCodeHostService : public ESP3DClient {
 
   TaskHandle_t _xHandle = NULL;
   bool _started = false;
-  const UBaseType_t _xPauseNotifyIndex = 1;
-  const UBaseType_t _xResumeNotifyIndex = 2;
-  const UBaseType_t _xAbortNotifyIndex = 3;
+  const UBaseType_t _xPauseNotifyIndex = 0;
+  const UBaseType_t _xResumeNotifyIndex = 1;
+  const UBaseType_t _xAbortNotifyIndex = 2;
 
   ESP3DClientType _outputClient = ESP3DClientType::no_client;
   bool _awaitingAck = false;

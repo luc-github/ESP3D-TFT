@@ -1229,7 +1229,7 @@ void ESP3DGCodeHostService::_handle_notifications() {
       }
     }
     if (ulTaskNotifyTakeIndexed(_xAbortNotifyIndex, pdTRUE, 0)) {
-      esp3d_log("Received abort notification");
+      esp3d_log_d("Received abort notification");
       if (state != ESP3DGcodeStreamState::undefined) {
         if (!_setStreamRequestState(ESP3DGcodeStreamState::abort)) {
           esp3d_log_e("Failed to abort stream");
@@ -1303,7 +1303,7 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       // check if we have a requested command to process before reading the
       // next
       if (_requested_state != (ESP3DGcodeStreamState::undefined)) {
-        if (_requested_state == ESP3DGcodeStreamState::pause) {
+        if (_requested_state == ESP3DGcodeStreamState::pause || _requested_state == ESP3DGcodeStreamState::abort) {
           // pause the stream
           _setStreamState(_requested_state);
         } else {
@@ -1592,11 +1592,15 @@ void ESP3DGCodeHostService::_handle_stream_states() {
       /////////////////////////////////////////////////////////
       // only valid for main stream
     case ESP3DGcodeStreamState::abort:
+      esp3d_log_d("Received abort notification");
       if (!_setMainStreamState(ESP3DGcodeStreamState::end)) {
         esp3d_log_e("Abort only valid for main stream");
         break;
       }
+      esp3d_log_d("Aborting current stream");
+      
       if (_stop_script.length() > 0) {
+        esp3d_log_d("Adding stop script");
         _add_stream(_stop_script.c_str(), _current_main_stream_ptr->auth_type,
                     true);
       }
