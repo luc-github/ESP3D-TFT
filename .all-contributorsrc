@@ -34,6 +34,16 @@
         "code",
         "ideas"
       ]
+    },
+    {
+      "login": "makerbase-mks",
+      "name": "makerbase",
+      "avatar_url": "https://avatars.githubusercontent.com/u/12979070?v=4",
+      "profile": "https://discord.gg/yNwksQvZmQ",
+      "contributions": [
+        "financial",
+        "platform"
+      ]
     }
   ],
   "contributorsPerLine": 7,
