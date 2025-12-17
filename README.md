@@ -3,8 +3,12 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-[![Development Version](https://img.shields.io/badge/Dev-v1.0-yellow?style=plastic) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3D-TFT/main?style=plastic)](https://github.com/luc-github/ESP3D-TFT/tree/main) [![github-ci](https://github.com/luc-github/ESP3D-TFT/workflows/build-ci/badge.svg)](https://github.com/luc-github/ESP3D-TFT/actions/workflows/build-ci.yml) [![Development  Version](https://img.shields.io/badge/Dev-v3.0-yellow?style=plastic&label=WebUI&logo=Preact)](https://github.com/luc-github/ESP3D-WEBUI/tree/3.0) [![IDF 5.1.5](https://img.shields.io/badge/IDF-v5.1.5-blue?style=plastic&label=IDF&logo=espressif)](https://github.com/espressif/esp-idf)
-![ESP3D-TFT](https://img.shields.io/badge/dynamic/json?label=ESP3D-TFT&query=$.version&url=https://raw.githubusercontent.com/luc-github/ESP3D-TFT/refs/heads/main/info.json)
+![ESP3D-TFT](https://img.shields.io/badge/dynamic/json?label=Development&query=$.devt&color=green&style=plastic&url=https://raw.githubusercontent.com/luc-github/ESP3D-TFT/refs/heads/main/info.json)
+![GitHub last commit (branch)](https://img.shields.io/github/last-commit/luc-github/ESP3D-TFT/main?style=plastic)
+[![github-ci](https://github.com/luc-github/ESP3D-TFT/workflows/build-ci/badge.svg)](https://github.com/luc-github/ESP3D-TFT/actions/workflows/build-ci.yml) 
+[![Development  Version](https://img.shields.io/badge/Dev-v3.0-yellow?style=plastic&label=WebUI&logo=Preact)](https://github.com/luc-github/ESP3D-WEBUI/tree/3.0) 
+[![IDF 5.1.5](https://img.shields.io/badge/IDF-v5.1.5-blue?style=plastic&label=IDF&logo=espressif)](https://github.com/espressif/esp-idf)
+
 
 > [!WARNING]
 >### Disclaimer
